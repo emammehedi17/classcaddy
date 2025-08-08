@@ -155,8 +155,6 @@ document.addEventListener('DOMContentLoaded', function () {
         let hidePlayerTimeout;
         let isPlaying = false;
 
-        // --- KEY CHANGE: The hardcoded playlist has been removed ---
-
         function formatTime(seconds) {
             if (isNaN(seconds)) return "0:00";
             const minutes = Math.floor(seconds / 60);
@@ -192,7 +190,10 @@ document.addEventListener('DOMContentLoaded', function () {
             isPlaying = true;
             playPauseIcon.classList.remove('fa-play');
             playPauseIcon.classList.add('fa-pause');
-            hidePlayerTimeout = setTimeout(() => musicPlayer.classList.add('player-hidden'), 2000);
+            // Only set timeout to hide if on a desktop-sized screen
+            if (window.innerWidth > 1024) {
+                hidePlayerTimeout = setTimeout(() => musicPlayer.classList.add('player-hidden'), 2000);
+            }
         }
 
         function pauseAudio() {
@@ -206,7 +207,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         function togglePlayPause() { isPlaying ? pauseAudio() : playAudio(); }
         
-        // --- KEY CHANGE: Prev/Next buttons are now disabled as there is no playlist ---
         if(prevBtn) prevBtn.style.display = 'none';
         if(nextBtn) nextBtn.style.display = 'none';
 
@@ -231,19 +231,24 @@ document.addEventListener('DOMContentLoaded', function () {
         audio.addEventListener('timeupdate', updateProgress);
         progressBarContainer.addEventListener('click', setProgress);
         
-        // When the song ends, it just resets to the beginning
         audio.addEventListener('ended', () => {
             pauseAudio();
-            audio.currentTime = 0; // Reset the track
+            audio.currentTime = 0;
         });
 
-        playerHoverArea.addEventListener('mouseenter', () => {
-            clearTimeout(hidePlayerTimeout);
-            musicPlayer.classList.remove('player-hidden');
-        });
-        musicPlayer.addEventListener('mouseleave', () => {
-            if (isPlaying) { hidePlayerTimeout = setTimeout(() => musicPlayer.classList.add('player-hidden'), 500); }
-        });
+        // --- KEY CHANGE: Auto-hide logic is now conditional ---
+        // Only add hover effects on desktop-sized screens
+        if (window.innerWidth > 1024) {
+            playerHoverArea.addEventListener('mouseenter', () => {
+                clearTimeout(hidePlayerTimeout);
+                musicPlayer.classList.remove('player-hidden');
+            });
+            musicPlayer.addEventListener('mouseleave', () => {
+                if (isPlaying) { 
+                    hidePlayerTimeout = setTimeout(() => musicPlayer.classList.add('player-hidden'), 500); 
+                }
+            });
+        }
     }
 
     /* ==========================================================================
@@ -258,31 +263,28 @@ document.addEventListener('DOMContentLoaded', function () {
             lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
         });
     }
+
+    /* ==========================================================================
+     * 6. Mobile Navigation Logic
+     * ========================================================================== */
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileAcademicButton = document.getElementById('mobile-academic-button');
+    const mobileAcademicMenu = document.getElementById('mobile-academic-menu');
+
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+
+    if (mobileAcademicButton && mobileAcademicMenu) {
+        mobileAcademicButton.addEventListener('click', () => {
+            mobileAcademicMenu.classList.toggle('hidden');
+            const arrowIcon = mobileAcademicButton.querySelector('svg');
+            if (arrowIcon) {
+                arrowIcon.classList.toggle('rotate-180');
+            }
+        });
+    }
 });
-
-
-/* ==========================================================================
- * 6. Mobile Navigation Logic
- * ========================================================================== */
-const mobileMenuButton = document.getElementById('mobile-menu-button');
-const mobileMenu = document.getElementById('mobile-menu');
-const mobileAcademicButton = document.getElementById('mobile-academic-button');
-const mobileAcademicMenu = document.getElementById('mobile-academic-menu');
-
-// Toggles the main mobile menu
-if (mobileMenuButton && mobileMenu) {
-    mobileMenuButton.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-    });
-}
-
-// Toggles the nested "Academic" sub-menu
-if (mobileAcademicButton && mobileAcademicMenu) {
-    mobileAcademicButton.addEventListener('click', () => {
-        mobileAcademicMenu.classList.toggle('hidden');
-        const arrowIcon = mobileAcademicButton.querySelector('svg');
-        if (arrowIcon) {
-            arrowIcon.classList.toggle('rotate-180');
-        }
-    });
-}

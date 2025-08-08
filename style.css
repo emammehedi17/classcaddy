@@ -595,3 +595,27 @@ body.is-fullscreen footer {
 #mobile-academic-button svg.rotate-180 {
     transform: rotate(180deg);
 }
+
+
+/* ==========================================================================
+   13. Mobile View Corrections
+   ========================================================================== */
+
+/* This media query targets screens smaller than 768px (tablets and phones) */
+@media (max-width: 768px) {
+    .poem-page {
+        /* Override the fixed 210mm width on mobile */
+        width: 100%; 
+        min-height: 0; /* Allow height to be determined by content */
+        padding: 15pt; /* Reduce padding slightly for small screens */
+        margin: 15px 0; /* Adjust margin for mobile */
+    }
+
+    .poem-page-content-wrapper {
+        padding: 10pt; /* Reduce inner padding */
+    }
+
+    .watermark {
+        font-size: 40pt; /* Make watermark smaller on mobile */
+    }
+}
