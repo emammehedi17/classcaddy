@@ -623,3 +623,11 @@ body.is-fullscreen footer {
         font-size: 16pt !important; /* You can change 16pt to a smaller value if you like */
     }
 }
+
+.styled-table td.bangla {
+    font-size: 12pt; /* Reduced from the default 14pt. Adjust as needed. */
+}
+
+.styled-table th.bangla {
+    width: 40%;
+}
