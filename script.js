@@ -138,7 +138,33 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /* ==========================================================================
-     * 4. Music Player Logic (with Auto-Hide)
+     * 4. Hide "Continued" Titles on Poem Pages
+     * ========================================================================== */
+    const sectionTitles = document.querySelectorAll('.section-title');
+    let firstWordByWordFound = false;
+    let firstLineByLineFound = false;
+
+    sectionTitles.forEach(title => {
+        const titleText = title.textContent.toLowerCase();
+        
+        if (titleText.includes('word-by-word')) {
+            if (firstWordByWordFound) {
+                title.style.display = 'none';
+            }
+            firstWordByWordFound = true;
+        }
+        
+        if (titleText.includes('line-by-line')) {
+            if (firstLineByLineFound) {
+                title.style.display = 'none';
+            }
+            firstLineByLineFound = true;
+        }
+    });
+
+
+    /* ==========================================================================
+     * 5. Music Player Logic (with Auto-Hide)
      * ========================================================================== */
     if (musicPlayer) {
         const audio = document.getElementById('audio-source');
@@ -190,7 +216,6 @@ document.addEventListener('DOMContentLoaded', function () {
             isPlaying = true;
             playPauseIcon.classList.remove('fa-play');
             playPauseIcon.classList.add('fa-pause');
-            // Only set timeout to hide if on a desktop-sized screen
             if (window.innerWidth > 1024) {
                 hidePlayerTimeout = setTimeout(() => musicPlayer.classList.add('player-hidden'), 2000);
             }
@@ -236,8 +261,6 @@ document.addEventListener('DOMContentLoaded', function () {
             audio.currentTime = 0;
         });
 
-        // --- KEY CHANGE: Auto-hide logic is now conditional ---
-        // Only add hover effects on desktop-sized screens
         if (window.innerWidth > 1024) {
             playerHoverArea.addEventListener('mouseenter', () => {
                 clearTimeout(hidePlayerTimeout);
@@ -252,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /* ==========================================================================
-     * 5. Header Scroll Effect Logic
+     * 6. Header Scroll Effect Logic
      * ========================================================================== */
     const header = document.querySelector('header');
     if (header) {
@@ -265,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /* ==========================================================================
-     * 6. Mobile Navigation Logic
+     * 7. Mobile Navigation Logic
      * ========================================================================== */
     const mobileMenuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
