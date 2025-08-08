@@ -1,0 +1,592 @@
+/* ==========================================================================
+   1. General & Global Styles
+   ========================================================================== */
+
+/* Apply Poppins font and dark theme to all pages */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #111827; /* Dark background */
+    color: white;
+    overflow-x: hidden;
+}
+
+/* Static background gradients */
+.bg-gradient-purple {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 24rem;
+    height: 24rem;
+    background-color: rgba(168, 85, 247, 0.125);
+    border-radius: 9999px;
+    filter: blur(3rem);
+    opacity: 0.7;
+}
+
+.bg-gradient-emerald {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 24rem;
+    height: 24rem;
+    background-color: rgba(16, 185, 129, 0.125);
+    border-radius: 9999px;
+    filter: blur(3rem);
+    opacity: 0.7;
+}
+
+.bg-gradient-red {
+    position: absolute;
+    top: 25%;
+    right: 25%;
+    width: 18rem;
+    height: 18rem;
+    background-color: rgba(239, 68, 68, 0.0625);
+    border-radius: 9999px;
+    filter: blur(3rem);
+    opacity: 0.7;
+}
+
+
+/* ==========================================================================
+   2. Header & Navigation Styles
+   ========================================================================== */
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background-color: rgba(17, 24, 39, 0.8);
+    backdrop-filter: blur(4px);
+    border-bottom: 1px solid #374151; /* gray-700 */
+}
+
+/* Dropdown menu styles */
+.dropdown-menu {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.dropdown-menu.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+/* ==========================================================================
+   3. Breadcrumbs & Page Navigation
+   ========================================================================== */
+
+.breadcrumbs-container {
+    position: relative;
+    z-index: 10;
+    padding-top: 6rem;
+    padding-bottom: 1.5rem;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+.breadcrumbs {
+    font-size: 0.875rem;
+    color: #9ca3af; /* gray-400 */
+}
+
+.breadcrumbs a:hover {
+    color: #10b981; /* emerald-500 */
+}
+
+
+/* ==========================================================================
+   4. Main Page Component Styles (Index, Academic, Course)
+   ========================================================================== */
+
+/* Glow effect for login/signup forms and announcement cards */
+.login-glow-card {
+    position: relative;
+    background-color: rgba(31, 41, 55, 0.5);
+    backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.25);
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+/* Container for the animated glow border */
+.login-form-container {
+    position: relative;
+}
+
+.login-glow-container {
+    position: absolute;
+    inset: 0;
+    border-radius: 1rem;
+    overflow: hidden;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.login-glow-container .glow {
+    position: absolute;
+    display: block;
+}
+
+/* Individual glow lines */
+.login-glow-container .glow:nth-child(1) { top: 0; left: -100%; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, #10b981, #10b981, transparent); }
+.login-glow-container .glow:nth-child(2) { top: -100%; right: 0; width: 3px; height: 100%; background: linear-gradient(180deg, transparent, #10b981, #10b981, transparent); }
+.login-glow-container .glow:nth-child(3) { bottom: 0; right: -100%; width: 100%; height: 3px; background: linear-gradient(270deg, transparent, #10b981, #10b981, transparent); }
+.login-glow-container .glow:nth-child(4) { bottom: -100%; left: 0; width: 3px; height: 100%; background: linear-gradient(0deg, transparent, #10b981, #10b981, transparent); }
+
+/* Active state for glow animation */
+.login-glow-active .glow:nth-child(1) { animation: animate1 2s linear infinite; }
+.login-glow-active .glow:nth-child(2) { animation: animate2 2s linear infinite; animation-delay: 0.5s; }
+.login-glow-active .glow:nth-child(3) { animation: animate3 2s linear infinite; animation-delay: 1s; }
+.login-glow-active .glow:nth-child(4) { animation: animate4 2s linear infinite; animation-delay: 1.5s; }
+.login-glow-active { box-shadow: 0 0 20px rgba(16, 185, 129, 0.6); }
+
+/* Glow effect for course buttons */
+.course-button-glow {
+    position: relative;
+    overflow: hidden;
+}
+.course-button-glow span.glow {
+    position: absolute;
+    display: block;
+}
+
+.course-button-glow span.glow:nth-child(1) { top: 0; left: -100%; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, #10b981); }
+.course-button-glow span.glow:nth-child(2) { top: -100%; right: 0; width: 2px; height: 100%; background: linear-gradient(180deg, transparent, #10b981); }
+.course-button-glow span.glow:nth-child(3) { bottom: 0; right: -100%; width: 100%; height: 2px; background: linear-gradient(270deg, transparent, #10b981); }
+.course-button-glow span.glow:nth-child(4) { bottom: -100%; left: 0; width: 2px; height: 100%; background: linear-gradient(360deg, transparent, #10b981); }
+
+/* Animate course button glow on hover */
+.course-button-glow:hover span.glow:nth-child(1) { animation: animate1 1s linear infinite; }
+.course-button-glow:hover span.glow:nth-child(2) { animation: animate2 1s linear infinite; animation-delay: 0.25s; }
+.course-button-glow:hover span.glow:nth-child(3) { animation: animate3 1s linear infinite; animation-delay: 0.5s; }
+.course-button-glow:hover span.glow:nth-child(4) { animation: animate4 1s linear infinite; animation-delay: 0.75s; }
+
+/* Keyframe animations for glow effects */
+@keyframes animate1 { 0% { left: -100%; } 50%, 100% { left: 100%; } }
+@keyframes animate2 { 0% { top: -100%; } 50%, 100% { top: 100%; } }
+@keyframes animate3 { 0% { right: -100%; } 50%, 100% { right: 100%; } }
+@keyframes animate4 { 0% { bottom: -100%; } 50%, 100% { bottom: 100%; } }
+
+
+/* ==========================================================================
+   5. Poem Page Specific Styles
+   ========================================================================== */
+
+.poem-page {
+    background: white;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 25px auto;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    padding: 28pt;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.poem-page-content-wrapper {
+    border: 3pt double #006600;
+    padding: 15pt;
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.poem-content-body {
+    padding-top: 1.5em;
+    padding-bottom: 1.5em;
+    flex-grow: 1;
+}
+
+.poem-header {
+    position: absolute;
+    top: 14pt;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10pt;
+    color: #000;
+    opacity: 0.5;
+    font-family: 'Times New Roman', Times, serif;
+    z-index: 10;
+    user-select: none;
+}
+
+.poem-page:first-of-type .poem-header {
+    display: none;
+}
+
+.page-number {
+    position: absolute;
+    bottom: 14pt;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11pt;
+    font-family: 'Times New Roman', Times, serif;
+    z-index: 10;
+    user-select: none;
+    color: #000;
+}
+
+.watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 70pt;
+    color: #000000;
+    opacity: 0.08;
+    font-weight: bold;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 1;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.poem-title {
+    font-size: 36pt;
+    color: #004466;
+    text-align: center;
+    margin-bottom: 15px;
+    font-family: 'Noto Naskh Arabic', serif;
+}
+
+.section-title {
+    font-size: 20pt;
+    color: #005683;
+    border-bottom: 2px solid #005683;
+    padding-bottom: 5px;
+    margin-top: 25px;
+    margin-bottom: 20px;
+    font-family: 'Times New Roman', Times, serif;
+    text-align: center;
+}
+
+.poem-text, .poem-list {
+    text-align: justify;
+    font-size: 14pt;
+    line-height: 1.8;
+    font-family: 'Times New Roman', Times, serif;
+    color: #333;
+}
+
+.bangla {
+    font-family: 'Kalpurush', sans-serif;
+}
+
+.styled-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+    font-size: 12pt;
+    border: 1pt solid #A8D08D;
+}
+
+.styled-table th, .styled-table td {
+    border: 1px solid #A8D08D;
+    padding: 8px 12px;
+    vertical-align: middle;
+}
+
+.styled-table th {
+    background-color: #70AD47;
+    color: white;
+    font-weight: bold;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14pt;
+    text-align: center;
+}
+
+.styled-table tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+.styled-table tr:nth-child(odd):not(:first-child) {
+     background-color: #E2EFD9;
+}
+
+.arabic-cell {
+    font-family: 'Noto Naskh Arabic', serif;
+    font-size: 16pt;
+    direction: rtl;
+    text-align: right;
+    padding-right: 12px;
+    unicode-bidi: bidi-override;
+    letter-spacing: normal;
+    word-spacing: normal;
+}
+
+.styled-table td {
+    text-align: left;
+    font-size: 14pt;
+    color: #333;
+}
+
+.styled-table td.arabic-cell {
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+
+/* ==========================================================================
+   6. Common Components (Go To Top, Footer, Feedback)
+   ========================================================================== */
+#action-buttons-container {
+    position: fixed;
+    bottom: 7rem; /* MOVED UP: Increased from 2rem to avoid player */
+    right: 2rem;
+    z-index: 50;
+    display: none;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-end;
+}
+
+#action-buttons-container.visible {
+    display: flex;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    background-color: #10b981;
+    color: white;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 1.2rem;
+}
+
+.action-btn:hover {
+    background-color: #059669;
+    transform: translateY(-2px);
+}
+
+
+/* ==========================================================================
+   7. Print Styles
+   ========================================================================== */
+
+@media print {
+    body {
+        background: #fff;
+    }
+    .arabic-cell {
+        text-align: right !important;
+        direction: rtl !important;
+    }
+    .go-to-top-btn, header, .breadcrumbs-container, .feedback-section, footer, #music-player, #player-hover-area {
+        display: none !important;
+    }
+    .poem-page {
+        page-break-after: always;
+        margin: 0;
+        box-shadow: none;
+    }
+    .main-content {
+        padding-top: 0;
+    }
+}
+
+
+/* ==========================================================================
+   8. Custom Course Button Styles
+   ========================================================================== */
+
+.open-btn {
+    display: inline-block;
+    background-color: #10b981;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 1rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.course-button-glow:hover .open-btn {
+    background-color: #059669;
+}
+
+.course-button-glow:active .open-btn {
+    background-color: #047857;
+    transform: scale(0.95);
+}
+
+/* ==========================================================================
+   9. Arabic Font Styles
+   ========================================================================== */
+
+.arabic-font {
+    font-family: 'Microsoft Uighur', 'Noto Naskh Arabic', serif;
+    font-size: 1.75rem !important;
+    font-weight: normal !important;
+}
+
+.poem-title {
+    font-family: 'Microsoft Uighur', 'Noto Naskh Arabic', serif;
+    font-size: 42pt !important;
+    font-weight: normal !important;
+}
+
+.arabic-cell {
+    font-family: 'Microsoft Uighur', 'Noto Naskh Arabic', serif;
+    font-size: 20pt !important;
+    font-weight: normal !important;
+}
+
+/* ==========================================================================
+   10. Music Player Styles
+   ========================================================================== */
+
+#music-player {
+    transition: transform 0.4s ease-in-out, visibility 0.4s, opacity 0.4s ease-in-out;
+    transform: translateY(100%);
+}
+
+#music-player.visible {
+    visibility: visible;
+    transform: translateY(0);
+}
+
+#progress-bar {
+	width: 0%;
+	transition: width 0.1s linear;
+}
+
+/* ==========================================================================
+   11. Header Scroll Effect
+   ========================================================================== */
+header.header-hidden {
+    transform: translateY(-100%);
+    transition: transform 0.4s ease-in-out;
+}
+
+/* ==========================================================================
+   12. Music Player Auto-Hide Effect
+   ========================================================================== */
+#music-player.player-hidden {
+    opacity: 0;
+    transform: translateY(100%);
+    pointer-events: none;
+}
+
+#player-hover-area {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 25px;
+    z-index: 45;
+}
+
+#progress-bar-container {
+    position: relative;
+}
+
+#progress-tooltip {
+    position: absolute;
+    bottom: 1rem;
+    transform: translateX(-50%);
+    background-color: #1f2937;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+
+#progress-bar-container:hover #progress-tooltip.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* --- Styles for Advanced Custom Zoom --- */
+
+/* The container for the zoom controls. Hidden by default. */
+#zoom-controls {
+    display: none; /* Hidden by default */
+    align-items: center;
+    background-color: #1f2937; /* bg-gray-800 */
+    border: 1px solid #4b5563;  /* border-gray-600 */
+    border-radius: 0.5rem;      /* rounded-lg */
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* When the body has the 'is-fullscreen' class, show the zoom controls */
+body.is-fullscreen #zoom-controls {
+    display: flex;
+}
+
+/* Style for the editable percentage input field */
+#zoom-percentage {
+    width: 60px;
+    background-color: transparent;
+    border: none;
+    border-left: 1px solid #4b5563;
+    border-right: 1px solid #4b5563;
+    color: white;
+    text-align: center;
+    font-size: 1rem;
+    padding: 0.5rem 0;
+    outline: none;
+}
+
+/* Style for the + and - buttons */
+.zoom-btn {
+    background-color: transparent;
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.2s;
+}
+
+.zoom-btn:hover {
+    background-color: #374151; /* bg-gray-700 */
+}
+
+/* Prepare the main content area for scaling */
+.main-content {
+    transform-origin: top center;
+    transition: transform 0.2s ease-out;
+}
+
+/* This is the new rule for the bottom row container */
+.bottom-row-controls {
+    display: flex;
+    flex-direction: row; /* Lays out items left-to-right */
+    align-items: center;
+    gap: 0.75rem;
+}
+
+
+/* ADD THIS NEW RULE TO THE END OF YOUR CSS FILE */
+
+/* Hide feedback and footer when in fullscreen to prevent overlap when zooming */
+body.is-fullscreen .feedback-section,
+body.is-fullscreen footer {
+    display: none;
+}

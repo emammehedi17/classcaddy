@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Caddy - Course 405</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+	<link rel="icon" href="https://eco.du.ac.bd//assets/images/fab_icon.ico" type="image/x-icon">
+</head>
+<body class="bg-gray-900 text-white">
+
+<!-- =================== HEADER & BREADCRUMBS START =================== -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-sm border-b border-gray-700">
+    <div class="container mx-auto px-6 py-3">
+        <nav class="flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
+                    <img src="images/profile.jpg" alt="Profile" class="h-12 w-12 rounded-full border-2 border-emerald-400 object-cover">
+                </a>
+                <a href="index.html">
+                    <h1 class="text-2xl font-bold">Class Caddy</h1>
+                </a>
+            </div>
+
+            <div class="hidden md:flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full p-1">
+                <a href="index.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Home</a>
+                
+                <div id="academic-dropdown" class="relative">
+                    <button id="academic-button" class="px-6 py-2 text-sm font-semibold bg-emerald-500 rounded-full transition-colors flex items-center">
+                        Academic
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="academic-menu" class="dropdown-menu absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
+                        <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 405</a>
+                        <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 406</a>
+                        <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 407</a>
+                        <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 408 (B)</a>
+                    </div>
+                </div>
+
+                <a href="shop.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Shop</a>
+                <a href="about.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">About</a>
+                <a href="contact.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Contact</a>
+            </div>
+
+            <div class="hidden md:flex items-center gap-4">
+                <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
+                    <img src="images/du_logo.png" alt="DU Logo" class="h-12 w-12 rounded-full border-2 border-gray-600 object-cover">
+                </a>
+                <a href="index.html#signup" class="px-6 py-3 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 rounded-full transition-colors">Sign Up</a>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<div class="breadcrumbs-container">
+    <div class="flex justify-between items-center mb-6">
+        <div class="text-sm text-gray-400 breadcrumbs">
+            <a href="index.html" class="hover:text-emerald-400">Home</a> &gt; 
+            <a href="academic.html" class="hover:text-emerald-400">Academic</a> &gt; 
+            <span class="text-emerald-400">Course-405</span>
+        </div>
+        <a href="academic.html" class="flex items-center text-sm text-emerald-400 hover:text-emerald-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+            </svg>
+            Back to Academic
+        </a>
+    </div>
+</div>
+<!-- =================== HEADER & BREADCRUMBS END =================== -->
+
+    <!-- Main Content -->
+    <div class="relative min-h-screen overflow-hidden">
+        <!-- Background Gradients -->
+        <div class="absolute top-0 left-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/4 right-1/4 w-72 h-72 bg-red-500/10 rounded-full blur-3xl"></div>
+
+        <!-- Course Content -->
+        <div class="relative z-10 container mx-auto px-6 pb-12">
+            <!-- Course Header -->
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-bold text-emerald-400 mb-3">Course-405</h2>
+                <p class="text-xl text-gray-400">Modern Poetry II</p>
+            </div>
+
+            <!-- Course Overview -->
+            <div class="mb-16 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-8">
+                <h3 class="text-2xl font-bold text-emerald-400 mb-6">Course Overview</h3>
+                <div class="text-gray-300 space-y-4">
+                    <p>The course familiarises the students with the renowned emigrant Arab or Mahjar poets and the poets of Diwan school. The course focuses on the emergence of Mahjar Literature and its significance.</p>
+                    
+                    <h4 class="text-lg font-semibold text-gray-200 mt-6 mb-3">Intended Learning Outcomes</h4>
+                    <p>On completion of the course students will be able to:</p>
+                    <ul class="list-disc pl-6 space-y-2">
+                        <li>Learn about mahjar poetry for its adoption of modern literary styles.</li>
+                        <li>Learn about the mahjar poets who literally have revolted against the literary orthodoxy and have adopted free verses in poetry.</li>
+                        <li>Gain knowledge for making Arabic poetry more people friendly, fascinating and easily understandable.</li>
+                        <li>Earn sufficient information about simple diction, style and stanzalc form with short metres and techniques of expression borrowed from drama and narratives provided in the hallmarks of poetry in the Arab and mahjar worlds.</li>
+                        <li>Be familiar with the characteristics (forms, techniques and themes) of different genres in modern Arabic and western literature and trace their histories and interactions.</li>
+                        <li>Know about the evolution of literary genres in the Arab and western worlds in their socio-cultural context, keeping in mind the dynamics of unity and diversity, and continuity and change.</li>
+                    </ul>
+                </div>
+            </div>
+
+           <!-- Course Contents -->
+            <div class="mb-16">
+                <h3 class="text-2xl font-bold text-emerald-400 mb-6">Course Contents</h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Ruhul Amin Sir -->
+                    <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6">
+                        <h4 class="text-xl font-bold text-center text-gray-300 mb-6">
+                            <img src="images/ruhul.jpg" alt="Ruhul Amin Sir" class="h-16 w-16 rounded-full border-2 border-emerald-400 object-cover mx-auto mb-2">
+                            Ruhul Amin Sir
+                        </h4>
+                        
+                        <!-- Poems -->
+                        <div class="mb-8">
+                            <h5 class="text-lg font-semibold text-emerald-400 mb-4">Poems</h5>
+                            <div class="grid grid-cols-3 gap-4">
+                                <!-- Akhi Poem -->
+                                <a href="poem-akhi.html" class="course-button-glow group flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-emerald-500 transition-colors w-[160px] h-[160px]">
+                                    <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                                    <div class="relative z-10 text-center">
+                                        <div class="arabic-font font-semibold text-gray-300">أخي</div>
+                                        <div class="text-sm text-gray-400 mt-1">ميخائيل نعيمة</div>
+                                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                                    </div>
+                                </a>
+                                <!-- Nahr Poem -->
+                                <a href="poem-nahr.html" class="course-button-glow group flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-emerald-500 transition-colors w-[160px] h-[160px]">
+                                    <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                                    <div class="relative z-10 text-center">
+                                        <div class="arabic-font font-semibold text-gray-300">النهر المتجمد</div>
+                                        <div class="text-sm text-gray-400 mt-1">ميخائيل نعيمة</div>
+                                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                                    </div>
+                                </a>
+                                <!-- Aghmid Poem -->
+                                <a href="poem-aghmid.html" class="course-button-glow group flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-emerald-500 transition-colors w-[160px] h-[160px]">
+                                    <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                                    <div class="relative z-10 text-center">
+                                        <div class="arabic-font font-semibold text-gray-300">أغمض جفونك</div>
+                                        <div class="text-sm text-gray-400 mt-1">ميخائيل نعيمة</div>
+                                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                                    </div>
+                                </a>
+                                <!-- Usfur Poem -->
+                                <a href="poem-usfur.html" class="course-button-glow group flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-emerald-500 transition-colors w-[160px] h-[160px]">
+                                    <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                                    <div class="relative z-10 text-center">
+                                        <div class="arabic-font font-semibold text-gray-300">عصفور الجنة</div>
+                                        <div class="text-sm text-gray-400 mt-1">عبد الرحمن شكري</div>
+                                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                                    </div>
+                                </a>
+                                <!-- Aghniya Poem -->
+                                <a href="poem-aghniya.html" class="course-button-glow group flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-emerald-500 transition-colors w-[160px] h-[160px]">
+                                    <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                                    <div class="relative z-10 text-center">
+                                        <div class="arabic-font font-semibold text-gray-300">أغنية قديمة</div>
+                                        <div class="text-sm text-gray-400 mt-1">بدر شاكر السياب</div>
+                                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Biographies -->
+                        <div class="mb-8">
+                            <h5 class="text-lg font-semibold text-emerald-400 mb-4">Biographies</h5>
+                            <div class="grid grid-cols-3 gap-4">
+                                <a href="#" class="course-button-glow group flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-emerald-500 transition-colors w-[160px] h-[160px]">
+                                    <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                                    <div class="relative z-10 text-center">
+                                        <div class="arabic-font font-semibold text-gray-300">ميخائيل نعيمة</div>
+                                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                                    </div>
+                                </a>
+                                <a href="#" class="course-button-glow group flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-emerald-500 transition-colors w-[160px] h-[160px]">
+                                    <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                                    <div class="relative z-10 text-center">
+                                        <div class="arabic-font font-semibold text-gray-300">عبد الرحمن شكري</div>
+                                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                                    </div>
+                                </a>
+                                <a href="#" class="course-button-glow group flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-emerald-500 transition-colors w-[160px] h-[160px]">
+                                    <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                                    <div class="relative z-10 text-center">
+                                        <div class="arabic-font font-semibold text-gray-300">بدر شاكر السياب</div>
+                                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Fozlur Rahman Sir -->
+                    <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6">
+                        <h4 class="text-xl font-bold text-center text-gray-300 mb-6">
+                            <img src="images/fozlu.jpg" alt="Fozlur Rahman Sir" class="h-16 w-16 rounded-full border-2 border-emerald-400 object-cover mx-auto mb-2">
+                            Fozlur Rahman Sir
+                        </h4>
+                        
+                        <!-- Poems -->
+                        <div class="mb-8">
+                            <h5 class="text-lg font-semibold text-emerald-400 mb-4">Poems</h5>
+                            <div class="grid grid-cols-3 gap-4">
+                                <a href="poem-anqa.html" class="course-button-glow group flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-emerald-500 transition-colors w-[160px] h-[160px]">
+                                    <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                                    <div class="relative z-10 text-center">
+                                        <div class="arabic-font font-semibold text-gray-300">العنقاء</div>
+                                        <div class="text-sm text-gray-400 mt-1">إيليا ابو ماضي</div>
+                                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                                    </div>
+                                </a>
+                                <a href="poem-ina.html" class="course-button-glow group flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-emerald-500 transition-colors w-[160px] h-[160px]">
+                                    <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                                    <div class="relative z-10 text-center">
+                                        <div class="arabic-font font-semibold text-gray-300">إناءٌ</div>
+                                        <div class="text-sm text-gray-400 mt-1">إلياس أبو شبكة</div>
+                                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                                    </div>
+                                </a>
+								<a href="poem-nihaya.html" class="course-button-glow group flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-emerald-500 transition-colors w-[160px] h-[160px]">
+                                    <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                                    <div class="relative z-10 text-center">
+                                        <div class="arabic-font font-semibold text-gray-300">نِهَايَةُ السُّلَّمِ</div>
+                                        <div class="text-sm text-gray-400 mt-1">نَازِكُ الْمَلَائِكَةِ</div>
+                                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Biographies -->
+                        <div class="mb-8">
+                            <h5 class="text-lg font-semibold text-emerald-400 mb-4">Biographies</h5>
+                            <div class="grid grid-cols-3 gap-4">
+                                <a href="#" class="course-button-glow group flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-emerald-500 transition-colors w-[160px] h-[160px]">
+                                    <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                                    <div class="relative z-10 text-center">
+                                        <div class="arabic-font font-semibold text-gray-300">إيليا ابو ماضي</div>
+                                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                                    </div>
+                                </a>
+                                <a href="#" class="course-button-glow group flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-emerald-500 transition-colors w-[160px] h-[160px]">
+                                    <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                                    <div class="relative z-10 text-center">
+                                        <div class="arabic-font font-semibold text-gray-300">إلياس أبو شبكة</div>
+                                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                        
+            <!-- Explanation -->
+            <div class="mb-8">
+                <h5 class="text-lg font-semibold text-emerald-400 mb-4">Explanation</h5>
+                <div class="bg-gray-700/30 border border-gray-600 rounded-lg p-4 min-h-32">
+                    <p class="text-gray-400 italic">Content will be added soon...</p>
+                </div>
+            </div>
+
+            <!-- Previous Questions -->
+            <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-8">
+                <h3 class="text-2xl font-bold text-emerald-400 mb-6">Previous Questions</h3>
+                <div class="bg-gray-700/30 border border-gray-600 rounded-lg p-8 min-h-32 text-center">
+                    <p class="text-gray-400 italic">Previous exam questions will be added here soon...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+	
+	<!-- =================== FEEDBACK & FOOTER START =================== -->
+    <section class="feedback-section py-20 bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-4xl font-bold mb-4">Feedback</h2>
+                    <p class="text-gray-400 mb-8">We value your input to make Class Caddy better. Please share your suggestions, report any issues, or let us know what you love!</p>
+                    <div class="flex gap-6">
+                        <a href="https://facebook.com/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-facebook-f fa-2x"></i></a>
+                        <a href="https://wa.me/+8801743303877" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-whatsapp fa-2x"></i></a>
+                        <a href="https://t.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-telegram fa-2x"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <form action="#" method="POST" class="space-y-6">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                            <input type="email" name="email" id="email" placeholder="Enter Email Address" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+                        </div>
+                        <div>
+                            <label for="suggestion" class="block text-sm font-medium text-gray-300 mb-2">Your suggestion</label>
+                            <textarea name="suggestion" id="suggestion" rows="4" placeholder="Write your complaint or suggestion" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"></textarea>
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer class="bg-gray-900 border-t border-gray-800 pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-3">
+                        <li><a href="about.html" class="text-gray-400 hover:text-emerald-400 transition">About Us</a></li>
+                        <li><a href="academic.html" class="text-gray-400 hover:text-emerald-400 transition">Courses</a></li>
+                        <li><a href="https://eco.du.ac.bd/" target="_blank" class="text-gray-400 hover:text-emerald-400 transition">DU Student Portal</a></li>
+                        <li><a href="https://result.du.ac.bd/" target="_blank" class="text-gray-400 hover:text-emerald-400 transition">DU Result Portal</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Contact Us</h3>
+                    <ul class="space-y-3">
+                        <li><a href="tel:+8801743303877" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fa-solid fa-phone"></i> Customer Support</a></li>
+                        <li><a href="https://wa.me/+8801743303877" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                        <li><a href="https://facebook.com/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-facebook-f"></i> Facebook</a></li>
+                        <li><a href="https://t.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-telegram"></i> Telegram</a></li>
+                        <li><a href="https://m.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-facebook-messenger"></i> Messenger</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Others</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Gallery</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Notice Board</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Events</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-2 lg:col-span-2">
+                     <h3 class="font-semibold text-white mb-4">Download App</h3>
+                     <div class="flex flex-col sm:flex-row lg:flex-col gap-4">
+                        <a href="#" class="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center gap-3 hover:bg-gray-700 transition">
+                            <i class="fab fa-google-play fa-2x text-white"></i>
+                            <div>
+                                <p class="text-xs text-gray-400">GET IT ON</p>
+                                <p class="text-lg font-semibold text-white">Google Play</p>
+                            </div>
+                        </a>
+                        <a href="#" class="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center gap-3 hover:bg-gray-700 transition">
+                            <i class="fab fa-apple fa-2x text-white"></i>
+                            <div>
+                                <p class="text-xs text-gray-400">Download on the</p>
+                                <p class="text-lg font-semibold text-white">App Store</p>
+                            </div>
+                        </a>
+                     </div>
+                </div>
+            </div>
+            <div class="mt-16 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+                <p>&copy; 2025 Class Caddy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+<!-- =================== FEEDBACK & FOOTER END =================== -->
+
+    <!-- Go to Top Button -->
+    <button class="go-to-top-btn" aria-label="Go to top">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+    </button>
+	<script src="script.js"></script>
+</body>
+</html>

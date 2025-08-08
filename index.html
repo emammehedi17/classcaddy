@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Caddy - Home</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts (Poppins) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="stylesheet" href="style.css">    
+	<link rel="stylesheet" href="style.css">
+	<link rel="icon" href="https://eco.du.ac.bd//assets/images/fab_icon.ico" type="image/x-icon">
+</head>
+<body class="bg-gray-900 text-white">
+
+<!-- For: index.html -->
+<!-- =================== HEADER START =================== -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-sm border-b border-gray-700">
+    <div class="container mx-auto px-6 py-3">
+        <nav class="flex justify-between items-center">
+            <!-- Left Side -->
+            <div class="flex items-center gap-4">
+                <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
+                    <img src="images/profile.jpg" alt="Profile" class="h-12 w-12 rounded-full border-2 border-emerald-400 object-cover">
+                </a>
+                <a href="index.html">
+                    <h1 class="text-2xl font-bold">Class Caddy</h1>
+                </a>
+            </div>
+
+            <!-- Center Navigation -->
+            <div class="hidden md:flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full p-1">
+                <a href="index.html" class="px-6 py-2 text-sm font-semibold bg-emerald-500 rounded-full transition-colors">Home</a>
+                
+                <div id="academic-dropdown" class="relative">
+                    <button id="academic-button" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors flex items-center">
+                        <a href="academic.html">Academic</a>
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="academic-menu" class="dropdown-menu absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
+                        <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 405</a>
+                        <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 406</a>
+                        <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 407</a>
+                        <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 408 (B)</a>
+                    </div>
+                </div>
+
+                <a href="shop.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Shop</a>
+                <a href="about.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">About us</a>
+                <a href="contact.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Contact</a>
+            </div>
+
+            <!-- Right Side -->
+            <div class="hidden md:flex items-center gap-4">
+                <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
+                    <img src="images/du_logo.png" alt="DU Logo" class="h-12 w-12 rounded-full border-2 border-gray-600 object-cover">
+                </a>
+               <a href="#signup" class="px-6 py-3 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 rounded-full transition-colors signup-button">
+                    Sign Up
+                </a>
+            </div>
+        </nav>
+    </div>
+</header>
+<!-- =================== HEADER END =================== -->
+
+
+    <!-- Main Content -->
+<!-- Main Content -->
+<div class="relative min-h-screen overflow-hidden pt-24">
+    <!-- Background Gradients -->
+    <div class="absolute top-0 left-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/4 right-1/4 w-72 h-72 bg-red-500/10 rounded-full blur-3xl"></div>
+
+        <!-- Content Wrapper -->
+        <div class="relative z-10">
+            <!-- Hero Section -->
+            <main class="container mx-auto px-6 mt-16 md:mt-24">
+                <div class="flex flex-col md:flex-row items-center justify-center gap-16">
+                    
+                    <!-- Welcome Text -->
+                    <div class="text-center md:text-left">
+                        <h2 class="text-5xl md:text-7xl font-bold text-emerald-400 leading-tight">
+                            Welcome to <br> Class Caddy
+                        </h2>
+                        <p class="text-gray-400 max-w-xl mt-6">
+                            Welcome to The Class Caddy, your hub for shared academic notes and learning resources.
+                            Join me on this journey as the site evolves to include personal vlogs, business projects, and more.
+                        </p>
+                    </div>
+
+                    <!-- Login Form -->
+                    <div class="w-full max-w-sm login-form-container">
+                        <!-- Glow Container -->
+                        <div id="login-glow" class="login-glow-container">
+                            <span class="glow"></span>
+                            <span class="glow"></span>
+                            <span class="glow"></span>
+                            <span class="glow"></span>
+                        </div>
+                        
+                        <!-- Login Card -->
+                        <div class="login-glow-card relative z-10">
+                            <div class="text-center mb-6">
+                                <div class="mx-auto w-14 h-14 rounded-full flex items-center justify-center bg-gray-700/50 mb-3 border border-gray-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
+                                </div>
+                                <h2 class="text-2xl font-bold text-white">Member Login</h2>
+                            </div>
+                            
+                            <form id="login-form">
+                                <div class="mb-4">
+                                    <label for="login-email" class="block text-xs font-medium text-gray-400 mb-2 text-left">Email ID*</label>
+                                    <input type="email" id="login-email" placeholder="Enter your academic email" required class="w-full px-4 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900/50 text-white focus:ring-emerald-500 focus:border-emerald-500">
+                                    <p class="text-xs text-gray-500 mt-2 text-left">i.e. s-2020343876@arab.du.ac.bd</p>
+                                </div>
+                                
+                                <div class="mb-5">
+                                    <label for="login-password" class="block text-xs font-medium text-gray-400 mb-2 text-left">Password*</label>
+                                    <input type="password" id="login-password" placeholder="Enter your password" required class="w-full px-4 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900/50 text-white focus:ring-emerald-500 focus:border-emerald-500">
+                                </div>
+                                
+                                <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-lg transition duration-300 text-sm">Login</button>
+                                <p id="login-error-msg" class="text-red-400 text-center mt-3 text-xs"></p>
+                            </form>
+                            
+                            <p class="text-xs text-gray-500 text-center mt-4">
+                                Don't have an account? 
+                                <a href="#signup" class="font-semibold text-emerald-400 hover:text-emerald-300">Create account</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Courses Section -->
+            <section class="container mx-auto px-6 mt-24 md:mt-32 pb-24">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-emerald-400 mb-2">Academic Courses</h2>
+                    <p class="text-gray-400">8th Semester</p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                    <!-- Course 405 -->
+                    <a href="course-405.html" class="group course-button-glow flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-2xl aspect-square hover:border-emerald-500 transition-colors">
+                        <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                        <div class="relative z-10 p-4 bg-emerald-500/10 rounded-lg mb-4 group-hover:bg-emerald-500/20 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M22 7.32a1 1 0 0 0-.5-.87L13 2.12a1 1 0 0 0-1 0L3.5 6.45a1 1 0 0 0-.5.87V11a1 1 0 0 0 .55.89l8.5 4.55a1 1 0 0 0 .9 0l8.5-4.55a1 1 0 0 0 .55-.89V7.32zM12 14.84L4 10.37l8-4.26l8 4.26z" />
+                                <path d="M5 13.5v3.37a2 2 0 0 0 1.13 1.81l5 2.88a1 1 0 0 0 .87 0l5-2.88a2 2 0 0 0 1.13-1.81V13.5l-6 3.2-6-3.2z" />
+                            </svg>
+                        </div>
+                        <div class="relative z-10 text-center">
+                            <div class="font-semibold text-gray-300">Course-405</div>
+                            <div class="text-xs text-gray-400 mt-1">Modern Poetry II</div>
+                        </div>
+                    </a>
+                    
+                    <!-- Course 406 -->
+                    <a href="#" class="group course-button-glow flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-2xl aspect-square hover:border-emerald-500 transition-colors">
+                        <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                        <div class="relative z-10 p-4 bg-emerald-500/10 rounded-lg mb-4 group-hover:bg-emerald-500/20 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M22 7.32a1 1 0 0 0-.5-.87L13 2.12a1 1 0 0 0-1 0L3.5 6.45a1 1 0 0 0-.5.87V11a1 1 0 0 0 .55.89l8.5 4.55a1 1 0 0 0 .9 0l8.5-4.55a1 1 0 0 0 .55-.89V7.32zM12 14.84L4 10.37l8-4.26l8 4.26z" />
+                                <path d="M5 13.5v3.37a2 2 0 0 0 1.13 1.81l5 2.88a1 1 0 0 0 .87 0l5-2.88a2 2 0 0 0 1.13-1.81V13.5l-6 3.2-6-3.2z" />
+                            </svg>
+                        </div>
+                        <div class="relative z-10 text-center">
+                            <div class="font-semibold text-gray-300">Course-406</div>
+                            <div class="text-xs text-gray-400 mt-1">Terminology through Translation</div>
+                        </div>
+                    </a>
+                    
+                    <!-- Course 407 -->
+                    <a href="#" class="group course-button-glow flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-2xl aspect-square hover:border-emerald-500 transition-colors">
+                        <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                        <div class="relative z-10 p-4 bg-emerald-500/10 rounded-lg mb-4 group-hover:bg-emerald-500/20 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M22 7.32a1 1 0 0 0-.5-.87L13 2.12a1 1 0 0 0-1 0L3.5 6.45a1 1 0 0 0-.5.87V11a1 1 0 0 0 .55.89l8.5 4.55a1 1 0 0 0 .9 0l8.5-4.55a1 1 0 0 0 .55-.89V7.32zM12 14.84L4 10.37l8-4.26l8 4.26z" />
+                                <path d="M5 13.5v3.37a2 2 0 0 0 1.13 1.81l5 2.88a1 1 0 0 0 .87 0l5-2.88a2 2 0 0 0 1.13-1.81V13.5l-6 3.2-6-3.2z" />
+                            </svg>
+                        </div>
+                        <div class="relative z-10 text-center">
+                            <div class="font-semibold text-gray-300">Course-407</div>
+                            <div class="text-xs text-gray-400 mt-1">Arabic Literary Criticism</div>
+                        </div>
+                    </a>
+                    
+                    <!-- Course 408 -->
+                    <a href="#" class="group course-button-glow flex flex-col items-center justify-center p-6 bg-gray-800/50 border border-gray-700 rounded-2xl aspect-square hover:border-emerald-500 transition-colors">
+                        <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
+                        <div class="relative z-10 p-4 bg-emerald-500/10 rounded-lg mb-4 group-hover:bg-emerald-500/20 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-400" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M22 7.32a1 1 0 0 0-.5-.87L13 2.12a1 1 0 0 0-1 0L3.5 6.45a1 1 0 0 0-.5.87V11a1 1 0 0 0 .55.89l8.5 4.55a1 1 0 0 0 .9 0l8.5-4.55a1 1 0 0 0 .55-.89V7.32zM12 14.84L4 10.37l8-4.26l8 4.26z" />
+                                <path d="M5 13.5v3.37a2 2 0 0 0 1.13 1.81l5 2.88a1 1 0 0 0 .87 0l5-2.88a2 2 0 0 0 1.13-1.81V13.5l-6 3.2-6-3.2z" />
+                            </svg>
+                        </div>
+                        <div class="relative z-10 text-center">
+                            <div class="font-semibold text-gray-300">Course-408 (B)</div>
+                            <div class="text-xs text-gray-400 mt-1">Social Research and Project</div>
+                        </div>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+     <!-- Signup Section -->
+    <div id="signup-section" class="relative z-10 py-24 bg-gray-900">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-center">
+                <div class="w-full max-w-sm login-form-container">
+                    <!-- Glow Effect Container -->
+                    <div id="signup-glow" class="login-glow-container">
+                        <span class="glow"></span>
+                        <span class="glow"></span>
+                        <span class="glow"></span>
+                        <span class="glow"></span>
+                    </div>
+                    
+                    <div class="login-glow-card relative z-10">
+                        <div class="text-center mb-6">
+                            <div class="mx-auto w-14 h-14 rounded-full flex items-center justify-center bg-gray-700/50 mb-3 border border-gray-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                </svg>
+                            </div>
+                            <h2 class="text-2xl font-bold text-white">Request Access</h2>
+                            <p class="text-gray-400 text-sm mt-2">Sign up to get full access to all contents.</p>
+                        </div>
+                        
+                        <form id="signup-form">
+                            <div class="mb-4">
+                                <label for="signup-name" class="block text-xs font-medium text-gray-400 mb-2 text-left">Full Name*</label>
+                                <input type="text" id="signup-name" placeholder="Enter your full name" required class="w-full px-4 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900/50 text-white focus:ring-emerald-500 focus:border-emerald-500">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="signup-email" class="block text-xs font-medium text-gray-400 mb-2 text-left">Email*</label>
+                                <input type="email" id="signup-email" placeholder="Enter your email" required class="w-full px-4 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900/50 text-white focus:ring-emerald-500 focus:border-emerald-500">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="signup-mobile" class="block text-xs font-medium text-gray-400 mb-2 text-left">Mobile*</label>
+                                <input type="tel" id="signup-mobile" placeholder="Enter your mobile number" required class="w-full px-4 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900/50 text-white focus:ring-emerald-500 focus:border-emerald-500">
+                            </div>
+                            
+                            <div class="mb-5 relative">
+                                <label for="signup-password" class="block text-xs font-medium text-gray-400 mb-2 text-left">Password*</label>
+                                <input type="password" id="signup-password" placeholder="Set a password" required class="w-full px-4 py-2 text-sm border border-gray-600 rounded-lg bg-gray-900/50 text-white focus:ring-emerald-500 focus:border-emerald-500 pr-10">
+                                <button type="button" id="toggle-password" class="absolute right-3 top-9 text-gray-400 hover:text-emerald-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-lg transition duration-300 text-sm">Sign Up</button>
+                            <p id="signup-error-msg" class="text-red-400 text-center mt-3 text-xs"></p>
+                        </form>
+                        
+                        <p class="text-xs text-gray-500 text-center mt-4">
+                            Already have an account? 
+                            <a href="index.html" class="font-semibold text-emerald-400 hover:text-emerald-300 login-redirect">Login instead</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	
+	<!-- =================== FEEDBACK & FOOTER START =================== -->
+<!-- You can paste this entire block into all of your pages -->
+
+<!-- FEEDBACK SECTION -->
+<section class="feedback-section py-20 bg-gray-900 border-t border-gray-800">
+    <div class="container mx-auto px-6">
+        <div class="grid md:grid-cols-2 gap-16 items-center">
+            <div>
+                <h2 class="text-4xl font-bold mb-4">Feedback</h2>
+                <p class="text-gray-400 mb-8">We value your input to make Class Caddy better. Please share your suggestions, report any issues, or let us know what you love!</p>
+                <div class="flex gap-6">
+                    <a href="https://facebook.com/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-facebook-f fa-2x"></i></a>
+                    <a href="https://wa.me/+8801743303877" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-whatsapp fa-2x"></i></a>
+                    <a href="https://t.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-telegram fa-2x"></i></a>
+                </div>
+            </div>
+            <div>
+                <form action="#" method="POST" class="space-y-6">
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                        <input type="email" name="email" id="email" placeholder="Enter Email Address" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+                    </div>
+                    <div>
+                        <label for="suggestion" class="block text-sm font-medium text-gray-300 mb-2">Your suggestion</label>
+                        <textarea name="suggestion" id="suggestion" rows="4" placeholder="Write your complaint or suggestion" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"></textarea>
+                    </div>
+                    <div>
+                        <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg">Send Message</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER SECTION -->
+<footer class="bg-gray-900 border-t border-gray-800 pt-16 pb-8">
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+            <!-- Column 1: Quick Links -->
+            <div class="col-span-1">
+                <h3 class="font-semibold text-white mb-4">Quick Links</h3>
+                <ul class="space-y-3">
+                    <li><a href="about.html" class="text-gray-400 hover:text-emerald-400 transition">About Us</a></li>
+                    <li><a href="academic.html" class="text-gray-400 hover:text-emerald-400 transition">Courses</a></li>
+                    <li><a href="https://eco.du.ac.bd/" target="_blank" class="text-gray-400 hover:text-emerald-400 transition">DU Student Portal</a></li>
+                    <li><a href="https://result.du.ac.bd/" target="_blank" class="text-gray-400 hover:text-emerald-400 transition">DU Result Portal</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 2: Contact Us -->
+            <div class="col-span-1">
+                <h3 class="font-semibold text-white mb-4">Contact Us</h3>
+                <ul class="space-y-3">
+                    <li><a href="tel:+8801743303877" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fa-solid fa-phone"></i> Customer Support</a></li>
+                    <li><a href="https://wa.me/+8801743303877" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                    <li><a href="https://facebook.com/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-facebook-f"></i> Facebook</a></li>
+                    <li><a href="https://t.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-telegram"></i> Telegram</a></li>
+                    <li><a href="https://m.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-facebook-messenger"></i> Messenger</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 3: Others -->
+            <div class="col-span-1">
+                <h3 class="font-semibold text-white mb-4">Others</h3>
+                <ul class="space-y-3">
+                    <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Gallery</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Notice Board</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Events</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Blog</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 4 & 5: Download App -->
+            <div class="col-span-2 lg:col-span-2">
+                 <h3 class="font-semibold text-white mb-4">Download App</h3>
+                 <div class="flex flex-col sm:flex-row lg:flex-col gap-4">
+                    <a href="#" class="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center gap-3 hover:bg-gray-700 transition">
+                        <i class="fab fa-google-play fa-2x text-white"></i>
+                        <div>
+                            <p class="text-xs text-gray-400">GET IT ON</p>
+                            <p class="text-lg font-semibold text-white">Google Play</p>
+                        </div>
+                    </a>
+                    <a href="#" class="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center gap-3 hover:bg-gray-700 transition">
+                        <i class="fab fa-apple fa-2x text-white"></i>
+                        <div>
+                            <p class="text-xs text-gray-400">Download on the</p>
+                            <p class="text-lg font-semibold text-white">App Store</p>
+                        </div>
+                    </a>
+                 </div>
+            </div>
+        </div>
+
+        <!-- Copyright -->
+        <div class="mt-16 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+            <p>&copy; 2025 Class Caddy. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+<!-- =================== FEEDBACK & FOOTER END =================== -->
+    <!-- Go to Top Button -->
+    <button class="go-to-top-btn" aria-label="Go to top">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+    </button>
+<script src="script.js"></script>
+</body>
+</html>
