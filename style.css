@@ -590,3 +590,9 @@ body.is-fullscreen .feedback-section,
 body.is-fullscreen footer {
     display: none;
 }
+
+
+/* --- Mobile Menu Styles --- */
+#mobile-academic-button svg.rotate-180 {
+    transform: rotate(180deg);
+}
