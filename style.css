@@ -336,10 +336,7 @@ header {
     direction: rtl !important;
 }
 
-/* Hide the section title on all poem pages after the first "Word-by-Word" page */
-.poem-page:nth-of-type(3) ~ .poem-page .section-title {
-    display: none;
-}
+
 
 
 /* ==========================================================================
