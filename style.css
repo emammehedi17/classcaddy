@@ -583,7 +583,6 @@ body.is-fullscreen #zoom-controls {
 }
 
 
-/* ADD THIS NEW RULE TO THE END OF YOUR CSS FILE */
 
 /* Hide feedback and footer when in fullscreen to prevent overlap when zooming */
 body.is-fullscreen .feedback-section,

@@ -20,6 +20,7 @@
 <header class="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-sm border-b border-gray-700">
     <div class="container mx-auto px-6 py-3">
         <nav class="flex justify-between items-center">
+            <!-- Left Side: Profile & Title -->
             <div class="flex items-center gap-4">
                 <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
                     <img src="images/profile.jpg" alt="Profile" class="h-12 w-12 rounded-full border-2 border-emerald-400 object-cover">
@@ -29,6 +30,7 @@
                 </a>
             </div>
 
+            <!-- Center: Desktop Navigation (hidden on mobile) -->
             <div class="hidden md:flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full p-1">
                 <a href="index.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Home</a>
                 
@@ -50,13 +52,44 @@
                 <a href="contact.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Contact</a>
             </div>
 
+            <!-- Right Side: DU Logo & Sign Up (hidden on mobile) -->
             <div class="hidden md:flex items-center gap-4">
                 <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
                     <img src="images/du_logo.png" alt="DU Logo" class="h-12 w-12 rounded-full border-2 border-gray-600 object-cover">
                 </a>
                 <a href="index.html#signup" class="px-6 py-3 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 rounded-full transition-colors">Sign Up</a>
             </div>
+
+            <!-- NEW: Hamburger Menu Button (visible on mobile) -->
+            <div class="md:hidden flex items-center">
+                <button id="mobile-menu-button" class="text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
         </nav>
+
+        <!-- NEW: Mobile Menu Panel (hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-800 border-t border-gray-700 -mx-6">
+            <a href="index.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Home</a>
+            
+            <!-- Mobile Academic Dropdown -->
+            <div>
+                <button id="mobile-academic-button" class="w-full text-left px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex justify-between items-center">
+                    <span>Academic</span>
+                    <svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="mobile-academic-menu" class="hidden pl-8 bg-gray-900">
+                    <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 405</a>
+                    <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 406</a>
+                    <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 407</a>
+                    <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 408 (B)</a>
+                </div>
+            </div>
+
+            <a href="shop.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Shop</a>
+            <a href="about.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">About</a>
+            <a href="contact.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Contact</a>
+        </div>
     </div>
 </header>
 
