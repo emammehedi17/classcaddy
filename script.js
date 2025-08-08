@@ -259,3 +259,30 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+
+/* ==========================================================================
+ * 6. Mobile Navigation Logic
+ * ========================================================================== */
+const mobileMenuButton = document.getElementById('mobile-menu-button');
+const mobileMenu = document.getElementById('mobile-menu');
+const mobileAcademicButton = document.getElementById('mobile-academic-button');
+const mobileAcademicMenu = document.getElementById('mobile-academic-menu');
+
+// Toggles the main mobile menu
+if (mobileMenuButton && mobileMenu) {
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+}
+
+// Toggles the nested "Academic" sub-menu
+if (mobileAcademicButton && mobileAcademicMenu) {
+    mobileAcademicButton.addEventListener('click', () => {
+        mobileAcademicMenu.classList.toggle('hidden');
+        const arrowIcon = mobileAcademicButton.querySelector('svg');
+        if (arrowIcon) {
+            arrowIcon.classList.toggle('rotate-180');
+        }
+    });
+}
