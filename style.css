@@ -336,6 +336,11 @@ header {
     direction: rtl !important;
 }
 
+/* Hide the section title on all poem pages except the first content page */
+.poem-page:nth-of-type(2) ~ .poem-page .section-title {
+    display: none;
+}
+
 
 /* ==========================================================================
    6. Common Components (Go To Top, Footer, Feedback)
