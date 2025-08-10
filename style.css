@@ -337,8 +337,6 @@ header {
 }
 
 
-
-
 /* ==========================================================================
    6. Common Components (Go To Top, Footer, Feedback)
    ========================================================================== */
@@ -584,52 +582,13 @@ body.is-fullscreen #zoom-controls {
     gap: 0.75rem;
 }
 
-
-
 /* Hide feedback and footer when in fullscreen to prevent overlap when zooming */
 body.is-fullscreen .feedback-section,
 body.is-fullscreen footer {
     display: none;
 }
 
-
-/* --- Mobile Menu Styles --- */
+/* Mobile Menu Styles */
 #mobile-academic-button svg.rotate-180 {
     transform: rotate(180deg);
-}
-
-
-/* ==========================================================================
-   13. Mobile View Corrections
-   ========================================================================== */
-
-/* This media query targets screens smaller than 768px (tablets and phones) */
-@media (max-width: 768px) {
-    .poem-page {
-        width: 100%; 
-        min-height: 0;
-        padding: 15pt;
-        margin: 15px 0;
-    }
-
-    .poem-page-content-wrapper {
-        padding: 10pt;
-    }
-
-    .watermark {
-        font-size: 40pt;
-    }
-    
-    /* ADD THIS RULE HERE */
-    .arabic-cell {
-        font-size: 16pt !important; /* You can change 16pt to a smaller value if you like */
-    }
-}
-
-.styled-table td.bangla {
-    font-size: 12pt; /* Reduced from the default 14pt. Adjust as needed. */
-}
-
-.styled-table th.bangla {
-    width: 50%;
 }
