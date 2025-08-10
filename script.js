@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function () {
             clearTimeout(hidePlayerTimeout);
             musicPlayer.classList.remove('player-hidden');
         });
-        musicPlayer.addEventListener('mouseleave', () => {
+        playerHoverArea.addEventListener('mouseleave', () => {
             if (isPlaying) { hidePlayerTimeout = setTimeout(() => musicPlayer.classList.add('player-hidden'), 500); }
         });
     }
