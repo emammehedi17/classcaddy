@@ -310,4 +310,31 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+	
+	/* ==========================================================================
+     * 8. Responsive Back Button Text
+     * ========================================================================== */
+    const backButton = document.querySelector('.breadcrumbs-container a:last-child');
+
+    if (backButton) {
+        const originalBackButtonHTML = backButton.innerHTML; // Store the original full text
+        const iconSVG = backButton.querySelector('svg')?.outerHTML || ''; // Get the arrow icon
+
+        const updateBackButtonText = () => {
+            // Check if the screen width is less than 768px (standard for mobile/tablet)
+            if (window.innerWidth < 768) {
+                // On mobile, create the simple "Back" button
+                backButton.innerHTML = iconSVG + ' Back';
+            } else {
+                // On desktop, restore the original full text
+                backButton.innerHTML = originalBackButtonHTML;
+            }
+        };
+
+        // Run the function on initial page load
+        updateBackButtonText();
+
+        // And run it again whenever the window is resized
+        window.addEventListener('resize', updateBackButtonText);
+    }
 });
