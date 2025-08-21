@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Caddy - জাহেলী যুগের কবিগণ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Naskh+Arabic:wght@400;700&family=Kalpurush:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+	<link rel="icon" href="https://eco.du.ac.bd//assets/images/fab_icon.ico" type="image/x-icon">
+    <style>
+        /* Styles for the A4 page format */
+        .page-container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+        .page {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 25px auto;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            color: #333; /* Reset text color for page content */
+        }
+
+        .page-content-wrapper {
+            margin: 28pt;
+            border: 3pt double #006600;
+            padding: 15pt;
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .content-body {
+            padding-top: 1.5em;
+            padding-bottom: 1.5em;
+            flex-grow: 1;
+        }
+
+        .header {
+            position: absolute;
+            top: 14pt;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10pt;
+            color: #000;
+            opacity: 0.5;
+            font-family: 'Times New Roman', Times, serif;
+            z-index: 10;
+            user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+        }
+
+        .page:first-of-type .header {
+            display: none;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 14pt;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11pt;
+            font-family: 'Times New Roman', Times, serif;
+            z-index: 10;
+            user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+        }
+        
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 70pt;
+            color: #000000;
+            opacity: 0.08;
+            font-weight: bold;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 1;
+            font-family: 'Times New Roman', Times, serif;
+            user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+        }
+
+        .page h1, .page h2, .page h3, .page h4 {
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .page h1 {
+            font-size: 24pt;
+            color: #004466;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .page h2 {
+            font-size: 18pt;
+            color: #005683;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-top: 20px;
+        }
+
+        .page h3 {
+            font-size: 16pt;
+            color: #00679b;
+            margin-top: 15px;
+        }
+        
+        .page p, .page li {
+            text-align: justify;
+            font-size: 14pt;
+            line-height: 1.8;
+        }
+
+        .bangla {
+            font-family: 'Kalpurush', sans-serif;
+        }
+
+        .arabic {
+            direction: rtl;
+            text-align: right;
+            font-family: 'Noto Naskh Arabic', 'Amiri', serif;
+            font-size: 16pt;
+            color: #000000;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        
+        @media print {
+            body {
+                background: none;
+            }
+            .page {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+            }
+            .main-website-ui {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+<!-- =================== HEADER & BREADCRUMBS START =================== -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-sm border-b border-gray-700 main-website-ui">
+    <div class="container mx-auto px-6 py-3">
+        <nav class="flex justify-between items-center">
+            <!-- Left Side: Profile & Title -->
+            <div class="flex items-center gap-4">
+                <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
+                    <img src="images/profile.jpg" alt="Profile" class="h-12 w-12 rounded-full border-2 border-emerald-400 object-cover">
+                </a>
+                <a href="index.html">
+                    <h1 class="text-2xl font-bold">Class Caddy</h1>
+                </a>
+            </div>
+
+            <!-- Center: Desktop Navigation (hidden on mobile) -->
+            <div class="hidden md:flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full p-1">
+                <a href="index.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Home</a>
+                
+                <div id="academic-dropdown" class="relative">
+                    <button id="academic-button" class="px-6 py-2 text-sm font-semibold bg-emerald-500 rounded-full transition-colors flex items-center">
+                        <a href="academic.html">Academic</a>
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="academic-menu" class="dropdown-menu absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
+                        <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 405</a>
+                        <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 406</a>
+                        <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 407</a>
+                        <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 408 (B)</a>
+                    </div>
+                </div>
+
+                <a href="shop.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Shop</a>
+                <a href="about.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">About</a>
+                <a href="contact.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Contact</a>
+            </div>
+
+            <!-- Right Side: DU Logo & Sign Up (hidden on mobile) -->
+            <div class="hidden md:flex items-center gap-4">
+                <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
+                    <img src="images/du_logo.png" alt="DU Logo" class="h-12 w-12 rounded-full border-2 border-gray-600 object-cover">
+                </a>
+                <a href="index.html#signup" class="px-6 py-3 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 rounded-full transition-colors">Sign Up</a>
+            </div>
+
+            <!-- Hamburger Menu Button (visible on mobile) -->
+            <div class="md:hidden flex items-center">
+                <button id="mobile-menu-button" class="text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu Panel (hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-800 border-t border-gray-700 -mx-6">
+            <a href="index.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Home</a>
+            
+            <div>
+                <button id="mobile-academic-button" class="w-full text-left px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex justify-between items-center">
+                    <span>Academic</span>
+                    <svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div id="mobile-academic-menu" class="hidden pl-8 bg-gray-900">
+                    <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 405</a>
+                    <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 406</a>
+                    <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 407</a>
+                    <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 408 (B)</a>
+                </div>
+            </div>
+
+            <a href="shop.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Shop</a>
+            <a href="about.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">About</a>
+            <a href="contact.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Contact</a>
+        </div>
+    </div>
+</header>
+
+<div class="breadcrumbs-container pt-24 main-website-ui">
+    <div class="container mx-auto px-6">
+        <div class="flex justify-between items-center mb-6">
+            <div class="text-sm text-gray-400 breadcrumbs">
+                <a href="index.html" class="hover:text-emerald-400">Home</a> &gt; 
+                <a href="academic.html" class="hover:text-emerald-400">Academic</a> &gt; 
+                <a href="course-407.html" class="hover:text-emerald-400">Coourse-407</a> &gt; 
+                <span class="text-emerald-400 bangla">জাহেলী যুগের কবিগণ</span>
+            </div>
+            <a href="academic.html" class="flex items-center text-sm text-emerald-400 hover:text-emerald-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                </svg>
+                Back to Academic
+            </a>
+        </div>
+    </div>
+</div>
+<!-- =================== HEADER & BREADCRUMBS END =================== -->
+
+    <!-- Main Content -->
+    <div class="relative min-h-screen overflow-hidden">
+        <div class="page-container">
+            <!-- PAGE 1 -->
+            <div class="page">
+                <div class="watermark">Class Caddy</div>
+                <div class="page-content-wrapper">
+                    <div class="content-body" style="text-align: center; display: flex; flex-direction: column; justify-content: center;">
+                        <h1 class="bangla" style="font-size: 36pt;">জাহেলী যুগের খ্যাতনামা কবিগণ</h1>
+                        <h2 class="bangla" style="font-size: 22pt; border: none; color: #333;">জীবনী ও কাব্যপ্রতিভা</h2>
+                    </div>
+                </div>
+                <div class="page-number">Page-01</div>
+            </div>
+
+            <!-- PAGE 2 -->
+            <div class="page">
+                <div class="watermark">Class Caddy</div>
+                <div class="header">Class Caddy</div>
+                <div class="page-content-wrapper">
+                    <div class="content-body">
+                        <h2 class="bangla">যুহায়র ইবনে আবী সুলমা (আনুমানিক ৫২০-৬০৯ খ্রি.)</h2>
+                        
+                        <h3 class="bangla">জীবনী</h3>
+                        <p class="bangla">যুহায়র ইবনে আবী সুলমা ছিলেন জাহেলী যুগের অন্যতম শ্রেষ্ঠ কবি। তিনি আরবের মুযায়না গোত্রে জন্মগ্রহণ করেন। তাঁর পুরো পরিবারই ছিল কবি পরিবার। তাঁর পিতা, ভগ্নিদ্বয় সালমা ও খানসা, এবং পুত্রদ্বয় কা'ব ও বুজায়র—সকলেই কবি ছিলেন। এজন্য তাঁর পরিবারকে 'কবি পরিবার' বলা হয়। তিনি দীর্ঘজীবী হয়েছিলেন এবং ইসলামের আবির্ভাবের পূর্বে মৃত্যুবরণ করেন। যুহায়র তাঁর কবিতা রচনার ক্ষেত্রে অত্যন্তพิถีพิถัน ছিলেন। তিনি একটি কাসিদা বা কবিতা রচনা করে তা এক বছর ধরে সম্পাদনা ও পরিমার্জন করতেন। এই কারণে তাঁর কবিতাগুলোকে 'হাওলিয়্যাত' (বার্ষিক কবিতা) বলা হয় এবং সমালোচকরা তাঁকে 'কৃত্রিম কবি' বা 'কারিগর কবি' (عبيد الشعر) বলে আখ্যায়িত করেছেন।</p>
+
+                        <h3 class="bangla">কাব্যপ্রতিভা ও অবদান</h3>
+                        <p class="bangla">যুহায়র ইবনে আবী সুলমাকে জাহেলী যুগের অন্যতম প্রভাবশালী কবি হিসেবে গণ্য করা হয়। তাঁর কাব্যিক বৈশিষ্ট্যের কারণে তাঁকে 'কবিগুরু' বলা হয়। তাঁর কাছ থেকে অনেক কবি, যেমন—আল-হুতায়'আ, কা'ব ইবনে যুহায়র প্রমুখ কাব্যজ্ঞান লাভ করেন।</p>
+                        <ul>
+                            <li class="bangla"><strong>শান্তির কবি:</strong> তিনি ছিলেন শান্তির অগ্রদূত। তাঁর বিখ্যাত মু'আল্লাকাটি 'দাহিস ও গাবরা' নামক দীর্ঘস্থায়ী যুদ্ধের অবসানের প্রেক্ষাপটে রচিত। তিনি হারিম ইবনে সিনান এবং হারিস ইবনে আওফ নামক দুজন গোত্রপ্রধানের প্রশংসা করেন, যারা নিজেদের সম্পদ ব্যয় করে দুই গোত্রের মধ্যে রক্তক্ষয়ী যুদ্ধ থামিয়েছিলেন।</li>
+                            <li class="bangla"><strong>নীতি ও প্রজ্ঞার কবি:</strong> তাঁর কবিতায় গভীর জীবনবোধ, প্রজ্ঞা ও নৈতিকতার ছাপ পাওয়া যায়। তিনি যুদ্ধ, মৃত্যু এবং মানব জীবনের বাস্তবতা নিয়ে অনেক প্রজ্ঞাপূর্ণ উক্তি করেছেন। হযরত উমর (রা.) তাঁর প্রজ্ঞার প্রশংসা করে বলেছিলেন, "আমি যদি তাঁকে পেতাম, তাঁর উত্তম বোধশক্তি ও সূক্ষ্ম প্রজ্ঞার জন্য তাঁকে বিচারক নিযুক্ত করতাম।"</li>
+                            <li class="bangla"><strong>নির্ভুল ও পরিমার্জিত ভাষা:</strong> তিনি কবিতায় অপরিচিত বা দুর্বোধ্য শব্দ ব্যবহার করতেন না এবং প্রশংসার ক্ষেত্রে অতিরঞ্জন পরিহার করতেন। তাঁর ভাষা ছিল স্পষ্ট, মার্জিত এবং বাহুল্যবর্জিত।</li>
+                            <li class="bangla"><strong>অশ্লীলতামুক্ত কাব্য:</strong> জাহেলী যুগের অনেক কবির কবিতায় যেখানে অশ্লীলতা ও অশালীন বর্ণনা পাওয়া যায়, সেখানে যুহায়রের কবিতা ছিল সম্পূর্ণ পরিচ্ছন্ন ও রুচিশীল।</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="page-number">Page-02</div>
+            </div>
+            
+            <!-- PAGE 3 -->
+            <div class="page">
+                <div class="watermark">Class Caddy</div>
+                <div class="header">Class Caddy</div>
+                <div class="page-content-wrapper">
+                    <div class="content-body">
+                        <h2 class="bangla">লাবিদ ইবনে রাবী'আ (আনুমানিক ৫৬০-৬৬১ খ্রি.)</h2>
+                        
+                        <h3 class="bangla">জীবনী</h3>
+                        <p class="bangla">লাবিদ ইবনে রাবী'আ ছিলেন 'মুখাদরাম' কবিদের মধ্যে অন্যতম, অর্থাৎ তিনি জাহেলী যুগ এবং ইসলামী যুগ—উভয়ই পেয়েছিলেন। তিনি আরবের বনু আমির গোত্রে জন্মগ্রহণ করেন এবং অত্যন্ত দীর্ঘ জীবন লাভ করেন (প্রায় ১২০-১৪০ বছর)। তিনি ইসলাম গ্রহণ করেন এবং একজন নিষ্ঠাবান সাহাবী হিসেবে পরিচিত হন। ইসলাম গ্রহণের পর তিনি কাব্যচর্চা প্রায় ছেড়েই দিয়েছিলেন। কথিত আছে, ইসলাম গ্রহণের পর তিনি মাত্র একটি বা দুটি পঙক্তি রচনা করেছিলেন। কুরআন মাজিদের ভাষার সৌন্দর্য ও গভীরতায় তিনি এতটাই মুগ্ধ হয়েছিলেন যে, এরপর আর কবিতা রচনার প্রয়োজন বোধ করেননি।</p>
+
+                        <h3 class="bangla">কাব্যপ্রতিভা ও অবদান</h3>
+                        <p class="bangla">লাবিদ জাহেলী যুগের একজন প্রথম সারির কবি ছিলেন। তাঁর কাব্যিক বৈশিষ্ট্যগুলো নিম্নরূপ:</p>
+                        <ul>
+                            <li class="bangla"><strong>মরুভূমির নিখুঁত চিত্রায়ন:</strong> তাঁর কবিতায় মরুভূমির প্রকৃতি, উটের বর্ণনা এবং বেদুইন জীবনের চিত্র অত্যন্ত নিখুঁতভাবে ফুটে উঠেছে। তাঁর মু'আল্লাকায় তিনি তাঁর উটের গতি ও শক্তির বর্ণনা দিয়েছেন।</li>
+                            <li class="bangla"><strong>নারীপ্রেমের অনুপস্থিতি:</strong> জাহেলী যুগের কবিদের মু'আল্লাকার একটি সাধারণ বৈশিষ্ট্য হলো 'নসীব' বা নারীপ্রেমের বর্ণনা দিয়ে কবিতা শুরু করা। কিন্তু লাবিদের মু'আল্লাকা এক্ষেত্রে ব্যতিক্রম। এতে নারীপ্রেমের পরিবর্তে পরিত্যক্ত আবাসের বর্ণনা রয়েছে।</li>
+                            <li class="bangla"><strong>শোকগাথা ও গৌরবগাথা:</strong> তিনি শোকগাথা রচনায় অত্যন্ত পারদর্শী ছিলেন। এছাড়া তাঁর কবিতায় বেদুইন আরবের আত্মমর্যাদা, আতিথেয়তা, দানশীলতা এবং গোত্রীয় গৌরব яркоভাবে প্রকাশিত হয়েছে।</li>
+                            <li class="bangla"><strong>ইসলামী প্রভাব:</strong> যদিও তাঁর শ্রেষ্ঠ কবিতাগুলো প্রাক-ইসলামী যুগে রচিত, তাঁর জীবনে ইসলামের গভীর প্রভাব পড়েছিল, যা তাঁর পরবর্তী জীবনদর্শনে প্রতিফলিত হয়।</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="page-number">Page-03</div>
+            </div>
+
+            <!-- PAGE 4 -->
+            <div class="page">
+                <div class="watermark">Class Caddy</div>
+                <div class="header">Class Caddy</div>
+                <div class="page-content-wrapper">
+                    <div class="content-body">
+                        <h2 class="bangla">আনতারা ইবনে শাদ্দাদ (আনুমানিক ৫২৫-৬১৫ খ্রি.)</h2>
+                        
+                        <h3 class="bangla">জীবনী</h3>
+                        <p class="bangla">আনতারা ইবনে শাদ্দাদ ছিলেন আরবের ইতিহাসে একাধারে একজন কিংবদন্তী যোদ্ধা এবং প্রখ্যাত কবি। তিনি বনু আবস গোত্রে জন্মগ্রহণ করেন। তাঁর পিতা শাদ্দাদ ছিলেন গোত্রের একজন সম্ভ্রান্ত ব্যক্তি, কিন্তু তাঁর মাতা জাবিবা ছিলেন একজন হাবশি ক্রীতদাসী। এই কারণে আনতারা জন্মগতভাবে দাসের মর্যাদা পান এবং গায়ের কালো রঙের জন্য সমাজে অবহেলিত হন। পিতার স্বীকৃতি আদায়ের জন্য তাঁকে বহু যুদ্ধক্ষেত্রে বীরত্বের প্রমাণ দিতে হয়েছে। তিনি তাঁর চাচাতো বোন 'আবলা'-কে ভালোবাসতেন, কিন্তু তাঁর সামাজিক অবস্থানের কারণে এই ভালোবাসার স্বীকৃতি পাওয়া ছিল কঠিন। তাঁর জীবন ছিল সংগ্রাম, বীরত্ব এবং ভালোবাসার এক মহাকাব্য।</p>
+
+                        <h3 class="bangla">কাব্যপ্রতিভা ও অবদান</h3>
+                        <p class="bangla">আনতারাকে আরবের 'নাইট-পোয়েট' বা অশ্বারোহী কবি বলা হয়। তাঁর কবিতায় তাঁর সংগ্রামী জীবন এবং বীরত্বগাথা ফুটে উঠেছে।</p>
+                        <ul>
+                            <li class="bangla"><strong>বীরত্ব ও আত্মমর্যাদার কবিতা (ফখর):</strong> তাঁর কবিতার একটি বড় অংশ জুড়ে রয়েছে তাঁর নিজের বীরত্বের বর্ণনা। তিনি যুদ্ধক্ষেত্রে তাঁর সাহস, শক্তি এবং অশ্বারোহণে দক্ষতার কথা গর্বের সাথে বর্ণনা করেছেন।</li>
+                            <li class="bangla"><strong>নির্মল প্রেম:</strong> আবলার প্রতি তাঁর প্রেম ছিল পবিত্র ও দেহাতীত। তাঁর মু'আল্লাকা শুরু হয়েছে আবলার প্রতি তাঁর ভালোবাসার স্মৃতিচারণ দিয়ে। তিনি আবলা ব্যতীত অন্য কোনো নারীর দিকে তাকাননি বলে কথিত আছে, যা তাঁকে এক বিরল প্রেমিকের মর্যাদা দিয়েছে।</li>
+                            <li class="bangla"><strong>ব্যক্তিগত অনুভূতির প্রকাশ:</strong> তাঁর কবিতায় গোত্রীয় চেতনার চেয়ে ব্যক্তিগত দুঃখ, সংগ্রাম এবং অনুভূতির প্রকাশই বেশি ঘটেছে। তিনি তাঁর দাসত্বের যন্ত্রণা এবং সামাজিক স্বীকৃতির জন্য তাঁর আকুতিকে কবিতার মাধ্যমে প্রকাশ করেছেন।</li>
+                            <li class="bangla"><strong>রাসূলুল্লাহ (সা.)-এর প্রশংসা:</strong> কথিত আছে, রাসূলুল্লাহ (সা.) আনতারার বীরত্ব ও উন্নত চরিত্র সম্পর্কে শুনে বলেছিলেন, "বেদুইনদের মধ্যে আনতারা ব্যতীত আর কারো সম্পর্কে শুনে তাকে দেখার ইচ্ছা আমার হয়নি।"</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="page-number">Page-04</div>
+            </div>
+            
+            <!-- PAGE 5 -->
+            <div class="page">
+                <div class="watermark">Class Caddy</div>
+                <div class="header">Class Caddy</div>
+                <div class="page-content-wrapper">
+                    <div class="content-body">
+                        <h2 class="bangla">আমর ইবনে কুলছুম (মৃত্যু আনু. ৫৮৪ খ্রি.)</h2>
+                        
+                        <h3 class="bangla">জীবনী</h3>
+                        <p class="bangla">আমর ইবনে কুলছুম ছিলেন তাগলিব গোত্রের একজন পরাক্রমশালী নেতা ও কবি। তাঁর মা লায়লা বিনতে মুহালহিল ছিলেন আরবের আরেক কিংবদন্তী কবি ও যোদ্ধা মুহালহিলের কন্যা। আমর ইবনে কুলছুম তাঁর গোত্রীয় অহংকার এবং নির্ভীকতার জন্য প্রবাদতুল্য ছিলেন। কথিত আছে, তিনি হিরার রাজা আমর ইবনে হিন্দের দরবারে অন্যান্য কবিদের মতো রাজার স্তুতি না গেয়ে নিজের ও নিজ গোত্রের গৌরবগাথা গাইতেন। রাজার মা তাঁর মা-কে অপমান করায় তিনি রাজদরবারেই রাজাকে হত্যা করেন। এই ঘটনা আরবের ইতিহাসে তাঁকে এক কিংবদন্তী চরিত্রে পরিণত করেছে।</p>
+
+                        <h3 class="bangla">কাব্যপ্রতিভা ও অবদান</h3>
+                        <p class="bangla">তাঁর মু'আল্লাকাটি জাহেলী যুগের অন্যতম শ্রেষ্ঠ গৌরবগাথা হিসেবে বিবেচিত হয়।</p>
+                        <ul>
+                            <li class="bangla"><strong>গোত্রীয় গৌরব (ফখর):</strong> তাঁর মু'আল্লাকার মূল বিষয়বস্তু হলো নিজ গোত্র তাগলিবের বীরত্ব, শক্তি ও মর্যাদার প্রশংসা। এটি এতটাই শক্তিশালী ছিল যে, তাগলিব গোত্রের লোকেরা এটিকে প্রজন্মের পর প্রজন্ম ধরে মুখস্থ রাখত।</li>
+                            <li class="bangla"><strong>শরাবের বর্ণনা:</strong> তাঁর মু'আল্লাকাটি আরবের প্রথাগত পরিত্যক্ত আবাসের বর্ণনা দিয়ে শুরু হয়নি, বরং শরাব বা মদের বর্ণনা দিয়ে শুরু হয়েছে, যা ছিল একটি ব্যতিক্রমী সূচনা।</li>
+                            <li class="bangla"><strong>অদম্য ও নির্ভীক সুর:</strong> তাঁর কবিতার ভাষা ও সুর অত্যন্ত জোরালো, নির্ভীক এবং অহংকারী। এতে কোনো বিনয় বা নমনীয়তার ছাপ নেই। তিনি রাজার সামনে দাঁড়িয়েও নিজের গোত্রকে পৃথিবীর সেরা বলে ঘোষণা দিয়েছেন।</li>
+                            <li class="bangla"><strong>অশ্লীলতামুক্ত:</strong> তাঁর কাব্য অশ্লীলতা ও কুরুচিপূর্ণ বর্ণনা থেকে মুক্ত। এতে বীরত্ব, সহনশীলতা, মহানুভবতা ইত্যাদি মানবিক গুণাবলি চিত্রিত হয়েছে।</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="page-number">Page-05</div>
+            </div>
+        </div>
+    </div>
+	
+	<!-- =================== FEEDBACK & FOOTER START =================== -->
+    <section class="feedback-section py-20 bg-gray-900 border-t border-gray-800 main-website-ui">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-4xl font-bold mb-4">Feedback</h2>
+                    <p class="text-gray-400 mb-8">We value your input to make Class Caddy better. Please share your suggestions, report any issues, or let us know what you love!</p>
+                    <div class="flex gap-6">
+                        <a href="https://facebook.com/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-facebook-f fa-2x"></i></a>
+                        <a href="https://wa.me/+8801743303877" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-whatsapp fa-2x"></i></a>
+                        <a href="https://t.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-telegram fa-2x"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <form action="#" method="POST" class="space-y-6">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                            <input type="email" name="email" id="email" placeholder="Enter Email Address" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+                        </div>
+                        <div>
+                            <label for="suggestion" class="block text-sm font-medium text-gray-300 mb-2">Your suggestion</label>
+                            <textarea name="suggestion" id="suggestion" rows="4" placeholder="Write your complaint or suggestion" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"></textarea>
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer class="bg-gray-900 border-t border-gray-800 pt-16 pb-8 main-website-ui">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-3">
+                        <li><a href="about.html" class="text-gray-400 hover:text-emerald-400 transition">About Us</a></li>
+                        <li><a href="academic.html" class="text-gray-400 hover:text-emerald-400 transition">Courses</a></li>
+                        <li><a href="https://eco.du.ac.bd/" target="_blank" class="text-gray-400 hover:text-emerald-400 transition">DU Student Portal</a></li>
+                        <li><a href="https://result.du.ac.bd/" target="_blank" class="text-gray-400 hover:text-emerald-400 transition">DU Result Portal</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Contact Us</h3>
+                    <ul class="space-y-3">
+                        <li><a href="tel:+8801743303877" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fa-solid fa-phone"></i> Customer Support</a></li>
+                        <li><a href="https://wa.me/+8801743303877" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                        <li><a href="https://facebook.com/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-facebook-f"></i> Facebook</a></li>
+                        <li><a href="https://t.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-telegram"></i> Telegram</a></li>
+                        <li><a href="https://m.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-facebook-messenger"></i> Messenger</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Others</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Gallery</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Notice Board</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Events</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-2 lg:col-span-2">
+                     <h3 class="font-semibold text-white mb-4">Download App</h3>
+                     <div class="flex flex-col sm:flex-row lg:flex-col gap-4">
+                        <a href="#" class="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center gap-3 hover:bg-gray-700 transition">
+                            <i class="fab fa-google-play fa-2x text-white"></i>
+                            <div>
+                                <p class="text-xs text-gray-400">GET IT ON</p>
+                                <p class="text-lg font-semibold text-white">Google Play</p>
+                            </div>
+                        </a>
+                        <a href="#" class="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center gap-3 hover:bg-gray-700 transition">
+                            <i class="fab fa-apple fa-2x text-white"></i>
+                            <div>
+                                <p class="text-xs text-gray-400">Download on the</p>
+                                <p class="text-lg font-semibold text-white">App Store</p>
+                            </div>
+                        </a>
+                     </div>
+                </div>
+            </div>
+            <div class="mt-16 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+                <p>&copy; 2025 Class Caddy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+<!-- =================== FEEDBACK & FOOTER END =================== -->
+
+    <!-- Go to Top Button -->
+    <button class="go-to-top-btn main-website-ui" aria-label="Go to top">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+    </button>
+    
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+	<script src="script.js"></script>
+</body>
+</html>
