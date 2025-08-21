@@ -337,4 +337,84 @@ document.addEventListener('DOMContentLoaded', function () {
         // And run it again whenever the window is resized
         window.addEventListener('resize', updateBackButtonText);
     }
+	
+	
+	/* ================================================= */
+	/* == 9. Karaoke Highlighting and Scrolling Function == */
+	/* ================================================= */
+
+	/**
+	 * Initializes the karaoke highlighting functionality on a page.
+	 * This function is designed to be called automatically if the required
+	 * elements and data (lineTimings) are present.
+	 * @param {Array} timings - The array of timestamp objects for the current page.
+	 */
+	function setupKaraoke(timings) {
+		const audio = document.getElementById('audio-source');
+		const lines = Array.from(document.querySelectorAll('tbody tr[id^="line-"]'));
+		let currentHighlight = null;
+
+		if (!audio || lines.length === 0) {
+			// Exit if essential elements aren't found
+			return;
+		}
+
+		// --- Click-to-seek functionality for each table row ---
+		lines.forEach(lineEl => {
+			const lineData = timings.find(t => t.id === lineEl.id);
+			if (lineData) {
+				lineEl.addEventListener('click', () => {
+					audio.currentTime = lineData.start;
+					if (audio.paused) {
+						audio.play();
+					}
+				});
+			}
+		});
+
+		// --- Main listener to update highlight during playback ---
+		audio.addEventListener('timeupdate', function() {
+			const currentTime = audio.currentTime;
+			let activeLine = null;
+
+			for (const timing of timings) {
+				if (currentTime >= timing.start && currentTime < timing.end) {
+					activeLine = document.getElementById(timing.id);
+					break;
+				}
+			}
+
+			if (activeLine && activeLine !== currentHighlight) {
+				// Remove highlight from the previous line
+				if (currentHighlight) {
+					currentHighlight.classList.remove('highlight');
+				}
+				// Add highlight to the new active line
+				activeLine.classList.add('highlight');
+				currentHighlight = activeLine;
+
+				// Auto-scroll to the highlighted line
+				currentHighlight.scrollIntoView({
+					behavior: 'smooth',
+					block: 'center'
+				});
+			}
+		});
+
+		// --- Cleanup when the audio finishes ---
+		audio.addEventListener('ended', function() {
+			if (currentHighlight) {
+				currentHighlight.classList.remove('highlight');
+				currentHighlight = null;
+			}
+		});
+	}
+
+
+	// --- Auto-starter ---
+// This code is ALREADY inside a DOMContentLoaded listener,
+// so we just check for the variable and run the setup function directly.
+if (typeof lineTimings !== 'undefined') {
+    setupKaraoke(lineTimings);
+}
 });

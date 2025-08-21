@@ -11,17 +11,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="icon" href="https://eco.du.ac.bd//assets/images/fab_icon.ico" type="image/x-icon">
-    <style>
-        /* Style for the highlighted table row's text */
-        tr.highlight .arabic-cell,
-        tr.highlight .bangla {
-            color: #10b981 !important; /* Emerald Green Text */
-            transition: color 0.3s ease-in-out;
-        }
-        tbody tr {
-            cursor: pointer;
-        }
-    </style>
+
 </head>
 <body class="bg-gray-900 text-white">
 
@@ -264,76 +254,111 @@
 		</div>
 	</div>
     
-    <!-- Your standard footer and feedback sections would go here -->
+        <!-- =================== FEEDBACK & FOOTER START =================== -->
+    <section class="feedback-section py-20 bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-4xl font-bold mb-4">Feedback</h2>
+                    <p class="text-gray-400 mb-8">We value your input to make Class Caddy better. Please share your suggestions, report any issues, or let us know what you love!</p>
+                    <div class="flex gap-6">
+                        <a href="https://facebook.com/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-facebook-f fa-2x"></i></a>
+                        <a href="https://wa.me/+8801743303877" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-whatsapp fa-2x"></i></a>
+                        <a href="https://t.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-telegram fa-2x"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <form action="#" method="POST" class="space-y-6">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                            <input type="email" name="email" id="email" placeholder="Enter Email Address" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+                        </div>
+                        <div>
+                            <label for="suggestion" class="block text-sm font-medium text-gray-300 mb-2">Your suggestion</label>
+                            <textarea name="suggestion" id="suggestion" rows="4" placeholder="Write your complaint or suggestion" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"></textarea>
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-gray-900 border-t border-gray-800 pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-3">
+                        <li><a href="about.html" class="text-gray-400 hover:text-emerald-400 transition">About Us</a></li>
+                        <li><a href="academic.html" class="text-gray-400 hover:text-emerald-400 transition">Courses</a></li>
+                        <li><a href="https://eco.du.ac.bd/" target="_blank" class="text-gray-400 hover:text-emerald-400 transition">DU Student Portal</a></li>
+                        <li><a href="https://result.du.ac.bd/" target="_blank" class="text-gray-400 hover:text-emerald-400 transition">DU Result Portal</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Contact Us</h3>
+                    <ul class="space-y-3">
+                        <li><a href="tel:+8801743303877" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fa-solid fa-phone"></i> Customer Support</a></li>
+                        <li><a href="https://wa.me/+8801743303877" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                        <li><a href="https://facebook.com/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-facebook-f"></i> Facebook</a></li>
+                        <li><a href="https://t.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-telegram"></i> Telegram</a></li>
+                        <li><a href="https://m.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-facebook-messenger"></i> Messenger</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Others</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Gallery</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Notice Board</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Events</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-2 lg:col-span-2">
+                     <h3 class="font-semibold text-white mb-4">Download App</h3>
+                     <div class="flex flex-col sm:flex-row lg:flex-col gap-4">
+                        <a href="#" class="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center gap-3 hover:bg-gray-700 transition">
+                            <i class="fab fa-google-play fa-2x text-white"></i>
+                            <div>
+                                <p class="text-xs text-gray-400">GET IT ON</p>
+                                <p class="text-lg font-semibold text-white">Google Play</p>
+                            </div>
+                        </a>
+                        <a href="#" class="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center gap-3 hover:bg-gray-700 transition">
+                            <i class="fab fa-apple fa-2x text-white"></i>
+                            <div>
+                                <p class="text-xs text-gray-400">Download on the</p>
+                                <p class="text-lg font-semibold text-white">App Store</p>
+                            </div>
+                        </a>
+                     </div>
+                </div>
+            </div>
+            <div class="mt-16 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+                <p>&copy; 2025 Class Caddy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <!-- =================== FEEDBACK & FOOTER END =================== -->
+	
     
-    <script src="script.js"></script>
-    <script>
-        // This script is specific to this page for karaoke highlighting and scrolling
-        document.addEventListener('DOMContentLoaded', function () {
-            const audio = document.getElementById('audio-source');
-            const lines = Array.from(document.querySelectorAll('tbody tr[id^="line-"]'));
-            let currentHighlight = null;
 
-            // --- CORRECTED Timestamp Data based on your input ---
-            const lineTimings = [
-                { id: 'line-0', start: 0, end: 16 },
-                { id: 'line-1', start: 16, end: 23 },
-                { id: 'line-2', start: 23, end: 28 },
-                { id: 'line-3', start: 28, end: 35 },
-                { id: 'line-4', start: 35, end: 41 },
-                { id: 'line-5', start: 41, end: 48 },
-                { id: 'line-6', start: 48, end: 54 },
-                { id: 'line-7', start: 54, end: 65 } // 1:05 is 65 seconds
-            ];
+<script>
+    const lineTimings = [
+        { id: 'line-0', start: 0, end: 16 },
+        { id: 'line-1', start: 16, end: 23 },
+        { id: 'line-2', start: 23, end: 28 },
+        { id: 'line-3', start: 28, end: 35 },
+        { id: 'line-4', start: 35, end: 41 },
+        { id: 'line-5', start: 41, end: 48 },
+        { id: 'line-6', start: 48, end: 54 },
+        { id: 'line-7', start: 54, end: 65 }
+    ];
+</script>
 
-            if (audio && lines.length > 0) {
-                // Add click-to-seek functionality to each table row
-                lines.forEach(lineEl => {
-                    const lineData = lineTimings.find(t => t.id === lineEl.id);
-                    if (lineData) {
-                        lineEl.addEventListener('click', () => {
-                            audio.currentTime = lineData.start;
-                            if (audio.paused) {
-                                audio.play();
-                            }
-                        });
-                    }
-                });
-
-                audio.addEventListener('timeupdate', function() {
-                    const currentTime = audio.currentTime;
-                    
-                    let activeLine = null;
-                    for (const timing of lineTimings) {
-                        if (currentTime >= timing.start && currentTime < timing.end) {
-                            activeLine = document.getElementById(timing.id);
-                            break;
-                        }
-                    }
-
-                    if (activeLine && activeLine !== currentHighlight) {
-                        if (currentHighlight) {
-                            currentHighlight.classList.remove('highlight');
-                        }
-                        activeLine.classList.add('highlight');
-                        currentHighlight = activeLine;
-
-                        // Auto-scroll to the highlighted line
-                        currentHighlight.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-                    }
-                });
-
-                audio.addEventListener('ended', function() {
-                    if (currentHighlight) {
-                        currentHighlight.classList.remove('highlight');
-                        currentHighlight = null;
-                    }
-                });
-            }
-        });
-    </script>
+<script src="script.js"></script>
 </body>
 </html>

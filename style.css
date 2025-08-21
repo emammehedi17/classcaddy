@@ -633,3 +633,29 @@ body.is-fullscreen footer {
 .styled-table th.bangla {
     width: 50%;
 }
+
+
+/* ============================================= */
+/* == 14. Karaoke Highlighting and Table Styles == */
+/* ============================================= */
+
+/* Adds a pointer cursor to clickable table rows */
+tbody tr {
+    cursor: pointer;
+}
+
+/* Styles for the currently highlighted row during audio playback.
+  The !important declarations ensure these styles override any
+  default table styles (like zebra-striping).
+*/
+tr.highlight {
+    background-color: #10b981 !important; /* Emerald Green Background */
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out; 
+}
+
+/* Styles for the text within the highlighted row */
+tr.highlight .arabic-cell,
+tr.highlight .bangla {
+    color: black !important; /* Black Text */
+}
+
