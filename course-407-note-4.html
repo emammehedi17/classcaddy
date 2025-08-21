@@ -138,6 +138,35 @@
             margin-bottom: 10px;
         }
         
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            body.bg-gray-900 {
+                background-color: #fff; /* White background on mobile for better reading */
+            }
+            .page-container {
+                padding: 0;
+            }
+            .page {
+                width: 100%;
+                min-height: auto;
+                margin: 0 auto;
+                box-shadow: none;
+                border-bottom: 1px solid #eee;
+            }
+            .page-content-wrapper {
+                margin: 15pt;
+                padding: 12pt;
+                border-width: 2pt;
+            }
+            .page h1 { font-size: 20pt; }
+            .page h2 { font-size: 17pt; }
+            .page h3 { font-size: 15pt; }
+            .page p, .page li { font-size: 12pt; line-height: 1.7; }
+            .watermark { font-size: 40pt; opacity: 0.06; }
+            .page-number, .header { font-size: 9pt; }
+            .breadcrumbs-container { padding-top: 5rem; } /* Adjust for fixed header */
+        }
+
         @media print {
             body {
                 background: none;
@@ -237,7 +266,6 @@
             <div class="text-sm text-gray-400 breadcrumbs">
                 <a href="index.html" class="hover:text-emerald-400">Home</a> &gt; 
                 <a href="academic.html" class="hover:text-emerald-400">Academic</a> &gt; 
-                <a href="course-407.html" class="hover:text-emerald-400">Coourse-407</a> &gt; 
                 <span class="text-emerald-400 bangla">জাহেলী যুগের কবিগণ</span>
             </div>
             <a href="academic.html" class="flex items-center text-sm text-emerald-400 hover:text-emerald-300">
