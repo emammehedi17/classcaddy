@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Prose: Translation Studies</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&family=Kalpurush:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&family=Kalpurush:wght@400;700&display=swap');
+
+        body {
+            background-color: #cccccc;
+            font-family: 'Times New Roman', Times, serif;
+            color: #333;
+            margin: 0;
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+        }
+
+        .page {
+            background: white;
+            width: 210mm;
+            height: 297mm;
+            margin: 25px auto;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            padding: 28pt;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .page-content-wrapper {
+            border: 3pt double #006600;
+            padding: 15pt;
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .content-body {
+            padding-top: 1.5em;
+            padding-bottom: 1.5em;
+            flex-grow: 1;
+        }
+
+        .header {
+            position: absolute;
+            top: 14pt;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10pt;
+            color: #000;
+            opacity: 0.5;
+            font-family: 'Times New Roman', Times, serif;
+            z-index: 10;
+            user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+        }
+
+        .page:first-of-type .header {
+            display: none;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 14pt;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11pt;
+            font-family: 'Times New Roman', Times, serif;
+            z-index: 10;
+            user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+        }
+        
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 70pt;
+            color: #000000;
+            opacity: 0.08;
+            font-weight: bold;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 1;
+            font-family: 'Times New Roman', Times, serif;
+            user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+        }
+
+        h1 {
+            font-size: 24pt;
+            color: #004466;
+            text-align: center;
+            margin-bottom: 25px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        h2 {
+            font-size: 18pt;
+            color: #005683;
+            border-bottom: 2px solid #005683;
+            padding-bottom: 5px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        h3 {
+            font-size: 16pt;
+            color: #2E8B57;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        
+        p, li {
+            text-align: justify;
+            font-size: 14pt;
+            line-height: 1.8;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        ul {
+            padding-left: 40px;
+            list-style-type: square;
+        }
+
+        .bangla {
+            font-family: 'Kalpurush', sans-serif;
+        }
+
+        .arabic {
+            direction: rtl;
+            text-align: justify;
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 16pt;
+            color: #000000;
+            background-color: #f9f9f9;
+            padding: 10px 15px;
+            border-right: 4px solid #2E8B57;
+            border-radius: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .example-box {
+            background-color: #f0f8ff;
+            border-left: 5px solid #1e90ff;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .example-box p, .example-box li {
+            font-style: italic;
+        }
+
+        .example-box .source-lang {
+            font-weight: bold;
+            color: #191970;
+            font-style: normal;
+        }
+        
+        .translation-note {
+            background-color: #fffacd;
+            border: 1px solid #fada5e;
+            padding: 10px 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+
+        .styled-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 25px 0;
+            font-size: 12pt;
+            border: 1pt solid #A8D08D;
+        }
+
+        .styled-table th, .styled-table td {
+            border: 1px solid #A8D08D;
+            padding: 8px 10px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .styled-table th {
+            background-color: #70AD47;
+            color: white;
+            font-weight: bold;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 13pt;
+        }
+
+        .styled-table tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+        
+        .styled-table tr:nth-child(odd):not(:first-child) {
+             background-color: #E2EFD9;
+        }
+        
+        .styled-table .first-col {
+            font-weight: bold;
+        }
+        .styled-table .arabic-cell {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 15pt;
+            direction: rtl;
+        }
+        .styled-table td {
+             text-align: left;
+             padding: 12px;
+        }
+        .styled-table th {
+            text-align: center;
+        }
+
+        @media print {
+            body {
+                background: none;
+            }
+            .page {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <h1>Translation of Idioms and Fixed Expressions</h1>
+                <h2>1. Defining Idioms and Fixed Expressions</h2>
+                <p>In the study of language and translation, idioms and fixed expressions represent a unique and fascinating challenge. They are best understood as <strong>frozen patterns of language</strong>. This "frozen" quality means they allow for little to no variation in their form. A key characteristic of idioms, specifically, is that they often carry meanings that cannot be logically deduced from the individual words they contain. The meaning is figurative and culturally embedded, rather than literal.</p>
+                <p>While similar to idioms in their fixed nature, <strong>fixed expressions</strong> differ in one crucial aspect: their meaning is generally transparent and can be understood from the words that compose them. Examples include common social formulas and phrases like <em>"as a matter of fact," "ladies and gentlemen,"</em> and <em>"all the best."</em></p>
+                <h2>2. The Inflexible Nature of Idioms</h2>
+                <p>The "frozen" or fixed structure of an idiom means that it resists common grammatical and lexical alterations. Any attempt to modify an idiom will often result in a phrase that is either nonsensical or loses its idiomatic meaning entirely. The following manipulations are generally not possible:</p>
+                 <ul>
+                    <li><strong>Changing the order of words:</strong> The correct expression is "cats and dogs." Reversing it to "dogs and cats" is not the idiom.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="page-number">Page-01</div>
+    </div>
+
+    <!-- PAGE 2 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <ul>
+                    <li><strong>Deleting a word:</strong> The idiom is "the long and the short of it." One cannot simply remove a word like 'the' or 'and' without breaking the expression.</li>
+                    <li><strong>Adding a word:</strong> We cannot say "the very long and short of it" and retain the idiomatic meaning.</li>
+                    <li><strong>Replacing a word with another:</strong> The idiom "bury the hatchet" means to end a conflict. One cannot substitute "hatchet" with another word, such as "a hatchet." Similarly, a Bengali idiom like <span class="bangla">'এক মাঘে শীত যায় না'</span> (literally, 'winter does not go away in one month of Magh,' meaning one event is not the end of the story) cannot be changed to <span class="bangla">'এক বর্ষায় বৃষ্টি যায় না'</span>.</li>
+                    <li><strong>Changing its grammatical structure:</strong> The idiom "face the music" is an active verb phrase. It cannot be made passive, for instance, as in "the music was faced."</li>
+                </ul>
+                <div class="example-box">
+                    <p><span class="source-lang">Idiom:</span> Face the music</p>
+                    <p><span class="source-lang">Meaning:</span> To receive punishment or accept the unpleasant results of one's actions.</p>
+                    <p><span class="source-lang">Usage Examples:</span><br>
+                    - Mary broke a dining-room window and had to <em>face the music</em> when her father got home.<br>
+                    - After failing a math test, Tom had to go home and <em>face the music</em>.</p>
+                </div>
+                 <h2>3. How to Recognize an Idiom</h2>
+                <p>Identifying idioms can be straightforward in some cases, but more challenging in others. They can often be recognized through several key features.</p>
+            </div>
+        </div>
+        <div class="page-number">Page-02</div>
+    </div>
+
+    <!-- PAGE 3 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <h3>a) Violation of Truth Conditions</h3>
+                <p>Some of the most easily recognizable idioms are those that describe situations that are logically or physically impossible. When a speaker says "it's raining cats and dogs," the listener immediately understands that the phrase cannot be literal, as animals do not fall from the sky as rain. This violation of real-world possibility signals that the expression has a figurative meaning.</p>
+                <div class="example-box">
+                    <p><span class="source-lang">Examples of Idioms Violating Truth Conditions:</span></p>
+                    <ul>
+                        <li><em>It's raining cats and dogs</em> (meaning: it is raining very heavily).</li>
+                        <li><em>Storm in a teacup</em> (meaning: a small, insignificant issue that is causing a disproportionately large amount of fuss).</li>
+                        <li><em>Food for thought</em> (meaning: an idea or issue that is worthy of serious consideration).</li>
+                        <li><span class="bangla">ব্যাঙের সর্দি</span> (Benger shordi - literally 'a frog's cold,' meaning a trivial or non-existent ailment, something not to be taken seriously).</li>
+                    </ul>
+                </div>
+                 <h3>b) Ill-formed Grammatical Structures</h3>
+                <p>Other idioms stand out because they do not follow the standard grammatical rules of the language. Their structure is peculiar, archaic, or syntactically irregular. This unusual construction is a strong indicator that the phrase is a fixed, idiomatic expression.</p>
+            </div>
+        </div>
+        <div class="page-number">Page-03</div>
+    </div>
+
+    <!-- PAGE 4 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <div class="example-box">
+                    <p><span class="source-lang">Examples of Grammatically Irregular Idioms:</span></p>
+                    <ul>
+                        <li><em>Blow someone to kingdom come</em> (meaning: to kill someone, often with a powerful explosion). The phrase "kingdom come" is not a typical destination.</li>
+                        <li><em>Put paid to</em> (meaning: to stop something abruptly or destroy it). The syntax is unusual in modern English.</li>
+                        <li><em>By and large</em> (meaning: on the whole; everything considered).</li>
+                        <li><em>The world and his wife</em> (meaning: a large number of people; practically everyone).</li>
+                    </ul>
+                </div>
+                <h3>c) Misleading Literal Meanings</h3>
+                <p>Perhaps the most challenging idioms to recognize are those that have a perfectly reasonable and plausible literal meaning in addition to their idiomatic one. In these cases, the context is the only reliable guide to determining which meaning is intended. Without the correct contextual clues, a translator or language learner might interpret the phrase literally and completely miss the figurative sense.</p>
+                 <div class="example-box">
+                    <p><span class="source-lang">Example 1:</span> <em>To take someone for a ride.</em></p>
+                    <ul>
+                        <li><strong>Literal Meaning:</strong> To give someone a lift in a vehicle.</li>
+                        <li><strong>Idiomatic Meaning:</strong> To deceive or cheat someone in some way.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="page-number">Page-04</div>
+    </div>
+
+    <!-- PAGE 5 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <div class="example-box">
+                    <p><span class="source-lang">Example 2 (from American trucker slang):</span></p>
+                    <p><em>"I'd just done my stint as rubber duck, see, and pulled off the grandma lane into the pitstop to drain the radiator."</em></p>
+                    <ul>
+                        <li><strong>Plausible Literal Interpretation:</strong> A driver, possibly of a car carrying a rubber duck toy, pulled his vehicle off the slow lane into a service station to fix an overheating engine. This interpretation is logical but incorrect.</li>
+                        <li><strong>Actual Idiomatic Meaning:</strong> In this specialized slang, "rubber duck" refers to the first trucker in a convoy; "grandma lane" is the slow lane on a highway; a "pitstop" is a rest area; and "to drain the radiator" is a euphemism for using the toilet. The actual meaning is: "After my turn as the lead truck, I pulled off the slow lane into a rest stop to urinate."</li>
+                    </ul>
+                </div>
+                 <h3>d) Similar Form, Different Idiomatic Meaning</h3>
+                <p>Another deeply misleading category includes idioms that exist in both the source and target languages with the same or similar literal meaning, but have completely different idiomatic meanings. This can create significant confusion and lead to serious translation errors if the translator is not aware of the cultural and linguistic nuances.</p>
+            </div>
+        </div>
+        <div class="page-number">Page-05</div>
+    </div>
+
+    <!-- PAGE 6 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <div class="example-box">
+                    <p><span class="source-lang">Idiom:</span> <em>To pull someone's leg.</em></p>
+                    <ul>
+                        <li><strong>English Meaning:</strong> To tell someone something untrue as a joke in order to shock them temporarily and amuse them when they find out it wasn't true (i.e., to tease someone).</li>
+                        <li><strong>Arabic Equivalent Form:</strong> <span class="arabic">يَسْحَبُ رِجْلَهُ</span> (yishab rijlahu)</li>
+                        <li><strong>Arabic Meaning:</strong> To trick someone into revealing information they would have preferred to keep secret.</li>
+                    </ul>
+                </div>
+                <h2>4. Difficulties in Translating Idioms</h2>
+                <p>Translating idioms presents several distinct challenges that go beyond simple lexical conversion. These difficulties arise from linguistic and cultural differences between the source and target languages, making idioms a well-known pitfall for translators.</p>
+                <h3>a) No Equivalent in the Target Language</h3>
+                <p>An idiom or fixed expression in the source language may have no direct equivalent in the target language. This often happens when an idiom is rooted in a specific cultural practice, historical event, or social custom that does not exist in the target culture. In such cases, the translator cannot simply substitute one idiom for another.</p>
+            </div>
+        </div>
+        <div class="page-number">Page-06</div>
+    </div>
+    
+    <!-- PAGE 7 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <div class="example-box">
+                    <p><span class="source-lang">Examples of Culture-Specific Expressions:</span></p>
+                    <ul>
+                        <li>The greetings <em>"Merry Christmas"</em> or the wedding-related phrase <em>"Say yes"</em> are deeply tied to Western, Christian-influenced cultures and may not have a single, concise idiomatic equivalent in other cultures.</li>
+                        <li>The formal letter closings <em>"Yours faithfully"</em> and <em>"Yours sincerely"</em> are conventional in English but do not have standard idiomatic equivalents in Arabic. Instead, a more elaborate fixed expression is used to convey a similar level of formality, such as:
+                        <br><span class="arabic">وَتَفَضَّلُوا بِقَبُولِ فَائِقِ الْاِحْتِرَامِ</span>
+                        <br><em>(Back-translation: And be kind enough to accept [our] highest respect.)</em></li>
+                    </ul>
+                </div>
+                 <h3>b) Different Connotations or Context of Use</h3>
+                <p>A source language idiom may have a counterpart in the target language that appears similar but carries different connotations or is used in different contexts. The nuances of when and how the idiom is used might not be pragmatically transferable, leading to an awkward or inappropriate translation.</p>
+                 <div class="example-box">
+                    <p><span class="source-lang">English Idiom:</span> <em>To go to the dogs.</em></p>
+                    <p><strong>Meaning:</strong> Used to describe a place, person, or organization that has lost its good qualities and is deteriorating.</p>
+                    <p><strong>German Counterpart:</strong> It can typically only be used in connection with a person and often carries the much stronger meaning of 'to die' or 'to perish'.</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-number">Page-07</div>
+    </div>
+
+    <!-- PAGE 8 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <h3>c) Use of an Idiom in Both Literal and Idiomatic Senses</h3>
+                <p>A significant challenge arises when an idiom is used in the source text in both its literal and idiomatic senses simultaneously. This kind of wordplay is often used for rhetorical effect or humor. It is extremely difficult to replicate in a target language if the target language does not have an idiom that can also be interpreted literally in the same context.</p>
+                <div class="example-box">
+                    <p><span class="source-lang">Context:</span> An anecdote about Egyptian President Gamal Abdel Nasser after the 1967 war, when Egypt lost significant territory to Israel.</p>
+                    <p>Egypt's Commander-in-Chief, Field Marshal Amin, was horrified to see President Nasser ordering a tattoo to print on his right arm the names of the territories seized by Israel like Sinai, Gaza, Sharm al-Shaykh, Jerusalem and Golan Heights.</p>
+                    <p>"Why are you doing this?"</p>
+                    <p>"Lest I should forget them."</p>
+                    <p>"But why tattooed? What will you do if we get them back?"</p>
+                    <p>"If we get them back I'll <strong>cut off my right arm</strong>."</p>
+                </div>
+                 <div class="translation-note">
+                    <p><strong>Analysis:</strong> Here, "I'll cut off my right arm" is used with a dual meaning.
+                    <br><strong>1. Literal Sense:</strong> He will literally remove the tattooed arm.
+                    <br><strong>2. Idiomatic Sense:</strong> The English idiom "I'd give my right arm" means to want something very much. Nasser is using a variation to express his intense desire to get the territories back.
+                    This clever wordplay is almost impossible to convey fully in a language where the equivalent idiom for strong desire does not involve a physical arm.</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-number">Page-08</div>
+    </div>
+
+    <!-- PAGE 9 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <h3>d) Differences in Frequency and Convention of Use</h3>
+                <p>There can be significant differences in the conventional use of idioms across languages and genres. English, for example, frequently uses idioms in many types of texts, including advertisements, promotional materials, and the tabloid press. However, their use is less common in more formal writing like quality-press news reports. In contrast, languages like Chinese and Arabic often maintain a sharper distinction between written and spoken discourses. In these languages, the use of idioms, which are often seen as part of informal, spoken language, tends to be avoided in formal written texts. A translator must be sensitive to these conventions to produce a text that feels natural in the target language.</p>
+                <h2>5. Strategies for Translating Idioms</h2>
+                <p>Given the complexities involved, translators employ a range of strategies to handle idioms. The choice of strategy depends on the nature of the idiom, its context, and the conventions of the target language.</p>
+                <h3>a) Using an Idiom of Similar Meaning and Form</h3>
+                <p>This is the ideal solution, but it is only occasionally possible. This strategy involves finding an idiom in the target language that uses equivalent lexical items and conveys a similar meaning. It creates a very natural-sounding and effective translation.</p>
+            </div>
+        </div>
+        <div class="page-number">Page-09</div>
+    </div>
+    
+    <!-- PAGE 10 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <div class="example-box">
+                    <p><span class="source-lang">Example 1:</span></p>
+                    <p><strong>English:</strong> Storm in a teacup</p>
+                    <p><strong>Bengali:</strong> <span class="bangla">চায়ের কাপে ঝড়</span> (Chayer kape jhor)</p>
+                </div>
+                <div class="example-box">
+                    <p><span class="source-lang">Example 2 (from <em>A Hero from Zero</em>):</span></p>
+                    <p><strong>Source Text (English):</strong> The Fayeds have turned the pre-bid House of Fraser strategy <em>on its head</em>.</p>
+                    <p><strong>Target Text (Arabic):</strong></p>
+                    <p class="arabic">وَبِذَا يَكُونُ الْإِخْوَةُ فَايِد قَدْ قَلَبُوا اِسْتِرَاتِيجِيَّةَ هَاوْس أُوفْ فِرِيزَرْ السَّابِقَةَ عَلَى عَرْضِ الْاِمْتِلَاكِ رَأْسًا عَلَى عَقِبٍ.</p>
+                    <p><strong>Back-translation:</strong> And with this the Fayed brothers have turned the strategy of the House of Fraser previous to the offer of ownership <em>head over heel</em>.</p>
+                </div>
+                 <h3>b) Using an Idiom of Similar Meaning but Dissimilar Form</h3>
+                <p>A more common scenario is finding an idiom in the target language that has a similar meaning to the source idiom but accomplishes it with different lexical items and imagery. The core idea is preserved, but the cultural metaphor changes.</p>
+            </div>
+        </div>
+        <div class="page-number">Page-10</div>
+    </div>
+
+    <!-- PAGE 11 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <div class="example-box">
+                    <p><span class="source-lang">English Idiom:</span> <em>One good turn deserves another.</em></p>
+                    <p><span class="source-lang">Bengali Counterpart:</span> <span class="bangla">ইটটি মারলে পাটকেলটি খেতে হবে।</span> (Back-translation: If you throw a brickbat, you should expect to be hit by a piece of brick in return.)</p>
+                </div>
+                <h3>c) Translation by Paraphrase</h3>
+                <p>This is the most common strategy for translating idioms, especially when a direct idiomatic match cannot be found. The translator explains the figurative meaning of the idiom using plain, literal language. While this approach ensures accuracy, it often loses the stylistic flair of the original idiom.</p>
+                <div class="example-box">
+                    <p><span class="source-lang">Example 1 (Car brochure):</span></p>
+                    <p><strong>Source (English):</strong> The suspension system has been fully uprated to <em>take rough terrain in its stride</em>.</p>
+                    <p><strong>Target (Arabic):</strong></p>
+                    <p class="arabic">وَقَدْ رُفِعَتْ طَاقَةُ نِظَامِ التَّعْلِيقِ بِحَيْثُ يَتَغَلَّبُ عَلَى وُعُورَةِ الْأَرْضِ.</p>
+                    <p><strong>Back-translation:</strong> The capacity of the suspension system has been raised so that it overcomes the roughness of the terrain.</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-number">Page-11</div>
+    </div>
+    
+    <!-- PAGE 12 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                 <div class="example-box">
+                    <p><span class="source-lang">Example 2 (from <em>A Hero from Zero</em>):</span></p>
+                    <p><strong>Source (English):</strong> ...while he <em>pushed another pony past the post</em>.</p>
+                    <p><strong>Target (Arabic):</strong></p>
+                    <p class="arabic">...بَيْنَمَا أَعَانَ مُتَسَابِقًا آخَرَ عَلَى بُلُوغِ نِهَايَةِ السِّبَاقِ.</p>
+                    <p><strong>Back-translation:</strong> ...while he helped another competitor to reach the end of the race.</p>
+                </div>
+                <h3>d) Translation by Omission</h3>
+                <p>In some cases, an idiom may be omitted altogether in the target text. Omission is generally justified if the idiom has no close match in the target language, its meaning cannot be easily paraphrased without being overly complex, or if its removal does not significantly impact the overall meaning.</p>
+                 <div class="example-box">
+                    <p><span class="source-lang">Example (from <em>A Hero from Zero</em>):</span></p>
+                    <p><strong>Source Text (English):</strong> It was bitter, but funny, to see that Professor Smith had doubled his own salary before recommending the offer from Fayed, and added a pre-dated bonus <em>for good measure</em>.</p>
+                    <p><strong>Analysis:</strong> The Arabic translation simply states that he "added to that a bonus." The stylistic nuance of the idiom ("for good measure") is omitted.</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-number">Page-12</div>
+    </div>
+
+    <!-- PAGE 13 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <h2>Some Arabic Idioms and Expressions</h2>
+                <p>The following table provides a list of common Arabic idioms, their literal translations, their idiomatic meanings, and their equivalents or explanations in English and Bengali.</p>
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Arabic Idiom</th>
+                            <th>Literal English Meaning / Back Translation</th>
+                            <th>Explanation / English Equivalent</th>
+                            <th class="bangla">Literal Bangla Meaning / Bangla Equivalent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="arabic-cell">تَنْشَقُّ الْأَرْضُ وَتَبْلَعُنِي</td>
+                            <td>May the earth split open and swallow me.</td>
+                            <td>Used in a frustrating or embarrassing situation where one wishes to disappear.</td>
+                            <td class="bangla">মাটি ফাঁক হয়ে যাক, আমি ঢুকে যাই।</td>
+                        </tr>
+                        <tr>
+                            <td class="arabic-cell">أَحْلَاهُمَا مُرٌّ</td>
+                            <td>The sweeter of the two is bitter.</td>
+                            <td>When you have only two unpleasant choices. (Between a rock and a hard place)</td>
+                            <td class="bangla">দুটির মধ্যে মিষ্টিটাও তিক্ত। (জলে কুমির, ডাঙায় বাঘ)</td>
+                        </tr>
+                        <tr>
+                            <td class="arabic-cell">أَبْعَدُ مِنْ نُجُومِ السَّمَا</td>
+                            <td>Farther than the stars in the sky.</td>
+                            <td>Used to describe something that is absolutely impossible to achieve.</td>
+                            <td class="bangla">আকাশের তারা থেকেও দূরে। (আকাশ কুসুম কল্পনা)</td>
+                        </tr>
+                        <tr>
+                            <td class="arabic-cell">اِبْنُ بَلَدٍ</td>
+                            <td>Son of the country/town.</td>
+                            <td>A compliment for someone who is loyal, authentic, generous, and true to their origins.</td>
+                            <td class="bangla">মাটির মানুষ।</td>
+                        </tr>
+                         <tr>
+                            <td class="arabic-cell">آخِرُ الْعُنْقُودِ</td>
+                            <td>The last bunch (of grapes).</td>
+                            <td>An affectionate term for the youngest child in a family, who is often pampered.</td>
+                            <td class="bangla">শেষের আঙ্গুরের থোকা। (ছোট সন্তান)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="page-number">Page-13</div>
+    </div>
+    
+    <!-- PAGE 14 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                 <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Arabic Idiom</th>
+                            <th>Literal English Meaning / Back Translation</th>
+                            <th>Explanation / English Equivalent</th>
+                            <th class="bangla">Literal Bangla Meaning / Bangla Equivalent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                         <tr>
+                            <td class="arabic-cell">أَصَابِعُ الْيَدِ لَيْسَتْ مِثْلَ بَعْضِهِنَّ</td>
+                            <td>The fingers of the hand are not like each other.</td>
+                            <td>People from the same group or family are not all the same. (All fingers are not the same.)</td>
+                            <td class="bangla">হাতের পাঁচ আঙুল সমান নয়।</td>
+                        </tr>
+                        <tr>
+                            <td class="arabic-cell">إِنَّ الطُّيُورَ عَلَى أَشْكَالِهَا تَقَعُ</td>
+                            <td>Birds of a feather flock together.</td>
+                            <td>People tend to associate with others who are similar to them.</td>
+                            <td class="bangla">চোরা চোরা মাসতুতো ভাই।</td>
+                        </tr>
+                        <tr>
+                            <td class="arabic-cell">أَرْضُ اللهِ وَاسِعَةٌ</td>
+                            <td>God's land is vast.</td>
+                            <td>Used when one must leave a place but is hopeful about finding opportunities elsewhere.</td>
+                            <td class="bangla">আল্লাহর জমিন অনেক বড়।</td>
+                        </tr>
+                        <tr>
+                            <td class="arabic-cell">اِنْقَلَبَ السِّحْرُ عَلَى السَّاحِرِ</td>
+                            <td>The magic has turned against the magician.</td>
+                            <td>A person's evil plan has backfired on them. (To dig one's own grave.)</td>
+                            <td class="bangla">জাদু জাদুকরের উপর উল্টে গেছে। (নিজের ফাঁদে নিজে পড়া)</td>
+                        </tr>
+                         <tr>
+                            <td class="arabic-cell">أَتَى الشَّيْءَ مِنْ بَابِهِ</td>
+                            <td>He approached the thing from its door.</td>
+                            <td>To go about something in the proper or correct way. (From the Quran)</td>
+                            <td class="bangla">সঠিক উপায়ে কিছু করা।</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="page-number">Page-14</div>
+    </div>
+    
+    <!-- PAGE 15 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Arabic Idiom</th>
+                            <th>Literal English Meaning / Back Translation</th>
+                            <th>Explanation / English Equivalent</th>
+                            <th class="bangla">Literal Bangla Meaning / Bangla Equivalent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="arabic-cell">اُخْطُمْ الطِّينَ مَا دَامَ رَطْبًا</td>
+                            <td>Stamp the clay while it is still wet.</td>
+                            <td>Make hay while the sun shines.</td>
+                            <td class="bangla">জোঁ বুঝে কোপ মারা।</td>
+                        </tr>
+                         <tr>
+                            <td class="arabic-cell">إِذَا هَبَّتْ رِيَاحُكَ فَاغْتَنِمْهَا</td>
+                            <td>If your winds blow, seize the opportunity.</td>
+                            <td>Strike while the iron is hot.</td>
+                            <td class="bangla">সুযোগের বাতাস বইলে তা কাজে লাগাও।</td>
+                        </tr>
+                        <tr>
+                            <td class="arabic-cell">الْجُوعُ أَمْهَرُ الطَّبَّاخِينَ</td>
+                            <td>Hunger is the most skilled of cooks.</td>
+                            <td>When you are truly hungry, any food tastes delicious. (Hunger is the best sauce.)</td>
+                            <td class="bangla">ক্ষুধাই সেরা পাচক।</td>
+                        </tr>
+                        <tr>
+                            <td class="arabic-cell">الْحَاجَةُ تَفْتِقُ الْحِيلَةَ</td>
+                            <td>Need rips open invention.</td>
+                            <td>When you need something, you find a way to get it. (Necessity is the mother of invention.)</td>
+                            <td class="bangla">প্রয়োজনই উদ্ভাবনের জনক।</td>
+                        </tr>
+                        <tr>
+                            <td class="arabic-cell">ضَرَبَ بِهِ عُرْضَ الْحَائِطِ</td>
+                            <td>He hit the width of the wall with it.</td>
+                            <td>To completely ignore or disregard something. (To brush aside.)</td>
+                            <td class="bangla">দেয়ালের সাথে ছুড়ে মারা। (অগ্রাহ্য করা)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="page-number">Page-15</div>
+    </div>
+    
+    <!-- PAGE 16 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Arabic Idiom</th>
+                            <th>Literal English Meaning / Back Translation</th>
+                            <th>Explanation / English Equivalent</th>
+                            <th class="bangla">Literal Bangla Meaning / Bangla Equivalent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="arabic-cell">الْحَدِيثُ ذُو شُجُونٍ</td>
+                            <td>The conversation has branches.</td>
+                            <td>One topic leads to another.</td>
+                            <td class="bangla">কথার শাখা-প্রশাখা আছে। (কথা থেকে কথা বাড়ে)</td>
+                        </tr>
+                        <tr>
+                            <td class="arabic-cell">ضَاقَتْ بِهِ الْأَرْضُ</td>
+                            <td>The earth narrowed for him.</td>
+                            <td>To be at a loss; to feel trapped or helpless.</td>
+                            <td class="bangla">তার জন্য পৃথিবী সংকুচিত হয়ে গেল। (অসহায় বোধ করা)</td>
+                        </tr>
+                         <tr>
+                            <td class="arabic-cell">الضَّرُورَاتُ تُبِيحُ الْمَحْظُورَاتِ</td>
+                            <td>Necessities permit the forbidden things.</td>
+                            <td>In times of extreme need, one is allowed to do things that are normally forbidden. (Necessity knows no law.)</td>
+                            <td class="bangla">অভাব বা প্রয়োজন নিষিদ্ধকেও বৈধ করে।</td>
+                        </tr>
+                         <tr>
+                            <td class="arabic-cell">ضِغْثٌ عَلَى إِبَّالَةٍ</td>
+                            <td>A bundle of twigs on a bundle of wood.</td>
+                            <td>Trouble upon trouble; one problem added to another.</td>
+                            <td class="bangla">কাঠের বোঝার উপর খড়ের বোঝা। (গোদের উপর বিষফোঁড়া)</td>
+                        </tr>
+                         <tr>
+                            <td class="arabic-cell">أَسْمَعُ جَعْجَعَةً وَلَا أَرَى طَحْنًا</td>
+                            <td>I hear a rattling but I don't see any flour.</td>
+                            <td>Said of someone who makes a lot of noise but delivers no results. (All talk and no action.)</td>
+                            <td class="bangla">ঘর্ঘর শব্দ শুনি কিন্তু আটা দেখি না। (ফাঁকা আওয়াজ)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="page-number">Page-16</div>
+    </div>
+    
+    <!-- PAGE 17 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <h2>Grammatical Equivalence in Translation</h2>
+                <p>Grammar is the set of rules that governs how a language is structured. When translating, achieving grammatical equivalence is a major challenge because these rules can differ dramatically between languages. A faithful translation must convey the meaning accurately while also adhering to the grammatical norms of the target language. This section explores key areas of grammatical difference: number, gender, and tense/aspect.</p>
+                <h3>1. The Category of Number</h3>
+                <p>The concept of countability—distinguishing between one and more than one—is a near-universal idea in human cognition. However, how languages express this concept grammatically varies significantly.</p>
+                <ul>
+                    <li>Some languages, such as <strong>Japanese, Chinese,</strong> and <strong>Vietnamese</strong>, do not have a formal grammatical category of number. Nouns do not typically change their form to indicate plurality.</li>
+                    <li>Many languages, including <strong>English</strong> and <strong>Bengali</strong>, have a two-part system: <strong>singular</strong> (one) and <strong>plural</strong> (more than one).</li>
+                    <li>A significant number of languages, notably <strong>Arabic</strong>, have a three-part system: <strong>singular</strong> (one), <strong>dual</strong> (two), and <strong>plural</strong> (more than two).</li>
+                </ul>
+            </div>
+        </div>
+        <div class="page-number">Page-17</div>
+    </div>
+    
+    <!-- PAGE 18 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                 <ul>
+                    <li>A small number of languages, such as <strong>Fijian</strong>, have even more complex systems, including a four-part distinction: <strong>singular, dual, trial,</strong> and <strong>plural</strong>.</li>
+                </ul>
+                <p>These differences create specific challenges when translating between languages with different number systems.</p>
+                <h4>Strategies for Translating Number</h4>
+                <p>When translating between languages with different number systems, a translator must choose a strategy, such as omitting information, encoding it lexically (e.g., Indonesian <em>buku-buku</em> for "books"), or specifying a number (e.g., using the Arabic dual form) where the source language was less specific.</p>
+                <h3>2. The Category of Gender</h3>
+                <p>Grammatical gender is another area of significant variation. It refers to the classification of nouns, pronouns, and sometimes adjectives and verbs into categories like masculine, feminine, and neuter. This grammatical category does not always align with natural, biological gender.</p>
+                <ul>
+                    <li><strong>English</strong> has a limited gender system, primarily in third-person pronouns (<em>he/she/it</em>). There is a modern trend towards the <strong>de-gendering of language</strong>, favoring neutral terms like "actor" for all genders.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="page-number">Page-18</div>
+    </div>
+
+    <!-- PAGE 19 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <ul>
+                    <li><strong>Arabic</strong> has a very extensive and pervasive gender system. It applies to pronouns (<span class="arabic">أَنْتَ</span> vs. <span class="arabic">أَنْتِ</span>), nouns (<span class="arabic">طَالِبٌ</span> vs. <span class="arabic">طَالِبَةٌ</span>), adjectives, and even verbs (<span class="arabic">ذَهَبَ</span> vs. <span class="arabic">ذَهَبَتْ</span>).</li>
+                </ul>
+                <p>This means that when translating from a language with limited gender like English into a language with extensive gender like Arabic, the translator must often add gender information that is not present in the source text.</p>
+                <h3>3. Tense and Aspect</h3>
+                <p>The concepts of tense and aspect deal with how languages locate events in time. While often related, they are distinct:</p>
+                <ul>
+                    <li><strong>Tense</strong> primarily relates to locating an event in time, typically in the past, present, or future.</li>
+                    <li><strong>Aspect</strong> deals with the temporal distribution of an event—how it unfolds over time. This includes whether an action is completed or ongoing.</li>
+                </ul>
+                <p>While most languages have systems for past, present, and future, their sub-categories and the way they handle aspect can be very different. A major point of non-equivalence between English and Arabic is that the Arabic <em>Mudari'</em> (المضارع) form can encompass both the present and the future.</p>
+            </div>
+        </div>
+        <div class="page-number">Page-19</div>
+    </div>
+    
+    <!-- PAGE 20 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <p>The following table illustrates some key differences and common translation pairings between English and Arabic tense/aspect systems.</p>
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Tense & Aspect</th>
+                            <th>English Example</th>
+                            <th>Arabic Translation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Past Simple</strong></td>
+                            <td>I wrote a letter.</td>
+                            <td class="arabic-cell">كَتَبْتُ رِسَالَةً<br><small>(Katabtu risalatan)</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Present Perfect</strong></td>
+                            <td>I have written a letter.</td>
+                            <td class="arabic-cell">كَتَبْتُ رِسَالَةً / قَدْ كَتَبْتُ رِسَالَةً<br><small>(I wrote / I have indeed written)</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Past Perfect</strong></td>
+                            <td>I had written a letter.</td>
+                            <td class="arabic-cell">كُنْتُ قَدْ كَتَبْتُ رِسَالَةً<br><small>(Kuntu qad katabtu risalatan)</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Present Progressive</strong></td>
+                            <td>It is raining.</td>
+                            <td class="arabic-cell">تَهْطِلُ الْأَمْطَارُ الْآنَ<br><small>(The rain is falling now)</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Past Progressive</strong></td>
+                            <td>He was wandering...</td>
+                            <td class="arabic-cell">كَانَ يَتَجَوَّلُ...<br><small>(Kana yatajawwalu...)</small></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="page-number">Page-20</div>
+    </div>
+
+    <!-- PAGE 21 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Tense & Aspect</th>
+                            <th>English Example</th>
+                            <th>Arabic Translation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                         <tr>
+                            <td><strong>Present Perfect Progressive</strong></td>
+                            <td>Children have been playing...</td>
+                            <td class="arabic-cell">كَانَ الْأَطْفَالُ يَلْعَبُونَ...<br><small>(The children were playing...)</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Future Progressive</strong></td>
+                            <td>I shall be eating.</td>
+                            <td class="arabic-cell">سَوْفَ آكُلُ<br><small>(Sawfa aakulu - I will eat)</small></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Future Perfect</strong></td>
+                            <td>The doctor will have gone...</td>
+                            <td class="arabic-cell">سَوْفَ يَكُونُ الطَّبِيبُ قَدْ ذَهَبَ...<br><small>(The doctor will be have gone...)</small></td>
+                        </tr>
+                    </tbody>
+                </table>
+                 <div class="translation-note">
+                    <p><strong>Note on Progressive Aspect:</strong> Arabic can express the progressive aspect (ongoing action) by using adverbs like <span class="arabic">الْآنَ</span> (now) or by using the active participle (<span class="arabic">اِسْمُ الْفَاعِلِ</span>). For example, "I'm leaving" can be translated as <span class="arabic">أَنَا مُغَادِرٌ</span> (Ana mughadirun - I am a leaver).</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-number">Page-21</div>
+    </div>
+    
+</body>
+</html>
