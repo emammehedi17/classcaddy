@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steps for a Successful Translation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&family=Kalpurush:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&family=Kalpurush:wght@400;700&display=swap');
+
+        body {
+            background-color: #cccccc;
+            font-family: 'Times New Roman', Times, serif;
+            color: #333;
+            margin: 0;
+            -webkit-print-color-adjust: exact;
+            color-adjust: exact;
+        }
+
+        .page {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 25px auto;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            padding: 28pt;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .page-content-wrapper {
+            border: 3pt double #006600;
+            padding: 15pt;
+            flex-grow: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .content-body {
+            padding-top: 1.5em;
+            padding-bottom: 1.5em;
+            flex-grow: 1;
+        }
+
+        .header {
+            position: absolute;
+            top: 14pt;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10pt;
+            color: #000;
+            opacity: 0.5;
+            font-family: 'Times New Roman', Times, serif;
+            z-index: 10;
+            user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+        }
+
+        .page:first-of-type .header {
+            display: none;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 14pt;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11pt;
+            font-family: 'Times New Roman', Times, serif;
+            z-index: 10;
+            user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+        }
+        
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 70pt;
+            color: #000000;
+            opacity: 0.08;
+            font-weight: bold;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 1;
+            font-family: 'Times New Roman', Times, serif;
+            user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;
+        }
+
+        h1 {
+            font-size: 24pt;
+            color: #004466;
+            text-align: center;
+            margin-bottom: 25px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        
+        .styled-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 25px 0;
+            font-size: 12pt;
+            border: 1pt solid #A8D08D;
+        }
+
+        .styled-table th, .styled-table td {
+            border: 1px solid #A8D08D;
+            padding: 8px 10px;
+            vertical-align: middle;
+        }
+
+        .styled-table th {
+            background-color: #70AD47;
+            color: white;
+            font-weight: bold;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 13pt;
+            text-align: center;
+        }
+
+        .styled-table tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+        
+        .styled-table tr:nth-child(odd):not(:first-child) {
+             background-color: #E2EFD9;
+        }
+        
+        .styled-table .arabic-cell {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 16pt;
+            direction: rtl;
+            text-align: right;
+        }
+        .styled-table .bangla-cell {
+            font-family: 'Kalpurush', sans-serif;
+            font-size: 14pt;
+            text-align: justify;
+        }
+        .styled-table td {
+             padding: 12px;
+        }
+
+        .final-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .final-links a {
+            margin: 0 15px;
+            font-size: 12pt;
+            color: #005683;
+            text-decoration: none;
+        }
+        .final-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media print {
+            body {
+                background: none;
+            }
+            .page {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+                min-height: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PAGE 1 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <h1 style="font-family: 'Noto Naskh Arabic', serif;">خُطُوَاتُ التَّرْجَمَةِ النَّاجِحَةِ</h1>
+                <h1 class="bangla-cell" style="font-size: 20pt;">সফল অনুবাদের ধাপসমূহ</h1>
+                
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Arabic Sentence</th>
+                            <th class="bangla-cell">Bangla Translation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="arabic-cell">اِسْتِكْمَالًا لِسِلْسِلَةِ التَّرْجَمَةِ الْقَانُونِيَّةِ، نَتَعَرَّضُ الْيَوْمَ لِبَعْضِ الْخُطُوَاتِ الْأَسَاسِيَّةِ لِلتَّرْجَمَةِ النَّاجِحَةِ، وَالَّتِي سَتَجْعَلُ تَرْجَمَةَ أَيِّ نَصٍّ قَانُونِيًّا كَانَ أَوْ لَمْ يَكُنْ، أَسْهَلَ لِلْمُتَرْجِمِ الْمُبْتَدِئِ.</td>
+                            <td class="bangla-cell">আইনী অনুবাদের ধারাবাহিকতা অব্যাহত রাখতে, আজ আমরা সফল অনুবাদের জন্য কিছু মৌলিক পদক্ষেপ নিয়ে আলোচনা করব, যা একজন নবীন অনুবাদকের জন্য যেকোনো পাঠ্য—হোক তা আইনী বা সাধারণ—অনুবাদ করা সহজ করে তুলবে।</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Arabic Sentence</th>
+                            <th class="bangla-cell">Bangla Translation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="arabic-cell">أَوَّلاً: يَجِبُ أَنْ يَكُونَ الْمُتَرْجِمُ الْقَانُونِيُّ فِي هَذِهِ الْحَالَةِ مُتَمَكِّنًا مِنَ اللُّغَتَيْنِ مَوْضُوعِ التَّرْجَمَةِ، وَبِمَا أَنَّ اللُّغَتَيْنِ الْعَرَبِيَّةَ وَالْإِنْجِلِيزِيَّةَ هُمَا الْأَكْثَرُ شُيُوعًا فِي الْعَمَلِ الْقَانُونِيِّ فِي سَلْطَنَةِ عُمَانَ، سَنَقُومُ بِالتَّرْكِيزِ عَلَيْهِمَا حَصْرِيًّا.</td>
+                            <td class="bangla-cell">প্রথমত: এক্ষেত্রে আইনী অনুবাদককে অবশ্যই অনুবাদের দুটি ভাষায় পারদর্শী হতে হবে। যেহেতু ওমান সালতানাতে আইনী কাজে আরবি এবং ইংরেজি ভাষা সবচেয়ে বেশি প্রচলিত, তাই আমরা কেবল এ দুটি ভাষার উপরই মনোযোগ দেব।</td>
+                        </tr>
+                        <tr>
+                            <td class="arabic-cell">الْقَصْدُ مِنْ "التَّمَكُّنِ مِنَ اللُّغَةِ" لَا يَعْنِي تَحَدُّثَهَا بِطَلَاقَةٍ فَقَطْ، بَلْ يَعْنِي كَذَلِكَ التَّمَكُّنَ مِنْ الشِّقَّيْنِ الرَّسْمِيِّ (الْفُصْحَى) وَالْعَامِّيِّ مِنَ اللُّغَةِ، فَاللُّغَةُ الْمُسْتَخْدَمَةُ فِي كِتَابَةِ النُّصُوصِ وَالتَّشْرِيعَاتِ الْقَانُونِيَّةِ، سَوَاءٌ الْعَرَبِيَّةُ أَوِ الْإِنْجِلِيزِيَّةُ دَائِمًا مَا تَكُونُ رَسْمِيَّةً.</td>
+                            <td class="bangla-cell">"ভাষায় দক্ষতা" বলতে শুধু অনর্গল কথা বলা বোঝায় না, বরং ভাষার আনুষ্ঠানিক (শুদ্ধ) এবং অনানুষ্ঠানিক (চলিত) উভয় দিক সম্পর্কেই পারদর্শিতা বোঝায়। আইনী পাঠ্য এবং আইন প্রণয়নে ব্যবহৃত ভাষা, আরবি হোক বা ইংরেজি, সবসময়ই আনুষ্ঠানিক হয়।</td>
+                        </tr>
+                        <tr>
+                            <td class="arabic-cell">وَمِنَ الْمُهِمِّ أَنْ يَنْتَبِهَ الْمُتَرْجِمُ لِهَذِهِ النُّقْطَةِ لِأَنَّهُ مِنَ السَّهْلِ جِدًّا اِسْتِخْدَامُ كَلِمَةٍ أَوْ كَلِمَاتٍ عَامِّيَّةٍ عِنْدَ تَرْجَمَةِ نَصٍّ مَا، خُصُوصًا عِنْدَ التَّرْجَمَةِ مِنَ الْعَرَبِيَّةِ إِلَى الْإِنْجِلِيزِيَّةِ.</td>
+                            <td class="bangla-cell">অনুবাদকের জন্য এই বিষয়টি খেয়াল রাখা গুরুত্বপূর্ণ, কারণ কোনো পাঠ্য অনুবাদ করার সময়, বিশেষ করে আরবি থেকে ইংরেজিতে অনুবাদ করার সময়, চলিত শব্দ বা শব্দাবলী ব্যবহার করে ফেলা খুব সহজ।</td>
+                        </tr>
+                         <tr>
+                            <td class="arabic-cell">أَسْهَلُ طَرِيقَةٍ لِمَعْرِفَةِ الْكَلِمَةِ الْمُنَاسِبَةِ هِيَ الْبَحْثُ عَنْ مَعْنَى الْكَلِمَةِ الْحَرْفِيِّ أَوَّلاً، ثُمَّ الْبَحْثُ عَنِ الْمُرَادِفَاتِ الرَّسْمِيَّةِ لِتِلْكَ الْكَلِمَةِ وَاسْتِخْدَامِ الْمُنَاسِبِ مِنْهَا تَبَعًا لِسِيَاقِ النَّصِّ.</td>
+                            <td class="bangla-cell">উপযুক্ত শব্দ খুঁজে বের করার সবচেয়ে সহজ উপায় হলো প্রথমে শব্দটির আক্ষরিক অর্থ অনুসন্ধান করা, তারপর সেই শব্দের আনুষ্ঠানিক প্রতিশব্দগুলো খুঁজে বের করা এবং পাঠ্যের প্রেক্ষাপট অনুযায়ী উপযুক্তটি ব্যবহার করা।</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="page-number"><a href="https://www.facebook.com/emammehedi17">Emam Mehedi</a> | Page-01</div>
+    </div>
+
+    <!-- PAGE 2 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header"><a href="https://www.facebook.com/emammehedi17">Emam Mehedi</a></div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Arabic Sentence</th>
+                            <th class="bangla-cell">Bangla Translation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="arabic-cell">ثَانِيًا: عَلَى الْمُتَرْجِمِ أَنْ يَكُونَ مُلِمًّا بِالْمُصْطَلَحَاتِ الْمُتَعَلِّقَةِ بِمَوْضُوعِ التَّرْجَمَةِ (الْمُصْطَلَحَاتِ الْقَانُونِيَّةِ فِي هَذِهِ الْحَالَةِ)، وَالْإِلْمَامُ هُنَا لَا يَعْنِي حِفْظَ جَمِيعِ الْمُصْطَلَحَاتِ الْقَانُونِيَّةِ بِاللُّغَتَيْنِ الْعَرَبِيَّةِ وَالْإِنْجِلِيزِيَّةِ فَذَلِكَ غَيْرُ مُمْكِنٍ خُصُوصًا لِلْقَانُونِيِّ الْمُبْتَدِئِ.</td>
+                            <td class="bangla-cell">দ্বিতীয়ত: অনুবাদককে অনুবাদের বিষয় সম্পর্কিত পরিভাষা (এক্ষেত্রে আইনী পরিভাষা) সম্পর্কে জ্ঞানী হতে হবে। এখানে জ্ঞানী হওয়ার অর্থ আরবি ও ইংরেজি উভয় ভাষার সমস্ত আইনী পরিভাষা মুখস্থ করা নয়, কারণ এটি বিশেষ করে একজন নবীন আইন বিশেষজ্ঞের জন্য সম্ভব নয়।</td>
+                        </tr>
+                        <tr>
+                            <td class="arabic-cell">عِوَضًا عَنْ ذَلِكَ، يُمْكِنُ لِلْمُتَرْجِمِ أَنْ يَكْتُبَ قَائِمَةً بِالْمُصْطَلَحَاتِ الْقَانُونِيَّةِ الْأَسَاسِيَّةِ بِاللُّغَتَيْنِ الْعَرَبِيَّةِ وَالْإِنْجِلِيزِيَّةِ لِلِاعْتِمَادِ عَلَيْهَا وَقْتَ التَّرْجَمَةِ، وَسَأَقُومُ بِمُشَارَكَةِ أَكْبَرِ عَدَدٍ مُمْكِنٍ مِنْ هَذِهِ الْمُصْطَلَحَاتِ لَاحِقًا فِي هَذِهِ السِّلْسِلَةِ لِتَكُونَ مَرْجِعًا لِمَنْ أَرَادَ.</td>
+                            <td class="bangla-cell">এর পরিবর্তে, অনুবাদক অনুবাদের সময় নির্ভর করার জন্য আরবি এবং ইংরেজি উভয় ভাষায় মৌলিক আইনী পরিভাষাগুলোর একটি তালিকা তৈরি করতে পারেন। আমি পরবর্তীতে এই সিরিজে এই পরিভাষাগুলো থেকে尽可能বেশি শেয়ার করব, যাতে এটি আগ্রহীদের জন্য একটি রেফারেন্স হিসেবে কাজ করে।</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Arabic Sentence</th>
+                            <th class="bangla-cell">Bangla Translation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="arabic-cell">ثَالِثًا: عَلَى الْمُتَرْجِمِ أَنْ يَقْرَأَ النَّصَّ عِدَّةَ مَرَّاتٍ قَبْلَ شُرُوعِهِ فِي التَّرْجَمَةِ، وَذَلِكَ لِاسْتِيعَابِ مَضْمُونِهِ وَمَعْنَاهُ وَالْهَدَفِ مِنْهُ، فَمَعْرِفَةُ تِلْكَ الْعَنَاصِرِ مُهِمَّةٌ لِسَبَبَيْنِ رَئِيسِيَّيْنِ (١) لِتَجَنُّبِ الْإِخْلَالِ بِالْمَعْنَى الْمُرَادِ مِنَ النَّصِّ الْأَصْلِيِّ، وَ (٢) لِتَسْهِيلِ تَحْدِيدِ الْمُصْطَلَحَاتِ الْمُلَائِمَةِ لِمَوْضُوعِ النَّصِّ وَبِالتَّالِي تَسْهِيلِ عَمَلِيَّةِ التَّرْجَمَةِ.</td>
+                            <td class="bangla-cell">তৃতীয়ত: অনুবাদ শুরু করার আগে অনুবাদককে অবশ্যই পাঠ্যটি বেশ কয়েকবার পড়তে হবে, যাতে এর বিষয়বস্তু, অর্থ এবং উদ্দেশ্য বোঝা যায়। এই উপাদানগুলো জানা দুটি প্রধান কারণে গুরুত্বপূর্ণ: (১) মূল পাঠ্যের উদ্দিষ্ট অর্থের বিকৃতি এড়ানো, এবং (২) পাঠ্যের বিষয়ের জন্য উপযুক্ত পরিভাষাগুলো চিহ্নিত করা সহজ করা, যা অনুবাদ প্রক্রিয়াকে সহজ করে তোলে।</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Arabic Sentence</th>
+                            <th class="bangla-cell">Bangla Translation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="arabic-cell">رَابِعًا: عَلَى الْمُتَرْجِمِ تَحْدِيدُ بِدَايَةِ وَنِهَايَةِ كُلِّ جُمْلَةٍ قَبْلَ الْبَدْءِ فِي تَرْجَمَتِهَا لِمَعْرِفَةِ الطَّرِيقَةِ الْأَنْسَبِ لِصِيَاغَتِهَا مِنْ حَيْثُ التَّرْكِيبِ وَالْمُصْطَلَحَاتِ الَّتِي يَجِبُ اسْتِخْدَامُهَا، وَلِحُسْنِ الْحَظِّ لَيْسَ ذَلِكَ بِالْأَمْرِ الصَّعْبِ، حَيْثُ غَالِبًا مَا تُكْتَبُ النُّصُوصُ الْقَانُونِيَّةُ وَالسَّوَابِقُ الْقَضَائِيَّةُ بِشَكْلٍ مُقْتَضَبٍ لِلْغَايَةِ بِالِاعْتِمَادِ عَلَى جُمَلٍ قَصِيرَةٍ نِسْبِيًّا.</td>
+                            <td class="bangla-cell">চতুর্থত: অনুবাদককে প্রতিটি বাক্য অনুবাদ শুরু করার আগে তার শুরু এবং শেষ চিহ্নিত করতে হবে, যাতে এর গঠন এবং ব্যবহৃত পরিভাষার দিক থেকে বাক্যটি রচনার সবচেয়ে উপযুক্ত উপায় জানা যায়। সৌভাগ্যবশত, এটি কঠিন কোনো কাজ নয়, কারণ আইনী পাঠ্য এবং বিচারিক উদাহরণগুলো প্রায়শই তুলনামূলকভাবে ছোট ছোট বাক্য ব্যবহার করে অত্যন্ত সংক্ষিপ্তভাবে লেখা হয়।</td>
+                        </tr>
+                        <tr>
+                            <td class="arabic-cell">أَفْضَلُ نَصِيحَةٍ هُنَا هِيَ تَرْجَمَةُ كُلِّ جُمْلَةٍ بِمُفْرَدِهَا، وَمِنْ ثَمَّ يُمْكِنُ تَقْدِيمُ / تَأْخِيرُ أَوْ تَغْيِيرُ بَعْضِ الْكَلِمَاتِ، لِيُصْبِحَ النَّصُّ الْمُتَرْجَمُ بِسَلَاسَةِ النَّصِّ الْأَصْلِيِّ، فَذَلِكَ أَسْهَلُ ذِهْنِيًّا مِنْ مُحَاوَلَةِ تَرْجَمَةِ النَّصِّ كَامِلاً دُفْعَةً وَاحِدَةً.</td>
+                            <td class="bangla-cell">এক্ষেত্রে সেরা পরামর্শ হলো প্রতিটি বাক্য আলাদাভাবে অনুবাদ করা। এরপর কিছু শব্দ আগে-পরে বা পরিবর্তন করা যেতে পারে, যাতে অনূদিত পাঠ্যটি মূল পাঠ্যের মতো সাবলীল হয়। পুরো পাঠ্যটি একবারে অনুবাদ করার চেষ্টার চেয়ে এটি মানসিকভাবে অনেক সহজ।</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="page-number"><a href="https://www.facebook.com/emammehedi17">Emam Mehedi</a> | Page-02</div>
+    </div>
+    
+    <!-- PAGE 3 -->
+    <div class="page">
+        <div class="watermark">Emam Mehedi</div>
+        <div class="header"><a href="https://www.facebook.com/emammehedi17">Emam Mehedi</a></div>
+        <div class="page-content-wrapper">
+            <div class="content-body">
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Arabic Sentence</th>
+                            <th class="bangla-cell">Bangla Translation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="arabic-cell">خَامِسًا: يَجِبُ أَنْ يَتَجَنَّبَ الْمُتَرْجِمُ حَذْفَ أَوْ اِخْتِصَارَ أَيِّ نَصٍّ أَوْ كَلِمَةٍ مِنَ النَّصِّ الْأَصْلِيِّ عِنْدَ تَرْجَمَتِهَا، خَاصَّةً عِنْدَ تَرْجَمَةِ النُّصُوصِ الْقَانُونِيَّةِ، فَجَمِيعُ الْمُفْرَدَاتِ فِي النُّصُوصِ الْقَانُونِيَّةِ وُجِدَتْ لِتُؤَدِّيَ مَعْنًى مُعَيَّنًا، وَهُوَ مَا يَجِبُ الْإِبْقَاءُ عَلَيْهِ نَظَرًا لِحَسَاسِيَّةِ تِلْكَ النُّصُوصِ، وَلِتَجَنُّبِ أَيِّ فَهْمٍ خَاطِئٍ يُخَالِفُ الْفَهْمَ الْمُرَادَ مِنَ النَّصِّ الْأَصْلِيِّ.</td>
+                            <td class="bangla-cell">পঞ্চমত: অনুবাদ করার সময় অনুবাদককে মূল পাঠ্য থেকে কোনো অংশ বা শব্দ حذف বা সংক্ষিপ্ত করা থেকে বিরত থাকতে হবে, বিশেষ করে আইনী পাঠ্য অনুবাদের ক্ষেত্রে। কারণ আইনী পাঠ্যের প্রতিটি শব্দ একটি নির্দিষ্ট অর্থ প্রকাশের জন্য ব্যবহৃত হয়, যা সেই পাঠ্যগুলোর সংবেদনশীলতার কারণে বজায় রাখা আবশ্যক, এবং মূল পাঠ্যের উদ্দিষ্ট অর্থের বিপরীত কোনো ভুল বোঝাবুঝি এড়ানোর জন্য এটি জরুরি।</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Arabic Sentence</th>
+                            <th class="bangla-cell">Bangla Translation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="arabic-cell">الْمَذْكُورُ أَعْلَاهُ مَا هُوَ إِلَّا عَدَدٌ قَلِيلٌ مِنَ النَّصَائِحِ الَّتِي سَاعَدَتْنِي شَخْصِيًّا فِي تَرْجَمَةِ بَعْضِ النُّصُوصِ الْقَانُونِيَّةِ سَابِقًا.</td>
+                            <td class="bangla-cell">উপরে যা উল্লেখ করা হয়েছে তা হলো কয়েকটি পরামর্শ যা অতীতে কিছু আইনী পাঠ্য অনুবাদে আমাকে ব্যক্তিগতভাবে সাহায্য করেছে।</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Arabic Sentence</th>
+                            <th class="bangla-cell">Bangla Translation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="arabic-cell">الْمَوْضُوعُ الْقَادِمُ سَيَكُونُ عَنِ الْمُصْطَلَحَاتِ الْقَانُونِيَّةِ الْأَسَاسِيَّةِ بِاللُّغَتَيْنِ الْعَرَبِيَّةِ وَالْإِنْجِلِيزِيَّةِ.</td>
+                            <td class="bangla-cell">পরবর্তী বিষয় হবে আরবি এবং ইংরেজি উভয় ভাষায় মৌলিক আইনী পরিভাষা সম্পর্কে।</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="styled-table">
+                     <thead>
+                        <tr>
+                            <th>Arabic Sentence</th>
+                            <th class="bangla-cell">Bangla Translation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="arabic-cell">دُمْتُمْ بِوُدٍّ.</td>
+                            <td class="bangla-cell">শুভেচ্ছান্তে।</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="final-links">
+                    <a href="https://wa.me/+8801743303877" target="_blank">Send Feedback</a>
+                    <a href="https://www.facebook.com/emammehedi17" target="_blank">Connect me on Facebook</a>
+                </div>
+            </div>
+        </div>
+        <div class="page-number"><a href="https://www.facebook.com/emammehedi17">Emam Mehedi</a> | Page-03</div>
+    </div>
+    
+</body>
+</html>
