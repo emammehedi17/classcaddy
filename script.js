@@ -441,6 +441,14 @@ if (courseContentsSection) {
 }
 
 
+/* ==========================================================================
+ * 12. Make all download links open in a new tab
+ * ========================================================================== */
+const downloadButtons = document.querySelectorAll('.download-btn');
+downloadButtons.forEach(button => {
+    button.setAttribute('target', '_blank');
+    button.setAttribute('rel', 'noopener noreferrer'); // For security
+});
 
 
 	// --- Auto-starter ---
