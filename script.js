@@ -410,6 +410,38 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	}
 
+/* ==========================================================================
+ * 10. Auto-scroll to Academic Courses on Index Page
+ * ========================================================================== */
+// Check if the current page is the index page by looking for a unique element,
+// like the login form.
+const loginFormForScroll = document.getElementById('login-form');
+const academicCoursesSection = document.getElementById('academic-courses');
+
+// If we are on the index page and the academic section exists...
+if (loginFormForScroll && academicCoursesSection) {
+    // Scroll to the section after a short delay to ensure the page has loaded smoothly.
+    setTimeout(() => {
+        academicCoursesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 500); // 500ms delay
+}
+
+/* ==========================================================================
+ * 11. Auto-scroll to Course Contents on Course Pages
+ * ========================================================================== */
+// Check if an element with the ID 'course-contents' exists on the page.
+const courseContentsSection = document.getElementById('course-contents');
+
+// If the section exists, it implies we are on a course page.
+if (courseContentsSection) {
+    // Scroll to the section after a short delay.
+    setTimeout(() => {
+        courseContentsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 500); // 500ms delay
+}
+
+
+
 
 	// --- Auto-starter ---
 // This code is ALREADY inside a DOMContentLoaded listener,
