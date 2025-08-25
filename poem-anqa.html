@@ -1161,28 +1161,28 @@
 	
     <!-- =================== ACTION BUTTONS START =================== -->
 	<div id="action-buttons-container">
-		<!-- Go To Top button remains at the top level -->
-		<button id="go-to-top-btn" class="action-btn" aria-label="Go to top">
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-				<path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-			</svg>
-		</button>
-
-		<!-- NEW: A container for the bottom row items -->
-		<div class="bottom-row-controls">
-			<!-- Zoom controls are now inside the new container -->
-			<div id="zoom-controls">
-				<button id="zoom-out-btn" class="zoom-btn" aria-label="Zoom Out">-</button>
-				<input type="text" id="zoom-percentage" value="100%">
-				<button id="zoom-in-btn" class="zoom-btn" aria-label="Zoom In">+</button>
-			</div>
-			
-			<!-- Fullscreen button is also inside the new container -->
-			<button id="fullscreen-btn" class="action-btn" aria-label="Toggle full screen">
-				<i id="fullscreen-icon" class="fas fa-expand"></i>
-			</button>
-		</div>
-	</div>
+    <button id="go-to-top-btn" class="action-btn" aria-label="Go to top">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+    </button>
+    <div class="bottom-row-controls">
+        <div id="zoom-controls">
+            <button id="zoom-out-btn" class="zoom-btn" aria-label="Zoom Out">-</button>
+            <input type="text" id="zoom-percentage" value="100%">
+            <button id="zoom-in-btn" class="zoom-btn" aria-label="Zoom In">+</button>
+        </div>
+        <!-- Vertical group for fullscreen and download buttons -->
+        <div class="vertical-button-group">
+            <button id="fullscreen-btn" class="action-btn" aria-label="Toggle full screen">
+                <i id="fullscreen-icon" class="fas fa-expand"></i>
+            </button>
+            <button id="print-btn" class="action-btn" aria-label="Download Page">
+                <i class="fas fa-download"></i>
+            </button>
+        </div>
+    </div>
+</div>
 	
 	<!-- =================== ACTION BUTTONS END =================== -->
 	

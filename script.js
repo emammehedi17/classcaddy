@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const fullscreenBtn = document.getElementById('fullscreen-btn');
     const fullscreenIcon = document.getElementById('fullscreen-icon');
     const musicPlayer = document.getElementById('music-player');
-    
+    const printBtn = document.getElementById('print-btn'); // <-- ADD THIS LINE
     const zoomControls = document.getElementById('zoom-controls');
     const zoomInBtn = document.getElementById('zoom-in-btn');
     const zoomOutBtn = document.getElementById('zoom-out-btn');
@@ -73,6 +73,14 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
         
+		
+		// Add this block for the print button
+    if (printBtn) {
+        printBtn.addEventListener('click', () => {
+            window.print();
+        });
+    }
+	
         if (zoomInBtn) {
             zoomInBtn.addEventListener('click', () => {
                 applyZoom(currentScale + 0.10);

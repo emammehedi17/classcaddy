@@ -379,6 +379,37 @@ header {
 }
 
 
+#action-buttons-container {
+    /* Position the main container in the bottom right corner */
+    position: fixed;
+    bottom: 20px;
+    right: 20px; /* Anchor to the right */
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Align children (go-to-top, bottom-row) to the right */
+    gap: 8px;
+    pointer-events: none; /* Allows clicking through the container */
+}
+
+.action-btn, .zoom-btn, #zoom-percentage {
+    pointer-events: auto; /* Makes sure buttons are clickable */
+}
+
+.bottom-row-controls {
+    /* This row contains the zoom controls and the vertical button group */
+    display: flex;
+    align-items: flex-end; /* Align to the bottom for consistent baseline */
+    gap: 8px; /* Space between zoom controls and the vertical group */
+}
+
+.vertical-button-group {
+    /* This new class will stack the fullscreen and download buttons */
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    gap: 8px; /* Space between the two buttons */
+}
+
 /* ==========================================================================
    7. Print Styles
    ========================================================================== */
