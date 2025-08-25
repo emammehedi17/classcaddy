@@ -340,17 +340,21 @@
                 </div>
             </div>
             <div>
-                <form action="#" method="POST" class="space-y-6">
+                <form name="feedback" data-netlify="true" data-netlify-honeypot="bot-field">
+                    <p class="hidden">
+                        <label>
+                          Don’t fill this out if you’re human: <input name="bot-field" />
+                        </label>
+                    </p>
+
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
                         <input type="email" name="email" id="email" placeholder="Enter Email Address" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
                     </div>
-                    <div>
-                        <label for="suggestion" class="block text-sm font-medium text-gray-300 mb-2">Your suggestion</label>
+                    <div class="mt-6"> <label for="suggestion" class="block text-sm font-medium text-gray-300 mb-2">Your suggestion</label>
                         <textarea name="suggestion" id="suggestion" rows="4" placeholder="Write your complaint or suggestion" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"></textarea>
                     </div>
-                    <div>
-                        <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg">Send Message</button>
+                    <div class="mt-6"> <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg">Send Message</button>
                     </div>
                 </form>
             </div>
