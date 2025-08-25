@@ -10,87 +10,73 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Naskh+Arabic:wght@400;700&family=Kalpurush:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-	<link rel="icon" href="https://eco.du.ac.bd//assets/images/fab_icon.ico" type="image/x-icon">
+    <link rel="icon" href="https://eco.du.ac.bd//assets/images/fab_icon.ico" type="image/x-icon">
 </head>
 <body class="bg-gray-900 text-white">
 
     <!-- =================== HEADER & BREADCRUMBS START =================== -->
     <header class="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-sm border-b border-gray-700">
-    <div class="container mx-auto px-6 py-3">
-        <nav class="flex justify-between items-center">
-            <!-- Left Side: Profile & Title -->
-            <div class="flex items-center gap-4">
-                <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
-                    <img src="images/profile.jpg" alt="Profile" class="h-12 w-12 rounded-full border-2 border-emerald-400 object-cover">
-                </a>
-                <a href="index.html">
-                    <h1 class="text-2xl font-bold">Class Caddy</h1>
-                </a>
-            </div>
-
-            <!-- Center: Desktop Navigation (hidden on mobile) -->
-            <div class="hidden md:flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full p-1">
-                <a href="index.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Home</a>
-                
-                <div id="academic-dropdown" class="relative">
-                    <button id="academic-button" class="px-6 py-2 text-sm font-semibold bg-emerald-500 rounded-full transition-colors flex items-center">
-                        <a href="academic.html">Academic</a>
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        <div class="container mx-auto px-6 py-3">
+            <nav class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
+                        <img src="images/profile.jpg" alt="Profile" class="h-12 w-12 rounded-full border-2 border-emerald-400 object-cover">
+                    </a>
+                    <a href="index.html">
+                        <h1 class="text-2xl font-bold">Class Caddy</h1>
+                    </a>
+                </div>
+                <div class="hidden md:flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full p-1">
+                    <a href="index.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Home</a>
+                    <div id="academic-dropdown" class="relative">
+                        <button id="academic-button" class="px-6 py-2 text-sm font-semibold bg-emerald-500 rounded-full transition-colors flex items-center">
+                            <a href="academic.html">Academic</a>
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="academic-menu" class="dropdown-menu absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
+                            <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 405</a>
+                            <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 406</a>
+                            <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 407</a>
+                            <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 408 (B)</a>
+                        </div>
+                    </div>
+                    <a href="shop.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Shop</a>
+                    <a href="about.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">About</a>
+                    <a href="contact.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Contact</a>
+                </div>
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
+                        <img src="images/du_logo.png" alt="DU Logo" class="h-12 w-12 rounded-full border-2 border-gray-600 object-cover">
+                    </a>
+                    <a href="index.html#signup" class="px-6 py-3 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 rounded-full transition-colors">Sign Up</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="text-white focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                     </button>
-                    <div id="academic-menu" class="dropdown-menu absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
-                        <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 405</a>
-                        <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 406</a>
-                        <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 407</a>
-                        <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 408 (B)</a>
+                </div>
+            </nav>
+            <div id="mobile-menu" class="hidden md:hidden bg-gray-800 border-t border-gray-700 -mx-6">
+                <a href="index.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Home</a>
+                <div>
+                    <button id="mobile-academic-button" class="w-full text-left px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex justify-between items-center">
+                        <span>Academic</span>
+                        <svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="mobile-academic-menu" class="hidden pl-8 bg-gray-900">
+                        <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 405</a>
+                        <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 406</a>
+                        <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 407</a>
+                        <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 408 (B)</a>
                     </div>
                 </div>
-
-                <a href="shop.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Shop</a>
-                <a href="about.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">About</a>
-                <a href="contact.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Contact</a>
+                <a href="shop.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Shop</a>
+                <a href="about.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">About</a>
+                <a href="contact.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Contact</a>
             </div>
-
-            <!-- Right Side: DU Logo & Sign Up (hidden on mobile) -->
-            <div class="hidden md:flex items-center gap-4">
-                <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
-                    <img src="images/du_logo.png" alt="DU Logo" class="h-12 w-12 rounded-full border-2 border-gray-600 object-cover">
-                </a>
-                <a href="index.html#signup" class="px-6 py-3 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 rounded-full transition-colors">Sign Up</a>
-            </div>
-
-            <!-- NEW: Hamburger Menu Button (visible on mobile) -->
-            <div class="md:hidden flex items-center">
-                <button id="mobile-menu-button" class="text-white focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
-            </div>
-        </nav>
-
-        <!-- NEW: Mobile Menu Panel (hidden by default) -->
-        <div id="mobile-menu" class="hidden md:hidden bg-gray-800 border-t border-gray-700 -mx-6">
-            <a href="index.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Home</a>
-            
-            <!-- Mobile Academic Dropdown -->
-            <div>
-                <button id="mobile-academic-button" class="w-full text-left px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex justify-between items-center">
-                    <span>Academic</span>
-                    <svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <div id="mobile-academic-menu" class="hidden pl-8 bg-gray-900">
-                    <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 405</a>
-                    <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 406</a>
-                    <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 407</a>
-                    <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 408 (B)</a>
-                </div>
-            </div>
-
-            <a href="shop.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Shop</a>
-            <a href="about.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">About</a>
-            <a href="contact.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Contact</a>
         </div>
-    </div>
-</header>
-    
+    </header>
+
     <div class="breadcrumbs-container">
         <div class="flex justify-between items-center mb-6">
             <div class="text-sm text-gray-400 breadcrumbs">
@@ -100,9 +86,7 @@
                 <span class="text-emerald-400">نهاية السلم Poem</span>
             </div>
             <a href="course-405.html" class="flex items-center text-sm text-emerald-400 hover:text-emerald-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
                 Back to Course-405
             </a>
         </div>
@@ -111,135 +95,525 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Background Gradients -->
         <div class="bg-gradient-purple" style="animation: none;"></div>
         <div class="bg-gradient-emerald" style="animation: none;"></div>
         <div class="bg-gradient-red" style="animation: none;"></div>
 
-        <!-- Poem Content Pages -->
         <!-- PAGE 1: Title Page -->
         <div class="poem-page">
             <div class="watermark">Emam Mehedi</div>
             <div class="poem-page-content-wrapper">
                 <div class="poem-content-body" style="display: flex; flex-direction: column; justify-content: center; text-align: center;">
-                    <h1 class="poem-title" style="font-size: 48pt;">نِهَايَةُ السُّلَّمِ</h1>
-                    <p class="poem-text" style="text-align: center; margin-top: 30px; font-size: 20pt;">-- نازك الملائكة --</p>
+                    <h1 class="poem-title">نِهَايَةُ السُّلَّمِ</h1>
+                    <h2 class="section-title" style="border-bottom: none;">(The End of the Ladder)</h2>
+                    <p class="poem-text" style="text-align: center; margin-top: 30px; font-size: 16pt;">By Nazik Al-Malaika</p>
+                    <p class="poem-text" style="text-align: center; margin-top: 50px;">This document contains the complete Bengali translations of the poem, presented in both line-by-line and word-by-word formats for detailed study.</p>
                 </div>
             </div>
             <div class="page-number">Page-01</div>
         </div>
 
-        <!-- PAGE 2: Poem Text -->
+        <!-- PAGE 2: Line-by-Line Translation -->
         <div class="poem-page">
             <div class="watermark">Emam Mehedi</div>
             <div class="poem-header">Poem: نهاية السلم (The End of the Ladder)</div>
-            <div class="poem-page-content-wrapper" style="justify-content: center;">
-                <div class="poem-content-body arabic-cell" style="text-align: center; font-size: 30pt !important; line-height: 2.1; color: black;">
-                    <div class="stanza">
-                        مَرَّتْ أَيَّامٌ مُنْطَفِئَاتْ<br>
-                        لَمْ نَلْتَقِ لَمْ يَجْمَعْنَا حَتَّى طَيْفُ سَرَابْ<br>
-                        وَأَنَا وَحْدِي, أَقْتَاتُ بِوَقْعِ خُطَى الظُّلُمَاتْ<br>
-                        خَلْفَ زُجَاجِ النَّافِذَةِ الْفَظَّةِ, خَلْفَ الْبَابْ<br>
-                        وَأَنَا وَحْدِي..<br>
-                        مَرَّتْ أَيَّامْ<br>
-                        بَارِدَةٌ تَزْحَفُ سَاحِبَةً ضَجَرِي الْمُرْتَابْ<br>
-                        وَأَنَا أُصْغِي وَأَعُدُّ دَقَائِقَهَا الْقَلِقَاتْ<br>
-                        هَلْ مَرَّ بِنَا زَمَنٌ؟ أَمْ خُضْنَا اللَّازَمَنَا؟<br>
-                        مَرَّتْ أَيَّامْ<br>
-                        أَيَّامٌ تُثْقِلُهَا أَشْوَاقِي. أَيْنَ أَنَا؟<br>
-                        مَا زِلْتُ أُحَدِّقُ فِي السُّلَّمْ<br>
-                        وَالسُّلَّمُ يَبْدَأُ لَكِنْ أَيْنَ نِهَايَتُهُ؟<br>
-                        يَبْدَأُ فِي قَلْبِي حَيْثُ التِّيهُ وَظُلْمَتُهُ<br>
-                        يَبْدَأُ.. أَيْنَ الْبَابُ الْمُبْهَمُ؟<br>
-                        بَابُ السُّلَّمِ؟
-                    </div>
+            <div class="poem-page-content-wrapper">
+                <div class="poem-content-body">
+                    <h2 class="section-title">Line-by-Line Translation (سطراً بسطر)</h2>
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Arabic Line</th>
+                                <th class="bangla">Bengali Translation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="line-0"><td class="arabic-cell">مَرَّتْ أَيَّامٌ مُنْطَفِئَاتْ</td><td class="bangla">কতগুলো দিন নিভতে নিভতে চলে গেল</td></tr>
+                            <tr id="line-1"><td class="arabic-cell">لَمْ نَلْتَقِ لَمْ يَجْمَعْنَا حَتَّى طَيْفُ سَرَابْ</td><td class="bangla">আমাদের মিলন হল না, মরীচিকার বর্ণালি পর্যন্ত আমাদেরকে একত্র করল না।</td></tr>
+                            <tr id="line-2"><td class="arabic-cell">وَأَنَا وَحْدِي, أَقْتَاتُ بِوَقْعِ خُطَى الظُّلُمَاتْ</td><td class="bangla">আমি একা, অন্ধকারে পা ফেলে ফেলে আমি জীবন কাটাচ্ছি</td></tr>
+                            <tr id="line-3"><td class="arabic-cell">خَلْفَ زُجَاجِ النَّافِذَةِ الْفَظَّةِ, خَلْفَ الْبَابْ</td><td class="bangla">(কখনও) শক্ত জানালার কাচের পেছনে, (কখনও) দরজার পেছনে</td></tr>
+                            <tr id="line-4"><td class="arabic-cell">وَأَنَا وَحْدِي..</td><td class="bangla">আমি একা।</td></tr>
+                            <tr id="line-5"><td class="arabic-cell">مَرَّتْ أَيَّامْ</td><td class="bangla">কতগুলো দিন চলে গেল</td></tr>
+                            <tr id="line-6"><td class="arabic-cell">بَارِدَةٌ تَزْحَفُ سَاحِبَةً ضَجَرِي الْمُرْتَابْ</td><td class="bangla">শীতল (নিষ্প্রাণ) অবস্থায় আমার সন্দিহান বিরক্তি টেনে নিয়ে হামাগুড়ি দিতে দিতে।</td></tr>
+                            <tr id="line-7"><td class="arabic-cell">وَأَنَا أُصْغِي وَأَعُدُّ دَقَائِقَهَا الْقَلِقَاتْ</td><td class="bangla">আমি কান পেতে শুনি আর দিনগুলোর উৎকণ্ঠিত মিনিট গণনা করি।</td></tr>
+                            <tr id="line-8"><td class="arabic-cell">هَلْ مَرَّ بِنَا زَمَنٌ؟ أَمْ خُضْنَا اللَّازَمَنَا؟</td><td class="bangla">আমাদের পাশ দিয়ে কি একটি কাল চলে গেল? নাকি আমরা কালবিহীনে ডুব দিয়েছি?</td></tr>
+                            <tr id="line-9"><td class="arabic-cell">مَرَّتْ أَيَّامْ</td><td class="bangla">কতগুলো দিন চলে গেল</td></tr>
+                            <tr id="line-10"><td class="arabic-cell">أَيَّامٌ تُثْقِلُهَا أَشْوَاقِي. أَيْنَ أَنَا؟</td><td class="bangla">এমনসব দিন যেগুলোকে ভারী করছিল আমার আকাংক্ষা। আমি কোথায়?</td></tr>
+                            <tr id="line-11"><td class="arabic-cell">مَا زِلْتُ أُحَدِّقُ فِي السُّلَّمْ</td><td class="bangla">সিঁড়ির মাঝে আমি কেবল তাকিয়ে থেকেছি</td></tr>
+                            <tr id="line-12"><td class="arabic-cell">وَالسُّلَّمُ يَبْدَأُ لَكِنْ أَيْنَ نِهَايَتُهُ؟</td><td class="bangla">(আর ভেবেছি,) সিঁড়ি শুরু তো হয়, তবে তার সমাপ্তি কোথায়?</td></tr>
+                            <tr id="line-13"><td class="arabic-cell">يَبْدَأُ فِي قَلْبِي حَيْثُ التِّيهُ وَظُلْمَتُهُ</td><td class="bangla">শুরু হয় আমার অন্তরে, যেখানে (শুধু) পথহীন প্রান্তর ও তার অন্ধকার।</td></tr>
+                            <tr id="line-14"><td class="arabic-cell">يَبْدَأُ.. أَيْنَ الْبَابُ الْمُبْهَمُ؟</td><td class="bangla">শুরু করিয়ে দেওয়া হয়, তবে কোথায় (তার) অজানা দরজা?</td></tr>
+                            <tr id="line-15"><td class="arabic-cell">بَابُ السُّلَّمِ؟</td><td class="bangla">সিঁড়ির দরজা?</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div class="page-number">Page-02</div>
         </div>
-
-        <!-- PAGE 3: Poem Text Continued -->
+        
+        <!-- PAGE 3: Line-by-Line Translation (Continued) -->
         <div class="poem-page">
             <div class="watermark">Emam Mehedi</div>
             <div class="poem-header">Poem: نهاية السلم (The End of the Ladder)</div>
-            <div class="poem-page-content-wrapper" style="justify-content: center;">
-                <div class="poem-content-body arabic-cell" style="text-align: center; font-size: 30pt !important; line-height: 2.1; color: black;">
-                    <div class="stanza">
-                        مَرَّتْ أَيَّامْ<br>
-                        لَمْ نَلْتَقِ, أَنْتَ هُنَاكَ وَرَاءَ مَدَى الْأَحْلَامْ<br>
-                        فِي أُفُقٍ حَفَّ بِهِ الْمَجْهُولُ<br>
-                        وَأَنَا أَمْشِي, وَأَرَى, وَأَنَامْ<br>
-                        أَسْتَنْفِدُ أَيَّامِي وَأَجُرُّ غَدِي الْمَعْسُولْ<br>
-                        فَيَفِرُّ إِلَى الْمَاضِي الْمَفْقُودِ<br>
-                        أَيَّامِي تَأْكُلُهَا الْآهَاتُ مَتَى سَتَعُودُ؟
-                    </div>
-                    <span style="display: block; margin: 25px auto; font-size: 20pt; color: #aaa;">***</span>
-                    <div class="stanza">
-                        مَرَّتْ أَيَّامٌ لَمْ تَتَذَكَّرْ أَنَّ هُنَاكْ<br>
-                        فِي زَاوِيَةٍ مِنْ قَلْبِكَ حُبًّا مَهْجُورًا<br>
-                        عَضَّتْ فِي قَدَمَيْهِ الْأَشْوَاكْ<br>
-                        حُبًّا يَتَضَرَّعُ مَذْعُورًا<br>
-                        هَبْهُ النُّورَا
-                    </div>
+            <div class="poem-page-content-wrapper">
+                <div class="poem-content-body">
+                    <h2 class="section-title">Line-by-Line Translation (Continued)</h2>
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Arabic Line</th>
+                                <th class="bangla">Bengali Translation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="line-16"><td class="arabic-cell">مَرَّتْ أَيَّامْ</td><td class="bangla">কতগুলো দিন চলে গেল।</td></tr>
+                            <tr id="line-17"><td class="arabic-cell">لَمْ نَلْتَقِ, أَنْتَ هُنَاكَ وَرَاءَ مَدَى الْأَحْلَامْ</td><td class="bangla">আমাদের মিলন হল না, তুমি আছো স্বপ্নের সীমানার ওপারে</td></tr>
+                            <tr id="line-18"><td class="arabic-cell">فِي أُفُقٍ حَفَّ بِهِ الْمَجْهُولُ</td><td class="bangla">তার (সিঁড়ির) মহাকালের অজানা দিগন্তে।</td></tr>
+                            <tr id="line-19"><td class="arabic-cell">وَأَنَا أَمْشِي, وَأَرَى, وَأَنَامْ</td><td class="bangla">(সিঁড়িতে) আমি চলছি, দেখছি আর ঘুমাচ্ছি।</td></tr>
+                            <tr id="line-20"><td class="arabic-cell">أَسْتَنْفِدُ أَيَّامِي وَأَجُرُّ غَدِي الْمَعْسُولْ</td><td class="bangla">আমি আমার দিনগুলো ফুরিয়ে ফেলছি আর আমার মধুময় আগামীকে কাছে টানছি।</td></tr>
+                            <tr id="line-21"><td class="arabic-cell">فَيَفِرُّ إِلَى الْمَاضِي الْمَفْقُودِ</td><td class="bangla">কিন্তু সে তো হারিয়ে-যাওয়া অতীত পানে পালিয়ে যাচ্ছে।</td></tr>
+                            <tr id="line-22"><td class="arabic-cell">أَيَّامِي تَأْكُلُهَا الْآهَاتُ مَتَى سَتَعُودُ؟</td><td class="bangla">আমার দিনগুলোকে দীর্ঘশ্বাসসমূহ খেয়ে ফেলছে, (হে প্রিয়!) তুমি কবে ফিরে আসবে?</td></tr>
+                            <tr id="line-23"><td class="arabic-cell">مَرَّتْ أَيَّامٌ لَمْ تَتَذَكَّرْ أَنَّ هُنَاكْ</td><td class="bangla">কতগুলো দিন চলে গেল, তোমার মনে পড়ল না যে, সেখানে</td></tr>
+                            <tr id="line-24"><td class="arabic-cell">فِي زَاوِيَةٍ مِنْ قَلْبِكَ حُبًّا مَهْجُورًا</td><td class="bangla">তোমার মনের এক কোণে ফেলে-যাওয়া এক প্রিয়জন আছে।</td></tr>
+                            <tr id="line-25"><td class="arabic-cell">عَضَّتْ فِي قَدَمَيْهِ الْأَشْوَاكْ</td><td class="bangla">তার দু'পায়ে কাঁটা দংশন করেছে (বিদ্ধ হয়েছে)।</td></tr>
+                            <tr id="line-26"><td class="arabic-cell">حُبًّا يَتَضَرَّعُ مَذْعُورًا</td><td class="bangla">এমন এক প্রিয়জন যে ভীত অবস্থায় মিনতি করছে।</td></tr>
+                            <tr id="line-27"><td class="arabic-cell">هَبْهُ النُّورَا</td><td class="bangla">তাকে আলো দান কর।</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div class="page-number">Page-03</div>
         </div>
 
-        <!-- PAGE 4: Poem Text Continued -->
+        <!-- PAGE 4: Line-by-Line Translation (Continued) -->
         <div class="poem-page">
             <div class="watermark">Emam Mehedi</div>
             <div class="poem-header">Poem: نهاية السلم (The End of the Ladder)</div>
-            <div class="poem-page-content-wrapper" style="justify-content: center;">
-                <div class="poem-content-body arabic-cell" style="text-align: center; font-size: 30pt !important; line-height: 2.1; color: black;">
-                    <div class="stanza">
-                        عُدْ.. bَعْضَ لِقَاءْ<br>
-                        يَمْنَحُنَا أَجْنِحَةً نَجْتَازُ اللَّيْلَ بِهَا<br>
-                        فَهُنَاكَ فَضَاءْ<br>
-                        خَلْفَ الْغَابَاتِ الْمُلْتَفَّاتِ, هُنَاكَ بُحُورٌ<br>
-                        لَا حَدَّ لَهَا تَرْغِي وَتَمُورُ<br>
-                        أَمْوَاجٌ مِنْ زَبَدِ الْأَحْلَامِ تُقَلِّبُهَا<br>
-                        أَيْدٍ مِنْ نُورْ
-                    </div>
-                    <span style="display: block; margin: 25px auto; font-size: 20pt; color: #aaa;">***</span>
-                    <div class="stanza">
-                        عُدْ, أَمْ سَيَمُوتُ,<br>
-                        صَوْتِي فِي سَمْعِكَ خَلْفَ الْمُنْعَرَجِ الْمَمْقُوتِ<br>
-                        وَأَظَلُّ أَنَا شَارِدَةً فِي قَلْبِ النِّسْيَانِ<br>
-                        لَا شَيْءَ سِوَى الصَّمْتِ الْمَمْدُودِ<br>
-                        فَوْقَ الْأَحْزَانِ<br>
-                        لَا شَيْءَ سِوَى رَجْعٍ نَعْسَانٍ<br>
-                        يَهْمِسُ فِي سَمْعِي لَيْسَ يَعُودُ<br>
-                        لَا لَيْسَ يَعُودُ
-                    </div>
+            <div class="poem-page-content-wrapper">
+                <div class="poem-content-body">
+                    <h2 class="section-title">Line-by-Line Translation (Continued)</h2>
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Arabic Line</th>
+                                <th class="bangla">Bengali Translation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="line-28"><td class="arabic-cell">عُدْ.. بَعْضَ لِقَاءْ</td><td class="bangla">ফিরে এসো, একটু সাক্ষাৎ</td></tr>
+                            <tr id="line-29"><td class="arabic-cell">يَمْنَحُنَا أَجْنِحَةً نَجْتَازُ اللَّيْلَ بِهَا</td><td class="bangla">আমাদেরকে দিতে পারে কিছু ডানা যার ওপর ভর করে আমরা রাত পার করতে পারি।</td></tr>
+                            <tr id="line-30"><td class="arabic-cell">فَهُنَاكَ فَضَاءْ</td><td class="bangla">কারণ, খোলা আকাশ আছে</td></tr>
+                            <tr id="line-31"><td class="arabic-cell">خَلْفَ الْغَابَاتِ الْمُلْتَفَّاتِ, هُنَاكَ بُحُورٌ</td><td class="bangla">নিবিড় জঙ্গলের পেছনে, আছে সমুদ্র</td></tr>
+                            <tr id="line-32"><td class="arabic-cell">لَا حَدَّ لَهَا تَرْغِي وَتَمُورُ</td><td class="bangla">যার কোন সীমা নেই, ফেনা তুলছে আর দোল খাচ্ছে</td></tr>
+                            <tr id="line-33"><td class="arabic-cell">أَمْوَاجٌ مِنْ زَبَدِ الْأَحْلَامِ تُقَلِّبُهَا</td><td class="bangla">স্বপ্নের (কল্পনার) ফেনার তরঙ্গমালা, যাকে উল্টে দিচ্ছে</td></tr>
+                            <tr id="line-34"><td class="arabic-cell">أَيْدٍ مِنْ نُورْ</td><td class="bangla">আলোর ক্ষমতা।</td></tr>
+                            <tr id="line-35"><td class="arabic-cell">عُدْ, أَمْ سَيَمُوتُ,</td><td class="bangla">ফিরে এসো, নইলে সে (তোমার ফেলে-যাওয়া সেই প্রিয়জন) শীঘ্রই মরে যাবে,</td></tr>
+                            <tr id="line-36"><td class="arabic-cell">صَوْتِي فِي سَمْعِكَ خَلْفَ الْمُنْعَرَجِ الْمَمْقُوتِ</td><td class="bangla">ঘৃণ্য বাঁকের পেছনে আমার (কথার) শব্দ তোমার কানে</td></tr>
+                            <tr id="line-37"><td class="arabic-cell">وَأَظَلُّ أَنَا شَارِدَةً فِي قَلْبِ النِّسْيَانِ</td><td class="bangla">আর আমি বিভ্রান্ত অবস্থায় থেকে যাচ্ছি ভুলো মানুষের হৃদয়ে।</td></tr>
+                            <tr id="line-38"><td class="arabic-cell">لَا شَيْءَ سِوَى الصَّمْتِ الْمَمْدُودِ</td><td class="bangla">বিস্তৃত নীরবতা ব্যতীত আর কিছু নেই</td></tr>
+                            <tr id="line-39"><td class="arabic-cell">فَوْقَ الْأَحْزَانِ</td><td class="bangla">বিষাদমালার ওপরে।</td></tr>
+                            <tr id="line-40"><td class="arabic-cell">لَا شَيْءَ سِوَى رَجْعٍ نَعْسَانٍ</td><td class="bangla">নিদ্রাচ্ছন্নের অনুনাদ ব্যতীত আর কিছু নেই।</td></tr>
+                            <tr id="line-41"><td class="arabic-cell">يَهْمِسُ فِي سَمْعِي لَيْسَ يَعُودُ</td><td class="bangla">আমার কানে সে ফিসফিস করে বলে, সে তো ফিরে আসবে না,</td></tr>
+                            <tr id="line-42"><td class="arabic-cell">لَا لَيْسَ يَعُودُ</td><td class="bangla">না, ফিরে আসবে না।</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div class="page-number">Page-04</div>
         </div>
 
+        <!-- PAGE 5: Word-by-Word Translation -->
+		<div class="poem-page">
+			<div class="watermark">Emam Mehedi</div>
+			<div class="poem-header">Poem: نهاية السلم (The End of the Ladder)</div>
+			<div class="poem-page-content-wrapper">
+				<div class="poem-content-body">
+					<h2 class="section-title">Word-by-Word Translation (كلمة بكلمة)</h2>
+					<table class="styled-table">
+						<thead>
+							<tr>
+								<th>Arabic Word</th>
+								<th class="bangla">Bengali Meaning</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr><td class="arabic-cell">مَرَّتْ</td><td class="bangla">চলে গেল</td></tr>
+							<tr><td class="arabic-cell">أَيَّامٌ</td><td class="bangla">কতগুলো দিন</td></tr>
+							<tr><td class="arabic-cell">مُنْطَفِئَاتْ</td><td class="bangla">নিভতে নিভতে</td></tr>
+							<tr><td class="arabic-cell">لَمْ نَلْتَقِ</td><td class="bangla">আমাদের মিলন হল না</td></tr>
+							<tr><td class="arabic-cell">لَمْ يَجْمَعْنَا</td><td class="bangla">একত্র করল না</td></tr>
+							<tr><td class="arabic-cell">حَتَّى</td><td class="bangla">এমনকি</td></tr>
+							<tr><td class="arabic-cell">طَيْفُ</td><td class="bangla">বর্ণালি</td></tr>
+							<tr><td class="arabic-cell">سَرَابْ</td><td class="bangla">মরীচিকার</td></tr>
+							<tr><td class="arabic-cell">وَأَنَا</td><td class="bangla">আর আমি</td></tr>
+							<tr><td class="arabic-cell">وَحْدِي</td><td class="bangla">একা</td></tr>
+							<tr><td class="arabic-cell">أَقْتَاتُ</td><td class="bangla">জীবন কাটাচ্ছি</td></tr>
+							<tr><td class="arabic-cell">بِوَقْعِ خُطَى</td><td class="bangla">পা ফেলে ফেলে</td></tr>
+							<tr><td class="arabic-cell">الظُّلُمَاتْ</td><td class="bangla">অন্ধকারে</td></tr>
+							<tr><td class="arabic-cell">خَلْفَ</td><td class="bangla">পেছনে</td></tr>
+							<tr><td class="arabic-cell">زُجَاجِ</td><td class="bangla">কাচের</td></tr>
+							<tr><td class="arabic-cell">النَّافِذَةِ</td><td class="bangla">জানালার</td></tr>
+                            <tr><td class="arabic-cell">الْفَظَّةِ</td><td class="bangla">শক্ত</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-number">Page-05</div>
+		</div>
+
+        <!-- PAGE 6: Word-by-Word Translation (Continued) -->
+		<div class="poem-page">
+			<div class="watermark">Emam Mehedi</div>
+			<div class="poem-header">Poem: نهاية السلم (The End of the Ladder)</div>
+			<div class="poem-page-content-wrapper">
+				<div class="poem-content-body">
+					<h2 class="section-title">Word-by-Word Translation (Continued)</h2>
+					<table class="styled-table">
+						<thead>
+							<tr>
+								<th>Arabic Word</th>
+								<th class="bangla">Bengali Meaning</th>
+							</tr>
+						</thead>
+						<tbody>
+                            <tr><td class="arabic-cell">الْبَابْ</td><td class="bangla">দরজার</td></tr>
+							<tr><td class="arabic-cell">بَارِدَةٌ</td><td class="bangla">শীতল</td></tr>
+							<tr><td class="arabic-cell">تَزْحَفُ</td><td class="bangla">হামাগুড়ি দিতে দিতে</td></tr>
+							<tr><td class="arabic-cell">سَاحِبَةً</td><td class="bangla">টেনে নিয়ে</td></tr>
+							<tr><td class="arabic-cell">ضَجَرِي</td><td class="bangla">আমার বিরক্তি</td></tr>
+							<tr><td class="arabic-cell">الْمُرْتَابْ</td><td class="bangla">সন্দিহান</td></tr>
+							<tr><td class="arabic-cell">أُصْغِي</td><td class="bangla">কান পেতে শুনি</td></tr>
+							<tr><td class="arabic-cell">أَعُدُّ</td><td class="bangla">গণনা করি</td></tr>
+							<tr><td class="arabic-cell">دَقَائِقَهَا</td><td class="bangla">তার মিনিটগুলো</td></tr>
+							<tr><td class="arabic-cell">الْقَلِقَاتْ</td><td class="bangla">উৎকণ্ঠিত</td></tr>
+							<tr><td class="arabic-cell">هَلْ</td><td class="bangla">কি</td></tr>
+							<tr><td class="arabic-cell">مَرَّ بِنَا</td><td class="bangla">আমাদের পাশ দিয়ে চলে গেল</td></tr>
+							<tr><td class="arabic-cell">زَمَنٌ</td><td class="bangla">একটি কাল</td></tr>
+							<tr><td class="arabic-cell">أَمْ</td><td class="bangla">নাকি</td></tr>
+							<tr><td class="arabic-cell">خُضْنَا</td><td class="bangla">আমরা ডুব দিয়েছি</td></tr>
+							<tr><td class="arabic-cell">اللَّازَمَنَا</td><td class="bangla">কালবিহীনে</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-number">Page-06</div>
+		</div>
+		
+		        <!-- PAGE 7: Word-by-Word Translation (Continued) -->
+		<div class="poem-page">
+			<div class="watermark">Emam Mehedi</div>
+			<div class="poem-header">Poem: نهاية السلم (The End of the Ladder)</div>
+			<div class="poem-page-content-wrapper">
+				<div class="poem-content-body">
+					<h2 class="section-title">Word-by-Word Translation (Continued)</h2>
+					<table class="styled-table">
+						<thead>
+							<tr>
+								<th>Arabic Word</th>
+								<th class="bangla">Bengali Meaning</th>
+							</tr>
+						</thead>
+						<tbody>
+                            <tr><td class="arabic-cell">أَيَّامٌ</td><td class="bangla">এমনসব দিন</td></tr>
+							<tr><td class="arabic-cell">تُثْقِلُهَا</td><td class="bangla">যেগুলোকে ভারী করছিল</td></tr>
+							<tr><td class="arabic-cell">أَشْوَاقِي</td><td class="bangla">আমার আকাংক্ষা</td></tr>
+							<tr><td class="arabic-cell">أَيْنَ</td><td class="bangla">কোথায়</td></tr>
+							<tr><td class="arabic-cell">أَنَا</td><td class="bangla">আমি</td></tr>
+							<tr><td class="arabic-cell">مَا زِلْتُ</td><td class="bangla">আমি কেবল</td></tr>
+							<tr><td class="arabic-cell">أُحَدِّقُ</td><td class="bangla">তাকিয়ে থেকেছি</td></tr>
+							<tr><td class="arabic-cell">فِي</td><td class="bangla">মাঝে</td></tr>
+							<tr><td class="arabic-cell">السُّلَّمْ</td><td class="bangla">সিঁড়ির</td></tr>
+							<tr><td class="arabic-cell">وَالسُّلَّمُ</td><td class="bangla">আর সিঁড়ি</td></tr>
+							<tr><td class="arabic-cell">يَبْدَأُ</td><td class="bangla">শুরু তো হয়</td></tr>
+							<tr><td class="arabic-cell">لَكِنْ</td><td class="bangla">তবে</td></tr>
+							<tr><td class="arabic-cell">أَيْنَ</td><td class="bangla">কোথায়</td></tr>
+							<tr><td class="arabic-cell">نِهَايَتُهُ</td><td class="bangla">তার সমাপ্তি</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-number">Page-07</div>
+		</div>
+
+        <!-- PAGE 8: Word-by-Word Translation (Continued) -->
+		<div class="poem-page">
+			<div class="watermark">Emam Mehedi</div>
+			<div class="poem-header">Poem: نهاية السلم (The End of the Ladder)</div>
+			<div class="poem-page-content-wrapper">
+				<div class="poem-content-body">
+					<h2 class="section-title">Word-by-Word Translation (Continued)</h2>
+					<table class="styled-table">
+						<thead>
+							<tr>
+								<th>Arabic Word</th>
+								<th class="bangla">Bengali Meaning</th>
+							</tr>
+						</thead>
+						<tbody>
+                            <tr><td class="arabic-cell">يَبْدَأُ</td><td class="bangla">শুরু হয়</td></tr>
+							<tr><td class="arabic-cell">فِي قَلْبِي</td><td class="bangla">আমার অন্তরে</td></tr>
+							<tr><td class="arabic-cell">حَيْثُ</td><td class="bangla">যেখানে</td></tr>
+							<tr><td class="arabic-cell">التِّيهُ</td><td class="bangla">পথহীন প্রান্তর</td></tr>
+							<tr><td class="arabic-cell">وَظُلْمَتُهُ</td><td class="bangla">ও তার অন্ধকার</td></tr>
+							<tr><td class="arabic-cell">يَبْدَأُ</td><td class="bangla">শুরু করিয়ে দেওয়া হয়</td></tr>
+							<tr><td class="arabic-cell">أَيْنَ</td><td class="bangla">কোথায়</td></tr>
+							<tr><td class="arabic-cell">الْبَابُ</td><td class="bangla">দরজা</td></tr>
+							<tr><td class="arabic-cell">الْمُبْهَمُ</td><td class="bangla">অজানা</td></tr>
+							<tr><td class="arabic-cell">بَابُ السُّلَّمِ</td><td class="bangla">সিঁড়ির দরজা</td></tr>
+							<tr><td class="arabic-cell">أَنْتَ</td><td class="bangla">তুমি</td></tr>
+							<tr><td class="arabic-cell">هُنَاكَ</td><td class="bangla">আছো</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-number">Page-08</div>
+		</div>
+
+        <!-- PAGE 9: Word-by-Word Translation (Continued) -->
+		<div class="poem-page">
+			<div class="watermark">Emam Mehedi</div>
+			<div class="poem-header">Poem: نهاية السلم (The End of the Ladder)</div>
+			<div class="poem-page-content-wrapper">
+				<div class="poem-content-body">
+					<h2 class="section-title">Word-by-Word Translation (Continued)</h2>
+					<table class="styled-table">
+						<thead>
+							<tr>
+								<th>Arabic Word</th>
+								<th class="bangla">Bengali Meaning</th>
+							</tr>
+						</thead>
+						<tbody>
+                            <tr><td class="arabic-cell">وَرَاءَ</td><td class="bangla">ওপারে</td></tr>
+							<tr><td class="arabic-cell">مَدَى</td><td class="bangla">সীমানার</td></tr>
+							<tr><td class="arabic-cell">الْأَحْلَامْ</td><td class="bangla">স্বপ্নের</td></tr>
+							<tr><td class="arabic-cell">فِي أُفُقٍ</td><td class="bangla">দিগন্তে</td></tr>
+							<tr><td class="arabic-cell">حَفَّ بِهِ</td><td class="bangla">তার মহাকালের</td></tr>
+							<tr><td class="arabic-cell">الْمَجْهُولُ</td><td class="bangla">অজানা</td></tr>
+							<tr><td class="arabic-cell">أَمْشِي</td><td class="bangla">আমি চলছি</td></tr>
+							<tr><td class="arabic-cell">وَأَرَى</td><td class="bangla">আর দেখছি</td></tr>
+							<tr><td class="arabic-cell">وَأَنَامْ</td><td class="bangla">আর ঘুমাচ্ছি</td></tr>
+							<tr><td class="arabic-cell">أَسْتَنْفِدُ</td><td class="bangla">আমি ফুরিয়ে ফেলছি</td></tr>
+							<tr><td class="arabic-cell">أَيَّامِي</td><td class="bangla">আমার দিনগুলো</td></tr>
+							<tr><td class="arabic-cell">وَأَجُرُّ</td><td class="bangla">আর কাছে টানছি</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-number">Page-09</div>
+		</div>
+
+        <!-- PAGE 10: Word-by-Word Translation (Continued) -->
+		<div class="poem-page">
+			<div class="watermark">Emam Mehedi</div>
+			<div class="poem-header">Poem: نهاية السلم (The End of the Ladder)</div>
+			<div class="poem-page-content-wrapper">
+				<div class="poem-content-body">
+					<h2 class="section-title">Word-by-Word Translation (Continued)</h2>
+					<table class="styled-table">
+						<thead>
+							<tr>
+								<th>Arabic Word</th>
+								<th class="bangla">Bengali Meaning</th>
+							</tr>
+						</thead>
+						<tbody>
+                            <tr><td class="arabic-cell">غَدِي</td><td class="bangla">আমার আগামীকে</td></tr>
+							<tr><td class="arabic-cell">الْمَعْسُولْ</td><td class="bangla">মধুময়</td></tr>
+							<tr><td class="arabic-cell">فَيَفِرُّ</td><td class="bangla">কিন্তু সে তো পালিয়ে যাচ্ছে</td></tr>
+							<tr><td class="arabic-cell">إِلَى</td><td class="bangla">পানে</td></tr>
+							<tr><td class="arabic-cell">الْمَاضِي</td><td class="bangla">অতীত</td></tr>
+							<tr><td class="arabic-cell">الْمَفْقُودِ</td><td class="bangla">হারিয়ে-যাওয়া</td></tr>
+							<tr><td class="arabic-cell">تَأْكُلُهَا</td><td class="bangla">খেয়ে ফেলছে</td></tr>
+							<tr><td class="arabic-cell">الْآهَاتُ</td><td class="bangla">দীর্ঘশ্বাসসমূহ</td></tr>
+							<tr><td class="arabic-cell">مَتَى</td><td class="bangla">কবে</td></tr>
+							<tr><td class="arabic-cell">سَتَعُودُ</td><td class="bangla">তুমি ফিরে আসবে</td></tr>
+							<tr><td class="arabic-cell">لَمْ تَتَذَكَّرْ</td><td class="bangla">তোমার মনে পড়ল না</td></tr>
+							<tr><td class="arabic-cell">أَنَّ</td><td class="bangla">যে</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-number">Page-10</div>
+		</div>
+
+        <!-- PAGE 11: Word-by-Word Translation (Continued) -->
+		<div class="poem-page">
+			<div class="watermark">Emam Mehedi</div>
+			<div class="poem-header">Poem: نهاية السلم (The End of the Ladder)</div>
+			<div class="poem-page-content-wrapper">
+				<div class="poem-content-body">
+					<h2 class="section-title">Word-by-Word Translation (Continued)</h2>
+					<table class="styled-table">
+						<thead>
+							<tr>
+								<th>Arabic Word</th>
+								<th class="bangla">Bengali Meaning</th>
+							</tr>
+						</thead>
+						<tbody>
+                            <tr><td class="arabic-cell">هُنَاكْ</td><td class="bangla">সেখানে</td></tr>
+							<tr><td class="arabic-cell">فِي زَاوِيَةٍ</td><td class="bangla">এক কোণে</td></tr>
+							<tr><td class="arabic-cell">مِنْ قَلْبِكَ</td><td class="bangla">তোমার মনের</td></tr>
+							<tr><td class="arabic-cell">حُبًّا</td><td class="bangla">এক প্রিয়জন</td></tr>
+							<tr><td class="arabic-cell">مَهْجُورًا</td><td class="bangla">ফেলে-যাওয়া</td></tr>
+							<tr><td class="arabic-cell">عَضَّتْ</td><td class="bangla">দংশন করেছে</td></tr>
+							<tr><td class="arabic-cell">فِي قَدَمَيْهِ</td><td class="bangla">তার দু'পায়ে</td></tr>
+							<tr><td class="arabic-cell">الْأَشْوَاكْ</td><td class="bangla">কাঁটা</td></tr>
+							<tr><td class="arabic-cell">يَتَضَرَّعُ</td><td class="bangla">মিনতি করছে</td></tr>
+							<tr><td class="arabic-cell">مَذْعُورًا</td><td class="bangla">ভীত অবস্থায়</td></tr>
+							<tr><td class="arabic-cell">هَبْهُ</td><td class="bangla">তাকে দান কর</td></tr>
+							<tr><td class="arabic-cell">النُّورَا</td><td class="bangla">আলো</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-number">Page-11</div>
+		</div>
+
+        <!-- PAGE 12: Word-by-Word Translation (Continued) -->
+		<div class="poem-page">
+			<div class="watermark">Emam Mehedi</div>
+			<div class="poem-header">Poem: نهاية السلم (The End of the Ladder)</div>
+			<div class="poem-page-content-wrapper">
+				<div class="poem-content-body">
+					<h2 class="section-title">Word-by-Word Translation (Continued)</h2>
+					<table class="styled-table">
+						<thead>
+							<tr>
+								<th>Arabic Word</th>
+								<th class="bangla">Bengali Meaning</th>
+							</tr>
+						</thead>
+						<tbody>
+                            <tr><td class="arabic-cell">عُدْ</td><td class="bangla">ফিরে এসো</td></tr>
+							<tr><td class="arabic-cell">بَعْضَ لِقَاءْ</td><td class="bangla">একটু সাক্ষাৎ</td></tr>
+							<tr><td class="arabic-cell">يَمْنَحُنَا</td><td class="bangla">আমাদেরকে দিতে পারে</td></tr>
+							<tr><td class="arabic-cell">أَجْنِحَةً</td><td class="bangla">কিছু ডানা</td></tr>
+							<tr><td class="arabic-cell">نَجْتَازُ بِهَا</td><td class="bangla">যার ওপর ভর করে আমরা পার করতে পারি</td></tr>
+							<tr><td class="arabic-cell">اللَّيْلَ</td><td class="bangla">রাত</td></tr>
+							<tr><td class="arabic-cell">فَهُنَاكَ</td><td class="bangla">কারণ, আছে</td></tr>
+							<tr><td class="arabic-cell">فَضَاءْ</td><td class="bangla">খোলা আকাশ</td></tr>
+							<tr><td class="arabic-cell">خَلْفَ</td><td class="bangla">পেছনে</td></tr>
+							<tr><td class="arabic-cell">الْغَابَاتِ الْمُلْتَفَّاتِ</td><td class="bangla">নিবিড় জঙ্গলের</td></tr>
+							<tr><td class="arabic-cell">هُنَاكَ</td><td class="bangla">আছে</td></tr>
+							<tr><td class="arabic-cell">بُحُورٌ</td><td class="bangla">সমুদ্র</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-number">Page-12</div>
+		</div>
+
+        <!-- PAGE 13: Word-by-Word Translation (Continued) -->
+		<div class="poem-page">
+			<div class="watermark">Emam Mehedi</div>
+			<div class="poem-header">Poem: نهاية السلم (The End of the Ladder)</div>
+			<div class="poem-page-content-wrapper">
+				<div class="poem-content-body">
+					<h2 class="section-title">Word-by-Word Translation (Continued)</h2>
+					<table class="styled-table">
+						<thead>
+							<tr>
+								<th>Arabic Word</th>
+								<th class="bangla">Bengali Meaning</th>
+							</tr>
+						</thead>
+						<tbody>
+                            <tr><td class="arabic-cell">لَا حَدَّ لَهَا</td><td class="bangla">যার কোন সীমা নেই</td></tr>
+							<tr><td class="arabic-cell">تَرْغِي</td><td class="bangla">ফেনা তুলছে</td></tr>
+							<tr><td class="arabic-cell">وَتَمُورُ</td><td class="bangla">আর দোল খাচ্ছে</td></tr>
+							<tr><td class="arabic-cell">أَمْوَاجٌ</td><td class="bangla">তরঙ্গমালা</td></tr>
+							<tr><td class="arabic-cell">مِنْ زَبَدِ الْأَحْلَامِ</td><td class="bangla">স্বপ্নের ফেনার</td></tr>
+							<tr><td class="arabic-cell">تُقَلِّبُهَا</td><td class="bangla">যাকে উল্টে দিচ্ছে</td></tr>
+							<tr><td class="arabic-cell">أَيْدٍ مِنْ نُورْ</td><td class="bangla">আলোর ক্ষমতা</td></tr>
+							<tr><td class="arabic-cell">أَمْ</td><td class="bangla">নইলে</td></tr>
+							<tr><td class="arabic-cell">سَيَمُوتُ</td><td class="bangla">সে শীঘ্রই মরে যাবে</td></tr>
+							<tr><td class="arabic-cell">صَوْتِي</td><td class="bangla">আমার শব্দ</td></tr>
+							<tr><td class="arabic-cell">فِي سَمْعِكَ</td><td class="bangla">তোমার কানে</td></tr>
+							<tr><td class="arabic-cell">خَلْفَ</td><td class="bangla">পেছনে</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-number">Page-13</div>
+		</div>
+
+        <!-- PAGE 14: Word-by-Word Translation (Continued) -->
+		<div class="poem-page">
+			<div class="watermark">Emam Mehedi</div>
+			<div class="poem-header">Poem: نهاية السلم (The End of the Ladder)</div>
+			<div class="poem-page-content-wrapper">
+				<div class="poem-content-body">
+					<h2 class="section-title">Word-by-Word Translation (Continued)</h2>
+					<table class="styled-table">
+						<thead>
+							<tr>
+								<th>Arabic Word</th>
+								<th class="bangla">Bengali Meaning</th>
+							</tr>
+						</thead>
+						<tbody>
+                            <tr><td class="arabic-cell">الْمُنْعَرَجِ</td><td class="bangla">বাঁকের</td></tr>
+							<tr><td class="arabic-cell">الْمَمْقُوتِ</td><td class="bangla">ঘৃণ্য</td></tr>
+							<tr><td class="arabic-cell">وَأَظَلُّ أَنَا</td><td class="bangla">আর আমি থেকে যাচ্ছি</td></tr>
+							<tr><td class="arabic-cell">شَارِدَةً</td><td class="bangla">বিভ্রান্ত অবস্থায়</td></tr>
+							<tr><td class="arabic-cell">فِي قَلْبِ</td><td class="bangla">হৃদয়ে</td></tr>
+							<tr><td class="arabic-cell">النِّسْيَانِ</td><td class="bangla">ভুলো মানুষের</td></tr>
+							<tr><td class="arabic-cell">لَا شَيْءَ سِوَى</td><td class="bangla">ব্যতীত আর কিছু নেই</td></tr>
+							<tr><td class="arabic-cell">الصَّمْتِ</td><td class="bangla">নীরবতা</td></tr>
+							<tr><td class="arabic-cell">الْمَمْدُودِ</td><td class="bangla">বিস্তৃত</td></tr>
+							<tr><td class="arabic-cell">فَوْقَ</td><td class="bangla">ওপরে</td></tr>
+							<tr><td class="arabic-cell">الْأَحْزَانِ</td><td class="bangla">বিষাদমালার</td></tr>
+							<tr><td class="arabic-cell">رَجْعٍ</td><td class="bangla">অনুনাদ</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-number">Page-14</div>
+		</div>
+
+        <!-- PAGE 15: Word-by-Word Translation (Continued) -->
+		<div class="poem-page">
+			<div class="watermark">Emam Mehedi</div>
+			<div class="poem-header">Poem: نهاية السلم (The End of the Ladder)</div>
+			<div class="poem-page-content-wrapper">
+				<div class="poem-content-body">
+					<h2 class="section-title">Word-by-Word Translation (Continued)</h2>
+					<table class="styled-table">
+						<thead>
+							<tr>
+								<th>Arabic Word</th>
+								<th class="bangla">Bengali Meaning</th>
+							</tr>
+						</thead>
+						<tbody>
+                            <tr><td class="arabic-cell">نَعْسَانٍ</td><td class="bangla">নিদ্রাচ্ছন্নের</td></tr>
+							<tr><td class="arabic-cell">يَهْمِسُ</td><td class="bangla">সে ফিসফিস করে বলে</td></tr>
+							<tr><td class="arabic-cell">فِي سَمْعِي</td><td class="bangla">আমার কানে</td></tr>
+							<tr><td class="arabic-cell">لَيْسَ يَعُودُ</td><td class="bangla">সে তো ফিরে আসবে না</td></tr>
+							<tr><td class="arabic-cell">لَا</td><td class="bangla">না</td></tr>
+							<tr><td class="arabic-cell">لَيْسَ يَعُودُ</td><td class="bangla">ফিরে আসবে না</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="page-number">Page-15</div>
+		</div>
+
     </div>
 
-    <!-- =================== MUSIC PLAYER START =================== -->
+    <!-- =================== MUSIC PLAYER & ACTION BUTTONS =================== -->
     <div id="music-player" class="fixed bottom-0 left-0 right-0 z-40 invisible">
         <div class="container mx-auto px-6">
             <div class="bg-black/80 backdrop-blur-md text-white rounded-t-lg p-3 flex items-center gap-4 shadow-lg">
-                <!-- Audio element - UPDATE THE SRC ATTRIBUTE FOR THIS POEM -->
                 <audio id="audio-source" src="audios/poem-nihayat.mp3"></audio>
-
                 <img src="images/profile.jpg" alt="Album Art" class="h-10 w-10 rounded-md">
-
                 <div class="flex items-center gap-4">
-                    <button id="prev-btn" class="text-gray-300 hover:text-white transition-colors">
-                        <i class="fas fa-backward fa-lg"></i>
-                    </button>
-                    <button id="play-pause-btn" class="bg-white text-black rounded-full w-10 h-10 flex items-center justify-center">
-                        <i id="play-pause-icon" class="fas fa-play"></i>
-                    </button>
-                    <button id="next-btn" class="text-gray-300 hover:text-white transition-colors">
-                        <i class="fas fa-forward fa-lg"></i>
-                    </button>
+                    <button id="prev-btn" class="text-gray-300 hover:text-white transition-colors"><i class="fas fa-backward fa-lg"></i></button>
+                    <button id="play-pause-btn" class="bg-white text-black rounded-full w-10 h-10 flex items-center justify-center"><i id="play-pause-icon" class="fas fa-play"></i></button>
+                    <button id="next-btn" class="text-gray-300 hover:text-white transition-colors"><i class="fas fa-forward fa-lg"></i></button>
                 </div>
-
                 <div class="flex-grow flex items-center gap-3">
                     <span id="current-time" class="text-xs w-10 text-right">0:00</span>
                     <div id="progress-bar-container" class="w-full bg-gray-600 rounded-full h-1.5 cursor-pointer">
@@ -251,10 +625,19 @@
             </div>
         </div>
     </div>
-    <!-- =================== MUSIC PLAYER END =================== -->
-
     <div id="player-hover-area"></div>
-
+    <div id="action-buttons-container">
+		<button id="go-to-top-btn" class="action-btn" aria-label="Go to top"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" /></svg></button>
+		<div class="bottom-row-controls">
+			<div id="zoom-controls">
+				<button id="zoom-out-btn" class="zoom-btn" aria-label="Zoom Out">-</button>
+				<input type="text" id="zoom-percentage" value="100%">
+				<button id="zoom-in-btn" class="zoom-btn" aria-label="Zoom In">+</button>
+			</div>
+			<button id="fullscreen-btn" class="action-btn" aria-label="Toggle full screen"><i id="fullscreen-icon" class="fas fa-expand"></i></button>
+		</div>
+	</div>
+    
     <!-- =================== FEEDBACK & FOOTER START =================== -->
     <section class="feedback-section py-20 bg-gray-900 border-t border-gray-800">
         <div class="container mx-auto px-6">
@@ -344,27 +727,9 @@
         </div>
     </footer>
     <!-- =================== FEEDBACK & FOOTER END =================== -->
-    
-    <!-- =================== ACTION BUTTONS START =================== -->
-    <div id="action-buttons-container">
-        <button id="go-to-top-btn" class="action-btn" aria-label="Go to top">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-            </svg>
-        </button>
-        <div class="bottom-row-controls">
-            <div id="zoom-controls">
-                <button id="zoom-out-btn" class="zoom-btn" aria-label="Zoom Out">-</button>
-                <input type="text" id="zoom-percentage" value="100%">
-                <button id="zoom-in-btn" class="zoom-btn" aria-label="Zoom In">+</button>
-            </div>
-            <button id="fullscreen-btn" class="action-btn" aria-label="Toggle full screen">
-                <i id="fullscreen-icon" class="fas fa-expand"></i>
-            </button>
-        </div>
-    </div>
-    <!-- =================== ACTION BUTTONS END =================== -->
-    
-    <script src="script.js"></script>
+	
+
+
+<script src="script.js"></script>
 </body>
 </html>
