@@ -62,6 +62,7 @@
                         <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 406</a>
                         <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 407</a>
                         <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 408 (B)</a>
+						<a href="https://drive.google.com/file/d/1I9fn2ROCa7a-jrNZ9U0KXK8jKznh378D/view?usp=sharing" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Previous Questions</a>
                     </div>
                 </div>
 
@@ -201,36 +202,43 @@
     </div>
 	
 	<!-- =================== FEEDBACK & FOOTER START =================== -->
-    <section class="feedback-section py-20 bg-gray-900 border-t border-gray-800">
-        <div class="container mx-auto px-6">
-            <div class="grid md:grid-cols-2 gap-16 items-center">
-                <div>
-                    <h2 class="text-4xl font-bold mb-4">Feedback</h2>
-                    <p class="text-gray-400 mb-8">We value your input to make Class Caddy better. Please share your suggestions, report any issues, or let us know what you love!</p>
-                    <div class="flex gap-6">
-                        <a href="https://facebook.com/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-facebook-f fa-2x"></i></a>
-                        <a href="https://wa.me/+8801743303877" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-whatsapp fa-2x"></i></a>
-                        <a href="https://t.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-telegram fa-2x"></i></a>
-                    </div>
-                </div>
-                <div>
-                    <form action="#" method="POST" class="space-y-6">
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
-                            <input type="email" name="email" id="email" placeholder="Enter Email Address" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
-                        </div>
-                        <div>
-                            <label for="suggestion" class="block text-sm font-medium text-gray-300 mb-2">Your suggestion</label>
-                            <textarea name="suggestion" id="suggestion" rows="4" placeholder="Write your complaint or suggestion" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"></textarea>
-                        </div>
-                        <div>
-                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg">Send Message</button>
-                        </div>
-                    </form>
+<!-- FEEDBACK SECTION -->
+<section class="feedback-section py-20 bg-gray-900 border-t border-gray-800">
+    <div class="container mx-auto px-6">
+        <div class="grid md:grid-cols-2 gap-16 items-center">
+            <div>
+                <h2 class="text-4xl font-bold mb-4">Feedback</h2>
+                <p class="text-gray-400 mb-8">We value your input to make Class Caddy better. Please share your suggestions, report any issues, or let us know what you love!</p>
+                <div class="flex gap-6">
+                    <a href="https://facebook.com/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-facebook-f fa-2x"></i></a>
+                    <a href="https://wa.me/+8801743303877" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-whatsapp fa-2x"></i></a>
+                    <a href="https://t.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-telegram fa-2x"></i></a>
                 </div>
             </div>
+            <div>
+                <form name="feedback" netlify data-netlify-honeypot="bot-field">
+					<p class="hidden">
+						<label>
+							Don’t fill this out if you’re human: <input name="bot-field" />
+						</label>
+					</p>
+
+					<div>
+						<label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+						<input type="email" name="email" id="email" placeholder="Enter Email Address" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all">
+					</div>
+					<div class="mt-6">
+						<label for="suggestion" class="block text-sm font-medium text-gray-300 mb-2">Your suggestion/Feedback</label>
+						<textarea name="suggestion" id="suggestion" rows="4" placeholder="Write your complaint or suggestion" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"></textarea>
+					</div>
+					<div class="mt-6">
+						<button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg">Send Message</button>
+					</div>
+				</form>
+            </div>
         </div>
-    </section>
+    </div>
+</section>
     
     <footer class="bg-gray-900 border-t border-gray-800 pt-16 pb-8">
         <div class="container mx-auto px-6">
