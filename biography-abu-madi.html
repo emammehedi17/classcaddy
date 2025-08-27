@@ -243,12 +243,13 @@
         </svg>
     </button>
     <div class="bottom-row-controls">
-        <div id="zoom-controls" style="display: none;"> <!-- Hidden by default, shown in fullscreen -->
+        <div id="zoom-controls">
             <button id="zoom-out-btn" class="zoom-btn" aria-label="Zoom Out">-</button>
             <input type="text" id="zoom-percentage" value="100%">
             <button id="zoom-in-btn" class="zoom-btn" aria-label="Zoom In">+</button>
         </div>
-        <div class="flex flex-col gap-3">
+        <!-- Vertical group for fullscreen and download buttons -->
+        <div class="vertical-button-group">
             <button id="fullscreen-btn" class="action-btn" aria-label="Toggle full screen">
                 <i id="fullscreen-icon" class="fas fa-expand"></i>
             </button>
