@@ -498,3 +498,29 @@ document.addEventListener('DOMContentLoaded', () => {
     // You can add more 'else if' blocks here for 'Shop', 'About', etc.
 });
 // ===== END: ACTIVE NAVIGATION SCRIPT =====
+
+// ===== START: SMOOTH SCROLL SCRIPT =====
+document.addEventListener('DOMContentLoaded', () => {
+    // This targets any link that starts with "index.html#"
+    const scrollLinks = document.querySelectorAll('a[href^="index.html#"]');
+
+    scrollLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Check if we are already on the homepage
+            const onHomePage = window.location.pathname.endsWith('/') || window.location.pathname.endsWith('index.html');
+            const hash = this.hash; // Gets the '#signup' part
+
+            if (onHomePage) {
+                e.preventDefault(); // Stop the default jump
+                const targetElement = document.querySelector(hash);
+                if (targetElement) {
+                    // Perform a smooth scroll to the target
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+            // If we are NOT on the homepage, the link will work normally,
+            // taking the user to index.html and then jumping to the section.
+        });
+    });
+});
+// ===== END: SMOOTH SCROLL SCRIPT =====
