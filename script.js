@@ -466,3 +466,35 @@ if (typeof lineTimings !== 'undefined') {
     setupKaraoke(lineTimings);
 }
 });
+
+
+// ===== START: ACTIVE NAVIGATION SCRIPT =====
+document.addEventListener('DOMContentLoaded', () => {
+    const path = window.location.pathname;
+    const pageName = path.split("/").pop();
+
+    // --- Define which pages belong to the 'Academic' section ---
+    const isAcademicPage = path.includes('academic.html') || 
+                           path.includes('course-') || 
+                           path.includes('poem-') || 
+                           path.includes('biography-');
+
+    // --- Select Navigation Elements ---
+    const academicButton = document.getElementById('academic-button');
+    const homeLink = document.querySelector('.hidden.md\\:flex a[href="index.html"]');
+    // Add other links here if you want them to be active on their pages
+    // const shopLink = document.querySelector('.hidden.md\\:flex a[href="shop.html"]');
+
+    // --- Logic to Apply Active Styles ---
+    if (isAcademicPage) {
+        // If it's an academic page, make the 'Academic' button green
+        academicButton.classList.add('bg-emerald-500');
+        academicButton.classList.remove('text-gray-400', 'hover:text-white');
+    } else if (pageName === 'index.html' || pageName === '') {
+        // If it's the homepage, make the 'Home' link green
+        homeLink.classList.add('bg-emerald-500', 'rounded-full');
+        homeLink.classList.remove('text-gray-400');
+    }
+    // You can add more 'else if' blocks here for 'Shop', 'About', etc.
+});
+// ===== END: ACTIVE NAVIGATION SCRIPT =====
