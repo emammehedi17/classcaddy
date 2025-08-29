@@ -271,6 +271,11 @@ header {
     text-align: center;
 }
 
+/* ADD THIS RULE to style.css */
+.section-spacing {
+    margin-top: 45px; /* You can adjust this value to increase or decrease the gap */
+}
+
 .poem-text, .poem-list {
     text-align: justify;
     font-size: 14pt;

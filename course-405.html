@@ -178,119 +178,190 @@
     </div>
 
     <!-- Tab Panels Container -->
-    <div class="relative" :style="{ 'min-height': containerHeight + 'px' }" style="transition: min-height 0.3s ease-out;">
+    <div class="relative overflow-hidden" :style="{ 'min-height': containerHeight + 'px' }" style="transition: min-height 0.3s ease-out;">
         <!-- Ruhul Amin Sir's Content -->
-        <div x-ref="ruhulPanel" x-show="activeTab === 'ruhul'"
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             x-transition:leave="transition ease-in duration-200 absolute w-full"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0"
-             class="space-y-8">
+<div x-ref="ruhulPanel" x-show="activeTab === 'ruhul'"
+     x-transition:enter="transition transform ease-out duration-300"
+     x-transition:enter-start="opacity-0 -translate-x-full"
+     x-transition:enter-end="opacity-100 translate-x-0"
+     x-transition:leave="transition transform ease-in duration-300 absolute w-full"
+     x-transition:leave-start="opacity-100 translate-x-0"
+     x-transition:leave-end="opacity-0 -translate-x-full"
+     class="space-y-8">
             
-            <!-- All the content for Ruhul Amin Sir goes here (unchanged) -->
             <div>
                 <h5 class="text-xl font-semibold text-emerald-400 mb-4">Poems</h5>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <a href="poem-akhi.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+                    <a href="poem-akhi.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">أخي</h6>
                         <p class="text-sm text-gray-400 mt-1">ميخائيل نعيمة</p>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
-                    <a href="poem-nahr.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+                    <a href="poem-nahr.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">النهر المتجمد</h6>
                         <p class="text-sm text-gray-400 mt-1">ميخائيل نعيمة</p>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
-                    <a href="poem-aghmid.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+                    <a href="poem-aghmid.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">أغمض جفونك</h6>
                         <p class="text-sm text-gray-400 mt-1">ميخائيل نعيمة</p>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
-                    <a href="poem-usfur.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+                    <a href="poem-usfur.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">عصفور الجنة</h6>
                         <p class="text-sm text-gray-400 mt-1">عبد الرحمن شكري</p>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
-                    <a href="poem-aghniya.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+                    <a href="poem-aghniya.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">أغنية قديمة</h6>
                         <p class="text-sm text-gray-400 mt-1">بدر شاكر السياب</p>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
                 </div>
             </div>
             <div>
                 <h5 class="text-xl font-semibold text-emerald-400 mb-4">Biographies</h5>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <a href="biography-mikhail.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+                    <a href="biography-mikhail.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">ميخائيل نعيمة</h6>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
-                    <a href="biography-shukri.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+                    <a href="biography-shukri.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">عبد الرحمن شكري</h6>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
-                    <a href="biography-badr-shakir.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+                    <a href="biography-badr-shakir.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">بدر شاكر السياب</h6>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
-					
                 </div>
             </div>
         </div>
 
         <!-- Fozlur Rahman Sir's Content -->
-        <div x-ref="fozlurPanel" x-show="activeTab === 'fozlur'"
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             x-transition:leave="transition ease-in duration-200 absolute w-full"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0"
-             class="space-y-8" style="display: none;">
+<div x-ref="fozlurPanel" x-show="activeTab === 'fozlur'"
+     x-transition:enter="transition transform ease-out duration-300"
+     x-transition:enter-start="opacity-0 translate-x-full"
+     x-transition:enter-end="opacity-100 translate-x-0"
+     x-transition:leave="transition transform ease-in duration-300 absolute w-full"
+     x-transition:leave-start="opacity-100 translate-x-0"
+     x-transition:leave-end="opacity-0 translate-x-full"
+     class="space-y-8" style="display: none;">
             
-            <!-- All the content for Fozlur Rahman Sir goes here (unchanged) -->
             <div>
                 <h5 class="text-xl font-semibold text-emerald-400 mb-4">Poems</h5>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <a href="poem-anqa.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+                    <a href="poem-anqa.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">العنقاء</h6>
                         <p class="text-sm text-gray-400 mt-1">إيليا ابو ماضي</p>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
-                    <a href="poem-ina.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+                    <a href="poem-ina.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">إناءٌ</h6>
                         <p class="text-sm text-gray-400 mt-1">إلياس أبو شبكة</p>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
-                    <a href="poem-nihaya.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+                    <a href="poem-nihaya.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">نِهَايَةُ السُّلَّمِ</h6>
                         <p class="text-sm text-gray-400 mt-1">نَازِكُ الْمَلَائِكَةِ</p>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
-					<a href="poem-eid.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+					<a href="poem-eid.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">عِيدٌ فِي الْقَرْيَةِ</h6>
                         <p class="text-sm text-gray-400 mt-1">إلياس أبو شبكة</p>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
                 </div>
             </div>
             <div>
                 <h5 class="text-xl font-semibold text-emerald-400 mb-4">Biographies</h5>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <a href="biography-abu-madi.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+                    <a href="biography-abu-madi.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">إيليا ابو ماضي</h6>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
-                    <a href="biography-abu-shabaka.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+                    <a href="biography-abu-shabaka.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">إلياس أبو شبكة</h6>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
-					
-					<a href="biography-najik.html" class="flex flex-col text-center items-center justify-center p-5 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
+					<a href="biography-najik.html" class="flex flex-col text-center items-center justify-center p-5 lg:p-4 rounded-lg border border-gray-700 hover:border-emerald-500 transition-all group bg-gray-800/50">
                         <h6 class="text-2xl font-semibold text-gray-200" style="font-family: 'Noto Naskh Arabic', serif;">نَازِكُ الْمَلَائِكَةِ</h6>
-                        <div class="mt-4"><span class="open-btn">Open</span></div>
+                        <div class="mt-4">
+                            <span class="open-btn inline-flex items-center gap-2">
+                                Open
+                                <i class="fa-solid fa-arrow-right-long transform transition-transform group-hover:translate-x-1"></i>
+                            </span>
+                        </div>
                     </a>
                 </div>
             </div>
@@ -301,7 +372,7 @@
             <!-- Summaries -->
             <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-8">
     <h3 class="text-2xl font-bold text-emerald-400 mb-6">Poem Summaries</h3>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         
         <a href="poem-summaries.html" target="_blank" rel="noopener noreferrer" class="group course-button-glow flex flex-col items-center justify-center p-4 bg-gray-800/50 border border-gray-700 rounded-2xl aspect-square hover:border-emerald-500 transition-colors">
             <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
@@ -321,9 +392,9 @@
 </div>
 
             <!-- Previous Questions -->
-<div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-8">
+<div class="mt-16 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-8">
     <h3 class="text-2xl font-bold text-emerald-400 mb-6">Previous Questions</h3>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         
         <a href="https://drive.google.com/file/d/1I9fn2ROCa7a-jrNZ9U0KXK8jKznh378D/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="group course-button-glow flex flex-col items-center justify-center p-4 bg-gray-800/50 border border-gray-700 rounded-2xl aspect-square hover:border-emerald-500 transition-colors">
             <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
