@@ -2,6 +2,12 @@
    1. General & Global Styles
    ========================================================================== */
 
+
+/* ADD THIS RULE to style.css */
+html {
+    scroll-behavior: smooth;
+}
+
 /* Apply Poppins font and dark theme to all pages */
 body {
     font-family: 'Poppins', sans-serif;
