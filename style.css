@@ -205,6 +205,7 @@ header {
     background-size: contain;
     background-repeat: no-repeat;
     print-color-adjust: exact;
+    display: none; /* Add this line to hide it by default */
 }
 
 .poem-page-content-wrapper {
@@ -425,8 +426,6 @@ header {
     flex-direction: column;
     gap: 8px;
 }
-
-
 /* ==========================================================================
    7. Print Styles
    ========================================================================== */
@@ -453,7 +452,7 @@ header {
         height: auto !important;
         min-height: initial !important;
         box-shadow: none !important;
-        border: none !important;
+        border-width: 0 !important; 
         margin: 0 !important;
         padding: 0 !important;
     }
@@ -465,9 +464,10 @@ header {
     
     /* Re-style the QR code to flow with the content at the end of its section */
     .poem-page::after {
-        position: relative; /* Override absolute positioning */
-        float: right;     /* Place it on the right */
-        margin-top: 1em;    /* Give it some space */
+        display: block; /* Show it for printing */
+        position: relative; 
+        float: right;     
+        margin-top: 1em;    
     }
 
     /* Force a new page to start before each logical section */
@@ -492,13 +492,15 @@ header {
         text-align: right !important;
         direction: rtl !important;
     }
-	
-		/* Add this code inside your @media print block */
-.styled-table, .styled-table th, .styled-table td {
-    border: 1px solid #A8D08D !important;
+    
+    /* --- FIX for Table Borders in Print --- */
+    .styled-table {
+        box-sizing: border-box !important; /* <-- ADDED THIS CRUCIAL FIX */
+    }
+    .styled-table, .styled-table th, .styled-table td {
+        border: 1px solid #A8D08D !important;
+    }
 }
-}
-
 
 /* ==========================================================================
    8. Custom Course Button Styles
