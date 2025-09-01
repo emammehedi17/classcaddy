@@ -2,8 +2,6 @@
    1. General & Global Styles
    ========================================================================== */
 
-
-
 /* Apply Poppins font and dark theme to all pages */
 body {
     font-family: 'Poppins', sans-serif;
@@ -195,6 +193,20 @@ header {
     flex-direction: column;
 }
 
+/* QR Code in the bottom right corner of each page */
+.poem-page::after {
+    content: '';
+    position: absolute;
+    bottom: 30pt;
+    right: 30pt;
+    width: 67px;
+    height: 67px;
+    background-image: url('images/qr.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    print-color-adjust: exact;
+}
+
 .poem-page-content-wrapper {
     border: 3pt double #006600;
     padding: 15pt;
@@ -273,9 +285,8 @@ header {
     text-align: center;
 }
 
-/* ADD THIS RULE to style.css */
 .section-spacing {
-    margin-top: 45px; /* You can adjust this value to increase or decrease the gap */
+    margin-top: 45px;
 }
 
 .poem-text, .poem-list {
@@ -339,19 +350,20 @@ header {
 }
 
 .styled-table td.arabic-cell {
-    text-align: right !important;
+    text-align: justify !important;
     direction: rtl !important;
 }
 
-
-
+.styled-table td.bangla {
+    text-align: justify;
+}
 
 /* ==========================================================================
    6. Common Components (Go To Top, Footer, Feedback)
    ========================================================================== */
 #action-buttons-container {
     position: fixed;
-    bottom: 7rem; /* MOVED UP: Increased from 2rem to avoid player */
+    bottom: 7rem;
     right: 2rem;
     z-index: 50;
     display: none;
@@ -387,59 +399,104 @@ header {
 
 
 #action-buttons-container {
-    /* Position the main container in the bottom right corner */
     position: fixed;
     bottom: 20px;
-    right: 20px; /* Anchor to the right */
+    right: 20px;
     z-index: 100;
     display: flex;
     flex-direction: column;
-    align-items: flex-end; /* Align children (go-to-top, bottom-row) to the right */
+    align-items: flex-end;
     gap: 8px;
-    pointer-events: none; /* Allows clicking through the container */
+    pointer-events: none;
 }
 
 .action-btn, .zoom-btn, #zoom-percentage {
-    pointer-events: auto; /* Makes sure buttons are clickable */
+    pointer-events: auto;
 }
 
 .bottom-row-controls {
-    /* This row contains the zoom controls and the vertical button group */
     display: flex;
-    align-items: flex-end; /* Align to the bottom for consistent baseline */
-    gap: 8px; /* Space between zoom controls and the vertical group */
+    align-items: flex-end;
+    gap: 8px;
 }
 
 .vertical-button-group {
-    /* This new class will stack the fullscreen and download buttons */
     display: flex;
-    flex-direction: column; /* Stack items vertically */
-    gap: 8px; /* Space between the two buttons */
+    flex-direction: column;
+    gap: 8px;
 }
+
 
 /* ==========================================================================
    7. Print Styles
    ========================================================================== */
 
 @media print {
-    body {
-        background: #fff;
+    /* --- General Print Reset --- */
+    html, body {
+        background: #fff !important; /* Ensure white background */
     }
+
+    .main-content {
+        background: #fff !important; /* Prevents dark background from showing */
+    }
+
+    /* Hide elements not needed for print */
+    header, .breadcrumbs-container, .feedback-section, footer, #music-player, #player-hover-area, #action-buttons-container {
+        display: none !important;
+    }
+
+    /* --- Treat content as a flowing document, not boxes --- */
+    .poem-page, .poem-page-content-wrapper {
+        display: block !important;
+        width: auto !important;
+        height: auto !important;
+        min-height: initial !important;
+        box-shadow: none !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Hide the original page numbers */
+    .page-number {
+        display: none !important;
+    }
+    
+    /* Re-style the QR code to flow with the content at the end of its section */
+    .poem-page::after {
+        position: relative; /* Override absolute positioning */
+        float: right;     /* Place it on the right */
+        margin-top: 1em;    /* Give it some space */
+    }
+
+    /* Force a new page to start before each logical section */
+    .poem-page {
+        page-break-before: always;
+    }
+
+    .poem-page:first-of-type {
+        page-break-before: auto; /* Don't start with a blank page */
+    }
+
+    /* --- Content Flow Hints for the Browser --- */
+    h1, h2, h3, .section-title {
+        page-break-after: avoid; /* Don't leave a title at the bottom of a page */
+    }
+
+    tr, td, th {
+        page-break-inside: avoid; /* Try not to split table rows */
+    }
+
     .arabic-cell {
         text-align: right !important;
         direction: rtl !important;
     }
-    .go-to-top-btn, header, .breadcrumbs-container, .feedback-section, footer, #music-player, #player-hover-area {
-        display: none !important;
-    }
-    .poem-page {
-        page-break-after: always;
-        margin: 0;
-        box-shadow: none;
-    }
-    .main-content {
-        padding-top: 0;
-    }
+	
+		/* Add this code inside your @media print block */
+.styled-table, .styled-table th, .styled-table td {
+    border: 1px solid #A8D08D !important;
+}
 }
 
 
@@ -562,23 +619,20 @@ header.header-hidden {
 
 /* --- Styles for Advanced Custom Zoom --- */
 
-/* The container for the zoom controls. Hidden by default. */
 #zoom-controls {
-    display: none; /* Hidden by default */
+    display: none;
     align-items: center;
-    background-color: #1f2937; /* bg-gray-800 */
-    border: 1px solid #4b5563;  /* border-gray-600 */
-    border-radius: 0.5rem;      /* rounded-lg */
+    background-color: #1f2937;
+    border: 1px solid #4b5563;
+    border-radius: 0.5rem;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* When the body has the 'is-fullscreen' class, show the zoom controls */
 body.is-fullscreen #zoom-controls {
     display: flex;
 }
 
-/* Style for the editable percentage input field */
 #zoom-percentage {
     width: 60px;
     background-color: transparent;
@@ -592,7 +646,6 @@ body.is-fullscreen #zoom-controls {
     outline: none;
 }
 
-/* Style for the + and - buttons */
 .zoom-btn {
     background-color: transparent;
     color: white;
@@ -605,26 +658,21 @@ body.is-fullscreen #zoom-controls {
 }
 
 .zoom-btn:hover {
-    background-color: #374151; /* bg-gray-700 */
+    background-color: #374151;
 }
 
-/* Prepare the main content area for scaling */
 .main-content {
     transform-origin: top center;
     transition: transform 0.2s ease-out;
 }
 
-/* This is the new rule for the bottom row container */
 .bottom-row-controls {
     display: flex;
-    flex-direction: row; /* Lays out items left-to-right */
+    flex-direction: row;
     align-items: center;
     gap: 0.75rem;
 }
 
-
-
-/* Hide feedback and footer when in fullscreen to prevent overlap when zooming */
 body.is-fullscreen .feedback-section,
 body.is-fullscreen footer {
     display: none;
@@ -641,7 +689,6 @@ body.is-fullscreen footer {
    13. Mobile View Corrections
    ========================================================================== */
 
-/* This media query targets screens smaller than 768px (tablets and phones) */
 @media (max-width: 768px) {
     .poem-page {
         width: 100%; 
@@ -658,16 +705,17 @@ body.is-fullscreen footer {
         font-size: 40pt;
     }
     
-    /* ADD THIS RULE HERE */
     .arabic-cell {
-        font-size: 16pt !important; /* You can change 16pt to a smaller value if you like */
+        font-size: 20pt !important;
     }
 }
 
+
 .styled-table td.bangla {
-    font-size: 12pt; /* Reduced from the default 14pt. Adjust as needed. */
+    font-size: 13pt;
 }
 
 .styled-table th.bangla {
     width: 50%;
 }
+
