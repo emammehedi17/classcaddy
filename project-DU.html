@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gantt Chart: Digitization of DU Central Library</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f7fa;
+            color: #333;
+            padding: 20px;
+        }
+
+        .gantt-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            overflow-x: auto; /* For responsiveness on smaller screens */
+        }
+
+        h1 {
+            text-align: center;
+            color: #0d47a1;
+            font-size: 24px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 15px;
+        }
+
+        /* Main Grid Layout */
+        .gantt-chart {
+            display: grid;
+            /* Column 1 for tasks, Columns 2-13 for months */
+            grid-template-columns: minmax(300px, 1.5fr) repeat(12, 1fr);
+            border: 1px solid #ccc;
+            position: relative;
+        }
+
+        /* Grid Cells Styling */
+        .gantt-cell {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            min-height: 40px; /* Ensures consistent row height */
+            box-sizing: border-box;
+        }
+
+        .gantt-cell:last-child {
+            border-right: none;
+        }
+
+        /* Header Styling */
+        .gantt-header {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .gantt-header.title {
+            text-align: left;
+            position: sticky;
+            left: 0;
+        }
+
+        /* Task & Phase Styling in the First Column */
+        .gantt-task-name {
+            grid-column: 1;
+            position: sticky;
+            left: 0;
+            background-color: #fff; /* Ensures it overlaps grid lines on scroll */
+            z-index: 5;
+        }
+
+        .gantt-task-name.phase {
+            font-weight: bold;
+            background-color: #e3f2fd; /* Light blue background for phase rows */
+            color: #0d47a1;
+        }
+
+        .gantt-task-name.task {
+            padding-left: 25px; /* Indent tasks under phases */
+        }
+        
+        .gantt-task-name.milestone {
+            color: #1b5e20; /* Green for milestones */
+            font-style: italic;
+        }
+
+        /* Timeline Bar Container */
+        .gantt-bar-container {
+            grid-column: 2 / -1; /* Span all 12 month columns */
+            position: relative;
+            padding: 0;
+            /* Add vertical grid lines for each month using a repeating background */
+            background-image: linear-gradient(to right, #e0e0e0 1px, transparent 1px);
+            background-size: calc(100% / 12) 100%;
+        }
+        
+        /* Bar & Milestone Marker Styling */
+        .gantt-bar {
+            position: absolute;
+            height: 60%;
+            top: 20%;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            /* Sizing is controlled by CSS custom properties */
+            left: calc((var(--start) - 1) * (100% / 12));
+            width: calc(var(--span) * (100% / 12));
+            min-width: 10px;
+        }
+        
+        .phase-bar {
+            background-color: #1976d2; /* Darker Blue */
+        }
+
+        .task-bar {
+            background-color: #64b5f6; /* Lighter Blue */
+        }
+
+        .milestone-marker {
+            position: absolute;
+            top: 50%;
+            left: calc(((var(--start) - 1) * (100% / 12))); /* Positioned at the start of the grid cell */
+            transform: translate(-50%, -50%) rotate(45deg);
+            width: 18px;
+            height: 18px;
+            background-color: #4caf50; /* Green */
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        /* SVG Overlay for Dependency Arrows */
+        .gantt-dependencies {
+            position: absolute;
+            top: 41px; /* Height of the header row */
+            left: 0;
+            width: 100%;
+            height: calc(100% - 41px);
+            pointer-events: none; /* Allows clicking through the SVG layer */
+            grid-column: 2 / -1;
+            grid-row: 2 / -1; /* Span all data rows */
+            z-index: 1;
+        }
+
+        .gantt-dependencies .arrow {
+            stroke: #888;
+            stroke-width: 1.5;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+    </style>
+</head>
+<body>
+
+<div class="gantt-container">
+    <h1>Gantt Chart: Digitization of the Dhaka University Central Library</h1>
+
+    <div class="gantt-chart">
+        <!-- Grid Header -->
+        <div class="gantt-cell gantt-header title">Task Name</div>
+        <div class="gantt-cell gantt-header">Month 1</div>
+        <div class="gantt-cell gantt-header">Month 2</div>
+        <div class="gantt-cell gantt-header">Month 3</div>
+        <div class="gantt-cell gantt-header">Month 4</div>
+        <div class="gantt-cell gantt-header">Month 5</div>
+        <div class="gantt-cell gantt-header">Month 6</div>
+        <div class="gantt-cell gantt-header">Month 7</div>
+        <div class="gantt-cell gantt-header">Month 8</div>
+        <div class="gantt-cell gantt-header">Month 9</div>
+        <div class="gantt-cell gantt-header">Month 10</div>
+        <div class="gantt-cell gantt-header">Month 11</div>
+        <div class="gantt-cell gantt-header">Month 12</div>
+
+        <!-- Phase 1: Conceptual / Initiation (Rows) -->
+        <div class="gantt-cell gantt-task-name phase">Phase 1: Conceptual / Initiation</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar phase-bar" style="--start: 1; --span: 2;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">Project Justification & Need Analysis</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" style="--start: 1; --span: 0.75;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">Goal Establishment & Proposal Writing</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" style="--start: 1.75; --span: 0.75;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">Secure Organizational Endorsement</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" style="--start: 2.5; --span: 0.5;"></div></div>
+        
+        <div class="gantt-cell gantt-task-name task">Appoint Project Director</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" style="--start: 3; --span: 0.25;"></div></div>
+
+        <div class="gantt-cell gantt-task-name milestone">◆ Project Charter Approved</div>
+        <div class="gantt-cell gantt-bar-container"><div class="milestone-marker" style="--start: 3;"></div></div>
+
+        <!-- Phase 2: Planning (Rows) -->
+        <div class="gantt-cell gantt-task-name phase">Phase 2: Planning</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar phase-bar" style="--start: 3; --span: 2;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">Develop Detailed Project Plan & WBS</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" style="--start: 3; --span: 1;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">Procurement Planning & Vendor Selection</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" style="--start: 4; --span: 1;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">Build & Onboard Project Team</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" style="--start: 4; --span: 0.5;"></div></div>
+
+        <div class="gantt-cell gantt-task-name milestone">◆ Detailed Project Plan Signed Off</div>
+        <div class="gantt-cell gantt-bar-container"><div class="milestone-marker" style="--start: 5;"></div></div>
+
+        <!-- Phase 3: Execution (Rows) -->
+        <div class="gantt-cell gantt-task-name phase">Phase 3: Execution</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar phase-bar" style="--start: 5; --span: 6;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">Procurement & Setup of Scanners</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" id="setup-scanners" style="--start: 5; --span: 1;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">Staff Training on Digitization</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" id="staff-training" style="--start: 6; --span: 0.5;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">User Portal Development</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" style="--start: 5; --span: 5;"></div></div>
+        
+        <!-- Adjusted digitization tasks to fit timeline -->
+        <div class="gantt-cell gantt-task-name task">Stage I: Digitize Rare Manuscripts</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" id="stage-1" style="--start: 6.5; --span: 2;"></div></div>
+        
+        <div class="gantt-cell gantt-task-name task">Stage II: Digitize Journals & Theses</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" id="stage-2" style="--start: 8.5; --span: 1.5;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">Stage III: Digitize Core Textbooks</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" id="stage-3" style="--start: 10; --span: 1;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">User Acceptance Testing (UAT)</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" style="--start: 10; --span: 1;"></div></div>
+
+        <div class="gantt-cell gantt-task-name milestone">◆ Digitization Complete & UAT Signed Off</div>
+        <div class="gantt-cell gantt-bar-container"><div class="milestone-marker" style="--start: 11;"></div></div>
+        
+        <!-- Phase 4: Termination / Close-out (Rows) -->
+        <div class="gantt-cell gantt-task-name phase">Phase 4: Termination / Close-out</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar phase-bar" style="--start: 11; --span: 2;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">Product Transfer & Handover</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" style="--start: 11; --span: 1;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">Complete Contracts & Finalize Finances</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" style="--start: 11; --span: 1;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">Release Resources & Disband Team</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" style="--start: 12; --span: 0.5;"></div></div>
+
+        <div class="gantt-cell gantt-task-name task">Final Project Report & Lessons Learned</div>
+        <div class="gantt-cell gantt-bar-container"><div class="gantt-bar task-bar" style="--start: 12; --span: 1;"></div></div>
+
+        <div class="gantt-cell gantt-task-name milestone">◆ Project Officially Closed</div>
+        <div class="gantt-cell gantt-bar-container"><div class="milestone-marker" style="--start: 13;"></div></div>
+        
+        <!-- SVG Overlay for Dependencies -->
+        <!-- Coordinates are hardcoded based on a row height of 42px and 12 timeline columns -->
+        <!-- Formula: y = (row_index * 42px) - 21px; x = (month_start - 1) * (100%/12) -->
+        <svg class="gantt-dependencies">
+            <defs>
+                <marker id="arrowhead" markerWidth="5" markerHeight="3.5" refX="0" refY="1.75" orient="auto">
+                    <polygon points="0 0, 5 1.75, 0 3.5" fill="#888" />
+                </marker>
+            </defs>
+            <!-- 1. Setup -> Training -->
+            <polyline class="arrow" points="41.66% 357, 45.83% 357, 45.83% 378, 50% 378"></polyline>
+            
+            <!-- 2. Training -> Stage I -->
+            <polyline class="arrow" points="54.16% 399, 56.25% 399, 56.25% 462, 58.33% 462"></polyline>
+            
+            <!-- 3. Stage I -> Stage II -->
+            <polyline class="arrow" points="75% 483, 77.08% 483, 77.08% 504, 79.16% 504"></polyline>
+            
+            <!-- 4. Stage II -> Stage III -->
+            <polyline class="arrow" points="91.66% 525, 93.75% 525, 93.75% 546, 95.83% 546"></polyline>
+        </svg>
+
+    </div>
+</div>
+
+</body>
+</html>
