@@ -579,16 +579,18 @@
                     currentMobileDay = item.day;
                 }
 let subjectContentHTML = `
-                    <input type="text" class="editable-field ${isEditingCurrentDay ? '' : 'hidden'}" value="${item.subject}" data-field-type="subject" data-day="${item.day}" data-old-subject="${item.subject}">
-                    <span class="font-medium text-gray-700 ${isEditingCurrentDay ? 'hidden' : ''}">${item.subject}</span>
+                    <p class="font-medium text-gray-700">
+                        <input type="text" class="editable-field ${isEditingCurrentDay ? '' : 'hidden'}" value="${item.subject}" data-field-type="subject" data-day="${item.day}" data-old-subject="${item.subject}">
+                        <span class="font-medium text-gray-700 ${isEditingCurrentDay ? 'hidden' : ''}">${item.subject}</span>
+                    </p>
                 `;
 
-                const topicInputType = (item.subject === 'Vocabulary' || item.subject === 'Newspaper' || item.subject === 'Basic View') ? 'textarea' : 'input';
-                let topicInputHTML = `
-                    <${topicInputType} class="editable-field ${isEditingCurrentDay ? '' : 'hidden'}" rows="${topicInputType === 'textarea' ? '2' : '1'}" placeholder="${item.subject === 'Vocabulary' ? 'Enter vocabulary as: Word, Meaning; AnotherWord, Meaning; ...' : 'Enter topic'}" data-field-type="topic" data-day="${item.day}" data-subject="${item.subject}">${item.topic || ''}</${topicInputType}>
-                `;
+const topicInputType = (item.subject === 'Vocabulary' || item.subject === 'Newspaper' || item.subject === 'Basic View') ? 'textarea' : 'input';
+let topicInputHTML = `
+    <${topicInputType} class="editable-field ${isEditingCurrentDay ? '' : 'hidden'}" rows="${topicInputType === 'textarea' ? '2' : '1'}" placeholder="${item.subject === 'Vocabulary' ? 'Enter vocabulary as: Word, Meaning; AnotherWord, Meaning; ...' : 'Enter topic'}" data-field-type="topic" data-day="${item.day}" data-subject="${item.subject}">${item.topic || ''}</${topicInputType}>
+`;
 
-                let topicDisplayHTML = `<div class="text-sm break-words ${isEditingCurrentDay ? 'hidden' : ''}">`;
+let topicDisplayHTML = `<div class="text-sm break-words ${isEditingCurrentDay ? 'hidden' : ''}" id="topic-mobile-${item.day}-${item.subject}-display-content">`; // Added an ID here for potential future use
                 if(item.subject === 'Vocabulary' && item.topic) {
                     const pairs = item.topic.split(';').filter(p=>p.trim());
                     topicDisplayHTML += '<div class="flex flex-wrap gap-2 py-1">';
@@ -607,17 +609,16 @@ let subjectContentHTML = `
                 let storyMobileContentHTML = '';
                 if (item.subject === 'Basic View') {
                     storyMobileContentHTML = `
-                        <div class="mt-4">
+                        <div class="mt-4 story-field-wrapper ${isEditingCurrentDay ? '' : 'hidden'}">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Vocabulary Story (optional)</label>
-                            <textarea class="editable-field ${isEditingCurrentDay ? '' : 'hidden'}" rows="4" placeholder="HTML allowed (e.g., use <strong>word</strong>)" data-field-type="story" data-day="${item.day}">${vocabStories[item.day] || ''}</textarea>
+                            <textarea class="editable-field" rows="4" placeholder="HTML allowed (e.g., use <strong>word</strong>)" data-field-type="story" data-day="${item.day}">${vocabStories[item.day] || ''}</textarea>
                         </div>
                     `;
                 }
                         
-                    `;
-                }
+                 
 
-                let editButtonsMobileHTML = '';
+let editButtonsMobileHTML = '';
                 // Mobile edit buttons are always present for "Basic View" tasks
                 if (item.subject === 'Basic View') {
                      editButtonsMobileHTML = `
@@ -629,18 +630,15 @@ let subjectContentHTML = `
                     `;
                 }
 
-
                 card.innerHTML = `
                     ${headerHTML}
                     ${dateInputMobileHTML}
                     <div class="flex items-start">
                         <input type="checkbox" class="task-checkbox mt-1" data-day="${item.day}" data-subject="${item.subject}">
                         <div class="ml-2 flex-1 min-w-0">
-                            <p class="font-medium text-gray-700">${subjectContentHTML}</p>
-                            <div class="text-sm break-words" id="topic-mobile-${item.day}-${item.subject}-input-display">
-                                ${topicInputHTML}
-                                ${topicDisplayHTML}
-                            </div>
+                            ${subjectContentHTML}
+                            ${topicInputHTML}
+                            ${topicDisplayHTML}
                             ${storyMobileContentHTML}
                             ${editButtonsMobileHTML}
                         </div>
