@@ -74,16 +74,21 @@
             border-color: #2563eb; /* Blue-600 */
         }
         .task-checkbox:checked::after {
+            /* This is a more robust way to draw a checkmark with CSS */
             content: "";
             position: absolute;
             display: block;
+            /* Position the checkmark */
             left: 0.4rem; /* 6px */
             top: 0.125rem; /* 2px */
+            /* Size of the checkmark */
             width: 0.35rem; /* 5px */
             height: 0.7rem; /* 11px */
+            /* Create the "L" shape */
             border-style: solid;
             border-color: white;
             border-width: 0 0.15rem 0.15rem 0; /* 0 2px 2px 0 */
+            /* Rotate the "L" to make it a checkmark */
             transform: rotate(45deg);
         }
 
@@ -102,11 +107,13 @@
         .vocab-item:hover {
             background-color: #c7d2fe; /* Indigo-200 */
         }
+        
+        /* This is the hidden popup */
         .vocab-meaning {
             visibility: hidden;
             opacity: 0;
             width: max-content;
-            max-width: 250px;
+            max-width: 250px; /* Max width for meaning */
             background-color: #312e81; /* Indigo-900 */
             color: #fff;
             text-align: center;
@@ -114,17 +121,21 @@
             padding: 6px 12px;
             position: absolute;
             z-index: 10;
-            bottom: 130%;
+            bottom: 130%; /* Position above the item */
             left: 50%;
             transform: translateX(-50%);
             transition: opacity 0.3s, visibility 0.3s;
             font-weight: 500;
-            white-space: normal;
+            white-space: normal; /* Allow meaning to wrap */
         }
+
+        /* This class is toggled by JS to show the popup */
         .vocab-item.active .vocab-meaning {
             visibility: visible;
             opacity: 1;
         }
+
+        /* Tooltip Arrow */
         .vocab-item .vocab-meaning::after {
             content: "";
             position: absolute;
@@ -137,174 +148,68 @@
         }
         /* --- End Vocabulary Styles --- */
         
-        /* --- Modal Styles (Shared) --- */
+        /* --- Story Modal Styles --- */
         .modal-hidden {
             display: none;
         }
-        .modal-overlay {
+        .story-modal-overlay {
             position: fixed;
             inset: 0;
-            background-color: rgba(0, 0, 0, 0.6);
+            background-color: rgba(0, 0, 0, 0.5);
             z-index: 40;
             transition: opacity 0.3s;
         }
-        .modal-box {
+        .story-modal-box {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 50;
-            background-color: #ffffff;
+            background-color: #fffbef; /* Amber-50 (parchment) */
+            border: 4px solid #78350f; /* Amber-800 (dark border) */
             border-radius: 0.75rem; /* rounded-lg */
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             width: 90%;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-        .modal-close-btn {
-            position: absolute;
-            top: 0.75rem;
-            right: 0.75rem;
-            background-color: transparent;
-            border: none;
-            color: #4b5563; /* Gray-600 */
-            font-size: 1.5rem; /* text-2xl */
-            font-weight: 700;
-            line-height: 1;
-            cursor: pointer;
-            padding: 0.25rem;
-            border-radius: 999px;
-            transition: background-color 0.2s, color 0.2s;
-        }
-        .modal-close-btn:hover {
-            background-color: #f3f4f6; /* Gray-100 */
-            color: #1f2937; /* Gray-800 */
-        }
-        
-        /* --- Story Modal Styles --- */
-        #story-modal-box {
-            background-color: #fffbef; /* Amber-50 (parchment) */
-            border: 4px solid #78350f; /* Amber-800 (dark border) */
             max-width: 500px; /* 500px */
+            max-height: 80vh;
+            overflow-y: auto;
             padding: 1.5rem; /* p-6 */
         }
-        #story-modal-box h3 {
+        .story-modal-box h3 {
             font-size: 1.25rem; /* text-xl */
             font-weight: 700; /* font-bold */
             color: #78350f; /* Amber-800 */
             margin-bottom: 1rem;
         }
-        #story-modal-box p {
+        .story-modal-box p {
             color: #451a03; /* Amber-950 */
             line-height: 1.6;
         }
-        #story-modal-box p strong {
+        .story-modal-box p strong {
             color: #c2410c; /* Orange-600 */
             font-weight: 600;
         }
-        #story-modal-box .modal-close-btn {
+        .story-modal-close-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background-color: transparent;
+            border: none;
             color: #78350f; /* Amber-800 */
-        }
-        #story-modal-box .modal-close-btn:hover {
-            color: #c2410c; /* Orange-600 */
-            background-color: #fef3c7; /* Amber-100 */
-        }
-
-        /* --- NEW: Edit Modal Styles --- */
-        #edit-modal-box {
-            max-width: 700px; /* Wider modal */
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 700;
+            line-height: 1;
+            cursor: pointer;
             padding: 0;
         }
-        #edit-modal-header {
-            padding: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e5e7eb; /* Gray-200 */
+        .story-modal-close-btn:hover {
+            color: #c2410c; /* Orange-600 */
         }
-        #edit-modal-header h3 {
-            font-size: 1.25rem; /* text-xl */
-            font-weight: 600; /* Semibold */
-            color: #111827; /* Gray-900 */
-        }
-        #edit-modal-content {
-            padding: 1.5rem;
-            background-color: #f9fafb; /* Gray-50 */
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-        #edit-modal-content .form-group {
-            margin-bottom: 1.25rem;
-        }
-        #edit-modal-content label {
-            display: block;
-            font-weight: 500;
-            color: #374151; /* Gray-700 */
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem; /* text-sm */
-        }
-        #edit-modal-content input,
-        #edit-modal-content textarea {
-            width: 100%;
-            border: 1px solid #d1d5db; /* Gray-300 */
-            border-radius: 0.5rem; /* rounded-lg */
-            padding: 0.6rem 0.8rem;
-            font-size: 0.95rem;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        #edit-modal-content input:focus,
-        #edit-modal-content textarea:focus {
-            outline: none;
-            border-color: #4f46e5; /* Indigo-600 */
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
-        }
-        #edit-modal-content textarea {
-            min-height: 80px;
-            font-family: 'Inter', sans-serif;
-        }
-        #edit-modal-footer {
-            padding: 1.25rem 1.5rem;
-            background-color: #ffffff;
-            border-top: 1px solid #e5e7eb; /* Gray-200 */
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-        }
-        .modal-btn {
-            padding: 0.5rem 1rem;
-            font-weight: 500;
-            border-radius: 0.5rem; /* rounded-lg */
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-        }
-        .btn-secondary {
-            background-color: #ffffff;
-            color: #374151; /* Gray-700 */
-            border: 1px solid #d1d5db; /* Gray-300 */
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
-        }
-        .btn-secondary:hover {
-            background-color: #f9fafb; /* Gray-50 */
-        }
-        .btn-primary {
-            background-color: #4f46e5; /* Indigo-600 */
-            color: white;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
-        }
-        .btn-primary:hover {
-            background-color: #4338ca; /* Indigo-700 */
-        }
-        .btn-primary:disabled {
-            background-color: #a5b4fc; /* Indigo-300 */
-            cursor: not-allowed;
-        }
-        /* --- End Edit Modal Styles --- */
-
-        .read-story-btn, .edit-day-btn {
+        .read-story-btn {
             display: inline-block;
             margin-top: 0.75rem; /* mt-3 */
             margin-left: 0.25rem; /* ml-1 */
+            background-color: #3730a3; /* Indigo-800 */
             color: white;
             padding: 4px 12px;
             border-radius: 9999px; /* rounded-full */
@@ -312,38 +217,11 @@
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.2s;
-            border: none;
-        }
-        .read-story-btn {
-             background-color: #3730a3; /* Indigo-800 */
         }
         .read-story-btn:hover {
             background-color: #4f46e5; /* Indigo-600 */
         }
-        /* NEW Edit button style */
-        .edit-day-btn {
-            background-color: #059669; /* Green-600 */
-            margin-left: 0.5rem; /* ml-2 */
-        }
-        .edit-day-btn:hover {
-            background-color: #047857; /* Green-700 */
-        }
-        /* Make checkbox and edit button line up */
-        .completion-cell-content {
-            display: flex;
-            align-items: center;
-        }
-        .completion-card-content {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .completion-card-controls {
-            display: flex;
-            align-items: center;
-            width: 100%;
-        }
-
+        /* --- End Story Modal Styles --- */
 
         /* --- Progress Bar Styles --- */
         .progress-container {
@@ -379,6 +257,8 @@
             padding-bottom: 0.75rem; /* py-3 */
             padding-left: 1.5rem; /* px-6 */
             padding-right: 1.5rem; /* px-6 */
+
+            /* Add borders to header to match group */
             border-top: 3px solid #4f46e5; /* Indigo-600 */
             border-bottom: 2px solid #4f46e5; /* Indigo-600 */
         }
@@ -388,6 +268,8 @@
         .full-table thead th:last-child {
             border-right: 3px solid #4f46e5; /* Indigo-600 */
         }
+
+
         .full-table tbody tr:nth-child(even) {
             background-color: #e0e7ff; /* Indigo-100 for even rows */
         }
@@ -400,22 +282,35 @@
         .full-table tbody tr.task-item.completed:nth-child(odd) {
             background-color: #a7f3d0; /* Green-200, slightly different completed color */
         }
+
+        /* Specific cell styles for better contrast */
         .full-table tbody td {
             color: #374151; /* Darker gray for text */
             border-top: 1px solid #c7d2fe; /* Indigo-200, thin horizontal line */
         }
+
+        /* --- Day Grouping Borders --- */
         .full-table tbody tr.day-group-start td {
+            /* Add a thick top border to the first row of the group */
             border-top: 3px solid #4f46e5; /* Indigo-600 */
         }
+        
         .full-table tbody tr.task-item td:first-child {
+            /* Add a left border to the first cell of every row */
             border-left: 3px solid #4f46e5; /* Indigo-600 */
         }
         .full-table tbody tr.task-item td:last-child {
+            /* Add a right border to the last cell of every row */
             border-right: 3px solid #4f46e5; /* Indigo-600 */
         }
+        
+        /* Add bottom border to the last row of the table */
         .full-table tbody tr:last-child td {
              border-bottom: 3px solid #4f46e5; /* Indigo-600 */
         }
+        /* --- End Grouping --- */
+
+
         .full-table tbody td:first-child { /* Day cell */
             font-weight: 600;
             color: #1e3a8a; /* Darker blue for day */
@@ -457,7 +352,7 @@
         }
         @media (min-width: 769px) {
             .full-table {
-                display: table;
+                display: block;
             }
             .mobile-cards {
                 display: none;
@@ -474,7 +369,7 @@
             <p class="text-lg text-gray-500">Monthly Plan (18.10.25 – 17.11.25)</p>
         </div>
 
-        <!-- Auth & Sync Status -->
+        <!-- NEW: Auth & Sync Status -->
         <div class="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg shadow">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
                 <!-- Status -->
@@ -504,6 +399,8 @@
                 </div>
             </div>
         </div>
+        <!-- END NEW -->
+
 
         <!-- Monthly Targets Grid --><div class="mb-10">
             <h2 class="text-2xl font-semibold text-gray-700 mb-4">Monthly Targets</h2>
@@ -523,6 +420,7 @@
                 <!-- Week 4 --><div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
                     <h3 class="font-semibold text-lg text-rose-700 mb-2">4th Week</h3>
                     <p class="text-gray-600">Basic View 151-300 pages, Mental Ability classes 15</p>
+
                 </div>
             </div>
         </div>
@@ -551,47 +449,24 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white" id="daily-plan-body">
-                        <!-- Tasks will be dynamically inserted here by JavaScript -->
-                    </tbody>
+                        <!-- Tasks will be dynamically inserted here by JavaScript --></tbody>
                 </table>
             </div>
 
             <!-- Mobile Cards --><div class="space-y-4 mobile-cards" id="daily-plan-cards">
-                <!-- Mobile cards will be dynamically inserted here -->
-            </div>
+                <!-- Mobile cards will be dynamically inserted here --></div>
         </div>
     </div>
 
-    <!-- --- Story Modal HTML (hidden by default) --- -->
-    <div id="story-modal" class="modal-hidden">
-        <div id="story-overlay" class="modal-overlay"></div>
-        <div id="story-modal-box" class="modal-box">
-            <button id="story-close-btn" class="modal-close-btn">&times;</button>
+    <!-- --- Story Modal HTML (hidden by default) --- --><div id="story-modal" class="modal-hidden">
+        <div id="story-overlay" class="story-modal-overlay"></div>
+        <div id="story-modal-box" class="story-modal-box">
+            <button id="story-close-btn" class="story-modal-close-btn">&times;</button>
             <h3 id="story-title">A Day's Tale</h3>
             <p id="story-content" class="mt-4"></p>
         </div>
     </div>
     <!-- --- End Story Modal HTML --- -->
-
-    <!-- --- NEW: Edit Modal HTML (hidden by default) --- -->
-    <div id="edit-modal" class="modal-hidden">
-        <div id="edit-overlay" class="modal-overlay"></div>
-        <div id="edit-modal-box" class="modal-box">
-            <div id="edit-modal-header">
-                <h3 id="edit-modal-title">Edit Day</h3>
-                <button id="edit-close-btn" class="modal-close-btn">&times;</button>
-            </div>
-            <div id="edit-modal-content">
-                <!-- Dynamic form content will be injected here -->
-            </div>
-            <div id="edit-modal-footer">
-                <button id="edit-cancel-btn" class="modal-btn btn-secondary">Cancel</button>
-                <button id="edit-save-btn" class="modal-btn btn-primary">Save Changes</button>
-            </div>
-        </div>
-    </div>
-    <!-- --- End Edit Modal HTML --- -->
-
 
     <!-- Firebase Imports -->
     <script type="module">
@@ -609,14 +484,12 @@
             doc, 
             setDoc, 
             onSnapshot,
-            collection,
-            query,
-            getDocs,
-            limit,
-            writeBatch
+            setLogLevel
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- Firebase Config ---
+        // --- 
+        // --- This is your Firebase Config object from your project ---
+        // ---
         const firebaseConfig = {
           apiKey: "AIzaSyAj7MDnrnzKUO73BXG0jeM-uBGrAH3XiAY",
           authDomain: "study-plan17.firebaseapp.com",
@@ -626,16 +499,14 @@
           appId: "1:394648483332:web:a0b8f6adc9c8cad0e4e751",
           measurementId: "G-X9CFFJCM2F"
         };
+        // -------------------------------------------------
 
         // --- Firebase Initialization ---
         let app, auth, db, userId;
-        let planContentCollectionRef = null;
-        let progressDocRef = null;
-        let unsubscribePlanListener = null; 
-        let unsubscribeProgressListener = null;
-        let isDataLoaded = false;
-        let currentPlanData = []; // Holds the local copy of the plan
-        let currentProgressData = {}; // Holds local copy of progress
+        let dataDocRef; // Reference to the user's data document
+        let unsubscribeListener = null; // Function to detach the listener
+        let isFirebaseReady = false;
+        let isDataLoaded = false; // Flag to prevent saving data before it's loaded
 
         // --- UI Elements for Auth & Sync ---
         const syncIndicator = document.getElementById('sync-indicator');
@@ -647,38 +518,6 @@
         const userName = document.getElementById('user-name');
         const userEmail = document.getElementById('user-email');
 
-        // --- UI Elements for Modals ---
-        const storyModal = document.getElementById('story-modal');
-        const storyOverlay = document.getElementById('story-overlay');
-        const storyCloseBtn = document.getElementById('story-close-btn');
-        const storyContent = document.getElementById('story-content');
-        const storyTitle = document.getElementById('story-title');
-
-        const editModal = document.getElementById('edit-modal');
-        const editOverlay = document.getElementById('edit-overlay');
-        const editCloseBtn = document.getElementById('edit-close-btn');
-        const editCancelBtn = document.getElementById('edit-cancel-btn');
-        const editSaveBtn = document.getElementById('edit-save-btn');
-        const editModalTitle = document.getElementById('edit-modal-title');
-        const editModalContent = document.getElementById('edit-modal-content');
-
-        // --- UI Elements for Plan ---
-        const tableBody = document.getElementById('daily-plan-body');
-        const mobileCardsContainer = document.getElementById('daily-plan-cards');
-        const progressLabel = document.getElementById('weekly-progress-label');
-        const progressBar = document.getElementById('weekly-progress-bar');
-        
-        // --- Progress Bar Logic ---
-        const taskWeights = {
-            'quran': 5/7,
-            'newspaper': 5/7,
-            'vocabulary': 10/7,
-            'math': 40/7,
-            'basic': 40/7
-        };
-        let maxWeight = 0; // Will be calculated when UI is built
-
-        // --- Set Sync Status UI ---
         function setSyncStatus(status, isError = false) {
             if (isError) {
                 syncIndicator.classList.remove('bg-green-500', 'animate-pulse');
@@ -701,11 +540,16 @@
             }
         }
 
-        // --- Auth UI Functions ---
+        // --- New UI Functions ---
         function showLoggedOutUI() {
-            if (unsubscribePlanListener) unsubscribePlanListener();
-            if (unsubscribeProgressListener) unsubscribeProgressListener();
+            // Detach any active listener
+            if (unsubscribeListener) {
+                unsubscribeListener();
+                unsubscribeListener = null;
+                console.log("Firestore listener detached.");
+            }
             
+            // Show Login button, hide user info
             userInfo.classList.add('hidden');
             loginBtn.classList.remove('hidden');
 
@@ -713,35 +557,59 @@
             syncIndicator.classList.remove('bg-green-500', 'bg-red-500', 'bg-yellow-500');
             syncIndicator.classList.add('bg-gray-400');
             
+            // Clear all local data from the UI
             clearLocalData();
             isDataLoaded = false;
         }
 
         function showLoggedInUI(user) {
+            // Hide Login button, show user info
             loginBtn.classList.add('hidden');
             userInfo.classList.remove('hidden');
+            
+            // Populate user info
             userName.textContent = user.displayName;
             userEmail.textContent = user.email;
+
             setSyncStatus("Connecting...");
         }
 
-        // --- Clear UI ---
         function clearLocalData() {
-            tableBody.innerHTML = '';
-            mobileCardsContainer.innerHTML = '';
-            currentPlanData = [];
-            currentProgressData = {};
+            // 1. Uncheck all checkboxes
+            const allCheckboxes = document.querySelectorAll('.task-checkbox');
+            allCheckboxes.forEach(cb => {
+                cb.checked = false;
+                const taskItem = cb.closest('.task-item, .card-item');
+                if (taskItem) {
+                    taskItem.classList.remove('completed');
+                }
+            });
+
+            // 2. Clear all date inputs
+            const allDateInputs = document.querySelectorAll('.date-input-desktop input, .date-input-mobile input');
+            allDateInputs.forEach(input => {
+                input.value = '';
+            });
+
+            // 3. Reset progress bar
             updateWeeklyProgress();
+
+            // 4. Hide all date inputs
+            const allDays = new Set(dailyPlanData.map(item => item.day));
+            allDays.forEach(day => checkDayCompletion(day));
+            
             console.log("Local UI cleared.");
         }
 
-        // --- Auth Functions ---
+
+        // --- New Auth Functions ---
         async function signInWithGoogle() {
             if (!auth) return;
             const provider = new GoogleAuthProvider();
             try {
                 setSyncStatus("Logging in...");
                 await signInWithPopup(auth, provider);
+                // onAuthStateChanged will handle the rest
             } catch (error) {
                 console.error("Error during Google sign-in:", error);
                 setSyncStatus(error.message, true);
@@ -752,134 +620,17 @@
             if (!auth) return;
             try {
                 await signOut(auth);
+                // onAuthStateChanged will handle the rest
             } catch (error) {
                 console.error("Error signing out:", error);
                 setSyncStatus(error.message, true);
             }
         }
 
-        // --- Default Data Function ---
-        // This is the new, structured data that will be seeded for new users
-        function getDefaultPlanData() {
-            return [
-                {
-                    dayId: 'Day-1',
-                    tasks: [
-                        { id: 'quran', subject: 'Quran', topic: 'Sura Anfal 8:45- 8:53' },
-                        { id: 'newspaper', subject: 'Newspaper', topic: 'The Daily Star: Shibir-backed panel sweeps Rucsu polls, Lowest HSC pass rate in 21 years' },
-                        { id: 'vocabulary', subject: 'Vocabulary', topic: 'Sweep- বিজয় অর্জন, Clinch- সমর্থন করা, unbridled-অবাধ, outperform-ছাড়িয়ে যাওয়া, Steep-خাড়া, dismally- poorly, poor show- নিম্ন ফলাফল, lenient- কোমল, pronounced- সুস্পষ্ট।' },
-                        { id: 'math', subject: 'Math', topic: 'Ratio Class 12, 13' },
-                        { id: 'basic', subject: 'Basic View', topic: 'Page 1-20' }
-                    ],
-                    story: "The young prince planned to <strong>sweep</strong> the election. He needed to <strong>clinch</strong> the final vote from the stubborn council. His victory led to <strong>unbridled</strong> celebrations in the streets. He promised his advisors he would <strong>outperform</strong> all previous rulers. But his first challenge was a <strong>steep</strong> mountain pass, now blocked by snow. The kingdom's food supply looked <strong>dismally</strong> low. The public called his first month a <strong>poor show</strong>. His <strong>pronounced</strong> frown showed his worry. He wondered, should he be <strong>lenient</strong> with the grain merchants, or seize their stock for the people?"
-                },
-                {
-                    dayId: 'Day-2',
-                    tasks: [
-                        { id: 'quran', subject: 'Quran', topic: 'Sura Anfal 8:53-8:69' },
-                        { id: 'newspaper', subject: 'Newspaper', topic: 'Editorial: Our children deserve clean air' },
-                        { id: 'vocabulary', subject: 'Vocabulary', topic: 'Unnerved- ভীত, dire- অত্যান্ত জরুরি, particulate matter- অতিক্ষুদ্র পদার্থ, brick kilns- ইট ভাটা, infants- শিশু, likelihood- সম্ভাবনা, ingrained- বদ্ধমূল, halt- থামা, perpetuate- অবিরাম করা,' },
-                        { id: 'math', subject: 'Math', topic: 'Ratio Class 14, 15' },
-                        { id: 'basic', subject: 'Basic View', topic: '' }
-                    ],
-                    story: "The old scientist felt <strong>unnerved</strong> by the sky's strange color. He gave a <strong>dire</strong> warning to the town's mayor. 'The <strong>particulate matter</strong> is at a deadly level,' he explained. 'It's coming from the new <strong>brick kilns</strong>.' He worried most about the <strong>infants</strong>, who were weakest. The <strong>likelihood</strong> of a lung disease was rising daily. This cough was now <strong>ingrained</strong> in the town's life. 'We must <strong>halt</strong> production!' he cried. 'If we let this <strong>perpetuate</strong>, no one will be left.'"
-                },
-                {
-                    dayId: 'Day-3',
-                    tasks: [
-                        { id: 'quran', subject: 'Quran', topic: 'Sura Anfal 8:70- Sura Tawbah 9:6' },
-                        { id: 'newspaper', subject: 'Newspaper', topic: 'Editorial: Sabotage or not, the government must account for the recent fires' },
-                        { id: 'vocabulary', subject: 'Vocabulary', topic: 'Sabotage- নাশকতা, Devastating- ধ্বংশাত্মক, Blaze- তীব্র অগ্নিকাণ্ড, deploy- মোতায়েন করা, disrupt- বিঘ্ন ঘটানো, stranded- আটকে পড়া, spate- ঢল, undermine- দুর্বল করা, <strong>sow</strong> panic- আতঙ্ক ছড়ানো, arson- অগ্নিসংযোগ, resolute- দৃঢ় প্রতিজ্ঞ, beyond comprehension- বোধগম্যতার বাইরে, contingency- বিকল্প ব্যবস্থা, bode- ইঙ্গিত দেয়া/ পূর্বাভাস' },
-                        { id: 'math', subject: 'Math', topic: 'Class 16, 17' },
-                        { id: 'basic', subject: 'Basic View', topic: '' }
-                    ],
-                    story: "The empress was certain it was <strong>sabotage</strong>. The result of the fire was <strong>devastating</strong>. The great <strong>blaze</strong> had destroyed the silk market. She had to <strong>deploy</strong> her royal guard immediately. Someone wanted to <strong>disrupt</strong> the peace festival. Many merchants were now <strong>stranded</strong> with no goods to sell. This was the latest in a <strong>spate</strong> of strange accidents. Someone was trying to <strong>undermine</strong> her authority. They wanted to <strong>sow</strong> panic among the citizens. This was clearly an act of <strong>arson</strong>. The empress remained <strong>resolute</strong> in her duty. The cruelty of the act was <strong>beyond comprehension</strong>. She immediately ordered a new <strong>contingency</strong> plan for the city's safety. 'This fire,' she whispered to her general, 'does not <strong>bode</strong> well for our future.'"
-                },
-                {
-                    dayId: 'Day-4',
-                    tasks: [
-                        { id: 'quran', subject: 'Quran', topic: 'Sura Tawbah 9:7- 9:20' },
-                        { id: 'newspaper', subject: 'Newspaper', topic: '' },
-                        { id: 'vocabulary', subject: 'Vocabulary', topic: '' },
-                        { id: 'math', subject: 'Math', topic: 'Class 18, 19' },
-                        { id: 'basic', subject: 'Basic View', topic: '' }
-                    ],
-                    story: ""
-                },
-                {
-                    dayId: 'Day-5',
-                    tasks: [
-                        { id: 'quran', subject: 'Quran', topic: 'Sura Tawbah 9:21- 9:31' },
-                        { id: 'newspaper', subject: 'Newspaper', topic: 'Tripura mob killing of Bangladeshis exposes the accountability gap' },
-                        { id: 'vocabulary', subject: 'Vocabulary', topic: 'Gruesome-ভয়াবহ, heinous-নিকৃষ্ট, sanctity- পবিত্রতা, frontier vengeance- সীমান্ত প্রতিহিংসা, porous- ছিদ্রযুক্ত, flux- অবিরাম গতি, illicit- অবৈধ, intricate- সূক্ষ্ণ, backdrop- পটভূমি, precarious- ঝুঁকিপূর্ণ, pledged- প্রতিজ্ঞা করা, curb- দমন করা, intrusions- onadhikar probes, repatriate- নিজ দেশে ফেরত পাঠানো, patrols- টহল, usher in- শুরু করা, restraint- সংগম, hollow- ফাঁপা, invoking- আহ্বান করা, culminating-শেষ করা, perpetrators- অপরাধী' },
-                        { id: 'math', subject: 'Math', topic: 'Class 20, 21' },
-                        { id: 'basic', subject: 'Basic View', topic: '' }
-                    ],
-                    story: "The detective inspected the <strong>gruesome</strong> crime scene. It was a truly <strong>heinous</strong> act. The killer had violated the <strong>sanctity</strong> of the old library. This felt like some kind of <strong>frontier vengeance</strong>. The city's borders were famously <strong>porous</strong>. There was a constant <strong>flux</strong> of strange visitors. Many were smuggling <strong>illicit</strong> goods. An <strong>intricate</strong> tapestry hung on the wall, a silent <strong>backdrop</strong> to the crime. The detective's own position was <strong>precarious</strong>. He had <strong>pledged</strong> to the public that he would solve the case. He had to <strong>curb</strong> these violent <strong>intrusions</strong>. He would find the killer and <strong>repatriate</strong> him to his home country for justice. His <strong>patrols</strong> would work day and night. He hoped to <strong>usher in</strong> an age of peace. He had to practice <strong>restraint</strong> and not rush the investigation. But his promises to the victim's family felt <strong>hollow</strong>. He found himself <strong>invoking</strong> the city's old charter for help. The long investigation was <strong>culminating</strong> in a final chase. At last, he cornered the <strong>perpetrators</strong> in the old bell tower."
-                },
-                {
-                    dayId: 'Day-6',
-                    tasks: [
-                        { id: 'quran', subject: 'Quran', topic: 'Sura Tawbah 9:31- 9:41' },
-                        { id: 'newspaper', subject: 'Newspaper', topic: '' },
-                        { id: 'vocabulary', subject: 'Vocabulary', topic: '' },
-                        { id: 'math', subject: 'Math', topic: '' },
-                        { id: 'basic', subject: 'Basic View', topic: '' }
-                    ],
-                    story: ""
-                },
-                {
-                    dayId: 'Day-7',
-                    tasks: [
-                        { id: 'quran', subject: 'Quran', topic: '' },
-                        { id: 'newspaper', subject: 'Newspaper', topic: '' },
-                        { id: 'vocabulary', subject: 'Vocabulary', topic: '' },
-                        { id: 'math', subject: 'Math', topic: '' },
-                        { id: 'basic', subject: 'Basic View', topic: '' }
-                    ],
-                    story: ""
-                }
-            ];
-        }
-
-        // --- NEW: Check if user is new, if so, seed default data ---
-        async function checkAndSeedDefaultData() {
-            if (!planContentCollectionRef) return;
-            
-            setSyncStatus("Checking data...");
-            const q = query(planContentCollectionRef, limit(1));
-            const snapshot = await getDocs(q);
-            
-            if (snapshot.empty) {
-                // This is a new user
-                console.log("New user detected. Seeding default plan data...");
-                setSyncStatus("Saving default plan...");
-                const defaultData = getDefaultPlanData();
-                const batch = writeBatch(db);
-
-                defaultData.forEach(dayData => {
-                    const dayDocRef = doc(planContentCollectionRef, dayData.dayId);
-                    batch.set(dayDocRef, dayData);
-                });
-
-                try {
-                    await batch.commit();
-                    console.log("Default data seeded successfully.");
-                } catch (error) {
-                    console.error("Error seeding data: ", error);
-                    setSyncStatus(error.message, true);
-                }
-            } else {
-                // Existing user
-                console.log("Existing user data found.");
-            }
-        }
-
-
         // --- Initialize Firebase and Authentication ---
         async function initFirebase() {
             if (firebaseConfig.apiKey.startsWith("PASTE_YOUR_")) {
-                const errorMsg = "Firebase config is missing."
+                const errorMsg = "Firebase config is missing. Please add it to the script."
                 console.error(errorMsg);
                 setSyncStatus(errorMsg, true);
                 return;
@@ -889,7 +640,10 @@
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
+                setLogLevel('error'); // Use 'debug' for more logs, 'error' for clean console
+                isFirebaseReady = true;
 
+                // Main auth state listener
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         // User is signed in
@@ -897,24 +651,19 @@
                         console.log("User is signed in:", user.displayName, `(${userId})`);
                         showLoggedInUI(user);
                         
-                        // Set up paths to this user's private data
-                        planContentCollectionRef = collection(db, `studyPlan/users/${userId}/planContent`);
-                        progressDocRef = doc(db, `studyPlan/users/${userId}/progress`);
+                        // Set up the path to this user's private data
+                        const dataPath = `/studyPlan/users/${userId}/progress`;
+                        dataDocRef = doc(db, dataPath);
                         
-                        // Check if they are a new user and seed data if needed
-                        await checkAndSeedDefaultData();
-
                         // Start listening for their data
-                        listenForPlanChanges();
-                        listenForProgressChanges();
+                        listenForDataChanges();
 
                     } else {
                         // User is signed out
                         console.log("User is signed out.");
                         showLoggedOutUI();
                         userId = null;
-                        planContentCollectionRef = null;
-                        progressDocRef = null;
+                        dataDocRef = null;
                     }
                 });
 
@@ -924,303 +673,95 @@
             }
         }
 
-        // --- Data-saving function for PROGRESS (checkboxes/dates) ---
+        // --- Data-saving function (debounced) ---
         let saveTimeout;
-        function debouncedSaveProgress() {
-            if (!isDataLoaded) return; 
+        function debouncedSaveData() {
+            if (!isDataLoaded || !isFirebaseReady || !userId) return; // Don't save if logged out or before load
 
             clearTimeout(saveTimeout);
             setSyncStatus('saving'); // Show "Saving..."
             saveTimeout = setTimeout(() => {
-                saveProgressToFirestore();
+                saveDataToFirestore();
             }, 1500); // Wait 1.5 seconds after the last change to save
         }
 
-        async function saveProgressToFirestore() {
-            if (!progressDocRef) {
-                console.log("No data reference. Cannot save progress.");
+        // --- Save Data to Firestore ---
+        async function saveDataToFirestore() {
+            if (!dataDocRef) {
+                console.log("No data reference. Cannot save data.");
                 return;
             }
-            const newProgressData = {};
+            const progressData = {};
             // 1. Save all checkbox states
             const allCheckboxes = document.querySelectorAll('.task-checkbox');
             allCheckboxes.forEach(cb => {
-                const day = cb.dataset.dayId;
-                const taskId = cb.dataset.taskId;
-                const key = `${day}-${taskId}-checked`;
-                if (newProgressData[key] === undefined) {
-                    newProgressData[key] = cb.checked;
+                const day = cb.dataset.day;
+                const subject = cb.dataset.subject;
+                const key = `${day}-${subject}-checked`;
+                if (progressData[key] === undefined) {
+                    progressData[key] = cb.checked;
                 }
             });
             // 2. Save all date inputs
             const allDateInputs = document.querySelectorAll('.date-input-desktop input, .date-input-mobile input');
             allDateInputs.forEach(input => {
-                const day = input.dataset.dayId;
+                const day = input.id.replace('date-', '').replace('date-mobile-', '');
                 const key = `${day}-date`;
-                if (newProgressData[key] === undefined) {
-                     newProgressData[key] = input.value;
+                if (progressData[key] === undefined) {
+                     progressData[key] = input.value;
                 }
             });
-
             try {
-                console.log("Saving progress data to Firestore...");
-                await setDoc(progressDocRef, newProgressData); // Overwrite with new progress
-                console.log("Progress saved successfully.");
+                console.log("Saving data to Firestore...");
+                await setDoc(dataDocRef, progressData, { merge: true }); // Merge to avoid overwriting
+                console.log("Data saved successfully.");
                 setSyncStatus('synced'); // Show "Synced"
             } catch (error) {
-                console.error("Error saving progress to Firestore:", error);
+                console.error("Error saving data to Firestore:", error);
                 setSyncStatus(error.message, true);
             }
         }
 
-        // --- Data Listeners ---
-        function listenForPlanChanges() {
-            if (!planContentCollectionRef) return;
-            if (unsubscribePlanListener) unsubscribePlanListener();
+        // --- Load Data from Firestore (Realtime) ---
+        function listenForDataChanges() {
+            if (!dataDocRef) return;
+            // Detach old listener if it exists
+            if (unsubscribeListener) {
+                unsubscribeListener();
+            }
 
-            console.log("Listening for plan data changes...");
-            unsubscribePlanListener = onSnapshot(planContentCollectionRef, (snapshot) => {
-                console.log("Received plan data from Firestore.");
-                currentPlanData = snapshot.docs.map(doc => doc.data());
-                // Sort by dayId to ensure "Day-1, Day-2" order
-                currentPlanData.sort((a, b) => a.dayId.localeCompare(b.dayId, undefined, {numeric: true}));
-                
-                buildUI(currentPlanData);
-                applyLoadedProgress(currentProgressData); // Re-apply progress
-                
-                setSyncStatus('synced');
-                isDataLoaded = true;
+            console.log("Listening for data changes...");
+            unsubscribeListener = onSnapshot(dataDocRef, (doc) => {
+                let progressData = {};
+                if (doc.exists()) {
+                    progressData = doc.data();
+                    console.log("Received data from Firestore:", progressData);
+                } else {
+                    console.log("No existing data found in Firestore for this user.");
+                }
+                // Apply data (or empty object if no data)
+                applyLoadedData(progressData);
+                setSyncStatus('synced'); // Data loaded or is new
+                isDataLoaded = true; // IMPORTANT: Allow saving *after* initial load
             }, (error) => {
-                console.error("Error listening to plan data:", error);
+                console.error("Error listening to data:", error);
                 setSyncStatus(error.message, true);
             });
         }
 
-        function listenForProgressChanges() {
-            if (!progressDocRef) return;
-            if (unsubscribeProgressListener) unsubscribeProgressListener();
+        // --- Apply Loaded Data to the UI ---
+        function applyLoadedData(progressData) {
+            // Clear local data first to reset UI from previous user
+            clearLocalData(); 
 
-            console.log("Listening for progress data changes...");
-            unsubscribeProgressListener = onSnapshot(progressDocRef, (doc) => {
-                console.log("Received progress data from Firestore.");
-                currentProgressData = doc.data() || {};
-                applyLoadedProgress(currentProgressData);
-            }, (error) => {
-                console.error("Error listening to progress data:", error);
-                setSyncStatus(error.message, true);
-            });
-        }
-        
-
-        // --- Main UI Building Function ---
-        function buildUI(planData) {
-            // Clear existing UI
-            tableBody.innerHTML = '';
-            mobileCardsContainer.innerHTML = '';
-            maxWeight = 0;
-            let currentDay = '';
-            let currentMobileDay = '';
-
-            planData.forEach(day => {
-                let isFirstRowOfDay = true;
-                day.tasks.forEach((task, taskIndex) => {
-                    const isLastTaskOfDay = taskIndex === day.tasks.length - 1;
-                    
-                    if ((task.subject || task.topic) && taskWeights[task.id]) {
-                        maxWeight += taskWeights[task.id];
-                    }
-
-                    // --- Create Table Row (Desktop) ---
-                    const row = document.createElement('tr');
-                    row.classList.add('task-item');
-                    row.setAttribute('data-day-id', day.dayId); 
-                    row.setAttribute('data-task-id', task.id);
-
-                    // Day Cell
-                    const dayCell = document.createElement('td');
-                    dayCell.classList.add('px-6', 'py-4', 'text-sm', 'font-medium', 'text-gray-900', 'align-top');
-                    
-                    if (isFirstRowOfDay) {
-                        row.classList.add('day-group-start');
-                        const dayText = document.createElement('span');
-                        dayText.textContent = day.dayId;
-                        dayCell.appendChild(dayText);
-
-                        const dateInputDiv = document.createElement('div');
-                        dateInputDiv.classList.add('date-input-desktop', 'mt-2'); 
-                        dateInputDiv.setAttribute('data-day-input', day.dayId);
-                        dateInputDiv.style.display = 'none'; 
-                        const dateInputId = `date-${day.dayId}`;
-                        dateInputDiv.innerHTML = `
-                            <div class="flex flex-col gap-1">
-                                <label for="${dateInputId}" class="text-xs font-medium text-gray-600">Completion Date:</label>
-                                <input type="text" id="${dateInputId}" data-day-id="${day.dayId}" class="form-input p-1 border border-gray-300 rounded-md shadow-sm text-sm w-full max-w-xs" placeholder="e.g., 24/10/25">
-                            </div>
-                        `;
-                        dateInputDiv.querySelector('input').addEventListener('input', onInputChange);
-                        dayCell.appendChild(dateInputDiv);
-                        isFirstRowOfDay = false;
-                    }
-                    row.appendChild(dayCell);
-
-                    // Subject Cell
-                    const subjectCell = document.createElement('td');
-                    subjectCell.classList.add('px-6', 'py-4', 'text-sm', 'text-gray-500', 'font-medium', 'align-top');
-                    subjectCell.textContent = task.subject;
-                    row.appendChild(subjectCell);
-
-                    // Topic Cell
-                    const topicCell = document.createElement('td');
-                    topicCell.classList.add('px-6', 'py-4', 'text-sm', 'text-gray-600', 'align-top', 'whitespace-normal', 'break-words');
-
-                    if (task.id === 'vocabulary' && task.topic) {
-                        const wrapper = document.createElement('div');
-                        wrapper.classList.add('flex', 'flex-wrap', 'gap-2', 'py-1');
-                        
-                        const pairs = task.topic.split(/, |।/).filter(p => p.trim());
-                        pairs.forEach(pair => {
-                            const vocabEl = createVocabElement(pair);
-                            if(vocabEl) wrapper.appendChild(vocabEl);
-                        });
-                        topicCell.appendChild(wrapper);
-
-                        if (pairs.length > 0 && day.story) {
-                            const storyBtn = document.createElement('button');
-                            storyBtn.textContent = 'Read story';
-                            storyBtn.classList.add('read-story-btn'); 
-                            storyBtn.setAttribute('data-day-id', day.dayId);
-                            topicCell.appendChild(storyBtn); 
-                        }
-                    } else {
-                        const topicSpan = document.createElement('span');
-                        topicSpan.textContent = task.topic || '-'; 
-                        topicCell.appendChild(topicSpan);
-                    }
-                    row.appendChild(topicCell);
-
-                    // Completion Cell
-                    const completionCell = document.createElement('td');
-                    completionCell.classList.add('px-6', 'py-4', 'text-sm', 'text-gray-500', 'align-top');
-                    const completionCellContent = document.createElement('div');
-                    completionCellContent.classList.add('completion-cell-content');
-                    
-                    if (task.subject || task.topic) {
-                        const checkbox = document.createElement('input');
-                        checkbox.type = 'checkbox';
-                        checkbox.classList.add('task-checkbox');
-                        checkbox.setAttribute('data-day-id', day.dayId); 
-                        checkbox.setAttribute('data-task-id', task.id);
-                        checkbox.addEventListener('change', onInputChange);
-                        completionCellContent.appendChild(checkbox);
-                    }
-
-                    // Add Edit button to the last task
-                    if (isLastTaskOfDay) {
-                        const editBtn = document.createElement('button');
-                        editBtn.innerHTML = '&#9998;'; // Pencil icon
-                        editBtn.classList.add('edit-day-btn');
-                        editBtn.setAttribute('data-day-id', day.dayId);
-                        completionCellContent.appendChild(editBtn);
-                    }
-                    completionCell.appendChild(completionCellContent);
-                    row.appendChild(completionCell);
-                    tableBody.appendChild(row);
-
-                    // --- Create Mobile Card ---
-                    if (task.subject || task.topic) {
-                        const card = document.createElement('div');
-                        card.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow', 'card-item'); 
-                        card.setAttribute('data-day-id', day.dayId); 
-                        card.setAttribute('data-task-id', task.id);
-                        
-                        let cardDay = '';
-                        let dateInputMobile = ''; 
-                        const dateInputMobileId = `date-mobile-${day.dayId}`;
-                        
-                        if (day.dayId !== currentMobileDay) { 
-                            cardDay = `<h3 class="font-bold text-lg text-gray-800 mb-2">${day.dayId}</h3>`;
-                            dateInputMobile = `
-                                <div class="date-input-mobile mt-2 mb-3 p-3 bg-green-50 rounded-md" data-day-input="${day.dayId}" style="display: none;">
-                                    <div class="flex items-center gap-2">
-                                        <label for="${dateInputMobileId}" class="text-sm font-medium text-gray-700">Completion Date:</label>
-                                        <input type="text" id="${dateInputMobileId}" data-day-id="${day.dayId}" class="form-input p-1 border border-gray-300 rounded-md shadow-sm text-sm w-full" placeholder="e.g., 24/10/25">
-                                    </div>
-                                </div>
-                            `;
-                            currentMobileDay = day.dayId; 
-                        }
-                        
-                        let topicContent = '';
-                        let storyButtonMobile = ''; 
-                        if (task.id === 'vocabulary' && task.topic) {
-                            const pairs = task.topic.split(/, |।/).filter(p => p.trim());
-                            topicContent = '<div class="flex flex-wrap gap-2 py-1">';
-                            pairs.forEach(pair => {
-                                const vocabEl = createVocabElement(pair);
-                                if(vocabEl) topicContent += vocabEl.outerHTML;
-                            });
-                            topicContent += '</div>';
-
-                            if (pairs.length > 0 && day.story) {
-                                storyButtonMobile = `<button class="read-story-btn" data-day-id="${day.dayId}">Read story</button>`;
-                            }
-
-                        } else {
-                            topicContent = `<span class="text-gray-600">${task.topic || '-'}</span>`;
-                        }
-
-                        // Add Edit button to last card
-                        let editButtonMobile = '';
-                        if (isLastTaskOfDay) {
-                            editButtonMobile = `<button class="edit-day-btn" data-day-id="${day.dayId}">&#9998; Edit Day</button>`;
-                        }
-                        
-                        card.innerHTML = `
-                            ${cardDay}
-                            ${dateInputMobile} 
-                            <div class="flex items-start">
-                                <div class="completion-card-controls">
-                                    <input type="checkbox" class="task-checkbox mt-1" data-day-id="${day.dayId}" data-task-id="${task.id}">
-                                    ${isLastTaskOfDay ? editButtonMobile : ''}
-                                </div>
-                                <div class="ml-2 flex-1 min-w-0">
-                                    <p class="font-medium text-gray-700">${task.subject}</p>
-                                    <div class="text-sm break-words">${topicContent}</div>
-                                    ${storyButtonMobile}
-                                </div>
-                            </div>
-                        `;
-                        
-                        card.querySelector('.task-checkbox').addEventListener('change', onInputChange);
-                        if(dateInputMobile) {
-                            card.querySelector(`#${dateInputMobileId}`).addEventListener('input', onInputChange);
-                        }
-                        
-                        card.querySelectorAll('.vocab-item').forEach(vocabContainer => {
-                            vocabContainer.addEventListener('click', function(event) {
-                                event.stopPropagation();
-                                document.querySelectorAll('.vocab-item.active').forEach(item => {
-                                    if(item !== this) item.classList.remove('active');
-                                });
-                                this.classList.toggle('active');
-                            });
-                        });
-                        mobileCardsContainer.appendChild(card);
-                    }
-                });
-            });
-        }
-
-        // --- Apply Loaded Progress to UI ---
-        function applyLoadedProgress(progressData) {
-            if (!progressData) return;
             // 1. Apply checkbox states
             const allCheckboxes = document.querySelectorAll('.task-checkbox');
             allCheckboxes.forEach(cb => {
-                const day = cb.dataset.dayId;
-                const taskId = cb.dataset.taskId;
-                const key = `${day}-${taskId}-checked`;
+                const day = cb.dataset.day;
+                const subject = cb.dataset.subject;
+                const key = `${day}-${subject}-checked`;
                 
+                // Use || false to handle undefined
                 const isChecked = progressData[key] || false;
                 cb.checked = isChecked;
                 const taskItem = cb.closest('.task-item, .card-item');
@@ -1232,72 +773,99 @@
             // 2. Apply date inputs
             const allDateInputs = document.querySelectorAll('.date-input-desktop input, .date-input-mobile input');
             allDateInputs.forEach(input => {
-                const day = input.dataset.dayId;
+                const day = input.id.replace('date-', '').replace('date-mobile-', '');
                 const key = `${day}-date`;
+                // Use || '' to handle undefined
                 input.value = progressData[key] || '';
             });
             
             // 3. After applying data, check all day completions
-            const allDays = new Set(currentPlanData.map(item => item.dayId));
+            const allDays = new Set(dailyPlanData.map(item => item.day));
             allDays.forEach(day => checkDayCompletion(day));
 
             // 4. Finally, update the progress bar
             updateWeeklyProgress();
-            console.log("Progress data applied to UI.");
+
+            console.log("Data loaded and applied to UI.");
         }
         
-        // --- Helper: Create Vocab Elements ---
-        function createVocabElement(pair) {
-            const parts = pair.split('-');
-            if (parts.length >= 2) { // Allow dashes in meaning
-                const eng = parts[0].trim();
-                const ban = parts.slice(1).join('-').trim().replace('।', ''); 
+        // --- Main App Logic (Inside DOMContentLoaded) ---
+        
+        // Data parsed from the document
+        const dailyPlanData = [
+            { day: 'Day-1', subject: 'Quran', topic: 'Sura Anfal 8:45- 8:53' },
+            { day: 'Day-1', subject: 'Newspaper', topic: 'The Daily Star: Shibir-backed panel sweeps Rucsu polls, Lowest HSC pass rate in 21 years' },
+            { day: 'Day-1', subject: 'Vocabulary', topic: 'Sweep- বিজয় অর্জন, Clinch- সমর্থন করা, unbridled-অবাধ, outperform-ছাড়িয়ে যাওয়া, Steep-خাড়া, dismally- poorly, poor show- নিম্ন ফলাফল, lenient- কোমল, pronounced- সুস্পষ্ট।' },
+            { day: 'Day-1', subject: 'Math', topic: 'Ratio Class 12, 13' },
+            { day: 'Day-1', subject: 'Basic View', topic: 'Page 1-20' },
+            { day: 'Day-2', subject: 'Quran', topic: 'Sura Anfal 8:53-8:69' },
+            { day: 'Day-2', subject: 'Newspaper', topic: 'Editorial: Our children deserve clean air' },
+            { day: 'Day-2', subject: 'Vocabulary', topic: 'Unnerved- ভীত, dire- অত্যান্ত জরুরি, particulate matter- অতিক্ষুদ্র পদার্থ, brick kilns- ইট ভাটা, infants- শিশু, likelihood- সম্ভাবনা, ingrained- বদ্ধমূল, halt- থামা, perpetuate- অবিরাম করা,' },
+            { day: 'Day-2', subject: 'Math', topic: 'Ratio Class 14, 15' },
+            { day: 'Day-2', subject: 'Basic View', topic: '' },
+            { day: 'Day-3', subject: 'Quran', topic: 'Sura Anfal 8:70- Sura Tawbah 9:6' },
+            { day: 'Day-3', subject: 'Newspaper', topic: 'Editorial: Sabotage or not, the government must account for the recent fires' },
+            { day: 'Day-3', subject: 'Vocabulary', topic: 'Sabotage- নাশকতা, Devastating- ধ্বংশাত্মক, Blaze- তীব্র অগ্নিকাণ্ড, deploy- মোতায়েন করা, disrupt- বিঘ্ন ঘটানো, stranded- আটকে পড়া, spate- ঢল, undermine- দুর্বল করা, sow panic- আতঙ্ক ছড়ানো, arson- অগ্নিসংযোগ, resolute- দৃঢ় প্রতিজ্ঞ, beyond comprehension- বোধগমতার বাইরে, contingency- বিকল্প ব্যবস্থা, bode- ইঙ্গিত দেয়া/ পূর্বাভাস' },
+            { day: 'Day-3', subject: 'Math', topic: 'Class 16, 17' },
+            { day: 'Day-3', subject: 'Basic View', topic: '' },
+            { day: 'Day-4', subject: 'Quran', topic: 'Sura Tawbah 9:7- 9:20' },
+            { day: 'Day-4', subject: 'Newspaper', topic: '' },
+            { day: 'Day-4', subject: 'Vocabulary', topic: '' },
+            { day: 'Day-4', subject: 'Math', topic: 'Class 18, 19' },
+            { day: 'Day-4', subject: 'Basic View', topic: '' },
+            { day: 'Day-5', subject: 'Quran', topic: 'Sura Tawbah 9:21- 9:31' },
+            { day: 'Day-5', subject: 'Newspaper', topic: 'Tripura mob killing of Bangladeshis exposes the accountability gap' },
+            { day: 'Day-5', subject: 'Vocabulary', topic: 'Gruesome-ভয়াবহ, heinous-নিকৃষ্ট, sanctity- পবিত্রতা, frontier vengeance- সীমান্ত প্রতিহিংসা, porous- ছিদ্রযুক্ত, flux- অবিরাম গতি, illicit- অবৈধ, intricate- সূক্ষ্ণ, backdrop- পটভূমি, precarious- ঝুঁকিপূর্ণ, pledged- প্রতিজ্ঞা করা, curb- দমন করা, intrusions- onadhikar probes, repatriate- নিজ দেশে ফেরত পাঠানো, patrols- টহল, usher in- শুরু করা, restraint- সংগম, hollow- ফাঁপা, invoking- আহ্বান করা, culminating-শেষ করা, perpetrators- অপরাধী' },
+            { day: 'Day-5', subject: 'Math', topic: 'Class 20, 21' },
+            { day: 'Day-5', subject: 'Basic View', topic: '' },
+            { day: 'Day-6', subject: 'Quran', topic: 'Sura Tawbah 9:31- 9:41' },
+            { day: 'Day-6', subject: 'Newspaper', topic: '' },
+            { day: 'Day-6', subject: 'Vocabulary', topic: '' },
+            { day: 'Day-6', subject: 'Math', topic: '' },
+            { day: 'Day-6', subject: 'Basic View', topic: '' },
+            { day: 'Day-7', subject: 'Quran', topic: '' },
+            { day: 'Day-7', subject: 'Newspaper', topic: '' },
+            { day: 'Day-7', subject: 'Vocabulary', topic: '' },
+            { day: 'Day-7', subject: 'Math', topic: '' },
+            { day: 'Day-7', subject: 'Basic View', topic: '' },
+        ];
 
-                if (eng && ban) {
-                    const vocabContainer = document.createElement('div');
-                    vocabContainer.classList.add('vocab-item');
-                    vocabContainer.setAttribute('tabindex', '0'); 
-                    
-                    vocabContainer.addEventListener('click', function(event) {
-                        event.stopPropagation(); 
-                        document.querySelectorAll('.vocab-item.active').forEach(item => {
-                            if(item !== this) item.classList.remove('active');
-                        });
-                        this.classList.toggle('active');
-                    });
-                    
-                    const engSpan = document.createElement('span');
-                    engSpan.classList.add('vocab-word');
-                    engSpan.textContent = eng;
-                    
-                    const banSpan = document.createElement('span');
-                    banSpan.classList.add('vocab-meaning');
-                    banSpan.textContent = ban;
-                    
-                    vocabContainer.appendChild(engSpan);
-                    vocabContainer.appendChild(banSpan);
-                    return vocabContainer;
-                }
-            } else if (pair.trim()) {
-                    const textSpan = document.createElement('span');
-                    textSpan.textContent = pair.trim();
-                    return textSpan;
-            }
-            return null;
-        }
+        // --- Story Data ---
+        const vocabStories = {
+    'Day-1': "The young prince planned to <strong>sweep</strong> the election. He needed to <strong>clinch</strong> the final vote from the stubborn council. His victory led to <strong>unbridled</strong> celebrations in the streets. He promised his advisors he would <strong>outperform</strong> all previous rulers. But his first challenge was a <strong>steep</strong> mountain pass, now blocked by snow. The kingdom's food supply looked <strong>dismally</strong> low. The public called his first month a <strong>poor show</strong>. His <strong>pronounced</strong> frown showed his worry. He wondered, should he be <strong>lenient</strong> with the grain merchants, or seize their stock for the people?",
 
-        // --- Helper: Update Progress Bar ---
-        window.updateWeeklyProgress = function() {
+    'Day-2': "The old scientist felt <strong>unnerved</strong> by the sky's strange color. He gave a <strong>dire</strong> warning to the town's mayor. 'The <strong>particulate matter</strong> is at a deadly level,' he explained. 'It's coming from the new <strong>brick kilns</strong>.' He worried most about the <strong>infants</strong>, who were weakest. The <strong>likelihood</strong> of a lung disease was rising daily. This cough was now <strong>ingrained</strong> in the town's life. 'We must <strong>halt</strong> production!' he cried. 'If we let this <strong>perpetuate</strong>, no one will be left.'",
+
+    'Day-3': "The empress was certain it was <strong>sabotage</strong>. The result of the fire was <strong>devastating</strong>. The great <strong>blaze</strong> had destroyed the silk market. She had to <strong>deploy</strong> her royal guard immediately. Someone wanted to <strong>disrupt</strong> the peace festival. Many merchants were now <strong>stranded</strong> with no goods to sell. This was the latest in a <strong>spate</strong> of strange accidents. Someone was trying to <strong>undermine</strong> her authority. They wanted to <strong>sow panic</strong>. She remained <strong>resolute</strong>, though the fire’s cause was <strong>beyond comprehension</strong>. A <strong>contingency</strong> plan had to be made, for it might <strong>bode</strong> more danger ahead.",
+
+    'Day-5': "The detective inspected the <strong>gruesome</strong> crime scene. It was a truly <strong>heinous</strong> act. The killer had violated the <strong>sanctity</strong> of the old library. This felt like some kind of <strong>frontier vengeance</strong>. The city's borders were famously <strong>porous</strong>. There was a constant <strong>flux</strong> of strange visitors. Many were smuggling <strong>illicit</strong> goods. An <strong>intricate</strong> tapestry hung on the wall, a silent <strong>backdrop</strong> to the crime. The detective's own position was <strong>precarious</strong>. He had <strong>pledged</strong> to the public that he would solve the case. He had to <strong>curb</strong> these violent <strong>intrusions</strong>. He would find the killer and <strong>repatriate</strong> him to his home country for justice. His <strong>patrols</strong> would work day and night. He hoped to <strong>usher in</strong> an age of peace. He had to practice <strong>restraint</strong> and not rush the investigation. But his promises to the victim's family felt <strong>hollow</strong>. He found himself <strong>invoking</strong> the city's old charter for help. The long investigation was <strong>culminating</strong> in a final chase. At last, he cornered the <strong>perpetrators</strong> in the old bell tower."
+};
+
+        // --- End Story Data ---
+
+        // --- Progress Bar Logic ---
+        const taskWeights = {
+            'Quran': 5/7,
+            'Newspaper': 5/7,
+            'Vocabulary': 10/7,
+            'Math': 40/7,
+            'Basic View': 40/7
+        };
+        let maxWeight = 0; // Will be calculated as tasks are generated
+        const progressLabel = document.getElementById('weekly-progress-label');
+        const progressBar = document.getElementById('weekly-progress-bar');
+
+        window.updateWeeklyProgress = function() { // Make global for applyLoadedData
             let currentWeight = 0;
             const allCheckboxes = document.querySelectorAll('.task-checkbox');
             const checkedTasks = new Set();
             
             allCheckboxes.forEach(cb => {
-                const uniqueId = `${cb.dataset.dayId}-${cb.dataset.taskId}`;
+                const uniqueId = `${cb.dataset.day}-${cb.dataset.subject}`;
                 if (cb.checked && !checkedTasks.has(uniqueId)) {
-                    const taskId = cb.dataset.taskId;
-                    if (taskId && taskWeights[taskId]) {
-                        currentWeight += taskWeights[taskId];
+                    const subject = cb.dataset.subject;
+                    if (subject && taskWeights[subject]) {
+                        currentWeight += taskWeights[subject];
                     }
                     checkedTasks.add(uniqueId);
                 }
@@ -1306,25 +874,64 @@
             if(progressLabel) progressLabel.textContent = `Weekly Progress: ${percentage.toFixed(0)}%`;
             if(progressBar) progressBar.style.width = `${percentage}%`;
         }
+        // --- END Progress Bar Logic ---
 
-        // --- Helper: Check Day Completion ---
-        window.checkDayCompletion = function(dayId) {
-            const allCheckboxesForDay = document.querySelectorAll(`.task-checkbox[data-day-id="${dayId}"]`);
+
+        const tableBody = document.getElementById('daily-plan-body');
+        const mobileCardsContainer = document.getElementById('daily-plan-cards');
+        let currentDay = '';
+        let currentMobileDay = ''; 
+
+        // --- Modal Variables ---
+        const storyModal = document.getElementById('story-modal');
+        const storyOverlay = document.getElementById('story-overlay');
+        const storyCloseBtn = document.getElementById('story-close-btn');
+        const storyContent = document.getElementById('story-content');
+        const storyTitle = document.getElementById('story-title');
+
+        // --- Modal Functions ---
+        function showStory(day) {
+            const story = vocabStories[day];
+            if (story) {
+                storyTitle.textContent = `A Tale from ${day}`;
+                storyContent.innerHTML = story;
+                storyModal.classList.remove('modal-hidden');
+            }
+        }
+        function hideStory() {
+            storyModal.classList.add('modal-hidden');
+        }
+
+        // --- Modal Event Listeners ---
+        storyCloseBtn.addEventListener('click', hideStory);
+        storyOverlay.addEventListener('click', hideStory);
+
+        // --- Event Delegation for Story Buttons ---
+        document.body.addEventListener('click', function(event) {
+            if (event.target.classList.contains('read-story-btn')) {
+                const day = event.target.getAttribute('data-day');
+                showStory(day);
+            }
+        });
+
+
+        window.checkDayCompletion = function(day) { // Make global for applyLoadedData
+            const allCheckboxesForDay = document.querySelectorAll(`.task-checkbox[data-day="${day}"]`);
             if (allCheckboxesForDay.length === 0) return;
 
             let allChecked = true;
-            const taskIds = new Set(Array.from(allCheckboxesForDay).map(cb => cb.dataset.taskId));
+            const subjects = new Set(Array.from(allCheckboxesForDay).map(cb => cb.dataset.subject));
             
-            taskIds.forEach(taskId => {
-                const checkboxesForTask = document.querySelectorAll(`.task-checkbox[data-day-id="${dayId}"][data-task-id="${taskId}"]`);
-                const isTaskChecked = Array.from(checkboxesForTask).some(cb => cb.checked);
-                if (!isTaskChecked) {
+            subjects.forEach(subject => {
+                const checkboxesForSubject = document.querySelectorAll(`.task-checkbox[data-day="${day}"][data-subject="${subject}"]`);
+                const isSubjectChecked = Array.from(checkboxesForSubject).some(cb => cb.checked);
+                if (!isSubjectChecked) {
                     allChecked = false;
                 }
             });
 
-            const dateInputDesktop = document.querySelector(`.date-input-desktop[data-day-input="${dayId}"]`); 
-            const dateInputMobile = document.querySelector(`.date-input-mobile[data-day-input="${dayId}"]`);
+            const dateInputDesktop = document.querySelector(`.date-input-desktop[data-day-input="${day}"]`); 
+            const dateInputMobile = document.querySelector(`.date-input-mobile[data-day-input="${day}"]`);
 
             if (allChecked) {
                 if(dateInputDesktop) dateInputDesktop.style.display = 'block'; 
@@ -1336,106 +943,42 @@
         }
 
 
-        // --- Story Modal Functions ---
-        function showStory(dayId) {
-            const dayData = currentPlanData.find(d => d.dayId === dayId);
-            if (dayData && dayData.story) {
-                storyTitle.textContent = `A Tale from ${dayId}`;
-                storyContent.innerHTML = dayData.story;
-                storyModal.classList.remove('modal-hidden');
-            }
-        }
-        function hideStory() {
-            storyModal.classList.add('modal-hidden');
-        }
+        function createVocabElement(pair) {
+            const parts = pair.split('-');
+            if (parts.length === 2 && parts[0].trim() && parts[1].trim()) {
+                const eng = parts[0].trim();
+                const ban = parts[1].trim().replace('।', ''); 
 
-        // --- NEW: Edit Modal Functions ---
-        let currentEditingDayId = null;
-
-        function openEditModal(dayId) {
-            const dayData = currentPlanData.find(d => d.dayId === dayId);
-            if (!dayData) return;
-
-            currentEditingDayId = dayId;
-            editModalTitle.textContent = `Edit Plan for ${dayId}`;
-            editModalContent.innerHTML = ''; // Clear old form
-
-            // Create form fields for each task
-            dayData.tasks.forEach((task, index) => {
-                const group = document.createElement('div');
-                group.classList.add('form-group', 'p-4', 'bg-white', 'rounded-lg', 'border');
+                const vocabContainer = document.createElement('div');
+                vocabContainer.classList.add('vocab-item');
+                vocabContainer.setAttribute('tabindex', '0'); 
                 
-                group.innerHTML = `
-                    <label for="edit-subject-${index}" class="font-semibold text-indigo-700">Task ${index + 1} Subject</label>
-                    <input type="text" id="edit-subject-${index}" data-task-id="${task.id}" value="${task.subject}" class="mb-3">
-                    
-                    <label for="edit-topic-${index}" class="font-semibold text-indigo-700">Task ${index + 1} Topic</label>
-                    <textarea id="edit-topic-${index}" data-task-id="${task.id}" rows="3">${task.topic}</textarea>
-                `;
-                editModalContent.appendChild(group);
-            });
-
-            // Add form field for the story
-            const storyGroup = document.createElement('div');
-            storyGroup.classList.add('form-group', 'p-4', 'bg-white', 'rounded-lg', 'border');
-            storyGroup.innerHTML = `
-                <label for="edit-story" class="font-semibold text-indigo-700">Vocabulary Story</label>
-                <textarea id="edit-story" rows="6" placeholder="Enter the story for this day...">${dayData.story || ''}</textarea>
-            `;
-            editModalContent.appendChild(storyGroup);
-
-            editModal.classList.remove('modal-hidden');
-        }
-
-        function hideEditModal() {
-            editModal.classList.add('modal-hidden');
-            currentEditingDayId = null;
-        }
-
-        async function saveDayData() {
-            if (!currentEditingDayId || !planContentCollectionRef) return;
-
-            setSyncStatus('saving');
-            editSaveBtn.disabled = true;
-            editSaveBtn.textContent = 'Saving...';
-
-            const dayDocRef = doc(planContentCollectionRef, currentEditingDayId);
-            const newTasks = [];
-
-            // Get all task subjects and topics from the form
-            const subjectInputs = editModalContent.querySelectorAll('input[id^="edit-subject-"]');
-            const topicTextareas = editModalContent.querySelectorAll('textarea[id^="edit-topic-"]');
-            
-            subjectInputs.forEach((input, index) => {
-                const taskId = input.dataset.taskId;
-                const subject = input.value;
-                const topic = topicTextareas[index].value;
-                newTasks.push({ id: taskId, subject, topic });
-            });
-
-            const newStory = editModalContent.querySelector('#edit-story').value;
-
-            const newDayData = {
-                dayId: currentEditingDayId,
-                tasks: newTasks,
-                story: newStory
-            };
-
-            try {
-                // Save the new data back to Firestore
-                await setDoc(dayDocRef, newDayData);
-                console.log(`Data for ${currentEditingDayId} saved successfully.`);
-                hideEditModal();
-                // No need to call buildUI here, the onSnapshot listener will do it
-            } catch (error) {
-                console.error("Error saving day data: ", error);
-                setSyncStatus(error.message, true);
-            } finally {
-                editSaveBtn.disabled = false;
-                editSaveBtn.textContent = 'Save Changes';
+                vocabContainer.addEventListener('click', function(event) {
+                    event.stopPropagation(); 
+                    document.querySelectorAll('.vocab-item.active').forEach(item => {
+                        if(item !== this) item.classList.remove('active');
+                    });
+                    this.classList.toggle('active');
+                });
+                
+                const engSpan = document.createElement('span');
+                engSpan.classList.add('vocab-word');
+                engSpan.textContent = eng;
+                
+                const banSpan = document.createElement('span');
+                banSpan.classList.add('vocab-meaning');
+                banSpan.textContent = ban;
+                
+                vocabContainer.appendChild(engSpan);
+                vocabContainer.appendChild(banSpan);
+                return vocabContainer;
+            } else if (pair.trim()) {
+                    const textSpan = document.createElement('span');
+                    textSpan.textContent = pair.trim();
+                    return textSpan;
             }
+            return null;
         }
-
 
         // --- Checkbox and Date Input change handler ---
         function onInputChange(event) {
@@ -1444,10 +987,10 @@
             const element = event.target;
             
             if (element.classList.contains('task-checkbox')) {
-                const dayId = element.dataset.dayId;
-                const taskId = element.dataset.taskId;
+                const day = element.dataset.day;
+                const subject = element.dataset.subject;
                 const isChecked = element.checked;
-                const allCheckboxesForTask = document.querySelectorAll(`.task-checkbox[data-day-id="${dayId}"][data-task-id="${taskId}"]`);
+                const allCheckboxesForTask = document.querySelectorAll(`.task-checkbox[data-day="${day}"][data-subject="${subject}"]`);
                 allCheckboxesForTask.forEach(cb => {
                     cb.checked = isChecked;
                     const taskItem = cb.closest('.task-item, .card-item');
@@ -1455,17 +998,17 @@
                         taskItem.classList.toggle('completed', isChecked);
                     }
                 });
-                checkDayCompletion(dayId);
+                checkDayCompletion(day);
             
             } else if (element.tagName === 'INPUT' && element.type === 'text') {
-                const dayId = element.dataset.dayId;
-                const desktopInput = document.getElementById(`date-${dayId}`);
-                const mobileInput = document.getElementById(`date-mobile-${dayId}`);
+                const day = element.id.replace('date-', '').replace('date-mobile-', '');
+                const desktopInput = document.getElementById(`date-${day}`);
+                const mobileInput = document.getElementById(`date-mobile-${day}`);
                 if (desktopInput) desktopInput.value = element.value;
                 if (mobileInput) mobileInput.value = element.value;
             }
             updateWeeklyProgress();
-            debouncedSaveProgress();
+            debouncedSaveData();
         }
 
         // --- Run on page load ---
@@ -1474,50 +1017,180 @@
             loginBtn.addEventListener('click', signInWithGoogle);
             logoutBtn.addEventListener('click', signOutUser);
 
-            // --- Add Listeners to Story Modal ---
-            storyCloseBtn.addEventListener('click', hideStory);
-            storyOverlay.addEventListener('click', hideStory);
-
-            // --- Add Listeners to Edit Modal ---
-            editCloseBtn.addEventListener('click', hideEditModal);
-            editCancelBtn.addEventListener('click', hideEditModal);
-            editOverlay.addEventListener('click', hideEditModal);
-            editSaveBtn.addEventListener('click', saveDayData);
-
-            // --- Event Delegation for dynamic buttons ---
-            document.body.addEventListener('click', function(event) {
-                // Story Button
-                const storyBtn = event.target.closest('.read-story-btn');
-                if (storyBtn) {
-                    const dayId = storyBtn.dataset.dayId;
-                    showStory(dayId);
-                    return;
+            // Build the UI
+            dailyPlanData.forEach(item => {
+                if ((item.subject || item.topic) && taskWeights[item.subject]) {
+                    maxWeight += taskWeights[item.subject];
                 }
 
-                // Edit Button
-                const editBtn = event.target.closest('.edit-day-btn');
-                if (editBtn) {
-                    const dayId = editBtn.dataset.dayId;
-                    openEditModal(dayId);
-                    return;
-                }
+                // --- Create Table Row (Desktop) ---
+                const row = document.createElement('tr');
+                row.classList.add('task-item');
+                row.setAttribute('data-day', item.day); 
 
-                // Vocab Item
-                const vocabItem = event.target.closest('.vocab-item');
-                if (vocabItem) {
-                    event.stopPropagation();
-                    document.querySelectorAll('.vocab-item.active').forEach(item => {
-                        if(item !== vocabItem) item.classList.remove('active');
+                const dayCell = document.createElement('td');
+                dayCell.classList.add('px-6', 'py-4', 'text-sm', 'font-medium', 'text-gray-900', 'align-top');
+                
+                if (item.day !== currentDay) {
+                    row.classList.add('day-group-start');
+                    const dayText = document.createElement('span');
+                    dayText.textContent = item.day;
+                    dayCell.appendChild(dayText);
+
+                    const dateInputDiv = document.createElement('div');
+                    dateInputDiv.classList.add('date-input-desktop', 'mt-2'); 
+                    dateInputDiv.setAttribute('data-day-input', item.day);
+                    dateInputDiv.style.display = 'none'; 
+                    const dateInputId = `date-${item.day}`;
+                    dateInputDiv.innerHTML = `
+                        <div class="flex flex-col gap-1">
+                            <label for="${dateInputId}" class="text-xs font-medium text-gray-600">Completion Date:</label>
+                            <input type="text" id="${dateInputId}" class="form-input p-1 border border-gray-300 rounded-md shadow-sm text-sm w-full max-w-xs" placeholder="e.g., 24/10/25">
+                        </div>
+                    `;
+                    dateInputDiv.querySelector('input').addEventListener('input', onInputChange);
+                    dayCell.appendChild(dateInputDiv);
+                    
+                    currentDay = item.day;
+                }
+                row.appendChild(dayCell);
+
+                const subjectCell = document.createElement('td');
+                subjectCell.classList.add('px-6', 'py-4', 'text-sm', 'text-gray-500', 'font-medium', 'align-top');
+                subjectCell.textContent = item.subject;
+                row.appendChild(subjectCell);
+
+                const topicCell = document.createElement('td');
+                topicCell.classList.add('px-6', 'py-4', 'text-sm', 'text-gray-600', 'align-top', 'whitespace-normal', 'break-words');
+
+                if (item.subject === 'Vocabulary' && item.topic) {
+                    const wrapper = document.createElement('div');
+                    wrapper.classList.add('flex', 'flex-wrap', 'gap-2', 'py-1');
+                    
+                    const pairs = item.topic.split(/, |।/).filter(p => p.trim());
+                    pairs.forEach(pair => {
+                        const vocabEl = createVocabElement(pair);
+                        if(vocabEl) wrapper.appendChild(vocabEl);
                     });
-                    vocabItem.classList.toggle('active');
-                    return;
-                }
+                    topicCell.appendChild(wrapper);
 
-                // Global click to close vocab
-                document.querySelectorAll('.vocab-item.active').forEach(vocab => {
-                    vocab.classList.remove('active');
-                });
+                    if (pairs.length > 0 && vocabStories[item.day]) {
+                        const storyBtn = document.createElement('button');
+                        storyBtn.textContent = 'Read story';
+                        storyBtn.classList.add('read-story-btn'); 
+                        storyBtn.setAttribute('data-day', item.day);
+                        topicCell.appendChild(storyBtn); 
+                    }
+
+                } else {
+                    const topicSpan = document.createElement('span');
+                    topicSpan.textContent = item.topic || '-'; 
+                    topicCell.appendChild(topicSpan);
+                }
+                row.appendChild(topicCell);
+
+                const completionCell = document.createElement('td');
+                completionCell.classList.add('px-6', 'py-4', 'text-sm', 'text-gray-500', 'align-top');
+                
+                if (item.subject || item.topic) {
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.classList.add('task-checkbox');
+                    checkbox.setAttribute('data-day', item.day); 
+                    checkbox.setAttribute('data-subject', item.subject);
+                    checkbox.addEventListener('change', onInputChange);
+                    completionCell.appendChild(checkbox);
+                }
+                row.appendChild(completionCell);
+                tableBody.appendChild(row);
+
+                // --- Create Mobile Card ---
+                if (item.subject || item.topic) {
+                    const card = document.createElement('div');
+                    card.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow', 'card-item'); 
+                    card.setAttribute('data-day', item.day); 
+                    
+                    let cardDay = '';
+                    let dateInputMobile = ''; 
+                    const dateInputMobileId = `date-mobile-${item.day}`;
+                    
+                    if (item.day !== currentMobileDay) { 
+                        cardDay = `<h3 class="font-bold text-lg text-gray-800 mb-2">${item.day}</h3>`;
+                        
+                        dateInputMobile = `
+                            <div class="date-input-mobile mt-2 mb-3 p-3 bg-green-50 rounded-md" data-day-input="${item.day}" style="display: none;">
+                                <div class="flex items-center gap-2">
+                                    <label for="${dateInputMobileId}" class="text-sm font-medium text-gray-700">Completion Date:</label>
+                                    <input type="text" id="${dateInputMobileId}" class="form-input p-1 border border-gray-300 rounded-md shadow-sm text-sm w-full" placeholder="e.g., 24/10/25">
+                                </div>
+                            </div>
+                        `;
+                        
+                        currentMobileDay = item.day; 
+                    }
+                    
+                    let topicContent = '';
+                    let storyButtonMobile = ''; 
+                    if (item.subject === 'Vocabulary' && item.topic) {
+                        const pairs = item.topic.split(/, |।/).filter(p => p.trim());
+                        topicContent = '<div class="flex flex-wrap gap-2 py-1">';
+                        pairs.forEach(pair => {
+                            const vocabEl = createVocabElement(pair);
+                            if(vocabEl) topicContent += vocabEl.outerHTML;
+                        });
+                        topicContent += '</div>';
+
+                        if (pairs.length > 0 && vocabStories[item.day]) {
+                            storyButtonMobile = `<button class="read-story-btn" data-day="${item.day}">Read story</button>`;
+                        }
+
+                    } else {
+                        topicContent = `<span class="text-gray-600">${item.topic || '-'}</span>`;
+                    }
+                    
+                    card.innerHTML = `
+                        ${cardDay}
+                        ${dateInputMobile} 
+                        <div class="flex items-start">
+                            <input type="checkbox" class="task-checkbox mt-1" data-day="${item.day}" data-subject="${item.subject}">
+                            <div class="ml-2 flex-1 min-w-0">
+                                <p class="font-medium text-gray-700">${item.subject}</p>
+                                <div class="text-sm break-words">${topicContent}</div>
+                                ${storyButtonMobile} </div>
+                        </div>
+                    `;
+                    
+                    card.querySelector('.task-checkbox').addEventListener('change', onInputChange);
+                    if(dateInputMobile) {
+                        card.querySelector(`#${dateInputMobileId}`).addEventListener('input', onInputChange);
+                    }
+                    
+                    card.querySelectorAll('.vocab-item').forEach(vocabContainer => {
+                        vocabContainer.addEventListener('click', function(event) {
+                            event.stopPropagation();
+                            document.querySelectorAll('.vocab-item.active').forEach(item => {
+                                if(item !== this) item.classList.remove('active');
+                            });
+                            this.classList.toggle('active');
+                        });
+                    });
+
+                    mobileCardsContainer.appendChild(card);
+                }
             });
+
+            // Add global click listener to close tooltips
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.vocab-item')) {
+                    const activeVocabs = document.querySelectorAll('.vocab-item.active');
+                    activeVocabs.forEach(vocab => {
+                        vocab.classList.remove('active');
+                    });
+                }
+            });
+
+            // Initial call to set progress bar
+            updateWeeklyProgress();
 
             // --- Start Firebase Init ---
             await initFirebase();
