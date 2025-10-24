@@ -344,7 +344,7 @@
         /* Responsive table layout */
         @media (max-width: 768px) {
             .full-table {
-                display: ;
+                display: none;
             }
             .mobile-cards {
                 display: block;
@@ -352,7 +352,7 @@
         }
         @media (min-width: 769px) {
             .full-table {
-                display: table;
+                display: block;
             }
             .mobile-cards {
                 display: none;
@@ -805,7 +805,7 @@
             { day: 'Day-2', subject: 'Basic View', topic: '' },
             { day: 'Day-3', subject: 'Quran', topic: 'Sura Anfal 8:70- Sura Tawbah 9:6' },
             { day: 'Day-3', subject: 'Newspaper', topic: 'Editorial: Sabotage or not, the government must account for the recent fires' },
-            { day: 'Day-3', subject: 'Vocabulary', topic: 'Sabotage- নাশকতা, Devastating- ধ্বংশাত্মক, Blaze- তীব্র অগ্নিকাণ্ড, deploy- মোতায়েন করা, disrupt- বিঘ্ন ঘটানো, stranded- আটকে পড়া, spate- ঢল, undermine- দুর্বল করা, sow panic- আতঙ্ক ছড়ানো, arson- অগ্নিসংযোগ, resolute- দৃঢ় প্রতিজ্ঞ, beyond comprehension- বোধগমVতার বাইরে, contigency- বিকল্প ব্যবস্থা, bode- ইঙ্গিত দেয়া/ পূর্বাভাস' },
+            { day: 'Day-3', subject: 'Vocabulary', topic: 'Sabotage- নাশকতা, Devastating- ধ্বংশাত্মক, Blaze- তীব্র অগ্নিকাণ্ড, deploy- মোতায়েন করা, disrupt- বিঘ্ন ঘটানো, stranded- আটকে পড়া, spate- ঢল, undermine- দুর্বল করা, sow panic- আতঙ্ক ছড়ানো, arson- অগ্নিসংযোগ, resolute- দৃঢ় প্রতিজ্ঞ, beyond comprehension- বোধগমতার বাইরে, contingency- বিকল্প ব্যবস্থা, bode- ইঙ্গিত দেয়া/ পূর্বাভাস' },
             { day: 'Day-3', subject: 'Math', topic: 'Class 16, 17' },
             { day: 'Day-3', subject: 'Basic View', topic: '' },
             { day: 'Day-4', subject: 'Quran', topic: 'Sura Tawbah 9:7- 9:20' },
@@ -832,11 +832,15 @@
 
         // --- Story Data ---
         const vocabStories = {
-            'Day-1': "The young prince planned to <strong>sweep</strong> the election. He needed to <strong>clinch</strong> the final vote from the stubborn council. His victory led to <strong>unbridled</strong> celebrations in the streets. He promised his advisors he would <strong>outperform</strong> all previous rulers. But his first challenge was a <strong>steep</strong> mountain pass, now blocked by snow. The kingdom's food supply looked <strong>dismally</strong> low. The public called his first month a <strong>poor show</strong>. His <strong>pronounced</strong> frown showed his worry. He wondered, should he be <strong>lenient</strong> with the grain merchants, or seize their stock for the people?",
-            'Day-2': "The old scientist felt <strong>unnerved</strong> by the sky's strange color. He gave a <strong>dire</strong> warning to the town's mayor. 'The <strong>particulate matter</strong> is at a deadly level,' he explained. 'It's coming from the new <strong>brick kilns</strong>.' He worried most about the <strong>infants</strong>, who were weakest. The <strong>likelihood</strong> of a lung disease was rising daily. This cough was now <strong>ingrained</strong> in the town's life. 'We must <strong>halt</strong> production!' he cried. 'If we let this <strong>perpetuate</strong>, no one will be left.'",
-            'Day-3': "The empress was certain it was <strong>sabotage</strong>. The result of the fire was <strong>devastating</strong>. The great <strong>blaze</strong> had destroyed the silk market. She had to <strong>deploy</strong> her royal guard immediately. Someone wanted to <strong>disrupt</strong> the peace festival. Many merchants were now <strong>stranded</strong> with no goods to sell. This was the latest in a <strong>spate</strong> of strange accidents. Someone was trying to <strong>undermine</strong> her authority. They wanted to <strong> sow </strong> panic- আতঙ্ক ছড়ানো, arson- অগ্নিসংযোগ, resolute- দৃঢ় প্রতিজ্ঞ, beyond comprehension- বোধগমVতার বাইরে, contigency- বিকল্প ব্যবস্থা, bode- ইঙ্গিত দেয়া/ পূর্বাভাস' },
-            'Day-5': "The detective inspected the <strong>gruesome</strong> crime scene. It was a truly <strong>heinous</strong> act. The killer had violated the <strong>sanctity</strong> of the old library. This felt like some kind of <strong>frontier vengeance</strong>. The city's borders were famously <strong>porous</strong>. There was a constant <strong>flux</strong> of strange visitors. Many were smuggling <strong>illicit</strong> goods. An <strong>intricate</strong> tapestry hung on the wall, a silent <strong>backdrop</strong> to the crime. The detective's own position was <strong>precarious</strong>. He had <strong>pledged</strong> to the public that he would solve the case. He had to <strong>curb</strong> these violent <strong>intrusions</strong>. He would find the killer and <strong>repatriate</strong> him to his home country for justice. His <strong>patrols</strong> would work day and night. He hoped to <strong>usher in</strong> an age of peace. He had to practice <strong>restraint</strong> and not rush the investigation. But his promises to the victim's family felt <strong>hollow</strong>. He found himself <strong>invoking</strong> the city's old charter for help. The long investigation was <strong>culminating</strong> in a final chase. At last, he cornered the <strong>perpetrators</strong> in the old bell tower."
-        };
+    'Day-1': "The young prince planned to <strong>sweep</strong> the election. He needed to <strong>clinch</strong> the final vote from the stubborn council. His victory led to <strong>unbridled</strong> celebrations in the streets. He promised his advisors he would <strong>outperform</strong> all previous rulers. But his first challenge was a <strong>steep</strong> mountain pass, now blocked by snow. The kingdom's food supply looked <strong>dismally</strong> low. The public called his first month a <strong>poor show</strong>. His <strong>pronounced</strong> frown showed his worry. He wondered, should he be <strong>lenient</strong> with the grain merchants, or seize their stock for the people?",
+
+    'Day-2': "The old scientist felt <strong>unnerved</strong> by the sky's strange color. He gave a <strong>dire</strong> warning to the town's mayor. 'The <strong>particulate matter</strong> is at a deadly level,' he explained. 'It's coming from the new <strong>brick kilns</strong>.' He worried most about the <strong>infants</strong>, who were weakest. The <strong>likelihood</strong> of a lung disease was rising daily. This cough was now <strong>ingrained</strong> in the town's life. 'We must <strong>halt</strong> production!' he cried. 'If we let this <strong>perpetuate</strong>, no one will be left.'",
+
+    'Day-3': "The empress was certain it was <strong>sabotage</strong>. The result of the fire was <strong>devastating</strong>. The great <strong>blaze</strong> had destroyed the silk market. She had to <strong>deploy</strong> her royal guard immediately. Someone wanted to <strong>disrupt</strong> the peace festival. Many merchants were now <strong>stranded</strong> with no goods to sell. This was the latest in a <strong>spate</strong> of strange accidents. Someone was trying to <strong>undermine</strong> her authority. They wanted to <strong>sow panic</strong>. She remained <strong>resolute</strong>, though the fire’s cause was <strong>beyond comprehension</strong>. A <strong>contingency</strong> plan had to be made, for it might <strong>bode</strong> more danger ahead.",
+
+    'Day-5': "The detective inspected the <strong>gruesome</strong> crime scene. It was a truly <strong>heinous</strong> act. The killer had violated the <strong>sanctity</strong> of the old library. This felt like some kind of <strong>frontier vengeance</strong>. The city's borders were famously <strong>porous</strong>. There was a constant <strong>flux</strong> of strange visitors. Many were smuggling <strong>illicit</strong> goods. An <strong>intricate</strong> tapestry hung on the wall, a silent <strong>backdrop</strong> to the crime. The detective's own position was <strong>precarious</strong>. He had <strong>pledged</strong> to the public that he would solve the case. He had to <strong>curb</strong> these violent <strong>intrusions</strong>. He would find the killer and <strong>repatriate</strong> him to his home country for justice. His <strong>patrols</strong> would work day and night. He hoped to <strong>usher in</strong> an age of peace. He had to practice <strong>restraint</strong> and not rush the investigation. But his promises to the victim's family felt <strong>hollow</strong>. He found himself <strong>invoking</strong> the city's old charter for help. The long investigation was <strong>culminating</strong> in a final chase. At last, he cornered the <strong>perpetrators</strong> in the old bell tower."
+};
+
         // --- End Story Data ---
 
         // --- Progress Bar Logic ---
