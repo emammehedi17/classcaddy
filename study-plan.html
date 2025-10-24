@@ -152,23 +152,113 @@
     </div>
 </div>
 
-<!-- Edit Modal (hidden by default) -->
-<div id="edit-modal" class="modal-hidden" aria-hidden="true">
-    <div id="edit-overlay" class="edit-modal-overlay modal-hidden"></div>
-    <div id="edit-box" class="edit-modal-box modal-hidden" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
-            <h3 id="edit-modal-title" style="font-weight:700;color:#1f2937">Edit Day</h3>
-            <button id="edit-close-btn" style="background:transparent;border:none;font-size:1.25rem;cursor:pointer;color:#6b7280">&times;</button>
+<!-- ====================== EDIT MODAL ====================== -->
+<div id="editModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+  <div class="bg-white rounded-2xl shadow-2xl p-6 w-11/12 max-w-3xl max-h-[80vh] overflow-y-auto relative">
+    <h2 class="text-2xl font-bold mb-4 text-center">Edit Day Details</h2>
+
+    <form id="editForm" class="space-y-4">
+      <div id="editFields" class="space-y-4"></div>
+
+      <div class="flex justify-between items-center pt-4 border-t">
+        <button type="button" id="addSubject" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+          + Add New Subject
+        </button>
+        <div class="flex gap-3">
+          <button type="button" id="cancelEdit" class="px-5 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 transition">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">Save Changes</button>
         </div>
-        <div id="edit-form">
-            <!-- Fields will be inserted dynamically -->
-        </div>
-        <div class="edit-actions">
-            <button id="edit-cancel-btn" class="px-4 py-2 rounded-md border border-gray-300">Cancel</button>
-            <button id="edit-save-btn" class="px-4 py-2 rounded-md bg-indigo-600 text-white">Save</button>
-        </div>
-    </div>
+      </div>
+    </form>
+  </div>
 </div>
+
+<script>
+let currentEditDay = null;
+
+// ==================== OPEN MODAL ====================
+function openEditModal(dayKey, dayData) {
+  currentEditDay = dayKey;
+  const editModal = document.getElementById('editModal');
+  const editFields = document.getElementById('editFields');
+  editFields.innerHTML = '';
+
+  // Create editable fields dynamically
+  Object.entries(dayData).forEach(([subject, value]) => {
+    if (subject === "completed") return; // Skip completion flag
+    addEditField(subject, value);
+  });
+
+  editModal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden'; // prevent background scroll
+}
+
+// ==================== ADD FIELD ====================
+function addEditField(subject = '', value = '') {
+  const editFields = document.getElementById('editFields');
+  const fieldDiv = document.createElement('div');
+  fieldDiv.className = 'grid grid-cols-2 gap-3 items-center';
+  fieldDiv.innerHTML = `
+    <input type="text" class="subjectInput border p-2 rounded-md font-semibold" placeholder="Subject name" value="${subject}">
+    <div class="flex items-center gap-2">
+      <textarea class="valueInput border p-2 rounded-md w-full" rows="1" placeholder="Value or details">${value}</textarea>
+      <button type="button" class="removeSubject text-red-500 font-bold text-lg hover:text-red-700" title="Remove this subject">&times;</button>
+    </div>
+  `;
+  editFields.appendChild(fieldDiv);
+
+  // Add remove functionality
+  fieldDiv.querySelector('.removeSubject').addEventListener('click', () => {
+    fieldDiv.remove();
+  });
+}
+
+// ==================== EVENT LISTENERS ====================
+
+// Add New Subject
+document.getElementById('addSubject').addEventListener('click', () => {
+  addEditField();
+});
+
+// Prevent modal from closing when clicking inside the white box
+document.querySelector('#editModal > div').addEventListener('click', e => e.stopPropagation());
+
+// Close when clicking on dark background
+document.getElementById('editModal').addEventListener('click', () => closeEditModal());
+
+// Cancel button
+document.getElementById('cancelEdit').addEventListener('click', () => closeEditModal());
+
+function closeEditModal() {
+  document.getElementById('editModal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+// ==================== SAVE CHANGES ====================
+document.getElementById('editForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!currentEditDay) return;
+
+  const subjectInputs = document.querySelectorAll('.subjectInput');
+  const valueInputs = document.querySelectorAll('.valueInput');
+  const updatedData = {};
+
+  subjectInputs.forEach((subjectEl, i) => {
+    const newSubject = subjectEl.value.trim();
+    const newValue = valueInputs[i].value.trim();
+    if (newSubject) updatedData[newSubject] = newValue;
+  });
+
+  // Preserve the completion status
+  const dayRef = ref(database, `users/${auth.currentUser.uid}/studyPlan/${currentEditDay}`);
+  await update(dayRef, updatedData);
+
+  closeEditModal();
+  loadStudyPlan(); // refresh display
+});
+</script>
+
+
 
 <!-- Firebase + App Script -->
 <script type="module">
