@@ -250,7 +250,8 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
   });
 
   // Preserve the completion status
-  const dayRef = ref(database, `users/${auth.currentUser.uid}/studyPlan/${currentEditDay}`);
+  const dayRef = doc(db, `users/${auth.currentUser.uid}/studyPlan/${currentEditDay}`);
+await updateDoc(dayRef, updatedData);
   await update(dayRef, updatedData);
 
   closeEditModal();
