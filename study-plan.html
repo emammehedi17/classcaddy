@@ -369,11 +369,14 @@
             <p class="text-lg text-gray-500">Monthly Plan (18.10.25 – 17.11.25)</p>
         </div>
 
-        <!-- NEW: User ID Display -->
+        <!-- NEW: Sync Status -->
         <div class="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg shadow">
-            <h3 class="font-semibold text-indigo-800">Your Sync ID</h3>
-            <p id="user-id-display" class="text-sm text-indigo-600 font-mono break-all select-all">Loading...</p>
-            <p class="text-xs text-indigo-500 mt-1">Open this file on any device to sync your progress.</p>
+            <h3 class="font-semibold text-indigo-800">Sync Status</h3>
+            <div class="flex items-center space-x-2">
+                <div id="sync-indicator" class="w-3 h-3 rounded-full bg-gray-400 animate-pulse"></div>
+                <p id="sync-status" class="text-sm text-indigo-700">Connecting...</p>
+            </div>
+            <p id="sync-error" class_hidden="text-xs text-red-600 mt-1"></p>
         </div>
         <!-- END NEW -->
 
@@ -443,32 +446,42 @@
     </div>
     <!-- --- End Story Modal HTML --- -->
 
-    <!-- NEW: Firebase Imports -->
+    <!-- Firebase Imports -->
     <script type="module">
         // --- Firebase SDK Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getAuth, 
             signInAnonymously, 
-            signInWithCustomToken, 
             onAuthStateChanged 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
             getFirestore, 
             doc, 
-            getDoc, 
             setDoc, 
             onSnapshot,
             setLogLevel
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- App Configuration (Provided by Environment) ---
-        // These variables are injected by the environment.
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-study-plan-app';
-        const firebaseConfig = (typeof __firebase_config !== 'undefined') 
-            ? JSON.parse(__firebase_config)
-            : { apiKey: "YOUR_API_KEY", authDomain: "YOUR_AUTH_DOMAIN", projectId: "YOUR_PROJECT_ID" }; // Fallback for local testing
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // --- 
+        // --- STEP 1: Get your Firebase Config ---
+        // ---
+        // 1. Go to https://console.firebase.google.com/
+        // 2. Create a new project.
+        // 3. In your project, click "Add app" and select the Web icon (</>).
+        // 4. Register the app (you can just give it a nickname).
+        // 5. Firebase will give you a `firebaseConfig` object.
+        // 6. Paste that object here, replacing the placeholder below.
+        // ---
+        const firebaseConfig = {
+            apiKey: "PASTE_YOUR_API_KEY_HERE",
+            authDomain: "PASTE_YOUR_AUTH_DOMAIN_HERE",
+            projectId: "PASTE_YOUR_PROJECT_ID_HERE",
+            storageBucket: "PASTE_YOUR_STORAGE_BUCKET_HERE",
+            messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
+            appId: "PASTE_YOUR_APP_ID_HERE"
+        };
+        // -------------------------------------------------
 
         // --- Firebase Initialization ---
         let app, auth, db, userId;
@@ -476,22 +489,56 @@
         let isFirebaseReady = false;
         let isDataLoaded = false; // Flag to prevent saving data before it's loaded
 
+        // --- UI Elements for Sync Status ---
+        const syncIndicator = document.getElementById('sync-indicator');
+        const syncStatus = document.getElementById('sync-status');
+        const syncError = document.getElementById('sync-error');
+
+        function setSyncStatus(status, isError = false) {
+            if (isError) {
+                syncIndicator.classList.remove('bg-green-500', 'animate-pulse');
+                syncIndicator.classList.add('bg-red-500');
+                syncStatus.textContent = "Sync Error";
+                syncError.textContent = status;
+                syncError.classList.remove('hidden');
+            } else if (status === 'synced') {
+                syncIndicator.classList.remove('bg-gray-400', 'animate-pulse', 'bg-yellow-500');
+                syncIndicator.classList.add('bg-green-500');
+                syncStatus.textContent = "Synced";
+                syncError.classList.add('hidden');
+            } else if (status === 'saving') {
+                syncIndicator.classList.remove('bg-green-500');
+                syncIndicator.classList.add('bg-yellow-500', 'animate-pulse');
+                syncStatus.textContent = "Saving...";
+            } else { // connecting
+                syncIndicator.classList.add('bg-gray-400', 'animate-pulse');
+                syncStatus.textContent = "Connecting...";
+            }
+        }
+
         // --- Initialize Firebase and Authentication ---
         async function initFirebase() {
+            // Basic check to see if config is still the placeholder
+            if (firebaseConfig.apiKey.startsWith("PASTE_YOUR_")) {
+                const errorMsg = "Firebase config is missing. Please follow STEP 1 in the script."
+                console.error(errorMsg);
+                setSyncStatus(errorMsg, true);
+                return;
+            }
+
             try {
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
-                setLogLevel('Debug'); // Enable debug logging for Firestore
+                setLogLevel('error'); // Use 'debug' for more logs, 'error' for clean console
 
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         userId = user.uid;
                         console.log("User is signed in with UID:", userId);
-                        document.getElementById('user-id-display').textContent = userId;
                         
-                        // Path to the user's private data document
-                        const dataPath = `/artifacts/${appId}/users/${userId}/studyPlan/progress`;
+                        // Use a simpler data path
+                        const dataPath = `/studyPlan/users/${userId}/progress`;
                         dataDocRef = doc(db, dataPath);
                         
                         isFirebaseReady = true;
@@ -501,39 +548,26 @@
 
                     } else {
                         console.log("User is signed out. Attempting to sign in.");
-                        await signIn();
+                        await signInAnonymously(auth);
                     }
                 });
 
             } catch (error) {
                 console.error("Error initializing Firebase:", error);
-            }
-        }
-
-        async function signIn() {
-            try {
-                if (initialAuthToken) {
-                    console.log("Signing in with custom token...");
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    console.log("Signing in anonymously...");
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Error signing in:", error);
+                setSyncStatus(error.message, true);
             }
         }
 
         // --- Data-saving function (debounced) ---
-        // This prevents spamming Firestore on every single click
         let saveTimeout;
         function debouncedSaveData() {
             if (!isDataLoaded) return; // Don't save before initial load
 
             clearTimeout(saveTimeout);
+            setSyncStatus('saving'); // Show "Saving..."
             saveTimeout = setTimeout(() => {
                 saveDataToFirestore();
-            }, 1000); // Wait 1 second after the last change to save
+            }, 1500); // Wait 1.5 seconds after the last change to save
         }
 
         // --- Save Data to Firestore ---
@@ -551,7 +585,6 @@
                 const day = cb.dataset.day;
                 const subject = cb.dataset.subject;
                 const key = `${day}-${subject}-checked`;
-                // Only save the *first* instance of a checkbox (table/mobile are duplicates)
                 if (progressData[key] === undefined) {
                     progressData[key] = cb.checked;
                 }
@@ -568,11 +601,13 @@
             });
 
             try {
-                console.log("Saving data to Firestore...", progressData);
+                console.log("Saving data to Firestore...");
                 await setDoc(dataDocRef, progressData, { merge: true }); // Merge to avoid overwriting
                 console.log("Data saved successfully.");
+                setSyncStatus('synced'); // Show "Synced"
             } catch (error) {
                 console.error("Error saving data to Firestore:", error);
+                setSyncStatus(error.message, true);
             }
         }
 
@@ -587,13 +622,13 @@
                     console.log("Received data from Firestore:", progressData);
                     applyLoadedData(progressData);
                 } else {
-                    console.log("No existing data found in Firestore.");
-                    // This is a new user, no data to load.
-                    // We must set isDataLoaded = true so they can start saving.
-                    isDataLoaded = true;
+                    console.log("No existing data found in Firestore. Creating new document.");
+                    isDataLoaded = true; // New user, allow saving
                 }
+                setSyncStatus('synced'); // Data loaded or is new
             }, (error) => {
                 console.error("Error listening to data:", error);
+                setSyncStatus(error.message, true);
             });
         }
 
@@ -609,8 +644,6 @@
                 if (progressData[key] !== undefined) {
                     const isChecked = progressData[key];
                     cb.checked = isChecked;
-                    
-                    // Sync parent UI
                     const taskItem = cb.closest('.task-item, .card-item');
                     if (taskItem) {
                         taskItem.classList.toggle('completed', isChecked);
@@ -642,237 +675,234 @@
         }
         
         // --- Main App Logic (Inside DOMContentLoaded) ---
-        document.addEventListener('DOMContentLoaded', async function() {
+        
+        // Data parsed from the document
+        const dailyPlanData = [
+            { day: 'Day-1', subject: 'Quran', topic: 'Sura Anfal 8:45- 8:53' },
+            { day: 'Day-1', subject: 'Newspaper', topic: 'The Daily Star: Shibir-backed panel sweeps Rucsu polls, Lowest HSC pass rate in 21 years' },
+            { day: 'Day-1', subject: 'Vocabulary', topic: 'Sweep- বিজয় অর্জন, Clinch- সমর্থন করা, unbridled-অবাধ, outperform-ছাড়িয়ে যাওয়া, Steep-خাড়া, dismally- poorly, poor show- নিম্ন ফলাফল, lenient- কোমল, pronounced- সুস্পষ্ট।' },
+            { day: 'Day-1', subject: 'Math', topic: 'Ratio Class 12, 13' },
+            { day: 'Day-1', subject: 'Basic View', topic: 'Page 1-20' },
+            { day: 'Day-2', subject: 'Quran', topic: 'Sura Anfal 8:53-8:69' },
+            { day: 'Day-2', subject: 'Newspaper', topic: 'Editorial: Our children deserve clean air' },
+            { day: 'Day-2', subject: 'Vocabulary', topic: 'Unnerved- ভীত, dire- অত্যান্ত জরুরি, particulate matter- অতিক্ষুদ্র পদার্থ, brick kilns- ইট ভাটা, infants- শিশু, likelihood- সম্ভাবনা, ingrained- বদ্ধমূল, halt- থামা, perpetuate- অবিরাম করা,' },
+            { day: 'Day-2', subject: 'Math', topic: 'Ratio Class 14, 15' },
+            { day: 'Day-2', subject: 'Basic View', topic: '' },
+            { day: 'Day-3', subject: 'Quran', topic: 'Sura Anfal 8:70- Sura Tawbah 9:6' },
+            { day: 'Day-3', subject: 'Newspaper', topic: 'Editorial: Sabotage or not, the government must account for the recent fires' },
+            { day: 'Day-3', subject: 'Vocabulary', topic: 'Sabotage- নাশকতা, Devastating- ধ্বংশাত্মক, Blaze- তীব্র অগ্নিকাণ্ড, deploy- মোতায়েন করা, disrupt- বিঘ্ন ঘটানো, stranded- আটকে পড়া, spate- ঢল, undermine- দুর্বল করা, sow panic- আতঙ্ক ছড়ানো, arson- অগ্নিসংযোগ, resolute- দৃঢ় প্রতিজ্ঞ, beyond comprehension- বোধগম্যতার বাইরে, contigency- বিকল্প ব্যবস্থা, bode- ইঙ্গিত দেয়া/ পূর্বাভাস' },
+            { day: 'Day-3', subject: 'Math', topic: 'Class 16, 17' },
+            { day: 'Day-3', subject: 'Basic View', topic: '' },
+            { day: 'Day-4', subject: 'Quran', topic: 'Sura Tawbah 9:7- 9:20' },
+            { day: 'Day-4', subject: 'Newspaper', topic: '' },
+            { day: 'Day-4', subject: 'Vocabulary', topic: '' },
+            { day: 'Day-4', subject: 'Math', topic: 'Class 18, 19' },
+            { day: 'Day-4', subject: 'Basic View', topic: '' },
+            { day: 'Day-5', subject: 'Quran', topic: 'Sura Tawbah 9:21- 9:31' },
+            { day: 'Day-5', subject: 'Newspaper', topic: 'Tripura mob killing of Bangladeshis exposes the accountability gap' },
+            { day: 'Day-5', subject: 'Vocabulary', topic: 'Gruesome-ভয়াবহ, heinous-নিকৃষ্ট, sanctity- পবিত্রতা, frontier vengeance- সীমান্ত প্রতিহিংসা, porous- ছিদ্রযুক্ত, flux- অবিরাম গতি, illicit- অবৈধ, intricate- সূক্ষ্ণ, backdrop- পটভূমি, precarious- ঝুঁকিপূর্ণ, pledged- প্রতিজ্ঞা করা, curb- দমন করা, intrusions- onadhikar probes, repatriate- নিজ দেশে ফেরত পাঠানো, patrols- টহল, usher in- শুরু করা, restraint- সংগম, hollow- ফাঁপা, invoking- আহ্বান করা, culminating-শেষ করা, perpetrators- অপরাধী' },
+            { day: 'Day-5', subject: 'Math', topic: 'Class 20, 21' },
+            { day: 'Day-5', subject: 'Basic View', topic: '' },
+            { day: 'Day-6', subject: 'Quran', topic: 'Sura Tawbah 9:31- 9:41' },
+            { day: 'Day-6', subject: 'Newspaper', topic: '' },
+            { day: 'Day-6', subject: 'Vocabulary', topic: '' },
+            { day: 'Day-6', subject: 'Math', topic: '' },
+            { day: 'Day-6', subject: 'Basic View', topic: '' },
+            { day: 'Day-7', subject: 'Quran', topic: '' },
+            { day: 'Day-7', subject: 'Newspaper', topic: '' },
+            { day: 'Day-7', subject: 'Vocabulary', topic: '' },
+            { day: 'Day-7', subject: 'Math', topic: '' },
+            { day: 'Day-7', subject: 'Basic View', topic: '' },
+        ];
+
+        // --- Story Data ---
+        const vocabStories = {
+            'Day-1': "The young prince planned to <strong>sweep</strong> the election. He needed to <strong>clinch</strong> the final vote from the stubborn council. His victory led to <strong>unbridled</strong> celebrations in the streets. He promised his advisors he would <strong>outperform</strong> all previous rulers. But his first challenge was a <strong>steep</strong> mountain pass, now blocked by snow. The kingdom's food supply looked <strong>dismally</strong> low. The public called his first month a <strong>poor show</strong>. His <strong>pronounced</strong> frown showed his worry. He wondered, should he be <strong>lenient</strong> with the grain merchants, or seize their stock for the people?",
+            'Day-2': "The old scientist felt <strong>unnerved</strong> by the sky's strange color. He gave a <strong>dire</strong> warning to the town's mayor. 'The <strong>particulate matter</strong> is at a deadly level,' he explained. 'It's coming from the new <strong>brick kilns</strong>.' He worried most about the <strong>infants</strong>, who were weakest. The <strong>likelihood</strong> of a lung disease was rising daily. This cough was now <strong>ingrained</strong> in the town's life. 'We must <strong>halt</strong> production!' he cried. 'If we let this <strong>perpetuate</strong>, no one will be left.'",
+            'Day-3': "The empress was certain it was <strong>sabotage</strong>. The result of the fire was <strong>devastating</strong>. The great <strong>blaze</strong> had destroyed the silk market. She had to <strong>deploy</strong> her royal guard immediately. Someone wanted to <strong>disrupt</strong> the peace festival. Many merchants were now <strong>stranded</strong> with no goods to sell. This was the latest in a <strong>spate</strong> of strange accidents. Someone was trying to <strong>undermine</strong> her authority. They wanted to <strong>sow panic</strong> among the citizens. This was clearly an act of <strong>arson</strong>. The empress remained <strong>resolute</strong> in her duty. The cruelty of the act was <strong>beyond comprehension</strong>. She immediately ordered a new <strong>contingency</strong> plan for the city's safety. 'This fire,' she whispered to her general, 'does not <strong>bode</strong> well for our future.'",
+            'Day-5': "The detective inspected the <strong>gruesome</strong> crime scene. It was a truly <strong>heinous</strong> act. The killer had violated the <strong>sanctity</strong> of the old library. This felt like some kind of <strong>frontier vengeance</strong>. The city's borders were famously <strong>porous</strong>. There was a constant <strong>flux</strong> of strange visitors. Many were smuggling <strong>illicit</strong> goods. An <strong>intricate</strong> tapestry hung on the wall, a silent <strong>backdrop</strong> to the crime. The detective's own position was <strong>precarious</strong>. He had <strong>pledged</strong> to the public that he would solve the case. He had to <strong>curb</strong> these violent <strong>intrusions</strong>. He would find the killer and <strong>repatriate</strong> him to his home country for justice. His <strong>patrols</strong> would work day and night. He hoped to <strong>usher in</strong> an age of peace. He had to practice <strong>restraint</strong> and not rush the investigation. But his promises to the victim's family felt <strong>hollow</strong>. He found himself <strong>invoking</strong> the city's old charter for help. The long investigation was <strong>culminating</strong> in a final chase. At last, he cornered the <strong>perpetrators</strong> in the old bell tower."
+        };
+        // --- End Story Data ---
+
+        // --- Progress Bar Logic ---
+        const taskWeights = {
+            'Quran': 5/7,
+            'Newspaper': 5/7,
+            'Vocabulary': 10/7,
+            'Math': 40/7,
+            'Basic View': 40/7
+        };
+        let maxWeight = 0; // Will be calculated as tasks are generated
+        const progressLabel = document.getElementById('weekly-progress-label');
+        const progressBar = document.getElementById('weekly-progress-bar');
+
+        window.updateWeeklyProgress = function() { // Make global for applyLoadedData
+            let currentWeight = 0;
+            const allCheckboxes = document.querySelectorAll('.task-checkbox');
+            const checkedTasks = new Set();
             
-            // --- Start Firebase Init ---
-            await initFirebase();
-            // --- All other logic will now run *after* data is loaded via the listener ---
-
-            // Data parsed from the document
-            const dailyPlanData = [
-                { day: 'Day-1', subject: 'Quran', topic: 'Sura Anfal 8:45- 8:53' },
-                { day: 'Day-1', subject: 'Newspaper', topic: 'The Daily Star: Shibir-backed panel sweeps Rucsu polls, Lowest HSC pass rate in 21 years' },
-                { day: 'Day-1', subject: 'Vocabulary', topic: 'Sweep- বিজয় অর্জন, Clinch- সমর্থন করা, unbridled-অবাধ, outperform-ছাড়িয়ে যাওয়া, Steep-খাড়া, dismally- poorly, poor show- নিম্ন ফলাফল, lenient- কোমল, pronounced- সুস্পষ্ট।' },
-                { day: 'Day-1', subject: 'Math', topic: 'Ratio Class 12, 13' },
-                { day: 'Day-1', subject: 'Basic View', topic: 'Page 1-20' },
-                { day: 'Day-2', subject: 'Quran', topic: 'Sura Anfal 8:53-8:69' },
-                { day: 'Day-2', subject: 'Newspaper', topic: 'Editorial: Our children deserve clean air' },
-                { day: 'Day-2', subject: 'Vocabulary', topic: 'Unnerved- ভীত, dire- অত্যান্ত জরুরি, particulate matter- অতিক্ষুদ্র পদার্থ, brick kilns- ইট ভাটা, infants- শিশু, likelihood- সম্ভাবনা, ingrained- বদ্ধমূল, halt- থামা, perpetuate- অবিরাম করা,' },
-                { day: 'Day-2', subject: 'Math', topic: 'Ratio Class 14, 15' },
-                { day: 'Day-2', subject: 'Basic View', topic: '' },
-                { day: 'Day-3', subject: 'Quran', topic: 'Sura Anfal 8:70- Sura Tawbah 9:6' },
-                { day: 'Day-3', subject: 'Newspaper', topic: 'Editorial: Sabotage or not, the government must account for the recent fires' },
-                { day: 'Day-3', subject: 'Vocabulary', topic: 'Sabotage- নাশকতা, Devastating- ধ্বংশাত্মক, Blaze- তীব্র অগ্নিকাণ্ড, deploy- মোতায়েন করা, disrupt- বিঘ্ন ঘটানো, stranded- আটকে পড়া, spate- ঢল, undermine- দুর্বল করা, sow panic- আতঙ্ক ছড়ানো, arson- অগ্নিসংযোগ, resolute- দৃঢ় প্রতিজ্ঞ, beyond comprehension- বোধগম্যতার বাইরে, contigency- বিকল্প ব্যবস্থা, bode- ইঙ্গিত দেয়া/ পূর্বাভাস' },
-                { day: 'Day-3', subject: 'Math', topic: 'Class 16, 17' },
-                { day: 'Day-3', subject: 'Basic View', topic: '' },
-                { day: 'Day-4', subject: 'Quran', topic: 'Sura Tawbah 9:7- 9:20' },
-                { day: 'Day-4', subject: 'Newspaper', topic: '' },
-                { day: 'Day-4', subject: 'Vocabulary', topic: '' },
-                { day: 'Day-4', subject: 'Math', topic: 'Class 18, 19' },
-                { day: 'Day-4', subject: 'Basic View', topic: '' },
-                { day: 'Day-5', subject: 'Quran', topic: 'Sura Tawbah 9:21- 9:31' },
-                { day: 'Day-5', subject: 'Newspaper', topic: 'Tripura mob killing of Bangladeshis exposes the accountability gap' },
-                { day: 'Day-5', subject: 'Vocabulary', topic: 'Gruesome-ভয়াবহ, heinous-নিকৃষ্ট, sanctity- পবিত্রতা, frontier vengeance- সীমান্ত প্রতিহিংসা, porous- ছিদ্রযুক্ত, flux- অবিরাম গতি, illicit- অবৈধ, intricate- সূক্ষ্ণ, backdrop- পটভূমি, precarious- ঝুঁকিপূর্ণ, pledged- প্রতিজ্ঞা করা, curb- দমন করা, intrusions- onadhikar probes, repatriate- নিজ দেশে ফেরত পাঠানো, patrols- টহল, usher in- শুরু করা, restraint- সংগম, hollow- ফাঁপা, invoking- আহ্বান করা, culminating-শেষ করা, perpetrators- অপরাধী' },
-                { day: 'Day-5', subject: 'Math', topic: 'Class 20, 21' },
-                { day: 'Day-5', subject: 'Basic View', topic: '' },
-                { day: 'Day-6', subject: 'Quran', topic: 'Sura Tawbah 9:31- 9:41' },
-                { day: 'Day-6', subject: 'Newspaper', topic: '' },
-                { day: 'Day-6', subject: 'Vocabulary', topic: '' },
-                { day: 'Day-6', subject: 'Math', topic: '' },
-                { day: 'Day-6', subject: 'Basic View', topic: '' },
-                { day: 'Day-7', subject: 'Quran', topic: '' },
-                { day: 'Day-7', subject: 'Newspaper', topic: '' },
-                { day: 'Day-7', subject: 'Vocabulary', topic: '' },
-                { day: 'Day-7', subject: 'Math', topic: '' },
-                { day: 'Day-7', subject: 'Basic View', topic: '' },
-            ];
-
-            // --- Story Data ---
-            const vocabStories = {
-                'Day-1': "The young prince planned to <strong>sweep</strong> the election. He needed to <strong>clinch</strong> the final vote from the stubborn council. His victory led to <strong>unbridled</strong> celebrations in the streets. He promised his advisors he would <strong>outperform</strong> all previous rulers. But his first challenge was a <strong>steep</strong> mountain pass, now blocked by snow. The kingdom's food supply looked <strong>dismally</strong> low. The public called his first month a <strong>poor show</strong>. His <strong>pronounced</strong> frown showed his worry. He wondered, should he be <strong>lenient</strong> with the grain merchants, or seize their stock for the people?",
-                'Day-2': "The old scientist felt <strong>unnerved</strong> by the sky's strange color. He gave a <strong>dire</strong> warning to the town's mayor. 'The <strong>particulate matter</strong> is at a deadly level,' he explained. 'It's coming from the new <strong>brick kilns</strong>.' He worried most about the <strong>infants</strong>, who were weakest. The <strong>likelihood</strong> of a lung disease was rising daily. This cough was now <strong>ingrained</strong> in the town's life. 'We must <strong>halt</strong> production!' he cried. 'If we let this <strong>perpetuate</strong>, no one will be left.'",
-                'Day-3': "The empress was certain it was <strong>sabotage</strong>. The result of the fire was <strong>devastating</strong>. The great <strong>blaze</strong> had destroyed the silk market. She had to <strong>deploy</strong> her royal guard immediately. Someone wanted to <strong>disrupt</strong> the peace festival. Many merchants were now <strong>stranded</strong> with no goods to sell. This was the latest in a <strong>spate</strong> of strange accidents. Someone was trying to <strong>undermine</strong> her authority. They wanted to <strong>sow panic</strong> among the citizens. This was clearly an act of <strong>arson</strong>. The empress remained <strong>resolute</strong> in her duty. The cruelty of the act was <strong>beyond comprehension</strong>. She immediately ordered a new <strong>contingency</strong> plan for the city's safety. 'This fire,' she whispered to her general, 'does not <strong>bode</strong> well for our future.'",
-                'Day-5': "The detective inspected the <strong>gruesome</strong> crime scene. It was a truly <strong>heinous</strong> act. The killer had violated the <strong>sanctity</strong> of the old library. This felt like some kind of <strong>frontier vengeance</strong>. The city's borders were famously <strong>porous</strong>. There was a constant <strong>flux</strong> of strange visitors. Many were smuggling <strong>illicit</strong> goods. An <strong>intricate</strong> tapestry hung on the wall, a silent <strong>backdrop</strong> to the crime. The detective's own position was <strong>precarious</strong>. He had <strong>pledged</strong> to the public that he would solve the case. He had to <strong>curb</strong> these violent <strong>intrusions</strong>. He would find the killer and <strong>repatriate</strong> him to his home country for justice. His <strong>patrols</strong> would work day and night. He hoped to <strong>usher in</strong> an age of peace. He had to practice <strong>restraint</strong> and not rush the investigation. But his promises to the victim's family felt <strong>hollow</strong>. He found himself <strong>invoking</strong> the city's old charter for help. The long investigation was <strong>culminating</strong> in a final chase. At last, he cornered the <strong>perpetrators</strong> in the old bell tower."
-            };
-            // --- End Story Data ---
-
-            // --- Progress Bar Logic ---
-            const taskWeights = {
-                'Quran': 5/7,
-                'Newspaper': 5/7,
-                'Vocabulary': 10/7,
-                'Math': 40/7,
-                'Basic View': 40/7
-            };
-            let maxWeight = 0; // Will be calculated as tasks are generated
-            const progressLabel = document.getElementById('weekly-progress-label');
-            const progressBar = document.getElementById('weekly-progress-bar');
-
-            window.updateWeeklyProgress = function() { // Make global for applyLoadedData
-                let currentWeight = 0;
-                const allCheckboxes = document.querySelectorAll('.task-checkbox');
-                const checkedTasks = new Set();
-                
-                allCheckboxes.forEach(cb => {
-                    const uniqueId = `${cb.dataset.day}-${cb.dataset.subject}`;
-                    if (cb.checked && !checkedTasks.has(uniqueId)) {
-                        const subject = cb.dataset.subject;
-                        if (subject && taskWeights[subject]) {
-                            currentWeight += taskWeights[subject];
-                        }
-                        checkedTasks.add(uniqueId);
+            allCheckboxes.forEach(cb => {
+                const uniqueId = `${cb.dataset.day}-${cb.dataset.subject}`;
+                if (cb.checked && !checkedTasks.has(uniqueId)) {
+                    const subject = cb.dataset.subject;
+                    if (subject && taskWeights[subject]) {
+                        currentWeight += taskWeights[subject];
                     }
-                });
-                const percentage = (maxWeight > 0) ? (currentWeight / maxWeight) * 100 : 0;
-                if(progressLabel) progressLabel.textContent = `Weekly Progress: ${percentage.toFixed(0)}%`;
-                if(progressBar) progressBar.style.width = `${percentage}%`;
-            }
-            // --- END Progress Bar Logic ---
-
-
-            const tableBody = document.getElementById('daily-plan-body');
-            const mobileCardsContainer = document.getElementById('daily-plan-cards');
-            let currentDay = '';
-            let currentMobileDay = ''; 
-
-            // --- Modal Variables ---
-            const storyModal = document.getElementById('story-modal');
-            const storyOverlay = document.getElementById('story-overlay');
-            const storyCloseBtn = document.getElementById('story-close-btn');
-            const storyContent = document.getElementById('story-content');
-            const storyTitle = document.getElementById('story-title');
-
-            // --- Modal Functions ---
-            function showStory(day) {
-                const story = vocabStories[day];
-                if (story) {
-                    storyTitle.textContent = `A Tale from ${day}`;
-                    storyContent.innerHTML = story;
-                    storyModal.classList.remove('modal-hidden');
+                    checkedTasks.add(uniqueId);
                 }
-            }
-            function hideStory() {
-                storyModal.classList.add('modal-hidden');
-            }
+            });
+            const percentage = (maxWeight > 0) ? (currentWeight / maxWeight) * 100 : 0;
+            if(progressLabel) progressLabel.textContent = `Weekly Progress: ${percentage.toFixed(0)}%`;
+            if(progressBar) progressBar.style.width = `${percentage}%`;
+        }
+        // --- END Progress Bar Logic ---
 
-            // --- Modal Event Listeners ---
-            storyCloseBtn.addEventListener('click', hideStory);
-            storyOverlay.addEventListener('click', hideStory);
 
-            // --- Event Delegation for Story Buttons ---
-            document.body.addEventListener('click', function(event) {
-                if (event.target.classList.contains('read-story-btn')) {
-                    const day = event.target.getAttribute('data-day');
-                    showStory(day);
+        const tableBody = document.getElementById('daily-plan-body');
+        const mobileCardsContainer = document.getElementById('daily-plan-cards');
+        let currentDay = '';
+        let currentMobileDay = ''; 
+
+        // --- Modal Variables ---
+        const storyModal = document.getElementById('story-modal');
+        const storyOverlay = document.getElementById('story-overlay');
+        const storyCloseBtn = document.getElementById('story-close-btn');
+        const storyContent = document.getElementById('story-content');
+        const storyTitle = document.getElementById('story-title');
+
+        // --- Modal Functions ---
+        function showStory(day) {
+            const story = vocabStories[day];
+            if (story) {
+                storyTitle.textContent = `A Tale from ${day}`;
+                storyContent.innerHTML = story;
+                storyModal.classList.remove('modal-hidden');
+            }
+        }
+        function hideStory() {
+            storyModal.classList.add('modal-hidden');
+        }
+
+        // --- Modal Event Listeners ---
+        storyCloseBtn.addEventListener('click', hideStory);
+        storyOverlay.addEventListener('click', hideStory);
+
+        // --- Event Delegation for Story Buttons ---
+        document.body.addEventListener('click', function(event) {
+            if (event.target.classList.contains('read-story-btn')) {
+                const day = event.target.getAttribute('data-day');
+                showStory(day);
+            }
+        });
+
+
+        window.checkDayCompletion = function(day) { // Make global for applyLoadedData
+            const allCheckboxesForDay = document.querySelectorAll(`.task-checkbox[data-day="${day}"]`);
+            if (allCheckboxesForDay.length === 0) return;
+
+            let allChecked = true;
+            const subjects = new Set(Array.from(allCheckboxesForDay).map(cb => cb.dataset.subject));
+            
+            subjects.forEach(subject => {
+                const checkboxesForSubject = document.querySelectorAll(`.task-checkbox[data-day="${day}"][data-subject="${subject}"]`);
+                const isSubjectChecked = Array.from(checkboxesForSubject).some(cb => cb.checked);
+                if (!isSubjectChecked) {
+                    allChecked = false;
                 }
             });
 
+            const dateInputDesktop = document.querySelector(`.date-input-desktop[data-day-input="${day}"]`); 
+            const dateInputMobile = document.querySelector(`.date-input-mobile[data-day-input="${day}"]`);
 
-            window.checkDayCompletion = function(day) { // Make global for applyLoadedData
-                const allCheckboxesForDay = document.querySelectorAll(`.task-checkbox[data-day="${day}"]`);
-                if (allCheckboxesForDay.length === 0) return;
+            if (allChecked) {
+                if(dateInputDesktop) dateInputDesktop.style.display = 'block'; 
+                if(dateInputMobile) dateInputMobile.style.display = 'block';
+            } else {
+                if(dateInputDesktop) dateInputDesktop.style.display = 'none';
+                if(dateInputMobile) dateInputMobile.style.display = 'none';
+            }
+        }
 
-                let allChecked = true;
-                const subjects = new Set(Array.from(allCheckboxesForDay).map(cb => cb.dataset.subject));
+
+        function createVocabElement(pair) {
+            const parts = pair.split('-');
+            if (parts.length === 2 && parts[0].trim() && parts[1].trim()) {
+                const eng = parts[0].trim();
+                const ban = parts[1].trim().replace('।', ''); 
+
+                const vocabContainer = document.createElement('div');
+                vocabContainer.classList.add('vocab-item');
+                vocabContainer.setAttribute('tabindex', '0'); 
                 
-                subjects.forEach(subject => {
-                    const checkboxesForSubject = document.querySelectorAll(`.task-checkbox[data-day="${day}"][data-subject="${subject}"]`);
-                    const isSubjectChecked = Array.from(checkboxesForSubject).some(cb => cb.checked);
-                    if (!isSubjectChecked) {
-                        allChecked = false;
+                vocabContainer.addEventListener('click', function(event) {
+                    event.stopPropagation(); 
+                    document.querySelectorAll('.vocab-item.active').forEach(item => {
+                        if(item !== this) item.classList.remove('active');
+                    });
+                    this.classList.toggle('active');
+                });
+                
+                const engSpan = document.createElement('span');
+                engSpan.classList.add('vocab-word');
+                engSpan.textContent = eng;
+                
+                const banSpan = document.createElement('span');
+                banSpan.classList.add('vocab-meaning');
+                banSpan.textContent = ban;
+                
+                vocabContainer.appendChild(engSpan);
+                vocabContainer.appendChild(banSpan);
+                return vocabContainer;
+            } else if (pair.trim()) {
+                    const textSpan = document.createElement('span');
+                    textSpan.textContent = pair.trim();
+                    return textSpan;
+            }
+            return null;
+        }
+
+        // --- Checkbox and Date Input change handler ---
+        function onInputChange(event) {
+            const element = event.target;
+            
+            if (element.classList.contains('task-checkbox')) {
+                const day = element.dataset.day;
+                const subject = element.dataset.subject;
+                const isChecked = element.checked;
+
+                // 1. Sync all checkboxes for this same task (day + subject)
+                const allCheckboxesForTask = document.querySelectorAll(`.task-checkbox[data-day="${day}"][data-subject="${subject}"]`);
+                allCheckboxesForTask.forEach(cb => {
+                    cb.checked = isChecked;
+                    // Toggle 'completed' class on parent row or card
+                    const taskItem = cb.closest('.task-item, .card-item');
+                    if (taskItem) {
+                        taskItem.classList.toggle('completed', isChecked);
                     }
                 });
 
-                const dateInputDesktop = document.querySelector(`.date-input-desktop[data-day-input="${day}"]`); 
-                const dateInputMobile = document.querySelector(`.date-input-mobile[data-day-input="${day}"]`);
-
-                if (allChecked) {
-                    if(dateInputDesktop) dateInputDesktop.style.display = 'block'; 
-                    if(dateInputMobile) dateInputMobile.style.display = 'block';
-                } else {
-                    if(dateInputDesktop) dateInputDesktop.style.display = 'none';
-                    if(dateInputMobile) dateInputMobile.style.display = 'none';
-                }
+                // 2. Check if the day is complete
+                checkDayCompletion(day);
+            
+            } else if (element.tagName === 'INPUT' && element.type === 'text') {
+                // Sync date inputs
+                const day = element.id.replace('date-', '').replace('date-mobile-', '');
+                const desktopInput = document.getElementById(`date-${day}`);
+                const mobileInput = document.getElementById(`date-mobile-${day}`);
+                if (desktopInput) desktopInput.value = element.value;
+                if (mobileInput) mobileInput.value = element.value;
             }
 
+            // 3. Update the weekly progress bar
+            updateWeeklyProgress();
+            
+            // 4. Save data to Firestore
+            debouncedSaveData();
+        }
 
-            function createVocabElement(pair) {
-                const parts = pair.split('-');
-                if (parts.length === 2 && parts[0].trim() && parts[1].trim()) {
-                    const eng = parts[0].trim();
-                    const ban = parts[1].trim().replace('।', ''); 
-
-                    const vocabContainer = document.createElement('div');
-                    vocabContainer.classList.add('vocab-item');
-                    vocabContainer.setAttribute('tabindex', '0'); 
-                    
-                    vocabContainer.addEventListener('click', function(event) {
-                        event.stopPropagation(); 
-                        document.querySelectorAll('.vocab-item.active').forEach(item => {
-                            if(item !== this) item.classList.remove('active');
-                        });
-                        this.classList.toggle('active');
-                    });
-                    
-                    const engSpan = document.createElement('span');
-                    engSpan.classList.add('vocab-word');
-                    engSpan.textContent = eng;
-                    
-                    const banSpan = document.createElement('span');
-                    banSpan.classList.add('vocab-meaning');
-                    banSpan.textContent = ban;
-                    
-                    vocabContainer.appendChild(engSpan);
-                    vocabContainer.appendChild(banSpan);
-                    return vocabContainer;
-                } else if (pair.trim()) {
-                     const textSpan = document.createElement('span');
-                     textSpan.textContent = pair.trim();
-                     return textSpan;
-                }
-                return null;
-            }
-
-            // --- Checkbox and Date Input change handler ---
-            function onInputChange(event) {
-                const element = event.target;
-                
-                if (element.classList.contains('task-checkbox')) {
-                    const day = element.dataset.day;
-                    const subject = element.dataset.subject;
-                    const isChecked = element.checked;
-
-                    // 1. Sync all checkboxes for this same task (day + subject)
-                    const allCheckboxesForTask = document.querySelectorAll(`.task-checkbox[data-day="${day}"][data-subject="${subject}"]`);
-                    allCheckboxesForTask.forEach(cb => {
-                        cb.checked = isChecked;
-                        // Toggle 'completed' class on parent row or card
-                        const taskItem = cb.closest('.task-item, .card-item');
-                        if (taskItem) {
-                            taskItem.classList.toggle('completed', isChecked);
-                        }
-                    });
-
-                    // 2. Check if the day is complete
-                    checkDayCompletion(day);
-                
-                } else if (element.tagName === 'INPUT' && element.type === 'text') {
-                    // Sync date inputs
-                    const day = element.id.replace('date-', '').replace('date-mobile-', '');
-                    const desktopInput = document.getElementById(`date-${day}`);
-                    const mobileInput = document.getElementById(`date-mobile-${day}`);
-                    if (desktopInput) desktopInput.value = element.value;
-                    if (mobileInput) mobileInput.value = element.value;
-                }
-
-                // 3. Update the weekly progress bar
-                updateWeeklyProgress();
-                
-                // 4. Save data to Firestore
-                debouncedSaveData();
-            }
-
-
+        // --- Run on page load ---
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Build the UI
             dailyPlanData.forEach(item => {
                 if ((item.subject || item.topic) && taskWeights[item.subject]) {
                     maxWeight += taskWeights[item.subject];
@@ -903,7 +933,6 @@
                             <input type="text" id="${dateInputId}" class="form-input p-1 border border-gray-300 rounded-md shadow-sm text-sm w-full max-w-xs" placeholder="e.g., 24/10/25">
                         </div>
                     `;
-                    // Add listener to the input
                     dateInputDiv.querySelector('input').addEventListener('input', onInputChange);
                     dayCell.appendChild(dateInputDiv);
                     
@@ -954,7 +983,7 @@
                     checkbox.classList.add('task-checkbox');
                     checkbox.setAttribute('data-day', item.day); 
                     checkbox.setAttribute('data-subject', item.subject);
-                    checkbox.addEventListener('change', onInputChange); // <-- Use shared handler
+                    checkbox.addEventListener('change', onInputChange);
                     completionCell.appendChild(checkbox);
                 }
                 row.appendChild(completionCell);
@@ -1016,7 +1045,6 @@
                         </div>
                     `;
                     
-                    // Add events to mobile card elements
                     card.querySelector('.task-checkbox').addEventListener('change', onInputChange);
                     if(dateInputMobile) {
                         card.querySelector(`#${dateInputMobileId}`).addEventListener('input', onInputChange);
@@ -1046,11 +1074,13 @@
                 }
             });
 
-            // Initial call to set progress bar (will be updated by loader)
+            // Initial call to set progress bar
             updateWeeklyProgress();
+
+            // --- Start Firebase Init ---
+            await initFirebase();
         });
     </script>
 
 </body>
 </html>
-
