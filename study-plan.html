@@ -112,14 +112,14 @@
         </div>
     </div>
 
-    <!-- Monthly Targets -->
+<!-- Monthly Targets -->
     <div class="mb-10">
         <h2 class="text-2xl font-semibold text-gray-700 mb-4">Monthly Targets</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-emerald-700 mb-2">1st Week</h3><p class="text-gray-600">Math Class 15, Basic View 1-150 pages</p></div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-sky-700 mb-2">2nd Week</h3><p class="text-gray-600">Bangla Class 15, Computer hour 1-150 pages</p></div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-amber-700 mb-2">3rd Week</h3><p class="text-gray-600">Math Class 7, English lit. handbook complete</p></div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-rose-700 mb-2">4th Week</h3><p class="text-gray-600">Basic View 151-300 pages, Mental Ability classes 15</p></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 monthly-targets">
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-emerald-700 mb-2">1st Week</h3><p class="text-gray-600 editable-field" contenteditable="true" data-target="monthly-1st-week">Enter target here...</p></div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-sky-700 mb-2">2nd Week</h3><p class="text-gray-600 editable-field" contenteditable="true" data-target="monthly-2nd-week">Enter target here...</p></div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-amber-700 mb-2">3rd Week</h3><p class="text-gray-600 editable-field" contenteditable="true" data-target="monthly-3rd-week">Enter target here...</p></div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-rose-700 mb-2">4th Week</h3><p class="text-gray-600 editable-field" contenteditable="true" data-target="monthly-4th-week">Enter target here...</p></div>
         </div>
     </div>
 
@@ -278,55 +278,54 @@
     // Initial plan (same as original). We'll allow edits that update this in-memory and persist to Firestore.
     // Make a deep copy to ensure original is not modified directly and we have a baseline for "cancel"
     let dailyPlanData = [
-        { day: 'Day-1', subject: 'Quran', topic: 'Sura Anfal 8:45- 8:53' },
-        { day: 'Day-1', subject: 'Newspaper', topic: 'The Daily Star: Shibir-backed panel sweeps Rucsu polls, Lowest HSC pass rate in 21 years' },
-        { day: 'Day-1', subject: 'Vocabulary', topic: 'Sweep- বিজয় অর্জন, Clinch- সমর্থন করা, unbridled-অবাধ, outperform-ছাড়িয়ে যাওয়া, Steep-খাড়া, dismally- poorly, poor show- নিম্ন ফলাফল, lenient- কোমল, pronounced- সুস্পষ্ট।' },
-        { day: 'Day-1', subject: 'Math', topic: 'Ratio Class 12, 13' },
-        { day: 'Day-1', subject: 'Basic View', topic: 'Page 1-20' },
-        { day: 'Day-2', subject: 'Quran', topic: 'Sura Anfal 8:53-8:69' },
-        { day: 'Day-2', subject: 'Newspaper', topic: 'Editorial: Our children deserve clean air' },
-        { day: 'Day-2', subject: 'Vocabulary', topic: 'Unnerved- ভীত, dire- অত্যান্ত জরুরি, particulate matter- অতিক্ষুদ্র পদার্থ, brick kilns- ইট ভাটা, infants- শিশু, likelihood- সম্ভাবনা, ingrained- বদ্ধমূল, halt- থামা, perpetuate- অবিরাম করা,' },
-        { day: 'Day-2', subject: 'Math', topic: 'Ratio Class 14, 15' },
-        { day: 'Day-2', subject: 'Basic View', topic: '' },
-        { day: 'Day-3', subject: 'Quran', topic: 'Sura Anfal 8:70- Sura Tawbah 9:6' },
-        { day: 'Day-3', subject: 'Newspaper', topic: 'Editorial: Sabotage or not, the government must account for the recent fires' },
-        { day: 'Day-3', subject: 'Vocabulary', topic: 'Sabotage- নাশকতা, Devastating- ধ্বংশাত্মক, Blaze- তীব্র অগ্নিকাণ্ড, deploy- মোতায়েন করা, disrupt- বিঘ্ন ঘটানো, stranded- আটকে পড়া, spate- ঢল, undermine- দুর্বল করা, sow panic- আতঙ্ক ছড়ানো, arson- অগ্নিসংযোগ, resolute- দৃঢ় প্রতিজ্ঞ, beyond comprehension- বোধগমতার বাইরে, contingency- বিকল্প ব্যবস্থা, bode- ইঙ্গিত দেয়া/ পূর্বাভাস' },
-        { day: 'Day-3', subject: 'Math', topic: 'Class 16, 17' },
-        { day: 'Day-3', subject: 'Basic View', topic: '' },
-        { day: 'Day-4', subject: 'Quran', topic: 'Sura Tawbah 9:7- 9:20' },
-        { day: 'Day-4', subject: 'Newspaper', topic: '' },
+        { day: 'Day-1', subject: 'Subject 1', topic: '' },
+        { day: 'Day-1', subject: 'Subject 2', topic: '' },
+        { day: 'Day-1', subject: 'Vocabulary', topic: '' }, // Ensure Vocabulary is an option
+        { day: 'Day-1', subject: 'Subject 4', topic: '' },
+        { day: 'Day-1', subject: 'Subject 5', topic: '' },
+        { day: 'Day-2', subject: 'Subject 1', topic: '' },
+        { day: 'Day-2', subject: 'Subject 2', topic: '' },
+        { day: 'Day-2', subject: 'Vocabulary', topic: '' },
+        { day: 'Day-2', subject: 'Subject 4', topic: '' },
+        { day: 'Day-2', subject: 'Subject 5', topic: '' },
+        { day: 'Day-3', subject: 'Subject 1', topic: '' },
+        { day: 'Day-3', subject: 'Subject 2', topic: '' },
+        { day: 'Day-3', subject: 'Vocabulary', topic: '' },
+        { day: 'Day-3', subject: 'Subject 4', topic: '' },
+        { day: 'Day-3', subject: 'Subject 5', topic: '' },
+        { day: 'Day-4', subject: 'Subject 1', topic: '' },
+        { day: 'Day-4', subject: 'Subject 2', topic: '' },
         { day: 'Day-4', subject: 'Vocabulary', topic: '' },
-        { day: 'Day-4', subject: 'Math', topic: 'Class 18, 19' },
-        { day: 'Day-4', subject: 'Basic View', topic: '' },
-        { day: 'Day-5', subject: 'Quran', topic: 'Sura Tawbah 9:21- 9:31' },
-        { day: 'Day-5', subject: 'Newspaper', topic: 'Tripura mob killing of Bangladeshis exposes the accountability gap' },
-        { day: 'Day-5', subject: 'Vocabulary', topic: 'Gruesome-ভয়াবহ, heinous-নিকৃষ্ট, sanctity- পবিত্রতা, frontier vengeance- সীমান্ত প্রতিহিংসা, porous- ছিদ্রযুক্ত, flux- অবিরাম গতি, illicit- অবৈধ, intricate- সূক্ষ্ণ, backdrop- পটভূমি, precarious- ঝুঁকিপূর্ণ, pledged- প্রতিজ্ঞা করা, curb- দমন করা, intrusions- onadhikar probes, repatriate- নিজ দেশে ফেরত পাঠানো, patrols- টহল, usher in- শুরু করা, restraint- সংগম, hollow- ফাঁপা, invoking- আহ্বান করা, culminating-শেষ করা, perpetrators- অপরাধী' },
-        { day: 'Day-5', subject: 'Math', topic: 'Class 20, 21' },
-        { day: 'Day-5', subject: 'Basic View', topic: '' },
-        { day: 'Day-6', subject: 'Quran', topic: 'Sura Tawbah 9:31- 9:41' },
-        { day: 'Day-6', subject: 'Newspaper', topic: '' },
+        { day: 'Day-4', subject: 'Subject 4', topic: '' },
+        { day: 'Day-4', subject: 'Subject 5', topic: '' },
+        { day: 'Day-5', subject: 'Subject 1', topic: '' },
+        { day: 'Day-5', subject: 'Subject 2', topic: '' },
+        { day: 'Day-5', subject: 'Vocabulary', topic: '' },
+        { day: 'Day-5', subject: 'Subject 4', topic: '' },
+        { day: 'Day-5', subject: 'Subject 5', topic: '' },
+        { day: 'Day-6', subject: 'Subject 1', topic: '' },
+        { day: 'Day-6', subject: 'Subject 2', topic: '' },
         { day: 'Day-6', subject: 'Vocabulary', topic: '' },
-        { day: 'Day-6', subject: 'Math', topic: '' },
-        { day: 'Day-6', subject: 'Basic View', topic: '' },
-        { day: 'Day-7', subject: 'Quran', topic: '' },
-        { day: 'Day-7', subject: 'Newspaper', topic: '' },
+        { day: 'Day-6', subject: 'Subject 4', topic: '' },
+        { day: 'Day-6', subject: 'Subject 5', topic: '' },
+        { day: 'Day-7', subject: 'Subject 1', topic: '' },
+        { day: 'Day-7', subject: 'Subject 2', topic: '' },
         { day: 'Day-7', subject: 'Vocabulary', topic: '' },
-        { day: 'Day-7', subject: 'Math', topic: '' },
-        { day: 'Day-7', subject: 'Basic View', topic: '' },
+        { day: 'Day-7', subject: 'Subject 4', topic: '' },
+        { day: 'Day-7', subject: 'Subject 5', topic: '' },
     ];
     let initialDailyPlanData = JSON.parse(JSON.stringify(dailyPlanData)); // To restore on cancel
 
-    let vocabStories = {
-        'Day-1': "The young prince planned to <strong>sweep</strong> the election. He needed to <strong>clinch</strong> the final vote from the stubborn council. ...",
-        'Day-2': "The old scientist felt <strong>unnerved</strong> by the sky's strange color. ...",
-        'Day-3': "The empress was certain it was <strong>sabotage</strong>. ...",
-        'Day-5': "The detective inspected the <strong>gruesome</strong> crime scene. ..."
-    };
-    let initialVocabStories = JSON.parse(JSON.stringify(vocabStories)); // To restore on cancel
-
+    let vocabStories = {}; // Initialize as empty
+    let initialVocabStories = {}; // Initialize as empty
 
     // Task weights & progress
-    const taskWeights = {'Quran':5/7,'Newspaper':5/7,'Vocabulary':10/7,'Math':40/7,'Basic View':40/7};
+    // Define a default weight for any subject that is not explicitly listed.
+    // User-defined subjects will take this weight. Vocabulary will have a specific weight.
+    const taskWeights = {
+        'Vocabulary': 10/7, // Keep vocabulary distinct if you want it to weigh more
+        'DEFAULT_SUBJECT_WEIGHT': 5/7 // Assign a default weight for user-entered subjects
+    };
     let maxWeight = 0;
     const progressLabel = document.getElementById('weekly-progress-label');
     const progressBar = document.getElementById('weekly-progress-bar');
@@ -339,7 +338,9 @@
             const uniqueId = `${cb.dataset.day}-${cb.dataset.subject}`;
             if(cb.checked && !checkedTasks.has(uniqueId)) {
                 const subject = cb.dataset.subject;
-                if(subject && taskWeights[subject]) currentWeight += taskWeights[subject];
+                if (subject) {
+                    currentWeight += taskWeights[subject] || taskWeights['DEFAULT_SUBJECT_WEIGHT'];
+                }
                 checkedTasks.add(uniqueId);
             }
         });
@@ -350,10 +351,13 @@
 
     /* ---------- Helpers for Vocab UI ---------- */
     function createVocabElementFromPair(pair) {
-        const parts = pair.split('-');
-        if(parts.length===2 && parts[0].trim() && parts[1].trim()) {
+        // Updated to split by comma (,) as per new format: Word, Meaning
+        const parts = pair.split(',');
+        if (parts.length >= 2 && parts[0].trim() && parts[1].trim()) {
             const eng = parts[0].trim();
-            const ban = parts[1].trim().replace('।','');
+            // Join remaining parts if there are more than 2 (e.g., if meaning contains commas)
+            const ban = parts.slice(1).join(',').trim().replace('।','');
+
             const container = document.createElement('div');
             container.classList.add('vocab-item');
             container.setAttribute('tabindex','0');
@@ -365,11 +369,11 @@
             const engSpan = document.createElement('span'); engSpan.classList.add('vocab-word'); engSpan.textContent=eng;
             const banSpan = document.createElement('span'); banSpan.classList.add('vocab-meaning'); banSpan.textContent=ban;
 
-            container.appendChild(engSpan); // ADD THIS LINE: Append the English word first
+            container.appendChild(engSpan);
             container.appendChild(banSpan);
 
             return container;
-        } else if(pair.trim()) {
+        } else if(pair.trim()) { // Handle cases where it might just be a single word without meaning
             const span = document.createElement('span'); span.textContent = pair.trim(); return span;
         }
         return null;
@@ -387,7 +391,8 @@
         maxWeight = 0;
 
         dailyPlanData.forEach(item => {
-            if((item.subject||item.topic) && taskWeights[item.subject]) maxWeight += taskWeights[item.subject];
+            // Use default weight if subject not explicitly defined in taskWeights
+            if((item.subject||item.topic)) maxWeight += taskWeights[item.subject] || taskWeights['DEFAULT_SUBJECT_WEIGHT'];
 
             const isEditingCurrentDay = (editingDay === item.day);
 
@@ -446,49 +451,59 @@
             const topicCellId = `topic-${item.day}-${item.subject}`.replace(/\s+/g,'_');
             topicCell.id = topicCellId;
 
-            if (isEditingCurrentDay) {
-                const topicInput = document.createElement(item.subject === 'Vocabulary' || item.subject === 'Newspaper' || item.subject === 'Basic View' ? 'textarea' : 'input');
-                if (topicInput.tagName === 'INPUT') topicInput.type = 'text';
-                topicInput.classList.add('editable-field');
-                topicInput.value = item.topic || '';
-                if (item.subject === 'Vocabulary') topicInput.placeholder = 'Enter comma separated pairs like: Word- বাংলা, ...';
-                topicInput.setAttribute('data-field-type', 'topic');
-                topicInput.setAttribute('data-day', item.day);
-                topicInput.setAttribute('data-subject', item.subject);
-                topicCell.appendChild(topicInput);
+            // Always show editable fields initially, then hide if not in editing mode
+            const topicInput = document.createElement(item.subject === 'Vocabulary' || item.subject === 'Newspaper' || item.subject === 'Basic View' ? 'textarea' : 'input');
+            if (topicInput.tagName === 'INPUT') topicInput.type = 'text';
+            topicInput.classList.add('editable-field');
+            topicInput.value = item.topic || '';
+            if (item.subject === 'Vocabulary') topicInput.placeholder = 'Enter vocabulary as: Word, Meaning; AnotherWord, Meaning; ...'; // Updated placeholder
+            topicInput.setAttribute('data-field-type', 'topic');
+            topicInput.setAttribute('data-day', item.day);
+            topicInput.setAttribute('data-subject', item.subject);
+            if (!isEditingCurrentDay) topicInput.style.display = 'none'; // Hide if not in editing mode
 
-                if(item.subject === 'Basic View') { // Story field is only shown on the last topic row for a day
-                    const storyFieldWrapper = document.createElement('div');
-                    storyFieldWrapper.classList.add('mt-4');
-                    const storyLabel = document.createElement('label'); storyLabel.textContent = 'Vocabulary Story (optional)'; storyLabel.classList.add('block', 'text-sm', 'font-medium', 'text-gray-700', 'mb-1');
-                    const storyArea = document.createElement('textarea');
-                    storyArea.classList.add('editable-field');
-                    storyArea.rows = 4;
-                    storyArea.placeholder = 'HTML allowed (e.g., use <strong>word</strong>)';
-                    storyArea.value = vocabStories[item.day] || '';
-                    storyArea.setAttribute('data-field-type', 'story');
-                    storyArea.setAttribute('data-day', item.day);
-                    storyFieldWrapper.appendChild(storyLabel);
-                    storyFieldWrapper.appendChild(storyArea);
-                    topicCell.appendChild(storyFieldWrapper);
-                }
+            // Display area for non-editing mode
+            const displaySpan = document.createElement('div');
+            displaySpan.classList.add('text-sm', 'break-words', 'whitespace-normal');
+            if (isEditingCurrentDay) displaySpan.style.display = 'none'; // Hide if in editing mode
 
-            } else {
-                if(item.subject === 'Vocabulary' && item.topic) {
-                    const wrapper = document.createElement('div'); wrapper.classList.add('flex','flex-wrap','gap-2','py-1');
-                    const pairs = item.topic.split(/, |।/).filter(p=>p.trim());
-                    pairs.forEach(p=>{
-                        const el = createVocabElementFromPair(p);
-                        if(el) wrapper.appendChild(el);
-                    });
-                    topicCell.appendChild(wrapper);
-                    if(pairs.length>0 && vocabStories[item.day]) {
-                        const storyBtn = document.createElement('button'); storyBtn.textContent='Read story'; storyBtn.classList.add('read-story-btn'); storyBtn.setAttribute('data-day', item.day);
-                        topicCell.appendChild(storyBtn);
-                    }
-                } else {
-                    const span = document.createElement('span'); span.textContent = item.topic || '-'; topicCell.appendChild(span);
+            if(item.subject === 'Vocabulary' && item.topic && !isEditingCurrentDay) {
+                const wrapper = document.createElement('div'); wrapper.classList.add('flex','flex-wrap','gap-2','py-1');
+                // Updated to split by semicolon for vocabulary entries
+                const pairs = item.topic.split(';').filter(p=>p.trim());
+                pairs.forEach(p=>{
+                    const el = createVocabElementFromPair(p);
+                    if(el) wrapper.appendChild(el);
+                });
+                displaySpan.appendChild(wrapper);
+                if(pairs.length>0 && vocabStories[item.day]) {
+                    const storyBtn = document.createElement('button'); storyBtn.textContent='Read story'; storyBtn.classList.add('read-story-btn'); storyBtn.setAttribute('data-day', item.day);
+                    displaySpan.appendChild(storyBtn);
                 }
+            } else if (!isEditingCurrentDay) {
+                displaySpan.textContent = item.topic || '-';
+            }
+
+            topicCell.appendChild(topicInput);
+            topicCell.appendChild(displaySpan); // Add display element
+
+
+            if(item.subject === 'Basic View') { // Story field is only shown on the last topic row for a day
+                const storyFieldWrapper = document.createElement('div');
+                storyFieldWrapper.classList.add('mt-4');
+                const storyLabel = document.createElement('label'); storyLabel.textContent = 'Vocabulary Story (optional)'; storyLabel.classList.add('block', 'text-sm', 'font-medium', 'text-gray-700', 'mb-1');
+                const storyArea = document.createElement('textarea');
+                storyArea.classList.add('editable-field');
+                storyArea.rows = 4;
+                storyArea.placeholder = 'HTML allowed (e.g., use <strong>word</strong>)';
+                storyArea.value = vocabStories[item.day] || '';
+                storyArea.setAttribute('data-field-type', 'story');
+                storyArea.setAttribute('data-day', item.day);
+                if (!isEditingCurrentDay) storyArea.style.display = 'none'; // Hide story area if not editing
+                storyFieldWrapper.appendChild(storyLabel);
+                storyFieldWrapper.appendChild(storyArea);
+                topicCell.appendChild(storyFieldWrapper);
+            }
             }
             row.appendChild(topicCell);
 
@@ -558,58 +573,51 @@
                     `;
                     currentMobileDay = item.day;
                 }
-                let subjectContent = item.subject;
-                let topicMobileContent = '';
-                let storyMobileContent = '';
-                let editButtonsMobileHTML = '';
+let subjectContent = `
+                    <input type="text" class="editable-field ${isEditingCurrentDay ? '' : 'hidden'}" value="${item.subject}" data-field-type="subject" data-day="${item.day}" data-old-subject="${item.subject}">
+                    <span class="font-medium text-gray-700 ${isEditingCurrentDay ? 'hidden' : ''}">${item.subject}</span>
+                `;
 
-                if (isEditingCurrentDay) {
-                    subjectContent = `<input type="text" class="editable-field" value="${item.subject}" data-field-type="subject" data-day="${item.day}" data-old-subject="${item.subject}">`;
+                const topicInputType = (item.subject === 'Vocabulary' || item.subject === 'Newspaper' || item.subject === 'Basic View') ? 'textarea' : 'input';
+                let topicMobileContent = `
+                    <${topicInputType} class="editable-field ${isEditingCurrentDay ? '' : 'hidden'}" rows="${topicInputType === 'textarea' ? '2' : '1'}" placeholder="${item.subject === 'Vocabulary' ? 'Enter vocabulary as: Word, Meaning; AnotherWord, Meaning; ...' : 'Enter topic'}" data-field-type="topic" data-day="${item.day}" data-subject="${item.subject}">${item.topic || ''}</${topicInputType}>
+                `;
 
-                    const topicInputType = (item.subject === 'Vocabulary' || item.subject === 'Newspaper' || item.subject === 'Basic View') ? 'textarea' : 'input';
-                    topicMobileContent = `<${topicInputType} class="editable-field" rows="${topicInputType === 'textarea' ? '2' : '1'}" placeholder="${item.subject === 'Vocabulary' ? 'Enter comma separated pairs like: Word- বাংলা, ...' : 'Enter topic'}" data-field-type="topic" data-day="${item.day}" data-subject="${item.subject}">${item.topic || ''}</${topicInputType}>`;
-
-                    if (item.subject === 'Basic View') {
-                        storyMobileContent = `
-                            <div class="mt-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Vocabulary Story (optional)</label>
-                                <textarea class="editable-field" rows="4" placeholder="HTML allowed (e.g., use <strong>word</strong>)" data-field-type="story" data-day="${item.day}">${vocabStories[item.day] || ''}</textarea>
-                            </div>
-                        `;
-                    }
-
-                    // Mobile edit buttons
-                    if (item.subject === 'Basic View') {
-                         editButtonsMobileHTML = `
-                            <div class="flex flex-col gap-2 mt-4">
-                                <button class="px-3 py-1 rounded-md font-medium text-xs shadow-sm transition bg-emerald-600 text-white hover:bg-emerald-700" data-day="${item.day}" onclick="saveDayEdits(event)">Save</button>
-                                <button class="px-3 py-1 rounded-md border border-gray-300 text-xs text-gray-700 hover:bg-gray-100 shadow-sm" data-day="${item.day}" onclick="cancelDayEdits(event)">Cancel</button>
-                            </div>
-                        `;
-                    }
-
+                let displayTopicMobileContent = '';
+                if(item.subject === 'Vocabulary' && item.topic) {
+                    const pairs = item.topic.split(';').filter(p=>p.trim()); // Split by semicolon
+                    displayTopicMobileContent += '<div class="flex flex-wrap gap-2 py-1">';
+                    pairs.forEach(p=>{
+                        const el = createVocabElementFromPair(p);
+                        if(el) displayTopicMobileContent += el.outerHTML;
+                    });
+                    displayTopicMobileContent += '</div>';
+                    if(pairs.length>0 && vocabStories[item.day]) displayTopicMobileContent += `<button class="read-story-btn" data-day="${item.day}">Read story</button>`;
                 } else {
-                    if(item.subject === 'Vocabulary' && item.topic) {
-                        const pairs = item.topic.split(/, |।/).filter(p=>p.trim());
-                        topicMobileContent = '<div class="flex flex-wrap gap-2 py-1">';
-                        pairs.forEach(p=>{
-                            const el = createVocabElementFromPair(p);
-                            if(el) topicMobileContent += el.outerHTML;
-                        });
-                        topicMobileContent += '</div>';
-                        if(pairs.length>0 && vocabStories[item.day]) topicMobileContent += `<button class="read-story-btn" data-day="${item.day}">Read story</button>`;
-                    } else {
-                        topicMobileContent = `<span class="text-gray-600">${item.topic || '-'}</span>`;
-                    }
+                    displayTopicMobileContent = `<span class="text-gray-600">${item.topic || '-'}</span>`;
+                }
+                topicMobileContent += `<div class="${isEditingCurrentDay ? 'hidden' : ''}">${displayTopicMobileContent}</div>`;
 
-                    // Mobile edit button (non-editing state)
-                    if (item.subject === 'Basic View') {
-                         editButtonsMobileHTML = `
-                            <div class="flex mt-4">
-                                <button class="px-3 py-1 rounded-md border border-gray-300 text-xs text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition" data-day="${item.day}" onclick="toggleDayEditMode(event)">Edit</button>
-                            </div>
-                        `;
-                    }
+                let storyMobileContent = '';
+                if (item.subject === 'Basic View') {
+                    storyMobileContent = `
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Vocabulary Story (optional)</label>
+                            <textarea class="editable-field ${isEditingCurrentDay ? '' : 'hidden'}" rows="4" placeholder="HTML allowed (e.g., use <strong>word</strong>)" data-field-type="story" data-day="${item.day}">${vocabStories[item.day] || ''}</textarea>
+                        </div>
+                    `;
+                }
+
+                let editButtonsMobileHTML = '';
+                // Mobile edit buttons are always present for "Basic View" tasks
+                if (item.subject === 'Basic View') {
+                     editButtonsMobileHTML = `
+                        <div class="flex flex-col gap-2 mt-4">
+                            <button class="px-3 py-1 rounded-md font-medium text-xs shadow-sm transition bg-emerald-600 text-white hover:bg-emerald-700 ${isEditingCurrentDay ? '' : 'hidden'}" data-day="${item.day}" onclick="saveDayEdits(event)">Save</button>
+                            <button class="px-3 py-1 rounded-md border border-gray-300 text-xs text-gray-700 hover:bg-gray-100 shadow-sm ${isEditingCurrentDay ? '' : 'hidden'}" data-day="${item.day}" onclick="cancelDayEdits(event)">Cancel</button>
+                            <button class="px-3 py-1 rounded-md border border-gray-300 text-xs text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition ${isEditingCurrentDay ? 'hidden' : ''}" data-day="${item.day}" onclick="toggleDayEditMode(event)">Edit</button>
+                        </div>
+                    `;
                 }
 
 
@@ -651,11 +659,13 @@
     }
 
     // Input change handler (checkboxes & date inputs)
-    function onInputChange(event) {
+function onInputChange(event) {
         if(!isDataLoaded) return; // Don't allow saves before initial data load
         const el = event.target;
+
         if(el.classList.contains('task-checkbox')) {
-            const day = el.dataset.day; const subject = el.dataset.subject;
+            const day = el.dataset.day;
+            const subject = el.dataset.subject;
             // set all checkboxes for this day & subject to same state (keeps table+mobile synced)
             document.querySelectorAll(`.task-checkbox[data-day="${day}"][data-subject="${subject}"]`).forEach(cb=>{
                 cb.checked = el.checked;
@@ -666,12 +676,17 @@
         } else if(el.tagName === 'INPUT' && el.type === 'text' && (el.id.startsWith('date-') || el.id.startsWith('date-mobile-'))) {
             // date input: keep desktop & mobile in sync
             const day = el.id.replace('date-','').replace('date-mobile-','');
-            const desktop = document.getElementById(`date-${day}`);
-            const mobile = document.getElementById(`date-mobile-${day}`);
-            if(desktop) desktop.value = el.value;
-            if(mobile) mobile.value = el.value;
+            const desktopInput = document.getElementById(`date-${day}`);
+            const mobileInput = document.getElementById(`date-mobile-${day}`);
+            if(desktopInput) desktopInput.value = el.value;
+            if(mobileInput) mobileInput.value = el.value;
+        } else if (el.closest('.monthly-targets')) {
+            // No direct action needed here for monthly targets other than the implicit save.
+            // Changes to contenteditable fields are not captured by `input` event consistently for all browsers,
+            // so we rely on the `saveDataToFirestore` function to read their current state when it runs.
         }
-        // No debouncedSaveData here for individual inputs, only after Save button click
+        // No debouncedSaveData here for individual inputs, only after Save button click for daily plan items.
+        // Monthly targets are implicitly saved with other data, or you could add a separate debounced save for them.
         updateWeeklyProgress();
         // If an editable field is changed during editing mode, mark it for save (implicitly by being in editingDay state)
     }
@@ -732,54 +747,84 @@
 // Saves the edits for a day
     window.saveDayEdits = function(event) {
         const dayToSave = event.target.dataset.day;
-        if (dayToSave !== editingDay) return; // Should only save the day currently being edited
+        if (dayToSave !== editingDay) {
+            console.warn("Attempted to save a day not in editing mode:", dayToSave);
+            return;
+        }
 
-        const newTopicValues = {};
-        const newSubjectNames = {}; // To store potentially updated subject names
-        let newStoryContent = vocabStories[dayToSave] || ''; // Default to existing story
+        const collectedNewData = {}; // Temp object to hold all new values for the day
+        let newStoryContent = null; // Use null to distinguish no change from empty string
 
-        // Collect new values from editable fields
+        // Iterate over all editable fields for the specific day
         document.querySelectorAll(`[data-day="${dayToSave}"] .editable-field`).forEach(field => {
             const fieldType = field.dataset.fieldType;
-            const subject = field.dataset.subject; // For topic fields
-            const oldSubject = field.dataset.oldSubject; // For subject fields
+            const originalSubject = field.dataset.oldSubject || field.dataset.subject; // Get original subject for identification
 
-            if (fieldType === 'subject') {
-                const updatedSubjectName = field.value.trim();
-                newSubjectNames[oldSubject] = updatedSubjectName; // Map old subject name to new
-            } else if (fieldType === 'topic' && subject) {
-                newTopicValues[subject] = field.value.trim();
+            if (fieldType === 'subject' && originalSubject) {
+                // For a subject input, its dataset.old-subject is key to identify the original item
+                collectedNewData[`subject-${originalSubject}`] = field.value.trim();
+            } else if (fieldType === 'topic' && originalSubject) {
+                // For a topic input/textarea, its dataset.subject is key to identify the original item
+                collectedNewData[`topic-${originalSubject}`] = field.value.trim();
             } else if (fieldType === 'story') {
                 newStoryContent = field.value.trim();
             }
         });
 
-        // Update in-memory dailyPlanData based on collected new values
-        dailyPlanData = dailyPlanData.map(item => {
+// Collect monthly target changes
+        const monthlyTargets = {};
+        document.querySelectorAll('.monthly-targets .editable-field[contenteditable="true"]').forEach(field => {
+            const targetKey = field.dataset.target; // e.g., "monthly-1st-week"
+            monthlyTargets[targetKey] = field.textContent.trim();
+        });
+        // You'll need to store monthlyTargets somewhere and then persist them.
+        // For simplicity, let's assume `progressData` will store them.
+        // Update: This is handled by a direct save to Firestore in saveDataToFirestore later.
+		
+        // --- Apply changes to dailyPlanData (in-memory) ---
+        // Create a *new* array by mapping over the existing one
+        const updatedDailyPlanData = dailyPlanData.map(item => {
             if (item.day === dayToSave) {
-                const oldSubject = item.subject;
-                const updatedSubjectName = newSubjectNames[oldSubject] !== undefined ? newSubjectNames[oldSubject] : oldSubject;
-                const updatedTopic = newTopicValues[oldSubject] !== undefined ? newTopicValues[oldSubject] : item.topic;
+                const oldSubject = item.subject; // Current subject name in this item
+
+                // Check if this subject's name was edited
+                const newSubjectName = collectedNewData[`subject-${oldSubject}`] !== undefined
+                                       ? collectedNewData[`subject-${oldSubject}`]
+                                       : oldSubject;
+
+                // Check if this subject's topic was edited
+                const newTopic = collectedNewData[`topic-${oldSubject}`] !== undefined
+                                 ? collectedNewData[`topic-${oldSubject}`]
+                                 : item.topic;
 
                 return {
                     day: item.day,
-                    subject: updatedSubjectName,
-                    topic: updatedTopic
+                    subject: newSubjectName,
+                    topic: newTopic
                 };
             }
-            return item;
+            return item; // Return unchanged item for other days
         });
+        dailyPlanData = updatedDailyPlanData; // Replace the old array with the updated one
 
-        // Update in-memory vocabStories
-        if (newStoryContent) {
-            vocabStories[dayToSave] = newStoryContent;
-        } else {
-            delete vocabStories[dayToSave]; // Remove story if it's empty
+        // --- Apply changes to vocabStories (in-memory) ---
+        if (newStoryContent !== null) { // Only update if story field was present and collected
+            if (newStoryContent) {
+                vocabStories[dayToSave] = newStoryContent;
+            } else {
+                delete vocabStories[dayToSave]; // Remove story entry if field was emptied
+            }
         }
 
-        editingDay = null; // Exit editing mode
-        buildUI(); // Rebuild UI to show updated, non-editable content
-        debouncedSaveData(); // Trigger save to Firestore
+        // Exit editing mode
+        editingDay = null;
+
+        // Rebuild UI to reflect all updated in-memory data
+        buildUI();
+
+        // Trigger save to Firestore with the latest in-memory data
+        debouncedSaveData();
+        console.log("Save initiated for day:", dayToSave, "Current dailyPlanData:", dailyPlanData, "Current vocabStories:", vocabStories);
     }
 
     // Cancels the edits for a day
@@ -842,6 +887,23 @@
             else if (progressData[key] !== undefined) delete progressData[key]; // Remove if empty
         });
 
+        // 5. Monthly targets
+        document.querySelectorAll('.monthly-targets .editable-field[contenteditable="true"]').forEach(field => {
+            const targetKey = field.dataset.target; // e.g., "monthly-1st-week"
+            progressData[targetKey] = field.textContent.trim();
+        });
+
+        try {
+            // Note: setDoc with merge:true will update fields. To entirely remove a field, you'd need deleteField()
+            // For now, we only save non-empty values. If a field becomes empty, it effectively won't be in the document
+            // or would need explicit deletion if it existed before. For simplicity, we just won't save empty.
+            await setDoc(dataDocRef, progressData, { merge: true });
+            setSyncStatus('synced');
+            console.log('Saved progress:', progressData);
+        } catch(err) {
+            console.error('Save error', err); setSyncStatus(err.message,true);
+        }
+
         try {
             // Note: setDoc with merge:true will update fields. To entirely remove a field, you'd need deleteField()
             // For now, we only save non-empty values. If a field becomes empty, it effectively won't be in the document
@@ -899,7 +961,15 @@
 
         // Now that in-memory data is updated, rebuild the UI
         buildUI();
-
+// 0. Apply monthly targets
+        document.querySelectorAll('.monthly-targets .editable-field[contenteditable="true"]').forEach(field => {
+            const targetKey = field.dataset.target;
+            if (progressData[targetKey] !== undefined) {
+                field.textContent = progressData[targetKey];
+            } else {
+                field.textContent = 'Enter target here...'; // Reset if not in loaded data
+            }
+        });
         // 3) Apply checkbox states to the newly built UI
         document.querySelectorAll('.task-checkbox').forEach(cb=>{
             const day = cb.dataset.day; const subj = cb.dataset.subject;
