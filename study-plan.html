@@ -430,18 +430,25 @@
 
             const subjectCell = document.createElement('td');
             subjectCell.classList.add('px-6','py-4','text-sm','text-gray-500','font-medium','align-top');
-            if (isEditingCurrentDay) {
-                const subjectInput = document.createElement('input');
-                subjectInput.type = 'text';
-                subjectInput.classList.add('editable-field');
-                subjectInput.value = item.subject;
-                subjectInput.setAttribute('data-field-type', 'subject');
-                subjectInput.setAttribute('data-day', item.day);
-                subjectInput.setAttribute('data-old-subject', item.subject); // Store original subject for lookup
-                subjectCell.appendChild(subjectInput);
-            } else {
-                subjectCell.textContent = item.subject;
-            }
+
+            // Subject Input (always created, visibility toggled)
+            const subjectInput = document.createElement('input');
+            subjectInput.type = 'text';
+            subjectInput.classList.add('editable-field');
+            subjectInput.value = item.subject;
+            subjectInput.setAttribute('data-field-type', 'subject');
+            subjectInput.setAttribute('data-day', item.day);
+            subjectInput.setAttribute('data-old-subject', item.subject); // Store original subject for lookup
+            if (!isEditingCurrentDay) subjectInput.style.display = 'none'; // Hide if not in editing mode
+            subjectCell.appendChild(subjectInput);
+
+            // Subject Display (always created, visibility toggled)
+            const subjectDisplaySpan = document.createElement('span');
+            subjectDisplaySpan.classList.add('font-medium', 'text-gray-700');
+            subjectDisplaySpan.textContent = item.subject;
+            if (isEditingCurrentDay) subjectDisplaySpan.style.display = 'none'; // Hide if in editing mode
+            subjectCell.appendChild(subjectDisplaySpan);
+
             row.appendChild(subjectCell);
 
 
@@ -503,7 +510,6 @@
                 storyFieldWrapper.appendChild(storyLabel);
                 storyFieldWrapper.appendChild(storyArea);
                 topicCell.appendChild(storyFieldWrapper);
-            }
             }
             row.appendChild(topicCell);
 
@@ -573,37 +579,41 @@
                     `;
                     currentMobileDay = item.day;
                 }
-let subjectContent = `
+let subjectContentHTML = `
                     <input type="text" class="editable-field ${isEditingCurrentDay ? '' : 'hidden'}" value="${item.subject}" data-field-type="subject" data-day="${item.day}" data-old-subject="${item.subject}">
                     <span class="font-medium text-gray-700 ${isEditingCurrentDay ? 'hidden' : ''}">${item.subject}</span>
                 `;
 
                 const topicInputType = (item.subject === 'Vocabulary' || item.subject === 'Newspaper' || item.subject === 'Basic View') ? 'textarea' : 'input';
-                let topicMobileContent = `
+                let topicInputHTML = `
                     <${topicInputType} class="editable-field ${isEditingCurrentDay ? '' : 'hidden'}" rows="${topicInputType === 'textarea' ? '2' : '1'}" placeholder="${item.subject === 'Vocabulary' ? 'Enter vocabulary as: Word, Meaning; AnotherWord, Meaning; ...' : 'Enter topic'}" data-field-type="topic" data-day="${item.day}" data-subject="${item.subject}">${item.topic || ''}</${topicInputType}>
                 `;
 
-                let displayTopicMobileContent = '';
+                let topicDisplayHTML = `<div class="text-sm break-words ${isEditingCurrentDay ? 'hidden' : ''}">`;
                 if(item.subject === 'Vocabulary' && item.topic) {
-                    const pairs = item.topic.split(';').filter(p=>p.trim()); // Split by semicolon
-                    displayTopicMobileContent += '<div class="flex flex-wrap gap-2 py-1">';
+                    const pairs = item.topic.split(';').filter(p=>p.trim());
+                    topicDisplayHTML += '<div class="flex flex-wrap gap-2 py-1">';
                     pairs.forEach(p=>{
                         const el = createVocabElementFromPair(p);
-                        if(el) displayTopicMobileContent += el.outerHTML;
+                        if(el) topicDisplayHTML += el.outerHTML;
                     });
-                    displayTopicMobileContent += '</div>';
-                    if(pairs.length>0 && vocabStories[item.day]) displayTopicMobileContent += `<button class="read-story-btn" data-day="${item.day}">Read story</button>`;
+                    topicDisplayHTML += '</div>';
+                    if(pairs.length>0 && vocabStories[item.day]) topicDisplayHTML += `<button class="read-story-btn" data-day="${item.day}">Read story</button>`;
                 } else {
-                    displayTopicMobileContent = `<span class="text-gray-600">${item.topic || '-'}</span>`;
+                    topicDisplayHTML += `<span>${item.topic || '-'}</span>`;
                 }
-                topicMobileContent += `<div class="${isEditingCurrentDay ? 'hidden' : ''}">${displayTopicMobileContent}</div>`;
+                topicDisplayHTML += `</div>`;
 
-                let storyMobileContent = '';
+
+                let storyMobileContentHTML = '';
                 if (item.subject === 'Basic View') {
-                    storyMobileContent = `
+                    storyMobileContentHTML = `
                         <div class="mt-4">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Vocabulary Story (optional)</label>
                             <textarea class="editable-field ${isEditingCurrentDay ? '' : 'hidden'}" rows="4" placeholder="HTML allowed (e.g., use <strong>word</strong>)" data-field-type="story" data-day="${item.day}">${vocabStories[item.day] || ''}</textarea>
+                        </div>
+                    `;
+                }
                         </div>
                     `;
                 }
@@ -627,9 +637,12 @@ let subjectContent = `
                     <div class="flex items-start">
                         <input type="checkbox" class="task-checkbox mt-1" data-day="${item.day}" data-subject="${item.subject}">
                         <div class="ml-2 flex-1 min-w-0">
-                            <p class="font-medium text-gray-700">${subjectContent}</p>
-                            <div class="text-sm break-words" id="topic-mobile-${item.day}-${item.subject}">${topicMobileContent}</div>
-                            ${storyMobileContent}
+                            <p class="font-medium text-gray-700">${subjectContentHTML}</p>
+                            <div class="text-sm break-words" id="topic-mobile-${item.day}-${item.subject}-input-display">
+                                ${topicInputHTML}
+                                ${topicDisplayHTML}
+                            </div>
+                            ${storyMobileContentHTML}
                             ${editButtonsMobileHTML}
                         </div>
                     </div>
@@ -770,16 +783,6 @@ function onInputChange(event) {
                 newStoryContent = field.value.trim();
             }
         });
-
-// Collect monthly target changes
-        const monthlyTargets = {};
-        document.querySelectorAll('.monthly-targets .editable-field[contenteditable="true"]').forEach(field => {
-            const targetKey = field.dataset.target; // e.g., "monthly-1st-week"
-            monthlyTargets[targetKey] = field.textContent.trim();
-        });
-        // You'll need to store monthlyTargets somewhere and then persist them.
-        // For simplicity, let's assume `progressData` will store them.
-        // Update: This is handled by a direct save to Firestore in saveDataToFirestore later.
 		
         // --- Apply changes to dailyPlanData (in-memory) ---
         // Create a *new* array by mapping over the existing one
@@ -892,17 +895,6 @@ function onInputChange(event) {
             const targetKey = field.dataset.target; // e.g., "monthly-1st-week"
             progressData[targetKey] = field.textContent.trim();
         });
-
-        try {
-            // Note: setDoc with merge:true will update fields. To entirely remove a field, you'd need deleteField()
-            // For now, we only save non-empty values. If a field becomes empty, it effectively won't be in the document
-            // or would need explicit deletion if it existed before. For simplicity, we just won't save empty.
-            await setDoc(dataDocRef, progressData, { merge: true });
-            setSyncStatus('synced');
-            console.log('Saved progress:', progressData);
-        } catch(err) {
-            console.error('Save error', err); setSyncStatus(err.message,true);
-        }
 
         try {
             // Note: setDoc with merge:true will update fields. To entirely remove a field, you'd need deleteField()
