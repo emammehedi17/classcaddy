@@ -729,67 +729,52 @@
         }
     }
 
-    // Saves the edits for a day
+// Saves the edits for a day
     window.saveDayEdits = function(event) {
         const dayToSave = event.target.dataset.day;
         if (dayToSave !== editingDay) return; // Should only save the day currently being edited
 
-        // Collect new values from editable fields
-        const newDayData = {};
-        let hasSubjectChanged = false; // Flag to detect if a subject name itself changed
+        const newTopicValues = {};
+        const newSubjectNames = {}; // To store potentially updated subject names
+        let newStoryContent = vocabStories[dayToSave] || ''; // Default to existing story
 
+        // Collect new values from editable fields
         document.querySelectorAll(`[data-day="${dayToSave}"] .editable-field`).forEach(field => {
             const fieldType = field.dataset.fieldType;
-            const originalSubject = field.dataset.oldSubject; // For subject fields
+            const subject = field.dataset.subject; // For topic fields
+            const oldSubject = field.dataset.oldSubject; // For subject fields
 
             if (fieldType === 'subject') {
-                const newSubject = field.value.trim();
-                // Check if the subject name itself has changed. This is complex as it requires updating data structure.
-                if (newSubject !== originalSubject && originalSubject) {
-                    hasSubjectChanged = true;
-                    newDayData[`${originalSubject}-new-name`] = newSubject; // Temporarily store new name
-                }
-                newDayData[fieldType + '-' + originalSubject] = newSubject; // Store new subject value
-            } else if (fieldType === 'topic') {
-                const subject = field.dataset.subject;
-                newDayData[fieldType + '-' + subject] = field.value.trim();
+                const updatedSubjectName = field.value.trim();
+                newSubjectNames[oldSubject] = updatedSubjectName; // Map old subject name to new
+            } else if (fieldType === 'topic' && subject) {
+                newTopicValues[subject] = field.value.trim();
             } else if (fieldType === 'story') {
-                newDayData[fieldType] = field.value.trim();
+                newStoryContent = field.value.trim();
             }
         });
 
-        // Apply changes to in-memory dailyPlanData
-        const updatedDailyPlanData = [];
-        dailyPlanData.forEach(item => {
+        // Update in-memory dailyPlanData based on collected new values
+        dailyPlanData = dailyPlanData.map(item => {
             if (item.day === dayToSave) {
                 const oldSubject = item.subject;
-                let currentSubject = item.subject;
+                const updatedSubjectName = newSubjectNames[oldSubject] !== undefined ? newSubjectNames[oldSubject] : oldSubject;
+                const updatedTopic = newTopicValues[oldSubject] !== undefined ? newTopicValues[oldSubject] : item.topic;
 
-                // Handle subject name change first
-                if (hasSubjectChanged && newDayData[`${oldSubject}-new-name`]) {
-                    currentSubject = newDayData[`${oldSubject}-new-name`];
-                }
-
-                const newTopicKey = `topic-${oldSubject}`; // Use old subject to retrieve topic during iteration
-                const newTopic = newDayData[newTopicKey];
-                const newSubjectName = newDayData[`subject-${oldSubject}`]; // Retrieve potentially new subject name
-
-                updatedDailyPlanData.push({
+                return {
                     day: item.day,
-                    subject: newSubjectName !== undefined ? newSubjectName : currentSubject, // Update subject name if it changed
-                    topic: newTopic !== undefined ? newTopic : item.topic, // Update topic if it changed
-                });
-            } else {
-                updatedDailyPlanData.push(item);
+                    subject: updatedSubjectName,
+                    topic: updatedTopic
+                };
             }
+            return item;
         });
-        dailyPlanData = updatedDailyPlanData;
 
-
-        // Apply story change to in-memory vocabStories
-        if (newDayData.story !== undefined) {
-            vocabStories[dayToSave] = newDayData.story;
-            if (!newDayData.story) delete vocabStories[dayToSave]; // Remove if empty
+        // Update in-memory vocabStories
+        if (newStoryContent) {
+            vocabStories[dayToSave] = newStoryContent;
+        } else {
+            delete vocabStories[dayToSave]; // Remove story if it's empty
         }
 
         editingDay = null; // Exit editing mode
