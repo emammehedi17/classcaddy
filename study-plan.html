@@ -369,16 +369,38 @@
             <p class="text-lg text-gray-500">Monthly Plan (18.10.25 – 17.11.25)</p>
         </div>
 
-        <!-- NEW: Sync Status -->
+        <!-- NEW: Auth & Sync Status -->
         <div class="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg shadow">
-            <h3 class="font-semibold text-indigo-800">Sync Status</h3>
-            <div class="flex items-center space-x-2">
-                <div id="sync-indicator" class="w-3 h-3 rounded-full bg-gray-400 animate-pulse"></div>
-                <p id="sync-status" class="text-sm text-indigo-700">Connecting...</p>
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                <!-- Status -->
+                <div>
+                    <h3 class="font-semibold text-indigo-800">Sync Status</h3>
+                    <div class="flex items-center space-x-2">
+                        <div id="sync-indicator" class="w-3 h-3 rounded-full bg-gray-400 animate-pulse"></div>
+                        <p id="sync-status" class="text-sm text-indigo-700">Waiting for login...</p>
+                    </div>
+                    <p id="sync-error" class="hidden text-xs text-red-600 mt-1"></p>
+                </div>
+                
+                <!-- Auth Controls -->
+                <div id="auth-container" class="mt-4 sm:mt-0 sm:ml-4 flex-shrink-0">
+                    <!-- Logged Out State (Default) -->
+                    <button id="login-btn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-sm hover:bg-gray-50 transition flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v8.51h13.04c-.57 2.75-2.23 5.08-4.79 6.64l7.98 6.19C45.27 36.64 48 31.13 48 24c0-.79-.07-1.55-.17-2.3z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.98-6.19c-2.11 1.45-4.8 2.3-7.91 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
+                        Sign in with Google
+                    </button>
+                    
+                    <!-- Logged In State (Hidden by default) -->
+                    <div id="user-info" class="hidden text-sm text-right">
+                         <p class="font-medium text-gray-800" id="user-name">Loading...</p>
+                         <p class="text-gray-600 truncate max-w-[200px]" id="user-email">...</p>
+                         <button id="logout-btn" class="text-xs text-red-600 font-medium hover:underline mt-1">Log Out</button>
+                    </div>
+                </div>
             </div>
-            <p id="sync-error" class_hidden="text-xs text-red-600 mt-1"></p>
         </div>
         <!-- END NEW -->
+
 
         <!-- Monthly Targets Grid --><div class="mb-10">
             <h2 class="text-2xl font-semibold text-gray-700 mb-4">Monthly Targets</h2>
@@ -452,8 +474,10 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getAuth, 
-            signInAnonymously, 
-            onAuthStateChanged 
+            onAuthStateChanged,
+            GoogleAuthProvider,
+            signInWithPopup,
+            signOut
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
             getFirestore, 
@@ -464,35 +488,35 @@
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- 
-        // --- STEP 1: Get your Firebase Config ---
-        // ---
-        // 1. Go to https://console.firebase.google.com/
-        // 2. Create a new project.
-        // 3. In your project, click "Add app" and select the Web icon (</>).
-        // 4. Register the app (you can just give it a nickname).
-        // 5. Firebase will give you a `firebaseConfig` object.
-        // 6. Paste that object here, replacing the placeholder below.
+        // --- This is your Firebase Config object from your project ---
         // ---
         const firebaseConfig = {
-            apiKey: "PASTE_YOUR_API_KEY_HERE",
-            authDomain: "PASTE_YOUR_AUTH_DOMAIN_HERE",
-            projectId: "PASTE_YOUR_PROJECT_ID_HERE",
-            storageBucket: "PASTE_YOUR_STORAGE_BUCKET_HERE",
-            messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID_HERE",
-            appId: "PASTE_YOUR_APP_ID_HERE"
+          apiKey: "AIzaSyAj7MDnrnzKUO73BXG0jeM-uBGrAH3XiAY",
+          authDomain: "study-plan17.firebaseapp.com",
+          projectId: "study-plan17",
+          storageBucket: "study-plan17.firebasestorage.app",
+          messagingSenderId: "394648483332",
+          appId: "1:394648483332:web:a0b8f6adc9c8cad0e4e751",
+          measurementId: "G-X9CFFJCM2F"
         };
         // -------------------------------------------------
 
         // --- Firebase Initialization ---
         let app, auth, db, userId;
         let dataDocRef; // Reference to the user's data document
+        let unsubscribeListener = null; // Function to detach the listener
         let isFirebaseReady = false;
         let isDataLoaded = false; // Flag to prevent saving data before it's loaded
 
-        // --- UI Elements for Sync Status ---
+        // --- UI Elements for Auth & Sync ---
         const syncIndicator = document.getElementById('sync-indicator');
         const syncStatus = document.getElementById('sync-status');
         const syncError = document.getElementById('sync-error');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const userInfo = document.getElementById('user-info');
+        const userName = document.getElementById('user-name');
+        const userEmail = document.getElementById('user-email');
 
         function setSyncStatus(status, isError = false) {
             if (isError) {
@@ -516,11 +540,97 @@
             }
         }
 
+        // --- New UI Functions ---
+        function showLoggedOutUI() {
+            // Detach any active listener
+            if (unsubscribeListener) {
+                unsubscribeListener();
+                unsubscribeListener = null;
+                console.log("Firestore listener detached.");
+            }
+            
+            // Show Login button, hide user info
+            userInfo.classList.add('hidden');
+            loginBtn.classList.remove('hidden');
+
+            setSyncStatus("Waiting for login...");
+            syncIndicator.classList.remove('bg-green-500', 'bg-red-500', 'bg-yellow-500');
+            syncIndicator.classList.add('bg-gray-400');
+            
+            // Clear all local data from the UI
+            clearLocalData();
+            isDataLoaded = false;
+        }
+
+        function showLoggedInUI(user) {
+            // Hide Login button, show user info
+            loginBtn.classList.add('hidden');
+            userInfo.classList.remove('hidden');
+            
+            // Populate user info
+            userName.textContent = user.displayName;
+            userEmail.textContent = user.email;
+
+            setSyncStatus("Connecting...");
+        }
+
+        function clearLocalData() {
+            // 1. Uncheck all checkboxes
+            const allCheckboxes = document.querySelectorAll('.task-checkbox');
+            allCheckboxes.forEach(cb => {
+                cb.checked = false;
+                const taskItem = cb.closest('.task-item, .card-item');
+                if (taskItem) {
+                    taskItem.classList.remove('completed');
+                }
+            });
+
+            // 2. Clear all date inputs
+            const allDateInputs = document.querySelectorAll('.date-input-desktop input, .date-input-mobile input');
+            allDateInputs.forEach(input => {
+                input.value = '';
+            });
+
+            // 3. Reset progress bar
+            updateWeeklyProgress();
+
+            // 4. Hide all date inputs
+            const allDays = new Set(dailyPlanData.map(item => item.day));
+            allDays.forEach(day => checkDayCompletion(day));
+            
+            console.log("Local UI cleared.");
+        }
+
+
+        // --- New Auth Functions ---
+        async function signInWithGoogle() {
+            if (!auth) return;
+            const provider = new GoogleAuthProvider();
+            try {
+                setSyncStatus("Logging in...");
+                await signInWithPopup(auth, provider);
+                // onAuthStateChanged will handle the rest
+            } catch (error) {
+                console.error("Error during Google sign-in:", error);
+                setSyncStatus(error.message, true);
+            }
+        }
+
+        async function signOutUser() {
+            if (!auth) return;
+            try {
+                await signOut(auth);
+                // onAuthStateChanged will handle the rest
+            } catch (error) {
+                console.error("Error signing out:", error);
+                setSyncStatus(error.message, true);
+            }
+        }
+
         // --- Initialize Firebase and Authentication ---
         async function initFirebase() {
-            // Basic check to see if config is still the placeholder
             if (firebaseConfig.apiKey.startsWith("PASTE_YOUR_")) {
-                const errorMsg = "Firebase config is missing. Please follow STEP 1 in the script."
+                const errorMsg = "Firebase config is missing. Please add it to the script."
                 console.error(errorMsg);
                 setSyncStatus(errorMsg, true);
                 return;
@@ -531,24 +641,29 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
                 setLogLevel('error'); // Use 'debug' for more logs, 'error' for clean console
+                isFirebaseReady = true;
 
+                // Main auth state listener
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
+                        // User is signed in
                         userId = user.uid;
-                        console.log("User is signed in with UID:", userId);
+                        console.log("User is signed in:", user.displayName, `(${userId})`);
+                        showLoggedInUI(user);
                         
-                        // Use a simpler data path
+                        // Set up the path to this user's private data
                         const dataPath = `/studyPlan/users/${userId}/progress`;
                         dataDocRef = doc(db, dataPath);
                         
-                        isFirebaseReady = true;
-                        
-                        // Start listening for realtime updates
+                        // Start listening for their data
                         listenForDataChanges();
 
                     } else {
-                        console.log("User is signed out. Attempting to sign in.");
-                        await signInAnonymously(auth);
+                        // User is signed out
+                        console.log("User is signed out.");
+                        showLoggedOutUI();
+                        userId = null;
+                        dataDocRef = null;
                     }
                 });
 
@@ -561,7 +676,7 @@
         // --- Data-saving function (debounced) ---
         let saveTimeout;
         function debouncedSaveData() {
-            if (!isDataLoaded) return; // Don't save before initial load
+            if (!isDataLoaded || !isFirebaseReady || !userId) return; // Don't save if logged out or before load
 
             clearTimeout(saveTimeout);
             setSyncStatus('saving'); // Show "Saving..."
@@ -572,13 +687,11 @@
 
         // --- Save Data to Firestore ---
         async function saveDataToFirestore() {
-            if (!isFirebaseReady || !dataDocRef) {
-                console.log("Firebase not ready. Cannot save data.");
+            if (!dataDocRef) {
+                console.log("No data reference. Cannot save data.");
                 return;
             }
-
             const progressData = {};
-            
             // 1. Save all checkbox states
             const allCheckboxes = document.querySelectorAll('.task-checkbox');
             allCheckboxes.forEach(cb => {
@@ -589,7 +702,6 @@
                     progressData[key] = cb.checked;
                 }
             });
-
             // 2. Save all date inputs
             const allDateInputs = document.querySelectorAll('.date-input-desktop input, .date-input-mobile input');
             allDateInputs.forEach(input => {
@@ -599,7 +711,6 @@
                      progressData[key] = input.value;
                 }
             });
-
             try {
                 console.log("Saving data to Firestore...");
                 await setDoc(dataDocRef, progressData, { merge: true }); // Merge to avoid overwriting
@@ -614,18 +725,24 @@
         // --- Load Data from Firestore (Realtime) ---
         function listenForDataChanges() {
             if (!dataDocRef) return;
+            // Detach old listener if it exists
+            if (unsubscribeListener) {
+                unsubscribeListener();
+            }
 
             console.log("Listening for data changes...");
-            onSnapshot(dataDocRef, (doc) => {
+            unsubscribeListener = onSnapshot(dataDocRef, (doc) => {
+                let progressData = {};
                 if (doc.exists()) {
-                    const progressData = doc.data();
+                    progressData = doc.data();
                     console.log("Received data from Firestore:", progressData);
-                    applyLoadedData(progressData);
                 } else {
-                    console.log("No existing data found in Firestore. Creating new document.");
-                    isDataLoaded = true; // New user, allow saving
+                    console.log("No existing data found in Firestore for this user.");
                 }
+                // Apply data (or empty object if no data)
+                applyLoadedData(progressData);
                 setSyncStatus('synced'); // Data loaded or is new
+                isDataLoaded = true; // IMPORTANT: Allow saving *after* initial load
             }, (error) => {
                 console.error("Error listening to data:", error);
                 setSyncStatus(error.message, true);
@@ -634,6 +751,9 @@
 
         // --- Apply Loaded Data to the UI ---
         function applyLoadedData(progressData) {
+            // Clear local data first to reset UI from previous user
+            clearLocalData(); 
+
             // 1. Apply checkbox states
             const allCheckboxes = document.querySelectorAll('.task-checkbox');
             allCheckboxes.forEach(cb => {
@@ -641,13 +761,12 @@
                 const subject = cb.dataset.subject;
                 const key = `${day}-${subject}-checked`;
                 
-                if (progressData[key] !== undefined) {
-                    const isChecked = progressData[key];
-                    cb.checked = isChecked;
-                    const taskItem = cb.closest('.task-item, .card-item');
-                    if (taskItem) {
-                        taskItem.classList.toggle('completed', isChecked);
-                    }
+                // Use || false to handle undefined
+                const isChecked = progressData[key] || false;
+                cb.checked = isChecked;
+                const taskItem = cb.closest('.task-item, .card-item');
+                if (taskItem) {
+                    taskItem.classList.toggle('completed', isChecked);
                 }
             });
 
@@ -656,10 +775,8 @@
             allDateInputs.forEach(input => {
                 const day = input.id.replace('date-', '').replace('date-mobile-', '');
                 const key = `${day}-date`;
-                
-                if (progressData[key] !== undefined) {
-                    input.value = progressData[key];
-                }
+                // Use || '' to handle undefined
+                input.value = progressData[key] || '';
             });
             
             // 3. After applying data, check all day completions
@@ -669,8 +786,6 @@
             // 4. Finally, update the progress bar
             updateWeeklyProgress();
 
-            // 5. Set flag to true
-            isDataLoaded = true;
             console.log("Data loaded and applied to UI.");
         }
         
@@ -690,7 +805,7 @@
             { day: 'Day-2', subject: 'Basic View', topic: '' },
             { day: 'Day-3', subject: 'Quran', topic: 'Sura Anfal 8:70- Sura Tawbah 9:6' },
             { day: 'Day-3', subject: 'Newspaper', topic: 'Editorial: Sabotage or not, the government must account for the recent fires' },
-            { day: 'Day-3', subject: 'Vocabulary', topic: 'Sabotage- নাশকতা, Devastating- ধ্বংশাত্মক, Blaze- তীব্র অগ্নিকাণ্ড, deploy- মোতায়েন করা, disrupt- বিঘ্ন ঘটানো, stranded- আটকে পড়া, spate- ঢল, undermine- দুর্বল করা, sow panic- আতঙ্ক ছড়ানো, arson- অগ্নিসংযোগ, resolute- দৃঢ় প্রতিজ্ঞ, beyond comprehension- বোধগম্যতার বাইরে, contigency- বিকল্প ব্যবস্থা, bode- ইঙ্গিত দেয়া/ পূর্বাভাস' },
+            { day: 'Day-3', subject: 'Vocabulary', topic: 'Sabotage- নাশকতা, Devastating- ধ্বংশাত্মক, Blaze- তীব্র অগ্নিকাণ্ড, deploy- মোতায়েন করা, disrupt- বিঘ্ন ঘটানো, stranded- আটকে পড়া, spate- ঢল, undermine- দুর্বল করা, sow panic- আতঙ্ক ছড়ানো, arson- অগ্নিসংযোগ, resolute- দৃঢ় প্রতিজ্ঞ, beyond comprehension- বোধগমVতার বাইরে, contigency- বিকল্প ব্যবস্থা, bode- ইঙ্গিত দেয়া/ পূর্বাভাস' },
             { day: 'Day-3', subject: 'Math', topic: 'Class 16, 17' },
             { day: 'Day-3', subject: 'Basic View', topic: '' },
             { day: 'Day-4', subject: 'Quran', topic: 'Sura Tawbah 9:7- 9:20' },
@@ -719,7 +834,7 @@
         const vocabStories = {
             'Day-1': "The young prince planned to <strong>sweep</strong> the election. He needed to <strong>clinch</strong> the final vote from the stubborn council. His victory led to <strong>unbridled</strong> celebrations in the streets. He promised his advisors he would <strong>outperform</strong> all previous rulers. But his first challenge was a <strong>steep</strong> mountain pass, now blocked by snow. The kingdom's food supply looked <strong>dismally</strong> low. The public called his first month a <strong>poor show</strong>. His <strong>pronounced</strong> frown showed his worry. He wondered, should he be <strong>lenient</strong> with the grain merchants, or seize their stock for the people?",
             'Day-2': "The old scientist felt <strong>unnerved</strong> by the sky's strange color. He gave a <strong>dire</strong> warning to the town's mayor. 'The <strong>particulate matter</strong> is at a deadly level,' he explained. 'It's coming from the new <strong>brick kilns</strong>.' He worried most about the <strong>infants</strong>, who were weakest. The <strong>likelihood</strong> of a lung disease was rising daily. This cough was now <strong>ingrained</strong> in the town's life. 'We must <strong>halt</strong> production!' he cried. 'If we let this <strong>perpetuate</strong>, no one will be left.'",
-            'Day-3': "The empress was certain it was <strong>sabotage</strong>. The result of the fire was <strong>devastating</strong>. The great <strong>blaze</strong> had destroyed the silk market. She had to <strong>deploy</strong> her royal guard immediately. Someone wanted to <strong>disrupt</strong> the peace festival. Many merchants were now <strong>stranded</strong> with no goods to sell. This was the latest in a <strong>spate</strong> of strange accidents. Someone was trying to <strong>undermine</strong> her authority. They wanted to <strong>sow panic</strong> among the citizens. This was clearly an act of <strong>arson</strong>. The empress remained <strong>resolute</strong> in her duty. The cruelty of the act was <strong>beyond comprehension</strong>. She immediately ordered a new <strong>contingency</strong> plan for the city's safety. 'This fire,' she whispered to her general, 'does not <strong>bode</strong> well for our future.'",
+            'Day-3': "The empress was certain it was <strong>sabotage</strong>. The result of the fire was <strong>devastating</strong>. The great <strong>blaze</strong> had destroyed the silk market. She had to <strong>deploy</strong> her royal guard immediately. Someone wanted to <strong>disrupt</strong> the peace festival. Many merchants were now <strong>stranded</strong> with no goods to sell. This was the latest in a <strong>spate</strong> of strange accidents. Someone was trying to <strong>undermine</strong> her authority. They wanted to <strong> sow </strong> panic- আতঙ্ক ছড়ানো, arson- অগ্নিসংযোগ, resolute- দৃঢ় প্রতিজ্ঞ, beyond comprehension- বোধগমVতার বাইরে, contigency- বিকল্প ব্যবস্থা, bode- ইঙ্গিত দেয়া/ পূর্বাভাস' },
             'Day-5': "The detective inspected the <strong>gruesome</strong> crime scene. It was a truly <strong>heinous</strong> act. The killer had violated the <strong>sanctity</strong> of the old library. This felt like some kind of <strong>frontier vengeance</strong>. The city's borders were famously <strong>porous</strong>. There was a constant <strong>flux</strong> of strange visitors. Many were smuggling <strong>illicit</strong> goods. An <strong>intricate</strong> tapestry hung on the wall, a silent <strong>backdrop</strong> to the crime. The detective's own position was <strong>precarious</strong>. He had <strong>pledged</strong> to the public that he would solve the case. He had to <strong>curb</strong> these violent <strong>intrusions</strong>. He would find the killer and <strong>repatriate</strong> him to his home country for justice. His <strong>patrols</strong> would work day and night. He hoped to <strong>usher in</strong> an age of peace. He had to practice <strong>restraint</strong> and not rush the investigation. But his promises to the victim's family felt <strong>hollow</strong>. He found himself <strong>invoking</strong> the city's old charter for help. The long investigation was <strong>culminating</strong> in a final chase. At last, he cornered the <strong>perpetrators</strong> in the old bell tower."
         };
         // --- End Story Data ---
@@ -863,45 +978,41 @@
 
         // --- Checkbox and Date Input change handler ---
         function onInputChange(event) {
+            if (!isDataLoaded) return; // Don't do anything if data isn't loaded
+            
             const element = event.target;
             
             if (element.classList.contains('task-checkbox')) {
                 const day = element.dataset.day;
                 const subject = element.dataset.subject;
                 const isChecked = element.checked;
-
-                // 1. Sync all checkboxes for this same task (day + subject)
                 const allCheckboxesForTask = document.querySelectorAll(`.task-checkbox[data-day="${day}"][data-subject="${subject}"]`);
                 allCheckboxesForTask.forEach(cb => {
                     cb.checked = isChecked;
-                    // Toggle 'completed' class on parent row or card
                     const taskItem = cb.closest('.task-item, .card-item');
                     if (taskItem) {
                         taskItem.classList.toggle('completed', isChecked);
                     }
                 });
-
-                // 2. Check if the day is complete
                 checkDayCompletion(day);
             
             } else if (element.tagName === 'INPUT' && element.type === 'text') {
-                // Sync date inputs
                 const day = element.id.replace('date-', '').replace('date-mobile-', '');
                 const desktopInput = document.getElementById(`date-${day}`);
                 const mobileInput = document.getElementById(`date-mobile-${day}`);
                 if (desktopInput) desktopInput.value = element.value;
                 if (mobileInput) mobileInput.value = element.value;
             }
-
-            // 3. Update the weekly progress bar
             updateWeeklyProgress();
-            
-            // 4. Save data to Firestore
             debouncedSaveData();
         }
 
         // --- Run on page load ---
         document.addEventListener('DOMContentLoaded', async function() {
+            // --- Add Listeners to Auth Buttons ---
+            loginBtn.addEventListener('click', signInWithGoogle);
+            logoutBtn.addEventListener('click', signOutUser);
+
             // Build the UI
             dailyPlanData.forEach(item => {
                 if ((item.subject || item.topic) && taskWeights[item.subject]) {
