@@ -364,7 +364,10 @@
             });
             const engSpan = document.createElement('span'); engSpan.classList.add('vocab-word'); engSpan.textContent=eng;
             const banSpan = document.createElement('span'); banSpan.classList.add('vocab-meaning'); banSpan.textContent=ban;
+
+            container.appendChild(engSpan); // ADD THIS LINE: Append the English word first
             container.appendChild(banSpan);
+
             return container;
         } else if(pair.trim()) {
             const span = document.createElement('span'); span.textContent = pair.trim(); return span;
