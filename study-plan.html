@@ -76,7 +76,7 @@
         }
 
         @media (max-width:768px){.full-table{display:none}.mobile-cards{display:block}}
-        @media (min-width:769px){.full-table{display:table}.mobile-cards{display:none}}
+        @media (min-width:769px){.full-table{display:table}.mobile-cards{display:block}}
     </style>
 </head>
 <body class="bg-gray-50 p-4 md:p-8">
@@ -136,7 +136,7 @@
         </div>
 
         <!-- Desktop Table -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 full-table">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 full-table" style="display: table;">
             <table class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
@@ -168,10 +168,9 @@
 <!-- Firebase + App Script -->
 <script type="module">
     // Firebase imports
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
     /* ----------------- CONFIG ----------------- */
     const firebaseConfig = {
       apiKey: "AIzaSyAj7MDnrnzKUO73BXG0jeM-uBGrAH3XiAY",
@@ -614,7 +613,7 @@ let subjectContentHTML = `
                         </div>
                     `;
                 }
-                        </div>
+                        
                     `;
                 }
 
