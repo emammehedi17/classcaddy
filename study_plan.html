@@ -205,13 +205,63 @@
          }
 
         /* --- Header Adjustments --- */
-         header nav a { color: #d1d5db; /* gray-300 */ } /* Default nav link color */
-         header nav a:hover { color: white; }
-         header nav #academic-button,
-         header nav #academic-button a { color: #d1d5db; } /* Ensure dropdown button matches */
-         header nav a.bg-emerald-500 { color: white !important; } /* Active link */
-         header #auth-container-desktop .text-gray-200 { color: #e5e7eb; } /* Lighter gray for name */
-         header #auth-container-desktop .text-gray-400 { color: #9ca3af; } /* Medium gray for email */
+         /* Override conflicting styles from external style.css if necessary */
+         header.main-website-ui {
+             background-color: rgb(255 255 255 / 0.9); /* bg-white/90 */
+             border-bottom-color: #e5e7eb; /* border-gray-200 */
+         }
+         header.main-website-ui h1 { color: #1f2937; } /* text-gray-800 */
+         header.main-website-ui nav a { color: #4b5563; } /* text-gray-600 */
+         header.main-website-ui nav a:hover { color: #111827; } /* text-gray-900 */
+         header.main-website-ui nav #academic-button,
+         header.main-website-ui nav #academic-button a { color: #4b5563; }
+         header.main-website-ui nav a.bg-emerald-500 { color: white !important; } /* Active link */
+         
+         header.main-website-ui #auth-container-desktop .text-gray-700 { color: #374151; } /* User name */
+         header.main-website-ui #auth-container-desktop .text-gray-500 { color: #6b7280; } /* User email */
+         
+         header.main-website-ui .md\:hidden button { color: #374151; } /* Mobile menu button */
+         
+         /* Mobile Menu Panel */
+         #mobile-menu { background-color: #ffffff; border-color: #e5e7eb; }
+         #mobile-menu a { color: #374151; }
+         #mobile-menu a:hover { background-color: #f3f4f6; }
+         #mobile-menu button { color: #374151; }
+         #mobile-menu button:hover { background-color: #f3f4f6; }
+         #mobile-menu #mobile-academic-menu { background-color: #f9fafb; }
+         #mobile-menu #mobile-academic-menu a { color: #4b5563; }
+         #mobile-menu a.text-emerald-600 { background-color: #ecfdf5; } /* Mobile active link */
+         #mobile-menu #auth-container-mobile { border-color: #e5e7eb; }
+         
+         /* Dropdown menu */
+         .dropdown-menu {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+            transform: translateY(-10px);
+            display: block; /* Keep it block for transitions, control with hidden */
+         }
+         .dropdown-menu.hidden {
+             opacity: 0;
+             visibility: hidden;
+             transform: translateY(-10px);
+         }
+         .dropdown-menu:not(.hidden) { /* This is the 'is-open' state */
+             opacity: 1;
+             visibility: visible;
+             transform: translateY(0);
+         }
+         /* Light theme for dropdown */
+         #academic-menu {
+             background-color: #ffffff;
+             border-color: #e5e7eb;
+         }
+         #academic-menu a {
+             color: #374151;
+         }
+         #academic-menu a:hover {
+             background-color: #f3f4f6;
+         }
 
     </style>
 </head>
@@ -456,6 +506,15 @@
         const authContainerDesktop = document.getElementById('auth-container-desktop');
         const authContainerMobile = document.getElementById('auth-container-mobile');
 
+        // Header navigation elements
+        const academicDropdown = document.getElementById('academic-dropdown');
+        const academicMenu = document.getElementById('academic-menu');
+        const academicButton = document.getElementById('academic-button');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileAcademicButton = document.getElementById('mobile-academic-button');
+        const mobileAcademicMenu = document.getElementById('mobile-academic-menu');
+
         // Modals
         const vocabModal = document.getElementById('vocab-modal');
         const storyModal = document.getElementById('story-modal');
@@ -473,6 +532,44 @@
         let unsubscribePlans = null;
         let currentStoryTarget = null;
         let currentConfirmAction = null; // To store the function to execute on confirm
+        
+        
+        // --- Header Navigation Logic (Copied from script.js) ---
+        if (academicDropdown && academicMenu && academicButton) {
+            let hideTimeout;
+            const showMenu = () => { clearTimeout(hideTimeout); academicMenu.classList.remove('hidden'); };
+            const hideMenu = () => { academicMenu.classList.add('hidden'); };
+            const hideMenuWithDelay = () => { hideTimeout = setTimeout(hideMenu, 2000); }; // Shorter delay
+            
+            academicButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                academicMenu.classList.toggle('hidden');
+            });
+            academicDropdown.addEventListener('mouseenter', showMenu);
+            academicDropdown.addEventListener('mouseleave', hideMenuWithDelay);
+            window.addEventListener('click', (event) => {
+                if (!academicDropdown.contains(event.target)) {
+                    hideMenu();
+                }
+            });
+        }
+
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        if (mobileAcademicButton && mobileAcademicMenu) {
+            mobileAcademicButton.addEventListener('click', () => {
+                mobileAcademicMenu.classList.toggle('hidden');
+                const arrowIcon = mobileAcademicButton.querySelector('svg');
+                if (arrowIcon) {
+                    arrowIcon.classList.toggle('rotate-180');
+                }
+            });
+        }
+        // --- End Header Navigation Logic ---
 
 
         // --- Authentication ---
@@ -579,40 +676,49 @@
             unsubscribePlans = onSnapshot(q, (querySnapshot) => {
                 console.log("Received plans snapshot. Number of plans:", querySnapshot.size);
                 monthNavButtonsContainer.innerHTML = ''; // Clear old buttons
-                currentMonthPlanDisplay.innerHTML = ''; // Clear old display
+                
+                // Preserve current view if it's still valid
+                let currentMonthElement = currentMonthPlanDisplay.querySelector('.card[data-month-id]');
+                let currentMonthId = currentMonthElement ? currentMonthElement.dataset.monthId : null;
+                let monthExists = false;
 
                 if (querySnapshot.empty) {
+                    currentMonthPlanDisplay.innerHTML = ''; // Clear display
                     noPlansMessage.style.display = 'block';
                     selectMonthMessage.classList.add('hidden');
                 } else {
                     noPlansMessage.style.display = 'none';
-                    selectMonthMessage.classList.remove('hidden'); // Show select message initially
-                    let firstMonthId = null;
-
+                    
                     querySnapshot.forEach((docSnap) => {
                         const monthId = docSnap.id;
+                        if (monthId === currentMonthId) monthExists = true;
                         const monthData = docSnap.data();
-                        if (!firstMonthId) firstMonthId = monthId; // Keep track of the first month
 
                         const button = document.createElement('button');
                         button.textContent = monthData.monthName || monthId;
                         button.dataset.monthId = monthId;
                         button.classList.add('action-button', 'action-button-secondary', 'text-xs');
+                        if (monthId === currentMonthId) {
+                             button.classList.add('active-month');
+                             button.classList.remove('action-button-secondary');
+                        }
                         button.addEventListener('click', () => displayMonthPlan(monthId));
                         monthNavButtonsContainer.appendChild(button);
                     });
 
-                    // Optionally, auto-load the first month
-                    // if (firstMonthId) {
-                    //    displayMonthPlan(firstMonthId);
-                    // }
+                    // If the previously viewed month was deleted, clear the display
+                    if (currentMonthId && !monthExists) {
+                        currentMonthPlanDisplay.innerHTML = '';
+                        selectMonthMessage.classList.remove('hidden');
+                    } else if (!currentMonthId) {
+                         selectMonthMessage.classList.remove('hidden');
+                    }
                 }
             }, (error) => {
                 console.error("Error fetching study plans:", error);
                 currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">Error loading plans.</p>';
                 noPlansMessage.style.display = 'none';
                 selectMonthMessage.classList.add('hidden');
-
             });
         }
 
@@ -624,7 +730,7 @@
              // Highlight active button
              monthNavButtonsContainer.querySelectorAll('button').forEach(btn => {
                  btn.classList.toggle('active-month', btn.dataset.monthId === monthId);
-                 btn.classList.toggle('action-button-secondary', btn.dataset.monthId !== monthId); // Ensure others are secondary
+                 btn.classList.toggle('action-button-secondary', btn.dataset.monthId !== monthId);
              });
 
 
@@ -634,14 +740,22 @@
 
              const docRef = doc(db, getUserPlansCollectionPath(), monthId);
              try {
-                 const docSnap = await getDoc(docRef);
-                 if (docSnap.exists()) {
-                     currentMonthPlanDisplay.innerHTML = ''; // Clear loading/message
-                     currentMonthPlanDisplay.appendChild(createMonthElement(monthId, docSnap.data()));
-                 } else {
-                     console.error("Document for monthId not found:", monthId);
-                     currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">Could not find plan data for this month.</p>';
-                 }
+                // Use onSnapshot for real-time updates on the *displayed* month
+                 onSnapshot(docRef, (docSnap) => {
+                     if (docSnap.exists()) {
+                         // Check if this is still the active month before re-rendering
+                         const activeBtn = monthNavButtonsContainer.querySelector('button.active-month');
+                         if (activeBtn && activeBtn.dataset.monthId === monthId) {
+                            currentMonthPlanDisplay.innerHTML = ''; // Clear loading/message
+                            currentMonthPlanDisplay.appendChild(createMonthElement(monthId, docSnap.data()));
+                         } else {
+                             console.log("Snapshot received for non-active month. Ignoring render.");
+                         }
+                     } else {
+                         console.error("Document for monthId not found (or deleted):", monthId);
+                         currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">This plan was not found (it may have been deleted).</p>';
+                     }
+                 });
              } catch (error) {
                  console.error("Error fetching specific month plan:", error);
                  currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">Error loading this month\'s plan.</p>';
@@ -718,7 +832,7 @@
                         ${[1, 2, 3, 4].map(weekNum => `
                             <div class="bg-gray-50 border border-gray-200 p-3 rounded-md shadow-sm">
                                 <label for="target-week-${monthId}-${weekNum}" class="block text-sm font-medium text-emerald-700 mb-1">Week ${weekNum}</label>
-                                <textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" rows="3" class="editable-input w-full text-sm placeholder-gray-400 bg-white" placeholder="Enter target...">${data.weeklyTargets?.[`week${weekNum}`] || ''}</textarea>
+                                <textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" rows="3" class="editable-input w-full text-sm placeholder-gray-400 bg-white" placeholder="Enter target...">${escapeHtml(data.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
                             </div>
                         `).join('')}
                     </div>
@@ -809,32 +923,32 @@
                      });
                      topicContent += `<button type="button" class="icon-button add-vocab-pair-btn mt-1" title="Add Word/Meaning Pair"><i class="fas fa-plus-circle text-emerald-500"></i></button></div>`;
                  } else {
-                     topicContent = `<textarea class="editable-input topic-input text-xs" rows="2" placeholder="Topic details...">${rowData.topic || ''}</textarea>`;
+                     topicContent = `<textarea class="editable-input topic-input text-xs" rows="2" placeholder="Topic details...">${escapeHtml(rowData.topic || '')}</textarea>`;
                  }
              } else {
                  if (isVocabRow) {
                      topicContent = generateVocabHtml(rowData.vocabData);
                  } else {
-                     topicContent = `<span class="topic-display">${rowData.topic || '-'}</span>`;
+                     topicContent = `<span class="topic-display">${escapeHtml(rowData.topic || '-')}</span>`;
                  }
              }
 
              // Read story button only appears in normal mode if a story exists for THIS ROW
-             const storyButtonHtml = (!isEditing && rowData.story)
+             const storyButtonHtml = (!isEditing && isVocabRow && rowData.story)
                 ? `<button class="action-button action-button-secondary text-xs read-story-btn mt-2 block">Read Story</button>` : '';
 
 
              return `
                  <tr id="${uniqueRowId}" data-row-index="${rowIndex}" class="${isEditing ? 'editing-mode' : ''} ${isVocabRow ? 'vocab-row' : 'normal-row'}">
                      <td class="px-3 py-2 align-top">
-                         ${isEditing ? `<input type="text" class="editable-input subject-input" placeholder="Subject" value="${escapeHtml(rowData.subject || '')}" ${isVocabRow ? 'readonly style="background-color:#e5e7eb;"' : ''}>` : `<span class="subject-display font-medium text-gray-700">${rowData.subject || '-'}</span>`}
+                         ${isEditing ? `<input type="text" class="editable-input subject-input" placeholder="Subject" value="${escapeHtml(rowData.subject || '')}" ${isVocabRow ? 'readonly style="background-color:#e5e7eb;"' : ''}>` : `<span class="subject-display font-medium text-gray-700">${escapeHtml(rowData.subject || '-')}</span>`}
                      </td>
                      <td class="px-3 py-2 align-top vocab-topic-cell">
                          ${topicContent}
                          ${storyButtonHtml}
                      </td>
                      <td class="px-3 py-2 align-top">
-                         ${isEditing ? `<textarea class="editable-input comment-input text-xs" rows="2" placeholder="Comment...">${escapeHtml(rowData.comment || '')}</textarea>` : `<span class="comment-display text-xs text-gray-500">${rowData.comment || '-'}</span>`}
+                         ${isEditing ? `<textarea class="editable-input comment-input text-xs" rows="2" placeholder="Comment...">${escapeHtml(rowData.comment || '')}</textarea>` : `<span class="comment-display text-xs text-gray-500">${escapeHtml(rowData.comment || '-')}</span>`}
                      </td>
                      <td class="px-3 py-2 align-middle center-cell">
                          <input type="checkbox" class="form-checkbox h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 completion-checkbox" ${rowData.completed ? 'checked' : ''} ${isEditing ? 'disabled' : ''}>
@@ -1011,9 +1125,13 @@
                 const updatedRows = [];
                 const rowElements = daySection.querySelectorAll('tbody tr');
 
-                rowElements.forEach(row => {
-                    const existingRowIndex = parseInt(row.dataset.rowIndex); // Get original index if exists
-                    const existingRowData = currentDayData.rows?.[existingRowIndex] || {}; // Get previous state
+                rowElements.forEach((row, uiRowIndex) => {
+                    // Check if row exists in UI (it might have been deleted but save not yet clicked)
+                    if (!row) return; 
+                    
+                    // For new rows, existingRowIndex will be NaN, handle this
+                    let existingRowIndex = parseInt(row.dataset.rowIndex); 
+                    const existingRowData = !isNaN(existingRowIndex) ? (currentDayData.rows?.[existingRowIndex] || {}) : {}; // Get previous state or empty obj
 
                     let subject, topic, comment, completed, completionPercentage, vocabData = null, story;
 
@@ -1022,7 +1140,8 @@
                          comment = row.querySelector('.comment-input')?.value.trim() || '';
                          completed = existingRowData.completed || false; // Persist non-editable completed status
                          completionPercentage = parseInt(row.querySelector('.completion-perc-input')?.value) || null;
-                         story = existingRowData.story; // Story is saved via modal
+                         // Handle story: if it's a vocab row, get existing story. If not, story is null.
+                         story = (subject.toLowerCase() === 'vocabulary') ? existingRowData.story : null;
 
                          if (row.classList.contains('vocab-row')) {
                              subject = 'Vocabulary'; // Ensure subject is set for vocab rows
@@ -1037,6 +1156,7 @@
                              topic = null; // Vocab rows don't use the simple topic field
                          } else {
                              topic = row.querySelector('.topic-input')?.value.trim() || '';
+                             vocabData = null; // Ensure vocabData is null for non-vocab rows
                          }
 
                     } else { // Handle saving checkbox clicks in normal mode
@@ -1075,7 +1195,13 @@
         function addRowToDay(monthId, weekId, daySection, type = 'normal') {
              const dayIndex = parseInt(daySection.dataset.dayIndex);
              const tableBody = daySection.querySelector('tbody');
-             const newRowIndex = tableBody.rows.length; // Will be the index after adding
+             // Find the highest existing row index to determine the new index
+             let maxIndex = -1;
+             tableBody.querySelectorAll('tr').forEach(tr => {
+                 const idx = parseInt(tr.dataset.rowIndex);
+                 if (idx > maxIndex) maxIndex = idx;
+             });
+             const newRowIndex = maxIndex + 1; // This will be the unique index for the new row
 
              let newRowData;
              if (type === 'vocabulary') {
@@ -1135,18 +1261,23 @@
                  let monthData = docSnap.data();
                  let daysArray = monthData.weeks?.[weekId]?.days || [];
                  if (!daysArray[dayIndex] || !daysArray[dayIndex].rows) throw new Error("Day or rows not found in Firestore.");
-
-                 // Remove the row from the array
-                 daysArray[dayIndex].rows.splice(rowIndex, 1);
-
-                 // Prepare update payload
-                 const updatePayload = {};
-                 updatePayload[`weeks.${weekId}.days`] = daysArray;
-
-                 await updateDoc(docRef, updatePayload);
-                 console.log("Row deleted successfully from Firestore.");
-                 rowElement.remove(); // Remove from UI
-                 // Re-index subsequent rows' data-row-index in the UI if needed, though saving rebuilds it
+                 
+                 // Find the row in the array by its index *at the time of deletion*
+                 // Note: The UI might have new, unsaved rows. We need to save the state *before* deleting.
+                 // OR, we can just remove it from the UI and let the next "Save" handle it.
+                 // Let's try removing from UI only first.
+                 
+                 // Problem: If we just remove from UI, saveDayPlan will reconstruct the array *without* this row.
+                 // But what was its original rowIndex in the database?
+                 // This is tricky. Let's force a save *before* deleting.
+                 
+                 // Alternative: Let's just remove from UI and then call saveDayPlan.
+                 // saveDayPlan iterates the UI rows.
+                 rowElement.remove(); // Remove from UI first
+                 console.log("Row removed from UI. Saving updated day plan...");
+                 await saveDayPlan(monthId, weekId, daySection); // Save the *new* state of the UI
+                 
+                 // Re-index remaining UI rows
                  daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => tr.dataset.rowIndex = newIdx);
 
 
@@ -1193,14 +1324,14 @@
 
                  await updateDoc(docRef, updatePayload);
                  console.log("Day deleted successfully from Firestore.");
-
-                 // Remove day section from UI and update subsequent day numbers/indices in UI
+                 // UI update will happen via onSnapshot, which re-calls displayMonthPlan
+                 // which re-calls createMonthElement
+                 // Let's just remove it manually to be faster.
                 const daysContainer = daySection.parentNode;
                  daySection.remove();
                  daysContainer.querySelectorAll('.day-section').forEach((ds, newIdx) => {
                      ds.dataset.dayIndex = newIdx;
                      ds.querySelector('h4').textContent = `Day ${newIdx + 1}`;
-                      // Update table IDs etc. if necessary for future edits
                       ds.querySelector('table').id = `table-${monthId}-${weekId}-${newIdx}`;
                  });
                   updateWeeklyProgressUI(monthId, weekId); // Recalculate progress
@@ -1285,8 +1416,13 @@
                      newDayData = {
                          dayNumber: daysArray.length + 1, date: '',
                          rows: lastDayRows.map(row => ({
-                             subject: row.subject || '', topic: row.topic || '', completed: false, comment: '', completionPercentage: null,
-                             vocabData: row.vocabData ? JSON.parse(JSON.stringify(row.vocabData)) : null, story: null
+                             subject: row.subject || '', 
+                             topic: row.topic || '', 
+                             completed: false, 
+                             comment: '', 
+                             completionPercentage: null,
+                             vocabData: row.vocabData ? JSON.parse(JSON.stringify(row.vocabData)) : null, 
+                             story: null // Do not copy story
                          }))
                      };
                  } else {
@@ -1327,7 +1463,7 @@
                      closeModal('edit-story-modal');
 
                      // --- Immediate UI Update ---
-                     const daySection = document.querySelector(`.day-section[data-day-index="${dayIndex}"]`);
+                     const daySection = document.querySelector(`[data-month-id="${monthId}"] .day-section[data-day-index="${dayIndex}"]`);
                      if (daySection && !daySection.classList.contains('editing')) {
                          const rowElement = daySection.querySelector(`tr[data-row-index="${rowIndex}"]`);
                          if(rowElement){
