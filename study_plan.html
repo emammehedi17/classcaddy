@@ -1247,6 +1247,7 @@
                  actionsHeader.classList.remove('hidden');
                  completionPercHeader.classList.remove('hidden');
 
+
                  const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
                  const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
                  if (!dayData) {
@@ -1297,7 +1298,6 @@
                  // --- End FIX ---
              }
         }
-
 
         // Save Day Plan (Fix for Bug #2)
         async function saveDayPlan(monthId, weekId, daySection) {
