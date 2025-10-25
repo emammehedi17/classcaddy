@@ -1197,7 +1197,7 @@
         }
 
 
-        // Toggle Edit Mode
+// Toggle Edit Mode
         async function toggleDayEditMode(monthId, weekId, daySection, enterEditMode) {
              const dayIndex = parseInt(daySection.dataset.dayIndex);
              const tableBody = daySection.querySelector('tbody');
@@ -1210,6 +1210,7 @@
              setSyncStatus("Syncing...", "yellow");
 
              if (enterEditMode) {
+                 // --- ENTERING EDIT MODE ---
                  daySection.classList.add('editing');
                  editButton.innerHTML = '<i class="fas fa-save mr-1"></i> Save';
                  editButton.classList.remove('action-button-secondary');
@@ -1221,15 +1222,20 @@
 
                  const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
                  const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
-                 if (!dayData) return;
+                 if (!dayData) {
+                     console.error("Could not find day data to edit.");
+                     setSyncStatus("Error", "red");
+                     return;
+                 }
 
                  tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
-                    createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, true)
+                    createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, true) // true for editing
                  ).join('');
                  daySection.querySelectorAll('.completion-checkbox').forEach(cb => cb.disabled = true);
                  setSyncStatus("Editing...", "blue");
 
              } else {
+                 // --- SAVING AND EXITING EDIT MODE ---
                  await saveDayPlan(monthId, weekId, daySection); // Save first
 
                  daySection.classList.remove('editing');
@@ -1239,21 +1245,19 @@
                  deleteDayButton.classList.add('hidden');
                  actionsHeader.classList.add('hidden');
                  completionPercHeader.classList.add('hidden');
-                 
+
                  // --- FIX: Manually re-render rows in normal mode ---
-                 // Don't rely on onSnapshot for this, as it might not fire.
-                 // Fetch the *just-saved* data to re-render in normal mode.
+                 // We re-fetch the data we *just* saved to ensure the UI is 100% in sync
                  try {
                      const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
                      const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
                      
                      if (!dayData) { 
-                         // This should not happen unless the day was deleted, but as a safeguard:
-                         tableBody.innerHTML = ''; 
+                         tableBody.innerHTML = ''; // Day was likely deleted
                      } else {
                          // Re-render all rows in normal (non-edit) mode
                          tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
-                            createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)
+                            createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false) // false for non-editing
                          ).join('');
                      }
                      
