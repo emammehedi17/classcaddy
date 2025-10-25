@@ -1,897 +1,1451 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>My Study Plan</title>
+    <!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-JWZXVQC68L"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-JWZXVQC68L');
+	</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Caddy - My Study Plan</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Naskh+Arabic:wght@400;700&family=Kalpurush:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Link to your existing style.css for consistency -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="https://eco.du.ac.bd//assets/images/fab_icon.ico" type="image/x-icon">
     <style>
-        body{font-family:'Inter',sans-serif;background-color:#f4f7f6}
-        .task-item,.card-item{transition:background-color .3s}
-        .task-item.completed{background-color:#bbf7d0}
-        .task-item.completed td{color:#374151}
-        .task-item.completed .vocab-item{color:#3730a3;opacity:.9}
-        .task-item.completed .vocab-item:hover{background-color:#c7d2fe;opacity:1}
-        .card-item.completed{background-color:#bbf7d0}
-        .card-item.completed p,.card-item.completed .text-gray-600,.card-item.completed .text-sm div{color:#374151}
-        .task-checkbox{appearance:none;-webkit-appearance:none;height:1.25rem;width:1.25rem;min-width:1.25rem;border:2px solid #cbd5e1;border-radius:.375rem;display:inline-block;position:relative;cursor:pointer;transition:all .2s;margin-right:.75rem;flex-shrink:0}
-        .task-checkbox:checked{background-color:#2563eb;border-color:#2563eb}
-        .task-checkbox:checked::after{content:"";position:absolute;display:block;left:.4rem;top:.125rem;width:.35rem;height:.7rem;border-style:solid;border-color:white;border-width:0 .15rem .15rem 0;transform:rotate(45deg)}
-        .vocab-item{position:relative;display:inline-block;background-color:#eef2ff;color:#3730a3;padding:4px 10px;border-radius:9999px;cursor:pointer;font-weight:500;transition:background-color .2s}
-        .vocab-item:hover{background-color:#c7d2fe}
-        .vocab-meaning{visibility:hidden;opacity:0;width:max-content;max-width:250px;background-color:#312e81;color:#fff;text-align:center;border-radius:6px;padding:6px 12px;position:absolute;z-index:10;bottom:130%;left:50%;transform:translateX(-50%);transition:opacity .3s,visibility .3s;font-weight:500;white-space:normal}
-        .vocab-item.active .vocab-meaning{visibility:visible;opacity:1}
-        .vocab-item .vocab-meaning::after{content:"";position:absolute;top:100%;left:50%;margin-left:-5px;border-width:5px;border-style:solid;border-color:#312e81 transparent transparent transparent}
-        .modal-hidden{display:none}
-        .story-modal-overlay{position:fixed;inset:0;background-color:rgba(0,0,0,.5);z-index:40;transition:opacity .3s}
-        .story-modal-box{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:50;background-color:#fffbef;border:4px solid #78350f;border-radius:.75rem;box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);width:90%;max-width:600px;max-height:80vh;overflow-y:auto;padding:1.25rem}
-        .story-modal-box h3{font-size:1.25rem;font-weight:700;color:#78350f;margin-bottom:1rem}
-        .story-modal-box p{color:#451a03;line-height:1.6}
-        .story-modal-close-btn{position:absolute;top:.75rem;right:.75rem;background-color:transparent;border:none;color:#78350f;font-size:1.5rem;font-weight:700;line-height:1;cursor:pointer;padding:0}
-        .read-story-btn{display:inline-block;margin-top:.75rem;margin-left:.25rem;background-color:#3730a3;color:white;padding:4px 12px;border-radius:9999px;font-size:.875rem;font-weight:500;cursor:pointer;transition:background-color .2s}
-        .read-story-btn:hover{background-color:#4f46e5}
-        .progress-container{position:sticky;top:0;z-index:10;background-color:#f4f7f6;padding-top:1rem;padding-bottom:1rem;margin-bottom:1.5rem}
-        .progress-bar-outer{background-color:#e5e7eb}
-        .progress-bar-inner{background-color:#4f46e5;transition:width .4s ease-in-out}
-        .full-table table{border-collapse:collapse}
-        .full-table thead th{background-color:#6366f1;color:white;font-weight:600;text-align:center;padding-top:.75rem;padding-bottom:.75rem;padding-left:1.5rem;padding-right:1.5rem;border-top:3px solid #4f46e5;border-bottom:2px solid #4f46e5}
-        .full-table thead th:first-child{border-left:3px solid #4f46e5}
-        .full-table thead th:last-child{border-right:3px solid #4f46e5}
-        .full-table tbody tr:nth-child(even){background-color:#e0e7ff}
-        .full-table tbody tr:nth-child(odd){background-color:#f0f4ff}
-        .full-table tbody tr.task-item.completed:nth-child(even){background-color:#99f6e4}
-        .full-table tbody tr.task-item.completed:nth-child(odd){background-color:#a7f3d0}
-        .full-table tbody td{color:#374151;border-top:1px solid #c7d2fe}
-        .full-table tbody tr.day-group-start td{border-top:3px solid #4f46e5}
-        .full-table tbody tr.task-item td:first-child{border-left:3px solid #4f46e5}
-        .full-table tbody tr.task-item td:last-child{border-right:3px solid #4f46e5}
-        .full-table tbody tr:last-child td{border-bottom:3px solid #4f46e5}
-        .full-table tbody td:first-child{font-weight:600;color:#1e3a8a}
-        .full-table tbody td:nth-child(2){color:#4b5563}
-        .full-table tbody td:nth-child(3){color:#1f2937}
-        .mobile-cards .card-item{background-color:#ffffff;border:1px solid #e5e7eb}
-        .mobile-cards .card-item.completed{background-color:#d1fae5;border-color:#a7f3d0}
-        .mobile-cards .card-item h3{color:#1e3a8a}
-        .mobile-cards .card-item p.font-medium{color:#4b5563}
-        .mobile-cards .card-item .text-sm{color:#1f2937}
-        @media (max-width:768px){.full-table{display:none}.mobile-cards{display:block}}
-        @media (min-width:769px){.full-table{display:block}.mobile-cards{display:none}}
-        /* Edit modal styles */
-        .edit-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:60;display:flex;align-items:center;justify-content:center}
-        .edit-modal-box{background:white;border-radius:.75rem;padding:1.25rem;width:95%;max-width:720px;max-height:85vh;overflow:auto;box-shadow:0 25px 50px rgba(0,0,0,.2);z-index:70}
-        .edit-field{margin-bottom:.75rem}
-        .edit-field label{display:block;font-weight:600;margin-bottom:.25rem;color:#1f2937}
-        .edit-field input,.edit-field textarea{width:100%;padding:.5rem;border:1px solid #e5e7eb;border-radius:.375rem;font-size:.95rem}
-        .edit-actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:.75rem}
+        /* Add specific styles for Study Plan page here if needed, keeping consistency */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #111827; /* Dark background */
+            color: white;
+        }
+        .kalpurush {
+            font-family: 'Kalpurush', sans-serif;
+        }
+        .arabic-font {
+             font-family: 'Noto Naskh Arabic', serif;
+        }
+        /* Style for editable cells */
+        [contenteditable="true"] {
+            outline: 2px solid #10b981; /* Emerald border */
+            background-color: #1f2937; /* Slightly lighter gray */
+            padding: 4px;
+            border-radius: 4px;
+        }
+        /* Style for vocabulary words */
+        .vocab-word {
+            cursor: pointer;
+            text-decoration: underline dotted;
+            margin-right: 8px;
+            display: inline-block;
+            padding: 2px 5px;
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .vocab-word:hover {
+            background-color: rgba(16, 185, 129, 0.2);
+        }
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: #1f2937; /* gray-800 */
+            margin: 15% auto;
+            padding: 25px;
+            border: 1px solid #4b5563; /* gray-600 */
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            position: relative;
+        }
+        .modal-close {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-close:hover,
+        .modal-close:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Progress Bar */
+        .progress-bar-container {
+            background-color: #374151; /* gray-700 */
+            border-radius: 9999px;
+            overflow: hidden;
+            height: 12px;
+        }
+        .progress-bar-fill {
+            background-color: #10b981; /* emerald-500 */
+            height: 100%;
+            transition: width 0.3s ease-in-out;
+            text-align: center;
+            line-height: 12px;
+            font-size: 10px;
+            color: #111827;
+            font-weight: bold;
+            border-radius: 9999px;
+        }
+        /* Add Row Button Style */
+        .add-row-btn {
+            background: none;
+            border: none;
+            color: #6ee7b7; /* emerald-300 */
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .add-row-btn:hover {
+            color: #10b981; /* emerald-500 */
+        }
+        /* General Button Style Consistency */
+        .action-button {
+            background-color: #10b981; /* emerald-500 */
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border: none;
+            font-size: 0.875rem; /* text-sm */
+        }
+        .action-button:hover {
+            background-color: #059669; /* emerald-600 */
+        }
+        .action-button-secondary {
+             background-color: #374151; /* gray-700 */
+             color: #d1d5db; /* gray-300 */
+        }
+        .action-button-secondary:hover {
+             background-color: #4b5563; /* gray-600 */
+        }
+         /* Styling for table cells in editing mode */
+        .study-table tbody tr.editing-mode td {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        .study-table tbody tr.editing-mode td > * { /* Target direct children like inputs/buttons within the TD */
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+        .editable-input {
+            background-color: #374151; /* gray-700 */
+            border: 1px solid #4b5563; /* gray-600 */
+            border-radius: 4px;
+            padding: 4px 8px;
+            color: white;
+            width: 100%;
+            font-size: 0.875rem;
+        }
+         /* Add Day Button Styling */
+        .add-day-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(16, 185, 129, 0.1); /* emerald-500 with alpha */
+            color: #6ee7b7; /* emerald-300 */
+            border: 1px dashed #34d399; /* emerald-400 */
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        .add-day-btn:hover {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #a7f3d0; /* emerald-200 */
+            border-color: #6ee7b7; /* emerald-300 */
+        }
+        .add-day-btn i {
+            margin-right: 8px;
+        }
+
     </style>
 </head>
-<body class="bg-gray-50 p-4 md:p-8">
+<body class="bg-gray-900 text-gray-100">
 
-<div class="max-w-7xl mx-auto">
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">My Study Plan</h1>
-        <p class="text-lg text-gray-500">Monthly Plan (18.10.25 – 17.11.25)</p>
-    </div>
-
-    <!-- Auth & Sync Status -->
-    <div class="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg shadow">
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-            <div>
-                <h3 class="font-semibold text-indigo-800">Sync Status</h3>
-                <div class="flex items-center space-x-2">
-                    <div id="sync-indicator" class="w-3 h-3 rounded-full bg-gray-400 animate-pulse"></div>
-                    <p id="sync-status" class="text-sm text-indigo-700">Waiting for login...</p>
+    <!-- Header (Assuming you have a standard header included via server-side or copy-pasted) -->
+    <!-- You Copy/Paste your existing header structure here -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-sm border-b border-gray-700 main-website-ui">
+        <div class="container mx-auto px-6 py-3">
+            <nav class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
+                        <img src="images/profile.jpg" alt="Profile" class="h-12 w-12 rounded-full border-2 border-emerald-400 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/48x48/111827/a7f3d0?text=CC';">
+                    </a>
+                    <a href="index.html">
+                        <h1 class="text-2xl font-bold">Class Caddy</h1>
+                    </a>
                 </div>
-                <p id="sync-error" class="hidden text-xs text-red-600 mt-1"></p>
+                <div class="hidden md:flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full p-1">
+                    <a href="index.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Home</a>
+                    <div id="academic-dropdown" class="relative">
+                        <button id="academic-button" class="px-6 py-2 text-sm font-semibold text-gray-400 hover:text-white rounded-full transition-colors flex items-center">
+                            <a href="academic.html">Academic</a>
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="academic-menu" class="dropdown-menu absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg hidden">
+                            <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 405</a>
+                            <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 406</a>
+                            <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 407</a>
+                            <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 408 (B)</a>
+                        </div>
+                    </div>
+                     <a href="study_plan.html" class="px-6 py-2 text-sm bg-emerald-500 rounded-full text-white transition-colors">Study Plan</a> <!-- Active Link Example -->
+                    <a href="shop.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Shop</a>
+                    <a href="about.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">About</a>
+                    <a href="contact.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Contact</a>
+                </div>
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
+                        <img src="images/du_logo.png" alt="DU Logo" class="h-12 w-12 rounded-full border-2 border-gray-600 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/48x48/eeeeee/111827?text=DU';">
+                    </a>
+                    <!-- User info/logout button will replace Sign Up when logged in -->
+                     <div id="auth-container-desktop" class="auth-container">
+                        <!-- Sign Up button initially -->
+                         <a href="index.html#signup" class="px-6 py-3 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 rounded-full transition-colors signup-button">Sign Up</a>
+                        <!-- Logged in state will be populated by JS -->
+                    </div>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="text-white focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </nav>
+             <div id="mobile-menu" class="hidden md:hidden bg-gray-800 border-t border-gray-700 -mx-6">
+                <a href="index.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Home</a>
+                <div>
+                    <button id="mobile-academic-button" class="w-full text-left px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex justify-between items-center">
+                        <span>Academic</span>
+                        <svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="mobile-academic-menu" class="hidden pl-8 bg-gray-900">
+                        <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 405</a>
+                        <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 406</a>
+                        <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 407</a>
+                        <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 408 (B)</a>
+                    </div>
+                </div>
+                 <a href="study_plan.html" class="block px-6 py-3 text-sm text-emerald-400 bg-gray-700 transition-colors">Study Plan</a> <!-- Active Link Example -->
+                <a href="shop.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Shop</a>
+                <a href="about.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">About</a>
+                <a href="contact.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Contact</a>
+                <!-- Mobile Auth -->
+                <div id="auth-container-mobile" class="auth-container px-6 py-3">
+                    <a href="index.html#signup" class="block w-full text-center text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 rounded-full py-2 transition-colors signup-button">Sign Up</a>
+                </div>
             </div>
-            <div id="auth-container" class="mt-4 sm:mt-0 sm:ml-4 flex-shrink-0">
-                <button id="login-btn" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 font-medium py-2 px-4 rounded-lg shadow-sm hover:bg-gray-50 transition flex items-center justify-center">
-                    <svg class="w-5 h-5 mr-2" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v8.51h13.04c-.57 2.75-2.23 5.08-4.79 6.64l7.98 6.19C45.27 36.64 48 31.13 48 24c0-.79-.07-1.55-.17-2.3z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.98-6.19c-2.11 1.45-4.8 2.3-7.91 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
-                    Sign in with Google
+        </div>
+    </header>
+    <!-- End Header -->
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
+
+        <h1 class="text-3xl sm:text-4xl font-bold text-emerald-400 mb-6 text-center">My Study Plan</h1>
+
+        <!-- Auth Status / Login Section -->
+        <div id="auth-section" class="mb-8 p-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg shadow-md">
+            <!-- Content dynamically updated by JS based on auth state -->
+             <div id="login-prompt" class="text-center">
+                <p class="text-gray-400 mb-4">Please log in to view and manage your study plans.</p>
+                <button id="google-login-btn" class="action-button bg-red-600 hover:bg-red-700">
+                    <i class="fab fa-google mr-2"></i> Sign in with Google
                 </button>
-                <div id="user-info" class="hidden text-sm text-right">
-                    <p class="font-medium text-gray-800" id="user-name">Loading...</p>
-                    <p class="text-gray-600 truncate max-w-[200px]" id="user-email">...</p>
-                    <button id="logout-btn" class="text-xs text-red-600 font-medium hover:underline mt-1">Log Out</button>
+                <!-- Add other login methods if desired -->
+            </div>
+             <div id="user-info" class="hidden flex flex-col sm:flex-row justify-between items-center text-sm">
+                 <div class="flex items-center gap-3 mb-2 sm:mb-0">
+                     <i class="fas fa-check-circle text-emerald-400"></i>
+                     <span class="font-semibold text-gray-300">Sync Status:</span>
+                     <span class="text-emerald-400">Synced</span>
+                     <span id="user-id-display" class="ml-4 text-xs text-gray-500 break-all"></span> <!-- Added User ID display -->
+                 </div>
+                <div class="text-center sm:text-right">
+                    <p id="user-display" class="font-medium text-gray-200"></p>
+                    <p id="user-email-display" class="text-gray-400 text-xs"></p>
+                    <button id="logout-btn" class="mt-1 text-red-400 hover:text-red-300 text-xs font-semibold">Log Out</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Monthly Targets -->
-    <div class="mb-10">
-        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Monthly Targets</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-indigo-700 mb-2">1st Week</h3><p class="text-gray-600">Math Class 15, Basic View 1-150 pages</p></div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-teal-700 mb-2">2nd Week</h3><p class="text-gray-600">Bangla Class 15, Computer hour 1-150 pages</p></div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-amber-700 mb-2">3rd Week</h3><p class="text-gray-600">Math Class 7, English lit. handbook complete</p></div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-rose-700 mb-2">4th Week</h3><p class="text-gray-600">Basic View 151-300 pages, Mental Ability classes 15</p></div>
-        </div>
-    </div>
+        <!-- Study Plan Content (Hidden until logged in) -->
+        <div id="study-plan-content" class="hidden">
 
-    <div>
-        <h2 class="text-2xl font-semibold text-gray-700 mb-4">Daily Plan – 1st Week</h2>
-
-        <div class="progress-container">
-            <div class="flex justify-between mb-1">
-                <span id="weekly-progress-label" class="text-base font-medium text-indigo-700">Weekly Progress: 0%</span>
+            <div class="flex justify-center mb-8">
+                 <button id="add-month-btn" class="action-button flex items-center gap-2">
+                     <i class="fas fa-plus-circle"></i> Add Month
+                 </button>
             </div>
-            <div class="w-full bg-gray-200 rounded-full h-3.5 progress-bar-outer shadow-inner">
-                <div id="weekly-progress-bar" class="bg-indigo-600 h-3.5 rounded-full progress-bar-inner" style="width:0%"></div>
+
+            <!-- Container for Monthly Plans -->
+            <div id="monthly-plans-container" class="space-y-12">
+                <!-- Monthly plans will be loaded here by JavaScript -->
+                 <p id="no-plans-message" class="text-center text-gray-500 italic">No study plans found. Click "Add Month" to create one.</p>
             </div>
-        </div>
 
-        <!-- Desktop Table -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 full-table">
-            <table class="min-w-full">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Day</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Topic</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Completed</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white" id="daily-plan-body"></tbody>
-            </table>
-        </div>
+        </div> <!-- End Study Plan Content -->
 
-        <!-- Mobile Cards -->
-        <div class="space-y-4 mobile-cards" id="daily-plan-cards"></div>
+    </main>
+
+    <!-- Modal for Vocabulary Meaning -->
+    <div id="vocab-modal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close" onclick="closeModal('vocab-modal')">&times;</span>
+        <h3 id="vocab-modal-word" class="text-xl font-semibold mb-3 text-emerald-400">Word</h3>
+        <p id="vocab-modal-meaning" class="text-gray-300"></p>
+      </div>
     </div>
-</div>
 
-<!-- Story Modal -->
-<div id="story-modal" class="modal-hidden">
-    <div id="story-overlay" class="story-modal-overlay"></div>
-    <div id="story-modal-box" class="story-modal-box">
-        <button id="story-close-btn" class="story-modal-close-btn">&times;</button>
-        <h3 id="story-title">A Day's Tale</h3>
-        <p id="story-content" class="mt-4"></p>
+    <!-- Modal for Story -->
+    <div id="story-modal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close" onclick="closeModal('story-modal')">&times;</span>
+        <h3 class="text-xl font-semibold mb-3 text-emerald-400">Story</h3>
+        <p id="story-modal-content" class="text-gray-300 whitespace-pre-wrap"></p>
+      </div>
     </div>
-</div>
 
-<!-- Edit Modal (hidden by default) -->
-<div id="edit-modal" class="modal-hidden" aria-hidden="true">
-    <div id="edit-overlay" class="edit-modal-overlay modal-hidden"></div>
-    <div id="edit-box" class="edit-modal-box modal-hidden" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
-            <h3 id="edit-modal-title" style="font-weight:700;color:#1f2937">Edit Day</h3>
-            <button id="edit-close-btn" style="background:transparent;border:none;font-size:1.25rem;cursor:pointer;color:#6b7280">&times;</button>
+     <!-- Modal for Adding/Editing Story -->
+    <div id="edit-story-modal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close" onclick="closeModal('edit-story-modal')">&times;</span>
+        <h3 class="text-xl font-semibold mb-3 text-emerald-400">Add/Edit Story</h3>
+        <textarea id="story-textarea" rows="6" class="w-full p-2 bg-gray-700 border border-gray-600 rounded-md text-gray-100 placeholder-gray-400 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Write a story using the vocabulary words..."></textarea>
+        <div class="mt-4 flex justify-end gap-3">
+             <button onclick="closeModal('edit-story-modal')" class="action-button action-button-secondary">Cancel</button>
+             <button id="save-story-btn" class="action-button">Save Story</button>
         </div>
-        <div id="edit-form">
-            <!-- Fields will be inserted dynamically -->
-        </div>
-        <div class="edit-actions">
-            <button id="edit-cancel-btn" class="px-4 py-2 rounded-md border border-gray-300">Cancel</button>
-            <button id="edit-save-btn" class="px-4 py-2 rounded-md bg-indigo-600 text-white">Save</button>
-        </div>
+      </div>
     </div>
-</div>
 
-<!-- Firebase + App Script -->
-<script type="module">
-    // Firebase imports
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import necessary functions from Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import {
+            getAuth,
+            onAuthStateChanged,
+            signInWithPopup,
+            GoogleAuthProvider,
+            signOut,
+            signInWithCustomToken,
+            signInAnonymously
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore,
+            setDoc,
+            doc,
+            getDoc,
+            collection,
+            query,
+            getDocs,
+            onSnapshot,
+            addDoc,
+            updateDoc,
+            deleteDoc,
+            arrayUnion,
+            arrayRemove,
+             writeBatch,
+             Timestamp,
+             where,
+             orderBy, // Note: orderBy might require composite indexes in Firestore
+             setLogLevel // Import setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    /* ----------------- CONFIG ----------------- */
-    const firebaseConfig = {
-      apiKey: "AIzaSyAj7MDnrnzKUO73BXG0jeM-uBGrAH3XiAY",
-      authDomain: "study-plan17.firebaseapp.com",
-      projectId: "study-plan17",
-      storageBucket: "study-plan17.firebasestorage.app",
-      messagingSenderId: "394648483332",
-      appId: "1:394648483332:web:a0b8f6adc9c8cad0e4e751",
-      measurementId: "G-X9CFFJCM2F"
-    };
+        // --- Firebase Configuration ---
+         // Enable Firestore debug logging
+        setLogLevel('debug'); // Set to 'debug' for verbose logging, 'silent' to disable
 
-    let app, auth, db, userId, dataDocRef, unsubscribeListener = null;
-    let isFirebaseReady = false, isDataLoaded = false;
+        // Use environment variables provided by the platform
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            // Provide default fallback config if needed, but ideally rely on __firebase_config
+            apiKey: "YOUR_FALLBACK_API_KEY",
+            authDomain: "YOUR_FALLBACK_AUTH_DOMAIN",
+            projectId: "YOUR_FALLBACK_PROJECT_ID",
+            storageBucket: "YOUR_FALLBACK_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_FALLBACK_MESSAGING_SENDER_ID",
+            appId: "YOUR_FALLBACK_APP_ID"
+         };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // Use provided app ID or a default
 
-    // UI elements
-    const loginBtn = document.getElementById('login-btn');
-    const logoutBtn = document.getElementById('logout-btn');
-    const userInfo = document.getElementById('user-info');
-    const userName = document.getElementById('user-name');
-    const userEmail = document.getElementById('user-email');
-    const syncIndicator = document.getElementById('sync-indicator');
-    const syncStatus = document.getElementById('sync-status');
-    const syncError = document.getElementById('sync-error');
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
 
-    function setSyncStatus(status, isError=false) {
-        if (isError) {
-            syncIndicator.classList.remove('bg-green-500','animate-pulse');
-            syncIndicator.classList.add('bg-red-500');
-            syncStatus.textContent = status;
-            syncError.textContent = status;
-            syncError.classList.remove('hidden');
-        } else if (status === 'synced') {
-            syncIndicator.classList.remove('bg-gray-400','animate-pulse','bg-yellow-500');
-            syncIndicator.classList.add('bg-green-500');
-            syncStatus.textContent = "Synced";
-            syncError.classList.add('hidden');
-        } else if (status === 'saving') {
-            syncIndicator.classList.remove('bg-green-500');
-            syncIndicator.classList.add('bg-yellow-500','animate-pulse');
-            syncStatus.textContent = "Saving...";
-        } else {
-            syncIndicator.classList.add('bg-gray-400','animate-pulse');
-            syncStatus.textContent = status || "Connecting...";
-        }
-    }
+        // --- DOM Elements ---
+        const authSection = document.getElementById('auth-section');
+        const loginPrompt = document.getElementById('login-prompt');
+        const userInfo = document.getElementById('user-info');
+        const userDisplay = document.getElementById('user-display');
+        const userEmailDisplay = document.getElementById('user-email-display');
+        const userIdDisplay = document.getElementById('user-id-display'); // Get the User ID display element
+        const googleLoginBtn = document.getElementById('google-login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const studyPlanContent = document.getElementById('study-plan-content');
+        const addMonthBtn = document.getElementById('add-month-btn');
+        const monthlyPlansContainer = document.getElementById('monthly-plans-container');
+        const noPlansMessage = document.getElementById('no-plans-message');
 
-    function showLoggedOutUI() {
-        if (unsubscribeListener) { unsubscribeListener(); unsubscribeListener = null; }
-        userInfo.classList.add('hidden'); loginBtn.classList.remove('hidden');
-        setSyncStatus("Waiting for login...");
-        syncIndicator.classList.remove('bg-green-500','bg-red-500','bg-yellow-500');
-        syncIndicator.classList.add('bg-gray-400');
-        clearLocalData();
-        isDataLoaded = false;
-    }
-    function showLoggedInUI(user) {
-        loginBtn.classList.add('hidden'); userInfo.classList.remove('hidden');
-        userName.textContent = user.displayName; userEmail.textContent = user.email;
-        setSyncStatus("Connecting...");
-    }
+        // Desktop/Mobile Auth Containers
+        const authContainerDesktop = document.getElementById('auth-container-desktop');
+        const authContainerMobile = document.getElementById('auth-container-mobile');
+        const signupButtons = document.querySelectorAll('.signup-button');
 
-    async function signInWithGoogle() {
-        if (!auth) return;
-        const provider = new GoogleAuthProvider();
-        try {
-            setSyncStatus("Logging in...");
-            await signInWithPopup(auth, provider);
-        } catch (err) {
-            console.error(err); setSyncStatus(err.message, true);
-        }
-    }
-    async function signOutUser() {
-        if (!auth) return;
-        try { await signOut(auth); } catch(err){ console.error(err); setSyncStatus(err.message,true); }
-    }
 
-    async function initFirebase() {
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            setLogLevel('error');
-            isFirebaseReady = true;
+        // Modals
+        const vocabModal = document.getElementById('vocab-modal');
+        const storyModal = document.getElementById('story-modal');
+        const editStoryModal = document.getElementById('edit-story-modal');
+        const saveStoryBtn = document.getElementById('save-story-btn');
+        let currentStoryTarget = null; // To store monthId, weekId, dayIndex, rowIndex for saving story
 
-            onAuthStateChanged(auth, async user => {
-                if (user) {
-                    userId = user.uid; showLoggedInUI(user);
-                    const dataPath = `/studyPlan/users/${userId}/progress`;
-                    dataDocRef = doc(db, dataPath);
-                    listenForDataChanges();
-                } else {
-                    userId = null; dataDocRef = null; showLoggedOutUI();
-                }
-            });
-        } catch(err) {
-            console.error("Firebase init error", err); setSyncStatus(err.message,true);
-        }
-    }
+        let currentUser = null;
+        let userId = null;
+        let unsubscribePlans = null; // To hold the listener
 
-    /* ------------- APP DATA & UI BUILD ------------- */
-    // Initial plan (same as original). We'll allow edits that update this in-memory and persist to Firestore.
-    const dailyPlanData = [
-        { day: 'Day-1', subject: 'Quran', topic: 'Sura Anfal 8:45- 8:53' },
-        { day: 'Day-1', subject: 'Newspaper', topic: 'The Daily Star: Shibir-backed panel sweeps Rucsu polls, Lowest HSC pass rate in 21 years' },
-        { day: 'Day-1', subject: 'Vocabulary', topic: 'Sweep- বিজয় অর্জন, Clinch- সমর্থন করা, unbridled-অবাধ, outperform-ছাড়িয়ে যাওয়া, Steep-خাড়া, dismally- poorly, poor show- নিম্ন ফলাফল, lenient- কোমল, pronounced- সুস্পষ্ট।' },
-        { day: 'Day-1', subject: 'Math', topic: 'Ratio Class 12, 13' },
-        { day: 'Day-1', subject: 'Basic View', topic: 'Page 1-20' },
-        { day: 'Day-2', subject: 'Quran', topic: 'Sura Anfal 8:53-8:69' },
-        { day: 'Day-2', subject: 'Newspaper', topic: 'Editorial: Our children deserve clean air' },
-        { day: 'Day-2', subject: 'Vocabulary', topic: 'Unnerved- ভীত, dire- অত্যান্ত জরুরি, particulate matter- অতিক্ষুদ্র পদার্থ, brick kilns- ইট ভাটা, infants- শিশু, likelihood- সম্ভাবনা, ingrained- বদ্ধমূল, halt- থামা, perpetuate- অবিরাম করা,' },
-        { day: 'Day-2', subject: 'Math', topic: 'Ratio Class 14, 15' },
-        { day: 'Day-2', subject: 'Basic View', topic: '' },
-        { day: 'Day-3', subject: 'Quran', topic: 'Sura Anfal 8:70- Sura Tawbah 9:6' },
-        { day: 'Day-3', subject: 'Newspaper', topic: 'Editorial: Sabotage or not, the government must account for the recent fires' },
-        { day: 'Day-3', subject: 'Vocabulary', topic: 'Sabotage- নাশকতা, Devastating- ধ্বংশাত্মক, Blaze- তীব্র অগ্নিকাণ্ড, deploy- মোতায়েন করা, disrupt- বিঘ্ন ঘটানো, stranded- আটকে পড়া, spate- ঢল, undermine- দুর্বল করা, sow panic- আতঙ্ক ছড়ানো, arson- অগ্নিসংযোগ, resolute- দৃঢ় প্রতিজ্ঞ, beyond comprehension- বোধগমতার বাইরে, contingency- বিকল্প ব্যবস্থা, bode- ইঙ্গিত দেয়া/ পূর্বাভাস' },
-        { day: 'Day-3', subject: 'Math', topic: 'Class 16, 17' },
-        { day: 'Day-3', subject: 'Basic View', topic: '' },
-        { day: 'Day-4', subject: 'Quran', topic: 'Sura Tawbah 9:7- 9:20' },
-        { day: 'Day-4', subject: 'Newspaper', topic: '' },
-        { day: 'Day-4', subject: 'Vocabulary', topic: '' },
-        { day: 'Day-4', subject: 'Math', topic: 'Class 18, 19' },
-        { day: 'Day-4', subject: 'Basic View', topic: '' },
-        { day: 'Day-5', subject: 'Quran', topic: 'Sura Tawbah 9:21- 9:31' },
-        { day: 'Day-5', subject: 'Newspaper', topic: 'Tripura mob killing of Bangladeshis exposes the accountability gap' },
-        { day: 'Day-5', subject: 'Vocabulary', topic: 'Gruesome-ভয়াবহ, heinous-নিকৃষ্ট, sanctity- পবিত্রতা, frontier vengeance- সীমান্ত প্রতিহিংসা, porous- ছিদ্রযুক্ত, flux- অবিরাম গতি, illicit- অবৈধ, intricate- সূক্ষ্ণ, backdrop- পটভূমি, precarious- ঝুঁকিপূর্ণ, pledged- প্রতিজ্ঞা করা, curb- দমন করা, intrusions- onadhikar probes, repatriate- নিজ দেশে ফেরত পাঠানো, patrols- টহল, usher in- শুরু করা, restraint- সংগম, hollow- ফাঁপা, invoking- আহ্বান করা, culminating-শেষ করা, perpetrators- অপরাধী' },
-        { day: 'Day-5', subject: 'Math', topic: 'Class 20, 21' },
-        { day: 'Day-5', subject: 'Basic View', topic: '' },
-        { day: 'Day-6', subject: 'Quran', topic: 'Sura Tawbah 9:31- 9:41' },
-        { day: 'Day-6', subject: 'Newspaper', topic: '' },
-        { day: 'Day-6', subject: 'Vocabulary', topic: '' },
-        { day: 'Day-6', subject: 'Math', topic: '' },
-        { day: 'Day-6', subject: 'Basic View', topic: '' },
-        { day: 'Day-7', subject: 'Quran', topic: '' },
-        { day: 'Day-7', subject: 'Newspaper', topic: '' },
-        { day: 'Day-7', subject: 'Vocabulary', topic: '' },
-        { day: 'Day-7', subject: 'Math', topic: '' },
-        { day: 'Day-7', subject: 'Basic View', topic: '' },
-    ];
 
-    const vocabStories = {
-        'Day-1': "The young prince planned to <strong>sweep</strong> the election. He needed to <strong>clinch</strong> the final vote from the stubborn council. ...",
-        'Day-2': "The old scientist felt <strong>unnerved</strong> by the sky's strange color. ...",
-        'Day-3': "The empress was certain it was <strong>sabotage</strong>. ...",
-        'Day-5': "The detective inspected the <strong>gruesome</strong> crime scene. ..."
-    };
+        // --- Authentication Logic ---
 
-    // Task weights & progress
-    const taskWeights = {'Quran':5/7,'Newspaper':5/7,'Vocabulary':10/7,'Math':40/7,'Basic View':40/7};
-    let maxWeight = 0;
-    const progressLabel = document.getElementById('weekly-progress-label');
-    const progressBar = document.getElementById('weekly-progress-bar');
+         // Function to update UI based on auth state
+        function updateAuthUI(user) {
+            const loggedInContentDesktop = `
+                <div class="text-sm">
+                    <p class="font-semibold text-gray-200">${user.displayName || 'User'}</p>
+                    <p class="text-gray-400 text-xs">${user.email || ''}</p>
+                </div>
+                <button id="logout-btn-desktop" class="ml-3 px-4 py-2 text-xs font-semibold bg-red-600 hover:bg-red-700 rounded-full transition-colors">Log Out</button>
+            `;
+            const loggedInContentMobile = `
+                <div class="text-sm mb-2">
+                    <p class="font-semibold text-gray-200">${user.displayName || 'User'}</p>
+                    <p class="text-gray-400 text-xs">${user.email || ''}</p>
+                </div>
+                <button id="logout-btn-mobile" class="w-full text-center text-sm font-semibold bg-red-600 hover:bg-red-700 rounded-full py-2 transition-colors">Log Out</button>
+            `;
+            const loggedOutContentDesktop = `<a href="index.html#signup" class="px-6 py-3 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 rounded-full transition-colors signup-button">Sign Up</a>`;
+            const loggedOutContentMobile = `<a href="index.html#signup" class="block w-full text-center text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 rounded-full py-2 transition-colors signup-button">Sign Up</a>`;
 
-    window.updateWeeklyProgress = function() {
-        let currentWeight = 0;
-        const allCheckboxes = document.querySelectorAll('.task-checkbox');
-        const checkedTasks = new Set();
-        allCheckboxes.forEach(cb => {
-            const uniqueId = `${cb.dataset.day}-${cb.dataset.subject}`;
-            if(cb.checked && !checkedTasks.has(uniqueId)) {
-                const subject = cb.dataset.subject;
-                if(subject && taskWeights[subject]) currentWeight += taskWeights[subject];
-                checkedTasks.add(uniqueId);
-            }
-        });
-        const percentage = (maxWeight>0)?(currentWeight/maxWeight)*100:0;
-        if(progressLabel) progressLabel.textContent = `Weekly Progress: ${percentage.toFixed(0)}%`;
-        if(progressBar) progressBar.style.width = `${percentage}%`;
-    }
 
-    /* ---------- Helpers for Vocab UI ---------- */
-    function createVocabElementFromPair(pair) {
-        const parts = pair.split('-');
-        if(parts.length===2 && parts[0].trim() && parts[1].trim()) {
-            const eng = parts[0].trim();
-            const ban = parts[1].trim().replace('।','');
-            const container = document.createElement('div');
-            container.classList.add('vocab-item');
-            container.setAttribute('tabindex','0');
-            container.addEventListener('click', function(e){
-                e.stopPropagation();
-                document.querySelectorAll('.vocab-item.active').forEach(it=>{ if(it!==this) it.classList.remove('active'); });
-                this.classList.toggle('active');
-            });
-            const engSpan = document.createElement('span'); engSpan.classList.add('vocab-word'); engSpan.textContent=eng;
-            const banSpan = document.createElement('span'); banSpan.classList.add('vocab-meaning'); banSpan.textContent=ban;
-            container.appendChild(engSpan); container.appendChild(banSpan);
-            return container;
-        } else if(pair.trim()) {
-            const span = document.createElement('span'); span.textContent = pair.trim(); return span;
-        }
-        return null;
-    }
+             if (user) {
+                currentUser = user;
+                userId = user.uid; // Use the authenticated user's UID
+                console.log("User logged in:", userId);
 
-    // Build UI
-    const tableBody = document.getElementById('daily-plan-body');
-    const mobileCardsContainer = document.getElementById('daily-plan-cards');
-    let currentDay = '', currentMobileDay = '';
+                // Update Auth Section
+                loginPrompt.style.display = 'none';
+                userInfo.classList.remove('hidden');
+                userDisplay.textContent = user.displayName || 'Anonymous User';
+                userEmailDisplay.textContent = user.email || '';
+                userIdDisplay.textContent = `ID: ${userId}`; // Display User ID
 
-    function buildUI() {
-        tableBody.innerHTML = '';
-        mobileCardsContainer.innerHTML = '';
-        currentDay = ''; currentMobileDay = '';
-        maxWeight = 0;
+                // Update Header Auth Containers
+                authContainerDesktop.innerHTML = loggedInContentDesktop;
+                authContainerMobile.innerHTML = loggedInContentMobile;
 
-        dailyPlanData.forEach(item => {
-            if((item.subject||item.topic) && taskWeights[item.subject]) maxWeight += taskWeights[item.subject];
+                // Attach logout listeners to the newly created buttons
+                document.getElementById('logout-btn-desktop')?.addEventListener('click', handleLogout);
+                document.getElementById('logout-btn-mobile')?.addEventListener('click', handleLogout);
+                logoutBtn.classList.remove('hidden'); // Show logout in the main section too
 
-            // Desktop row
-            const row = document.createElement('tr'); row.classList.add('task-item'); row.setAttribute('data-day', item.day); row.setAttribute('data-subject', item.subject);
-            const dayCell = document.createElement('td'); dayCell.classList.add('px-6','py-4','text-sm','font-medium','text-gray-900','align-top');
 
-            if(item.day !== currentDay) {
-                row.classList.add('day-group-start');
-                const dayText = document.createElement('span'); dayText.textContent = item.day; dayCell.appendChild(dayText);
+                // Show study plan content and load data
+                studyPlanContent.classList.remove('hidden');
+                loadStudyPlans();
 
-                const dateInputDiv = document.createElement('div'); dateInputDiv.classList.add('date-input-desktop','mt-2'); dateInputDiv.setAttribute('data-day-input', item.day); dateInputDiv.style.display='none';
-                const dateInputId = `date-${item.day}`;
-                dateInputDiv.innerHTML = `
-                    <div class="flex flex-col gap-1">
-                        <label for="${dateInputId}" class="text-xs font-medium text-gray-600">Completion Date:</label>
-                        <input type="text" id="${dateInputId}" class="form-input p-1 border border-gray-300 rounded-md shadow-sm text-sm w-full max-w-xs" placeholder="e.g., 24/10/25">
-                    </div>
-                `;
-                dateInputDiv.querySelector('input').addEventListener('input', onInputChange);
-                dayCell.appendChild(dateInputDiv);
-                currentDay = item.day;
-            }
-            row.appendChild(dayCell);
-
-            const subjectCell = document.createElement('td'); subjectCell.classList.add('px-6','py-4','text-sm','text-gray-500','font-medium','align-top'); subjectCell.textContent = item.subject; row.appendChild(subjectCell);
-
-            const topicCell = document.createElement('td'); topicCell.classList.add('px-6','py-4','text-sm','text-gray-600','align-top','whitespace-normal','break-words');
-            // unique id for topic cell for persistence / updates
-            const topicCellId = `topic-${item.day}-${item.subject}`.replace(/\s+/g,'_');
-            topicCell.id = topicCellId;
-
-            if(item.subject === 'Vocabulary' && item.topic) {
-                const wrapper = document.createElement('div'); wrapper.classList.add('flex','flex-wrap','gap-2','py-1');
-                const pairs = item.topic.split(/, |।/).filter(p=>p.trim());
-                pairs.forEach(p=>{
-                    const el = createVocabElementFromPair(p);
-                    if(el) wrapper.appendChild(el);
-                });
-                topicCell.appendChild(wrapper);
-                if(pairs.length>0 && vocabStories[item.day]) {
-                    const storyBtn = document.createElement('button'); storyBtn.textContent='Read story'; storyBtn.classList.add('read-story-btn'); storyBtn.setAttribute('data-day', item.day);
-                    topicCell.appendChild(storyBtn);
-                }
             } else {
-                const span = document.createElement('span'); span.textContent = item.topic || '-'; topicCell.appendChild(span);
-            }
-            row.appendChild(topicCell);
+                currentUser = null;
+                userId = crypto.randomUUID(); // Generate a random ID for anonymous users
+                console.log("User logged out or anonymous:", userId);
 
-            const completionCell = document.createElement('td'); completionCell.classList.add('px-6','py-4','text-sm','text-gray-500','align-top','flex','items-start','gap-2');
-            if(item.subject || item.topic) {
-                const checkbox = document.createElement('input'); checkbox.type='checkbox'; checkbox.classList.add('task-checkbox'); checkbox.setAttribute('data-day',item.day); checkbox.setAttribute('data-subject', item.subject);
-                checkbox.addEventListener('change', onInputChange);
-                completionCell.appendChild(checkbox);
-                // Add Edit button for the day's LAST row (Basic View) only.
-                if(item.subject === 'Basic View') {
-                    const editBtn = document.createElement('button'); editBtn.classList.add('px-3','py-1','rounded-md','border','border-gray-300','text-xs','text-gray-700'); editBtn.textContent = 'Edit';
-                    editBtn.addEventListener('click', (e)=>{ e.stopPropagation(); openEditModal(item.day); });
-                    completionCell.appendChild(editBtn);
+                // Update Auth Section
+                loginPrompt.style.display = 'block';
+                userInfo.classList.add('hidden');
+                logoutBtn.classList.add('hidden'); // Hide logout in main section
+
+                 // Update Header Auth Containers
+                authContainerDesktop.innerHTML = loggedOutContentDesktop;
+                authContainerMobile.innerHTML = loggedOutContentMobile;
+
+
+                // Hide study plan content and clear display
+                studyPlanContent.classList.add('hidden');
+                monthlyPlansContainer.innerHTML = ''; // Clear previous plans
+                noPlansMessage.style.display = 'block';
+                if (unsubscribePlans) {
+                    unsubscribePlans(); // Detach listener
+                    unsubscribePlans = null;
                 }
             }
-            row.appendChild(completionCell);
-            tableBody.appendChild(row);
 
-            // Mobile card
-            if(item.subject || item.topic) {
-                const card = document.createElement('div'); card.classList.add('bg-white','p-4','rounded-lg','shadow','card-item'); card.setAttribute('data-day', item.day);
-                let headerHTML = '';
-                let dateInputMobileHTML = '';
-                const dateInputMobileId = `date-mobile-${item.day}`;
-                if(item.day !== currentMobileDay) {
-                    headerHTML = `<h3 class="font-bold text-lg text-gray-800 mb-2">${item.day}</h3>`;
-                    dateInputMobileHTML = `
-                        <div class="date-input-mobile mt-2 mb-3 p-3 bg-green-50 rounded-md" data-day-input="${item.day}" style="display:none;">
-                            <div class="flex items-center gap-2">
-                                <label for="${dateInputMobileId}" class="text-sm font-medium text-gray-700">Completion Date:</label>
-                                <input type="text" id="${dateInputMobileId}" class="form-input p-1 border border-gray-300 rounded-md shadow-sm text-sm w-full" placeholder="e.g., 24/10/25">
-                            </div>
-                        </div>
-                    `;
-                    currentMobileDay = item.day;
-                }
-                let topicMobileContent = '';
-                if(item.subject === 'Vocabulary' && item.topic) {
-                    const pairs = item.topic.split(/, |।/).filter(p=>p.trim());
-                    topicMobileContent = '<div class="flex flex-wrap gap-2 py-1">';
-                    pairs.forEach(p=>{
-                        const el = createVocabElementFromPair(p);
-                        if(el) topicMobileContent += el.outerHTML;
-                    });
-                    topicMobileContent += '</div>';
-                    if(pairs.length>0 && vocabStories[item.day]) topicMobileContent += `<button class="read-story-btn" data-day="${item.day}">Read story</button>`;
+             // Re-attach listeners for dynamically added signup buttons if needed
+             document.querySelectorAll('.signup-button').forEach(button => {
+                 // Add smooth scroll logic if needed again, assuming script.js handles it
+             });
+        }
+
+
+        onAuthStateChanged(auth, async (user) => {
+            console.log("Auth state changed. User:", user);
+             if (user) {
+                updateAuthUI(user);
+            } else {
+                // Try signing in with the custom token if available
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    try {
+                        console.log("Attempting sign in with custom token...");
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                        // onAuthStateChanged will trigger again with the authenticated user
+                        console.log("Sign in with custom token successful.");
+                    } catch (error) {
+                        console.error("Error signing in with custom token:", error);
+                        // If custom token fails, sign in anonymously
+                        try {
+                            console.log("Attempting anonymous sign in as fallback...");
+                            await signInAnonymously(auth);
+                            console.log("Anonymous sign in successful.");
+                            // onAuthStateChanged will trigger again with the anonymous user
+                        } catch (anonError) {
+                            console.error("Error signing in anonymously:", anonError);
+                            updateAuthUI(null); // Show logged-out state if all fails
+                        }
+                    }
                 } else {
-                    topicMobileContent = `<span class="text-gray-600">${item.topic || '-'}</span>`;
+                    // If no custom token, sign in anonymously directly
+                     try {
+                        console.log("No custom token found, attempting anonymous sign in...");
+                        await signInAnonymously(auth);
+                         console.log("Anonymous sign in successful.");
+                        // onAuthStateChanged will trigger again with the anonymous user
+                    } catch (anonError) {
+                        console.error("Error signing in anonymously:", anonError);
+                        updateAuthUI(null); // Show logged-out state if anonymous sign-in fails
+                    }
                 }
+            }
+        });
 
-                // For mobile, add edit button in Basic View card as well
-                const editBtnMobile = (item.subject === 'Basic View') ? `<button class="px-3 py-1 rounded-md border border-gray-300 text-xs text-gray-700" data-edit-day="${item.day}">Edit</button>` : '';
 
-                card.innerHTML = `
-                    ${headerHTML}
-                    ${dateInputMobileHTML}
-                    <div class="flex items-start">
-                        <input type="checkbox" class="task-checkbox mt-1" data-day="${item.day}" data-subject="${item.subject}">
-                        <div class="ml-2 flex-1 min-w-0">
-                            <p class="font-medium text-gray-700">${item.subject}</p>
-                            <div class="text-sm break-words" id="topic-mobile-${item.day}-${item.subject}">${topicMobileContent}</div>
-                            ${editBtnMobile}
+        // Google Login Handler
+        googleLoginBtn.addEventListener('click', async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+                // onAuthStateChanged will handle the UI update
+            } catch (error) {
+                console.error("Google Sign-In Error:", error);
+                // Handle specific errors like popup blocked
+            }
+        });
+
+        // Logout Handler
+        async function handleLogout() {
+             console.log("Logging out...");
+            try {
+                await signOut(auth);
+                 console.log("Logout successful.");
+                // onAuthStateChanged will handle the UI update to the logged-out state
+            } catch (error) {
+                console.error("Logout Error:", error);
+            }
+        }
+         // Initial setup for the main logout button in the auth section
+         logoutBtn.addEventListener('click', handleLogout);
+
+
+        // --- Firestore Logic ---
+
+        // Function to get the path for user's private data
+        function getUserPlansCollectionPath() {
+             if (!userId) throw new Error("User ID is not available.");
+             // Storing study plans as private data by default
+             return `artifacts/${appId}/users/${userId}/studyPlans`;
+        }
+
+
+        // Load existing study plans
+        async function loadStudyPlans() {
+            if (!currentUser || !userId) return;
+            console.log("Loading study plans for user:", userId);
+
+             const plansCollectionPath = getUserPlansCollectionPath();
+             const q = query(collection(db, plansCollectionPath)); // Consider adding orderBy('createdAt', 'desc') later if needed
+
+            // Detach previous listener if exists
+            if (unsubscribePlans) {
+                unsubscribePlans();
+            }
+
+            unsubscribePlans = onSnapshot(q, (querySnapshot) => {
+                 console.log("Received plans snapshot. Number of plans:", querySnapshot.size);
+                monthlyPlansContainer.innerHTML = ''; // Clear existing plans first
+                if (querySnapshot.empty) {
+                    noPlansMessage.style.display = 'block';
+                } else {
+                    noPlansMessage.style.display = 'none';
+                     const plans = [];
+                     querySnapshot.forEach((doc) => {
+                         plans.push({ id: doc.id, ...doc.data() });
+                     });
+
+                     // Sort plans client-side (e.g., by monthId YYYY-MM descending)
+                     plans.sort((a, b) => b.id.localeCompare(a.id));
+
+                     plans.forEach(planData => {
+                        monthlyPlansContainer.appendChild(createMonthElement(planData.id, planData));
+                    });
+                }
+            }, (error) => {
+                 console.error("Error fetching study plans:", error);
+                 monthlyPlansContainer.innerHTML = '<p class="text-red-400 text-center">Error loading plans. Please try again later.</p>';
+                 noPlansMessage.style.display = 'none';
+            });
+        }
+
+       // Add a new month
+        addMonthBtn.addEventListener('click', async () => {
+            if (!currentUser || !userId) return;
+
+            const currentYear = new Date().getFullYear();
+            const currentMonthIndex = new Date().getMonth(); // 0-11
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            // Suggest the next month by default
+            const nextMonthIndex = (currentMonthIndex + 1) % 12;
+            const nextMonthYear = currentMonthIndex === 11 ? currentYear + 1 : currentYear;
+            const suggestedMonthName = `${monthNames[nextMonthIndex]} ${nextMonthYear}`;
+
+            const monthName = prompt("Enter month name (e.g., 'October 2025'):", suggestedMonthName);
+            if (!monthName || monthName.trim() === '') return;
+
+             // Generate a Firestore-friendly ID (e.g., YYYY-MM)
+             // Try to parse the input or use the suggested one
+             let monthId = '';
+             try {
+                // Basic parsing attempt - adjust if needed for more robust parsing
+                const parts = monthName.split(' ');
+                const year = parseInt(parts[1]);
+                const monthIndex = monthNames.findIndex(m => m.toLowerCase() === parts[0].toLowerCase());
+                if (year && monthIndex !== -1) {
+                    monthId = `${year}-${(monthIndex + 1).toString().padStart(2, '0')}`;
+                } else {
+                     throw new Error("Invalid format");
+                }
+             } catch (e) {
+                 // Fallback if parsing fails - use next month's ID
+                 monthId = `${nextMonthYear}-${(nextMonthIndex + 1).toString().padStart(2, '0')}`;
+                 console.warn("Could not parse month name, using generated ID:", monthId);
+             }
+
+
+             // Check if month already exists (optional but good practice)
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             const docSnap = await getDoc(docRef);
+             if (docSnap.exists()) {
+                // Using a simple browser confirm replacement
+                showCustomAlert(`Study plan for month ID ${monthId} already exists.`);
+                 return;
+             }
+
+
+            const newPlanData = {
+                monthName: monthName.trim(),
+                createdAt: Timestamp.now(), // Add a timestamp
+                weeklyTargets: { week1: '', week2: '', week3: '', week4: '' },
+                weeks: {
+                    // Initialize Week 1 with one default day and one default row
+                     week1: {
+                         days: [
+                             {
+                                 dayNumber: 1,
+                                 date: '', // User can set this
+                                 rows: [
+                                     { subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }
+                                 ]
+                             }
+                         ]
+                     },
+                     week2: { days: [] },
+                     week3: { days: [] },
+                     week4: { days: [] }
+                }
+            };
+
+            try {
+                await setDoc(docRef, newPlanData);
+                console.log("New month added with ID:", monthId);
+                // UI update will happen via onSnapshot listener
+            } catch (error) {
+                console.error("Error adding new month:", error);
+                 showCustomAlert("Error adding month. Please try again.");
+            }
+        });
+
+        // --- UI Creation Functions ---
+
+        // Create HTML for a whole month section
+        function createMonthElement(monthId, data) {
+            const monthDiv = document.createElement('div');
+            monthDiv.classList.add('mb-12', 'p-6', 'bg-gray-800', 'rounded-lg', 'shadow-lg');
+            monthDiv.dataset.monthId = monthId;
+
+            monthDiv.innerHTML = `
+                <h2 class="text-2xl font-bold text-emerald-300 mb-4">${data.monthName || 'Unnamed Month'} (${monthId})</h2>
+
+                <!-- Monthly Targets -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-gray-300 mb-3">Monthly Targets</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 monthly-targets">
+                        ${[1, 2, 3, 4].map(weekNum => `
+                            <div class="bg-gray-700 p-4 rounded-md shadow">
+                                <label for="target-week-${monthId}-${weekNum}" class="block text-sm font-medium text-emerald-400 mb-1">Week ${weekNum}</label>
+                                <textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" rows="3" class="editable-input w-full text-sm placeholder-gray-400" placeholder="Enter target...">${data.weeklyTargets?.[`week${weekNum}`] || ''}</textarea>
+                            </div>
+                        `).join('')}
+                    </div>
+                     <div class="text-right mt-3">
+                        <button class="action-button action-button-secondary text-xs save-targets-btn">Save Targets</button>
+                    </div>
+                </div>
+
+                 <!-- Weekly Plans Container -->
+                <div class="space-y-8 weekly-plans-container">
+                    ${[1, 2, 3, 4].map(weekNum => createWeekElement(monthId, `week${weekNum}`, data.weeks?.[`week${weekNum}`])).join('')}
+                </div>
+            `;
+
+            // Add event listener for saving targets
+             monthDiv.querySelector('.save-targets-btn').addEventListener('click', (e) => {
+                 saveMonthlyTargets(monthId, monthDiv);
+             });
+
+             // Add event listeners for week elements (delegated or added within createWeekElement)
+             attachWeekEventListeners(monthDiv, monthId);
+
+
+            return monthDiv;
+        }
+
+        // Create HTML for a week section
+        function createWeekElement(monthId, weekId, weekData) {
+            const daysHtml = weekData?.days?.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('') || '<p class="text-gray-500 italic text-sm py-4">No days added for this week yet.</p>';
+            const totalDays = weekData?.days?.length || 0;
+            // Calculate progress initially
+            const initialProgress = calculateWeeklyProgress(weekData);
+
+            return `
+                <div class="bg-gray-700/50 p-4 rounded-lg shadow-inner week-section" data-week-id="${weekId}">
+                    <h3 class="text-lg font-semibold text-emerald-400 mb-3 capitalize">Daily Plan - ${weekId.replace('week', 'Week ')}</h3>
+
+                    <!-- Weekly Progress Bar -->
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-gray-400 mb-1">
+                            <span>Weekly Progress</span>
+                            <span class="progress-percentage">${initialProgress}%</span>
+                        </div>
+                        <div class="progress-bar-container w-full">
+                            <div class="progress-bar-fill" style="width: ${initialProgress}%;"></div>
                         </div>
                     </div>
-                `;
-                // checkbox listener
-                card.querySelector('.task-checkbox').addEventListener('change', onInputChange);
-                // date input listener if present
-                if(card.querySelector(`#${dateInputMobileId}`)) card.querySelector(`#${dateInputMobileId}`).addEventListener('input', onInputChange);
-                // edit button listener
-                if(editBtnMobile) {
-                    card.querySelector(`[data-edit-day="${item.day}"]`).addEventListener('click', (e)=>{ e.stopPropagation(); openEditModal(item.day); });
-                }
-                // attach vocab click toggles for mobile items that were put as innerHTML
-                card.querySelectorAll('.vocab-item').forEach(vc => {
-                    vc.addEventListener('click', function(ev){ ev.stopPropagation(); document.querySelectorAll('.vocab-item.active').forEach(i=>{ if(i!==this) i.classList.remove('active'); }); this.classList.toggle('active'); });
-                });
 
-                mobileCardsContainer.appendChild(card);
+                    <!-- Days Container -->
+                    <div class="days-container space-y-6">
+                        ${daysHtml}
+                    </div>
+                    <!-- Add Day Button for the week -->
+                     ${totalDays > 0 ? `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>` : `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`}
+                </div>
+            `;
+        }
+
+       // Create HTML for a day section (including the table)
+        function createDayElement(monthId, weekId, dayIndex, dayData) {
+            const tableId = `table-${monthId}-${weekId}-${dayIndex}`;
+            return `
+                <div class="day-section border-t border-gray-600 pt-4" data-day-index="${dayIndex}">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-semibold text-gray-200">Day ${dayData.dayNumber}</h4>
+                        <button class="action-button action-button-secondary text-xs edit-day-btn">
+                            <i class="fas fa-pencil-alt mr-1"></i> Edit
+                        </button>
+                    </div>
+                    <table class="w-full text-sm text-left text-gray-400 study-table" id="${tableId}">
+                        <thead class="text-xs text-gray-300 uppercase bg-gray-600/50">
+                            <tr>
+                                <th scope="col" class="px-3 py-2 w-1/6">Subject</th>
+                                <th scope="col" class="px-3 py-2 w-3/6">Topic / Vocab</th>
+                                <th scope="col" class="px-3 py-2 w-1/6">Comment</th>
+                                <th scope="col" class="px-3 py-2 w-1/12 text-center">Done</th>
+                                <th scope="col" class="px-3 py-2 w-1/12 text-center completion-perc-header hidden">%</th> <!-- Hidden by default -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${dayData.rows?.map((rowData, rowIndex) => createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)).join('') || ''}
+                        </tbody>
+                    </table>
+                     <!-- Add Row Button - Initially Hidden -->
+                    <button class="add-row-btn hidden mt-2 ml-1" title="Add Row">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+       // Create HTML for a table row (normal or edit mode)
+        function createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, isEditing) {
+            const uniqueRowId = `row-${monthId}-${weekId}-${dayIndex}-${rowIndex}`;
+            const isVocab = rowData.subject?.toLowerCase().startsWith('vocab');
+            const topicContent = isEditing
+                ? `<textarea class="editable-input topic-input text-xs" rows="2" placeholder="Topic details...">${rowData.topic || ''}</textarea>`
+                 : (isVocab ? generateVocabHtml(rowData.vocabData) : `<span class="topic-display">${rowData.topic || ''}</span>`);
+
+            const storyButtonHtml = (!isEditing && isVocab && rowData.story)
+                 ? `<button class="action-button action-button-secondary text-xs read-story-btn mt-1">Read Story</button>` : '';
+
+             const addStoryButtonHtml = (isEditing && isVocab)
+                 ? `<button class="action-button action-button-secondary text-xs add-story-btn mt-1">Add/Edit Story</button>` : '';
+
+
+            return `
+                <tr id="${uniqueRowId}" data-row-index="${rowIndex}" class="${isEditing ? 'editing-mode' : ''} border-b border-gray-700 hover:bg-gray-700/30">
+                    <td class="px-3 py-2 align-top">
+                        ${isEditing ? `<input type="text" class="editable-input subject-input" placeholder="Subject" value="${rowData.subject || ''}">` : `<span class="subject-display font-medium text-gray-200">${rowData.subject || '-'}</span>`}
+                    </td>
+                    <td class="px-3 py-2 align-top vocab-topic-cell">
+                        ${topicContent}
+                        ${storyButtonHtml}
+                        ${addStoryButtonHtml}
+                    </td>
+                    <td class="px-3 py-2 align-top">
+                        ${isEditing ? `<textarea class="editable-input comment-input text-xs" rows="2" placeholder="Comment...">${rowData.comment || ''}</textarea>` : `<span class="comment-display text-xs">${rowData.comment || '-'}</span>`}
+                    </td>
+                    <td class="px-3 py-2 align-middle text-center">
+                        <input type="checkbox" class="form-checkbox h-4 w-4 text-emerald-500 bg-gray-600 border-gray-500 rounded focus:ring-emerald-400 completion-checkbox" ${rowData.completed ? 'checked' : ''} ${isEditing ? 'disabled' : ''}>
+                    </td>
+                     <td class="px-3 py-2 align-middle text-center completion-perc-cell ${isEditing ? '' : 'hidden'}">
+                         ${isEditing ? `<input type="number" min="0" max="100" class="editable-input completion-perc-input w-16 text-center text-xs" placeholder="%" value="${rowData.completionPercentage ?? ''}">` : ''}
+                     </td>
+                </tr>
+            `;
+        }
+
+        // Generate HTML for vocabulary display
+        function generateVocabHtml(vocabData) {
+            if (!vocabData || vocabData.length === 0) return '-';
+            return vocabData.map(v => `<span class="vocab-word" data-meaning="${escapeHtml(v.meaning || '')}">${escapeHtml(v.word || '')}</span>`).join('');
+        }
+
+        // Helper to escape HTML characters
+        function escapeHtml(unsafe) {
+            if (unsafe === null || unsafe === undefined) return '';
+             return unsafe
+                 .toString()
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+
+        // --- Event Listeners and Handlers ---
+
+        function attachWeekEventListeners(monthElement, monthId) {
+             const weeklyPlansContainer = monthElement.querySelector('.weekly-plans-container');
+
+             weeklyPlansContainer.addEventListener('click', async (e) => {
+                 const target = e.target;
+                 const weekSection = target.closest('.week-section');
+                 if (!weekSection) return;
+                 const weekId = weekSection.dataset.weekId;
+
+                // Edit/Save Day Button
+                if (target.closest('.edit-day-btn')) {
+                    const button = target.closest('.edit-day-btn');
+                    const daySection = button.closest('.day-section');
+                    const isEditing = daySection.classList.contains('editing');
+                    toggleDayEditMode(monthId, weekId, daySection, !isEditing);
+                 }
+                 // Add Row Button
+                 else if (target.closest('.add-row-btn')) {
+                    const daySection = target.closest('.day-section');
+                    addRowToDay(monthId, weekId, daySection);
+                 }
+                 // Completion Checkbox
+                 else if (target.classList.contains('completion-checkbox')) {
+                     // Save immediately when checkbox is clicked in non-edit mode
+                     const daySection = target.closest('.day-section');
+                     if (!daySection.classList.contains('editing')) {
+                         await saveDayPlan(monthId, weekId, daySection); // Save the entire day's state
+                         updateWeeklyProgressUI(monthId, weekId); // Update progress bar after saving
+                     }
+                 }
+                 // Vocab Word Click
+                 else if (target.classList.contains('vocab-word')) {
+                     showVocabMeaning(target);
+                 }
+                 // Read Story Button
+                 else if (target.classList.contains('read-story-btn')) {
+                     const row = target.closest('tr');
+                     const dayIndex = parseInt(row.closest('.day-section').dataset.dayIndex);
+                     const rowIndex = parseInt(row.dataset.rowIndex);
+                     readStory(monthId, weekId, dayIndex, rowIndex);
+                 }
+                  // Add/Edit Story Button
+                 else if (target.classList.contains('add-story-btn')) {
+                     const row = target.closest('tr');
+                      const daySection = row.closest('.day-section');
+                      const dayIndex = parseInt(daySection.dataset.dayIndex);
+                      const rowIndex = parseInt(row.dataset.rowIndex);
+                      openEditStoryModal(monthId, weekId, dayIndex, rowIndex);
+                 }
+                 // Add Day Button
+                 else if (target.classList.contains('add-day-btn') || target.classList.contains('add-first-day-btn')) {
+                     const weekId = target.dataset.weekId;
+                     addNewDay(monthId, weekId, weekSection);
+                 }
+             });
+        }
+
+
+        // Toggle Edit Mode for a Day
+        async function toggleDayEditMode(monthId, weekId, daySection, enterEditMode) {
+            const dayIndex = parseInt(daySection.dataset.dayIndex);
+            const tableBody = daySection.querySelector('tbody');
+            const editButton = daySection.querySelector('.edit-day-btn');
+            const addRowButton = daySection.querySelector('.add-row-btn');
+             const completionPercHeader = daySection.querySelector('.completion-perc-header');
+
+
+             if (enterEditMode) {
+                // Entering Edit Mode
+                 daySection.classList.add('editing');
+                 editButton.innerHTML = '<i class="fas fa-save mr-1"></i> Save';
+                 editButton.classList.remove('action-button-secondary'); // Make it primary save color
+                 addRowButton.classList.remove('hidden');
+                 completionPercHeader.classList.remove('hidden');
+
+
+                // Fetch current data to populate editable fields accurately
+                const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
+                if (!planDoc.exists()) return;
+                const dayData = planDoc.data().weeks[weekId]?.days[dayIndex];
+                if (!dayData) return;
+
+                // Re-render rows in edit mode
+                tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
+                    createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, true)
+                ).join('');
+
+                // Disable completion checkboxes in edit mode
+                daySection.querySelectorAll('.completion-checkbox').forEach(cb => cb.disabled = true);
+
+
+            } else {
+                // Saving and Exiting Edit Mode
+                 await saveDayPlan(monthId, weekId, daySection); // Save the data first
+
+                 daySection.classList.remove('editing');
+                 editButton.innerHTML = '<i class="fas fa-pencil-alt mr-1"></i> Edit';
+                 editButton.classList.add('action-button-secondary'); // Make it secondary color again
+                 addRowButton.classList.add('hidden');
+                  completionPercHeader.classList.add('hidden');
+
+                 // Fetch the *saved* data to re-render in normal mode
+                const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
+                 if (!planDoc.exists()) return;
+                const dayData = planDoc.data().weeks[weekId]?.days[dayIndex];
+                 if (!dayData) return;
+
+                 // Re-render rows in normal mode
+                tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
+                    createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)
+                ).join('');
+
+                updateWeeklyProgressUI(monthId, weekId); // Update progress bar after saving
             }
-        });
+        }
 
-        // global click to close vocab tooltips
-        document.addEventListener('click', function(event) {
-            if(!event.target.closest('.vocab-item')) {
-                document.querySelectorAll('.vocab-item.active').forEach(v=>v.classList.remove('active'));
-            }
-        });
 
-        updateWeeklyProgress();
-    }
+         // Save the current state of a day's plan
+        async function saveDayPlan(monthId, weekId, daySection) {
+            if (!currentUser || !userId) return;
+             console.log(`Saving day plan for ${monthId}, ${weekId}, Day Index: ${daySection.dataset.dayIndex}`);
 
-    // Input change handler (checkboxes & date inputs)
-    function onInputChange(event) {
-        if(!isDataLoaded) return; // Don't allow saves before initial data load
-        const el = event.target;
-        if(el.classList.contains('task-checkbox')) {
-            const day = el.dataset.day; const subject = el.dataset.subject;
-            // set all checkboxes for this day & subject to same state (keeps table+mobile synced)
-            document.querySelectorAll(`.task-checkbox[data-day="${day}"][data-subject="${subject}"]`).forEach(cb=>{
-                cb.checked = el.checked;
-                const taskItem = cb.closest('.task-item, .card-item');
-                if(taskItem) taskItem.classList.toggle('completed', el.checked);
+            const dayIndex = parseInt(daySection.dataset.dayIndex);
+            const rowsData = [];
+            const rows = daySection.querySelectorAll('tbody tr');
+
+            rows.forEach((row, rowIndex) => {
+                 let rowData = {};
+                 if (daySection.classList.contains('editing')) {
+                     // Read from input fields in edit mode
+                     rowData = {
+                         subject: row.querySelector('.subject-input')?.value.trim() || '',
+                         topic: row.querySelector('.topic-input')?.value.trim() || '',
+                         comment: row.querySelector('.comment-input')?.value.trim() || '',
+                         completed: false, // Checkboxes are disabled in edit mode, save as false initially
+                         completionPercentage: parseInt(row.querySelector('.completion-perc-input')?.value) || null,
+                         vocabData: null, // Will be processed below if subject is vocab
+                         story: null // Will be retrieved from existing data if not changed
+                     };
+                      // Parse vocab if subject is 'Vocabulary'
+                     if (rowData.subject?.toLowerCase().startsWith('vocab')) {
+                        rowData.vocabData = parseVocabString(rowData.topic);
+                     }
+                      // Preserve existing story if not editing it now
+                     // Need to fetch previous story data if it exists
+                     // This part is tricky without fetching state *before* editing.
+                     // Let's assume story is handled separately via the modal save.
+
+                 } else {
+                     // Read from display elements and checkbox in normal mode (mainly for checkbox changes)
+                     const subject = row.querySelector('.subject-display')?.textContent || '';
+                     const topic = row.querySelector('.topic-display')?.textContent || ''; // Or handle vocab spans if needed
+                     const comment = row.querySelector('.comment-display')?.textContent || '';
+                     const completed = row.querySelector('.completion-checkbox')?.checked || false;
+
+                     // Need to fetch percentage, vocabData, story from Firestore for this row
+                     // This highlights a potential issue: saving just checkbox requires fetching other row data
+                     // A better approach might be to ONLY update the 'completed' field in Firestore for checkbox clicks
+                      rowData = { subject, topic, comment, completed }; // INCOMPLETE - needs full data fetch or targeted update
+                 }
+                rowsData.push(rowData);
             });
-            checkDayCompletion(day);
-        } else if(el.tagName === 'INPUT' && el.type === 'text') {
-            // date input: keep desktop & mobile in sync
-            const day = el.id.replace('date-','').replace('date-mobile-','');
-            const desktop = document.getElementById(`date-${day}`);
-            const mobile = document.getElementById(`date-mobile-${day}`);
-            if(desktop) desktop.value = el.value;
-            if(mobile) mobile.value = el.value;
+
+
+             // --- More Robust Saving Strategy ---
+             // Fetch the entire month document first
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             try {
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) {
+                    console.error("Month document not found for saving.");
+                    showCustomAlert("Error: Could not find the month plan to save.");
+                    return;
+                }
+
+                let monthData = docSnap.data();
+                let daysArray = monthData.weeks?.[weekId]?.days || [];
+
+                // Reconstruct the day's data accurately
+                const currentDayData = daysArray[dayIndex]; // Get existing data
+                const updatedRows = [];
+
+                rows.forEach((row, rowIndex) => {
+                    let subject, topic, comment, completed, completionPercentage, vocabData, story;
+                     const existingRowData = currentDayData?.rows?.[rowIndex] || {}; // Data before edit/click
+
+                     if (daySection.classList.contains('editing')) {
+                         // Read from inputs
+                         subject = row.querySelector('.subject-input')?.value.trim() || '';
+                         topic = row.querySelector('.topic-input')?.value.trim() || '';
+                         comment = row.querySelector('.comment-input')?.value.trim() || '';
+                         completed = existingRowData.completed || false; // Keep completed status unless checkbox was clicked *before* edit
+                         completionPercentage = parseInt(row.querySelector('.completion-perc-input')?.value) || null;
+                         vocabData = subject?.toLowerCase().startsWith('vocab') ? parseVocabString(topic) : null;
+                         story = existingRowData.story; // Preserve existing story
+                     } else {
+                         // Read from display + checkbox (only checkbox can change here)
+                         subject = existingRowData.subject;
+                         topic = existingRowData.topic;
+                         comment = existingRowData.comment;
+                         completed = row.querySelector('.completion-checkbox')?.checked || false; // The changed value
+                         completionPercentage = existingRowData.completionPercentage;
+                         vocabData = existingRowData.vocabData;
+                         story = existingRowData.story;
+                     }
+
+                     updatedRows.push({
+                         subject,
+                         topic,
+                         comment,
+                         completed,
+                         completionPercentage,
+                         vocabData,
+                         story
+                     });
+                 });
+
+                 // Update the specific day's rows in the fetched data
+                 if (daysArray[dayIndex]) {
+                     daysArray[dayIndex].rows = updatedRows;
+                 } else {
+                     // This case shouldn't happen if we're saving an existing day
+                     console.error("Trying to save data for a non-existent day index.");
+                     return;
+                 }
+
+                 // Prepare the update object for Firestore
+                 const updatePayload = {};
+                 updatePayload[`weeks.${weekId}.days`] = daysArray;
+
+                 // Update Firestore
+                await updateDoc(docRef, updatePayload);
+                console.log(`Day ${dayIndex + 1} for ${weekId} saved successfully.`);
+
+             } catch (error) {
+                 console.error("Error saving day plan:", error);
+                 showCustomAlert("Error saving changes. Please check your connection and try again.");
+             }
         }
-        updateWeeklyProgress();
-        debouncedSaveData();
-    }
 
-    // Check if all subjects for a day are completed to show date input
-    window.checkDayCompletion = function(day) {
-        const allCheckboxesForDay = document.querySelectorAll(`.task-checkbox[data-day="${day}"]`);
-        if(allCheckboxesForDay.length === 0) return;
-        let allChecked = true;
-        const subjects = new Set(Array.from(allCheckboxesForDay).map(cb=>cb.dataset.subject));
-        subjects.forEach(subject=>{
-            const boxes = document.querySelectorAll(`.task-checkbox[data-day="${day}"][data-subject="${subject}"]`);
-            const isSubjectChecked = Array.from(boxes).some(cb=>cb.checked);
-            if(!isSubjectChecked) allChecked = false;
-        });
 
-        const desktopInput = document.querySelector(`.date-input-desktop[data-day-input="${day}"]`);
-        const mobileInput = document.querySelector(`.date-input-mobile[data-day-input="${day}"]`);
-        if(allChecked) { if(desktopInput) desktopInput.style.display='block'; if(mobileInput) mobileInput.style.display='block'; }
-        else { if(desktopInput) desktopInput.style.display='none'; if(mobileInput) mobileInput.style.display='none'; }
-    }
+         // Add a new row to a day's table (in edit mode)
+        function addRowToDay(monthId, weekId, daySection) {
+            const dayIndex = parseInt(daySection.dataset.dayIndex);
+            const tableBody = daySection.querySelector('tbody');
+            const newRowIndex = tableBody.rows.length; // Index for the new row
 
-    /* ----------------- Edit Modal Logic ----------------- */
-    const editModal = document.getElementById('edit-modal');
-    const editOverlay = document.getElementById('edit-overlay');
-    const editBox = document.getElementById('edit-box');
-    const editForm = document.getElementById('edit-form');
-    const editCloseBtn = document.getElementById('edit-close-btn');
-    const editCancelBtn = document.getElementById('edit-cancel-btn');
-    const editSaveBtn = document.getElementById('edit-save-btn');
-    const editTitle = document.getElementById('edit-modal-title');
+            const newRowData = { subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null };
+            const newRowHtml = createTableRow(monthId, weekId, dayIndex, newRowIndex, newRowData, true); // Create in edit mode
 
-    function openEditModal(day) {
-        // Build form fields for this day: Quran, Newspaper, Vocabulary, Math, Basic View, Story
-        editTitle.textContent = `Edit ${day}`;
-        editForm.innerHTML = '';
-        const subjects = ['Quran','Newspaper','Vocabulary','Math','Basic View'];
-        subjects.forEach(subj=>{
-            const field = document.createElement('div'); field.classList.add('edit-field');
-            const label = document.createElement('label'); label.textContent = subj;
-            const input = document.createElement(subj === 'Vocabulary' || subj === 'Newspaper' || subj === 'Basic View' ? 'textarea' : 'input');
-            input.id = `edit-${day}-${subj}`.replace(/\s+/g,'_');
-            input.rows = (subj==='Vocabulary')?4:2;
-            input.placeholder = (subj==='Vocabulary')? 'Enter comma separated pairs like: Word- বাংলা, ...' : 'Enter topic';
-            // Prefill: try to get from in-memory dailyPlanData if present, else from DOM
-            const matching = dailyPlanData.find(d=>d.day===day && d.subject===subj);
-            let initial = matching ? (matching.topic || '') : '';
-            // If DOM value exists (persisted loaded data might differ), prefer DOM innerText/innerHTML for vocab
-            const topicCell = document.getElementById(`topic-${day}-${subj}`.replace(/\s+/g,'_'));
-            if(topicCell) {
-                if(subj === 'Vocabulary') {
-                    // Attempt to reconstruct the stored comma-separated topic from DOM text; fallback to matching.topic
-                    initial = (matching && matching.topic) ? matching.topic : initial;
-                } else {
-                    const textNode = topicCell.querySelector('span');
-                    initial = textNode ? textNode.textContent : (matching?matching.topic:'');
-                }
+            tableBody.insertAdjacentHTML('beforeend', newRowHtml);
+             // Note: This row only exists in the UI until 'Save' is clicked for the day.
+             // saveDayPlan handles collecting all rows including new ones.
+        }
+
+       // Add a new day to a week
+        async function addNewDay(monthId, weekId, weekSection) {
+            if (!currentUser || !userId) return;
+             console.log(`Adding new day to ${monthId}, ${weekId}`);
+
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             try {
+                 const docSnap = await getDoc(docRef);
+                 if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                 const monthData = docSnap.data();
+                 let daysArray = monthData.weeks?.[weekId]?.days || [];
+                 const lastDayIndex = daysArray.length - 1;
+                 let newDayData;
+
+                 if (lastDayIndex >= 0) {
+                     // Copy structure from the last day
+                     const lastDayRows = daysArray[lastDayIndex].rows || [];
+                     newDayData = {
+                         dayNumber: daysArray.length + 1,
+                         date: '', // Reset date
+                         rows: lastDayRows.map(row => ({
+                             subject: row.subject || '',
+                             topic: row.topic || '', // Keep topic structure
+                             completed: false, // Reset completion
+                             comment: '', // Reset comment
+                             completionPercentage: null, // Reset percentage
+                             vocabData: row.vocabData ? JSON.parse(JSON.stringify(row.vocabData)) : null, // Deep copy vocab structure if exists
+                             story: null // Reset story
+                         }))
+                     };
+                 } else {
+                     // If it's the first day being added
+                     newDayData = {
+                         dayNumber: 1,
+                         date: '',
+                         rows: [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }] // Start with one blank row
+                     };
+                 }
+
+                 // Update Firestore using arrayUnion or by setting the whole array
+                 const updatePayload = {};
+                 updatePayload[`weeks.${weekId}.days`] = arrayUnion(newDayData); // Atomically add the new day object
+
+                 await updateDoc(docRef, updatePayload);
+                 console.log("New day added successfully to Firestore.");
+                 // UI will update via the onSnapshot listener
+
+             } catch (error) {
+                 console.error("Error adding new day:", error);
+                 showCustomAlert("Error adding new day. Please try again.");
+             }
+         }
+
+
+        // Save monthly targets
+        async function saveMonthlyTargets(monthId, monthElement) {
+             if (!currentUser || !userId) return;
+             console.log("Saving targets for month:", monthId);
+
+             const targets = {};
+             monthElement.querySelectorAll('.monthly-targets textarea').forEach(textarea => {
+                 targets[textarea.dataset.week] = textarea.value.trim();
+             });
+
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             try {
+                 await updateDoc(docRef, {
+                     weeklyTargets: targets
+                 });
+                 console.log("Monthly targets saved.");
+                  showCustomAlert("Monthly targets saved successfully!", "success"); // Simple feedback
+             } catch (error) {
+                 console.error("Error saving targets:", error);
+                  showCustomAlert("Error saving targets. Please try again.");
+             }
+        }
+
+       // --- Vocabulary and Story Functions ---
+
+        // Parse "Word,Meaning; Word2,Meaning2" string
+        function parseVocabString(text) {
+             if (!text || typeof text !== 'string') return null;
+             return text.split(';')
+                 .map(pair => {
+                     const parts = pair.split(',');
+                     if (parts.length >= 2) {
+                         return { word: parts[0].trim(), meaning: parts.slice(1).join(',').trim() }; // Handle commas in meaning
+                     }
+                     return null; // Ignore invalid pairs
+                 })
+                 .filter(item => item && item.word); // Filter out nulls and items without a word
+        }
+
+
+        // Show vocab meaning in modal
+        function showVocabMeaning(wordSpan) {
+            document.getElementById('vocab-modal-word').textContent = wordSpan.textContent;
+            document.getElementById('vocab-modal-meaning').textContent = wordSpan.dataset.meaning || 'No meaning provided.';
+            vocabModal.style.display = "block";
+        }
+
+        // Show story in modal
+        async function readStory(monthId, weekId, dayIndex, rowIndex) {
+            if (!currentUser || !userId) return;
+             try {
+                 const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                 const docSnap = await getDoc(docRef);
+                 if (docSnap.exists()) {
+                     const story = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex]?.story;
+                     if (story) {
+                         document.getElementById('story-modal-content').textContent = story;
+                         storyModal.style.display = "block";
+                     } else {
+                         showCustomAlert("No story found for this entry.");
+                     }
+                 }
+             } catch (error) {
+                 console.error("Error reading story:", error);
+                  showCustomAlert("Could not load the story.");
+             }
+
+        }
+
+        // Open the modal to add/edit a story
+         async function openEditStoryModal(monthId, weekId, dayIndex, rowIndex) {
+             if (!currentUser || !userId) return;
+             currentStoryTarget = { monthId, weekId, dayIndex, rowIndex }; // Store context
+
+             // Fetch existing story to pre-fill textarea
+             let existingStory = '';
+             try {
+                 const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                 const docSnap = await getDoc(docRef);
+                 if (docSnap.exists()) {
+                     existingStory = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex]?.story || '';
+                 }
+             } catch (error) {
+                 console.error("Error fetching existing story:", error);
+             }
+
+             document.getElementById('story-textarea').value = existingStory;
+             editStoryModal.style.display = "block";
+         }
+
+         // Save the story from the modal
+        saveStoryBtn.addEventListener('click', async () => {
+             if (!currentUser || !userId || !currentStoryTarget) return;
+
+             const { monthId, weekId, dayIndex, rowIndex } = currentStoryTarget;
+             const newStory = document.getElementById('story-textarea').value.trim();
+
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+
+             try {
+                // Fetch the current state of the day's rows
+                 const docSnap = await getDoc(docRef);
+                 if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                 let monthData = docSnap.data();
+                 let daysArray = monthData.weeks?.[weekId]?.days || [];
+
+                 // Ensure the structure exists
+                 if (daysArray[dayIndex] && daysArray[dayIndex].rows && daysArray[dayIndex].rows[rowIndex]) {
+                     // Update the story for the specific row
+                     daysArray[dayIndex].rows[rowIndex].story = newStory || null; // Store null if empty
+
+                     // Prepare the update payload
+                     const updatePayload = {};
+                     updatePayload[`weeks.${weekId}.days`] = daysArray;
+
+                     // Update Firestore
+                     await updateDoc(docRef, updatePayload);
+                     console.log("Story saved successfully.");
+
+                     closeModal('edit-story-modal');
+                     // Optionally, refresh the specific day's UI or rely on onSnapshot
+
+                     // --- Update UI immediately after saving story ---
+                     const daySection = document.querySelector(`[data-month-id="${monthId}"] .week-section[data-week-id="${weekId}"] .day-section[data-day-index="${dayIndex}"]`);
+                     if (daySection && !daySection.classList.contains('editing')) { // Only update if not in edit mode
+                         const rowElement = daySection.querySelector(`tbody tr[data-row-index="${rowIndex}"]`);
+                         if (rowElement) {
+                             // Fetch updated row data (including the saved story)
+                              const updatedDocSnap = await getDoc(docRef);
+                              if(updatedDocSnap.exists()){
+                                  const updatedRowData = updatedDocSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex];
+                                  if(updatedRowData){
+                                        rowElement.outerHTML = createTableRow(monthId, weekId, dayIndex, rowIndex, updatedRowData, false);
+                                  }
+                              }
+                         }
+                     }
+                     // --- End UI Update ---
+
+
+                 } else {
+                     console.error("Row structure not found for saving story.");
+                     showCustomAlert("Error: Could not find the specific row to save the story.");
+                 }
+
+             } catch (error) {
+                 console.error("Error saving story:", error);
+                  showCustomAlert("Error saving story. Please try again.");
+             } finally {
+                 currentStoryTarget = null; // Reset target
+             }
+         });
+
+
+        // --- Progress Calculation ---
+
+        function calculateWeeklyProgress(weekData) {
+            if (!weekData || !weekData.days || weekData.days.length === 0) {
+                return 0;
             }
 
-            if(input.tagName === 'TEXTAREA') input.value = initial || '';
-            else input.value = initial || '';
-            field.appendChild(label); field.appendChild(input);
-            editForm.appendChild(field);
-        });
+            let totalPercentage = 0;
+            let completedCount = 0;
 
-        // Story field
-        const storyField = document.createElement('div'); storyField.classList.add('edit-field');
-        const storyLabel = document.createElement('label'); storyLabel.textContent = 'Vocabulary Story (optional)';
-        const storyArea = document.createElement('textarea'); storyArea.id = `edit-${day}-Story`.replace(/\s+/g,'_'); storyArea.rows = 6; storyArea.placeholder = 'HTML allowed (e.g., use <strong>word</strong>)';
-        storyArea.value = vocabStories[day] || '';
-        storyField.appendChild(storyLabel); storyField.appendChild(storyArea); editForm.appendChild(storyField);
-
-        // show modal
-        editOverlay.classList.remove('modal-hidden'); editBox.classList.remove('modal-hidden'); editModal.classList.remove('modal-hidden'); editBox.style.display='block';
-        // focus first input
-        const firstInput = editForm.querySelector('input, textarea'); if(firstInput) firstInput.focus();
-    }
-
-    function closeEditModal() {
-        editOverlay.classList.add('modal-hidden'); editBox.classList.add('modal-hidden'); editModal.classList.add('modal-hidden');
-        editBox.style.display='none';
-    }
-
-    editCloseBtn.addEventListener('click', closeEditModal);
-    editCancelBtn.addEventListener('click', closeEditModal);
-    editOverlay.addEventListener('click', closeEditModal);
-
-    // Save edits: update in-memory dailyPlanData, DOM and trigger save to Firestore
-    editSaveBtn.addEventListener('click', async ()=>{
-        const title = editTitle.textContent || '';
-        const day = title.replace(/^Edit\s+/,'').trim();
-        // For each subject, read value and update dailyPlanData
-        const subjects = ['Quran','Newspaper','Vocabulary','Math','Basic View'];
-        subjects.forEach(subj=>{
-            const eid = `edit-${day}-${subj}`.replace(/\s+/g,'_');
-            const el = document.getElementById(eid);
-            const value = el ? el.value.trim() : '';
-            // find index in dailyPlanData and update
-            for(let i=0;i<dailyPlanData.length;i++){
-                if(dailyPlanData[i].day===day && dailyPlanData[i].subject===subj) {
-                    dailyPlanData[i].topic = value;
-                    break;
-                }
-            }
-            // Update DOM topic cells (desktop + mobile)
-            const topicCellId = `topic-${day}-${subj}`.replace(/\s+/g,'_');
-            const topicCell = document.getElementById(topicCellId);
-            if(topicCell) {
-                topicCell.innerHTML = '';
-                if(subj === 'Vocabulary') {
-                    const wrapper = document.createElement('div'); wrapper.classList.add('flex','flex-wrap','gap-2','py-1');
-                    const pairs = value.split(/,|।/).map(p=>p.trim()).filter(p=>p);
-                    pairs.forEach(p=>{
-                        const elv = createVocabElementFromPair(p);
-                        if(elv) wrapper.appendChild(elv);
-                    });
-                    topicCell.appendChild(wrapper);
-                    if(pairs.length>0 && (vocabStories[day] || document.getElementById(`edit-${day}-Story`.replace(/\s+/g,'_')).value.trim())) {
-                        const storyBtn = document.createElement('button'); storyBtn.textContent='Read story'; storyBtn.classList.add('read-story-btn'); storyBtn.setAttribute('data-day', day);
-                        topicCell.appendChild(storyBtn);
+            weekData.days.forEach(day => {
+                day.rows?.forEach(row => {
+                    if (row.completed && typeof row.completionPercentage === 'number' && row.completionPercentage > 0) {
+                        totalPercentage += row.completionPercentage;
+                        // completedCount++; // Don't count items, just sum percentages
                     }
-                } else {
-                    const span = document.createElement('span'); span.textContent = value || '-'; topicCell.appendChild(span);
-                }
-            }
-            // mobile topic
-            const mobileTopicId = `topic-mobile-${day}-${subj}`;
-            const mobileTopic = document.getElementById(mobileTopicId);
-            if(mobileTopic) {
-                if(subj === 'Vocabulary') {
-                    const pairs = value.split(/,|।/).map(p=>p.trim()).filter(p=>p);
-                    let html = '<div class="flex flex-wrap gap-2 py-1">';
-                    pairs.forEach(p=>{
-                        const elv = createVocabElementFromPair(p);
-                        if(elv) html += elv.outerHTML;
-                    });
-                    html += '</div>';
-                    if(pairs.length>0 && (vocabStories[day] || document.getElementById(`edit-${day}-Story`.replace(/\s+/g,'_')).value.trim())) html += `<button class="read-story-btn" data-day="${day}">Read story</button>`;
-                    mobileTopic.innerHTML = html;
-                    // reattach click listeners to newly inserted .vocab-item(s)
-                    mobileTopic.querySelectorAll('.vocab-item').forEach(vc=>{
-                        vc.addEventListener('click', function(ev){ ev.stopPropagation(); document.querySelectorAll('.vocab-item.active').forEach(i=>{ if(i!==this) i.classList.remove('active'); }); this.classList.toggle('active'); });
-                    });
-                } else {
-                    mobileTopic.innerHTML = `<span class="text-gray-600">${value || '-'}</span>`;
-                }
-            }
-        });
+                });
+            });
 
-        // Story:
-        const storyVal = document.getElementById(`edit-${day}-Story`.replace(/\s+/g,'_')).value.trim();
-        if(storyVal) vocabStories[day] = storyVal;
-        else delete vocabStories[day];
-
-        // Close modal and save to firestore
-        closeEditModal();
-        updateWeeklyProgress();
-        debouncedSaveData(); // saves topics and story along with checkboxes/dates
-    });
-
-    /* ------------- Persistence: Save & Load ------------- */
-
-    let saveTimeout;
-    function debouncedSaveData() {
-        if(!isDataLoaded || !isFirebaseReady || !userId) return;
-        clearTimeout(saveTimeout);
-        setSyncStatus('saving');
-        saveTimeout = setTimeout(()=>{ saveDataToFirestore(); }, 1200);
-    }
-
-    async function saveDataToFirestore() {
-        if(!dataDocRef) { console.warn('No doc ref to save'); return; }
-        const progressData = {};
-        // 1. checkbox states
-        document.querySelectorAll('.task-checkbox').forEach(cb=>{
-            const day = cb.dataset.day; const subj = cb.dataset.subject;
-            const key = `${day}-${subj}-checked`;
-            if(progressData[key] === undefined) progressData[key] = cb.checked;
-        });
-        // 2. date inputs
-        document.querySelectorAll('.date-input-desktop input, .date-input-mobile input').forEach(input=>{
-            const id = input.id || '';
-            const day = id.replace('date-','').replace('date-mobile-','');
-            if(!day) return;
-            const key = `${day}-date`;
-            if(progressData[key] === undefined) progressData[key] = input.value;
-        });
-        // 3. topics per day-subject (store as plain string)
-        dailyPlanData.forEach(item=>{
-            const key = `${item.day}-${item.subject}-topic`;
-            progressData[key] = item.topic || '';
-        });
-        // 4. stories per day
-        Object.keys(vocabStories).forEach(day=>{
-            const key = `${day}-story`;
-            progressData[key] = vocabStories[day];
-        });
-        try {
-            await setDoc(dataDocRef, progressData, { merge: true });
-            setSyncStatus('synced');
-            console.log('Saved progress:', progressData);
-        } catch(err) {
-            console.error('Save error', err); setSyncStatus(err.message,true);
+             // Cap at 100%
+             return Math.min(Math.round(totalPercentage), 100);
         }
-    }
 
-    function listenForDataChanges() {
-        if(!dataDocRef) return;
-        if(unsubscribeListener) unsubscribeListener();
-        unsubscribeListener = onSnapshot(dataDocRef, docSnap=>{
-            let progressData = {};
-            if(docSnap.exists()) progressData = docSnap.data();
-            console.log('Loaded data from firestore', progressData);
-            applyLoadedData(progressData);
-            setSyncStatus('synced');
-            isDataLoaded = true;
-        }, err=>{
-            console.error('Snapshot error', err); setSyncStatus(err.message,true);
-        });
-    }
+         // Update the progress bar UI for a specific week
+        async function updateWeeklyProgressUI(monthId, weekId) {
+             if (!currentUser || !userId) return;
+              console.log(`Updating progress UI for ${monthId}, ${weekId}`);
 
-    function clearLocalData() {
-        // clear checkboxes, date inputs and remove "completed" classes
-        document.querySelectorAll('.task-checkbox').forEach(cb=>{ cb.checked = false; const ti = cb.closest('.task-item, .card-item'); if(ti) ti.classList.remove('completed'); });
-        document.querySelectorAll('.date-input-desktop input, .date-input-mobile input').forEach(inp=>inp.value='');
-        updateWeeklyProgress();
-    }
+             const weekSection = document.querySelector(`[data-month-id="${monthId}"] .week-section[data-week-id="${weekId}"]`);
+             if (!weekSection) return;
 
-    function applyLoadedData(progressData) {
-        // Reset UI first (but keep structure)
-        clearLocalData();
+             const progressBarFill = weekSection.querySelector('.progress-bar-fill');
+             const progressPercentageSpan = weekSection.querySelector('.progress-percentage');
 
-        // 1) Apply checkbox states
-        document.querySelectorAll('.task-checkbox').forEach(cb=>{
-            const day = cb.dataset.day; const subj = cb.dataset.subject;
-            const key = `${day}-${subj}-checked`;
-            const val = (progressData[key] === undefined)? false : progressData[key];
-            cb.checked = !!val;
-            const taskItem = cb.closest('.task-item, .card-item');
-            if(taskItem) taskItem.classList.toggle('completed', !!val);
-        });
-        // 2) Apply date inputs
-        document.querySelectorAll('.date-input-desktop input, .date-input-mobile input').forEach(inp=>{
-            const id = inp.id || '';
-            const day = id.replace('date-','').replace('date-mobile-','');
-            const key = `${day}-date`;
-            inp.value = progressData[key] || '';
-        });
+             try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                 if (docSnap.exists()) {
+                     const weekData = docSnap.data().weeks?.[weekId];
+                     const progress = calculateWeeklyProgress(weekData);
 
-        // 3) Apply topics (day-subject) into dailyPlanData and DOM
-        dailyPlanData.forEach((item, idx)=>{
-            const key = `${item.day}-${item.subject}-topic`;
-            if(progressData[key] !== undefined) {
-                item.topic = progressData[key];
-            }
-            // update DOM cells if present
-            const tid = `topic-${item.day}-${item.subject}`.replace(/\s+/g,'_');
-            const tcell = document.getElementById(tid);
-            if(tcell) {
-                tcell.innerHTML = '';
-                if(item.subject === 'Vocabulary' && item.topic) {
-                    const wrapper = document.createElement('div'); wrapper.classList.add('flex','flex-wrap','gap-2','py-1');
-                    const pairs = item.topic.split(/,|।/).map(p=>p.trim()).filter(p=>p);
-                    pairs.forEach(p=>{
-                        const elv = createVocabElementFromPair(p);
-                        if(elv) wrapper.appendChild(elv);
-                    });
-                    tcell.appendChild(wrapper);
-                    if(pairs.length>0 && (progressData[`${item.day}-story`] || vocabStories[item.day])) {
-                        const storyBtn = document.createElement('button'); storyBtn.textContent='Read story'; storyBtn.classList.add('read-story-btn'); storyBtn.setAttribute('data-day', item.day);
-                        tcell.appendChild(storyBtn);
-                    }
-                } else {
-                    const span = document.createElement('span'); span.textContent = item.topic || '-'; tcell.appendChild(span);
-                }
-            }
-            // mobile topic update
-            const mid = `topic-mobile-${item.day}-${item.subject}`;
-            const mcell = document.getElementById(mid);
-            if(mcell) {
-                if(item.subject === 'Vocabulary' && item.topic) {
-                    const pairs = item.topic.split(/,|।/).map(p=>p.trim()).filter(p=>p);
-                    let html = '<div class="flex flex-wrap gap-2 py-1">';
-                    pairs.forEach(p=>{
-                        const elv = createVocabElementFromPair(p);
-                        if(elv) html += elv.outerHTML;
-                    });
-                    html += '</div>';
-                    if(pairs.length>0 && (progressData[`${item.day}-story`] || vocabStories[item.day])) html += `<button class="read-story-btn" data-day="${item.day}">Read story</button>`;
-                    mcell.innerHTML = html;
-                    // reattach click toggles
-                    mcell.querySelectorAll('.vocab-item').forEach(vc=>{
-                        vc.addEventListener('click', function(ev){ ev.stopPropagation(); document.querySelectorAll('.vocab-item.active').forEach(i=>{ if(i!==this) i.classList.remove('active'); }); this.classList.toggle('active'); });
-                    });
-                } else {
-                    mcell.innerHTML = `<span class="text-gray-600">${item.topic || '-'}</span>`;
-                }
-            }
-        });
-
-        // 4) Apply stories
-        Object.keys(progressData).forEach(key=>{
-            if(key.endsWith('-story')) {
-                const day = key.replace('-story','');
-                vocabStories[day] = progressData[key];
-            }
-        });
-
-        // After all applied, check day completions and progress
-        const allDays = new Set(dailyPlanData.map(it=>it.day));
-        allDays.forEach(d=>checkDayCompletion(d));
-        updateWeeklyProgress();
-    }
-
-    /* ----------------- Story Modal handling ----------------- */
-    const storyModal = document.getElementById('story-modal');
-    const storyOverlay = document.getElementById('story-overlay');
-    const storyCloseBtn = document.getElementById('story-close-btn');
-    const storyContent = document.getElementById('story-content');
-    const storyTitle = document.getElementById('story-title');
-
-    function showStory(day) {
-        const story = vocabStories[day];
-        if(story) {
-            storyTitle.textContent = `A Tale from ${day}`;
-            storyContent.innerHTML = story;
-            storyModal.classList.remove('modal-hidden');
+                    progressBarFill.style.width = `${progress}%`;
+                    progressPercentageSpan.textContent = `${progress}%`;
+                     // Optional: Add text inside bar if needed
+                     // progressBarFill.textContent = progress > 10 ? `${progress}%` : '';
+                     console.log(`Progress updated to ${progress}%`);
+                 }
+             } catch (error) {
+                 console.error("Error fetching week data for progress update:", error);
+             }
         }
-    }
-    function hideStory() { storyModal.classList.add('modal-hidden'); }
-    storyCloseBtn.addEventListener('click', hideStory);
-    storyOverlay.addEventListener('click', hideStory);
 
-    document.body.addEventListener('click', function(event){
-        if(event.target.classList.contains('read-story-btn')) {
-            const day = event.target.getAttribute('data-day'); showStory(day);
+
+        // --- Modal Handling ---
+        window.closeModal = function(modalId) {
+          document.getElementById(modalId).style.display = "none";
         }
-    });
+        // Close modal if clicked outside of it
+        window.onclick = function(event) {
+          if (event.target.classList.contains('modal')) {
+            event.target.style.display = "none";
+          }
+        }
 
-    /* ---------- Init and events ---------- */
-    document.addEventListener('DOMContentLoaded', async () => {
-        loginBtn.addEventListener('click', signInWithGoogle);
-        logoutBtn.addEventListener('click', signOutUser);
-        // Build initial UI
-        buildUI();
-        // Start Firebase
-        await initFirebase();
-    });
+         // --- Simple Custom Alert ---
+         function showCustomAlert(message, type = "error") {
+            // In a real app, you'd create a styled modal or toast notification
+            console.log(`ALERT (${type}): ${message}`);
+            // Simple temporary alert-like behavior (replace with a proper UI element)
+            const alertBox = document.createElement('div');
+            alertBox.style.position = 'fixed';
+            alertBox.style.top = '20px';
+            alertBox.style.left = '50%';
+            alertBox.style.transform = 'translateX(-50%)';
+            alertBox.style.padding = '10px 20px';
+            alertBox.style.borderRadius = '5px';
+            alertBox.style.zIndex = '200';
+            alertBox.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+            if (type === 'success') {
+                alertBox.style.backgroundColor = '#10b981'; // emerald-500
+                 alertBox.style.color = 'white';
+            } else {
+                 alertBox.style.backgroundColor = '#f87171'; // red-400
+                 alertBox.style.color = 'white';
+            }
+             alertBox.textContent = message;
+             document.body.appendChild(alertBox);
+             setTimeout(() => {
+                 alertBox.remove();
+             }, 3000); // Remove after 3 seconds
+         }
 
-    // attach save on unload (best effort)
-    window.addEventListener('beforeunload', function() { if(isDataLoaded) saveDataToFirestore(); });
 
-</script>
+        // --- Initial Load ---
+        // Authentication state determines the initial load call via onAuthStateChanged
+
+    </script>
+
+     <!-- Your existing script.js link - Ensure it's loaded AFTER the Firebase module script -->
+     <script src="script.js" defer></script>
+
+
 </body>
 </html>
