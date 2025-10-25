@@ -127,7 +127,7 @@
         .study-table th { text-align: left; }
         .study-table td.center-cell { text-align: center; }
 
-        .editable-input, .vocab-input, .target-textarea {
+        .editable-input, .vocab-input {
             background-color: #f9fafb; /* gray-50 */
             border: 1px solid #d1d5db; /* gray-300 */
             border-radius: 4px;
@@ -137,48 +137,100 @@
             font-size: 0.875rem;
             transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
         }
-         .editable-input:focus, .vocab-input:focus, .target-textarea:focus {
+         .editable-input:focus, .vocab-input:focus {
              outline: none;
              border-color: #34d399; /* emerald-400 */
              box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
              background-color: white;
          }
         textarea.editable-input { min-height: 40px; }
-
-        /* Styles for Target Textareas */
+        
+        /* Styles for Target Textareas (from example) */
+        .target-card {
+            background-color: white;
+            padding: 1.5rem; /* p-6 */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.03); /* shadow-lg */
+            border: 1px solid #e5e7eb; /* border-gray-200 */
+        }
         .target-textarea {
-            font-size: 0.875rem;
-            padding: 8px;
+            font-family: 'Poppins', sans-serif;
+            background-color: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            min-height: 60px;
+            resize: none;
+            color: #4b5563; /* gray-600 */
+            font-size: 0.95rem;
+            line-height: 1.5;
+            outline: none;
+            box-shadow: none;
         }
         .target-textarea:disabled {
-            background-color: #f3f4f6; /* gray-100 */
-            cursor: not-allowed;
-            color: #6b7280; /* gray-500 */
-            box-shadow: none;
-            border-color: #e5e7eb; /* gray-200 */
+            background-color: transparent;
+            cursor: default;
         }
          .target-textarea:not(:disabled) {
-             background-color: white;
-             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+             background-color: #f9fafb; /* gray-50 */
+             border: 1px dashed #34d399; /* emerald-400 */
+             padding: 8px;
+             border-radius: 4px;
          }
 
 
         tr.editing-mode td { background-color: #f0fdf4; } /* emerald-50 */
 
-        /* --- Vocabulary Specific Styles --- */
+        /* --- Vocabulary Specific Styles (from example) --- */
         .vocab-word {
-            cursor: pointer;
-            text-decoration: none;
-            border-bottom: 1px dotted #10b981; /* emerald-500 */
+            position: relative; 
+            display: inline-block;
+            background-color: #f1f5f9; /* gray-100 */
+            color: #334155; /* gray-700 */
+            padding: 4px 10px; 
+            border-radius: 9999px; /* rounded-full */
+            cursor: pointer; 
+            font-weight: 500; 
+            transition: background-color 0.2s;
             margin-right: 8px;
-            padding-bottom: 1px;
-             color: #047857; /* emerald-700 */
-             font-weight: 500;
-            transition: color 0.2s;
+            margin-bottom: 4px;
         }
-        .vocab-word:hover {
-            color: #064e3b; /* emerald-900 */
+        .vocab-word:hover { background-color: #e2e8f0; } /* gray-200 */
+        .vocab-meaning {
+            visibility: hidden; 
+            opacity: 0; 
+            width: max-content; 
+            max-width: 250px;
+            background-color: #1e293b; /* gray-800 */
+            color: #fff; 
+            text-align: center;
+            border-radius: 6px; 
+            padding: 6px 12px;
+            position: absolute; 
+            z-index: 10; 
+            bottom: 130%; 
+            left: 50%;
+            transform: translateX(-50%); 
+            transition: opacity 0.3s, visibility 0.3s;
+            font-weight: 500; 
+            white-space: normal;
+            font-size: 0.8rem;
         }
+        .vocab-word.active .vocab-meaning { visibility: visible; opacity: 1; }
+        .vocab-word .vocab-meaning::after {
+            content: ""; 
+            position: absolute; 
+            top: 100%; 
+            left: 50%;
+            margin-left: -5px; 
+            border-width: 5px; 
+            border-style: solid;
+            border-color: #1e293b transparent transparent transparent; /* gray-800 */
+        }
+        /* --- End Vocab Styles --- */
+
         .vocab-pair {
             display: flex;
             align-items: center;
@@ -199,7 +251,7 @@
         /* --- Sticky Progress Bar --- */
         .sticky-progress-wrapper {
             position: sticky;
-            top: 60px; /* Adjust based on your header height */
+            top: 65px; /* Updated for header height */
             z-index: 10;
             background-color: #ffffff; /* Opaque background */
             padding: 12px 16px; /* Match week-section padding */
@@ -207,10 +259,9 @@
             border-bottom: 1px solid #e5e7eb; /* gray-200 */
             box-shadow: 0 2px 4px rgba(0,0,0,0.03);
         }
-        /* The header height is approx 60-64px. Let's set top to 60px */
         @media (min-width: 768px) {
              .sticky-progress-wrapper {
-                 top: 60px; /* Adjust this value if header height is different */
+                 top: 65px; /* Updated for header height */
              }
         }
 
@@ -238,7 +289,6 @@
          }
 
         /* --- Header Adjustments --- */
-         /* Override conflicting styles from external style.css if necessary */
          header.main-website-ui {
              background-color: rgb(255 255 255 / 0.9); /* bg-white/90 */
              border-bottom-color: #e5e7eb; /* border-gray-200 */
@@ -276,29 +326,24 @@
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
             transform: translateY(-10px);
-            display: block; /* Keep it block for transitions, control with hidden */
+            display: block; 
          }
          .dropdown-menu.hidden {
              opacity: 0;
              visibility: hidden;
              transform: translateY(-10px);
          }
-         .dropdown-menu:not(.hidden) { /* This is the 'is-open' state */
+         .dropdown-menu:not(.hidden) {
              opacity: 1;
              visibility: visible;
              transform: translateY(0);
          }
-         /* Light theme for dropdown */
          #academic-menu {
              background-color: #ffffff;
              border-color: #e5e7eb;
          }
-         #academic-menu a {
-             color: #374151;
-         }
-         #academic-menu a:hover {
-             background-color: #f3f4f6;
-         }
+         #academic-menu a { color: #374151; }
+         #academic-menu a:hover { background-color: #f3f4f6; }
 
     </style>
 </head>
@@ -431,14 +476,8 @@
 
     </main>
 
-    <!-- Modal for Vocabulary Meaning -->
-    <div id="vocab-modal" class="modal">
-      <div class="modal-content">
-        <span class="modal-close" onclick="closeModal('vocab-modal')">&times;</span>
-        <h3 id="vocab-modal-word" class="text-xl font-semibold mb-3 text-emerald-600">Word</h3>
-        <p id="vocab-modal-meaning" class="text-gray-700"></p>
-      </div>
-    </div>
+    <!-- Modal for Vocabulary Meaning (No longer used, replaced by tooltip) -->
+    <!-- <div id="vocab-modal" class="modal"> ... </div> -->
 
     <!-- Modal for Story -->
     <div id="story-modal" class="modal">
@@ -554,7 +593,7 @@
         const mobileAcademicMenu = document.getElementById('mobile-academic-menu');
 
         // Modals
-        const vocabModal = document.getElementById('vocab-modal');
+        // const vocabModal = document.getElementById('vocab-modal'); // No longer used
         const storyModal = document.getElementById('story-modal');
         const editStoryModal = document.getElementById('edit-story-modal');
         const saveStoryBtn = document.getElementById('save-story-btn');
@@ -864,6 +903,14 @@
             monthDiv.className = 'mb-12 p-6 card';
             monthDiv.dataset.monthId = monthId;
 
+            // Define target colors from example
+            const targetColors = {
+                week1: 'text-indigo-700',
+                week2: 'text-teal-700',
+                week3: 'text-amber-700',
+                week4: 'text-rose-700'
+            };
+
             monthDiv.innerHTML = `
                 <div class="flex justify-between items-start mb-6">
                      <h2 class="text-2xl font-bold text-emerald-600">${data.monthName || 'Unnamed Month'} <span class="text-lg text-gray-400 font-normal">(${monthId})</span></h2>
@@ -871,14 +918,14 @@
                  </div>
                  <div class="mb-8">
                     <div class="flex justify-between items-center mb-3">
-                         <h3 class="text-xl font-semibold text-gray-700">Monthly Targets</h3>
+                         <h3 class="text-2xl font-semibold text-gray-700">Monthly Targets</h3>
                          <button class="action-button action-button-secondary text-xs edit-targets-btn" data-editing="false">Edit Targets</button>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 monthly-targets">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 monthly-targets">
                         ${[1, 2, 3, 4].map(weekNum => `
-                            <div class="bg-gray-50 border border-gray-200 p-3 rounded-md shadow-sm">
-                                <label for="target-week-${monthId}-${weekNum}" class="block text-sm font-medium text-emerald-700 mb-1">Week ${weekNum}</label>
-                                <textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" rows="3" class="target-textarea w-full text-sm placeholder-gray-400" placeholder="Enter target..." disabled>${escapeHtml(data.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
+                            <div class"target-card bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                                <h3 class="font-semibold text-lg ${targetColors[`week${weekNum}`] || 'text-gray-700'} mb-2">Week ${weekNum}</h3>
+                                <textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" rows="3" class="target-textarea w-full" placeholder="Enter target..." disabled>${escapeHtml(data.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
                             </div>
                         `).join('')}
                     </div>
@@ -898,12 +945,12 @@
             const daysHtml = weekData?.days?.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('') || '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
             const totalDays = weekData?.days?.length || 0;
             const initialProgress = calculateWeeklyProgress(weekData);
+            const headerHeight = (document.querySelector('header.main-website-ui')?.offsetHeight || 65) + 'px';
 
-            // Note: Added sticky-progress-wrapper
             return `
                 <div class="bg-white/60 border border-gray-200 p-4 rounded-lg shadow week-section" data-week-id="${weekId}">
                     <h3 class="text-lg font-semibold text-emerald-700 mb-4 capitalize">${weekId.replace('week', 'Week ')} Plan</h3>
-                    <div class="sticky-progress-wrapper">
+                    <div class="sticky-progress-wrapper" style="top: ${headerHeight};">
                         <div class="flex justify-between text-xs text-gray-500 mb-1">
                             <span>Weekly Progress</span>
                             <span class="progress-percentage font-medium">${initialProgress}%</span>
@@ -1005,9 +1052,15 @@
                  </tr>`;
         }
 
+        // Generate Vocab HTML with new Tooltip style
         function generateVocabHtml(vocabData) {
             if (!vocabData || vocabData.length === 0) return '-';
-            return vocabData.map(v => `<span class="vocab-word" data-meaning="${escapeHtml(v.meaning || '')}">${escapeHtml(v.word || '')}</span>`).join(' '); // Join with space
+            return vocabData.map(v => 
+                `<div class="vocab-word" tabindex="0">
+                    ${escapeHtml(v.word || '')}
+                    <span class="vocab-meaning">${escapeHtml(v.meaning || 'No meaning')}</span>
+                 </div>`
+            ).join(' ');
         }
 
         function escapeHtml(unsafe) { 
@@ -1046,14 +1099,12 @@
                  // Add/Edit Story Button (Edit Mode) - Opens modal
                  else if (button?.classList.contains('add-story-btn')) {
                       const dayIndex = parseInt(daySection.dataset.dayIndex);
-                      // Find the first vocab row *index* in the data
                       const vocabRow = daySection.querySelector('tr.vocab-row');
                       let vocabRowIndex = -1;
                       if(vocabRow) {
                           vocabRowIndex = parseInt(vocabRow.dataset.rowIndex);
                       }
-                      
-                      openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex); // Pass vocab row index, or -1
+                      openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex); 
                  }
                   // Delete Row Button (Edit Mode)
                  else if (button?.classList.contains('delete-row-btn')) {
@@ -1077,8 +1128,8 @@
                      updateWeeklyProgressUI(monthId, weekId);
                  }
                  // Vocab Word Click (Normal Mode)
-                 else if (target.classList.contains('vocab-word') && !daySection.classList.contains('editing')) {
-                     showVocabMeaning(target);
+                 else if (target.closest('.vocab-word') && !daySection.classList.contains('editing')) {
+                     showVocabMeaning(target.closest('.vocab-word'));
                  }
                  // Read Story Button (Normal Mode)
                  else if (button?.classList.contains('read-story-btn')) {
@@ -1091,6 +1142,13 @@
                      addNewDay(monthId, weekId, weekSection);
                  }
              });
+             
+            // Add global click listener to close vocab popups
+            document.addEventListener('click', function (event) {
+                if (!event.target.closest('.vocab-word')) {
+                    document.querySelectorAll('.vocab-word.active').forEach(v => v.classList.remove('active'));
+                }
+            });
         }
 
 
@@ -1136,12 +1194,9 @@
                  deleteDayButton.classList.add('hidden');
                  actionsHeader.classList.add('hidden');
                  completionPercHeader.classList.add('hidden');
-
-                 // Re-render in normal mode
-                 // Note: The onSnapshot listener for the active month *should* handle this re-render automatically.
-                 // We will rely on that, but if it's slow, we can add a manual re-fetch here.
-                 // For now, let's just update the progress bar.
-                 updateWeeklyProgressUI(monthId, weekId);
+                 
+                 // onSnapshot will auto-refresh the UI to non-edit mode
+                 updateWeeklyProgressUI(monthId, weekId); // Update progress bar
                  setSyncStatus("Synced", "green");
              }
         }
@@ -1180,9 +1235,6 @@
                          comment = row.querySelector('.comment-input')?.value.trim() || '';
                          completed = existingRowData.completed || false; 
                          completionPercentage = parseInt(row.querySelector('.completion-perc-input')?.value) || null;
-                         
-                         // *** FIX FOR BUG #2 & #3 ***
-                         // Ensure story is null, not undefined, for new rows
                          story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
 
                          if (row.classList.contains('vocab-row')) {
@@ -1211,7 +1263,6 @@
                          story = existingRowData.story;
                      }
                      
-                     // Ensure no undefined values are pushed
                      updatedRows.push({ 
                          subject: subject || '', 
                          topic: topic || null, 
@@ -1243,13 +1294,12 @@
         function addRowToDay(monthId, weekId, daySection, type = 'normal') {
              const dayIndex = parseInt(daySection.dataset.dayIndex);
              const tableBody = daySection.querySelector('tbody');
-             // Find the highest existing row index to determine the new index
              let maxIndex = -1;
              tableBody.querySelectorAll('tr').forEach(tr => {
                  const idx = parseInt(tr.dataset.rowIndex);
                  if (idx > maxIndex) maxIndex = idx;
              });
-             const newRowIndex = maxIndex + 1; // This will be the unique index for the new row
+             const newRowIndex = maxIndex + 1; 
 
              let newRowData;
              if (type === 'vocabulary') {
@@ -1258,7 +1308,7 @@
                  newRowData = { subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null };
              }
 
-             const newRowHtml = createTableRow(monthId, weekId, dayIndex, newRowIndex, newRowData, true); // Create in edit mode
+             const newRowHtml = createTableRow(monthId, weekId, dayIndex, newRowIndex, newRowData, true); 
              tableBody.insertAdjacentHTML('beforeend', newRowHtml);
          }
 
@@ -1289,17 +1339,42 @@
              const rowIndex = parseInt(rowElement.dataset.rowIndex);
              showConfirmationModal(
                  "Delete Row",
-                 "Are you sure you want to delete this row? This action cannot be undone.",
+                 "Are you sure you want to delete this row? This will be saved immediately.",
                  () => deleteRow(monthId, weekId, daySection, rowElement, rowIndex)
              );
          }
 
          async function deleteRow(monthId, weekId, daySection, rowElement, rowIndex) {
-            // This function now *only* removes from UI. The 'Save' button will finalize.
-            rowElement.remove(); // Remove from UI
-            console.log("Row removed from UI. Click 'Save' to confirm deletion.");
-            setSyncStatus("Unsaved changes", "yellow");
-            // No saveDayPlan call here. User must click "Save" on the day.
+            if (!currentUser || !userId) return;
+             const dayIndex = parseInt(daySection.dataset.dayIndex);
+             console.log(`Attempting to delete row ${rowIndex} from day ${dayIndex}, week ${weekId}, month ${monthId}`);
+             setSyncStatus("Syncing...", "yellow");
+
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             try {
+                // We MUST read, modify, and write the array (no server-side arrayRemove by index)
+                 const docSnap = await getDoc(docRef);
+                 if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                 let monthData = docSnap.data();
+                 let daysArray = monthData.weeks?.[weekId]?.days || [];
+                 if (!daysArray[dayIndex] || !daysArray[dayIndex].rows) throw new Error("Day or rows not found in Firestore.");
+                 
+                 // Remove the row from the array
+                 daysArray[dayIndex].rows.splice(rowIndex, 1);
+
+                 const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
+                 await updateDoc(docRef, updatePayload);
+                 console.log("Row deleted successfully from Firestore.");
+                 
+                 // onSnapshot will handle the UI update
+                 setSyncStatus("Synced", "green");
+
+             } catch (error) {
+                 console.error("Error deleting row:", error);
+                 showCustomAlert("Error deleting row. Please try again.");
+                 setSyncStatus("Error", "red");
+             }
          }
 
          function confirmDeleteDay(monthId, weekId, daySection) {
@@ -1336,8 +1411,8 @@
                  const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
                  await updateDoc(docRef, updatePayload);
                  console.log("Day deleted successfully from Firestore.");
-                 // UI update will now be handled by the onSnapshot listener for the active month
                  setSyncStatus("Synced", "green");
+                 // onSnapshot will handle UI refresh
 
              } catch (error) {
                  console.error("Error deleting day:", error);
@@ -1361,11 +1436,18 @@
              console.log("Attempting to delete month:", monthId);
              setSyncStatus("Syncing...", "yellow");
              
+             // If we are deleting the currently viewed month, stop listening to it
+             const activeBtn = monthNavButtonsContainer.querySelector('button.active-month');
+             if (activeBtn && activeBtn.dataset.monthId === monthId && unsubscribeActiveMonth) {
+                 unsubscribeActiveMonth();
+                 unsubscribeActiveMonth = null;
+             }
+             
              const docRef = doc(db, getUserPlansCollectionPath(), monthId);
              try {
                  await deleteDoc(docRef);
                  console.log("Month deleted successfully.");
-                 // onSnapshot listener will update UI
+                 // onSnapshot (loadStudyPlans) will update UI
                  setSyncStatus("Synced", "green");
              } catch (error) {
                  console.error("Error deleting month:", error);
@@ -1439,7 +1521,7 @@
         // --- Monthly Target Edit ---
         function handleEditTargets(button, monthId) {
             const isEditing = button.dataset.editing === 'true';
-            const targetsContainer = button.closest('.mb-8'); // Find the parent .mb-8
+            const targetsContainer = button.closest('.mb-8'); 
             const textareas = targetsContainer.querySelectorAll('.target-textarea');
 
             if (isEditing) {
@@ -1448,22 +1530,14 @@
                 button.textContent = 'Edit Targets';
                 button.dataset.editing = 'false';
                 button.classList.add('action-button-secondary');
-                textareas.forEach(ta => {
-                    ta.disabled = true;
-                    ta.classList.add('bg-gray-100', 'cursor-not-allowed', 'border-gray-200');
-                    ta.classList.remove('bg-white', 'shadow-sm');
-                });
+                textareas.forEach(ta => ta.disabled = true );
             } else {
                 // Was not editing, now Edit
                 button.textContent = 'Save Targets';
                 button.dataset.editing = 'true';
                 button.classList.remove('action-button-secondary');
-                textareas.forEach(ta => {
-                    ta.disabled = false;
-                    ta.classList.remove('bg-gray-100', 'cursor-not-allowed', 'border-gray-200');
-                    ta.classList.add('bg-white', 'shadow-sm');
-                });
-                textareas[0].focus(); // Focus on the first textarea
+                textareas.forEach(ta => ta.disabled = false );
+                textareas[0].focus(); 
             }
         }
         
@@ -1495,10 +1569,10 @@
          async function openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex) {
              if (!currentUser || !userId) return;
              
+             let daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
+             
              // Check if a vocab row exists
              if (vocabRowIndex === -1) {
-                 // Try to find one again, just in case UI is ahead of data
-                 const daySection = document.querySelector(`.day-section[data-day-index="${dayIndex}"]`);
                  const vocabRow = daySection ? daySection.querySelector('tr.vocab-row') : null;
                  if(vocabRow) {
                      vocabRowIndex = parseInt(vocabRow.dataset.rowIndex);
@@ -1508,25 +1582,42 @@
                  }
              }
 
-             currentStoryTarget = { monthId, weekId, dayIndex, rowIndex: vocabRowIndex }; // Store context
-             
              let existingStory = '';
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             setSyncStatus("Syncing...", "yellow");
              try {
-                 const docRef = doc(db, getUserPlansCollectionPath(), monthId);
                  const docSnap = await getDoc(docRef);
+                 let dayData;
                  if (docSnap.exists()) {
-                     existingStory = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[vocabRowIndex]?.story || '';
+                     dayData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex];
+                     if (dayData && dayData.rows && dayData.rows[vocabRowIndex]) {
+                         existingStory = dayData.rows[vocabRowIndex].story || '';
+                     } else if (daySection.classList.contains('editing')) {
+                         // Row exists in UI but not DB. Save day first.
+                         console.log("New row detected. Saving day plan before opening story editor...");
+                         await saveDayPlan(monthId, weekId, daySection);
+                         // After save, existingStory is still '', which is correct.
+                     } else {
+                         // This shouldn't happen if button is clicked correctly
+                         throw new Error("Target row not found.");
+                     }
                  }
-             } catch (error) { console.error("Error fetching existing story:", error); }
-
-             document.getElementById('story-textarea').value = existingStory;
-             editStoryModal.style.display = "block";
+                 setSyncStatus("Synced", "green");
+                 currentStoryTarget = { monthId, weekId, dayIndex, rowIndex: vocabRowIndex }; // Store context
+                 document.getElementById('story-textarea').value = existingStory;
+                 editStoryModal.style.display = "block";
+                 
+             } catch (error) { 
+                 console.error("Error fetching/prepping story:", error); 
+                 showCustomAlert("Could not open story editor. Please save your day plan first.");
+                 setSyncStatus("Error", "red");
+             }
          }
          
          saveStoryBtn.addEventListener('click', async () => {
              if (!currentUser || !userId || !currentStoryTarget) return;
              const { monthId, weekId, dayIndex, rowIndex } = currentStoryTarget; 
-             if (rowIndex === -1) { // Safety check
+             if (rowIndex === -1) { 
                  showCustomAlert("Error: No associated vocabulary row found.");
                  return;
              }
@@ -1586,11 +1677,16 @@
              } catch (error) { console.error("Error fetching data for progress UI:", error); }
         }
 
-        function showVocabMeaning(wordSpan) {
-             document.getElementById('vocab-modal-word').textContent = wordSpan.textContent;
-             document.getElementById('vocab-modal-meaning').textContent = wordSpan.dataset.meaning || 'No meaning provided.';
-             vocabModal.style.display = "block";
+        // Show vocab meaning in tooltip
+        function showVocabMeaning(vocabWordElement) {
+             // Close all other active tooltips
+             document.querySelectorAll('.vocab-word.active').forEach(v => {
+                 if (v !== vocabWordElement) v.classList.remove('active');
+             });
+             // Toggle the clicked one
+             vocabWordElement.classList.toggle('active');
         }
+        
          async function readStory(monthId, weekId, dayIndex, rowIndex) {
              if (!currentUser || !userId) return;
               try {
@@ -1627,10 +1723,6 @@
          }
 
     </script>
-
-     <!-- This external script is NOT needed if all logic is above, but kept as requested -->
-     <!-- <script src="script.js" defer></script> --> 
-
 </body>
 </html>
 
