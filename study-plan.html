@@ -7,76 +7,63 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <style>
-        body{font-family:'Inter',sans-serif;background-color:#f8fafc}
+        body{font-family:'Inter',sans-serif;background-color:#f4f7f6}
         .task-item,.card-item{transition:background-color .3s}
-        .task-item.completed{background-color:#dcfce7} /* Lighter green for completed */
+        .task-item.completed{background-color:#bbf7d0}
         .task-item.completed td{color:#374151}
-        .task-item.completed .vocab-item{color:#065f46;opacity:.9} /* Darker green for vocab */
-        .task-item.completed .vocab-item:hover{background-color:#a7f3d0;opacity:1}
-        .card-item.completed{background-color:#dcfce7}
+        .task-item.completed .vocab-item{color:#3730a3;opacity:.9}
+        .task-item.completed .vocab-item:hover{background-color:#c7d2fe;opacity:1}
+        .card-item.completed{background-color:#bbf7d0}
         .card-item.completed p,.card-item.completed .text-gray-600,.card-item.completed .text-sm div{color:#374151}
-        .task-checkbox{appearance:none;-webkit-appearance:none;height:1.25rem;width:1.25rem;min-width:1.25rem;border:2px solid #9ca3af;border-radius:.375rem;display:inline-block;position:relative;cursor:pointer;transition:all .2s;margin-right:.75rem;flex-shrink:0}
-        .task-checkbox:checked{background-color:#10b981;border-color:#10b981} /* Emerald green checkbox */
+        .task-checkbox{appearance:none;-webkit-appearance:none;height:1.25rem;width:1.25rem;min-width:1.25rem;border:2px solid #cbd5e1;border-radius:.375rem;display:inline-block;position:relative;cursor:pointer;transition:all .2s;margin-right:.75rem;flex-shrink:0}
+        .task-checkbox:checked{background-color:#2563eb;border-color:#2563eb}
         .task-checkbox:checked::after{content:"";position:absolute;display:block;left:.4rem;top:.125rem;width:.35rem;height:.7rem;border-style:solid;border-color:white;border-width:0 .15rem .15rem 0;transform:rotate(45deg)}
-        .vocab-item{position:relative;display:inline-block;background-color:#ecfdf5;color:#047857;padding:4px 10px;border-radius:9999px;cursor:pointer;font-weight:500;transition:background-color .2s;white-space:nowrap;} /* Emerald vocab */
-        .vocab-item:hover{background-color:#a7f3d0}
-        .vocab-meaning{visibility:hidden;opacity:0;width:max-content;max-width:250px;background-color:#065f46;color:#fff;text-align:center;border-radius:6px;padding:6px 12px;position:absolute;z-index:10;bottom:130%;left:50%;transform:translateX(-50%);transition:opacity .3s,visibility .3s;font-weight:500;white-space:normal}
+        .vocab-item{position:relative;display:inline-block;background-color:#eef2ff;color:#3730a3;padding:4px 10px;border-radius:9999px;cursor:pointer;font-weight:500;transition:background-color .2s}
+        .vocab-item:hover{background-color:#c7d2fe}
+        .vocab-meaning{visibility:hidden;opacity:0;width:max-content;max-width:250px;background-color:#312e81;color:#fff;text-align:center;border-radius:6px;padding:6px 12px;position:absolute;z-index:10;bottom:130%;left:50%;transform:translateX(-50%);transition:opacity .3s,visibility .3s;font-weight:500;white-space:normal}
         .vocab-item.active .vocab-meaning{visibility:visible;opacity:1}
-        .vocab-item .vocab-meaning::after{content:"";position:absolute;top:100%;left:50%;margin-left:-5px;border-width:5px;border-style:solid;border-color:#065f46 transparent transparent transparent}
+        .vocab-item .vocab-meaning::after{content:"";position:absolute;top:100%;left:50%;margin-left:-5px;border-width:5px;border-style:solid;border-color:#312e81 transparent transparent transparent}
         .modal-hidden{display:none}
         .story-modal-overlay{position:fixed;inset:0;background-color:rgba(0,0,0,.5);z-index:40;transition:opacity .3s}
-        .story-modal-box{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:50;background-color:#f0fdf4;border:4px solid #16a34a;border-radius:.75rem;box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);width:90%;max-width:600px;max-height:80vh;overflow-y:auto;padding:1.25rem}
-        .story-modal-box h3{font-size:1.25rem;font-weight:700;color:#16a34a;margin-bottom:1rem}
-        .story-modal-box p{color:#047857;line-height:1.6}
-        .story-modal-close-btn{position:absolute;top:.75rem;right:.75rem;background-color:transparent;border:none;color:#16a34a;font-size:1.5rem;font-weight:700;line-height:1;cursor:pointer;padding:0}
-        .read-story-btn{display:inline-block;margin-top:.75rem;margin-left:.25rem;background-color:#059669;color:white;padding:4px 12px;border-radius:9999px;font-size:.875rem;font-weight:500;cursor:pointer;transition:background-color .2s} /* Emerald story button */
-        .read-story-btn:hover{background-color:#047857}
-        .progress-container{position:sticky;top:0;z-index:10;background-color:#f8fafc;padding-top:1rem;padding-bottom:1rem;margin-bottom:1.5rem}
-        .progress-bar-outer{background-color:#e2e8f0}
-        .progress-bar-inner{background-color:#10b981;transition:width .4s ease-in-out} /* Emerald progress bar */
-        .full-table table{border-collapse:collapse;width:100%;}
-        .full-table thead th{background-color:#059669;color:white;font-weight:600;text-align:left;padding:.75rem 1.5rem;border-top:3px solid #047857;border-bottom:2px solid #047857;vertical-align:top;}
-        .full-table thead th:first-child{border-left:3px solid #047857}
-        .full-table thead th:last-child{border-right:3px solid #047857}
-        .full-table tbody tr:nth-child(even){background-color:#f0fdf4} /* Lighter emerald even rows */
-        .full-table tbody tr:nth-child(odd){background-color:#ffffff} /* White odd rows */
-        .full-table tbody tr.task-item.completed:nth-child(even){background-color:#bbf7d0} /* Slightly darker completed even */
-        .full-table tbody tr.task-item.completed:nth-child(odd){background-color:#dcfce7} /* Slightly darker completed odd */
-        .full-table tbody td{color:#374151;border-top:1px solid #d1fae5;padding:.75rem 1.5rem;} /* Emerald borders */
-        .full-table tbody tr.day-group-start td{border-top:3px solid #047857}
-        .full-table tbody tr.task-item td:first-child{border-left:3px solid #047857}
-        .full-table tbody tr.task-item td:last-child{border-right:3px solid #047857}
-        .full-table tbody tr:last-child td{border-bottom:3px solid #047857}
-        .full-table tbody td:first-child{font-weight:600;color:#064e3b} /* Dark emerald for day */
-        .full-table tbody td:nth-child(2){color:#065f46} /* Green for subject */
+        .story-modal-box{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:50;background-color:#fffbef;border:4px solid #78350f;border-radius:.75rem;box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);width:90%;max-width:600px;max-height:80vh;overflow-y:auto;padding:1.25rem}
+        .story-modal-box h3{font-size:1.25rem;font-weight:700;color:#78350f;margin-bottom:1rem}
+        .story-modal-box p{color:#451a03;line-height:1.6}
+        .story-modal-close-btn{position:absolute;top:.75rem;right:.75rem;background-color:transparent;border:none;color:#78350f;font-size:1.5rem;font-weight:700;line-height:1;cursor:pointer;padding:0}
+        .read-story-btn{display:inline-block;margin-top:.75rem;margin-left:.25rem;background-color:#3730a3;color:white;padding:4px 12px;border-radius:9999px;font-size:.875rem;font-weight:500;cursor:pointer;transition:background-color .2s}
+        .read-story-btn:hover{background-color:#4f46e5}
+        .progress-container{position:sticky;top:0;z-index:10;background-color:#f4f7f6;padding-top:1rem;padding-bottom:1rem;margin-bottom:1.5rem}
+        .progress-bar-outer{background-color:#e5e7eb}
+        .progress-bar-inner{background-color:#4f46e5;transition:width .4s ease-in-out}
+        .full-table table{border-collapse:collapse}
+        .full-table thead th{background-color:#6366f1;color:white;font-weight:600;text-align:center;padding-top:.75rem;padding-bottom:.75rem;padding-left:1.5rem;padding-right:1.5rem;border-top:3px solid #4f46e5;border-bottom:2px solid #4f46e5}
+        .full-table thead th:first-child{border-left:3px solid #4f46e5}
+        .full-table thead th:last-child{border-right:3px solid #4f46e5}
+        .full-table tbody tr:nth-child(even){background-color:#e0e7ff}
+        .full-table tbody tr:nth-child(odd){background-color:#f0f4ff}
+        .full-table tbody tr.task-item.completed:nth-child(even){background-color:#99f6e4}
+        .full-table tbody tr.task-item.completed:nth-child(odd){background-color:#a7f3d0}
+        .full-table tbody td{color:#374151;border-top:1px solid #c7d2fe}
+        .full-table tbody tr.day-group-start td{border-top:3px solid #4f46e5}
+        .full-table tbody tr.task-item td:first-child{border-left:3px solid #4f46e5}
+        .full-table tbody tr.task-item td:last-child{border-right:3px solid #4f46e5}
+        .full-table tbody tr:last-child td{border-bottom:3px solid #4f46e5}
+        .full-table tbody td:first-child{font-weight:600;color:#1e3a8a}
+        .full-table tbody td:nth-child(2){color:#4b5563}
         .full-table tbody td:nth-child(3){color:#1f2937}
-
-        /* Inline editing styles */
-        .editable-field {
-            border: 1px solid #d1fae5; /* Light green border for editable fields */
-            border-radius: 0.375rem;
-            padding: 0.25rem 0.5rem;
-            width: 100%;
-            background-color: #f0fdf4; /* Light green background */
-            font-size: 0.875rem;
-            line-height: 1.25rem;
-            color: #1f2937;
-        }
-        .editable-field:focus {
-            outline: none;
-            border-color: #059669; /* Darker green on focus */
-            box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2);
-        }
-        textarea.editable-field {
-            min-height: 40px;
-            resize: vertical;
-        }
-        .edit-buttons button {
-            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
-        }
-
+        .mobile-cards .card-item{background-color:#ffffff;border:1px solid #e5e7eb}
+        .mobile-cards .card-item.completed{background-color:#d1fae5;border-color:#a7f3d0}
+        .mobile-cards .card-item h3{color:#1e3a8a}
+        .mobile-cards .card-item p.font-medium{color:#4b5563}
+        .mobile-cards .card-item .text-sm{color:#1f2937}
         @media (max-width:768px){.full-table{display:none}.mobile-cards{display:block}}
-        @media (min-width:769px){.full-table{display:table}.mobile-cards{display:block}}
+        @media (min-width:769px){.full-table{display:block}.mobile-cards{display:none}}
+        /* Edit modal styles */
+        .edit-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:60;display:flex;align-items:center;justify-content:center}
+        .edit-modal-box{background:white;border-radius:.75rem;padding:1.25rem;width:95%;max-width:720px;max-height:85vh;overflow:auto;box-shadow:0 25px 50px rgba(0,0,0,.2);z-index:70}
+        .edit-field{margin-bottom:.75rem}
+        .edit-field label{display:block;font-weight:600;margin-bottom:.25rem;color:#1f2937}
+        .edit-field input,.edit-field textarea{width:100%;padding:.5rem;border:1px solid #e5e7eb;border-radius:.375rem;font-size:.95rem}
+        .edit-actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:.75rem}
     </style>
 </head>
 <body class="bg-gray-50 p-4 md:p-8">
@@ -88,13 +75,13 @@
     </div>
 
     <!-- Auth & Sync Status -->
-    <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg shadow">
+    <div class="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg shadow">
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
             <div>
-                <h3 class="font-semibold text-emerald-800">Sync Status</h3>
+                <h3 class="font-semibold text-indigo-800">Sync Status</h3>
                 <div class="flex items-center space-x-2">
                     <div id="sync-indicator" class="w-3 h-3 rounded-full bg-gray-400 animate-pulse"></div>
-                    <p id="sync-status" class="text-sm text-emerald-700">Waiting for login...</p>
+                    <p id="sync-status" class="text-sm text-indigo-700">Waiting for login...</p>
                 </div>
                 <p id="sync-error" class="hidden text-xs text-red-600 mt-1"></p>
             </div>
@@ -112,14 +99,14 @@
         </div>
     </div>
 
-<!-- Monthly Targets -->
+    <!-- Monthly Targets -->
     <div class="mb-10">
         <h2 class="text-2xl font-semibold text-gray-700 mb-4">Monthly Targets</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 monthly-targets">
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-emerald-700 mb-2">1st Week</h3><p class="text-gray-600 editable-field" contenteditable="true" data-target="monthly-1st-week">Enter target here...</p></div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-sky-700 mb-2">2nd Week</h3><p class="text-gray-600 editable-field" contenteditable="true" data-target="monthly-2nd-week">Enter target here...</p></div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-amber-700 mb-2">3rd Week</h3><p class="text-gray-600 editable-field" contenteditable="true" data-target="monthly-3rd-week">Enter target here...</p></div>
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-rose-700 mb-2">4th Week</h3><p class="text-gray-600 editable-field" contenteditable="true" data-target="monthly-4th-week">Enter target here...</p></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-indigo-700 mb-2">1st Week</h3><p class="text-gray-600">Math Class 15, Basic View 1-150 pages</p></div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-teal-700 mb-2">2nd Week</h3><p class="text-gray-600">Bangla Class 15, Computer hour 1-150 pages</p></div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-amber-700 mb-2">3rd Week</h3><p class="text-gray-600">Math Class 7, English lit. handbook complete</p></div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100"><h3 class="font-semibold text-lg text-rose-700 mb-2">4th Week</h3><p class="text-gray-600">Basic View 151-300 pages, Mental Ability classes 15</p></div>
         </div>
     </div>
 
@@ -128,22 +115,22 @@
 
         <div class="progress-container">
             <div class="flex justify-between mb-1">
-                <span id="weekly-progress-label" class="text-base font-medium text-emerald-700">Weekly Progress: 0%</span>
+                <span id="weekly-progress-label" class="text-base font-medium text-indigo-700">Weekly Progress: 0%</span>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-3.5 progress-bar-outer shadow-inner">
-                <div id="weekly-progress-bar" class="bg-emerald-600 h-3.5 rounded-full progress-bar-inner" style="width:0%"></div>
+                <div id="weekly-progress-bar" class="bg-indigo-600 h-3.5 rounded-full progress-bar-inner" style="width:0%"></div>
             </div>
         </div>
 
         <!-- Desktop Table -->
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 full-table" style="display: table;">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 full-table">
             <table class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">Day</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">Subject</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-7/12">Topic</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Day</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Topic</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Completed</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white" id="daily-plan-body"></tbody>
@@ -165,12 +152,31 @@
     </div>
 </div>
 
+<!-- Edit Modal (hidden by default) -->
+<div id="edit-modal" class="modal-hidden" aria-hidden="true">
+    <div id="edit-overlay" class="edit-modal-overlay modal-hidden"></div>
+    <div id="edit-box" class="edit-modal-box modal-hidden" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+            <h3 id="edit-modal-title" style="font-weight:700;color:#1f2937">Edit Day</h3>
+            <button id="edit-close-btn" style="background:transparent;border:none;font-size:1.25rem;cursor:pointer;color:#6b7280">&times;</button>
+        </div>
+        <div id="edit-form">
+            <!-- Fields will be inserted dynamically -->
+        </div>
+        <div class="edit-actions">
+            <button id="edit-cancel-btn" class="px-4 py-2 rounded-md border border-gray-300">Cancel</button>
+            <button id="edit-save-btn" class="px-4 py-2 rounded-md bg-indigo-600 text-white">Save</button>
+        </div>
+    </div>
+</div>
+
 <!-- Firebase + App Script -->
 <script type="module">
     // Firebase imports
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
     /* ----------------- CONFIG ----------------- */
     const firebaseConfig = {
       apiKey: "AIzaSyAj7MDnrnzKUO73BXG0jeM-uBGrAH3XiAY",
@@ -184,7 +190,6 @@
 
     let app, auth, db, userId, dataDocRef, unsubscribeListener = null;
     let isFirebaseReady = false, isDataLoaded = false;
-    let editingDay = null; // Stores the day currently being edited
 
     // UI elements
     const loginBtn = document.getElementById('login-btn');
@@ -198,18 +203,18 @@
 
     function setSyncStatus(status, isError=false) {
         if (isError) {
-            syncIndicator.classList.remove('bg-green-500','animate-pulse', 'bg-emerald-500', 'bg-yellow-500'); // Updated
+            syncIndicator.classList.remove('bg-green-500','animate-pulse');
             syncIndicator.classList.add('bg-red-500');
             syncStatus.textContent = status;
             syncError.textContent = status;
             syncError.classList.remove('hidden');
         } else if (status === 'synced') {
-            syncIndicator.classList.remove('bg-gray-400','animate-pulse','bg-yellow-500','bg-red-500');
-            syncIndicator.classList.add('bg-emerald-500'); // Updated
+            syncIndicator.classList.remove('bg-gray-400','animate-pulse','bg-yellow-500');
+            syncIndicator.classList.add('bg-green-500');
             syncStatus.textContent = "Synced";
             syncError.classList.add('hidden');
         } else if (status === 'saving') {
-            syncIndicator.classList.remove('bg-emerald-500','bg-red-500'); // Updated
+            syncIndicator.classList.remove('bg-green-500');
             syncIndicator.classList.add('bg-yellow-500','animate-pulse');
             syncStatus.textContent = "Saving...";
         } else {
@@ -222,12 +227,10 @@
         if (unsubscribeListener) { unsubscribeListener(); unsubscribeListener = null; }
         userInfo.classList.add('hidden'); loginBtn.classList.remove('hidden');
         setSyncStatus("Waiting for login...");
-        syncIndicator.classList.remove('bg-emerald-500','bg-red-500','bg-yellow-500'); // Updated
+        syncIndicator.classList.remove('bg-green-500','bg-red-500','bg-yellow-500');
         syncIndicator.classList.add('bg-gray-400');
         clearLocalData();
         isDataLoaded = false;
-        editingDay = null; // Ensure editing state is reset
-        buildUI(); // Rebuild UI to clear any editing states
     }
     function showLoggedInUI(user) {
         loginBtn.classList.add('hidden'); userInfo.classList.remove('hidden');
@@ -275,56 +278,53 @@
 
     /* ------------- APP DATA & UI BUILD ------------- */
     // Initial plan (same as original). We'll allow edits that update this in-memory and persist to Firestore.
-    // Make a deep copy to ensure original is not modified directly and we have a baseline for "cancel"
-    let dailyPlanData = [
-        { day: 'Day-1', subject: 'Subject 1', topic: '' },
-        { day: 'Day-1', subject: 'Subject 2', topic: '' },
-        { day: 'Day-1', subject: 'Vocabulary', topic: '' }, // Ensure Vocabulary is an option
-        { day: 'Day-1', subject: 'Subject 4', topic: '' },
-        { day: 'Day-1', subject: 'Subject 5', topic: '' },
-        { day: 'Day-2', subject: 'Subject 1', topic: '' },
-        { day: 'Day-2', subject: 'Subject 2', topic: '' },
-        { day: 'Day-2', subject: 'Vocabulary', topic: '' },
-        { day: 'Day-2', subject: 'Subject 4', topic: '' },
-        { day: 'Day-2', subject: 'Subject 5', topic: '' },
-        { day: 'Day-3', subject: 'Subject 1', topic: '' },
-        { day: 'Day-3', subject: 'Subject 2', topic: '' },
-        { day: 'Day-3', subject: 'Vocabulary', topic: '' },
-        { day: 'Day-3', subject: 'Subject 4', topic: '' },
-        { day: 'Day-3', subject: 'Subject 5', topic: '' },
-        { day: 'Day-4', subject: 'Subject 1', topic: '' },
-        { day: 'Day-4', subject: 'Subject 2', topic: '' },
+    const dailyPlanData = [
+        { day: 'Day-1', subject: 'Quran', topic: 'Sura Anfal 8:45- 8:53' },
+        { day: 'Day-1', subject: 'Newspaper', topic: 'The Daily Star: Shibir-backed panel sweeps Rucsu polls, Lowest HSC pass rate in 21 years' },
+        { day: 'Day-1', subject: 'Vocabulary', topic: 'Sweep- বিজয় অর্জন, Clinch- সমর্থন করা, unbridled-অবাধ, outperform-ছাড়িয়ে যাওয়া, Steep-خাড়া, dismally- poorly, poor show- নিম্ন ফলাফল, lenient- কোমল, pronounced- সুস্পষ্ট।' },
+        { day: 'Day-1', subject: 'Math', topic: 'Ratio Class 12, 13' },
+        { day: 'Day-1', subject: 'Basic View', topic: 'Page 1-20' },
+        { day: 'Day-2', subject: 'Quran', topic: 'Sura Anfal 8:53-8:69' },
+        { day: 'Day-2', subject: 'Newspaper', topic: 'Editorial: Our children deserve clean air' },
+        { day: 'Day-2', subject: 'Vocabulary', topic: 'Unnerved- ভীত, dire- অত্যান্ত জরুরি, particulate matter- অতিক্ষুদ্র পদার্থ, brick kilns- ইট ভাটা, infants- শিশু, likelihood- সম্ভাবনা, ingrained- বদ্ধমূল, halt- থামা, perpetuate- অবিরাম করা,' },
+        { day: 'Day-2', subject: 'Math', topic: 'Ratio Class 14, 15' },
+        { day: 'Day-2', subject: 'Basic View', topic: '' },
+        { day: 'Day-3', subject: 'Quran', topic: 'Sura Anfal 8:70- Sura Tawbah 9:6' },
+        { day: 'Day-3', subject: 'Newspaper', topic: 'Editorial: Sabotage or not, the government must account for the recent fires' },
+        { day: 'Day-3', subject: 'Vocabulary', topic: 'Sabotage- নাশকতা, Devastating- ধ্বংশাত্মক, Blaze- তীব্র অগ্নিকাণ্ড, deploy- মোতায়েন করা, disrupt- বিঘ্ন ঘটানো, stranded- আটকে পড়া, spate- ঢল, undermine- দুর্বল করা, sow panic- আতঙ্ক ছড়ানো, arson- অগ্নিসংযোগ, resolute- দৃঢ় প্রতিজ্ঞ, beyond comprehension- বোধগমতার বাইরে, contingency- বিকল্প ব্যবস্থা, bode- ইঙ্গিত দেয়া/ পূর্বাভাস' },
+        { day: 'Day-3', subject: 'Math', topic: 'Class 16, 17' },
+        { day: 'Day-3', subject: 'Basic View', topic: '' },
+        { day: 'Day-4', subject: 'Quran', topic: 'Sura Tawbah 9:7- 9:20' },
+        { day: 'Day-4', subject: 'Newspaper', topic: '' },
         { day: 'Day-4', subject: 'Vocabulary', topic: '' },
-        { day: 'Day-4', subject: 'Subject 4', topic: '' },
-        { day: 'Day-4', subject: 'Subject 5', topic: '' },
-        { day: 'Day-5', subject: 'Subject 1', topic: '' },
-        { day: 'Day-5', subject: 'Subject 2', topic: '' },
-        { day: 'Day-5', subject: 'Vocabulary', topic: '' },
-        { day: 'Day-5', subject: 'Subject 4', topic: '' },
-        { day: 'Day-5', subject: 'Subject 5', topic: '' },
-        { day: 'Day-6', subject: 'Subject 1', topic: '' },
-        { day: 'Day-6', subject: 'Subject 2', topic: '' },
+        { day: 'Day-4', subject: 'Math', topic: 'Class 18, 19' },
+        { day: 'Day-4', subject: 'Basic View', topic: '' },
+        { day: 'Day-5', subject: 'Quran', topic: 'Sura Tawbah 9:21- 9:31' },
+        { day: 'Day-5', subject: 'Newspaper', topic: 'Tripura mob killing of Bangladeshis exposes the accountability gap' },
+        { day: 'Day-5', subject: 'Vocabulary', topic: 'Gruesome-ভয়াবহ, heinous-নিকৃষ্ট, sanctity- পবিত্রতা, frontier vengeance- সীমান্ত প্রতিহিংসা, porous- ছিদ্রযুক্ত, flux- অবিরাম গতি, illicit- অবৈধ, intricate- সূক্ষ্ণ, backdrop- পটভূমি, precarious- ঝুঁকিপূর্ণ, pledged- প্রতিজ্ঞা করা, curb- দমন করা, intrusions- onadhikar probes, repatriate- নিজ দেশে ফেরত পাঠানো, patrols- টহল, usher in- শুরু করা, restraint- সংগম, hollow- ফাঁপা, invoking- আহ্বান করা, culminating-শেষ করা, perpetrators- অপরাধী' },
+        { day: 'Day-5', subject: 'Math', topic: 'Class 20, 21' },
+        { day: 'Day-5', subject: 'Basic View', topic: '' },
+        { day: 'Day-6', subject: 'Quran', topic: 'Sura Tawbah 9:31- 9:41' },
+        { day: 'Day-6', subject: 'Newspaper', topic: '' },
         { day: 'Day-6', subject: 'Vocabulary', topic: '' },
-        { day: 'Day-6', subject: 'Subject 4', topic: '' },
-        { day: 'Day-6', subject: 'Subject 5', topic: '' },
-        { day: 'Day-7', subject: 'Subject 1', topic: '' },
-        { day: 'Day-7', subject: 'Subject 2', topic: '' },
+        { day: 'Day-6', subject: 'Math', topic: '' },
+        { day: 'Day-6', subject: 'Basic View', topic: '' },
+        { day: 'Day-7', subject: 'Quran', topic: '' },
+        { day: 'Day-7', subject: 'Newspaper', topic: '' },
         { day: 'Day-7', subject: 'Vocabulary', topic: '' },
-        { day: 'Day-7', subject: 'Subject 4', topic: '' },
-        { day: 'Day-7', subject: 'Subject 5', topic: '' },
+        { day: 'Day-7', subject: 'Math', topic: '' },
+        { day: 'Day-7', subject: 'Basic View', topic: '' },
     ];
-    let initialDailyPlanData = JSON.parse(JSON.stringify(dailyPlanData)); // To restore on cancel
 
-    let vocabStories = {}; // Initialize as empty
-    let initialVocabStories = {}; // Initialize as empty
+    const vocabStories = {
+        'Day-1': "The young prince planned to <strong>sweep</strong> the election. He needed to <strong>clinch</strong> the final vote from the stubborn council. ...",
+        'Day-2': "The old scientist felt <strong>unnerved</strong> by the sky's strange color. ...",
+        'Day-3': "The empress was certain it was <strong>sabotage</strong>. ...",
+        'Day-5': "The detective inspected the <strong>gruesome</strong> crime scene. ..."
+    };
 
     // Task weights & progress
-    // Define a default weight for any subject that is not explicitly listed.
-    // User-defined subjects will take this weight. Vocabulary will have a specific weight.
-    const taskWeights = {
-        'Vocabulary': 10/7, // Keep vocabulary distinct if you want it to weigh more
-        'DEFAULT_SUBJECT_WEIGHT': 5/7 // Assign a default weight for user-entered subjects
-    };
+    const taskWeights = {'Quran':5/7,'Newspaper':5/7,'Vocabulary':10/7,'Math':40/7,'Basic View':40/7};
     let maxWeight = 0;
     const progressLabel = document.getElementById('weekly-progress-label');
     const progressBar = document.getElementById('weekly-progress-bar');
@@ -337,9 +337,7 @@
             const uniqueId = `${cb.dataset.day}-${cb.dataset.subject}`;
             if(cb.checked && !checkedTasks.has(uniqueId)) {
                 const subject = cb.dataset.subject;
-                if (subject) {
-                    currentWeight += taskWeights[subject] || taskWeights['DEFAULT_SUBJECT_WEIGHT'];
-                }
+                if(subject && taskWeights[subject]) currentWeight += taskWeights[subject];
                 checkedTasks.add(uniqueId);
             }
         });
@@ -350,13 +348,10 @@
 
     /* ---------- Helpers for Vocab UI ---------- */
     function createVocabElementFromPair(pair) {
-        // Updated to split by comma (,) as per new format: Word, Meaning
-        const parts = pair.split(',');
-        if (parts.length >= 2 && parts[0].trim() && parts[1].trim()) {
+        const parts = pair.split('-');
+        if(parts.length===2 && parts[0].trim() && parts[1].trim()) {
             const eng = parts[0].trim();
-            // Join remaining parts if there are more than 2 (e.g., if meaning contains commas)
-            const ban = parts.slice(1).join(',').trim().replace('।','');
-
+            const ban = parts[1].trim().replace('।','');
             const container = document.createElement('div');
             container.classList.add('vocab-item');
             container.setAttribute('tabindex','0');
@@ -367,12 +362,9 @@
             });
             const engSpan = document.createElement('span'); engSpan.classList.add('vocab-word'); engSpan.textContent=eng;
             const banSpan = document.createElement('span'); banSpan.classList.add('vocab-meaning'); banSpan.textContent=ban;
-
-            container.appendChild(engSpan);
-            container.appendChild(banSpan);
-
+            container.appendChild(engSpan); container.appendChild(banSpan);
             return container;
-        } else if(pair.trim()) { // Handle cases where it might just be a single word without meaning
+        } else if(pair.trim()) {
             const span = document.createElement('span'); span.textContent = pair.trim(); return span;
         }
         return null;
@@ -390,35 +382,22 @@
         maxWeight = 0;
 
         dailyPlanData.forEach(item => {
-            // Use default weight if subject not explicitly defined in taskWeights
-            if((item.subject||item.topic)) maxWeight += taskWeights[item.subject] || taskWeights['DEFAULT_SUBJECT_WEIGHT'];
-
-            const isEditingCurrentDay = (editingDay === item.day);
+            if((item.subject||item.topic) && taskWeights[item.subject]) maxWeight += taskWeights[item.subject];
 
             // Desktop row
-            const row = document.createElement('tr');
-            row.classList.add('task-item');
-            row.setAttribute('data-day', item.day);
-            row.setAttribute('data-subject', item.subject);
-
-            const dayCell = document.createElement('td');
-            dayCell.classList.add('px-6','py-4','text-sm','font-medium','text-gray-900','align-top');
+            const row = document.createElement('tr'); row.classList.add('task-item'); row.setAttribute('data-day', item.day); row.setAttribute('data-subject', item.subject);
+            const dayCell = document.createElement('td'); dayCell.classList.add('px-6','py-4','text-sm','font-medium','text-gray-900','align-top');
 
             if(item.day !== currentDay) {
                 row.classList.add('day-group-start');
-                const dayText = document.createElement('span');
-                dayText.textContent = item.day;
-                dayCell.appendChild(dayText);
+                const dayText = document.createElement('span'); dayText.textContent = item.day; dayCell.appendChild(dayText);
 
-                const dateInputDiv = document.createElement('div');
-                dateInputDiv.classList.add('date-input-desktop','mt-2');
-                dateInputDiv.setAttribute('data-day-input', item.day);
-                dateInputDiv.style.display='none';
+                const dateInputDiv = document.createElement('div'); dateInputDiv.classList.add('date-input-desktop','mt-2'); dateInputDiv.setAttribute('data-day-input', item.day); dateInputDiv.style.display='none';
                 const dateInputId = `date-${item.day}`;
                 dateInputDiv.innerHTML = `
                     <div class="flex flex-col gap-1">
                         <label for="${dateInputId}" class="text-xs font-medium text-gray-600">Completion Date:</label>
-                        <input type="text" id="${dateInputId}" class="form-input p-1 border border-gray-300 rounded-md shadow-sm text-sm w-full max-w-xs editable-field" placeholder="e.g., 24/10/25" ${isEditingCurrentDay ? '' : 'disabled'}>
+                        <input type="text" id="${dateInputId}" class="form-input p-1 border border-gray-300 rounded-md shadow-sm text-sm w-full max-w-xs" placeholder="e.g., 24/10/25">
                     </div>
                 `;
                 dateInputDiv.querySelector('input').addEventListener('input', onInputChange);
@@ -427,208 +406,79 @@
             }
             row.appendChild(dayCell);
 
-            const subjectCell = document.createElement('td');
-            subjectCell.classList.add('px-6','py-4','text-sm','text-gray-500','font-medium','align-top');
+            const subjectCell = document.createElement('td'); subjectCell.classList.add('px-6','py-4','text-sm','text-gray-500','font-medium','align-top'); subjectCell.textContent = item.subject; row.appendChild(subjectCell);
 
-            // Subject Input (always created, visibility toggled)
-            const subjectInput = document.createElement('input');
-            subjectInput.type = 'text';
-            subjectInput.classList.add('editable-field');
-            subjectInput.value = item.subject;
-            subjectInput.setAttribute('data-field-type', 'subject');
-            subjectInput.setAttribute('data-day', item.day);
-            subjectInput.setAttribute('data-old-subject', item.subject); // Store original subject for lookup
-            if (!isEditingCurrentDay) subjectInput.style.display = 'none'; // Hide if not in editing mode
-            subjectCell.appendChild(subjectInput);
-
-            // Subject Display (always created, visibility toggled)
-            const subjectDisplaySpan = document.createElement('span');
-            subjectDisplaySpan.classList.add('font-medium', 'text-gray-700');
-            subjectDisplaySpan.textContent = item.subject;
-            if (isEditingCurrentDay) subjectDisplaySpan.style.display = 'none'; // Hide if in editing mode
-            subjectCell.appendChild(subjectDisplaySpan);
-
-            row.appendChild(subjectCell);
-
-
-            const topicCell = document.createElement('td');
-            topicCell.classList.add('px-6','py-4','text-sm','text-gray-600','align-top','whitespace-normal','break-words');
+            const topicCell = document.createElement('td'); topicCell.classList.add('px-6','py-4','text-sm','text-gray-600','align-top','whitespace-normal','break-words');
             // unique id for topic cell for persistence / updates
             const topicCellId = `topic-${item.day}-${item.subject}`.replace(/\s+/g,'_');
             topicCell.id = topicCellId;
 
-            // Always show editable fields initially, then hide if not in editing mode
-            const topicInput = document.createElement(item.subject === 'Vocabulary' || item.subject === 'Newspaper' || item.subject === 'Basic View' ? 'textarea' : 'input');
-            if (topicInput.tagName === 'INPUT') topicInput.type = 'text';
-            topicInput.classList.add('editable-field');
-            topicInput.value = item.topic || '';
-            if (item.subject === 'Vocabulary') topicInput.placeholder = 'Enter vocabulary as: Word, Meaning; AnotherWord, Meaning; ...'; // Updated placeholder
-            topicInput.setAttribute('data-field-type', 'topic');
-            topicInput.setAttribute('data-day', item.day);
-            topicInput.setAttribute('data-subject', item.subject);
-            if (!isEditingCurrentDay) topicInput.style.display = 'none'; // Hide if not in editing mode
-
-            // Display area for non-editing mode
-            const displaySpan = document.createElement('div');
-            displaySpan.classList.add('text-sm', 'break-words', 'whitespace-normal');
-            if (isEditingCurrentDay) displaySpan.style.display = 'none'; // Hide if in editing mode
-
-            if(item.subject === 'Vocabulary' && item.topic && !isEditingCurrentDay) {
+            if(item.subject === 'Vocabulary' && item.topic) {
                 const wrapper = document.createElement('div'); wrapper.classList.add('flex','flex-wrap','gap-2','py-1');
-                // Updated to split by semicolon for vocabulary entries
-                const pairs = item.topic.split(';').filter(p=>p.trim());
+                const pairs = item.topic.split(/, |।/).filter(p=>p.trim());
                 pairs.forEach(p=>{
                     const el = createVocabElementFromPair(p);
                     if(el) wrapper.appendChild(el);
                 });
-                displaySpan.appendChild(wrapper);
+                topicCell.appendChild(wrapper);
                 if(pairs.length>0 && vocabStories[item.day]) {
                     const storyBtn = document.createElement('button'); storyBtn.textContent='Read story'; storyBtn.classList.add('read-story-btn'); storyBtn.setAttribute('data-day', item.day);
-                    displaySpan.appendChild(storyBtn);
+                    topicCell.appendChild(storyBtn);
                 }
-            } else if (!isEditingCurrentDay) {
-                displaySpan.textContent = item.topic || '-';
-            }
-
-            topicCell.appendChild(topicInput);
-            topicCell.appendChild(displaySpan); // Add display element
-
-
-            if(item.subject === 'Basic View') { // Story field is only shown on the last topic row for a day
-                const storyFieldWrapper = document.createElement('div');
-                storyFieldWrapper.classList.add('mt-4');
-                const storyLabel = document.createElement('label'); storyLabel.textContent = 'Vocabulary Story (optional)'; storyLabel.classList.add('block', 'text-sm', 'font-medium', 'text-gray-700', 'mb-1');
-                const storyArea = document.createElement('textarea');
-                storyArea.classList.add('editable-field');
-                storyArea.rows = 4;
-                storyArea.placeholder = 'HTML allowed (e.g., use <strong>word</strong>)';
-                storyArea.value = vocabStories[item.day] || '';
-                storyArea.setAttribute('data-field-type', 'story');
-                storyArea.setAttribute('data-day', item.day);
-                if (!isEditingCurrentDay) storyArea.style.display = 'none'; // Hide story area if not editing
-                storyFieldWrapper.appendChild(storyLabel);
-                storyFieldWrapper.appendChild(storyArea);
-                topicCell.appendChild(storyFieldWrapper);
+            } else {
+                const span = document.createElement('span'); span.textContent = item.topic || '-'; topicCell.appendChild(span);
             }
             row.appendChild(topicCell);
 
-            const actionsCell = document.createElement('td');
-            actionsCell.classList.add('px-6','py-4','text-sm','text-gray-500','align-top','flex','items-start','gap-2');
-
-            // Checkbox
+            const completionCell = document.createElement('td'); completionCell.classList.add('px-6','py-4','text-sm','text-gray-500','align-top','flex','items-start','gap-2');
             if(item.subject || item.topic) {
-                const checkbox = document.createElement('input');
-                checkbox.type='checkbox';
-                checkbox.classList.add('task-checkbox');
-                checkbox.setAttribute('data-day',item.day);
-                checkbox.setAttribute('data-subject', item.subject);
+                const checkbox = document.createElement('input'); checkbox.type='checkbox'; checkbox.classList.add('task-checkbox'); checkbox.setAttribute('data-day',item.day); checkbox.setAttribute('data-subject', item.subject);
                 checkbox.addEventListener('change', onInputChange);
-                actionsCell.appendChild(checkbox);
-            }
-
-            // Edit/Save/Cancel buttons
-            if (item.subject === 'Basic View') { // Attach buttons only to the last subject row for the day
-                const editButtonContainer = document.createElement('div');
-                editButtonContainer.classList.add('edit-buttons', 'flex', 'flex-col', 'gap-2', 'ml-2');
-                const editSaveBtn = document.createElement('button');
-                editSaveBtn.classList.add('px-3','py-1','rounded-md','font-medium','text-xs', 'shadow-sm', 'transition');
-                editSaveBtn.setAttribute('data-day', item.day);
-
-                if (isEditingCurrentDay) {
-                    editSaveBtn.textContent = 'Save';
-                    editSaveBtn.classList.add('bg-emerald-600', 'text-white', 'hover:bg-emerald-700');
-                    editSaveBtn.addEventListener('click', saveDayEdits);
-
-                    const cancelBtn = document.createElement('button');
-                    cancelBtn.textContent = 'Cancel';
-                    cancelBtn.classList.add('px-3','py-1','rounded-md','border','border-gray-300','text-xs','text-gray-700', 'hover:bg-gray-100', 'shadow-sm');
-                    cancelBtn.setAttribute('data-day', item.day);
-                    cancelBtn.addEventListener('click', cancelDayEdits);
-                    editButtonContainer.appendChild(cancelBtn);
-                } else {
-                    editSaveBtn.textContent = 'Edit';
-                    editSaveBtn.classList.add('bg-white', 'border', 'border-gray-300', 'text-gray-700', 'hover:bg-gray-50');
-                    editSaveBtn.addEventListener('click', toggleDayEditMode);
+                completionCell.appendChild(checkbox);
+                // Add Edit button for the day's LAST row (Basic View) only.
+                if(item.subject === 'Basic View') {
+                    const editBtn = document.createElement('button'); editBtn.classList.add('px-3','py-1','rounded-md','border','border-gray-300','text-xs','text-gray-700'); editBtn.textContent = 'Edit';
+                    editBtn.addEventListener('click', (e)=>{ e.stopPropagation(); openEditModal(item.day); });
+                    completionCell.appendChild(editBtn);
                 }
-                editButtonContainer.appendChild(editSaveBtn);
-                actionsCell.appendChild(editButtonContainer);
             }
-
-            row.appendChild(actionsCell);
+            row.appendChild(completionCell);
             tableBody.appendChild(row);
 
             // Mobile card
             if(item.subject || item.topic) {
-                const card = document.createElement('div');
-                card.classList.add('bg-white','p-4','rounded-lg','shadow','card-item');
-                card.setAttribute('data-day', item.day);
-
+                const card = document.createElement('div'); card.classList.add('bg-white','p-4','rounded-lg','shadow','card-item'); card.setAttribute('data-day', item.day);
                 let headerHTML = '';
                 let dateInputMobileHTML = '';
                 const dateInputMobileId = `date-mobile-${item.day}`;
                 if(item.day !== currentMobileDay) {
                     headerHTML = `<h3 class="font-bold text-lg text-gray-800 mb-2">${item.day}</h3>`;
                     dateInputMobileHTML = `
-                        <div class="date-input-mobile mt-2 mb-3 p-3 bg-emerald-50 rounded-md" data-day-input="${item.day}" style="display:none;">
+                        <div class="date-input-mobile mt-2 mb-3 p-3 bg-green-50 rounded-md" data-day-input="${item.day}" style="display:none;">
                             <div class="flex items-center gap-2">
                                 <label for="${dateInputMobileId}" class="text-sm font-medium text-gray-700">Completion Date:</label>
-                                <input type="text" id="${dateInputMobileId}" class="form-input p-1 border border-gray-300 rounded-md shadow-sm text-sm w-full editable-field" placeholder="e.g., 24/10/25" ${isEditingCurrentDay ? '' : 'disabled'}>
+                                <input type="text" id="${dateInputMobileId}" class="form-input p-1 border border-gray-300 rounded-md shadow-sm text-sm w-full" placeholder="e.g., 24/10/25">
                             </div>
                         </div>
                     `;
                     currentMobileDay = item.day;
                 }
-let subjectContentHTML = `
-                    <p class="font-medium text-gray-700">
-                        <input type="text" class="editable-field ${isEditingCurrentDay ? '' : 'hidden'}" value="${item.subject}" data-field-type="subject" data-day="${item.day}" data-old-subject="${item.subject}">
-                        <span class="font-medium text-gray-700 ${isEditingCurrentDay ? 'hidden' : ''}">${item.subject}</span>
-                    </p>
-                `;
-
-const topicInputType = (item.subject === 'Vocabulary' || item.subject === 'Newspaper' || item.subject === 'Basic View') ? 'textarea' : 'input';
-let topicInputHTML = `
-    <${topicInputType} class="editable-field ${isEditingCurrentDay ? '' : 'hidden'}" rows="${topicInputType === 'textarea' ? '2' : '1'}" placeholder="${item.subject === 'Vocabulary' ? 'Enter vocabulary as: Word, Meaning; AnotherWord, Meaning; ...' : 'Enter topic'}" data-field-type="topic" data-day="${item.day}" data-subject="${item.subject}">${item.topic || ''}</${topicInputType}>
-`;
-
-let topicDisplayHTML = `<div class="text-sm break-words ${isEditingCurrentDay ? 'hidden' : ''}" id="topic-mobile-${item.day}-${item.subject}-display-content">`; // Added an ID here for potential future use
+                let topicMobileContent = '';
                 if(item.subject === 'Vocabulary' && item.topic) {
-                    const pairs = item.topic.split(';').filter(p=>p.trim());
-                    topicDisplayHTML += '<div class="flex flex-wrap gap-2 py-1">';
+                    const pairs = item.topic.split(/, |।/).filter(p=>p.trim());
+                    topicMobileContent = '<div class="flex flex-wrap gap-2 py-1">';
                     pairs.forEach(p=>{
                         const el = createVocabElementFromPair(p);
-                        if(el) topicDisplayHTML += el.outerHTML;
+                        if(el) topicMobileContent += el.outerHTML;
                     });
-                    topicDisplayHTML += '</div>';
-                    if(pairs.length>0 && vocabStories[item.day]) topicDisplayHTML += `<button class="read-story-btn" data-day="${item.day}">Read story</button>`;
+                    topicMobileContent += '</div>';
+                    if(pairs.length>0 && vocabStories[item.day]) topicMobileContent += `<button class="read-story-btn" data-day="${item.day}">Read story</button>`;
                 } else {
-                    topicDisplayHTML += `<span>${item.topic || '-'}</span>`;
+                    topicMobileContent = `<span class="text-gray-600">${item.topic || '-'}</span>`;
                 }
-                topicDisplayHTML += `</div>`;
 
-
-                let storyMobileContentHTML = '';
-                if (item.subject === 'Basic View') {
-                    storyMobileContentHTML = `
-                        <div class="mt-4 story-field-wrapper ${isEditingCurrentDay ? '' : 'hidden'}">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Vocabulary Story (optional)</label>
-                            <textarea class="editable-field" rows="4" placeholder="HTML allowed (e.g., use <strong>word</strong>)" data-field-type="story" data-day="${item.day}">${vocabStories[item.day] || ''}</textarea>
-                        </div>
-                    `;
-                }
-                        
-                 
-
-let editButtonsMobileHTML = '';
-                // Mobile edit buttons are always present for "Basic View" tasks
-                if (item.subject === 'Basic View') {
-                     editButtonsMobileHTML = `
-                        <div class="flex flex-col gap-2 mt-4">
-                            <button class="px-3 py-1 rounded-md font-medium text-xs shadow-sm transition bg-emerald-600 text-white hover:bg-emerald-700 ${isEditingCurrentDay ? '' : 'hidden'}" data-day="${item.day}" onclick="saveDayEdits(event)">Save</button>
-                            <button class="px-3 py-1 rounded-md border border-gray-300 text-xs text-gray-700 hover:bg-gray-100 shadow-sm ${isEditingCurrentDay ? '' : 'hidden'}" data-day="${item.day}" onclick="cancelDayEdits(event)">Cancel</button>
-                            <button class="px-3 py-1 rounded-md border border-gray-300 text-xs text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition ${isEditingCurrentDay ? 'hidden' : ''}" data-day="${item.day}" onclick="toggleDayEditMode(event)">Edit</button>
-                        </div>
-                    `;
-                }
+                // For mobile, add edit button in Basic View card as well
+                const editBtnMobile = (item.subject === 'Basic View') ? `<button class="px-3 py-1 rounded-md border border-gray-300 text-xs text-gray-700" data-edit-day="${item.day}">Edit</button>` : '';
 
                 card.innerHTML = `
                     ${headerHTML}
@@ -636,11 +486,9 @@ let editButtonsMobileHTML = '';
                     <div class="flex items-start">
                         <input type="checkbox" class="task-checkbox mt-1" data-day="${item.day}" data-subject="${item.subject}">
                         <div class="ml-2 flex-1 min-w-0">
-                            ${subjectContentHTML}
-                            ${topicInputHTML}
-                            ${topicDisplayHTML}
-                            ${storyMobileContentHTML}
-                            ${editButtonsMobileHTML}
+                            <p class="font-medium text-gray-700">${item.subject}</p>
+                            <div class="text-sm break-words" id="topic-mobile-${item.day}-${item.subject}">${topicMobileContent}</div>
+                            ${editBtnMobile}
                         </div>
                     </div>
                 `;
@@ -648,7 +496,10 @@ let editButtonsMobileHTML = '';
                 card.querySelector('.task-checkbox').addEventListener('change', onInputChange);
                 // date input listener if present
                 if(card.querySelector(`#${dateInputMobileId}`)) card.querySelector(`#${dateInputMobileId}`).addEventListener('input', onInputChange);
-
+                // edit button listener
+                if(editBtnMobile) {
+                    card.querySelector(`[data-edit-day="${item.day}"]`).addEventListener('click', (e)=>{ e.stopPropagation(); openEditModal(item.day); });
+                }
                 // attach vocab click toggles for mobile items that were put as innerHTML
                 card.querySelectorAll('.vocab-item').forEach(vc => {
                     vc.addEventListener('click', function(ev){ ev.stopPropagation(); document.querySelectorAll('.vocab-item.active').forEach(i=>{ if(i!==this) i.classList.remove('active'); }); this.classList.toggle('active'); });
@@ -669,13 +520,11 @@ let editButtonsMobileHTML = '';
     }
 
     // Input change handler (checkboxes & date inputs)
-function onInputChange(event) {
+    function onInputChange(event) {
         if(!isDataLoaded) return; // Don't allow saves before initial data load
         const el = event.target;
-
         if(el.classList.contains('task-checkbox')) {
-            const day = el.dataset.day;
-            const subject = el.dataset.subject;
+            const day = el.dataset.day; const subject = el.dataset.subject;
             // set all checkboxes for this day & subject to same state (keeps table+mobile synced)
             document.querySelectorAll(`.task-checkbox[data-day="${day}"][data-subject="${subject}"]`).forEach(cb=>{
                 cb.checked = el.checked;
@@ -683,22 +532,16 @@ function onInputChange(event) {
                 if(taskItem) taskItem.classList.toggle('completed', el.checked);
             });
             checkDayCompletion(day);
-        } else if(el.tagName === 'INPUT' && el.type === 'text' && (el.id.startsWith('date-') || el.id.startsWith('date-mobile-'))) {
+        } else if(el.tagName === 'INPUT' && el.type === 'text') {
             // date input: keep desktop & mobile in sync
             const day = el.id.replace('date-','').replace('date-mobile-','');
-            const desktopInput = document.getElementById(`date-${day}`);
-            const mobileInput = document.getElementById(`date-mobile-${day}`);
-            if(desktopInput) desktopInput.value = el.value;
-            if(mobileInput) mobileInput.value = el.value;
-        } else if (el.closest('.monthly-targets')) {
-            // No direct action needed here for monthly targets other than the implicit save.
-            // Changes to contenteditable fields are not captured by `input` event consistently for all browsers,
-            // so we rely on the `saveDataToFirestore` function to read their current state when it runs.
+            const desktop = document.getElementById(`date-${day}`);
+            const mobile = document.getElementById(`date-mobile-${day}`);
+            if(desktop) desktop.value = el.value;
+            if(mobile) mobile.value = el.value;
         }
-        // No debouncedSaveData here for individual inputs, only after Save button click for daily plan items.
-        // Monthly targets are implicitly saved with other data, or you could add a separate debounced save for them.
         updateWeeklyProgress();
-        // If an editable field is changed during editing mode, mark it for save (implicitly by being in editingDay state)
+        debouncedSaveData();
     }
 
     // Check if all subjects for a day are completed to show date input
@@ -719,127 +562,143 @@ function onInputChange(event) {
         else { if(desktopInput) desktopInput.style.display='none'; if(mobileInput) mobileInput.style.display='none'; }
     }
 
-    /* ----------------- Inline Editing Logic ----------------- */
+    /* ----------------- Edit Modal Logic ----------------- */
+    const editModal = document.getElementById('edit-modal');
+    const editOverlay = document.getElementById('edit-overlay');
+    const editBox = document.getElementById('edit-box');
+    const editForm = document.getElementById('edit-form');
+    const editCloseBtn = document.getElementById('edit-close-btn');
+    const editCancelBtn = document.getElementById('edit-cancel-btn');
+    const editSaveBtn = document.getElementById('edit-save-btn');
+    const editTitle = document.getElementById('edit-modal-title');
 
-    // Toggles the editing mode for a specific day
-    window.toggleDayEditMode = function(event) {
-        if (!isFirebaseReady || !userId) {
-            alert("Please sign in to edit your study plan.");
-            return;
-        }
+    function openEditModal(day) {
+        // Build form fields for this day: Quran, Newspaper, Vocabulary, Math, Basic View, Story
+        editTitle.textContent = `Edit ${day}`;
+        editForm.innerHTML = '';
+        const subjects = ['Quran','Newspaper','Vocabulary','Math','Basic View'];
+        subjects.forEach(subj=>{
+            const field = document.createElement('div'); field.classList.add('edit-field');
+            const label = document.createElement('label'); label.textContent = subj;
+            const input = document.createElement(subj === 'Vocabulary' || subj === 'Newspaper' || subj === 'Basic View' ? 'textarea' : 'input');
+            input.id = `edit-${day}-${subj}`.replace(/\s+/g,'_');
+            input.rows = (subj==='Vocabulary')?4:2;
+            input.placeholder = (subj==='Vocabulary')? 'Enter comma separated pairs like: Word- বাংলা, ...' : 'Enter topic';
+            // Prefill: try to get from in-memory dailyPlanData if present, else from DOM
+            const matching = dailyPlanData.find(d=>d.day===day && d.subject===subj);
+            let initial = matching ? (matching.topic || '') : '';
+            // If DOM value exists (persisted loaded data might differ), prefer DOM innerText/innerHTML for vocab
+            const topicCell = document.getElementById(`topic-${day}-${subj}`.replace(/\s+/g,'_'));
+            if(topicCell) {
+                if(subj === 'Vocabulary') {
+                    // Attempt to reconstruct the stored comma-separated topic from DOM text; fallback to matching.topic
+                    initial = (matching && matching.topic) ? matching.topic : initial;
+                } else {
+                    const textNode = topicCell.querySelector('span');
+                    initial = textNode ? textNode.textContent : (matching?matching.topic:'');
+                }
+            }
 
-        const dayToEdit = event.target.dataset.day;
+            if(input.tagName === 'TEXTAREA') input.value = initial || '';
+            else input.value = initial || '';
+            field.appendChild(label); field.appendChild(input);
+            editForm.appendChild(field);
+        });
 
-        // If another day is being edited, prevent simultaneous edits
-        if (editingDay && editingDay !== dayToEdit) {
-            alert(`Please save or cancel edits for ${editingDay} before editing another day.`);
-            return;
-        }
+        // Story field
+        const storyField = document.createElement('div'); storyField.classList.add('edit-field');
+        const storyLabel = document.createElement('label'); storyLabel.textContent = 'Vocabulary Story (optional)';
+        const storyArea = document.createElement('textarea'); storyArea.id = `edit-${day}-Story`.replace(/\s+/g,'_'); storyArea.rows = 6; storyArea.placeholder = 'HTML allowed (e.g., use <strong>word</strong>)';
+        storyArea.value = vocabStories[day] || '';
+        storyField.appendChild(storyLabel); storyField.appendChild(storyArea); editForm.appendChild(storyField);
 
-        editingDay = (editingDay === dayToEdit) ? null : dayToEdit; // Toggle editing state
-
-        // Capture current state as initial for potential "cancel" operation
-        if (editingDay) {
-            initialDailyPlanData = JSON.parse(JSON.stringify(dailyPlanData));
-            initialVocabStories = JSON.parse(JSON.stringify(vocabStories));
-        }
-
-        buildUI(); // Rebuild UI to reflect editing state for the selected day
-        if (editingDay) {
-             // After rebuilding, focus on the first editable field of the day
-             const firstEditableField = document.querySelector(`[data-day="${editingDay}"] .editable-field`);
-             if (firstEditableField) {
-                 firstEditableField.focus();
-             }
-        }
+        // show modal
+        editOverlay.classList.remove('modal-hidden'); editBox.classList.remove('modal-hidden'); editModal.classList.remove('modal-hidden'); editBox.style.display='block';
+        // focus first input
+        const firstInput = editForm.querySelector('input, textarea'); if(firstInput) firstInput.focus();
     }
 
-// Saves the edits for a day
-    window.saveDayEdits = function(event) {
-        const dayToSave = event.target.dataset.day;
-        if (dayToSave !== editingDay) {
-            console.warn("Attempted to save a day not in editing mode:", dayToSave);
-            return;
-        }
+    function closeEditModal() {
+        editOverlay.classList.add('modal-hidden'); editBox.classList.add('modal-hidden'); editModal.classList.add('modal-hidden');
+        editBox.style.display='none';
+    }
 
-        const collectedNewData = {}; // Temp object to hold all new values for the day
-        let newStoryContent = null; // Use null to distinguish no change from empty string
+    editCloseBtn.addEventListener('click', closeEditModal);
+    editCancelBtn.addEventListener('click', closeEditModal);
+    editOverlay.addEventListener('click', closeEditModal);
 
-        // Iterate over all editable fields for the specific day
-        document.querySelectorAll(`[data-day="${dayToSave}"] .editable-field`).forEach(field => {
-            const fieldType = field.dataset.fieldType;
-            const originalSubject = field.dataset.oldSubject || field.dataset.subject; // Get original subject for identification
-
-            if (fieldType === 'subject' && originalSubject) {
-                // For a subject input, its dataset.old-subject is key to identify the original item
-                collectedNewData[`subject-${originalSubject}`] = field.value.trim();
-            } else if (fieldType === 'topic' && originalSubject) {
-                // For a topic input/textarea, its dataset.subject is key to identify the original item
-                collectedNewData[`topic-${originalSubject}`] = field.value.trim();
-            } else if (fieldType === 'story') {
-                newStoryContent = field.value.trim();
+    // Save edits: update in-memory dailyPlanData, DOM and trigger save to Firestore
+    editSaveBtn.addEventListener('click', async ()=>{
+        const title = editTitle.textContent || '';
+        const day = title.replace(/^Edit\s+/,'').trim();
+        // For each subject, read value and update dailyPlanData
+        const subjects = ['Quran','Newspaper','Vocabulary','Math','Basic View'];
+        subjects.forEach(subj=>{
+            const eid = `edit-${day}-${subj}`.replace(/\s+/g,'_');
+            const el = document.getElementById(eid);
+            const value = el ? el.value.trim() : '';
+            // find index in dailyPlanData and update
+            for(let i=0;i<dailyPlanData.length;i++){
+                if(dailyPlanData[i].day===day && dailyPlanData[i].subject===subj) {
+                    dailyPlanData[i].topic = value;
+                    break;
+                }
+            }
+            // Update DOM topic cells (desktop + mobile)
+            const topicCellId = `topic-${day}-${subj}`.replace(/\s+/g,'_');
+            const topicCell = document.getElementById(topicCellId);
+            if(topicCell) {
+                topicCell.innerHTML = '';
+                if(subj === 'Vocabulary') {
+                    const wrapper = document.createElement('div'); wrapper.classList.add('flex','flex-wrap','gap-2','py-1');
+                    const pairs = value.split(/,|।/).map(p=>p.trim()).filter(p=>p);
+                    pairs.forEach(p=>{
+                        const elv = createVocabElementFromPair(p);
+                        if(elv) wrapper.appendChild(elv);
+                    });
+                    topicCell.appendChild(wrapper);
+                    if(pairs.length>0 && (vocabStories[day] || document.getElementById(`edit-${day}-Story`.replace(/\s+/g,'_')).value.trim())) {
+                        const storyBtn = document.createElement('button'); storyBtn.textContent='Read story'; storyBtn.classList.add('read-story-btn'); storyBtn.setAttribute('data-day', day);
+                        topicCell.appendChild(storyBtn);
+                    }
+                } else {
+                    const span = document.createElement('span'); span.textContent = value || '-'; topicCell.appendChild(span);
+                }
+            }
+            // mobile topic
+            const mobileTopicId = `topic-mobile-${day}-${subj}`;
+            const mobileTopic = document.getElementById(mobileTopicId);
+            if(mobileTopic) {
+                if(subj === 'Vocabulary') {
+                    const pairs = value.split(/,|।/).map(p=>p.trim()).filter(p=>p);
+                    let html = '<div class="flex flex-wrap gap-2 py-1">';
+                    pairs.forEach(p=>{
+                        const elv = createVocabElementFromPair(p);
+                        if(elv) html += elv.outerHTML;
+                    });
+                    html += '</div>';
+                    if(pairs.length>0 && (vocabStories[day] || document.getElementById(`edit-${day}-Story`.replace(/\s+/g,'_')).value.trim())) html += `<button class="read-story-btn" data-day="${day}">Read story</button>`;
+                    mobileTopic.innerHTML = html;
+                    // reattach click listeners to newly inserted .vocab-item(s)
+                    mobileTopic.querySelectorAll('.vocab-item').forEach(vc=>{
+                        vc.addEventListener('click', function(ev){ ev.stopPropagation(); document.querySelectorAll('.vocab-item.active').forEach(i=>{ if(i!==this) i.classList.remove('active'); }); this.classList.toggle('active'); });
+                    });
+                } else {
+                    mobileTopic.innerHTML = `<span class="text-gray-600">${value || '-'}</span>`;
+                }
             }
         });
-		
-        // --- Apply changes to dailyPlanData (in-memory) ---
-        // Create a *new* array by mapping over the existing one
-        const updatedDailyPlanData = dailyPlanData.map(item => {
-            if (item.day === dayToSave) {
-                const oldSubject = item.subject; // Current subject name in this item
 
-                // Check if this subject's name was edited
-                const newSubjectName = collectedNewData[`subject-${oldSubject}`] !== undefined
-                                       ? collectedNewData[`subject-${oldSubject}`]
-                                       : oldSubject;
+        // Story:
+        const storyVal = document.getElementById(`edit-${day}-Story`.replace(/\s+/g,'_')).value.trim();
+        if(storyVal) vocabStories[day] = storyVal;
+        else delete vocabStories[day];
 
-                // Check if this subject's topic was edited
-                const newTopic = collectedNewData[`topic-${oldSubject}`] !== undefined
-                                 ? collectedNewData[`topic-${oldSubject}`]
-                                 : item.topic;
-
-                return {
-                    day: item.day,
-                    subject: newSubjectName,
-                    topic: newTopic
-                };
-            }
-            return item; // Return unchanged item for other days
-        });
-        dailyPlanData = updatedDailyPlanData; // Replace the old array with the updated one
-
-        // --- Apply changes to vocabStories (in-memory) ---
-        if (newStoryContent !== null) { // Only update if story field was present and collected
-            if (newStoryContent) {
-                vocabStories[dayToSave] = newStoryContent;
-            } else {
-                delete vocabStories[dayToSave]; // Remove story entry if field was emptied
-            }
-        }
-
-        // Exit editing mode
-        editingDay = null;
-
-        // Rebuild UI to reflect all updated in-memory data
-        buildUI();
-
-        // Trigger save to Firestore with the latest in-memory data
-        debouncedSaveData();
-        console.log("Save initiated for day:", dayToSave, "Current dailyPlanData:", dailyPlanData, "Current vocabStories:", vocabStories);
-    }
-
-    // Cancels the edits for a day
-    window.cancelDayEdits = function(event) {
-        const dayToCancel = event.target.dataset.day;
-        if (dayToCancel !== editingDay) return;
-
-        // Restore original data from the snapshot taken when editing started
-        dailyPlanData = JSON.parse(JSON.stringify(initialDailyPlanData));
-        vocabStories = JSON.parse(JSON.stringify(initialVocabStories));
-
-        editingDay = null; // Exit editing mode
-        buildUI(); // Rebuild UI to show original, non-editable content
-        // No Firestore save needed for cancel
-    }
+        // Close modal and save to firestore
+        closeEditModal();
+        updateWeeklyProgress();
+        debouncedSaveData(); // saves topics and story along with checkboxes/dates
+    });
 
     /* ------------- Persistence: Save & Load ------------- */
 
@@ -858,45 +717,27 @@ function onInputChange(event) {
         document.querySelectorAll('.task-checkbox').forEach(cb=>{
             const day = cb.dataset.day; const subj = cb.dataset.subject;
             const key = `${day}-${subj}-checked`;
-            // Only store if actually checked or if it was unchecked (explicitly false)
-            // This prevents cluttering with 'false' for all tasks if not previously stored
-            if(cb.checked) progressData[key] = cb.checked;
-            else if (progressData[key] !== undefined) delete progressData[key]; // If it was true and is now false, explicitly remove or set false
+            if(progressData[key] === undefined) progressData[key] = cb.checked;
         });
-
         // 2. date inputs
         document.querySelectorAll('.date-input-desktop input, .date-input-mobile input').forEach(input=>{
             const id = input.id || '';
             const day = id.replace('date-','').replace('date-mobile-','');
             if(!day) return;
             const key = `${day}-date`;
-            if(input.value) progressData[key] = input.value;
-            else if (progressData[key] !== undefined) delete progressData[key]; // Remove if empty
+            if(progressData[key] === undefined) progressData[key] = input.value;
         });
-
         // 3. topics per day-subject (store as plain string)
         dailyPlanData.forEach(item=>{
             const key = `${item.day}-${item.subject}-topic`;
-            if(item.topic) progressData[key] = item.topic;
-            else if (progressData[key] !== undefined) delete progressData[key]; // Remove if empty
+            progressData[key] = item.topic || '';
         });
         // 4. stories per day
         Object.keys(vocabStories).forEach(day=>{
             const key = `${day}-story`;
-            if(vocabStories[day]) progressData[key] = vocabStories[day];
-            else if (progressData[key] !== undefined) delete progressData[key]; // Remove if empty
+            progressData[key] = vocabStories[day];
         });
-
-        // 5. Monthly targets
-        document.querySelectorAll('.monthly-targets .editable-field[contenteditable="true"]').forEach(field => {
-            const targetKey = field.dataset.target; // e.g., "monthly-1st-week"
-            progressData[targetKey] = field.textContent.trim();
-        });
-
         try {
-            // Note: setDoc with merge:true will update fields. To entirely remove a field, you'd need deleteField()
-            // For now, we only save non-empty values. If a field becomes empty, it effectively won't be in the document
-            // or would need explicit deletion if it existed before. For simplicity, we just won't save empty.
             await setDoc(dataDocRef, progressData, { merge: true });
             setSyncStatus('synced');
             console.log('Saved progress:', progressData);
@@ -928,38 +769,10 @@ function onInputChange(event) {
     }
 
     function applyLoadedData(progressData) {
-        // Reset in-memory data to initial structure, then apply loaded topics
-        dailyPlanData = JSON.parse(JSON.stringify(initialDailyPlanData)); // Reset topics to default before applying loaded ones
-        vocabStories = JSON.parse(JSON.stringify(initialVocabStories)); // Reset stories to default before applying loaded ones
+        // Reset UI first (but keep structure)
+        clearLocalData();
 
-        // 1) Apply topics (day-subject) into dailyPlanData
-        dailyPlanData.forEach(item=>{
-            const key = `${item.day}-${item.subject}-topic`;
-            if(progressData[key] !== undefined) {
-                item.topic = progressData[key];
-            }
-        });
-
-        // 2) Apply stories
-        Object.keys(progressData).forEach(key=>{
-            if(key.endsWith('-story')) {
-                const day = key.replace('-story','');
-                vocabStories[day] = progressData[key];
-            }
-        });
-
-        // Now that in-memory data is updated, rebuild the UI
-        buildUI();
-// 0. Apply monthly targets
-        document.querySelectorAll('.monthly-targets .editable-field[contenteditable="true"]').forEach(field => {
-            const targetKey = field.dataset.target;
-            if (progressData[targetKey] !== undefined) {
-                field.textContent = progressData[targetKey];
-            } else {
-                field.textContent = 'Enter target here...'; // Reset if not in loaded data
-            }
-        });
-        // 3) Apply checkbox states to the newly built UI
+        // 1) Apply checkbox states
         document.querySelectorAll('.task-checkbox').forEach(cb=>{
             const day = cb.dataset.day; const subj = cb.dataset.subject;
             const key = `${day}-${subj}-checked`;
@@ -968,13 +781,71 @@ function onInputChange(event) {
             const taskItem = cb.closest('.task-item, .card-item');
             if(taskItem) taskItem.classList.toggle('completed', !!val);
         });
-
-        // 4) Apply date inputs to the newly built UI
+        // 2) Apply date inputs
         document.querySelectorAll('.date-input-desktop input, .date-input-mobile input').forEach(inp=>{
             const id = inp.id || '';
             const day = id.replace('date-','').replace('date-mobile-','');
             const key = `${day}-date`;
             inp.value = progressData[key] || '';
+        });
+
+        // 3) Apply topics (day-subject) into dailyPlanData and DOM
+        dailyPlanData.forEach((item, idx)=>{
+            const key = `${item.day}-${item.subject}-topic`;
+            if(progressData[key] !== undefined) {
+                item.topic = progressData[key];
+            }
+            // update DOM cells if present
+            const tid = `topic-${item.day}-${item.subject}`.replace(/\s+/g,'_');
+            const tcell = document.getElementById(tid);
+            if(tcell) {
+                tcell.innerHTML = '';
+                if(item.subject === 'Vocabulary' && item.topic) {
+                    const wrapper = document.createElement('div'); wrapper.classList.add('flex','flex-wrap','gap-2','py-1');
+                    const pairs = item.topic.split(/,|।/).map(p=>p.trim()).filter(p=>p);
+                    pairs.forEach(p=>{
+                        const elv = createVocabElementFromPair(p);
+                        if(elv) wrapper.appendChild(elv);
+                    });
+                    tcell.appendChild(wrapper);
+                    if(pairs.length>0 && (progressData[`${item.day}-story`] || vocabStories[item.day])) {
+                        const storyBtn = document.createElement('button'); storyBtn.textContent='Read story'; storyBtn.classList.add('read-story-btn'); storyBtn.setAttribute('data-day', item.day);
+                        tcell.appendChild(storyBtn);
+                    }
+                } else {
+                    const span = document.createElement('span'); span.textContent = item.topic || '-'; tcell.appendChild(span);
+                }
+            }
+            // mobile topic update
+            const mid = `topic-mobile-${item.day}-${item.subject}`;
+            const mcell = document.getElementById(mid);
+            if(mcell) {
+                if(item.subject === 'Vocabulary' && item.topic) {
+                    const pairs = item.topic.split(/,|।/).map(p=>p.trim()).filter(p=>p);
+                    let html = '<div class="flex flex-wrap gap-2 py-1">';
+                    pairs.forEach(p=>{
+                        const elv = createVocabElementFromPair(p);
+                        if(elv) html += elv.outerHTML;
+                    });
+                    html += '</div>';
+                    if(pairs.length>0 && (progressData[`${item.day}-story`] || vocabStories[item.day])) html += `<button class="read-story-btn" data-day="${item.day}">Read story</button>`;
+                    mcell.innerHTML = html;
+                    // reattach click toggles
+                    mcell.querySelectorAll('.vocab-item').forEach(vc=>{
+                        vc.addEventListener('click', function(ev){ ev.stopPropagation(); document.querySelectorAll('.vocab-item.active').forEach(i=>{ if(i!==this) i.classList.remove('active'); }); this.classList.toggle('active'); });
+                    });
+                } else {
+                    mcell.innerHTML = `<span class="text-gray-600">${item.topic || '-'}</span>`;
+                }
+            }
+        });
+
+        // 4) Apply stories
+        Object.keys(progressData).forEach(key=>{
+            if(key.endsWith('-story')) {
+                const day = key.replace('-story','');
+                vocabStories[day] = progressData[key];
+            }
         });
 
         // After all applied, check day completions and progress
