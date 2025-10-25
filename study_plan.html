@@ -22,6 +22,7 @@
     <link rel="icon" href="https://eco.du.ac.bd//assets/images/fab_icon.ico" type="image/x-icon">
     <style>
         /* --- Light Theme & Motivational Styles --- */
+        html { scroll-behavior: smooth; }
         body {
             font-family: 'Inter', 'Poppins', sans-serif; /* Prioritize Inter */
             background-color: #f8fafc; /* Lighter gray background (slate-50) */
@@ -257,19 +258,16 @@
         /* --- Sticky Progress Bar --- */
         .sticky-progress-wrapper {
             position: sticky;
-            top: 65px; /* Updated for header height */
+            /* top: 65px; */ /* REMOVED: JS will set this */
             z-index: 10;
             background-color: #ffffff; /* Opaque background */
             padding: 12px 16px; /* Match week-section padding */
             margin: 0 -16px; /* Counteract parent padding */
             border-bottom: 1px solid #e5e7eb; /* gray-200 */
             box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            transition: top 0.3s ease-in-out; /* Smooth transition */
         }
-        @media (min-width: 768px) {
-             .sticky-progress-wrapper {
-                 top: 65px; /* Updated for header height */
-             }
-        }
+
         /* --- FIX for Progress Bar Visual --- */
         .progress-bar-container { background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; height: 12px; }
         .progress-bar-fill { 
@@ -374,7 +372,7 @@
             <nav class="flex justify-between items-center">
                 <div class="flex items-center gap-4">
                     <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
-                        <img src="images/profile.jpg" alt="Profile" class="h-10 w-10 rounded-full border-2 border-emerald-500 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/ffffff/059669?text=CC';">
+                        <img src="images/profile.jpg" alt="Profile" class="h-10 w-10 rounded-full border-2 border-emerald-500 object-cover" onerror="this.onerror=null; this.src='https::placehold.co/40x40/ffffff/059669?text=CC';">
                     </a>
                     <a href="index.html">
                         <h1 class="text-xl font-bold text-gray-800">Class Caddy</h1>
@@ -631,14 +629,26 @@
         // --- Header Navigation & Scroll Logic (from script.js) ---
         if (pageHeader) {
             let lastScrollY = window.scrollY;
+            const headerHeight = pageHeader.offsetHeight; // Get header height
+            
             window.addEventListener('scroll', () => {
                 const currentScrollY = window.scrollY;
+                let isHeaderHidden = false; // Track state
+                
                 if (currentScrollY > lastScrollY && currentScrollY > 100) {
                      pageHeader.classList.add('header-hidden');
+                     isHeaderHidden = true;
                 } else {
                      pageHeader.classList.remove('header-hidden');
+                     isHeaderHidden = false;
                 }
                 lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+                
+                // NEW LOGIC: Update all sticky progress bars
+                const newTop = isHeaderHidden ? '0px' : `${headerHeight}px`;
+                document.querySelectorAll('.sticky-progress-wrapper').forEach(bar => {
+                    bar.style.top = newTop;
+                });
             });
         }
         
@@ -776,6 +786,11 @@
                 let currentMonthElement = currentMonthPlanDisplay.querySelector('.card[data-month-id]');
                 let currentMonthId = currentMonthElement ? currentMonthElement.dataset.monthId : null;
                 let monthExists = false;
+                
+                // FIX: Save scroll position
+                let scrollY = window.scrollY;
+                let parentContainerRect = monthNavButtonsContainer.getBoundingClientRect();
+                let shouldRestoreScroll = scrollY > (parentContainerRect.top + window.scrollY);
 
                 if (querySnapshot.empty) {
                     currentMonthPlanDisplay.innerHTML = ''; 
@@ -812,6 +827,12 @@
                     } else if (!currentMonthId) {
                          selectMonthMessage.classList.remove('hidden');
                     }
+                }
+                
+                // FIX: Restore scroll position
+                if (shouldRestoreScroll) {
+                    console.log("Restoring scroll position to (loadStudyPlans):", scrollY);
+                    window.scrollTo({ top: scrollY, behavior: 'auto' }); // Use 'auto' for instant jump
                 }
             }, (error) => {
                 console.error("Error fetching study plans:", error);
@@ -854,7 +875,9 @@
                      // FIX: Save scroll position
                      let scrollY = window.scrollY;
                      let parentContainerRect = currentMonthPlanDisplay.getBoundingClientRect();
-                     let shouldRestoreScroll = scrollY > parentContainerRect.top + window.scrollY;
+                     // Only restore if we're scrolled past the *start* of the container
+                     let shouldRestoreScroll = parentContainerRect.top < 0; 
+
 
                      if (docSnap.exists()) {
                          currentMonthPlanDisplay.innerHTML = '';
@@ -866,8 +889,8 @@
                      
                      // FIX: Restore scroll position
                      if (shouldRestoreScroll) {
-                        console.log("Restoring scroll position to:", scrollY);
-                        window.scrollTo(0, scrollY);
+                        console.log("Restoring scroll position to (displayMonthPlan):", scrollY);
+                        window.scrollTo({ top: scrollY, behavior: 'auto' });
                      }
                  });
              } catch (error) {
@@ -978,7 +1001,9 @@
             const daysHtml = weekData?.days?.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('') || '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
             const totalDays = weekData?.days?.length || 0;
             const initialProgress = calculateWeeklyProgress(weekData);
-            const headerHeight = (document.querySelector('header.main-website-ui')?.offsetHeight || 65) + 'px';
+            
+            // Get initial header height
+            const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px';
 
             return `
                 <div class="bg-white/60 border border-gray-200 p-4 rounded-lg shadow week-section" data-week-id="${weekId}">
@@ -1120,17 +1145,20 @@
                  if (button) e.preventDefault();
                  
                  // Handle vocab word click separately to avoid prevention
-                 if (target.closest('.vocab-word') && !daySection.classList.contains('editing')) {
+                 if (target.closest('.vocab-word') && !daySection?.classList.contains('editing')) {
                      e.preventDefault(); // Also prevent jump for vocab
                      showVocabMeaning(target.closest('.vocab-word'));
                      return; // Stop further processing
                  }
                  
                  // Handle checkbox click
-                 if (target.classList.contains('completion-checkbox') && !daySection.classList.contains('editing')) {
+                 if (target.classList.contains('completion-checkbox') && !daySection?.classList.contains('editing')) {
                      // No preventDefault here, let the checkbox check
+                     // FIX: Save scroll position before async save
+                     let scrollY = window.scrollY;
                      await saveDayPlan(monthId, weekId, daySection); // Save just the checkbox state
                      updateWeeklyProgressUI(monthId, weekId);
+                     window.scrollTo({ top: scrollY, behavior: 'auto' }); // Restore scroll
                      return; // Stop further processing
                  }
 
@@ -1197,7 +1225,7 @@
         }
 
 
-// Toggle Edit Mode
+        // Toggle Edit Mode
         async function toggleDayEditMode(monthId, weekId, daySection, enterEditMode) {
              const dayIndex = parseInt(daySection.dataset.dayIndex);
              const tableBody = daySection.querySelector('tbody');
@@ -1218,7 +1246,6 @@
                  deleteDayButton.classList.remove('hidden');
                  actionsHeader.classList.remove('hidden');
                  completionPercHeader.classList.remove('hidden');
-
 
                  const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
                  const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
@@ -1304,7 +1331,11 @@
                          subject = row.querySelector('.subject-input')?.value.trim() || '';
                          comment = row.querySelector('.comment-input')?.value.trim() || '';
                          completed = existingRowData.completed || false; 
-                         completionPercentage = parseInt(row.querySelector('.completion-perc-input')?.value) || null;
+                         
+                         // FIX for NaN bug:
+                         const percValue = parseInt(row.querySelector('.completion-perc-input')?.value);
+                         completionPercentage = isNaN(percValue) ? null : percValue;
+                         
                          story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
 
                          if (row.classList.contains('vocab-row')) {
@@ -1409,42 +1440,26 @@
              const rowIndex = parseInt(rowElement.dataset.rowIndex);
              showConfirmationModal(
                  "Delete Row",
-                 "Are you sure you want to delete this row? This will be saved immediately.",
-                 () => deleteRow(monthId, weekId, daySection, rowElement, rowIndex)
+                 "Are you sure you want to delete this row? This action cannot be undone.",
+                 () => deleteRow(monthId, weekId, daySection, rowElement, rowIndex) // Changed: Now calls save
              );
          }
 
          async function deleteRow(monthId, weekId, daySection, rowElement, rowIndex) {
-            if (!currentUser || !userId) return;
-             const dayIndex = parseInt(daySection.dataset.dayIndex);
-             console.log(`Attempting to delete row ${rowIndex} from day ${dayIndex}, week ${weekId}, month ${monthId}`);
-             setSyncStatus("Syncing...", "yellow");
-
-             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-             try {
-                // We MUST read, modify, and write the array (no server-side arrayRemove by index)
-                 const docSnap = await getDoc(docRef);
-                 if (!docSnap.exists()) throw new Error("Month document not found.");
-
-                 let monthData = docSnap.data();
-                 let daysArray = monthData.weeks?.[weekId]?.days || [];
-                 if (!daysArray[dayIndex] || !daysArray[dayIndex].rows) throw new Error("Day or rows not found in Firestore.");
-                 
-                 // Remove the row from the array
-                 daysArray[dayIndex].rows.splice(rowIndex, 1);
-
-                 const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
-                 await updateDoc(docRef, updatePayload);
-                 console.log("Row deleted successfully from Firestore.");
-                 
-                 // onSnapshot will handle the UI update
-                 setSyncStatus("Synced", "green");
-
-             } catch (error) {
-                 console.error("Error deleting row:", error);
-                 showCustomAlert("Error deleting row. Please try again.");
-                 setSyncStatus("Error", "red");
-             }
+            // This function now *only* removes from UI. The 'Save' button will finalize.
+            rowElement.remove(); // Remove from UI
+            console.log("Row removed from UI. Saving updated day plan...");
+            setSyncStatus("Unsaved changes", "yellow");
+            
+            // FIX: Save immediately after UI removal to persist change
+            await saveDayPlan(monthId, weekId, daySection); 
+            
+            // Re-index remaining UI rows
+            daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => {
+                tr.dataset.rowIndex = newIdx;
+                // Also update row ID
+                tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`;
+            });
          }
 
          function confirmDeleteDay(monthId, weekId, daySection) {
@@ -1663,12 +1678,10 @@
                      if (dayData && dayData.rows && dayData.rows[vocabRowIndex]) {
                          existingStory = dayData.rows[vocabRowIndex].story || '';
                      } else if (daySection.classList.contains('editing')) {
-                         // Row exists in UI but not DB. Save day first.
                          console.log("New row detected. Saving day plan before opening story editor...");
                          await saveDayPlan(monthId, weekId, daySection);
                          // After save, existingStory is still '', which is correct.
                      } else {
-                         // This shouldn't happen if button is clicked correctly
                          throw new Error("Target row not found.");
                      }
                  }
@@ -1721,7 +1734,7 @@
             let totalPercentage = 0;
             weekData.days.forEach(day => {
                 day.rows?.forEach(row => {
-                    if (row.completed && typeof row.completionPercentage === 'number' && row.completionPercentage > 0) {
+                    if (row.completed && typeof row.completionPercentage === 'number' && !isNaN(row.completionPercentage) && row.completionPercentage > 0) {
                         totalPercentage += row.completionPercentage;
                     }
                 });
@@ -1770,7 +1783,15 @@
               } catch (error) { console.error("Error reading story:", error); showCustomAlert("Could not load story."); }
          }
          window.closeModal = function(modalId) { document.getElementById(modalId).style.display = "none"; }
-         window.onclick = function(event) { if (event.target.classList.contains('modal')) { event.target.style.display = "none"; } }
+         window.onclick = function(event) { 
+             if (event.target.classList.contains('modal')) { 
+                 event.target.style.display = "none"; 
+             }
+             // Close vocab popups if clicking outside
+             if (!event.target.closest('.vocab-word')) {
+                document.querySelectorAll('.vocab-word.active').forEach(v => v.classList.remove('active'));
+             }
+         }
 
          function setSyncStatus(text, color) {
              if (!syncStatusText) return;
@@ -1795,5 +1816,4 @@
     </script>
 </body>
 </html>
-`
 
