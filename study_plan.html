@@ -1240,9 +1240,30 @@
                  actionsHeader.classList.add('hidden');
                  completionPercHeader.classList.add('hidden');
                  
-                 // onSnapshot will auto-refresh the UI to non-edit mode
-                 updateWeeklyProgressUI(monthId, weekId); // Update progress bar
-                 setSyncStatus("Synced", "green");
+                 // --- FIX: Manually re-render rows in normal mode ---
+                 // Don't rely on onSnapshot for this, as it might not fire.
+                 // Fetch the *just-saved* data to re-render in normal mode.
+                 try {
+                     const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
+                     const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
+                     
+                     if (!dayData) { 
+                         // This should not happen unless the day was deleted, but as a safeguard:
+                         tableBody.innerHTML = ''; 
+                     } else {
+                         // Re-render all rows in normal (non-edit) mode
+                         tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
+                            createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)
+                         ).join('');
+                     }
+                     
+                     updateWeeklyProgressUI(monthId, weekId); // Update progress bar
+                     setSyncStatus("Synced", "green");
+                 } catch (renderError) {
+                     console.error("Error re-rendering day after save:", renderError);
+                     setSyncStatus("Error", "red");
+                 }
+                 // --- End FIX ---
              }
         }
 
