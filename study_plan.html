@@ -441,23 +441,6 @@
              throw new Error("Firebase initialization failed.");
         }
         // --- End Firebase Configuration ---
-        // Use environment variables provided by the platform
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            // Provide default fallback config if needed, but ideally rely on __firebase_config
-            apiKey: "YOUR_FALLBACK_API_KEY",
-            authDomain: "YOUR_FALLBACK_AUTH_DOMAIN",
-            projectId: "YOUR_FALLBACK_PROJECT_ID",
-            storageBucket: "YOUR_FALLBACK_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_FALLBACK_MESSAGING_SENDER_ID",
-            appId: "YOUR_FALLBACK_APP_ID"
-         };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // Use provided app ID or a default
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const googleProvider = new GoogleAuthProvider();
 
         // --- DOM Elements ---
         const authSection = document.getElementById('auth-section');
