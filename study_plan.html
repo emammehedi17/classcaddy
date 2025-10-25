@@ -1580,9 +1580,9 @@
                          rows: lastDayRows.map(row => ({
                              subject: row.subject || '', 
                              topic: (row.subject?.toLowerCase() === 'vocabulary') ? null : (row.topic || ''), // Don't copy vocab topics
-                             completed: false, 
-                             comment: '', 
-                             completionPercentage: null,
+                             completed: false,  // Reset completion
+                             comment: '', // Reset comment
+                             completionPercentage: row.completionPercentage || null, // <-- THE FIX IS HERE
                              vocabData: (row.subject?.toLowerCase() === 'vocabulary') ? (row.vocabData || null) : null, // Copy vocab structure
                              story: null // Do not copy story
                          }))
