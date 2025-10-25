@@ -1102,7 +1102,7 @@
                          <input type="checkbox" class="form-checkbox h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 completion-checkbox" ${rowData.completed ? 'checked' : ''} ${isEditing ? 'disabled' : ''}>
                      </td>
                       <td class="px-3 py-2 align-middle center-cell completion-perc-cell ${isEditing ? '' : 'hidden'}">
-                          ${isEditing ? `<input type="number" min="0" max="100" class="editable-input completion-perc-input w-16 text-center text-xs" placeholder="%" value="${rowData.completionPercentage ?? ''}">` : ''}
+                          ${isEditing ? `<input type="text" inputmode="decimal" class="editable-input completion-perc-input w-16 text-center text-xs" placeholder="%" value="${rowData.completionPercentage ?? ''}">` : ''}
                       </td>
                      <td class="px-3 py-2 align-middle center-cell actions-cell ${isEditing ? '' : 'hidden'}">
                           ${isEditing ? `<button class="icon-button delete-row-btn" title="Delete Row"><i class="fas fa-trash-alt text-red-500"></i></button>` : ''}
@@ -1333,8 +1333,8 @@
                          completed = existingRowData.completed || false; 
                          
                          // FIX for NaN bug:
-                         const percValue = parseInt(row.querySelector('.completion-perc-input')?.value);
-                         completionPercentage = isNaN(percValue) ? null : percValue;
+                         const percInput = row.querySelector('.completion-perc-input')?.value;
+                         completionPercentage = parsePercentage(percInput);
                          
                          story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
 
@@ -1734,8 +1734,11 @@
             let totalPercentage = 0;
             weekData.days.forEach(day => {
                 day.rows?.forEach(row => {
-                    if (row.completed && typeof row.completionPercentage === 'number' && !isNaN(row.completionPercentage) && row.completionPercentage > 0) {
-                        totalPercentage += row.completionPercentage;
+                    if (row.completed) {
+                         const perc = parseFloat(row.completionPercentage); // This will handle numbers
+                         if (!isNaN(perc) && perc > 0) {
+                             totalPercentage += perc;
+                         }
                     }
                 });
             });
@@ -1791,6 +1794,31 @@
              if (!event.target.closest('.vocab-word')) {
                 document.querySelectorAll('.vocab-word.active').forEach(v => v.classList.remove('active'));
              }
+         }
+function parsePercentage(value) {
+            if (value === null || value === undefined) return null;
+            let strVal = String(value).trim();
+            if (strVal === '') return null;
+
+            // Check for fraction
+            if (strVal.includes('/')) {
+                const parts = strVal.split('/');
+                const num = parseFloat(parts[0]);
+                const den = parseFloat(parts[1]);
+                if (!isNaN(num) && !isNaN(den) && den !== 0) {
+                    // User said 1/2 -> 0.5
+                    return parseFloat((num / den).toFixed(10));
+                }
+            }
+            
+            // Check for decimal (with comma or dot)
+            strVal = strVal.replace(',', '.');
+            const floatVal = parseFloat(strVal);
+            if (!isNaN(floatVal)) {
+                return parseFloat(floatVal.toFixed(10));
+            }
+            
+            return null; // Invalid input
          }
 
          function setSyncStatus(text, color) {
