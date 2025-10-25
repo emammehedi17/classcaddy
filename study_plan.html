@@ -18,7 +18,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;700&family=Kalpurush:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Link to your existing style.css for consistency (Optional, styles below override/complement) -->
     <!-- <link rel="stylesheet" href="style.css"> -->
     <link rel="icon" href="https://eco.du.ac.bd//assets/images/fab_icon.ico" type="image/x-icon">
     <style>
@@ -128,7 +127,7 @@
         .study-table th { text-align: left; }
         .study-table td.center-cell { text-align: center; }
 
-        .editable-input, .vocab-input {
+        .editable-input, .vocab-input, .target-textarea {
             background-color: #f9fafb; /* gray-50 */
             border: 1px solid #d1d5db; /* gray-300 */
             border-radius: 4px;
@@ -136,14 +135,33 @@
             color: #1f2937; /* gray-800 */
             width: 100%;
             font-size: 0.875rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
         }
-         .editable-input:focus, .vocab-input:focus {
+         .editable-input:focus, .vocab-input:focus, .target-textarea:focus {
              outline: none;
              border-color: #34d399; /* emerald-400 */
              box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+             background-color: white;
          }
         textarea.editable-input { min-height: 40px; }
+
+        /* Styles for Target Textareas */
+        .target-textarea {
+            font-size: 0.875rem;
+            padding: 8px;
+        }
+        .target-textarea:disabled {
+            background-color: #f3f4f6; /* gray-100 */
+            cursor: not-allowed;
+            color: #6b7280; /* gray-500 */
+            box-shadow: none;
+            border-color: #e5e7eb; /* gray-200 */
+        }
+         .target-textarea:not(:disabled) {
+             background-color: white;
+             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+         }
+
 
         tr.editing-mode td { background-color: #f0fdf4; } /* emerald-50 */
 
@@ -178,9 +196,24 @@
         .modal-close:hover, .modal-close:focus { color: #1f2937; }
          #story-textarea { background-color: #f9fafb; border: 1px solid #d1d5db; color: #1f2937; }
 
-        /* --- Progress Bar --- */
-        .progress-bar-container { background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; height: 12px; }
-        .progress-bar-fill { background-color: #10b981; /* ... rest of progress bar styles */ height: 100%; transition: width 0.3s ease-in-out; text-align: center; line-height: 12px; font-size: 10px; color: white; font-weight: bold; border-radius: 9999px; }
+        /* --- Sticky Progress Bar --- */
+        .sticky-progress-wrapper {
+            position: sticky;
+            top: 60px; /* Adjust based on your header height */
+            z-index: 10;
+            background-color: #ffffff; /* Opaque background */
+            padding: 12px 16px; /* Match week-section padding */
+            margin: 0 -16px; /* Counteract parent padding */
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+        /* The header height is approx 60-64px. Let's set top to 60px */
+        @media (min-width: 768px) {
+             .sticky-progress-wrapper {
+                 top: 60px; /* Adjust this value if header height is different */
+             }
+        }
+
 
         /* --- Add Day Button --- */
         .add-day-btn { display: flex; align-items: center; justify-content: center; background-color: #ecfdf5; color: #059669; border: 1px dashed #34d399; /* ... rest of add day styles */ border-radius: 8px; padding: 12px; margin-top: 1rem; cursor: pointer; transition: all 0.2s; font-weight: 600; }
@@ -209,6 +242,10 @@
          header.main-website-ui {
              background-color: rgb(255 255 255 / 0.9); /* bg-white/90 */
              border-bottom-color: #e5e7eb; /* border-gray-200 */
+             transition: transform 0.3s ease-in-out; /* Added for scroll effect */
+         }
+         header.header-hidden {
+             transform: translateY(-100%);
          }
          header.main-website-ui h1 { color: #1f2937; } /* text-gray-800 */
          header.main-website-ui nav a { color: #4b5563; } /* text-gray-600 */
@@ -267,8 +304,7 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <!-- Header (Assuming you have a standard header included via server-side or copy-pasted) -->
-    <!-- You Copy/Paste your existing header structure here -->
+    <!-- Header -->
     <header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200 main-website-ui shadow-sm">
         <div class="container mx-auto px-6 py-3">
             <nav class="flex justify-between items-center">
@@ -359,12 +395,12 @@
                  <div class="flex items-center gap-3 mb-3 sm:mb-0 text-gray-600">
                      <i class="fas fa-check-circle text-emerald-500"></i>
                      <span class="font-semibold">Sync Status:</span>
-                     <span class="text-emerald-500 font-medium">Synced</span>
-                     <span id="user-id-display" class="ml-4 text-xs text-gray-400 break-all" title="Your unique User ID"></span>
+                     <span id="sync-status-text" class="text-emerald-500 font-medium">Synced</span>
                  </div>
                 <div class="text-center sm:text-right">
                     <p id="user-display" class="font-medium text-gray-800"></p>
                     <p id="user-email-display" class="text-gray-500 text-xs"></p>
+                     <span id="user-id-display" class="ml-4 text-xs text-gray-400 break-all" title="Your unique User ID"></span>
                     <button id="logout-btn" class="mt-1 text-red-500 hover:text-red-700 text-xs font-semibold">Log Out</button>
                 </div>
             </div>
@@ -502,11 +538,13 @@
         const currentMonthPlanDisplay = document.getElementById('current-month-plan-display');
         const noPlansMessage = document.getElementById('no-plans-message');
         const selectMonthMessage = document.getElementById('select-month-message');
+        const syncStatusText = document.getElementById('sync-status-text');
 
         const authContainerDesktop = document.getElementById('auth-container-desktop');
         const authContainerMobile = document.getElementById('auth-container-mobile');
 
         // Header navigation elements
+        const pageHeader = document.querySelector('header.main-website-ui');
         const academicDropdown = document.getElementById('academic-dropdown');
         const academicMenu = document.getElementById('academic-menu');
         const academicButton = document.getElementById('academic-button');
@@ -529,17 +567,31 @@
 
         let currentUser = null;
         let userId = null;
-        let unsubscribePlans = null;
+        let unsubscribePlans = null; // For the list of month buttons
+        let unsubscribeActiveMonth = null; // For the currently displayed month
         let currentStoryTarget = null;
-        let currentConfirmAction = null; // To store the function to execute on confirm
+        let currentConfirmAction = null; 
         
         
-        // --- Header Navigation Logic (Copied from script.js) ---
+        // --- Header Navigation & Scroll Logic (from script.js) ---
+        if (pageHeader) {
+            let lastScrollY = window.scrollY;
+            window.addEventListener('scroll', () => {
+                const currentScrollY = window.scrollY;
+                if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                     pageHeader.classList.add('header-hidden');
+                } else {
+                     pageHeader.classList.remove('header-hidden');
+                }
+                lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+            });
+        }
+        
         if (academicDropdown && academicMenu && academicButton) {
             let hideTimeout;
             const showMenu = () => { clearTimeout(hideTimeout); academicMenu.classList.remove('hidden'); };
             const hideMenu = () => { academicMenu.classList.add('hidden'); };
-            const hideMenuWithDelay = () => { hideTimeout = setTimeout(hideMenu, 2000); }; // Shorter delay
+            const hideMenuWithDelay = () => { hideTimeout = setTimeout(hideMenu, 2000); };
             
             academicButton.addEventListener('click', (event) => {
                 event.stopPropagation();
@@ -569,12 +621,11 @@
                 }
             });
         }
-        // --- End Header Navigation Logic ---
+        // --- End Header Logic ---
 
 
         // --- Authentication ---
         function updateAuthUI(user) {
-             // Simplified - assumes script.js might handle some header parts
              if (user) {
                 currentUser = user;
                 userId = user.uid;
@@ -583,46 +634,43 @@
                 loginPrompt.style.display = 'none';
                 userInfo.classList.remove('hidden');
                 userDisplay.textContent = user.displayName || 'User';
-                userEmailDisplay.textContent = user.email || '';
+                userEmailDisplay.textContent = user.email || (user.isAnonymous ? 'Anonymous User' : '');
                 userIdDisplay.textContent = `ID: ${userId}`;
                 userIdDisplay.title = 'Your unique User ID';
                 logoutBtn.classList.remove('hidden');
 
-                // Update Header elements (basic example)
-                const loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700">${user.displayName || 'User'}</p><p class="text-gray-500 text-xs">${user.email || ''}</p></div><button id="logout-btn-header" class="ml-3 action-button action-button-danger text-xs px-3 py-1">Log Out</button>`;
+                const loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700">${user.displayName || 'User'}</p><p class="text-gray-500 text-xs">${user.email || (user.isAnonymous ? 'Anonymous' : '')}</p></div><button id="logout-btn-header" class="ml-3 action-button action-button-danger text-xs px-3 py-1">Log Out</button>`;
                 authContainerDesktop.innerHTML = loggedInHTML;
-                authContainerMobile.innerHTML = loggedInHTML.replace('ml-3', 'w-full mt-2').replace('logout-btn-header', 'logout-btn-mobile'); // Adjust mobile layout
+                authContainerMobile.innerHTML = loggedInHTML.replace('ml-3', 'w-full mt-2').replace('logout-btn-header', 'logout-btn-mobile');
 
                 document.getElementById('logout-btn-header')?.addEventListener('click', handleLogout);
                 document.getElementById('logout-btn-mobile')?.addEventListener('click', handleLogout);
-
 
                 studyPlanContent.classList.remove('hidden');
                 loadStudyPlans(); // Load plans AND month buttons
             } else {
                 currentUser = null;
-                userId = null; // No persistent ID if logged out
+                userId = null; 
                 console.log("User logged out");
 
                 loginPrompt.style.display = 'block';
                 userInfo.classList.add('hidden');
                 logoutBtn.classList.add('hidden');
 
-                 // Update Header elements (basic example)
                  const loggedOutHTML = `<a href="index.html#signup" class="px-5 py-2 font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors signup-button text-sm">Sign Up</a>`;
                  authContainerDesktop.innerHTML = loggedOutHTML;
                  authContainerMobile.innerHTML = loggedOutHTML.replace('px-5 py-2', 'block w-full text-center py-2');
 
-
                 studyPlanContent.classList.add('hidden');
-                monthNavButtonsContainer.innerHTML = ''; // Clear nav
-                currentMonthPlanDisplay.innerHTML = ''; // Clear display
+                monthNavButtonsContainer.innerHTML = '';
+                currentMonthPlanDisplay.innerHTML = '';
                 noPlansMessage.style.display = 'block';
                  selectMonthMessage.classList.add('hidden');
-                if (unsubscribePlans) {
-                    unsubscribePlans();
-                    unsubscribePlans = null;
-                }
+                 
+                if (unsubscribePlans) unsubscribePlans();
+                if (unsubscribeActiveMonth) unsubscribeActiveMonth();
+                unsubscribePlans = null;
+                unsubscribeActiveMonth = null;
             }
         }
 
@@ -631,33 +679,28 @@
              if (user) {
                 updateAuthUI(user);
              } else {
-                 // Try custom token first, then anonymous as fallback ONLY IF no Google login attempt is pending
-                 if (auth.currentUser) { // If a user object exists (e.g., anonymous), just update UI
+                 if (auth.currentUser) { 
                      updateAuthUI(auth.currentUser);
                      return;
                  }
-
                  if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                      try {
-                         console.log("Attempting sign in with custom token...");
                          await signInWithCustomToken(auth, __initial_auth_token);
-                         console.log("Sign in with custom token successful."); // onAuthStateChanged triggers again
                      } catch (error) {
-                         console.error("Error signing in with custom token, trying anonymous:", error);
-                         try { await signInAnonymously(auth); console.log("Anonymous sign in successful."); }
-                         catch (anonError) { console.error("Error signing in anonymously:", anonError); updateAuthUI(null); }
+                         console.error("Error custom token, trying anonymous:", error);
+                         try { await signInAnonymously(auth); }
+                         catch (anonError) { console.error("Error anonymous:", anonError); updateAuthUI(null); }
                      }
                  } else {
-                     console.log("No user, no custom token, trying anonymous...");
-                     try { await signInAnonymously(auth); console.log("Anonymous sign in successful."); }
-                     catch (anonError) { console.error("Error signing in anonymously:", anonError); updateAuthUI(null); }
+                     try { await signInAnonymously(auth); }
+                     catch (anonError) { console.error("Error anonymous:", anonError); updateAuthUI(null); }
                  }
              }
         });
 
         googleLoginBtn.addEventListener('click', async () => { try { await signInWithPopup(auth, googleProvider); } catch (error) { console.error("Google Sign-In Error:", error); } });
-        async function handleLogout() { try { await signOut(auth); console.log("Logout successful."); } catch (error) { console.error("Logout Error:", error); } }
-        logoutBtn.addEventListener('click', handleLogout); // Attach to main logout btn
+        async function handleLogout() { try { if (unsubscribeActiveMonth) unsubscribeActiveMonth(); unsubscribeActiveMonth = null; await signOut(auth); console.log("Logout successful."); } catch (error) { console.error("Logout Error:", error); } }
+        logoutBtn.addEventListener('click', handleLogout); 
 
 
         // --- Firestore ---
@@ -666,24 +709,21 @@
         // Load plans AND setup month navigation
         async function loadStudyPlans() {
             if (!currentUser || !userId) return;
-            console.log("Loading study plans for user:", userId);
-
             const plansCollectionPath = getUserPlansCollectionPath();
-            const q = query(collection(db, plansCollectionPath), orderBy("monthName")); // Order by name for buttons
+            const q = query(collection(db, plansCollectionPath), orderBy("createdAt", "desc")); // Order by creation time
 
-            if (unsubscribePlans) unsubscribePlans(); // Detach old listener
+            if (unsubscribePlans) unsubscribePlans(); 
 
             unsubscribePlans = onSnapshot(q, (querySnapshot) => {
                 console.log("Received plans snapshot. Number of plans:", querySnapshot.size);
-                monthNavButtonsContainer.innerHTML = ''; // Clear old buttons
+                monthNavButtonsContainer.innerHTML = ''; 
                 
-                // Preserve current view if it's still valid
                 let currentMonthElement = currentMonthPlanDisplay.querySelector('.card[data-month-id]');
                 let currentMonthId = currentMonthElement ? currentMonthElement.dataset.monthId : null;
                 let monthExists = false;
 
                 if (querySnapshot.empty) {
-                    currentMonthPlanDisplay.innerHTML = ''; // Clear display
+                    currentMonthPlanDisplay.innerHTML = ''; 
                     noPlansMessage.style.display = 'block';
                     selectMonthMessage.classList.add('hidden');
                 } else {
@@ -706,10 +746,11 @@
                         monthNavButtonsContainer.appendChild(button);
                     });
 
-                    // If the previously viewed month was deleted, clear the display
                     if (currentMonthId && !monthExists) {
                         currentMonthPlanDisplay.innerHTML = '';
                         selectMonthMessage.classList.remove('hidden');
+                        if (unsubscribeActiveMonth) unsubscribeActiveMonth(); // Stop listening to deleted month
+                        unsubscribeActiveMonth = null;
                     } else if (!currentMonthId) {
                          selectMonthMessage.classList.remove('hidden');
                     }
@@ -727,30 +768,34 @@
             if (!currentUser || !userId) return;
              console.log("Displaying plan for month:", monthId);
 
-             // Highlight active button
              monthNavButtonsContainer.querySelectorAll('button').forEach(btn => {
                  btn.classList.toggle('active-month', btn.dataset.monthId === monthId);
                  btn.classList.toggle('action-button-secondary', btn.dataset.monthId !== monthId);
              });
 
-
-             currentMonthPlanDisplay.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading...</p>'; // Loading indicator
+             currentMonthPlanDisplay.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading...</p>';
              selectMonthMessage.classList.add('hidden');
 
+             // Stop listening to the previously active month
+             if (unsubscribeActiveMonth) {
+                 unsubscribeActiveMonth();
+             }
 
              const docRef = doc(db, getUserPlansCollectionPath(), monthId);
              try {
-                // Use onSnapshot for real-time updates on the *displayed* month
-                 onSnapshot(docRef, (docSnap) => {
+                 // Listen for real-time updates ONLY on the selected month
+                 unsubscribeActiveMonth = onSnapshot(docRef, (docSnap) => {
+                     // Check if this is still the active month before re-rendering
+                     const activeBtn = monthNavButtonsContainer.querySelector('button.active-month');
+                     if (!activeBtn || activeBtn.dataset.monthId !== monthId) {
+                         console.log("Snapshot received for non-active month. Ignoring render.");
+                         if (unsubscribeActiveMonth) unsubscribeActiveMonth(); // Stop listening
+                         return;
+                     }
+
                      if (docSnap.exists()) {
-                         // Check if this is still the active month before re-rendering
-                         const activeBtn = monthNavButtonsContainer.querySelector('button.active-month');
-                         if (activeBtn && activeBtn.dataset.monthId === monthId) {
-                            currentMonthPlanDisplay.innerHTML = ''; // Clear loading/message
-                            currentMonthPlanDisplay.appendChild(createMonthElement(monthId, docSnap.data()));
-                         } else {
-                             console.log("Snapshot received for non-active month. Ignoring render.");
-                         }
+                         currentMonthPlanDisplay.innerHTML = '';
+                         currentMonthPlanDisplay.appendChild(createMonthElement(monthId, docSnap.data()));
                      } else {
                          console.error("Document for monthId not found (or deleted):", monthId);
                          currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">This plan was not found (it may have been deleted).</p>';
@@ -763,47 +808,49 @@
          }
 
 
-       // Add a new month (logic remains similar, but UI update is handled by loadStudyPlans via snapshot)
+       // Add a new month
         addMonthBtn.addEventListener('click', async () => {
              if (!currentUser || !userId) return;
-             // ... (rest of the prompt and ID generation logic is the same) ...
-            const currentYear = new Date().getFullYear();
-            const currentMonthIndex = new Date().getMonth(); // 0-11
-            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            const nextMonthIndex = (currentMonthIndex + 1) % 12;
-            const nextMonthYear = currentMonthIndex === 11 ? currentYear + 1 : currentYear;
-            const suggestedMonthName = `${monthNames[nextMonthIndex]} ${nextMonthYear}`;
-            const monthNameInput = prompt("Enter month name (e.g., 'October 2025'):", suggestedMonthName);
+             const currentYear = new Date().getFullYear();
+             const currentMonthIndex = new Date().getMonth();
+             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+             
+             // Default to *current* month
+             const suggestedMonthName = `${monthNames[currentMonthIndex]} ${currentYear}`;
+             const monthNameInput = prompt("Enter month name (e.g., 'October 2025'):", suggestedMonthName);
              if (!monthNameInput || monthNameInput.trim() === '') return;
              const monthName = monthNameInput.trim();
 
              let monthId = '';
+             let monthYear = currentYear;
+             let monthIndex = currentMonthIndex;
+             
              try {
                 const parts = monthName.split(' ');
                 const year = parseInt(parts[1]);
-                const monthIndex = monthNames.findIndex(m => m.toLowerCase() === parts[0].toLowerCase());
-                if (year && monthIndex !== -1 && year > 1900 && year < 3000) { // Basic validation
-                    monthId = `${year}-${(monthIndex + 1).toString().padStart(2, '0')}`;
+                const index = monthNames.findIndex(m => m.toLowerCase() === parts[0].toLowerCase());
+                if (year && index !== -1 && year > 1900 && year < 3000) {
+                    monthId = `${year}-${(index + 1).toString().padStart(2, '0')}`;
+                    monthYear = year;
+                    monthIndex = index;
                 } else { throw new Error("Invalid format"); }
              } catch (e) {
-                 monthId = `${nextMonthYear}-${(nextMonthIndex + 1).toString().padStart(2, '0')}`;
+                 monthId = `${monthYear}-${(monthIndex + 1).toString().padStart(2, '0')}`;
                  console.warn("Could not parse month name, using generated ID:", monthId);
              }
 
              const docRef = doc(db, getUserPlansCollectionPath(), monthId);
              const docSnap = await getDoc(docRef);
-             if (docSnap.exists()) { showCustomAlert(`Month ID ${monthId} already exists.`); return; }
+             if (docSnap.exists()) { showCustomAlert(`Month ID ${monthId} (${monthName}) already exists.`); return; }
 
              const newPlanData = {
-                monthName: monthName, // Use the trimmed name
-                createdAt: Timestamp.now(),
+                monthName: monthName,
+                createdAt: Timestamp.now(), // Used for sorting
                 weeklyTargets: { week1: '', week2: '', week3: '', week4: '' },
                 weeks: {
                     week1: { days: [] }, week2: { days: [] }, week3: { days: [] }, week4: { days: [] }
                 }
              };
-            // Initialize Week 1 with a default day/row if preferred, or leave empty
-            // newPlanData.weeks.week1.days = [{ dayNumber: 1, date: '', rows: [...] }];
 
             try { await setDoc(docRef, newPlanData); console.log("New month added:", monthId); }
             catch (error) { console.error("Error adding new month:", error); showCustomAlert("Error adding month."); }
@@ -813,10 +860,8 @@
         // --- UI Creation ---
 
         function createMonthElement(monthId, data) {
-             // ... (innerHTML structure remains largely the same as before) ...
             const monthDiv = document.createElement('div');
-            // USE light theme card style:
-            monthDiv.className = 'mb-12 p-6 card'; // Use the card class
+            monthDiv.className = 'mb-12 p-6 card';
             monthDiv.dataset.monthId = monthId;
 
             monthDiv.innerHTML = `
@@ -824,29 +869,26 @@
                      <h2 class="text-2xl font-bold text-emerald-600">${data.monthName || 'Unnamed Month'} <span class="text-lg text-gray-400 font-normal">(${monthId})</span></h2>
                      <button class="icon-button delete-month-btn" title="Delete Month"><i class="fas fa-trash-alt text-red-500"></i></button>
                  </div>
-
-                 <!-- Monthly Targets -->
-                <div class="mb-8">
-                    <h3 class="text-xl font-semibold text-gray-700 mb-3">Monthly Targets</h3>
+                 <div class="mb-8">
+                    <div class="flex justify-between items-center mb-3">
+                         <h3 class="text-xl font-semibold text-gray-700">Monthly Targets</h3>
+                         <button class="action-button action-button-secondary text-xs edit-targets-btn" data-editing="false">Edit Targets</button>
+                    </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 monthly-targets">
                         ${[1, 2, 3, 4].map(weekNum => `
                             <div class="bg-gray-50 border border-gray-200 p-3 rounded-md shadow-sm">
                                 <label for="target-week-${monthId}-${weekNum}" class="block text-sm font-medium text-emerald-700 mb-1">Week ${weekNum}</label>
-                                <textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" rows="3" class="editable-input w-full text-sm placeholder-gray-400 bg-white" placeholder="Enter target...">${escapeHtml(data.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
+                                <textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" rows="3" class="target-textarea w-full text-sm placeholder-gray-400" placeholder="Enter target..." disabled>${escapeHtml(data.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
                             </div>
                         `).join('')}
                     </div>
-                     <div class="text-right mt-3">
-                        <button class="action-button action-button-secondary text-xs save-targets-btn">Save Targets</button>
-                    </div>
                 </div>
-
-                 <!-- Weekly Plans Container -->
-                <div class="space-y-8 weekly-plans-container">
+                 <div class="space-y-8 weekly-plans-container">
                     ${[1, 2, 3, 4].map(weekNum => createWeekElement(monthId, `week${weekNum}`, data.weeks?.[`week${weekNum}`])).join('')}
                 </div>`;
 
-             monthDiv.querySelector('.save-targets-btn').addEventListener('click', () => saveMonthlyTargets(monthId, monthDiv));
+             // Event Listeners for this month element
+             monthDiv.querySelector('.edit-targets-btn').addEventListener('click', (e) => handleEditTargets(e.target, monthId));
              monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId));
              attachWeekEventListeners(monthDiv, monthId);
              return monthDiv;
@@ -857,17 +899,18 @@
             const totalDays = weekData?.days?.length || 0;
             const initialProgress = calculateWeeklyProgress(weekData);
 
+            // Note: Added sticky-progress-wrapper
             return `
                 <div class="bg-white/60 border border-gray-200 p-4 rounded-lg shadow week-section" data-week-id="${weekId}">
                     <h3 class="text-lg font-semibold text-emerald-700 mb-4 capitalize">${weekId.replace('week', 'Week ')} Plan</h3>
-                    <div class="mb-4">
+                    <div class="sticky-progress-wrapper">
                         <div class="flex justify-between text-xs text-gray-500 mb-1">
                             <span>Weekly Progress</span>
                             <span class="progress-percentage font-medium">${initialProgress}%</span>
                         </div>
                         <div class="progress-bar-container w-full"> <div class="progress-bar-fill" style="width: ${initialProgress}%;"></div> </div>
                     </div>
-                    <div class="days-container space-y-6"> ${daysHtml} </div>
+                    <div class="days-container space-y-6 mt-4"> ${daysHtml} </div>
                      ${totalDays < 7 ? (totalDays > 0 ? `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>` : `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`) : '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>'}
                 </div>`;
         }
@@ -967,7 +1010,7 @@
             return vocabData.map(v => `<span class="vocab-word" data-meaning="${escapeHtml(v.meaning || '')}">${escapeHtml(v.word || '')}</span>`).join(' '); // Join with space
         }
 
-        function escapeHtml(unsafe) { /* ... same as before ... */
+        function escapeHtml(unsafe) { 
             if (unsafe === null || unsafe === undefined) return '';
              return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
@@ -1002,15 +1045,15 @@
                  }
                  // Add/Edit Story Button (Edit Mode) - Opens modal
                  else if (button?.classList.contains('add-story-btn')) {
-                      // Find the first vocab row in this day to associate the story
+                      const dayIndex = parseInt(daySection.dataset.dayIndex);
+                      // Find the first vocab row *index* in the data
                       const vocabRow = daySection.querySelector('tr.vocab-row');
-                      if (vocabRow) {
-                          const dayIndex = parseInt(daySection.dataset.dayIndex);
-                          const rowIndex = parseInt(vocabRow.dataset.rowIndex);
-                          openEditStoryModal(monthId, weekId, dayIndex, rowIndex); // Pass vocab row context
-                      } else {
-                          showCustomAlert("Please add a Vocabulary row first to attach a story.");
+                      let vocabRowIndex = -1;
+                      if(vocabRow) {
+                          vocabRowIndex = parseInt(vocabRow.dataset.rowIndex);
                       }
+                      
+                      openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex); // Pass vocab row index, or -1
                  }
                   // Delete Row Button (Edit Mode)
                  else if (button?.classList.contains('delete-row-btn')) {
@@ -1061,6 +1104,7 @@
              const actionsHeader = daySection.querySelector('.actions-header');
              const completionPercHeader = daySection.querySelector('.completion-perc-header');
 
+             setSyncStatus("Syncing...", "yellow");
 
              if (enterEditMode) {
                  daySection.classList.add('editing');
@@ -1080,6 +1124,7 @@
                     createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, true)
                  ).join('');
                  daySection.querySelectorAll('.completion-checkbox').forEach(cb => cb.disabled = true);
+                 setSyncStatus("Editing...", "blue");
 
              } else {
                  await saveDayPlan(monthId, weekId, daySection); // Save first
@@ -1092,25 +1137,22 @@
                  actionsHeader.classList.add('hidden');
                  completionPercHeader.classList.add('hidden');
 
-
-                 const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
-                 const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
-                 if (!dayData) { tableBody.innerHTML = ''; return; } // Clear if day was deleted somehow
-
-                 tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
-                    createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)
-                 ).join('');
-
+                 // Re-render in normal mode
+                 // Note: The onSnapshot listener for the active month *should* handle this re-render automatically.
+                 // We will rely on that, but if it's slow, we can add a manual re-fetch here.
+                 // For now, let's just update the progress bar.
                  updateWeeklyProgressUI(monthId, weekId);
+                 setSyncStatus("Synced", "green");
              }
         }
 
 
-        // Save Day Plan (Improved for new rows and vocab)
+        // Save Day Plan (Fix for Bug #2)
         async function saveDayPlan(monthId, weekId, daySection) {
             if (!currentUser || !userId) return;
             const dayIndex = parseInt(daySection.dataset.dayIndex);
             console.log(`Saving day plan for ${monthId}, ${weekId}, Day Index: ${dayIndex}`);
+            setSyncStatus("Syncing...", "yellow");
 
             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
             try {
@@ -1126,42 +1168,41 @@
                 const rowElements = daySection.querySelectorAll('tbody tr');
 
                 rowElements.forEach((row, uiRowIndex) => {
-                    // Check if row exists in UI (it might have been deleted but save not yet clicked)
-                    if (!row) return; 
-                    
-                    // For new rows, existingRowIndex will be NaN, handle this
                     let existingRowIndex = parseInt(row.dataset.rowIndex); 
-                    const existingRowData = !isNaN(existingRowIndex) ? (currentDayData.rows?.[existingRowIndex] || {}) : {}; // Get previous state or empty obj
+                    const existingRowData = !isNaN(existingRowIndex) && currentDayData.rows?.[existingRowIndex] 
+                                            ? currentDayData.rows[existingRowIndex] 
+                                            : {}; // Get previous state or empty obj for new rows
 
                     let subject, topic, comment, completed, completionPercentage, vocabData = null, story;
 
                     if (daySection.classList.contains('editing')) {
                          subject = row.querySelector('.subject-input')?.value.trim() || '';
                          comment = row.querySelector('.comment-input')?.value.trim() || '';
-                         completed = existingRowData.completed || false; // Persist non-editable completed status
+                         completed = existingRowData.completed || false; 
                          completionPercentage = parseInt(row.querySelector('.completion-perc-input')?.value) || null;
-                         // Handle story: if it's a vocab row, get existing story. If not, story is null.
-                         story = (subject.toLowerCase() === 'vocabulary') ? existingRowData.story : null;
+                         
+                         // *** FIX FOR BUG #2 & #3 ***
+                         // Ensure story is null, not undefined, for new rows
+                         story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
 
                          if (row.classList.contains('vocab-row')) {
-                             subject = 'Vocabulary'; // Ensure subject is set for vocab rows
+                             subject = 'Vocabulary'; 
                              vocabData = [];
                              row.querySelectorAll('.vocab-pair').forEach(pairEl => {
                                  const word = pairEl.querySelector('.vocab-word-input')?.value.trim();
                                  const meaning = pairEl.querySelector('.vocab-meaning-input')?.value.trim();
-                                 if (word) { // Only save pairs with a word
+                                 if (word) { 
                                      vocabData.push({ word: word, meaning: meaning || '' });
                                  }
                              });
-                             topic = null; // Vocab rows don't use the simple topic field
+                             topic = null; 
                          } else {
                              topic = row.querySelector('.topic-input')?.value.trim() || '';
-                             vocabData = null; // Ensure vocabData is null for non-vocab rows
+                             vocabData = null; 
                          }
 
                     } else { // Handle saving checkbox clicks in normal mode
                          completed = row.querySelector('.completion-checkbox')?.checked || false;
-                         // Get other data from existing state in Firestore (via currentDayData)
                          subject = existingRowData.subject;
                          topic = existingRowData.topic;
                          comment = existingRowData.comment;
@@ -1169,24 +1210,31 @@
                          vocabData = existingRowData.vocabData;
                          story = existingRowData.story;
                      }
-
-                     updatedRows.push({ subject, topic, comment, completed, completionPercentage, vocabData, story });
+                     
+                     // Ensure no undefined values are pushed
+                     updatedRows.push({ 
+                         subject: subject || '', 
+                         topic: topic || null, 
+                         comment: comment || '', 
+                         completed: completed || false, 
+                         completionPercentage: completionPercentage || null, 
+                         vocabData: vocabData || null, 
+                         story: story || null 
+                     });
                 });
 
                 // Update the day's rows in the local copy
                  daysArray[dayIndex].rows = updatedRows;
+                const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
 
-                // Prepare update payload
-                const updatePayload = {};
-                updatePayload[`weeks.${weekId}.days`] = daysArray;
-
-                // Update Firestore
                 await updateDoc(docRef, updatePayload);
                 console.log(`Day ${dayIndex + 1} for ${weekId} saved successfully.`);
+                setSyncStatus("Synced", "green");
 
             } catch (error) {
                 console.error("Error saving day plan:", error);
                 showCustomAlert("Error saving changes. Please check your connection and try again.");
+                setSyncStatus("Error", "red");
             }
         }
 
@@ -1223,12 +1271,10 @@
                      <input type="text" class="vocab-input vocab-meaning-input" placeholder="Meaning" value="">
                      <button type="button" class="icon-button delete-vocab-pair-btn" title="Delete Pair"><i class="fas fa-times text-red-500"></i></button>
                  </div>`;
-             // Insert before the add button
              container.querySelector('.add-vocab-pair-btn').insertAdjacentHTML('beforebegin', pairHtml);
          }
 
          function deleteVocabPairInputs(pairElement) {
-             // Prevent deleting the last pair
              const container = pairElement.closest('.vocab-edit-container');
              if (container && container.querySelectorAll('.vocab-pair').length > 1) {
                 pairElement.remove();
@@ -1249,42 +1295,11 @@
          }
 
          async function deleteRow(monthId, weekId, daySection, rowElement, rowIndex) {
-            if (!currentUser || !userId) return;
-             const dayIndex = parseInt(daySection.dataset.dayIndex);
-             console.log(`Attempting to delete row ${rowIndex} from day ${dayIndex}, week ${weekId}, month ${monthId}`);
-
-             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-             try {
-                 const docSnap = await getDoc(docRef);
-                 if (!docSnap.exists()) throw new Error("Month document not found.");
-
-                 let monthData = docSnap.data();
-                 let daysArray = monthData.weeks?.[weekId]?.days || [];
-                 if (!daysArray[dayIndex] || !daysArray[dayIndex].rows) throw new Error("Day or rows not found in Firestore.");
-                 
-                 // Find the row in the array by its index *at the time of deletion*
-                 // Note: The UI might have new, unsaved rows. We need to save the state *before* deleting.
-                 // OR, we can just remove it from the UI and let the next "Save" handle it.
-                 // Let's try removing from UI only first.
-                 
-                 // Problem: If we just remove from UI, saveDayPlan will reconstruct the array *without* this row.
-                 // But what was its original rowIndex in the database?
-                 // This is tricky. Let's force a save *before* deleting.
-                 
-                 // Alternative: Let's just remove from UI and then call saveDayPlan.
-                 // saveDayPlan iterates the UI rows.
-                 rowElement.remove(); // Remove from UI first
-                 console.log("Row removed from UI. Saving updated day plan...");
-                 await saveDayPlan(monthId, weekId, daySection); // Save the *new* state of the UI
-                 
-                 // Re-index remaining UI rows
-                 daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => tr.dataset.rowIndex = newIdx);
-
-
-             } catch (error) {
-                 console.error("Error deleting row:", error);
-                 showCustomAlert("Error deleting row. Please try again.");
-             }
+            // This function now *only* removes from UI. The 'Save' button will finalize.
+            rowElement.remove(); // Remove from UI
+            console.log("Row removed from UI. Click 'Save' to confirm deletion.");
+            setSyncStatus("Unsaved changes", "yellow");
+            // No saveDayPlan call here. User must click "Save" on the day.
          }
 
          function confirmDeleteDay(monthId, weekId, daySection) {
@@ -1300,6 +1315,7 @@
          async function deleteDay(monthId, weekId, daySection, dayIndex) {
             if (!currentUser || !userId) return;
             console.log(`Attempting to delete day index ${dayIndex} from week ${weekId}, month ${monthId}`);
+            setSyncStatus("Syncing...", "yellow");
 
             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
              try {
@@ -1310,40 +1326,27 @@
                  let daysArray = monthData.weeks?.[weekId]?.days || [];
                  if (!daysArray[dayIndex]) throw new Error("Day not found in Firestore.");
 
-                 // Remove the day from the array
-                 daysArray.splice(dayIndex, 1);
+                 daysArray.splice(dayIndex, 1); // Remove the day
 
                  // Renumber subsequent days
                  for (let i = dayIndex; i < daysArray.length; i++) {
                      daysArray[i].dayNumber = i + 1;
                  }
-
-                 // Prepare update payload
-                 const updatePayload = {};
-                 updatePayload[`weeks.${weekId}.days`] = daysArray;
-
+                 
+                 const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
                  await updateDoc(docRef, updatePayload);
                  console.log("Day deleted successfully from Firestore.");
-                 // UI update will happen via onSnapshot, which re-calls displayMonthPlan
-                 // which re-calls createMonthElement
-                 // Let's just remove it manually to be faster.
-                const daysContainer = daySection.parentNode;
-                 daySection.remove();
-                 daysContainer.querySelectorAll('.day-section').forEach((ds, newIdx) => {
-                     ds.dataset.dayIndex = newIdx;
-                     ds.querySelector('h4').textContent = `Day ${newIdx + 1}`;
-                      ds.querySelector('table').id = `table-${monthId}-${weekId}-${newIdx}`;
-                 });
-                  updateWeeklyProgressUI(monthId, weekId); // Recalculate progress
+                 // UI update will now be handled by the onSnapshot listener for the active month
+                 setSyncStatus("Synced", "green");
 
              } catch (error) {
                  console.error("Error deleting day:", error);
                  showCustomAlert("Error deleting day. Please try again.");
+                 setSyncStatus("Error", "red");
              }
          }
 
          function confirmDeleteMonth(monthId) {
-             // Get month name for confirmation message
              const monthButton = monthNavButtonsContainer.querySelector(`button[data-month-id="${monthId}"]`);
              const monthName = monthButton ? monthButton.textContent : monthId;
              showConfirmationModal(
@@ -1356,16 +1359,18 @@
          async function deleteMonth(monthId) {
              if (!currentUser || !userId) return;
              console.log("Attempting to delete month:", monthId);
+             setSyncStatus("Syncing...", "yellow");
+             
              const docRef = doc(db, getUserPlansCollectionPath(), monthId);
              try {
                  await deleteDoc(docRef);
                  console.log("Month deleted successfully.");
-                 // UI update happens via onSnapshot listener triggering loadStudyPlans
-                 currentMonthPlanDisplay.innerHTML = ''; // Clear display
-                 selectMonthMessage.classList.remove('hidden'); // Show select message again
+                 // onSnapshot listener will update UI
+                 setSyncStatus("Synced", "green");
              } catch (error) {
                  console.error("Error deleting month:", error);
                  showCustomAlert("Error deleting month. Please try again.");
+                 setSyncStatus("Error", "red");
              }
          }
 
@@ -1373,18 +1378,9 @@
          function showConfirmationModal(title, message, onConfirm) {
              confirmModalTitle.textContent = title;
              confirmModalMessage.textContent = message;
-             currentConfirmAction = onConfirm; // Store the action
-
-             confirmModalConfirmBtn.onclick = () => {
-                 if (currentConfirmAction) {
-                     currentConfirmAction();
-                 }
-                 closeModal('confirm-modal');
-             };
-             confirmModalCancelBtn.onclick = () => {
-                 closeModal('confirm-modal');
-             };
-
+             currentConfirmAction = onConfirm; 
+             confirmModalConfirmBtn.onclick = () => { if (currentConfirmAction) currentConfirmAction(); closeModal('confirm-modal'); };
+             confirmModalCancelBtn.onclick = () => closeModal('confirm-modal');
              confirmModal.style.display = 'block';
          }
 
@@ -1406,22 +1402,21 @@
                      return;
                  }
                 console.log(`Adding new day to ${monthId}, ${weekId} (Current count: ${daysArray.length})`);
-
+                setSyncStatus("Syncing...", "yellow");
 
                  const lastDayIndex = daysArray.length - 1;
                  let newDayData;
-                 // ... (rest of the copy logic remains the same) ...
                   if (lastDayIndex >= 0) {
                      const lastDayRows = daysArray[lastDayIndex].rows || [];
                      newDayData = {
                          dayNumber: daysArray.length + 1, date: '',
                          rows: lastDayRows.map(row => ({
                              subject: row.subject || '', 
-                             topic: row.topic || '', 
+                             topic: (row.subject?.toLowerCase() === 'vocabulary') ? null : (row.topic || ''), // Don't copy vocab topics
                              completed: false, 
                              comment: '', 
                              completionPercentage: null,
-                             vocabData: row.vocabData ? JSON.parse(JSON.stringify(row.vocabData)) : null, 
+                             vocabData: (row.subject?.toLowerCase() === 'vocabulary') ? (row.vocabData || null) : null, // Copy vocab structure
                              story: null // Do not copy story
                          }))
                      };
@@ -1429,25 +1424,115 @@
                      newDayData = { dayNumber: 1, date: '', rows: [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }] };
                  }
 
-
-                 const updatePayload = {};
-                 updatePayload[`weeks.${weekId}.days`] = arrayUnion(newDayData);
+                 const updatePayload = { [`weeks.${weekId}.days`]: arrayUnion(newDayData) };
                  await updateDoc(docRef, updatePayload);
                  console.log("New day added successfully.");
+                 setSyncStatus("Synced", "green");
 
              } catch (error) {
                  console.error("Error adding new day:", error);
                  showCustomAlert("Error adding new day.");
+                 setSyncStatus("Error", "red");
+             }
+        }
+
+        // --- Monthly Target Edit ---
+        function handleEditTargets(button, monthId) {
+            const isEditing = button.dataset.editing === 'true';
+            const targetsContainer = button.closest('.mb-8'); // Find the parent .mb-8
+            const textareas = targetsContainer.querySelectorAll('.target-textarea');
+
+            if (isEditing) {
+                // Was editing, now Save
+                saveMonthlyTargets(monthId, targetsContainer);
+                button.textContent = 'Edit Targets';
+                button.dataset.editing = 'false';
+                button.classList.add('action-button-secondary');
+                textareas.forEach(ta => {
+                    ta.disabled = true;
+                    ta.classList.add('bg-gray-100', 'cursor-not-allowed', 'border-gray-200');
+                    ta.classList.remove('bg-white', 'shadow-sm');
+                });
+            } else {
+                // Was not editing, now Edit
+                button.textContent = 'Save Targets';
+                button.dataset.editing = 'true';
+                button.classList.remove('action-button-secondary');
+                textareas.forEach(ta => {
+                    ta.disabled = false;
+                    ta.classList.remove('bg-gray-100', 'cursor-not-allowed', 'border-gray-200');
+                    ta.classList.add('bg-white', 'shadow-sm');
+                });
+                textareas[0].focus(); // Focus on the first textarea
+            }
+        }
+        
+        async function saveMonthlyTargets(monthId, targetsContainer) {
+             if (!currentUser || !userId) return;
+             console.log("Saving targets for month:", monthId);
+             setSyncStatus("Syncing...", "yellow");
+
+             const targets = {};
+             targetsContainer.querySelectorAll('.target-textarea').forEach(textarea => {
+                 targets[textarea.dataset.week] = textarea.value.trim();
+             });
+
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             try {
+                 await updateDoc(docRef, { weeklyTargets: targets });
+                 console.log("Monthly targets saved.");
+                 showCustomAlert("Monthly targets saved!", "success");
+                 setSyncStatus("Synced", "green");
+             } catch (error) {
+                 console.error("Error saving targets:", error);
+                 showCustomAlert("Error saving targets.");
+                 setSyncStatus("Error", "red");
              }
         }
 
 
-        // Save Story (Modified to target specific row)
+        // Save Story (Fix for Bug #3)
+         async function openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex) {
+             if (!currentUser || !userId) return;
+             
+             // Check if a vocab row exists
+             if (vocabRowIndex === -1) {
+                 // Try to find one again, just in case UI is ahead of data
+                 const daySection = document.querySelector(`.day-section[data-day-index="${dayIndex}"]`);
+                 const vocabRow = daySection ? daySection.querySelector('tr.vocab-row') : null;
+                 if(vocabRow) {
+                     vocabRowIndex = parseInt(vocabRow.dataset.rowIndex);
+                 } else {
+                     showCustomAlert("Please add and save a Vocabulary row before adding a story.");
+                     return;
+                 }
+             }
+
+             currentStoryTarget = { monthId, weekId, dayIndex, rowIndex: vocabRowIndex }; // Store context
+             
+             let existingStory = '';
+             try {
+                 const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                 const docSnap = await getDoc(docRef);
+                 if (docSnap.exists()) {
+                     existingStory = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[vocabRowIndex]?.story || '';
+                 }
+             } catch (error) { console.error("Error fetching existing story:", error); }
+
+             document.getElementById('story-textarea').value = existingStory;
+             editStoryModal.style.display = "block";
+         }
+         
          saveStoryBtn.addEventListener('click', async () => {
              if (!currentUser || !userId || !currentStoryTarget) return;
-             const { monthId, weekId, dayIndex, rowIndex } = currentStoryTarget; // Use the stored target row
+             const { monthId, weekId, dayIndex, rowIndex } = currentStoryTarget; 
+             if (rowIndex === -1) { // Safety check
+                 showCustomAlert("Error: No associated vocabulary row found.");
+                 return;
+             }
              const newStory = document.getElementById('story-textarea').value.trim();
              const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             setSyncStatus("Syncing...", "yellow");
 
              try {
                  const docSnap = await getDoc(docRef);
@@ -1456,37 +1541,21 @@
                  let daysArray = monthData.weeks?.[weekId]?.days || [];
 
                  if (daysArray[dayIndex]?.rows?.[rowIndex]) {
-                     daysArray[dayIndex].rows[rowIndex].story = newStory || null; // Update specific row's story
+                     daysArray[dayIndex].rows[rowIndex].story = newStory || null;
                      const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
                      await updateDoc(docRef, updatePayload);
                      console.log("Story saved successfully for row:", rowIndex);
                      closeModal('edit-story-modal');
-
-                     // --- Immediate UI Update ---
-                     const daySection = document.querySelector(`[data-month-id="${monthId}"] .day-section[data-day-index="${dayIndex}"]`);
-                     if (daySection && !daySection.classList.contains('editing')) {
-                         const rowElement = daySection.querySelector(`tr[data-row-index="${rowIndex}"]`);
-                         if(rowElement){
-                              const updatedDocSnap = await getDoc(docRef); // Re-fetch
-                              if(updatedDocSnap.exists()){
-                                   const updatedRowData = updatedDocSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex];
-                                   if(updatedRowData) {
-                                        rowElement.outerHTML = createTableRow(monthId, weekId, dayIndex, rowIndex, updatedRowData, false);
-                                   }
-                              }
-                         }
-                     }
-                     // --- End UI Update ---
-
+                     setSyncStatus("Synced", "green");
+                     // onSnapshot will handle the UI update
                  } else { throw new Error("Target row for story not found."); }
-             } catch (error) { console.error("Error saving story:", error); showCustomAlert("Error saving story."); }
+             } catch (error) { console.error("Error saving story:", error); showCustomAlert("Error saving story."); setSyncStatus("Error", "red"); }
              finally { currentStoryTarget = null; }
          });
 
 
-        // --- Other functions (calculateWeeklyProgress, updateWeeklyProgressUI, showVocabMeaning, readStory, parseVocabString, escapeHtml, closeModal, showCustomAlert) remain largely the same ---
-         // --- Progress Calculation ---
-        function calculateWeeklyProgress(weekData) { /* ... same as before ... */
+        // --- Other functions (calculateWeeklyProgress, updateWeeklyProgressUI, showVocabMeaning, readStory, parseVocabString, escapeHtml, closeModal, showCustomAlert) ---
+         function calculateWeeklyProgress(weekData) {
             if (!weekData || !weekData.days || weekData.days.length === 0) return 0;
             let totalPercentage = 0;
             weekData.days.forEach(day => {
@@ -1499,8 +1568,7 @@
              return Math.min(Math.round(totalPercentage), 100);
         }
 
-         // Update the progress bar UI
-        async function updateWeeklyProgressUI(monthId, weekId) { /* ... same as before but fetch data ... */
+        async function updateWeeklyProgressUI(monthId, weekId) {
              if (!currentUser || !userId) return;
              const weekSection = document.querySelector(`[data-month-id="${monthId}"] .week-section[data-week-id="${weekId}"]`);
              if (!weekSection) return;
@@ -1518,13 +1586,12 @@
              } catch (error) { console.error("Error fetching data for progress UI:", error); }
         }
 
-        // --- Modals ---
-        function showVocabMeaning(wordSpan) { /* ... same as before ... */
+        function showVocabMeaning(wordSpan) {
              document.getElementById('vocab-modal-word').textContent = wordSpan.textContent;
              document.getElementById('vocab-modal-meaning').textContent = wordSpan.dataset.meaning || 'No meaning provided.';
              vocabModal.style.display = "block";
         }
-         async function readStory(monthId, weekId, dayIndex, rowIndex) { /* ... same as before ... */
+         async function readStory(monthId, weekId, dayIndex, rowIndex) {
              if (!currentUser || !userId) return;
               try {
                   const docRef = doc(db, getUserPlansCollectionPath(), monthId);
@@ -1539,21 +1606,30 @@
          window.closeModal = function(modalId) { document.getElementById(modalId).style.display = "none"; }
          window.onclick = function(event) { if (event.target.classList.contains('modal')) { event.target.style.display = "none"; } }
 
-        // --- Alert ---
-         function showCustomAlert(message, type = "error") { /* ... same as before ... */
+         function setSyncStatus(text, color) {
+             if (!syncStatusText) return;
+             syncStatusText.textContent = text;
+             syncStatusText.classList.remove('text-emerald-500', 'text-yellow-500', 'text-red-500', 'text-blue-500');
+             if (color === 'green') syncStatusText.classList.add('text-emerald-500');
+             else if (color === 'yellow') syncStatusText.classList.add('text-yellow-500');
+             else if (color === 'red') syncStatusText.classList.add('text-red-500');
+             else if (color === 'blue') syncStatusText.classList.add('text-blue-500');
+         }
+
+         function showCustomAlert(message, type = "error") {
              console.log(`ALERT (${type}): ${message}`);
              const alertBox = document.createElement('div');
-             alertBox.style.cssText = `position:fixed; top:20px; left:50%; transform:translateX(-50%); padding:10px 20px; border-radius:5px; z-index:200; box-shadow:0 2px 10px rgba(0,0,0,0.2); font-size: 0.875rem; font-weight: 500;`;
+             alertBox.style.cssText = `position:fixed; top:80px; left:50%; transform:translateX(-50%); padding:12px 24px; border-radius:8px; z-index:200; box-shadow:0 4px 12px rgba(0,0,0,0.15); font-size: 0.9rem; font-weight: 500;`;
              if (type === 'success') { alertBox.style.backgroundColor = '#10b981'; alertBox.style.color = 'white'; }
-             else { alertBox.style.backgroundColor = '#f87171'; alertBox.style.color = 'white'; }
+             else { alertBox.style.backgroundColor = '#ef4444'; alertBox.style.color = 'white'; }
              alertBox.textContent = message; document.body.appendChild(alertBox);
              setTimeout(() => { alertBox.remove(); }, 3000);
          }
 
     </script>
 
-     <!-- Your existing script.js link -->
-     <script src="script.js" defer></script>
+     <!-- This external script is NOT needed if all logic is above, but kept as requested -->
+     <!-- <script src="script.js" defer></script> --> 
 
 </body>
 </html>
