@@ -383,9 +383,64 @@
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Firebase Configuration ---
-         // Enable Firestore debug logging
-        setLogLevel('debug'); // Set to 'debug' for verbose logging, 'silent' to disable
+        setLogLevel('debug'); // Keep debug logging enabled for now
 
+        let firebaseConfig;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // Use provided app ID or a default
+
+        console.log("Checking for __firebase_config..."); // Log check
+        if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+            try {
+                firebaseConfig = JSON.parse(__firebase_config);
+                console.log("Firebase config loaded from environment variable:", firebaseConfig);
+            } catch (e) {
+                console.error("Error parsing __firebase_config JSON:", e);
+                // Fallback if JSON parsing fails
+                firebaseConfig = { /* Your Fallback Config - MAKE SURE this is correctly filled if needed */
+                     apiKey: "YOUR_FALLBACK_API_KEY", // Replace if needed, but ideally env var should work
+                     authDomain: "YOUR_FALLBACK_AUTH_DOMAIN",
+                     projectId: "YOUR_FALLBACK_PROJECT_ID",
+                     // ... other fallback keys ...
+                     appId: "YOUR_FALLBACK_APP_ID"
+                 };
+                console.warn("Using fallback Firebase config due to parsing error.");
+            }
+        } else {
+            console.error("__firebase_config is not defined or empty. Authentication will likely fail.");
+            // Define fallback config if the environment variable is completely missing
+            firebaseConfig = { /* Your Fallback Config - MAKE SURE this is correctly filled if needed */
+                 apiKey: "YOUR_FALLBACK_API_KEY", // Replace if needed, but ideally env var should work
+                 authDomain: "YOUR_FALLBACK_AUTH_DOMAIN",
+                 projectId: "YOUR_FALLBACK_PROJECT_ID",
+                 // ... other fallback keys ...
+                 appId: "YOUR_FALLBACK_APP_ID"
+             };
+            console.warn("Using fallback Firebase config because environment variable was missing.");
+        }
+
+
+        // Initialize Firebase
+        let app;
+        let auth;
+        let db;
+        let googleProvider;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            googleProvider = new GoogleAuthProvider();
+            console.log("Firebase initialized successfully.");
+        } catch (error) {
+            console.error("CRITICAL ERROR initializing Firebase:", error);
+            console.error("Firebase Config Used:", firebaseConfig);
+            // Display an error message to the user on the page itself
+             const authSection = document.getElementById('auth-section');
+             if(authSection) authSection.innerHTML = `<p class="text-red-500 font-bold text-center">Error: Could not initialize Firebase. Please check the console.</p>`;
+             // Stop further execution if Firebase fails to init
+             throw new Error("Firebase initialization failed.");
+        }
+        // --- End Firebase Configuration ---
         // Use environment variables provided by the platform
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             // Provide default fallback config if needed, but ideally rely on __firebase_config
