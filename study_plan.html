@@ -16,15 +16,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;700&family=Kalpurush:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Use Inter font to match the example -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;700&family=Kalpurush:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- <link rel="stylesheet" href="style.css"> -->
     <link rel="icon" href="https://eco.du.ac.bd//assets/images/fab_icon.ico" type="image/x-icon">
     <style>
         /* --- Light Theme & Motivational Styles --- */
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f3f4f6; /* gray-100 */
+            font-family: 'Inter', 'Poppins', sans-serif; /* Prioritize Inter */
+            background-color: #f8fafc; /* Lighter gray background (slate-50) */
             color: #1f2937; /* gray-800 */
         }
         /* Subtle background pattern */
@@ -35,10 +35,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: radial-gradient(circle at top right, rgba(16, 185, 129, 0.05), transparent 40%),
-                              radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.05), transparent 40%);
+            background-image: radial-gradient(circle at top right, rgba(16, 185, 129, 0.03), transparent 40%),
+                              radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.03), transparent 40%);
             z-index: -1;
-            opacity: 0.6;
+            opacity: 0.8;
         }
         .kalpurush { font-family: 'Kalpurush', sans-serif; }
         .arabic-font { font-family: 'Noto Naskh Arabic', serif; }
@@ -50,7 +50,7 @@
             padding: 8px 16px;
             border-radius: 6px;
             font-weight: 600;
-            transition: background-color 0.2s, transform 0.1s;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
             cursor: pointer;
             border: none;
             font-size: 0.875rem; /* text-sm */
@@ -58,27 +58,28 @@
         }
         .action-button:hover {
             background-color: #059669; /* emerald-600 */
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.05);
         }
          .action-button:active {
             transform: scale(0.98);
         }
         .action-button-secondary {
-             background-color: #e5e7eb; /* gray-200 */
+             background-color: #ffffff; /* white */
              color: #374151; /* gray-700 */
-             box-shadow: none;
+             box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
              border: 1px solid #d1d5db; /* gray-300 */
         }
         .action-button-secondary:hover {
-             background-color: #d1d5db; /* gray-300 */
+             background-color: #f9fafb; /* gray-50 */
         }
         .action-button-danger {
-            background-color: #fecaca; /* red-200 */
+            background-color: #fee2e2; /* red-100 */
             color: #b91c1c; /* red-700 */
             box-shadow: none;
-            border: 1px solid #fca5a5; /* red-300 */
+            border: 1px solid #fecaca; /* red-300 */
         }
          .action-button-danger:hover {
-            background-color: #fca5a5; /* red-300 */
+            background-color: #fecaca; /* red-300 */
              color: #991b1b; /* red-800 */
         }
         .icon-button {
@@ -102,59 +103,27 @@
         /* --- Card Styles --- */
         .card {
             background-color: white;
-            border-radius: 8px;
+            border-radius: 0.75rem; /* rounded-xl */
             border: 1px solid #e5e7eb; /* gray-200 */
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
             padding: 1.5rem; /* p-6 */
         }
-
-        /* --- Table & Editing Styles --- */
-        .study-table thead {
-            background-color: #f9fafb; /* gray-50 */
-            color: #4b5563; /* gray-600 */
-            font-size: 0.75rem; /* text-xs */
-        }
-        .study-table tbody tr {
-            border-bottom: 1px solid #e5e7eb; /* gray-200 */
-        }
-        .study-table tbody tr:hover {
-            background-color: #f9fafb; /* gray-50 */
-        }
-        .study-table td, .study-table th {
-            padding: 8px 12px; /* px-3 py-2 */
-            vertical-align: middle;
-        }
-        .study-table th { text-align: left; }
-        .study-table td.center-cell { text-align: center; }
-
-        .editable-input, .vocab-input {
-            background-color: #f9fafb; /* gray-50 */
-            border: 1px solid #d1d5db; /* gray-300 */
-            border-radius: 4px;
-            padding: 6px 8px;
-            color: #1f2937; /* gray-800 */
-            width: 100%;
-            font-size: 0.875rem;
-            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
-        }
-         .editable-input:focus, .vocab-input:focus {
-             outline: none;
-             border-color: #34d399; /* emerald-400 */
-             box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
-             background-color: white;
-         }
-        textarea.editable-input { min-height: 40px; }
         
-        /* Styles for Target Textareas (from example) */
+        /* NEW: Target Card style from example */
         .target-card {
             background-color: white;
             padding: 1.5rem; /* p-6 */
             border-radius: 0.75rem; /* rounded-xl */
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.03); /* shadow-lg */
-            border: 1px solid #e5e7eb; /* border-gray-200 */
+            box-shadow: 0 4px 10px -3px rgba(0,0,0,0.07), 0 2px 6px -2px rgba(0,0,0,0.04); /* Softer shadow */
+            border: 1px solid #f3f4f6; /* gray-100 */
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+        }
+        .target-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.07), 0 4px 6px -2px rgba(0,0,0,0.05);
         }
         .target-textarea {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', 'Poppins', sans-serif;
             background-color: transparent;
             border: none;
             padding: 0;
@@ -179,16 +148,52 @@
              padding: 8px;
              border-radius: 4px;
          }
+         
+        /* --- Table & Editing Styles --- */
+        .study-table thead {
+            background-color: #f9fafb; /* gray-50 */
+            color: #4b5563; /* gray-600 */
+            font-size: 0.75rem; /* text-xs */
+        }
+        .study-table tbody tr {
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+        }
+        .study-table tbody tr:hover {
+            background-color: #f9fafb; /* gray-50 */
+        }
+        .study-table td, .study-table th {
+            padding: 10px 12px; /* px-3 py-2.5 */
+            vertical-align: middle;
+        }
+        .study-table th { text-align: left; }
+        .study-table td.center-cell { text-align: center; }
 
-
+        .editable-input, .vocab-input {
+            background-color: #f9fafb; /* gray-50 */
+            border: 1px solid #d1d5db; /* gray-300 */
+            border-radius: 4px;
+            padding: 6px 8px;
+            color: #1f2937; /* gray-800 */
+            width: 100%;
+            font-size: 0.875rem;
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+        }
+         .editable-input:focus, .vocab-input:focus {
+             outline: none;
+             border-color: #34d399; /* emerald-400 */
+             box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+             background-color: white;
+         }
+        textarea.editable-input { min-height: 40px; }
+        
         tr.editing-mode td { background-color: #f0fdf4; } /* emerald-50 */
 
         /* --- Vocabulary Specific Styles (from example) --- */
         .vocab-word {
             position: relative; 
             display: inline-block;
-            background-color: #f1f5f9; /* gray-100 */
-            color: #334155; /* gray-700 */
+            background-color: #eef2ff; /* indigo-50 */
+            color: #3730a3; /* indigo-800 */
             padding: 4px 10px; 
             border-radius: 9999px; /* rounded-full */
             cursor: pointer; 
@@ -196,8 +201,9 @@
             transition: background-color 0.2s;
             margin-right: 8px;
             margin-bottom: 4px;
+            font-size: 0.875rem;
         }
-        .vocab-word:hover { background-color: #e2e8f0; } /* gray-200 */
+        .vocab-word:hover { background-color: #e0e7ff; } /* indigo-100 */
         .vocab-meaning {
             visibility: hidden; 
             opacity: 0; 
@@ -263,6 +269,19 @@
              .sticky-progress-wrapper {
                  top: 65px; /* Updated for header height */
              }
+        }
+        /* --- FIX for Progress Bar Visual --- */
+        .progress-bar-container { background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; height: 12px; }
+        .progress-bar-fill { 
+            background-color: #10b981; /* emerald-500 */
+            height: 100%; 
+            transition: width 0.4s ease-in-out; /* Smooth transition */
+            text-align: center; 
+            line-height: 12px; 
+            font-size: 10px; 
+            color: white; 
+            font-weight: bold; 
+            border-radius: 9999px; 
         }
 
 
@@ -475,9 +494,6 @@
         </div> <!-- End Study Plan Content -->
 
     </main>
-
-    <!-- Modal for Vocabulary Meaning (No longer used, replaced by tooltip) -->
-    <!-- <div id="vocab-modal" class="modal"> ... </div> -->
 
     <!-- Modal for Story -->
     <div id="story-modal" class="modal">
@@ -781,7 +797,10 @@
                              button.classList.add('active-month');
                              button.classList.remove('action-button-secondary');
                         }
-                        button.addEventListener('click', () => displayMonthPlan(monthId));
+                        button.addEventListener('click', (e) => {
+                            e.preventDefault(); // FIX: Prevent page jump
+                            displayMonthPlan(monthId);
+                        });
                         monthNavButtonsContainer.appendChild(button);
                     });
 
@@ -831,6 +850,11 @@
                          if (unsubscribeActiveMonth) unsubscribeActiveMonth(); // Stop listening
                          return;
                      }
+                     
+                     // FIX: Save scroll position
+                     let scrollY = window.scrollY;
+                     let parentContainerRect = currentMonthPlanDisplay.getBoundingClientRect();
+                     let shouldRestoreScroll = scrollY > parentContainerRect.top + window.scrollY;
 
                      if (docSnap.exists()) {
                          currentMonthPlanDisplay.innerHTML = '';
@@ -838,6 +862,12 @@
                      } else {
                          console.error("Document for monthId not found (or deleted):", monthId);
                          currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">This plan was not found (it may have been deleted).</p>';
+                     }
+                     
+                     // FIX: Restore scroll position
+                     if (shouldRestoreScroll) {
+                        console.log("Restoring scroll position to:", scrollY);
+                        window.scrollTo(0, scrollY);
                      }
                  });
              } catch (error) {
@@ -848,7 +878,8 @@
 
 
        // Add a new month
-        addMonthBtn.addEventListener('click', async () => {
+        addMonthBtn.addEventListener('click', async (e) => {
+             e.preventDefault(); // FIX: Prevent page jump
              if (!currentUser || !userId) return;
              const currentYear = new Date().getFullYear();
              const currentMonthIndex = new Date().getMonth();
@@ -917,13 +948,15 @@
                      <button class="icon-button delete-month-btn" title="Delete Month"><i class="fas fa-trash-alt text-red-500"></i></button>
                  </div>
                  <div class="mb-8">
-                    <div class="flex justify-between items-center mb-3">
+                    <div class="flex justify-between items-center mb-4">
                          <h3 class="text-2xl font-semibold text-gray-700">Monthly Targets</h3>
-                         <button class="action-button action-button-secondary text-xs edit-targets-btn" data-editing="false">Edit Targets</button>
+                         <button class="action-button action-button-secondary text-xs edit-targets-btn" data-editing="false">
+                            <i class="fas fa-pencil-alt mr-1"></i> Edit Targets
+                         </button>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 monthly-targets">
                         ${[1, 2, 3, 4].map(weekNum => `
-                            <div class"target-card bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                            <div class="target-card">
                                 <h3 class="font-semibold text-lg ${targetColors[`week${weekNum}`] || 'text-gray-700'} mb-2">Week ${weekNum}</h3>
                                 <textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" rows="3" class="target-textarea w-full" placeholder="Enter target..." disabled>${escapeHtml(data.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
                             </div>
@@ -1083,21 +1116,42 @@
                  const daySection = target.closest('.day-section');
                  const row = target.closest('tr');
 
+                 // Prevent default "jump" for button clicks
+                 if (button) e.preventDefault();
+                 
+                 // Handle vocab word click separately to avoid prevention
+                 if (target.closest('.vocab-word') && !daySection.classList.contains('editing')) {
+                     e.preventDefault(); // Also prevent jump for vocab
+                     showVocabMeaning(target.closest('.vocab-word'));
+                     return; // Stop further processing
+                 }
+                 
+                 // Handle checkbox click
+                 if (target.classList.contains('completion-checkbox') && !daySection.classList.contains('editing')) {
+                     // No preventDefault here, let the checkbox check
+                     await saveDayPlan(monthId, weekId, daySection); // Save just the checkbox state
+                     updateWeeklyProgressUI(monthId, weekId);
+                     return; // Stop further processing
+                 }
+
+                 // Handle other button clicks
+                 if (!button) return; // Not a button, do nothing
+
                  // Edit/Save Day Button
-                 if (button?.classList.contains('edit-day-btn')) {
+                 if (button.classList.contains('edit-day-btn')) {
                      const isEditing = daySection.classList.contains('editing');
                      toggleDayEditMode(monthId, weekId, daySection, !isEditing);
                  }
                  // Add Normal Row Button (Edit Mode)
-                 else if (button?.classList.contains('add-normal-row-btn')) {
+                 else if (button.classList.contains('add-normal-row-btn')) {
                      addRowToDay(monthId, weekId, daySection, 'normal');
                  }
                  // Add Vocab Row Button (Edit Mode)
-                  else if (button?.classList.contains('add-vocab-row-btn')) {
+                  else if (button.classList.contains('add-vocab-row-btn')) {
                      addRowToDay(monthId, weekId, daySection, 'vocabulary');
                  }
                  // Add/Edit Story Button (Edit Mode) - Opens modal
-                 else if (button?.classList.contains('add-story-btn')) {
+                 else if (button.classList.contains('add-story-btn')) {
                       const dayIndex = parseInt(daySection.dataset.dayIndex);
                       const vocabRow = daySection.querySelector('tr.vocab-row');
                       let vocabRowIndex = -1;
@@ -1107,38 +1161,29 @@
                       openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex); 
                  }
                   // Delete Row Button (Edit Mode)
-                 else if (button?.classList.contains('delete-row-btn')) {
+                 else if (button.classList.contains('delete-row-btn')) {
                      confirmDeleteRow(monthId, weekId, daySection, row);
                  }
                   // Delete Day Button (Edit Mode)
-                 else if (button?.classList.contains('delete-day-btn')) {
+                 else if (button.classList.contains('delete-day-btn')) {
                      confirmDeleteDay(monthId, weekId, daySection);
                  }
                  // Add Vocab Pair Button (Edit Mode)
-                 else if (button?.classList.contains('add-vocab-pair-btn')) {
+                 else if (button.classList.contains('add-vocab-pair-btn')) {
                       addVocabPairInputs(button.closest('.vocab-edit-container'));
                  }
                  // Delete Vocab Pair Button (Edit Mode)
-                 else if (button?.classList.contains('delete-vocab-pair-btn')) {
+                 else if (button.classList.contains('delete-vocab-pair-btn')) {
                       deleteVocabPairInputs(button.closest('.vocab-pair'));
                  }
-                 // Completion Checkbox (Normal Mode Only)
-                 else if (target.classList.contains('completion-checkbox') && !daySection.classList.contains('editing')) {
-                     await saveDayPlan(monthId, weekId, daySection); // Save just the checkbox state
-                     updateWeeklyProgressUI(monthId, weekId);
-                 }
-                 // Vocab Word Click (Normal Mode)
-                 else if (target.closest('.vocab-word') && !daySection.classList.contains('editing')) {
-                     showVocabMeaning(target.closest('.vocab-word'));
-                 }
                  // Read Story Button (Normal Mode)
-                 else if (button?.classList.contains('read-story-btn')) {
+                 else if (button.classList.contains('read-story-btn')) {
                      const dayIndex = parseInt(daySection.dataset.dayIndex);
                      const rowIndex = parseInt(row.dataset.rowIndex);
                      readStory(monthId, weekId, dayIndex, rowIndex);
                  }
                  // Add Day Button / Add First Day
-                 else if (button?.classList.contains('add-day-btn') || button?.classList.contains('add-first-day-btn')) {
+                 else if (button.classList.contains('add-day-btn') || button.classList.contains('add-first-day-btn')) {
                      addNewDay(monthId, weekId, weekSection);
                  }
              });
@@ -1527,13 +1572,13 @@
             if (isEditing) {
                 // Was editing, now Save
                 saveMonthlyTargets(monthId, targetsContainer);
-                button.textContent = 'Edit Targets';
+                button.innerHTML = '<i class="fas fa-pencil-alt mr-1"></i> Edit Targets';
                 button.dataset.editing = 'false';
                 button.classList.add('action-button-secondary');
                 textareas.forEach(ta => ta.disabled = true );
             } else {
                 // Was not editing, now Edit
-                button.textContent = 'Save Targets';
+                button.innerHTML = '<i class="fas fa-save mr-1"></i> Save Targets';
                 button.dataset.editing = 'true';
                 button.classList.remove('action-button-secondary');
                 textareas.forEach(ta => ta.disabled = false );
@@ -1725,4 +1770,5 @@
     </script>
 </body>
 </html>
+`
 
