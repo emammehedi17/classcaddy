@@ -183,6 +183,7 @@ a.target-card-link:hover {
         .target-textarea:disabled {
             background-color: transparent;
             cursor: default;
+			pointer-events: none; /* এই লাইনটি যোগ করুন */
         }
          .target-textarea:not(:disabled) {
              background-color: #f9fafb; /* gray-50 */
@@ -1659,26 +1660,44 @@ function createMonthElement(monthId, data) {
 
         // --- Monthly Target Edit ---
         function handleEditTargets(button, monthId) {
-            const isEditing = button.dataset.editing === 'true';
-            const targetsContainer = button.closest('.mb-8'); 
-            const textareas = targetsContainer.querySelectorAll('.target-textarea');
+    const isEditing = button.dataset.editing === 'true';
+    const targetsContainer = button.closest('.mb-8'); 
+    const textareas = targetsContainer.querySelectorAll('.target-textarea');
+    
+    // নতুন: সব লিঙ্ক সিলেক্ট করুন
+    const links = targetsContainer.querySelectorAll('.target-card-link');
 
-            if (isEditing) {
-                // Was editing, now Save
-                saveMonthlyTargets(monthId, targetsContainer);
-                button.innerHTML = '<i class="fas fa-pencil-alt mr-1"></i> Edit Targets';
-                button.dataset.editing = 'false';
-                button.classList.add('action-button-secondary');
-                textareas.forEach(ta => ta.disabled = true );
-            } else {
-                // Was not editing, now Edit
-                button.innerHTML = '<i class="fas fa-save mr-1"></i> Save Targets';
-                button.dataset.editing = 'true';
-                button.classList.remove('action-button-secondary');
-                textareas.forEach(ta => ta.disabled = false );
-                textareas[0].focus(); 
+    if (isEditing) {
+        // Was editing, now Save
+        saveMonthlyTargets(monthId, targetsContainer);
+        button.innerHTML = '<i class="fas fa-pencil-alt mr-1"></i> Edit Targets';
+        button.dataset.editing = 'false';
+        button.classList.add('action-button-secondary');
+        textareas.forEach(ta => ta.disabled = true );
+        
+        // নতুন: লিঙ্কগুলো আবার সক্রিয় করুন
+        links.forEach(link => { 
+            if (link.dataset.href) { // যদি সেভ করা href থাকে
+                link.setAttribute('href', link.dataset.href); 
             }
-        }
+        });
+
+    } else {
+        // Was not editing, now Edit
+        button.innerHTML = '<i class="fas fa-save mr-1"></i> Save Targets';
+        button.dataset.editing = 'true';
+        button.classList.remove('action-button-secondary');
+        
+        // নতুন: লিঙ্কগুলো নিষ্ক্রিয় করুন
+        links.forEach(link => {
+            link.dataset.href = link.getAttribute('href'); // href টি সেভ করুন
+            link.removeAttribute('href'); // href মুছে ফেলুন
+        });
+        
+        textareas.forEach(ta => ta.disabled = false );
+        textareas[0].focus(); 
+    }
+}
         
         async function saveMonthlyTargets(monthId, targetsContainer) {
              if (!currentUser || !userId) return;
