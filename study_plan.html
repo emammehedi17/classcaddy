@@ -237,6 +237,16 @@
             content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
             border-width: 5px; border-style: solid; border-color: #1e293b transparent transparent transparent;
         }
+		/* --- Style for Highlighted Vocab in Story --- */
+.highlighted-vocab {
+    background-color: #fef3c7; /* amber-100 */
+    color: #b45309; /* amber-700 */
+    font-weight: 600; /* semi-bold */
+    padding: 0.1em 0.3em; /* Small padding */
+    border-radius: 3px; /* Slightly rounded */
+    margin: 0 0.1em; /* Tiny space around the word */
+    display: inline-block; /* Ensures padding is applied correctly */
+}
         .vocab-pair { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
         .vocab-pair .vocab-input { flex-grow: 1; }
 
@@ -1492,16 +1502,71 @@ function attachWeekEventListeners(monthElement, monthId) {
              finally { currentStoryTarget = null; }
          });
          async function readStory(monthId, weekId, dayIndex, rowIndex) {
-             if (!currentUser || !userId) return;
-              try {
-                  const docRef = doc(db, getUserPlansCollectionPath(), monthId); const docSnap = await getDoc(docRef);
-                  if (docSnap.exists()) {
-                      const story = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex]?.story;
-                      if (story) { document.getElementById('story-modal-content').textContent = story; storyModal.style.display = "block"; }
-                      else { showCustomAlert("No story found for this entry."); }
-                  }
-              } catch (error) { console.error("Error reading story:", error); showCustomAlert("Could not load story."); }
-         }
+            if (!currentUser || !userId) return;
+            const storyModalContent = document.getElementById('story-modal-content');
+            storyModalContent.innerHTML = '<p class="text-gray-500 italic">Loading story...</p>'; // Clear previous content and show loading
+            storyModal.style.display = "block"; // Show modal immediately
+
+             try {
+                 const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                 const docSnap = await getDoc(docRef);
+                 if (docSnap.exists()) {
+                     const dayData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex];
+                     const rowData = dayData?.rows?.[rowIndex];
+                     const story = rowData?.story;
+                     const vocabData = rowData?.vocabData; // Get the vocab data for this row
+
+                     if (story) {
+                         let highlightedStory = escapeHtml(story); // Start with escaped story text
+
+                         if (vocabData && vocabData.length > 0) {
+                             // Create a sorted list of vocab words (longer words first to avoid partial matches)
+                             const wordsToHighlight = vocabData
+                                 .map(v => v.word?.trim())
+                                 .filter(Boolean) // Remove empty words
+                                 .sort((a, b) => b.length - a.length); // Sort longest first
+
+                             wordsToHighlight.forEach(word => {
+                                 // Use RegExp for case-insensitive, whole word matching
+                                 // \b ensures word boundaries (prevents matching 'cat' inside 'category')
+                                 // 'gi' flags: global (all occurrences) and case-insensitive
+                                 const regex = new RegExp(`\\b(${escapeRegExp(word)})\\b`, 'gi');
+
+                                 // Replace found words with highlighted span, preserving original casing
+                                 highlightedStory = highlightedStory.replace(regex, (match) => {
+                                     // Check if already inside a span (avoid nested highlighting)
+                                     // This is a basic check; complex HTML might need a more robust parser
+                                     const surroundingChars = highlightedStory.substring(
+                                         Math.max(0, highlightedStory.indexOf(match) - 25),
+                                         highlightedStory.indexOf(match) + match.length + 10
+                                     );
+                                     if (surroundingChars.includes('<span class="highlighted-vocab">')) {
+                                         return match; // Already highlighted (or part of one), skip
+                                     }
+                                     return `<span class="highlighted-vocab">${match}</span>`;
+                                 });
+                             });
+                         }
+                         // Use innerHTML to render the spans
+                         storyModalContent.innerHTML = highlightedStory.replace(/\n/g, '<br>'); // Replace newlines with <br> for display
+
+                     } else {
+                         storyModalContent.textContent = "No story found for this entry.";
+                     }
+                 } else {
+                     storyModalContent.textContent = "Study plan data not found.";
+                 }
+             } catch (error) {
+                 console.error("Error reading or highlighting story:", error);
+                 storyModalContent.textContent = "Could not load or process the story.";
+                 showCustomAlert("Could not load story.");
+             }
+        }
+
+        // Helper function to escape special characters for RegExp
+        function escapeRegExp(string) {
+          return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+        }
 
         // --- Other Utility functions ---
          function calculateWeeklyProgress(weekData) {
