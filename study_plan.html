@@ -1351,8 +1351,19 @@ function attachWeekEventListeners(monthElement, monthId) {
             rowElement.remove(); // Remove from UI
             console.log("Row removed from UI. Saving updated day plan...");
             setSyncStatus("Unsaved changes", "yellow");
-            await saveDayPlan(monthId, weekId, daySection); // Save immediately
-            daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => { tr.dataset.rowIndex = newIdx; tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`; });
+await saveDayPlan(monthId, weekId, daySection); // Save immediately
+
+// --- Keep editing mode after delete ---
+if (!daySection.classList.contains('editing')) {
+    toggleDayEditMode(monthId, weekId, daySection, true);
+}
+
+// Re-index remaining rows
+daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => {
+    tr.dataset.rowIndex = newIdx;
+    tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`;
+});
+
          }
          function confirmDeleteDay(monthId, weekId, daySection) {
              const dayIndex = parseInt(daySection.dataset.dayIndex);
@@ -1495,8 +1506,17 @@ function attachWeekEventListeners(monthElement, monthId) {
                  if (daysArray[dayIndex]?.rows?.[rowIndex]) {
                      daysArray[dayIndex].rows[rowIndex].story = newStory || null;
                      const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
-                     await updateDoc(docRef, updatePayload); console.log("Story saved successfully for row:", rowIndex);
-                     closeModal('edit-story-modal'); setSyncStatus("Synced", "green");
+                     await updateDoc(docRef, updatePayload);
+console.log("Story saved successfully for row:", rowIndex);
+closeModal('edit-story-modal');
+setSyncStatus("Synced", "green");
+
+// --- Keep day editing mode active ---
+const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
+if (daySection && !daySection.classList.contains('editing')) {
+    toggleDayEditMode(monthId, weekId, daySection, true);
+}
+
                  } else { throw new Error("Target row for story not found."); }
              } catch (error) { console.error("Error saving story:", error); showCustomAlert("Error saving story."); setSyncStatus("Error", "red"); }
              finally { currentStoryTarget = null; }
