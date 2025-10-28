@@ -133,6 +133,43 @@
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.05); /* shadow-lg on hover */
 }
 
+/* --- Day Card Color Variations --- */
+/* Define color variables for easier management */
+:root {
+    --day-color-1: #ecfdf5; /* emerald-50 */
+    --day-color-2: #f0f9ff; /* sky-50 */
+    --day-color-3: #fffbeb; /* amber-50 */
+    --day-color-4: #fef2f2; /* red-50 */
+    --day-color-5: #faf5ff; /* purple-50 */
+    --day-color-6: #f5f3ff; /* violet-50 */
+    --day-color-7: #f0fdfa; /* cyan-50 */
+}
+
+/* Apply colors cyclically using :nth-of-type */
+.days-container > .day-section:nth-of-type(7n+1) { background-color: var(--day-color-1); border-left: 4px solid #10b981; /* emerald-500 */ }
+.days-container > .day-section:nth-of-type(7n+2) { background-color: var(--day-color-2); border-left: 4px solid #0ea5e9; /* sky-500 */ }
+.days-container > .day-section:nth-of-type(7n+3) { background-color: var(--day-color-3); border-left: 4px solid #f59e0b; /* amber-500 */ }
+.days-container > .day-section:nth-of-type(7n+4) { background-color: var(--day-color-4); border-left: 4px solid #ef4444; /* red-500 */ }
+.days-container > .day-section:nth-of-type(7n+5) { background-color: var(--day-color-5); border-left: 4px solid #a855f7; /* purple-500 */ }
+.days-container > .day-section:nth-of-type(7n+6) { background-color: var(--day-color-6); border-left: 4px solid #8b5cf6; /* violet-500 */ }
+.days-container > .day-section:nth-of-type(7n+7) { background-color: var(--day-color-7); border-left: 4px solid #06b6d4; /* cyan-500 */ }
+
+/* Ensure hover shadow is still visible */
+.day-section:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.05); /* shadow-lg on hover */
+}
+
+/* Override base background color for day-section */
+.day-section {
+    /* background-color: #ffffff; REMOVE or comment out this line */
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    transition: box-shadow 0.2s ease-out;
+    /* border-left is now added cyclically */
+}
+
 /* Optional: Adjust spacing inside the day card if needed */
 .day-section .flex.justify-between {
     margin-bottom: 1rem; /* mb-4, slightly increased from mb-3 */
