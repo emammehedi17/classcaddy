@@ -1722,7 +1722,7 @@ function attachWeekEventListeners(monthElement, monthId) {
                  document.getElementById('story-textarea').value = existingStory; editStoryModal.style.display = "block";
              } catch (error) { console.error("Error fetching/prepping story:", error); showCustomAlert("Could not open story editor. Please save your day plan first."); setSyncStatus("Error", "red"); }
          }
-         s// Save Story Button - Corrected Logic (Updates DOM only)
+        // Save Story Button - Corrected Logic (Updates DOM only)
         saveStoryBtn.addEventListener('click', () => { // Removed async
             if (!currentStoryTarget) {
                 showCustomAlert("Error: No target row identified for saving story.");
