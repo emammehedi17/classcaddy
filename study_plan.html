@@ -1353,7 +1353,7 @@ function attachWeekEventListeners(monthElement, monthId) {
             setSyncStatus("Unsaved changes", "yellow");
 await saveDayPlan(monthId, weekId, daySection); // Save immediately
 
-// --- Keep editing mode after delete ---
+// --- Keep editing mode active after deleting ---
 if (!daySection.classList.contains('editing')) {
     toggleDayEditMode(monthId, weekId, daySection, true);
 }
@@ -1363,6 +1363,7 @@ daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => {
     tr.dataset.rowIndex = newIdx;
     tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`;
 });
+
 
          }
          function confirmDeleteDay(monthId, weekId, daySection) {
