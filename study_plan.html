@@ -477,16 +477,16 @@
     </div>
 
      <div id="edit-story-modal" class="modal">
-      <div class="modal-content">
-        <span class="modal-close" onclick="closeModal('edit-story-modal')">&times;</span>
-        <h3 class="text-xl font-semibold mb-3 text-emerald-600">Add/Edit Story</h3>
-        <textarea id="story-textarea" rows="6" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-md text-gray-800 placeholder-gray-400 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Write a story using the vocabulary words..."></textarea>
-        <div class="mt-4 flex justify-end gap-3">
-             <button onclick="closeModal('edit-story-modal')" class="action-button action-button-secondary">Cancel</button>
-             <button id="save-story-btn" class="action-button">Save Story</button>
-        </div>
-      </div>
+  <div class="modal-content">
+    <span id="edit-story-modal-close" class="modal-close">&times;</span>
+    <h3 class="text-xl font-semibold mb-3 text-emerald-600">Add/Edit Story</h3>
+    <textarea id="story-textarea" rows="6" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-md text-gray-800 placeholder-gray-400 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Write a story using the vocabulary words..."></textarea>
+    <div class="mt-4 flex justify-end gap-3">
+         <button id="edit-story-modal-cancel" class="action-button action-button-secondary">Cancel</button>
+         <button id="save-story-btn" class="action-button">Save Story</button>
     </div>
+  </div>
+</div>
 
      <div id="confirm-modal" class="modal">
       <div class="modal-content">
@@ -586,8 +586,48 @@
         const confirmModalMessage = document.getElementById('confirm-modal-message');
         const confirmModalConfirmBtn = document.getElementById('confirm-modal-confirm');
         const confirmModalCancelBtn = document.getElementById('confirm-modal-cancel');
+		const editStoryModalCloseBtn = document.getElementById('edit-story-modal-close');
+const editStoryModalCancelBtn = document.getElementById('edit-story-modal-cancel');
+const editStoryModalElement = document.getElementById('edit-story-modal'); // Get the modal itself
 
+// Add Event Listener for the Close Icon (X)
+if (editStoryModalCloseBtn) {
+    editStoryModalCloseBtn.addEventListener('click', () => {
+        closeModal('edit-story-modal');
+    });
+} else {
+    console.error("Could not find edit story modal close button element.");
+}
 
+// Add Event Listener for the Cancel Button
+if (editStoryModalCancelBtn) {
+    editStoryModalCancelBtn.addEventListener('click', () => {
+        closeModal('edit-story-modal');
+    });
+} else {
+    console.error("Could not find edit story modal cancel button element.");
+}
+
+// Keep the existing closeModal function
+window.closeModal = function(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = "none";
+    } else {
+        console.error(`Modal with ID "${modalId}" not found for closing.`);
+    }
+}
+
+// Keep the existing window.onclick for closing modals by clicking outside
+window.onclick = function(event) {
+     if (event.target.classList.contains('modal')) {
+         event.target.style.display = "none";
+     }
+     // Close vocab popups if clicking outside
+     if (!event.target.closest('.vocab-word')) {
+         document.querySelectorAll('.vocab-word.active').forEach(v => v.classList.remove('active'));
+     }
+ }
         let currentUser = null;
         let userId = null;
         let unsubscribePlans = null; // For the list of month buttons
