@@ -964,10 +964,35 @@
         }
 
         function createWeekElement(monthId, weekId, weekData, sectionId) {
-            const daysHtml = weekData?.days?.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('') || '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
-            const totalDays = weekData?.days?.length || 0;
-            const initialProgress = calculateWeeklyProgress(weekData);
-            const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px';
+            let daysHtml = '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>'; // Default message
+            const daysSource = weekData?.days;
+
+            if (daysSource) {
+                if (Array.isArray(daysSource)) {
+                    // --- Handle NEW Array structure ---
+                    if (daysSource.length > 0) {
+                        daysHtml = daysSource.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('');
+                    }
+                } else if (typeof daysSource === 'object' && !Array.isArray(daysSource) && Object.keys(daysSource).length > 0) {
+                    // --- Handle OLD Map/Object structure ---
+                    console.warn(`Detected old Map structure for days in ${monthId}/${weekId}. Converting for display.`);
+                    // Sort keys numerically if they are numbers, otherwise alphabetically
+                    const sortedKeys = Object.keys(daysSource).sort((a, b) => {
+                        const numA = parseInt(a);
+                        const numB = parseInt(b);
+                        if (!isNaN(numA) && !isNaN(numB)) {
+                            return numA - numB;
+                        }
+                        return a.localeCompare(b); // Fallback for non-numeric keys
+                    });
+                     // Generate HTML using the sorted keys, treating the key as the index for compatibility
+                    daysHtml = sortedKeys.map(key => createDayElement(monthId, weekId, parseInt(key), daysSource[key])).join('');
+                }
+            }
+
+            const totalDays = Array.isArray(daysSource) ? (daysSource?.length || 0) : (daysSource ? Object.keys(daysSource).length : 0); // Correctly count days for both types
+            const initialProgress = calculateWeeklyProgress(weekData); // Assumes calculateWeeklyProgress can handle both structures
+            const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px'; // Ensure pageHeader is defined or provide fallback
 
             return `
                 <div id="${sectionId}" class="bg-white/60 border border-gray-200 p-4 rounded-lg shadow week-section" data-week-id="${weekId}">
@@ -986,6 +1011,30 @@
 
         function createDayElement(monthId, weekId, dayIndex, dayData) {
              const tableId = `table-${monthId}-${weekId}-${dayIndex}`;
+             let rowsHtml = '';
+             const rowsSource = dayData?.rows;
+
+             if (rowsSource) {
+                 if (Array.isArray(rowsSource)) {
+                     // --- Handle NEW Array structure ---
+                     rowsHtml = rowsSource.map((rowData, rowIndex) => createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)).join('');
+                 } else if (typeof rowsSource === 'object' && !Array.isArray(rowsSource) && Object.keys(rowsSource).length > 0) {
+                     // --- Handle OLD Map/Object structure ---
+                    console.warn(`Detected old Map structure for rows in ${monthId}/${weekId}/day ${dayData.dayNumber}. Converting for display.`);
+                    // Sort keys numerically if they are numbers, otherwise alphabetically
+                    const sortedKeys = Object.keys(rowsSource).sort((a, b) => {
+                        const numA = parseInt(a);
+                        const numB = parseInt(b);
+                        if (!isNaN(numA) && !isNaN(numB)) {
+                            return numA - numB;
+                        }
+                        return a.localeCompare(b); // Fallback for non-numeric keys
+                    });
+                     // Generate HTML using sorted keys, treating key as rowIndex
+                     rowsHtml = sortedKeys.map(key => createTableRow(monthId, weekId, dayIndex, parseInt(key), rowsSource[key], false)).join('');
+                 }
+             }
+
              return `
                  <div class="day-section" data-day-index="${dayIndex}"> <div class="flex justify-between items-center mb-3">
                          <div class="flex items-center gap-2">
@@ -1004,7 +1053,7 @@
                                  <th scope="col" class="px-3 py-2 w-[10%] md:w-[5%] center-cell completion-perc-header hidden">%</th>
                                  <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell actions-header hidden"></th> </tr>
                          </thead>
-                         <tbody> ${dayData.rows?.map((rowData, rowIndex) => createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)).join('') || ''} </tbody>
+                         <tbody> ${rowsHtml} </tbody>
                      </table>
                      <div class="edit-mode-controls hidden mt-3 flex flex-wrap gap-2 justify-between items-center">
                          <button class="action-button action-button-secondary text-xs add-normal-row-btn"><i class="fas fa-plus mr-1"></i> Add Row</button>
