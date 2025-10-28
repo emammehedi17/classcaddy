@@ -1349,10 +1349,26 @@ function attachWeekEventListeners(monthElement, monthId) {
          }
          async function deleteRow(monthId, weekId, daySection, rowElement, rowIndex) {
             rowElement.remove(); // Remove from UI
-            console.log("Row removed from UI. Saving updated day plan...");
-            setSyncStatus("Unsaved changes", "yellow");
-            await saveDayPlan(monthId, weekId, daySection); // Save immediately
-            daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => { tr.dataset.rowIndex = newIdx; tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`; });
+            console.log("Row removed from UI. Changes will be saved when day plan is saved.");
+            setSyncStatus("Editing...", "blue"); // Keep status as Editing
+
+            // await saveDayPlan(monthId, weekId, daySection); // <-- REMOVED immediate save
+
+            // Re-index remaining rows visually in the DOM
+            daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => {
+                 tr.dataset.rowIndex = newIdx; // Update the data attribute
+                 tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`; // Update the ID
+
+                 // Also update the field paths for Firestore within input/textarea names or data attributes if you use them directly for saving later
+                 tr.querySelectorAll('input, textarea').forEach(input => {
+                     // Example: If you were using names like 'rows[0].subject', update them
+                     const name = input.getAttribute('name');
+                     if (name && name.includes(`rows[${rowIndex}]`)) {
+                          input.setAttribute('name', name.replace(`rows[${rowIndex}]`, `rows[${newIdx}]`));
+                     }
+                     // Add similar logic if you store paths in data attributes
+                 });
+             });
          }
          function confirmDeleteDay(monthId, weekId, daySection) {
              const dayIndex = parseInt(daySection.dataset.dayIndex);
@@ -1483,23 +1499,30 @@ function attachWeekEventListeners(monthElement, monthId) {
              } catch (error) { console.error("Error fetching/prepping story:", error); showCustomAlert("Could not open story editor. Please save your day plan first."); setSyncStatus("Error", "red"); }
          }
          saveStoryBtn.addEventListener('click', async () => {
-             if (!currentUser || !userId || !currentStoryTarget) return;
-             const { monthId, weekId, dayIndex, rowIndex } = currentStoryTarget;
-             if (rowIndex === -1) { showCustomAlert("Error: No associated vocabulary row found."); return; }
-             const newStory = document.getElementById('story-textarea').value.trim();
-             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-             setSyncStatus("Syncing...", "yellow");
-             try {
-                 const docSnap = await getDoc(docRef); if (!docSnap.exists()) throw new Error("Month document not found.");
-                 let monthData = docSnap.data(); let daysArray = monthData.weeks?.[weekId]?.days || [];
-                 if (daysArray[dayIndex]?.rows?.[rowIndex]) {
-                     daysArray[dayIndex].rows[rowIndex].story = newStory || null;
-                     const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
-                     await updateDoc(docRef, updatePayload); console.log("Story saved successfully for row:", rowIndex);
-                     closeModal('edit-story-modal'); setSyncStatus("Synced", "green");
-                 } else { throw new Error("Target row for story not found."); }
-             } catch (error) { console.error("Error saving story:", error); showCustomAlert("Error saving story."); setSyncStatus("Error", "red"); }
-             finally { currentStoryTarget = null; }
+            if (!currentUser || !userId || !currentStoryTarget) return;
+            const { monthId, weekId, dayIndex, rowIndex } = currentStoryTarget;
+            if (rowIndex === -1) { showCustomAlert("Error: No associated vocabulary row found."); return; }
+            const newStory = document.getElementById('story-textarea').value.trim();
+            const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+            setSyncStatus("Syncing...", "yellow");
+            try {
+                // Construct the specific field path to update only the story
+                const storyFieldPath = `weeks.${weekId}.days.${dayIndex}.rows.${rowIndex}.story`;
+                const updatePayload = { [storyFieldPath]: newStory || null }; // Use null if story is empty
+
+                await updateDoc(docRef, updatePayload); // Update only the story field in Firestore
+                console.log("Story saved successfully for row:", rowIndex);
+                closeModal('edit-story-modal'); // Close modal
+                // No setSyncStatus here, keep it as "Editing..." or let the main save handle it.
+                // NOTE: The visual change (like adding the 'Read Story' button) won't appear until you SAVE the day.
+                // Or, optionally, find the row in the DOM and manually update its story state if needed immediately.
+            } catch (error) {
+                console.error("Error saving story:", error);
+                showCustomAlert("Error saving story.");
+                setSyncStatus("Error", "red"); // Show error if save fails
+            }
+            // Do NOT reset currentStoryTarget here, keep it in case needed again before saving day
+            // finally { currentStoryTarget = null; } // Removed this line
          });
          async function readStory(monthId, weekId, dayIndex, rowIndex) {
             if (!currentUser || !userId) return;
