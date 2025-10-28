@@ -477,16 +477,16 @@
     </div>
 
      <div id="edit-story-modal" class="modal">
-  <div class="modal-content">
-    <span id="edit-story-modal-close" class="modal-close">&times;</span>
-    <h3 class="text-xl font-semibold mb-3 text-emerald-600">Add/Edit Story</h3>
-    <textarea id="story-textarea" rows="6" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-md text-gray-800 placeholder-gray-400 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Write a story using the vocabulary words..."></textarea>
-    <div class="mt-4 flex justify-end gap-3">
-         <button id="edit-story-modal-cancel" class="action-button action-button-secondary">Cancel</button>
-         <button id="save-story-btn" class="action-button">Save Story</button>
+      <div class="modal-content">
+        <span class="modal-close" onclick="closeModal('edit-story-modal')">&times;</span>
+        <h3 class="text-xl font-semibold mb-3 text-emerald-600">Add/Edit Story</h3>
+        <textarea id="story-textarea" rows="6" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-md text-gray-800 placeholder-gray-400 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Write a story using the vocabulary words..."></textarea>
+        <div class="mt-4 flex justify-end gap-3">
+             <button onclick="closeModal('edit-story-modal')" class="action-button action-button-secondary">Cancel</button>
+             <button id="save-story-btn" class="action-button">Save Story</button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
      <div id="confirm-modal" class="modal">
       <div class="modal-content">
@@ -586,55 +586,14 @@
         const confirmModalMessage = document.getElementById('confirm-modal-message');
         const confirmModalConfirmBtn = document.getElementById('confirm-modal-confirm');
         const confirmModalCancelBtn = document.getElementById('confirm-modal-cancel');
-		const editStoryModalCloseBtn = document.getElementById('edit-story-modal-close');
-const editStoryModalCancelBtn = document.getElementById('edit-story-modal-cancel');
-const editStoryModalElement = document.getElementById('edit-story-modal'); // Get the modal itself
 
-// Add Event Listener for the Close Icon (X)
-if (editStoryModalCloseBtn) {
-    editStoryModalCloseBtn.addEventListener('click', () => {
-        closeModal('edit-story-modal');
-    });
-} else {
-    console.error("Could not find edit story modal close button element.");
-}
 
-// Add Event Listener for the Cancel Button
-if (editStoryModalCancelBtn) {
-    editStoryModalCancelBtn.addEventListener('click', () => {
-        closeModal('edit-story-modal');
-    });
-} else {
-    console.error("Could not find edit story modal cancel button element.");
-}
-
-// Keep the existing closeModal function
-window.closeModal = function(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = "none";
-    } else {
-        console.error(`Modal with ID "${modalId}" not found for closing.`);
-    }
-}
-
-// Keep the existing window.onclick for closing modals by clicking outside
-window.onclick = function(event) {
-     if (event.target.classList.contains('modal')) {
-         event.target.style.display = "none";
-     }
-     // Close vocab popups if clicking outside
-     if (!event.target.closest('.vocab-word')) {
-         document.querySelectorAll('.vocab-word.active').forEach(v => v.classList.remove('active'));
-     }
- }
         let currentUser = null;
         let userId = null;
         let unsubscribePlans = null; // For the list of month buttons
         let unsubscribeActiveMonth = null; // For the currently displayed month
         let currentStoryTarget = null;
         let currentConfirmAction = null;
-		let editingDayInfo = { monthId: null, weekId: null, dayIndex: null };
 
 
         // --- Header Navigation & Scroll Logic (from script.js) ---
@@ -874,31 +833,14 @@ window.onclick = function(event) {
              const docRef = doc(db, getUserPlansCollectionPath(), monthId);
              try {
                  // Listen for real-time updates ONLY on the selected month
-                 // Listen for real-time updates ONLY on the selected month
                  unsubscribeActiveMonth = onSnapshot(docRef, (docSnap) => {
                      // Check if this is still the active month before re-rendering
                      const activeBtn = monthNavButtonsContainer.querySelector('button.active-month');
                      if (!activeBtn || activeBtn.dataset.monthId !== monthId) {
                          console.log("Snapshot received for non-active month. Ignoring render.");
-                         if (unsubscribeActiveMonth) {
-                             unsubscribeActiveMonth(); // Stop listening if month changed
-                             unsubscribeActiveMonth = null; // Clear reference
-                         }
+                         if (unsubscribeActiveMonth) unsubscribeActiveMonth(); // Stop listening
                          return;
                      }
-
-                     // --- Store editing state BEFORE re-rendering ---
-                     let wasEditing = false;
-                     let editingWeekId = null;
-                     let editingDayIndex = null;
-                     // Use the global editingDayInfo variable correctly
-                     if (editingDayInfo.monthId === monthId && editingDayInfo.weekId !== null && editingDayInfo.dayIndex !== null) {
-                         wasEditing = true;
-                         editingWeekId = editingDayInfo.weekId;
-                         editingDayIndex = editingDayInfo.dayIndex;
-                         console.log(`Snapshot update received while editing ${monthId}/${editingWeekId}/Day ${editingDayIndex + 1}. Will restore state.`);
-                     }
-                     // --- End Store editing state ---
 
                      // Save scroll position
                      let scrollY = window.scrollY;
@@ -908,48 +850,19 @@ window.onclick = function(event) {
 
 
                      if (docSnap.exists()) {
-                         currentMonthPlanDisplay.innerHTML = ''; // Clear previous display
-                         const monthElement = createMonthElement(monthId, docSnap.data()); // Redraw month
-                         currentMonthPlanDisplay.appendChild(monthElement);
-
-                         // --- Restore editing state AFTER re-rendering ---
-                         if (wasEditing && editingWeekId !== null && editingDayIndex !== null) {
-                             // Find the newly rendered day section within the redrawn monthElement
-                             const newlyRenderedDaySection = monthElement.querySelector(`.week-section[data-week-id="${editingWeekId}"] .day-section[data-day-index="${editingDayIndex}"]`);
-                             if (newlyRenderedDaySection) {
-                                 console.log(`Restoring edit mode UI for ${monthId}/${editingWeekId}/Day ${editingDayIndex + 1}`);
-                                 // Call toggleDayEditMode to restore UI state, passing restoringState = true
-                                 toggleDayEditMode(monthId, editingWeekId, newlyRenderedDaySection, true, true); // Enter edit mode, restoring state
-                             } else {
-                                 console.error("Could not find the day section to restore edit mode after snapshot update.");
-                                 // Clear tracked state if element unexpectedly not found
-                                 editingDayInfo = { monthId: null, weekId: null, dayIndex: null };
-                             }
-                         }
-                         // --- End Restore editing state ---
-
+                         currentMonthPlanDisplay.innerHTML = '';
+                         currentMonthPlanDisplay.appendChild(createMonthElement(monthId, docSnap.data()));
                      } else {
                          console.error("Document for monthId not found (or deleted):", monthId);
                          currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">This plan was not found (it may have been deleted).</p>';
-                         // Clear tracked state if doc deleted
-                         editingDayInfo = { monthId: null, weekId: null, dayIndex: null };
                      }
 
                      // Restore scroll position
                      if (shouldRestoreScroll) {
-                        console.log("Restoring scroll position to (displayMonthPlan - onSnapshot):", scrollY);
+                        console.log("Restoring scroll position to (displayMonthPlan):", scrollY);
                         window.scrollTo({ top: scrollY, behavior: 'auto' });
                      }
-                 }, (error) => { // Add error handling for the snapshot listener itself
-                      console.error("Error in onSnapshot listener for month:", monthId, error);
-                      currentMonthPlanDisplay.innerHTML = `<p class="text-red-500 text-center">Error listening for updates for ${monthId}. Please refresh.</p>`;
-                      // Clear tracked state on listener error
-                      editingDayInfo = { monthId: null, weekId: null, dayIndex: null };
-                      if (unsubscribeActiveMonth) {
-                         unsubscribeActiveMonth();
-                         unsubscribeActiveMonth = null;
-                      }
-                 }); // End of corrected onSnapshot listener
+                 });
              } catch (error) {
                  console.error("Error fetching specific month plan:", error);
                  currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">Error loading this month\'s plan.</p>';
@@ -1051,35 +964,10 @@ window.onclick = function(event) {
         }
 
         function createWeekElement(monthId, weekId, weekData, sectionId) {
-            let daysHtml = '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>'; // Default message
-            const daysSource = weekData?.days;
-
-            if (daysSource) {
-                if (Array.isArray(daysSource)) {
-                    // --- Handle NEW Array structure ---
-                    if (daysSource.length > 0) {
-                        daysHtml = daysSource.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('');
-                    }
-                } else if (typeof daysSource === 'object' && !Array.isArray(daysSource) && Object.keys(daysSource).length > 0) {
-                    // --- Handle OLD Map/Object structure ---
-                    console.warn(`Detected old Map structure for days in ${monthId}/${weekId}. Converting for display.`);
-                    // Sort keys numerically if they are numbers, otherwise alphabetically
-                    const sortedKeys = Object.keys(daysSource).sort((a, b) => {
-                        const numA = parseInt(a);
-                        const numB = parseInt(b);
-                        if (!isNaN(numA) && !isNaN(numB)) {
-                            return numA - numB;
-                        }
-                        return a.localeCompare(b); // Fallback for non-numeric keys
-                    });
-                     // Generate HTML using the sorted keys, treating the key as the index for compatibility
-                    daysHtml = sortedKeys.map(key => createDayElement(monthId, weekId, parseInt(key), daysSource[key])).join('');
-                }
-            }
-
-            const totalDays = Array.isArray(daysSource) ? (daysSource?.length || 0) : (daysSource ? Object.keys(daysSource).length : 0); // Correctly count days for both types
-            const initialProgress = calculateWeeklyProgress(weekData); // Assumes calculateWeeklyProgress can handle both structures
-            const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px'; // Ensure pageHeader is defined or provide fallback
+            const daysHtml = weekData?.days?.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('') || '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
+            const totalDays = weekData?.days?.length || 0;
+            const initialProgress = calculateWeeklyProgress(weekData);
+            const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px';
 
             return `
                 <div id="${sectionId}" class="bg-white/60 border border-gray-200 p-4 rounded-lg shadow week-section" data-week-id="${weekId}">
@@ -1098,30 +986,6 @@ window.onclick = function(event) {
 
         function createDayElement(monthId, weekId, dayIndex, dayData) {
              const tableId = `table-${monthId}-${weekId}-${dayIndex}`;
-             let rowsHtml = '';
-             const rowsSource = dayData?.rows;
-
-             if (rowsSource) {
-                 if (Array.isArray(rowsSource)) {
-                     // --- Handle NEW Array structure ---
-                     rowsHtml = rowsSource.map((rowData, rowIndex) => createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)).join('');
-                 } else if (typeof rowsSource === 'object' && !Array.isArray(rowsSource) && Object.keys(rowsSource).length > 0) {
-                     // --- Handle OLD Map/Object structure ---
-                    console.warn(`Detected old Map structure for rows in ${monthId}/${weekId}/day ${dayData.dayNumber}. Converting for display.`);
-                    // Sort keys numerically if they are numbers, otherwise alphabetically
-                    const sortedKeys = Object.keys(rowsSource).sort((a, b) => {
-                        const numA = parseInt(a);
-                        const numB = parseInt(b);
-                        if (!isNaN(numA) && !isNaN(numB)) {
-                            return numA - numB;
-                        }
-                        return a.localeCompare(b); // Fallback for non-numeric keys
-                    });
-                     // Generate HTML using sorted keys, treating key as rowIndex
-                     rowsHtml = sortedKeys.map(key => createTableRow(monthId, weekId, dayIndex, parseInt(key), rowsSource[key], false)).join('');
-                 }
-             }
-
              return `
                  <div class="day-section" data-day-index="${dayIndex}"> <div class="flex justify-between items-center mb-3">
                          <div class="flex items-center gap-2">
@@ -1140,7 +1004,7 @@ window.onclick = function(event) {
                                  <th scope="col" class="px-3 py-2 w-[10%] md:w-[5%] center-cell completion-perc-header hidden">%</th>
                                  <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell actions-header hidden"></th> </tr>
                          </thead>
-                         <tbody> ${rowsHtml} </tbody>
+                         <tbody> ${dayData.rows?.map((rowData, rowIndex) => createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)).join('') || ''} </tbody>
                      </table>
                      <div class="edit-mode-controls hidden mt-3 flex flex-wrap gap-2 justify-between items-center">
                          <button class="action-button action-button-secondary text-xs add-normal-row-btn"><i class="fas fa-plus mr-1"></i> Add Row</button>
@@ -1317,271 +1181,138 @@ function attachWeekEventListeners(monthElement, monthId) {
 
 
         // Toggle Edit Mode - Updated for Button Swap
-        // Toggle Edit Mode - Updated for Button Swap & State Restoration
-        async function toggleDayEditMode(monthId, weekId, daySection, enterEditMode, restoringState = false) {
+        async function toggleDayEditMode(monthId, weekId, daySection, enterEditMode) {
              const dayIndex = parseInt(daySection.dataset.dayIndex);
              const tableBody = daySection.querySelector('tbody');
              const editButton = daySection.querySelector('.edit-day-btn'); // Top right button
-             // const saveButton = daySection.querySelector('.save-day-btn'); // Bottom button (part of controls)
+             const saveButton = daySection.querySelector('.save-day-btn'); // Bottom button
              const editModeControls = daySection.querySelector('.edit-mode-controls');
              const deleteDayButton = daySection.querySelector('.delete-day-btn');
              const actionsHeader = daySection.querySelector('.actions-header');
              const completionPercHeader = daySection.querySelector('.completion-perc-header');
 
-             // Set sync status only if not just restoring state
-             if (!restoringState) {
-                 setSyncStatus("Syncing...", "yellow");
-             }
+             setSyncStatus("Syncing...", "yellow");
 
              if (enterEditMode) {
                  // --- ENTERING EDIT MODE ---
-                 console.log(`Entering edit mode for ${monthId}/${weekId}/Day ${dayIndex + 1}`);
-                 editingDayInfo = { monthId, weekId, dayIndex }; // <-- Track editing state
-
                  daySection.classList.add('editing');
                  editButton.classList.add('hidden'); // Hide Edit button
                  editModeControls.classList.remove('hidden'); // Show controls (including Save)
+                 // saveButton is already visible because editModeControls is shown
                  deleteDayButton.classList.remove('hidden');
                  actionsHeader.classList.remove('hidden');
                  completionPercHeader.classList.remove('hidden');
 
-                 // Only fetch and re-render rows if NOT just restoring state after snapshot
-                 if (!restoringState) {
-                     try {
-                         const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
-                         const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
-                         if (!dayData) { throw new Error("Could not find day data to edit."); }
+                 const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
+                 const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
+                 if (!dayData) { console.error("Could not find day data to edit."); setSyncStatus("Error", "red"); return; }
 
-                         tableBody.innerHTML = (dayData.rows || []).map((rowData, rowIndex) => // Handle potentially undefined rows
-                            createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, true) // Render in edit mode
-                         ).join('');
-                         setSyncStatus("Editing...", "blue");
-                     } catch (error) {
-                         console.error("Error fetching day data for edit:", error);
-                         showCustomAlert("Error preparing edit mode.");
-                         setSyncStatus("Error", "red");
-                         // Optionally revert UI changes if fetch failed
-                         editingDayInfo = { monthId: null, weekId: null, dayIndex: null };
-                         daySection.classList.remove('editing');
-                         editButton.classList.remove('hidden');
-                         editModeControls.classList.add('hidden');
-                         deleteDayButton.classList.add('hidden');
-                         actionsHeader.classList.add('hidden');
-                         completionPercHeader.classList.add('hidden');
-                         return; // Stop further execution
-                     }
-                 } else {
-                     // If restoring state, assume rows are already correctly rendered by snapshot
-                     // Just ensure controls are visible and correct classes applied
-                     console.log(`Restored edit mode UI for ${monthId}/${weekId}/Day ${dayIndex + 1}`);
-                     setSyncStatus("Editing...", "blue"); // Set status correctly
-                 }
-                 // Disable checkboxes in edit mode (do this regardless of restoringState)
+                 tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
+                    createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, true) // Render in edit mode
+                 ).join('');
                  daySection.querySelectorAll('.completion-checkbox').forEach(cb => cb.disabled = true);
+                 setSyncStatus("Editing...", "blue");
 
              } else {
                  // --- SAVING AND EXITING EDIT MODE ---
-                 console.log(`Exiting edit mode for ${monthId}/${weekId}/Day ${dayIndex + 1}`);
-                 editingDayInfo = { monthId: null, weekId: null, dayIndex: null }; // <-- Clear editing state
-
-                 // Save first (only if not just restoring state which failed)
-                 if (!restoringState) { // Avoid saving if we are trying to exit because entering failed
-                     await saveDayPlan(monthId, weekId, daySection);
-                 }
+                 await saveDayPlan(monthId, weekId, daySection); // Save first
 
                  daySection.classList.remove('editing');
                  editButton.classList.remove('hidden'); // Show Edit button
                  editModeControls.classList.add('hidden'); // Hide controls (including Save)
+                 // saveButton is hidden because editModeControls is hidden
                  deleteDayButton.classList.add('hidden');
                  actionsHeader.classList.add('hidden');
                  completionPercHeader.classList.add('hidden');
 
-                 // Re-render rows in normal mode (only if save was likely successful)
-                 // The onSnapshot listener will handle the re-render naturally after saveDayPlan completes and Firestore updates
-                 // We don't necessarily need to force a re-render here immediately unless saveDayPlan failed.
-                 // If saveDayPlan succeeded, onSnapshot should trigger soon.
-                 if (syncStatusText.textContent !== "Error") {
-                      // Optionally clear table body and show a temporary "Loading..." if snapshot takes time
-                      // tableBody.innerHTML = '<tr><td colspan="6" class="text-center italic text-gray-400 py-3">Loading saved view...</td></tr>';
-                 } else {
-                     // If saving failed, maybe don't clear the edit view immediately? Or try to revert?
-                     // For now, let's assume the user will see the error and might try saving again or reload.
+                 // Re-render rows in normal mode
+                 try {
+                     const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
+                     const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
+
+                     if (!dayData) { tableBody.innerHTML = ''; }
+                     else {
+                         tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
+                            createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false) // Render non-edit mode
+                         ).join('');
+                     }
+
+                     updateWeeklyProgressUI(monthId, weekId);
+                     setSyncStatus("Synced", "green");
+                 } catch (renderError) {
+                     console.error("Error re-rendering day after save:", renderError);
+                     setSyncStatus("Error", "red");
                  }
-                 // Enable checkboxes again (will happen on re-render, but good practice)
-                 daySection.querySelectorAll('.completion-checkbox').forEach(cb => cb.disabled = false);
              }
         }
 
         // Save Day Plan
-        // --- Inside the <script type="module"> block ---
+        async function saveDayPlan(monthId, weekId, daySection) {
+            if (!currentUser || !userId) return;
+            const dayIndex = parseInt(daySection.dataset.dayIndex);
+            console.log(`Saving day plan for ${monthId}, ${weekId}, Day Index: ${dayIndex}`);
+            setSyncStatus("Syncing...", "yellow");
 
-// Replace the ENTIRE existing saveDayPlan function with this one:
-async function saveDayPlan(monthId, weekId, daySection) {
-    if (!currentUser || !userId) {
-        console.error("Save attempt failed: No user logged in.");
-        return; // Exit if not logged in
-    }
-    const dayIndex = parseInt(daySection.dataset.dayIndex);
-    console.log(`--- Starting saveDayPlan for ${monthId}/${weekId}/Day Index ${dayIndex} ---`);
-    setSyncStatus("Syncing...", "yellow");
+            const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+            try {
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
 
-    const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                let monthData = docSnap.data();
+                let daysArray = monthData.weeks?.[weekId]?.days || [];
+                const currentDayData = daysArray[dayIndex];
+                 if (!currentDayData) throw new Error(`Day data for index ${dayIndex} not found in Firestore.`);
 
-    try {
-        // It's crucial to get the LATEST data right before updating
-        // to correctly fetch existing stories if needed and handle potential concurrent edits (though full handling is complex)
-        const docSnap = await getDoc(docRef);
-        if (!docSnap.exists()) {
-            throw new Error(`Month document "${monthId}" not found.`);
-        }
+                const updatedRows = [];
+                const rowElements = daySection.querySelectorAll('tbody tr');
 
-        let monthData = docSnap.data();
-        // Ensure the path to the days array exists, create if not (should generally exist)
-        if (!monthData.weeks) monthData.weeks = {};
-        if (!monthData.weeks[weekId]) monthData.weeks[weekId] = { days: [] };
-        if (!monthData.weeks[weekId].days) monthData.weeks[weekId].days = [];
+                rowElements.forEach((row) => {
+                    let existingRowIndex = parseInt(row.dataset.rowIndex);
+                    const existingRowData = !isNaN(existingRowIndex) && currentDayData.rows?.[existingRowIndex] ? currentDayData.rows[existingRowIndex] : {};
 
-        let daysArray = monthData.weeks[weekId].days;
-        const currentDayData = daysArray[dayIndex]; // Get original day data for reference (e.g., existing story)
+                    let subject, topic, comment, completed, completionPercentage, vocabData = null, story;
 
-        // Ensure currentDayData exists before proceeding
-        if (!currentDayData) {
-             console.warn(`Day data at index ${dayIndex} seems missing in Firestore for ${monthId}/${weekId}. Saving might create it if rows are found.`);
-             // If day data is missing, we might need to create a default structure, but let's see if rows exist first.
-        }
+                    if (daySection.classList.contains('editing')) {
+                         subject = row.querySelector('.subject-input')?.value.trim() || '';
+                         comment = row.querySelector('.comment-input')?.value.trim() || '';
+                         completed = existingRowData.completed || false;
+                         const percInput = row.querySelector('.completion-perc-input')?.value;
+                         completionPercentage = parsePercentage(percInput);
+                         story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
 
-        const updatedRows = [];
-        const rowElements = daySection.querySelectorAll('tbody tr'); // Get all table rows in the section being edited
-        console.log(`Found ${rowElements.length} row elements in the DOM for Day Index ${dayIndex}.`);
-
-        rowElements.forEach((row, currentDomIndex) => {
-            const rowIndexInDataAttribute = parseInt(row.dataset.rowIndex); // Index from data attribute (might differ if rows were deleted)
-            const isVocab = row.classList.contains('vocab-row');
-            console.log(`Processing DOM row ${currentDomIndex} (data-row-index: ${rowIndexInDataAttribute}) | isVocab: ${isVocab}`);
-
-            // --- Read data directly from DOM inputs ---
-            const subjectInput = row.querySelector('.subject-input');
-            const topicInput = row.querySelector('.topic-input'); // Textarea for normal rows
-            const commentInput = row.querySelector('.comment-input'); // Textarea
-            const checkbox = row.querySelector('.completion-checkbox');
-            const percInput = row.querySelector('.completion-perc-input');
-
-            // Safely get values, defaulting to empty strings if elements aren't found (shouldn't happen in edit mode)
-            let subject = subjectInput?.value.trim() ?? '';
-            let comment = commentInput?.value.trim() ?? '';
-            // IMPORTANT: Read the 'checked' state from the checkbox. Since it's disabled in edit mode,
-            // this *should* reflect the state it had *before* entering edit mode OR the state set by default for new rows.
-            // If the user *could* check/uncheck in edit mode, we'd read it here.
-            let completed = checkbox?.checked ?? false;
-            let completionPercentage = parsePercentage(percInput?.value);
-
-            let vocabData = null;
-            let topic = null;
-            let story = null;
-
-            if (isVocab) {
-                subject = 'Vocabulary'; // Ensure subject is correct
-                topic = null; // No separate topic for vocab rows
-                vocabData = [];
-                row.querySelectorAll('.vocab-pair').forEach(pairEl => {
-                    const wordInput = pairEl.querySelector('.vocab-word-input');
-                    const meaningInput = pairEl.querySelector('.vocab-meaning-input');
-                    const word = wordInput?.value.trim();
-                    const meaning = meaningInput?.value.trim();
-                    if (word) { // Only add if there's a word
-                        vocabData.push({ word: word, meaning: meaning || '' });
-                    } else {
-                        console.log(`Skipping empty vocab pair in row index ${rowIndexInDataAttribute}.`);
-                    }
+                         if (row.classList.contains('vocab-row')) {
+                             subject = 'Vocabulary';
+                             vocabData = [];
+                             row.querySelectorAll('.vocab-pair').forEach(pairEl => {
+                                 const word = pairEl.querySelector('.vocab-word-input')?.value.trim();
+                                 const meaning = pairEl.querySelector('.vocab-meaning-input')?.value.trim();
+                                 if (word) { vocabData.push({ word: word, meaning: meaning || '' }); }
+                             });
+                             topic = null;
+                         } else {
+                             topic = row.querySelector('.topic-input')?.value.trim() || '';
+                             vocabData = null;
+                         }
+                    } else { // Handle saving checkbox clicks in normal mode
+                         completed = row.querySelector('.completion-checkbox')?.checked || false;
+                         subject = existingRowData.subject; topic = existingRowData.topic; comment = existingRowData.comment;
+                         completionPercentage = existingRowData.completionPercentage; vocabData = existingRowData.vocabData; story = existingRowData.story;
+                     }
+                     updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null });
                 });
-                console.log(`Read vocabData for row index ${rowIndexInDataAttribute}:`, JSON.stringify(vocabData));
 
-                // Story Handling: Prioritize pending story from DOM attribute, else use existing from Firestore data
-                if (row.dataset.pendingStory !== undefined) {
-                    story = row.dataset.pendingStory.trim() || null; // Use pending story, allow empty string to clear
-                    console.log(`Using PENDING story for row index ${rowIndexInDataAttribute}.`);
-                    // delete row.dataset.pendingStory; // Don't delete yet, wait for successful save
-                } else if (currentDayData?.rows && currentDayData.rows[rowIndexInDataAttribute]) {
-                    // Use story from the data we fetched from Firestore *before* reading the DOM
-                    story = currentDayData.rows[rowIndexInDataAttribute].story || null;
-                    console.log(`Using EXISTING story for row index ${rowIndexInDataAttribute}.`);
-                } else {
-                    console.log(`No pending or existing story found for row index ${rowIndexInDataAttribute}.`);
-                    story = null;
-                }
+                 daysArray[dayIndex].rows = updatedRows;
+                const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
+                await updateDoc(docRef, updatePayload);
+                console.log(`Day ${dayIndex + 1} for ${weekId} saved successfully.`);
+                setSyncStatus("Synced", "green");
 
-            } else { // Normal row
-                topic = topicInput?.value.trim() ?? '';
-                vocabData = null; // Ensure vocabData is null
-                story = null; // Ensure story is null
-                console.log(`Read topic for row index ${rowIndexInDataAttribute}: "${topic}"`);
+            } catch (error) {
+                console.error("Error saving day plan:", error);
+                showCustomAlert("Error saving changes. Please check your connection and try again.");
+                setSyncStatus("Error", "red");
             }
-
-            console.log(`Read for row index ${rowIndexInDataAttribute}: Subject="${subject}", Comment="${comment}", Completed=${completed}, Perc=${completionPercentage}`);
-
-            // Construct the row object for saving
-            const rowToSave = {
-                subject: subject || '',
-                topic: topic, // Will be null for vocab
-                comment: comment || '',
-                completed: completed || false,
-                completionPercentage: completionPercentage ?? null, // Use null if parsing failed
-                vocabData: vocabData, // Will be null for normal
-                story: story // Save the determined story
-            };
-            updatedRows.push(rowToSave);
-            console.log(`Prepared rowToSave for index ${rowIndexInDataAttribute}:`, JSON.stringify(rowToSave));
-
-        }); // End rowElements.forEach
-
-        console.log(`Total updated rows prepared: ${updatedRows.length}`);
-
-        // Ensure the day object exists in the array before assigning rows
-        if (!daysArray[dayIndex]) {
-             console.log(`Creating day object structure at index ${dayIndex} as it was missing.`);
-             // Create a basic day structure; assuming dayNumber should be index + 1
-             daysArray[dayIndex] = { dayNumber: dayIndex + 1, date: '', rows: [] };
         }
-
-        // Update the rows for the specific day
-        daysArray[dayIndex].rows = updatedRows;
-
-        // Re-number days in case some were deleted during edit (optional but good practice)
-        // for (let i = 0; i < daysArray.length; i++) {
-        //     if(daysArray[i]) daysArray[i].dayNumber = i + 1;
-        // }
-
-        const updatePayload = {
-            [`weeks.${weekId}.days`]: daysArray // Update the entire days array for the week
-        };
-
-        console.log("--- Preparing to update Firestore with payload for path:", `weeks.${weekId}.days`);
-        // console.log("Update Payload:", JSON.stringify(updatePayload, null, 2)); // Be careful logging large data
-
-        await updateDoc(docRef, updatePayload); // Perform the update
-
-        console.log(`--- Day ${dayIndex + 1} for ${weekId}/${monthId} saved successfully to Firestore. ---`);
-
-        // Now that save is successful, clear pending story attributes
-        daySection.querySelectorAll('tbody tr[data-pending-story]').forEach(row => {
-            delete row.dataset.pendingStory;
-        });
-        // Also clear visual cues
-        const addStoryBtn = daySection.querySelector('.add-story-btn');
-        if (addStoryBtn && addStoryBtn.textContent.includes('*')) {
-            addStoryBtn.innerHTML = '<i class="fas fa-feather-alt mr-1"></i> Add/Edit Story';
-        }
-
-
-        setSyncStatus("Synced", "green");
-
-    } catch (error) {
-        console.error("Error in saveDayPlan:", error);
-        showCustomAlert(`Error saving changes for Day ${dayIndex + 1}. Details: ${error.message}`);
-        setSyncStatus("Error", "red");
-        // Optionally, re-enable edit mode or provide other recovery options
-    }
-}
 
          // Add Row (normal or vocab)
         function addRowToDay(monthId, weekId, daySection, type = 'normal') {
@@ -1618,43 +1349,10 @@ async function saveDayPlan(monthId, weekId, daySection) {
          }
          async function deleteRow(monthId, weekId, daySection, rowElement, rowIndex) {
             rowElement.remove(); // Remove from UI
-            console.log("Row removed from UI. Changes will be saved when day plan is saved.");
-            setSyncStatus("Editing...", "blue"); // Keep status as Editing
-
-            // await saveDayPlan(monthId, weekId, daySection); // <-- REMOVED immediate save
-
-            // Re-index remaining rows visually in the DOM
-            daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => {
-                 tr.dataset.rowIndex = newIdx; // Update the data attribute
-                 tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`; // Update the ID
-
-                 // Also update the field paths for Firestore within input/textarea names or data attributes if you use them directly for saving later
-                 tr.querySelectorAll('input, textarea').forEach(input => {
-                     // Example: If you were using names like 'rows[0].subject', update them
-                     const name = input.getAttribute('name');
-                     // Find the original index in the name attribute using regex to handle multi-digit indices
-                     const match = name ? name.match(/rows\[(\d+)\]/) : null;
-                     if (match) {
-                         const originalIndex = parseInt(match[1]);
-                         // Only update if the original index needs re-indexing (i.e., it was after the deleted row)
-                         if (originalIndex > rowIndex) {
-                             // Correctly replace the old index number with the new index number
-                             input.setAttribute('name', name.replace(`rows[${originalIndex}]`, `rows[${originalIndex - 1}]`));
-                         } else if (originalIndex === rowIndex) {
-                            // Although the row is removed, inputs might still linger briefly; ensure they don't cause issues
-                            // Or handle this by ensuring all event listeners are removed with the row
-                         }
-                     }
-                     // Add similar logic if you store paths in data attributes
-                 });
-                  // Re-index vocab pairs within remaining vocab rows if necessary
-                 if (tr.classList.contains('vocab-row')) {
-                     tr.querySelectorAll('.vocab-pair').forEach((pair, pairIdx) => {
-                         pair.dataset.pairIndex = pairIdx;
-                         // Update input names/data attributes within the pair if needed
-                     });
-                 }
-             });
+            console.log("Row removed from UI. Saving updated day plan...");
+            setSyncStatus("Unsaved changes", "yellow");
+            await saveDayPlan(monthId, weekId, daySection); // Save immediately
+            daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => { tr.dataset.rowIndex = newIdx; tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`; });
          }
          function confirmDeleteDay(monthId, weekId, daySection) {
              const dayIndex = parseInt(daySection.dataset.dayIndex);
@@ -1784,41 +1482,25 @@ async function saveDayPlan(monthId, weekId, daySection) {
                  document.getElementById('story-textarea').value = existingStory; editStoryModal.style.display = "block";
              } catch (error) { console.error("Error fetching/prepping story:", error); showCustomAlert("Could not open story editor. Please save your day plan first."); setSyncStatus("Error", "red"); }
          }
-        // Save Story Button - Corrected Logic (Updates DOM only)
-        saveStoryBtn.addEventListener('click', () => { // Removed async
-            if (!currentStoryTarget) {
-                showCustomAlert("Error: No target row identified for saving story.");
-                return;
-            }
-            const { monthId, weekId, dayIndex, rowIndex } = currentStoryTarget;
-            const newStory = document.getElementById('story-textarea').value.trim();
-
-            // Find the corresponding row element in the DOM
-            const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
-            const vocabRowElement = daySection ? daySection.querySelector(`tbody tr[data-row-index="${rowIndex}"]`) : null;
-
-            if (vocabRowElement) {
-                // Store the story in the data attribute
-                vocabRowElement.dataset.pendingStory = newStory;
-                console.log(`Pending story updated for row ${rowIndex}:`, newStory);
-
-                // Optional: Add a visual cue that an unsaved story exists
-                // Example: Find the "Add/Edit Story" button and add a small dot or change text
-                const addStoryBtn = daySection.querySelector('.add-story-btn');
-                if (addStoryBtn) {
-                    // You might add a class or change the text slightly
-                    addStoryBtn.innerHTML = '<i class="fas fa-feather-alt mr-1"></i> Edit Story*'; // Indicate unsaved change
-                }
-
-                closeModal('edit-story-modal');
-                setSyncStatus("Editing...", "blue"); // Remain in editing status
-            } else {
-                console.error(`Error: Could not find row element ${rowIndex} to attach pending story.`);
-                showCustomAlert("Error saving story locally. Row not found.");
-            }
-            // Clear target AFTER processing, not before
-            // currentStoryTarget = null; // We might need it if they click again before saving day
-        });
+         saveStoryBtn.addEventListener('click', async () => {
+             if (!currentUser || !userId || !currentStoryTarget) return;
+             const { monthId, weekId, dayIndex, rowIndex } = currentStoryTarget;
+             if (rowIndex === -1) { showCustomAlert("Error: No associated vocabulary row found."); return; }
+             const newStory = document.getElementById('story-textarea').value.trim();
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             setSyncStatus("Syncing...", "yellow");
+             try {
+                 const docSnap = await getDoc(docRef); if (!docSnap.exists()) throw new Error("Month document not found.");
+                 let monthData = docSnap.data(); let daysArray = monthData.weeks?.[weekId]?.days || [];
+                 if (daysArray[dayIndex]?.rows?.[rowIndex]) {
+                     daysArray[dayIndex].rows[rowIndex].story = newStory || null;
+                     const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
+                     await updateDoc(docRef, updatePayload); console.log("Story saved successfully for row:", rowIndex);
+                     closeModal('edit-story-modal'); setSyncStatus("Synced", "green");
+                 } else { throw new Error("Target row for story not found."); }
+             } catch (error) { console.error("Error saving story:", error); showCustomAlert("Error saving story."); setSyncStatus("Error", "red"); }
+             finally { currentStoryTarget = null; }
+         });
          async function readStory(monthId, weekId, dayIndex, rowIndex) {
             if (!currentUser || !userId) return;
             const storyModalContent = document.getElementById('story-modal-content');
@@ -1888,55 +1570,19 @@ async function saveDayPlan(monthId, weekId, daySection) {
 
         // --- Other Utility functions ---
          function calculateWeeklyProgress(weekData) {
-            if (!weekData || !weekData.days) return 0; // Check if days exist at all
-
-            let totalPercentage = 0;
-            let totalRows = 0;
-            const daysSource = weekData.days;
-
-            // Helper function to process rows within a day (handles both Array and Map for rows)
-            const processDayRows = (day) => {
-                 // Ensure 'day' itself is not null or undefined, especially when iterating objects
-                 if (!day) return;
-                 const rowsSource = day.rows; // Access rows from the passed day object
-                 if (!rowsSource) return;
-
-                 if (Array.isArray(rowsSource)) {
-                     // Handle NEW Array structure for rows
-                     rowsSource.forEach(row => {
-                         totalRows++;
-                         if (row.completed) {
-                             const perc = parsePercentage(row.completionPercentage);
-                             totalPercentage += (perc === null ? 100 : perc);
-                         }
-                     });
-                 } else if (typeof rowsSource === 'object' && !Array.isArray(rowsSource)) {
-                     // Handle OLD Map structure for rows
-                     Object.values(rowsSource).forEach(row => { // Iterate over values (the row objects)
-                         totalRows++;
-                         if (row.completed) {
-                             const perc = parsePercentage(row.completionPercentage);
-                             totalPercentage += (perc === null ? 100 : perc);
-                         }
-                     });
-                 }
-            };
-
-            // Iterate over days depending on whether it's an Array or Map
-            if (Array.isArray(daysSource)) {
-                 // Handle NEW Array structure for days
-                 if (daysSource.length === 0) return 0;
-                 daysSource.forEach(processDayRows); // Pass each day object to the helper
-            } else if (typeof daysSource === 'object' && !Array.isArray(daysSource)) {
-                 // Handle OLD Map structure for days
-                 const dayKeys = Object.keys(daysSource);
-                 if (dayKeys.length === 0) return 0;
-                 dayKeys.forEach(key => processDayRows(daysSource[key])); // Pass each day object using its key
-            } else {
-                 return 0; // Not an array or non-empty object
-            }
-
-            // Calculate average percentage based on number of rows
+            if (!weekData || !weekData.days || weekData.days.length === 0) return 0;
+            let totalPercentage = 0; let totalRows = 0;
+            weekData.days.forEach(day => {
+                day.rows?.forEach(row => {
+                    totalRows++;
+                    if (row.completed) {
+                         // Default to 100% if no percentage is set but it's checked
+                         const perc = parsePercentage(row.completionPercentage);
+                         totalPercentage += (perc === null ? 100 : perc); // Assume 100% if checked without number
+                    }
+                });
+            });
+             // Calculate average percentage based on number of rows
             return totalRows === 0 ? 0 : Math.min(Math.round(totalPercentage / totalRows), 100);
         }
         async function updateWeeklyProgressUI(monthId, weekId) {
