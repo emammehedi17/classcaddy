@@ -1361,17 +1361,18 @@ function attachWeekEventListeners(monthElement, monthId) {
             setSyncStatus("Unsaved changes", "yellow");
             await saveDayPlan(monthId, weekId, daySection); // Save immediately
 
-		// --- Keep editing mode after delete ---
-		if (!daySection.classList.contains('editing')) {
-			toggleDayEditMode(monthId, weekId, daySection, true);
-		}
+// --- Keep editing mode after delete ---
+if (!daySection.classList.contains('editing')) {
+    toggleDayEditMode(monthId, weekId, daySection, true);
+}
 
-		// Re-index remaining rows
-		daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => {
-			tr.dataset.rowIndex = newIdx;
-			tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`;
-		});
+// Re-index remaining rows
+daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => {
+    tr.dataset.rowIndex = newIdx;
+    tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`;
+});
 
+         }
          function confirmDeleteDay(monthId, weekId, daySection) {
              const dayIndex = parseInt(daySection.dataset.dayIndex);
              const dayNum = daySection.querySelector('h4').textContent;
