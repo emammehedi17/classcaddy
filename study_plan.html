@@ -594,6 +594,7 @@
         let unsubscribeActiveMonth = null; // For the currently displayed month
         let currentStoryTarget = null;
         let currentConfirmAction = null;
+		let editingDayInfo = { monthId: null, weekId: null, dayIndex: null };
 
 
         // --- Header Navigation & Scroll Logic (from script.js) ---
@@ -833,14 +834,31 @@
              const docRef = doc(db, getUserPlansCollectionPath(), monthId);
              try {
                  // Listen for real-time updates ONLY on the selected month
+                 // Listen for real-time updates ONLY on the selected month
                  unsubscribeActiveMonth = onSnapshot(docRef, (docSnap) => {
                      // Check if this is still the active month before re-rendering
                      const activeBtn = monthNavButtonsContainer.querySelector('button.active-month');
                      if (!activeBtn || activeBtn.dataset.monthId !== monthId) {
                          console.log("Snapshot received for non-active month. Ignoring render.");
-                         if (unsubscribeActiveMonth) unsubscribeActiveMonth(); // Stop listening
+                         if (unsubscribeActiveMonth) {
+                             unsubscribeActiveMonth(); // Stop listening if month changed
+                             unsubscribeActiveMonth = null; // Clear reference
+                         }
                          return;
                      }
+
+                     // --- Store editing state BEFORE re-rendering ---
+                     let wasEditing = false;
+                     let editingWeekId = null;
+                     let editingDayIndex = null;
+                     // Use the global editingDayInfo variable correctly
+                     if (editingDayInfo.monthId === monthId && editingDayInfo.weekId !== null && editingDayInfo.dayIndex !== null) {
+                         wasEditing = true;
+                         editingWeekId = editingDayInfo.weekId;
+                         editingDayIndex = editingDayInfo.dayIndex;
+                         console.log(`Snapshot update received while editing ${monthId}/${editingWeekId}/Day ${editingDayIndex + 1}. Will restore state.`);
+                     }
+                     // --- End Store editing state ---
 
                      // Save scroll position
                      let scrollY = window.scrollY;
@@ -850,19 +868,48 @@
 
 
                      if (docSnap.exists()) {
-                         currentMonthPlanDisplay.innerHTML = '';
-                         currentMonthPlanDisplay.appendChild(createMonthElement(monthId, docSnap.data()));
+                         currentMonthPlanDisplay.innerHTML = ''; // Clear previous display
+                         const monthElement = createMonthElement(monthId, docSnap.data()); // Redraw month
+                         currentMonthPlanDisplay.appendChild(monthElement);
+
+                         // --- Restore editing state AFTER re-rendering ---
+                         if (wasEditing && editingWeekId !== null && editingDayIndex !== null) {
+                             // Find the newly rendered day section within the redrawn monthElement
+                             const newlyRenderedDaySection = monthElement.querySelector(`.week-section[data-week-id="${editingWeekId}"] .day-section[data-day-index="${editingDayIndex}"]`);
+                             if (newlyRenderedDaySection) {
+                                 console.log(`Restoring edit mode UI for ${monthId}/${editingWeekId}/Day ${editingDayIndex + 1}`);
+                                 // Call toggleDayEditMode to restore UI state, passing restoringState = true
+                                 toggleDayEditMode(monthId, editingWeekId, newlyRenderedDaySection, true, true); // Enter edit mode, restoring state
+                             } else {
+                                 console.error("Could not find the day section to restore edit mode after snapshot update.");
+                                 // Clear tracked state if element unexpectedly not found
+                                 editingDayInfo = { monthId: null, weekId: null, dayIndex: null };
+                             }
+                         }
+                         // --- End Restore editing state ---
+
                      } else {
                          console.error("Document for monthId not found (or deleted):", monthId);
                          currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">This plan was not found (it may have been deleted).</p>';
+                         // Clear tracked state if doc deleted
+                         editingDayInfo = { monthId: null, weekId: null, dayIndex: null };
                      }
 
                      // Restore scroll position
                      if (shouldRestoreScroll) {
-                        console.log("Restoring scroll position to (displayMonthPlan):", scrollY);
+                        console.log("Restoring scroll position to (displayMonthPlan - onSnapshot):", scrollY);
                         window.scrollTo({ top: scrollY, behavior: 'auto' });
                      }
-                 });
+                 }, (error) => { // Add error handling for the snapshot listener itself
+                      console.error("Error in onSnapshot listener for month:", monthId, error);
+                      currentMonthPlanDisplay.innerHTML = `<p class="text-red-500 text-center">Error listening for updates for ${monthId}. Please refresh.</p>`;
+                      // Clear tracked state on listener error
+                      editingDayInfo = { monthId: null, weekId: null, dayIndex: null };
+                      if (unsubscribeActiveMonth) {
+                         unsubscribeActiveMonth();
+                         unsubscribeActiveMonth = null;
+                      }
+                 }); // End of corrected onSnapshot listener
              } catch (error) {
                  console.error("Error fetching specific month plan:", error);
                  currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">Error loading this month\'s plan.</p>';
@@ -1230,68 +1277,98 @@ function attachWeekEventListeners(monthElement, monthId) {
 
 
         // Toggle Edit Mode - Updated for Button Swap
-        async function toggleDayEditMode(monthId, weekId, daySection, enterEditMode) {
+        // Toggle Edit Mode - Updated for Button Swap & State Restoration
+        async function toggleDayEditMode(monthId, weekId, daySection, enterEditMode, restoringState = false) {
              const dayIndex = parseInt(daySection.dataset.dayIndex);
              const tableBody = daySection.querySelector('tbody');
              const editButton = daySection.querySelector('.edit-day-btn'); // Top right button
-             const saveButton = daySection.querySelector('.save-day-btn'); // Bottom button
+             // const saveButton = daySection.querySelector('.save-day-btn'); // Bottom button (part of controls)
              const editModeControls = daySection.querySelector('.edit-mode-controls');
              const deleteDayButton = daySection.querySelector('.delete-day-btn');
              const actionsHeader = daySection.querySelector('.actions-header');
              const completionPercHeader = daySection.querySelector('.completion-perc-header');
 
-             setSyncStatus("Syncing...", "yellow");
+             // Set sync status only if not just restoring state
+             if (!restoringState) {
+                 setSyncStatus("Syncing...", "yellow");
+             }
 
              if (enterEditMode) {
                  // --- ENTERING EDIT MODE ---
+                 console.log(`Entering edit mode for ${monthId}/${weekId}/Day ${dayIndex + 1}`);
+                 editingDayInfo = { monthId, weekId, dayIndex }; // <-- Track editing state
+
                  daySection.classList.add('editing');
                  editButton.classList.add('hidden'); // Hide Edit button
                  editModeControls.classList.remove('hidden'); // Show controls (including Save)
-                 // saveButton is already visible because editModeControls is shown
                  deleteDayButton.classList.remove('hidden');
                  actionsHeader.classList.remove('hidden');
                  completionPercHeader.classList.remove('hidden');
 
-                 const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
-                 const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
-                 if (!dayData) { console.error("Could not find day data to edit."); setSyncStatus("Error", "red"); return; }
+                 // Only fetch and re-render rows if NOT just restoring state after snapshot
+                 if (!restoringState) {
+                     try {
+                         const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
+                         const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
+                         if (!dayData) { throw new Error("Could not find day data to edit."); }
 
-                 tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
-                    createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, true) // Render in edit mode
-                 ).join('');
+                         tableBody.innerHTML = (dayData.rows || []).map((rowData, rowIndex) => // Handle potentially undefined rows
+                            createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, true) // Render in edit mode
+                         ).join('');
+                         setSyncStatus("Editing...", "blue");
+                     } catch (error) {
+                         console.error("Error fetching day data for edit:", error);
+                         showCustomAlert("Error preparing edit mode.");
+                         setSyncStatus("Error", "red");
+                         // Optionally revert UI changes if fetch failed
+                         editingDayInfo = { monthId: null, weekId: null, dayIndex: null };
+                         daySection.classList.remove('editing');
+                         editButton.classList.remove('hidden');
+                         editModeControls.classList.add('hidden');
+                         deleteDayButton.classList.add('hidden');
+                         actionsHeader.classList.add('hidden');
+                         completionPercHeader.classList.add('hidden');
+                         return; // Stop further execution
+                     }
+                 } else {
+                     // If restoring state, assume rows are already correctly rendered by snapshot
+                     // Just ensure controls are visible and correct classes applied
+                     console.log(`Restored edit mode UI for ${monthId}/${weekId}/Day ${dayIndex + 1}`);
+                     setSyncStatus("Editing...", "blue"); // Set status correctly
+                 }
+                 // Disable checkboxes in edit mode (do this regardless of restoringState)
                  daySection.querySelectorAll('.completion-checkbox').forEach(cb => cb.disabled = true);
-                 setSyncStatus("Editing...", "blue");
 
              } else {
                  // --- SAVING AND EXITING EDIT MODE ---
-                 await saveDayPlan(monthId, weekId, daySection); // Save first
+                 console.log(`Exiting edit mode for ${monthId}/${weekId}/Day ${dayIndex + 1}`);
+                 editingDayInfo = { monthId: null, weekId: null, dayIndex: null }; // <-- Clear editing state
+
+                 // Save first (only if not just restoring state which failed)
+                 if (!restoringState) { // Avoid saving if we are trying to exit because entering failed
+                     await saveDayPlan(monthId, weekId, daySection);
+                 }
 
                  daySection.classList.remove('editing');
                  editButton.classList.remove('hidden'); // Show Edit button
                  editModeControls.classList.add('hidden'); // Hide controls (including Save)
-                 // saveButton is hidden because editModeControls is hidden
                  deleteDayButton.classList.add('hidden');
                  actionsHeader.classList.add('hidden');
                  completionPercHeader.classList.add('hidden');
 
-                 // Re-render rows in normal mode
-                 try {
-                     const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
-                     const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
-
-                     if (!dayData) { tableBody.innerHTML = ''; }
-                     else {
-                         tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
-                            createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false) // Render non-edit mode
-                         ).join('');
-                     }
-
-                     updateWeeklyProgressUI(monthId, weekId);
-                     setSyncStatus("Synced", "green");
-                 } catch (renderError) {
-                     console.error("Error re-rendering day after save:", renderError);
-                     setSyncStatus("Error", "red");
+                 // Re-render rows in normal mode (only if save was likely successful)
+                 // The onSnapshot listener will handle the re-render naturally after saveDayPlan completes and Firestore updates
+                 // We don't necessarily need to force a re-render here immediately unless saveDayPlan failed.
+                 // If saveDayPlan succeeded, onSnapshot should trigger soon.
+                 if (syncStatusText.textContent !== "Error") {
+                      // Optionally clear table body and show a temporary "Loading..." if snapshot takes time
+                      // tableBody.innerHTML = '<tr><td colspan="6" class="text-center italic text-gray-400 py-3">Loading saved view...</td></tr>';
+                 } else {
+                     // If saving failed, maybe don't clear the edit view immediately? Or try to revert?
+                     // For now, let's assume the user will see the error and might try saving again or reload.
                  }
+                 // Enable checkboxes again (will happen on re-render, but good practice)
+                 daySection.querySelectorAll('.completion-checkbox').forEach(cb => cb.disabled = false);
              }
         }
 
@@ -1572,23 +1649,41 @@ function attachWeekEventListeners(monthElement, monthId) {
             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
             setSyncStatus("Syncing...", "yellow");
             try {
-                // Construct the specific field path to update only the story
-                const storyFieldPath = `weeks.${weekId}.days.${dayIndex}.rows.${rowIndex}.story`;
-                const updatePayload = { [storyFieldPath]: newStory || null }; // Use null if story is empty
+                 const docSnap = await getDoc(docRef);
+                 let existingStory = ''; // Initialize existingStory
 
-                await updateDoc(docRef, updatePayload); // Update only the story field in Firestore
-                console.log("Story saved successfully for row:", rowIndex);
-                closeModal('edit-story-modal'); // Close modal
-                // Keep the status as "Editing..." since the main day isn't fully saved yet.
-                setSyncStatus("Editing...", "blue");
-                // The visual change (like the 'Read Story' button appearing/disappearing)
-                // won't happen until the main 'Save' button for the day is clicked.
-                // This is expected behavior to maintain the edit state.
-            } catch (error) {
-                console.error("Error saving story:", error);
-                showCustomAlert("Error saving story.");
-                setSyncStatus("Error", "red"); // Show error if save fails
-            }
+                 if (docSnap.exists()) {
+                     const dayData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex];
+                     // Check if the row index actually exists in the fetched data's rows array/object
+                     const rowExistsInData = dayData?.rows && (
+                         Array.isArray(dayData.rows) ? dayData.rows[vocabRowIndex] !== undefined : dayData.rows[vocabRowIndex] !== undefined
+                     );
+
+                     if (rowExistsInData) {
+                         // Row exists in Firestore data, get the story
+                         existingStory = (Array.isArray(dayData.rows) ? dayData.rows[vocabRowIndex]?.story : dayData.rows[vocabRowIndex]?.story) || '';
+                         setSyncStatus("Synced", "green"); // Data is current
+                     } else {
+                         // Row only exists visually (was just added in edit mode)
+                         console.log("Vocab row is new and not yet saved. Story cannot be fetched/saved until the day is saved.");
+                         showCustomAlert("Please save the day plan first before adding a story to a new Vocabulary row.");
+                         setSyncStatus("Editing...", "blue"); // Remain in editing status
+                         return; // Prevent modal from opening
+                     }
+                 } else {
+                     // Month doesn't exist? Should ideally not happen if we're editing a day within it.
+                     throw new Error("Month document not found.");
+                 }
+
+                 currentStoryTarget = { monthId, weekId, dayIndex, rowIndex: vocabRowIndex };
+                 document.getElementById('story-textarea').value = existingStory;
+                 editStoryModal.style.display = "block";
+
+             } catch (error) {
+                 console.error("Error opening story editor:", error);
+                 showCustomAlert("Could not open story editor. Ensure the day plan is saved.");
+                 setSyncStatus("Error", "red");
+             }
             // Do NOT reset currentStoryTarget here, keep it in case needed again before saving day
             // finally { currentStoryTarget = null; } // Removed this line
          });
