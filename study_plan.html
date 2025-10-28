@@ -964,35 +964,10 @@
         }
 
         function createWeekElement(monthId, weekId, weekData, sectionId) {
-            let daysHtml = '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>'; // Default message
-            const daysSource = weekData?.days;
-
-            if (daysSource) {
-                if (Array.isArray(daysSource)) {
-                    // --- Handle NEW Array structure ---
-                    if (daysSource.length > 0) {
-                        daysHtml = daysSource.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('');
-                    }
-                } else if (typeof daysSource === 'object' && !Array.isArray(daysSource) && Object.keys(daysSource).length > 0) {
-                    // --- Handle OLD Map/Object structure ---
-                    console.warn(`Detected old Map structure for days in ${monthId}/${weekId}. Converting for display.`);
-                    // Sort keys numerically if they are numbers, otherwise alphabetically
-                    const sortedKeys = Object.keys(daysSource).sort((a, b) => {
-                        const numA = parseInt(a);
-                        const numB = parseInt(b);
-                        if (!isNaN(numA) && !isNaN(numB)) {
-                            return numA - numB;
-                        }
-                        return a.localeCompare(b); // Fallback for non-numeric keys
-                    });
-                     // Generate HTML using the sorted keys, treating the key as the index for compatibility
-                    daysHtml = sortedKeys.map(key => createDayElement(monthId, weekId, parseInt(key), daysSource[key])).join('');
-                }
-            }
-
-            const totalDays = Array.isArray(daysSource) ? (daysSource?.length || 0) : (daysSource ? Object.keys(daysSource).length : 0); // Correctly count days for both types
-            const initialProgress = calculateWeeklyProgress(weekData); // Assumes calculateWeeklyProgress can handle both structures
-            const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px'; // Ensure pageHeader is defined or provide fallback
+            const daysHtml = weekData?.days?.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('') || '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
+            const totalDays = weekData?.days?.length || 0;
+            const initialProgress = calculateWeeklyProgress(weekData);
+            const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px';
 
             return `
                 <div id="${sectionId}" class="bg-white/60 border border-gray-200 p-4 rounded-lg shadow week-section" data-week-id="${weekId}">
@@ -1388,28 +1363,11 @@ function attachWeekEventListeners(monthElement, monthId) {
                  tr.querySelectorAll('input, textarea').forEach(input => {
                      // Example: If you were using names like 'rows[0].subject', update them
                      const name = input.getAttribute('name');
-                     // Find the original index in the name attribute using regex to handle multi-digit indices
-                     const match = name ? name.match(/rows\[(\d+)\]/) : null;
-                     if (match) {
-                         const originalIndex = parseInt(match[1]);
-                         // Only update if the original index needs re-indexing (i.e., it was after the deleted row)
-                         if (originalIndex > rowIndex) {
-                             // Correctly replace the old index number with the new index number
-                             input.setAttribute('name', name.replace(`rows[${originalIndex}]`, `rows[${originalIndex - 1}]`));
-                         } else if (originalIndex === rowIndex) {
-                            // Although the row is removed, inputs might still linger briefly; ensure they don't cause issues
-                            // Or handle this by ensuring all event listeners are removed with the row
-                         }
+                     if (name && name.includes(`rows[${rowIndex}]`)) {
+                          input.setAttribute('name', name.replace(`rows[${rowIndex}]`, `rows[${newIdx}]`));
                      }
                      // Add similar logic if you store paths in data attributes
                  });
-                  // Re-index vocab pairs within remaining vocab rows if necessary
-                 if (tr.classList.contains('vocab-row')) {
-                     tr.querySelectorAll('.vocab-pair').forEach((pair, pairIdx) => {
-                         pair.dataset.pairIndex = pairIdx;
-                         // Update input names/data attributes within the pair if needed
-                     });
-                 }
              });
          }
          function confirmDeleteDay(monthId, weekId, daySection) {
