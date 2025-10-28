@@ -1393,39 +1393,80 @@ function attachWeekEventListeners(monthElement, monthId) {
                 const rowElements = daySection.querySelectorAll('tbody tr');
 
                 rowElements.forEach((row) => {
-                    let existingRowIndex = parseInt(row.dataset.rowIndex);
-                    const existingRowData = !isNaN(existingRowIndex) && currentDayData.rows?.[existingRowIndex] ? currentDayData.rows[existingRowIndex] : {};
+                    const rowIndex = parseInt(row.dataset.rowIndex); // Get current visual index
+                    const isVocab = row.classList.contains('vocab-row');
 
-                    let subject, topic, comment, completed, completionPercentage, vocabData = null, story;
+                    let subject, topic, comment, completed, completionPercentage, vocabData = null, story = null; // Default story to null
 
-                    if (daySection.classList.contains('editing')) {
-                         subject = row.querySelector('.subject-input')?.value.trim() || '';
-                         comment = row.querySelector('.comment-input')?.value.trim() || '';
-                         completed = existingRowData.completed || false;
-                         const percInput = row.querySelector('.completion-perc-input')?.value;
-                         completionPercentage = parsePercentage(percInput);
-                         story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
+                    // We are always reading from the edit mode inputs here
+                    subject = row.querySelector('.subject-input')?.value.trim() || '';
+                    comment = row.querySelector('.comment-input')?.value.trim() || '';
 
-                         if (row.classList.contains('vocab-row')) {
-                             subject = 'Vocabulary';
-                             vocabData = [];
-                             row.querySelectorAll('.vocab-pair').forEach(pairEl => {
-                                 const word = pairEl.querySelector('.vocab-word-input')?.value.trim();
-                                 const meaning = pairEl.querySelector('.vocab-meaning-input')?.value.trim();
-                                 if (word) { vocabData.push({ word: word, meaning: meaning || '' }); }
-                             });
-                             topic = null;
-                         } else {
-                             topic = row.querySelector('.topic-input')?.value.trim() || '';
-                             vocabData = null;
-                         }
-                    } else { // Handle saving checkbox clicks in normal mode
-                         completed = row.querySelector('.completion-checkbox')?.checked || false;
-                         subject = existingRowData.subject; topic = existingRowData.topic; comment = existingRowData.comment;
-                         completionPercentage = existingRowData.completionPercentage; vocabData = existingRowData.vocabData; story = existingRowData.story;
-                     }
-                     updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null });
-                });
+                    // Get completion status from the disabled checkbox (its underlying checked state)
+                    // We need the original state before edit if possible, but reading the DOM is simpler here.
+                    // The main save should reflect the state *at the time of save*
+                    // Let's assume completion state doesn't change *during* edit mode itself,
+                    // it's toggled *outside* edit mode. We'll need to fetch the original state
+                    // if we want to preserve it perfectly across edits without relying on the checkbox.
+                    // FOR NOW: Let's assume 'completed' status is not meant to be edited here.
+                    // We'll fetch it from original data if possible, or default to false.
+                    // Fetching original data inside saveDayPlan might be needed for robustness.
+                    // Let's simplify: read checkbox state but it's disabled, so it reflects pre-edit state.
+                    completed = row.querySelector('.completion-checkbox')?.checked || false; // Read current state
+
+                    const percInput = row.querySelector('.completion-perc-input')?.value;
+                    completionPercentage = parsePercentage(percInput);
+
+                    if (isVocab) {
+                        subject = 'Vocabulary'; // Force subject for vocab rows
+                        vocabData = [];
+                        row.querySelectorAll('.vocab-pair').forEach(pairEl => {
+                            const word = pairEl.querySelector('.vocab-word-input')?.value.trim();
+                            const meaning = pairEl.querySelector('.vocab-meaning-input')?.value.trim();
+                            if (word) { vocabData.push({ word: word, meaning: meaning || '' }); }
+                        });
+                        topic = null; // Vocab rows don't have a main topic field
+
+                        // --- Check for pending story ---
+                        if (row.dataset.pendingStory !== undefined) {
+                            story = row.dataset.pendingStory.trim() || null; // Use pending story
+                            delete row.dataset.pendingStory; // Clear attribute after reading
+                            console.log(`Including pending story for row ${rowIndex} in save data.`);
+                        } else {
+                            // If no pending story, try to get previously saved story (Needs access to original data)
+                            // This part is tricky without passing original data. Let's assume story is only set via pending for now.
+                            // To be fully robust, saveDayPlan might need to fetch `docSnap` again OR
+                            // the `toggleDayEditMode` function could store the original `dayData` somewhere accessible.
+                            // Simplified approach: Only save stories added/edited *during this edit session*.
+                            story = null; // Assume no story unless it was just edited.
+                            // If you need to preserve existing stories, this needs refinement.
+                            // Let's try fetching the original data to preserve existing stories:
+                            const existingRowData = currentDayData?.rows?.[rowIndex]; // Access original day data
+                            story = existingRowData?.story || null; // Use original story if no pending one
+                        }
+
+                    } else {
+                        topic = row.querySelector('.topic-input')?.value.trim() || '';
+                        vocabData = null;
+                        story = null; // Normal rows don't have stories
+                    }
+
+                    updatedRows.push({
+                        subject: subject || '',
+                        topic: topic || null, // Ensure topic is null for vocab
+                        comment: comment || '',
+                        completed: completed || false,
+                        completionPercentage: completionPercentage ?? null,
+                        vocabData: vocabData || null, // Ensure vocabData is null for normal rows
+                        story: story || null // Store the determined story
+                    });
+
+                    // Optional: Reset visual cue on Add/Edit Story button after successful save
+                    const addStoryBtn = daySection.querySelector('.add-story-btn');
+                    if (addStoryBtn && addStoryBtn.textContent.includes('*')) {
+                         addStoryBtn.innerHTML = '<i class="fas fa-feather-alt mr-1"></i> Add/Edit Story';
+                    }
+                }); // End rowElements.forEach
 
                  daysArray[dayIndex].rows = updatedRows;
                 const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
@@ -1641,52 +1682,41 @@ function attachWeekEventListeners(monthElement, monthId) {
                  document.getElementById('story-textarea').value = existingStory; editStoryModal.style.display = "block";
              } catch (error) { console.error("Error fetching/prepping story:", error); showCustomAlert("Could not open story editor. Please save your day plan first."); setSyncStatus("Error", "red"); }
          }
-         saveStoryBtn.addEventListener('click', async () => {
-            if (!currentUser || !userId || !currentStoryTarget) return;
+         s// Save Story Button - Corrected Logic (Updates DOM only)
+        saveStoryBtn.addEventListener('click', () => { // Removed async
+            if (!currentStoryTarget) {
+                showCustomAlert("Error: No target row identified for saving story.");
+                return;
+            }
             const { monthId, weekId, dayIndex, rowIndex } = currentStoryTarget;
-            if (rowIndex === -1) { showCustomAlert("Error: No associated vocabulary row found."); return; }
             const newStory = document.getElementById('story-textarea').value.trim();
-            const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-            setSyncStatus("Syncing...", "yellow");
-            try {
-                 const docSnap = await getDoc(docRef);
-                 let existingStory = ''; // Initialize existingStory
 
-                 if (docSnap.exists()) {
-                     const dayData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex];
-                     // Check if the row index actually exists in the fetched data's rows array/object
-                     const rowExistsInData = dayData?.rows && (
-                         Array.isArray(dayData.rows) ? dayData.rows[vocabRowIndex] !== undefined : dayData.rows[vocabRowIndex] !== undefined
-                     );
+            // Find the corresponding row element in the DOM
+            const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
+            const vocabRowElement = daySection ? daySection.querySelector(`tbody tr[data-row-index="${rowIndex}"]`) : null;
 
-                     if (rowExistsInData) {
-                         // Row exists in Firestore data, get the story
-                         existingStory = (Array.isArray(dayData.rows) ? dayData.rows[vocabRowIndex]?.story : dayData.rows[vocabRowIndex]?.story) || '';
-                         setSyncStatus("Synced", "green"); // Data is current
-                     } else {
-                         // Row only exists visually (was just added in edit mode)
-                         console.log("Vocab row is new and not yet saved. Story cannot be fetched/saved until the day is saved.");
-                         showCustomAlert("Please save the day plan first before adding a story to a new Vocabulary row.");
-                         setSyncStatus("Editing...", "blue"); // Remain in editing status
-                         return; // Prevent modal from opening
-                     }
-                 } else {
-                     // Month doesn't exist? Should ideally not happen if we're editing a day within it.
-                     throw new Error("Month document not found.");
-                 }
+            if (vocabRowElement) {
+                // Store the story in the data attribute
+                vocabRowElement.dataset.pendingStory = newStory;
+                console.log(`Pending story updated for row ${rowIndex}:`, newStory);
 
-                 currentStoryTarget = { monthId, weekId, dayIndex, rowIndex: vocabRowIndex };
-                 document.getElementById('story-textarea').value = existingStory;
-                 editStoryModal.style.display = "block";
+                // Optional: Add a visual cue that an unsaved story exists
+                // Example: Find the "Add/Edit Story" button and add a small dot or change text
+                const addStoryBtn = daySection.querySelector('.add-story-btn');
+                if (addStoryBtn) {
+                    // You might add a class or change the text slightly
+                    addStoryBtn.innerHTML = '<i class="fas fa-feather-alt mr-1"></i> Edit Story*'; // Indicate unsaved change
+                }
 
-             } catch (error) {
-                 console.error("Error opening story editor:", error);
-                 showCustomAlert("Could not open story editor. Ensure the day plan is saved.");
-                 setSyncStatus("Error", "red");
-             }
-            // Do NOT reset currentStoryTarget here, keep it in case needed again before saving day
-            // finally { currentStoryTarget = null; } // Removed this line
-         });
+                closeModal('edit-story-modal');
+                setSyncStatus("Editing...", "blue"); // Remain in editing status
+            } else {
+                console.error(`Error: Could not find row element ${rowIndex} to attach pending story.`);
+                showCustomAlert("Error saving story locally. Row not found.");
+            }
+            // Clear target AFTER processing, not before
+            // currentStoryTarget = null; // We might need it if they click again before saving day
+        });
          async function readStory(monthId, weekId, dayIndex, rowIndex) {
             if (!currentUser || !userId) return;
             const storyModalContent = document.getElementById('story-modal-content');
