@@ -1363,11 +1363,28 @@ function attachWeekEventListeners(monthElement, monthId) {
                  tr.querySelectorAll('input, textarea').forEach(input => {
                      // Example: If you were using names like 'rows[0].subject', update them
                      const name = input.getAttribute('name');
-                     if (name && name.includes(`rows[${rowIndex}]`)) {
-                          input.setAttribute('name', name.replace(`rows[${rowIndex}]`, `rows[${newIdx}]`));
+                     // Find the original index in the name attribute using regex to handle multi-digit indices
+                     const match = name ? name.match(/rows\[(\d+)\]/) : null;
+                     if (match) {
+                         const originalIndex = parseInt(match[1]);
+                         // Only update if the original index needs re-indexing (i.e., it was after the deleted row)
+                         if (originalIndex > rowIndex) {
+                             // Correctly replace the old index number with the new index number
+                             input.setAttribute('name', name.replace(`rows[${originalIndex}]`, `rows[${originalIndex - 1}]`));
+                         } else if (originalIndex === rowIndex) {
+                            // Although the row is removed, inputs might still linger briefly; ensure they don't cause issues
+                            // Or handle this by ensuring all event listeners are removed with the row
+                         }
                      }
                      // Add similar logic if you store paths in data attributes
                  });
+                  // Re-index vocab pairs within remaining vocab rows if necessary
+                 if (tr.classList.contains('vocab-row')) {
+                     tr.querySelectorAll('.vocab-pair').forEach((pair, pairIdx) => {
+                         pair.dataset.pairIndex = pairIdx;
+                         // Update input names/data attributes within the pair if needed
+                     });
+                 }
              });
          }
          function confirmDeleteDay(monthId, weekId, daySection) {
@@ -1513,9 +1530,11 @@ function attachWeekEventListeners(monthElement, monthId) {
                 await updateDoc(docRef, updatePayload); // Update only the story field in Firestore
                 console.log("Story saved successfully for row:", rowIndex);
                 closeModal('edit-story-modal'); // Close modal
-                // No setSyncStatus here, keep it as "Editing..." or let the main save handle it.
-                // NOTE: The visual change (like adding the 'Read Story' button) won't appear until you SAVE the day.
-                // Or, optionally, find the row in the DOM and manually update its story state if needed immediately.
+                // Keep the status as "Editing..." since the main day isn't fully saved yet.
+                setSyncStatus("Editing...", "blue");
+                // The visual change (like the 'Read Story' button appearing/disappearing)
+                // won't happen until the main 'Save' button for the day is clicked.
+                // This is expected behavior to maintain the edit state.
             } catch (error) {
                 console.error("Error saving story:", error);
                 showCustomAlert("Error saving story.");
