@@ -1078,7 +1078,7 @@ function createMonthElement(monthId, data) {
         function createDayElement(monthId, weekId, dayIndex, dayData) {
              const tableId = `table-${monthId}-${weekId}-${dayIndex}`;
              return `
-                 <div class="day-section border-t border-gray-200 pt-4" data-day-index="${dayIndex}">
+                 <div class="day-section bg-white rounded-lg shadow-sm p-4" data-day-index="${dayIndex}">
                      <div class="flex justify-between items-center mb-3">
                          <div class="flex items-center gap-2">
                              <h4 class="font-semibold text-gray-700">Day ${dayData.dayNumber}</h4>
