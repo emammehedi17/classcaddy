@@ -1661,15 +1661,17 @@ function attachWeekEventListeners(monthElement, monthId) {
 
         // --- Other Utility functions ---
          function calculateWeeklyProgress(weekData) {
-            if (!weekData || !weekData.days) return 0; // Check if days exist
+            if (!weekData || !weekData.days) return 0; // Check if days exist at all
 
             let totalPercentage = 0;
             let totalRows = 0;
             const daysSource = weekData.days;
 
-            // Function to process rows within a day (handles both Array and Map for rows)
+            // Helper function to process rows within a day (handles both Array and Map for rows)
             const processDayRows = (day) => {
-                 const rowsSource = day?.rows;
+                 // Ensure 'day' itself is not null or undefined, especially when iterating objects
+                 if (!day) return;
+                 const rowsSource = day.rows; // Access rows from the passed day object
                  if (!rowsSource) return;
 
                  if (Array.isArray(rowsSource)) {
@@ -1697,14 +1699,14 @@ function attachWeekEventListeners(monthElement, monthId) {
             if (Array.isArray(daysSource)) {
                  // Handle NEW Array structure for days
                  if (daysSource.length === 0) return 0;
-                 daysSource.forEach(processDayRows);
+                 daysSource.forEach(processDayRows); // Pass each day object to the helper
             } else if (typeof daysSource === 'object' && !Array.isArray(daysSource)) {
                  // Handle OLD Map structure for days
                  const dayKeys = Object.keys(daysSource);
                  if (dayKeys.length === 0) return 0;
-                 dayKeys.forEach(key => processDayRows(daysSource[key])); // Pass the day object
+                 dayKeys.forEach(key => processDayRows(daysSource[key])); // Pass each day object using its key
             } else {
-                 return 0; // Not an array or object, or empty
+                 return 0; // Not an array or non-empty object
             }
 
             // Calculate average percentage based on number of rows
