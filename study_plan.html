@@ -121,40 +121,49 @@
         }
         /* --- Target Card Link Styles --- */
 a.target-card-link {
-    display: block; /* Make the link fill the container */
-    text-decoration: none; /* Remove underline */
-    color: inherit; /* Inherit text color */
+    display: block; /* Crucial: Make the link fill the area */
+    text-decoration: none;
+    color: inherit;
     border-radius: 0.75rem; /* Match card rounding */
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease-out;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease-out; /* Apply transitions to the link */
+    cursor: pointer;
 }
-/* --- Target Card Link Styles --- */
-a.target-card-link {
-    display: block; /* Make the link fill the container */
-    text-decoration: none; /* Remove underline */
-    color: inherit; /* Inherit text color */
-    border-radius: 0.75rem; /* Match card rounding */
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease-out; /* Add background-color transition to the link */
-    cursor: pointer; /* Add pointer cursor directly to the link */
-}
-/* Apply hover effects directly to the link and slightly modify inner card */
+/* Apply hover effects DIRECTLY to the link */
 a.target-card-link:hover {
-    background-color: #a7f3d0; /* DEEPER emerald background on hover (emerald-200) */
-    box-shadow: 0 12px 20px -3px rgba(16, 185, 129, 0.15), 0 4px 8px -2px rgba(16, 185, 129, 0.1); /* Emerald shadow on hover */
-    transform: translateY(-3px); /* Apply transform to the link */
+    background-color: #6ee7b7; /* EVEN DEEPER emerald background (emerald-300) */
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1), 0 4px 6px -4px rgba(16, 185, 129, 0.1); /* Adjusted emerald shadow */
+    transform: translateY(-3px);
 }
-/* Ensure the inner card still has its base styles */
+/* Ensure the inner card has base styles and TRANSPARENT background on hover */
 .target-card {
-    background-color: white;
+    background-color: white; /* Base background */
     padding: 1.5rem; /* p-6 */
     border-radius: 0.75rem; /* rounded-xl */
-    box-shadow: 0 4px 10px -3px rgba(0,0,0,0.07), 0 2px 6px -2px rgba(0,0,0,0.04); /* Softer shadow */
+    box-shadow: 0 4px 10px -3px rgba(0,0,0,0.07), 0 2px 6px -2px rgba(0,0,0,0.04);
     border: 1px solid #f3f4f6; /* gray-100 */
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; /* Removed background-color transition here */
+    transition: background-color 0.2s ease-out; /* Only background needs transition here */
 }
-/* Optional: Slightly adjust inner card appearance on hover if needed */
-/* a.target-card-link:hover .target-card { */
-    /* Add specific inner card adjustments here if desired, e.g., border color */
-/* } */
+/* Make the inner card transparent when the link is hovered so the link's background shows through */
+a.target-card-link:hover .target-card {
+    background-color: transparent; /* Makes link background visible */
+    box-shadow: none; /* Remove inner card shadow on hover */
+    border-color: transparent; /* Remove inner card border on hover */
+}
+/* Keep textarea visible when editing, even with transparent card background */
+.target-textarea:not(:disabled) {
+     background-color: #f9fafb; /* gray-50 */
+     border: 1px dashed #34d399; /* emerald-400 */
+     padding: 8px;
+     border-radius: 4px;
+ }
+ /* Ensure disabled textarea text remains visible on hover */
+ a.target-card-link:hover .target-textarea:disabled {
+     color: #4b5563; /* Keep original text color */
+ }
+ /* Ensure heading remains visible on hover */
+ a.target-card-link:hover .target-card h3 {
+     color: #065f46; /* Optional: Darker emerald text for heading on hover (emerald-800) */
+ }
 /* Ensure the inner card still has its base styles */
 .target-card {
     background-color: white;
