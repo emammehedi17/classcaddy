@@ -1661,19 +1661,53 @@ function attachWeekEventListeners(monthElement, monthId) {
 
         // --- Other Utility functions ---
          function calculateWeeklyProgress(weekData) {
-            if (!weekData || !weekData.days || weekData.days.length === 0) return 0;
-            let totalPercentage = 0; let totalRows = 0;
-            weekData.days.forEach(day => {
-                day.rows?.forEach(row => {
-                    totalRows++;
-                    if (row.completed) {
-                         // Default to 100% if no percentage is set but it's checked
-                         const perc = parsePercentage(row.completionPercentage);
-                         totalPercentage += (perc === null ? 100 : perc); // Assume 100% if checked without number
-                    }
-                });
-            });
-             // Calculate average percentage based on number of rows
+            if (!weekData || !weekData.days) return 0; // Check if days exist
+
+            let totalPercentage = 0;
+            let totalRows = 0;
+            const daysSource = weekData.days;
+
+            // Function to process rows within a day (handles both Array and Map for rows)
+            const processDayRows = (day) => {
+                 const rowsSource = day?.rows;
+                 if (!rowsSource) return;
+
+                 if (Array.isArray(rowsSource)) {
+                     // Handle NEW Array structure for rows
+                     rowsSource.forEach(row => {
+                         totalRows++;
+                         if (row.completed) {
+                             const perc = parsePercentage(row.completionPercentage);
+                             totalPercentage += (perc === null ? 100 : perc);
+                         }
+                     });
+                 } else if (typeof rowsSource === 'object' && !Array.isArray(rowsSource)) {
+                     // Handle OLD Map structure for rows
+                     Object.values(rowsSource).forEach(row => { // Iterate over values (the row objects)
+                         totalRows++;
+                         if (row.completed) {
+                             const perc = parsePercentage(row.completionPercentage);
+                             totalPercentage += (perc === null ? 100 : perc);
+                         }
+                     });
+                 }
+            };
+
+            // Iterate over days depending on whether it's an Array or Map
+            if (Array.isArray(daysSource)) {
+                 // Handle NEW Array structure for days
+                 if (daysSource.length === 0) return 0;
+                 daysSource.forEach(processDayRows);
+            } else if (typeof daysSource === 'object' && !Array.isArray(daysSource)) {
+                 // Handle OLD Map structure for days
+                 const dayKeys = Object.keys(daysSource);
+                 if (dayKeys.length === 0) return 0;
+                 dayKeys.forEach(key => processDayRows(daysSource[key])); // Pass the day object
+            } else {
+                 return 0; // Not an array or object, or empty
+            }
+
+            // Calculate average percentage based on number of rows
             return totalRows === 0 ? 0 : Math.min(Math.round(totalPercentage / totalRows), 100);
         }
         async function updateWeeklyProgressUI(monthId, weekId) {
