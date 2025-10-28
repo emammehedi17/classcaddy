@@ -1303,9 +1303,17 @@ function attachWeekEventListeners(monthElement, monthId) {
 
                  daysArray[dayIndex].rows = updatedRows;
                 const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
-                await updateDoc(docRef, updatePayload);
-                console.log(`Day ${dayIndex + 1} for ${weekId} saved successfully.`);
-                setSyncStatus("Synced", "green");
+				await updateDoc(docRef, updatePayload);
+				console.log("Story saved successfully for row:", rowIndex);
+				closeModal('edit-story-modal');
+				setSyncStatus("Synced", "green");
+
+				// --- Keep day editing mode active ---
+				const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
+				if (daySection && !daySection.classList.contains('editing')) {
+					toggleDayEditMode(monthId, weekId, daySection, true);
+				}
+
 
             } catch (error) {
                 console.error("Error saving day plan:", error);
@@ -1352,8 +1360,18 @@ function attachWeekEventListeners(monthElement, monthId) {
             console.log("Row removed from UI. Saving updated day plan...");
             setSyncStatus("Unsaved changes", "yellow");
             await saveDayPlan(monthId, weekId, daySection); // Save immediately
-            daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => { tr.dataset.rowIndex = newIdx; tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`; });
-         }
+
+		// --- Keep editing mode after delete ---
+		if (!daySection.classList.contains('editing')) {
+			toggleDayEditMode(monthId, weekId, daySection, true);
+		}
+
+		// Re-index remaining rows
+		daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => {
+			tr.dataset.rowIndex = newIdx;
+			tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`;
+		});
+
          function confirmDeleteDay(monthId, weekId, daySection) {
              const dayIndex = parseInt(daySection.dataset.dayIndex);
              const dayNum = daySection.querySelector('h4').textContent;
