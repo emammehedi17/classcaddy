@@ -119,6 +119,30 @@
             border: 1px solid #f3f4f6; /* gray-100 */
             transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
         }
+		
+		/* --- Day Card Styles --- */
+.day-section {
+    background-color: #ffffff;  /* bg-white */
+    border-radius: 0.75rem;   /* rounded-xl */
+    padding: 1.5rem;          /* p-6 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05); /* shadow-md */
+    border: 1px solid #e5e7eb; /* border-gray-200 */
+    transition: box-shadow 0.2s ease-out; /* Add transition for hover */
+}
+.day-section:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.05); /* shadow-lg on hover */
+}
+
+/* Optional: Adjust spacing inside the day card if needed */
+.day-section .flex.justify-between {
+    margin-bottom: 1rem; /* mb-4, slightly increased from mb-3 */
+}
+.day-section .study-table {
+    margin-top: 0.5rem; /* Add some space above the table */
+}
+.day-section .edit-mode-controls {
+    margin-top: 1rem; /* mt-4 */
+}
         /* --- Target Card Link Styles --- */
 a.target-card-link {
     display: block; /* Crucial: Make the link fill the area */
