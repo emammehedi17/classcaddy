@@ -119,10 +119,29 @@
             border: 1px solid #f3f4f6; /* gray-100 */
             transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
         }
-        .target-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.07), 0 4px 6px -2px rgba(0,0,0,0.05);
-        }
+        /* --- Target Card Link Styles --- */
+a.target-card-link {
+    display: block; /* Make the link fill the container */
+    text-decoration: none; /* Remove underline */
+    color: inherit; /* Inherit text color */
+    border-radius: 0.75rem; /* Match card rounding */
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease-out;
+}
+a.target-card-link:hover .target-card {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 20px -3px rgba(16, 185, 129, 0.15), 0 4px 8px -2px rgba(16, 185, 129, 0.1); /* Emerald shadow on hover */
+    background-color: #f0fdf4; /* Light emerald background on hover (emerald-50) */
+    cursor: pointer; /* Add pointer cursor on hover */
+}
+/* Ensure the inner card still has its base styles */
+.target-card {
+    background-color: white;
+    padding: 1.5rem; /* p-6 */
+    border-radius: 0.75rem; /* rounded-xl */
+    box-shadow: 0 4px 10px -3px rgba(0,0,0,0.07), 0 2px 6px -2px rgba(0,0,0,0.04); /* Softer shadow */
+    border: 1px solid #f3f4f6; /* gray-100 */
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease-out; /* Add background-color transition */
+}
         .target-textarea {
             font-family: 'Inter', 'Poppins', sans-serif;
             background-color: transparent;
@@ -952,7 +971,7 @@
 
         // --- UI Creation ---
 
-        function createMonthElement(monthId, data) {
+function createMonthElement(monthId, data) {
             const monthDiv = document.createElement('div');
             monthDiv.className = 'mb-12 p-6 card';
             monthDiv.dataset.monthId = monthId;
@@ -964,6 +983,14 @@
                 week3: 'text-amber-700',
                 week4: 'text-rose-700'
             };
+            // Define hover background colors (Tailwind classes)
+            const targetHoverBgColors = {
+                week1: 'hover:bg-indigo-50',
+                week2: 'hover:bg-teal-50',
+                week3: 'hover:bg-amber-50',
+                week4: 'hover:bg-rose-50'
+            };
+
 
             monthDiv.innerHTML = `
                 <div class="flex justify-between items-start mb-6">
@@ -979,15 +1006,17 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 monthly-targets">
                         ${[1, 2, 3, 4].map(weekNum => `
-                            <div class="target-card">
-                                <h3 class="font-semibold text-lg ${targetColors[`week${weekNum}`] || 'text-gray-700'} mb-2">Week ${weekNum}</h3>
-                                <textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" rows="3" class="target-textarea w-full" placeholder="Enter target..." disabled>${escapeHtml(data.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
-                            </div>
+                            <a href="#week-${monthId}-${weekNum}" class="target-card-link ${targetHoverBgColors[`week${weekNum}`] || ''}">
+                                <div class="target-card">
+                                    <h3 class="font-semibold text-lg ${targetColors[`week${weekNum}`] || 'text-gray-700'} mb-2">Week ${weekNum}</h3>
+                                    <textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" rows="3" class="target-textarea w-full" placeholder="Enter target..." disabled>${escapeHtml(data.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
+                                </div>
+                            </a>
                         `).join('')}
                     </div>
                 </div>
                  <div class="space-y-8 weekly-plans-container">
-                    ${[1, 2, 3, 4].map(weekNum => createWeekElement(monthId, `week${weekNum}`, data.weeks?.[`week${weekNum}`])).join('')}
+                    ${[1, 2, 3, 4].map(weekNum => createWeekElement(monthId, `week${weekNum}`, data.weeks?.[`week${weekNum}`], `week-${monthId}-${weekNum}`)).join('')}
                 </div>`;
 
              // Event Listeners for this month element
@@ -997,16 +1026,19 @@
              return monthDiv;
         }
 
-        function createWeekElement(monthId, weekId, weekData) {
+        // MODIFICATION: Added sectionId parameter
+        function createWeekElement(monthId, weekId, weekData, sectionId) {
             const daysHtml = weekData?.days?.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('') || '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
             const totalDays = weekData?.days?.length || 0;
             const initialProgress = calculateWeeklyProgress(weekData);
-            
+
             // Get initial header height
             const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px';
 
+
+            // MODIFICATION: Add id="${sectionId}" to the main div
             return `
-                <div class="bg-white/60 border border-gray-200 p-4 rounded-lg shadow week-section" data-week-id="${weekId}">
+                <div id="${sectionId}" class="bg-white/60 border border-gray-200 p-4 rounded-lg shadow week-section" data-week-id="${weekId}">
                     <h3 class="text-lg font-semibold text-emerald-700 mb-4 capitalize">${weekId.replace('week', 'Week ')} Plan</h3>
                     <div class="sticky-progress-wrapper" style="top: ${headerHeight};">
                         <div class="flex justify-between text-xs text-gray-500 mb-1">
@@ -1018,7 +1050,7 @@
                     <div class="days-container space-y-6 mt-4"> ${daysHtml} </div>
                      ${totalDays < 7 ? (totalDays > 0 ? `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>` : `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`) : '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>'}
                 </div>`;
-        }
+        } // Make sure this closing brace matches the function
 
         function createDayElement(monthId, weekId, dayIndex, dayData) {
              const tableId = `table-${monthId}-${weekId}-${dayIndex}`;
