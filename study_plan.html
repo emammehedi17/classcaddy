@@ -881,15 +881,11 @@
                      // Check if any day in this month is currently being edited
                      const isCurrentlyEditing = currentMonthPlanDisplay.querySelector('.day-section.editing');
                      if (isCurrentlyEditing) {
-                         console.log("Skipping full re-render because a day is in edit mode.");
-                         // We are editing, so don't re-render the whole month.
-                         // Just update the weekly progress bars with the new data.
-                         const monthData = docSnap.data();
-                         [1, 2, 3, 4].forEach(weekNum => {
-                             const weekId = `week${weekNum}`;
-                             updateWeeklyProgressUI(monthId, weekId, monthData.weeks?.[weekId]);
-                         });
-                         return; // Stop here to prevent redraw
+                         console.log("Skipping all re-renders because a day is in edit mode.");
+                         // We are editing, so we skip the full re-render AND the progress bar update.
+                         // This prevents any DOM manipulation that could cause the header to reappear.
+                         // The progress bar will update when the user manually saves and exits edit mode.
+                         return; // Stop here. Do nothing.
                      }
                      // --- AUTOSAVE FIX END ---
 
