@@ -1300,15 +1300,21 @@
                      let vocabRowIndex = vocabRow ? parseInt(vocabRow.dataset.rowIndex) : -1;
                      openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex);
                  }
-				 // --- MODIFIED CLICK HANDLER ---
-                 // Add Vocab with Code Button (Edit Mode)
+				 // --- MODIFIED CLICK HANDLER WITH LOGS ---
                  else if (button.classList.contains('add-vocab-code-btn')) {
+                     console.log("Checkpoint 1: 'Add with Code' button clicked.");
                      const vocabRow = target.closest('tr.vocab-row'); // Find parent row
                      if (vocabRow) {
+                         console.log("Checkpoint 2: Found vocabRow:", vocabRow);
                          const vocabContainer = vocabRow.querySelector('.vocab-edit-container');
-                         openVocabCodeModal(vocabContainer);
+                         if (vocabContainer) {
+                             console.log("Checkpoint 3: Found vocabContainer:", vocabContainer);
+                             openVocabCodeModal(vocabContainer);
+                         } else {
+                             console.error("CRITICAL: Found row, but NOT '.vocab-edit-container' inside it.");
+                         }
                      } else {
-                         showCustomAlert("Error: Could not find vocabulary container.");
+                         console.error("CRITICAL: Could not find parent 'tr.vocab-row'.");
                      }
                  }
                  // --- END MODIFIED BLOCK ---
@@ -1534,7 +1540,8 @@
          }
 
         // Add/Delete Vocab Pair Inputs
-         function addVocabPairInputs(container, word = '', meaning = '') {
+function addVocabPairInputs(container, word = '', meaning = '') {
+             console.log("Checkpoint 8: addVocabPairInputs called with:", word, meaning);
              const newPairIndex = container.querySelectorAll('.vocab-pair').length;
              const pairHtml = `<div class="vocab-pair" data-pair-index="${newPairIndex}">
                                  <input type="text" class="vocab-input vocab-word-input" placeholder="Word" value="${escapeHtml(word)}">
@@ -1547,11 +1554,14 @@
              const buttonContainer = container.querySelector('.vocab-button-container');
              
              if (buttonContainer) {
+                 console.log("Checkpoint 9: Found button container, inserting HTML.");
                  // Insert the new pair *before* that button container
                  buttonContainer.insertAdjacentHTML('beforebegin', pairHtml);
              } else {
-                 console.error("Could not find '.vocab-button-container' to insert new pair.");
+                 // This will now show a RED error if it fails
+                 console.error("CRITICAL: Could not find '.vocab-button-container' to insert new pair.");
              }
+         }
          }
          function deleteVocabPairInputs(pairElement) {
              const container = pairElement.closest('.vocab-edit-container');
@@ -1562,8 +1572,13 @@
 		 // --- NEW Vocab Code Modal Functions ---
 
         function openVocabCodeModal(vocabContainer) {
-            if (!vocabContainer) return;
+            console.log("Checkpoint 4: openVocabCodeModal called.");
+            if (!vocabContainer) {
+                console.error("CRITICAL: openVocabCodeModal was called with a NULL container. Target will not be set.");
+                // We still show the modal, but it won't work
+            }
             currentVocabCodeTarget = vocabContainer;
+            console.log("Checkpoint 5: currentVocabCodeTarget set to:", currentVocabCodeTarget);
             document.getElementById('vocab-code-textarea').value = ''; // Clear textarea
             document.getElementById('vocab-code-modal').style.display = "block";
             document.getElementById('vocab-code-textarea').focus();
@@ -1576,10 +1591,18 @@
         }
 
         function handleSaveVocabCode() {
-            if (!currentVocabCodeTarget) return;
+            console.log("Checkpoint 6: 'Save & Add Pairs' button clicked. handleSaveVocabCode FIRED.");
+            
+            if (!currentVocabCodeTarget) {
+                console.error("CRITICAL: Save failed because currentVocabCodeTarget is NULL.");
+                return;
+            }
+            
+            console.log("Checkpoint 7: Save function has a valid target:", currentVocabCodeTarget);
             const container = currentVocabCodeTarget;
             const text = document.getElementById('vocab-code-textarea').value.trim();
             if (!text) {
+                console.log("Text area is empty. Closing modal.");
                 closeVocabCodeModal();
                 return;
             }
@@ -1595,6 +1618,7 @@
                 }
             }
 
+            console.log("Parsing text:", text);
             const pairs = text.split(';');
             pairs.forEach(pairStr => {
                 const pair = pairStr.trim();
@@ -1610,6 +1634,7 @@
                     }
 
                     if (word) {
+                        console.log("Adding pair:", word, meaning);
                         addVocabPairInputs(container, word, meaning);
                     }
                 }
