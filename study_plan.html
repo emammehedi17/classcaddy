@@ -274,9 +274,38 @@
         .add-day-btn i { margin-right: 8px; }
 
         /* --- Month Navigation --- */
-        #month-nav-buttons button { background-color: #e5e7eb; color: #374151; margin-right: 8px; margin-bottom: 8px; padding: 6px 12px; border-radius: 6px; font-weight: 500; font-size: 0.875rem; transition: background-color 0.2s, color 0.2s; }
-        #month-nav-buttons button:hover { background-color: #d1d5db; }
-        #month-nav-buttons button.active-month { background-color: #10b981; color: white; font-weight: 600; }
+        #month-nav-buttons button {
+            background-color: #ffffff; /* white */
+            color: #374151; /* gray-700 */
+            margin-right: 8px;
+            margin-bottom: 8px;
+            padding: 12px 16px; /* Increased padding */
+            border-radius: 8px; /* Slightly larger radius */
+            font-weight: 500;
+            font-size: 0.875rem;
+            text-align: center;
+            border: 1px solid #e5e7eb; /* gray-200 border */
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); /* Subtle shadow */
+            transition: all 0.2s ease-out; /* Transition all properties */
+        }
+        #month-nav-buttons button:hover {
+            background-color: #ecfdf5; /* emerald-50 */
+            color: #065f46; /* emerald-800 */
+            border-color: #a7f3d0; /* emerald-200 */
+            transform: translateY(-2px); /* Lift effect */
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.05);
+        }
+        #month-nav-buttons button.active-month {
+            background-color: #10b981; /* emerald-500 */
+            color: white;
+            font-weight: 600;
+            border-color: #10b981;
+        }
+        /* Make active button hover consistent */
+        #month-nav-buttons button.active-month:hover {
+            background-color: #059669; /* emerald-600 */
+            border-color: #059669;
+        }
 
         /* --- Header Adjustments --- */
         header.main-website-ui { background-color: rgb(255 255 255 / 0.9); border-bottom-color: #e5e7eb; transition: transform 0.3s ease-in-out; }
