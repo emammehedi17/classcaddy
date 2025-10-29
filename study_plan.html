@@ -638,18 +638,23 @@
 
             window.addEventListener('scroll', () => {
                 const currentScrollY = window.scrollY;
-                let isHeaderHidden = false; // Track state
+                let isHeaderHidden = pageHeader.classList.contains('header-hidden'); // Get current state
 
                 if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                     pageHeader.classList.add('header-hidden');
-                     isHeaderHidden = true;
-                } else {
-                     pageHeader.classList.remove('header-hidden');
-                     isHeaderHidden = false;
+                    // Scrolling DOWN: Hide header
+                    pageHeader.classList.add('header-hidden');
+                    isHeaderHidden = true;
+                } else if (currentScrollY < lastScrollY || currentScrollY <= 0) {
+                    // Scrolling UP (or at the top): Show header
+                    pageHeader.classList.remove('header-hidden');
+                    isHeaderHidden = false;
                 }
+                // If currentScrollY === lastScrollY (i.e., during autosave),
+                // neither condition is met, so nothing happens. This is the fix.
+                
                 lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
 
-                // NEW LOGIC: Update all sticky progress bars
+                // Update sticky progress bars
                 const newTop = isHeaderHidden ? '0px' : `${headerHeight}px`;
                 document.querySelectorAll('.sticky-progress-wrapper').forEach(bar => {
                     bar.style.top = newTop;
