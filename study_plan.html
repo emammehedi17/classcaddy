@@ -1619,32 +1619,38 @@ function addVocabPairInputs(container, word = '', meaning = '') {
 
             console.log("Parsing text:", text);
             const pairs = text.split(';');
+
+            // --- REPLACED LOGIC ---
             pairs.forEach(pairStr => {
                 const pair = pairStr.trim();
                 if (pair) {
-                    const parts = pair.split(/,(.+)/); // Split on first comma
                     let word = '';
                     let meaning = '';
-                    if (parts.length === 2) { // "Word, Meaning"
-                        word = parts[0].trim();
-                        meaning = parts[1].trim();
-                    } else if (parts.length === 1 && parts[0]) { // "Word" (no comma)
-                        word = parts[0].trim();
+                    
+                    const commaIndex = pair.indexOf(',');
+
+                    if (commaIndex === -1) {
+                        // No comma found, treat the whole thing as a word
+                        word = pair.trim();
+                    } else {
+                        // Comma found, split into word and meaning
+                        word = pair.substring(0, commaIndex).trim();
+                        meaning = pair.substring(commaIndex + 1).trim();
                     }
 
-                    if (word) {
-                        console.log("Adding pair:", word, meaning);
+                    if (word) { // Check if the word is not empty
+                        console.log("Adding pair:", word, meaning); 
                         addVocabPairInputs(container, word, meaning);
                     }
                 }
             });
+            // --- END REPLACED LOGIC ---
 
             // Add one new empty pair for the user to manually add more
             addVocabPairInputs(container, '', '');
 
             closeVocabCodeModal();
         }
-
         // Add listener for the new modal's save button
         document.getElementById('save-vocab-code-btn').addEventListener('click', handleSaveVocabCode);
 
