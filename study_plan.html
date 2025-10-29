@@ -1152,7 +1152,10 @@ function attachWeekEventListeners(monthElement, monthId) {
                      openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex);
                  }
                  // Delete Row Button (Edit Mode)
-                 else if (button.classList.contains('delete-row-btn')) { confirmDeleteRow(monthId, weekId, daySection, row); }
+                 else if (button.classList.contains('delete-row-btn')) {
+                    const rowIndex = parseInt(row.dataset.rowIndex);
+                    deleteRow(monthId, weekId, daySection, row, rowIndex);
+                 }
                  // Delete Day Button (Edit Mode)
                  else if (button.classList.contains('delete-day-btn')) { confirmDeleteDay(monthId, weekId, daySection); }
                  // Add Vocab Pair Button (Edit Mode)
