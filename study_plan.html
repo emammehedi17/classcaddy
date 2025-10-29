@@ -279,20 +279,22 @@
             color: #374151; /* gray-700 */
             margin-right: 8px;
             margin-bottom: 8px;
-            padding: 12px 16px; /* Increased padding */
-            border-radius: 8px; /* Slightly larger radius */
+            padding: 12px 16px;
+            border-radius: 8px;
             font-weight: 500;
             font-size: 0.875rem;
             text-align: center;
             border: 1px solid #e5e7eb; /* gray-200 border */
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); /* Subtle shadow */
-            transition: all 0.2s ease-out; /* Transition all properties */
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+            /* --- MODIFICATION --- */
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother, slightly longer transition */
         }
         #month-nav-buttons button:hover {
             background-color: #ecfdf5; /* emerald-50 */
             color: #065f46; /* emerald-800 */
             border-color: #a7f3d0; /* emerald-200 */
-            transform: translateY(-2px); /* Lift effect */
+            /* --- MODIFICATION --- */
+            transform: translateY(-2px) scale(1.03); /* Add a slight scale on hover */
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.05);
         }
         #month-nav-buttons button.active-month {
@@ -300,11 +302,16 @@
             color: white;
             font-weight: 600;
             border-color: #10b981;
+            /* --- MODIFICATION --- */
+            transform: scale(1.05); /* Make active button slightly larger */
+            box-shadow: 0 4px 10px -2px rgba(16, 185, 129, 0.4); /* Add emerald shadow */
         }
         /* Make active button hover consistent */
         #month-nav-buttons button.active-month:hover {
             background-color: #059669; /* emerald-600 */
             border-color: #059669;
+            /* --- MODIFICATION --- */
+            transform: scale(1.05) translateY(-2px); /* Combine active scale and hover lift */
         }
 
         /* --- Header Adjustments --- */
