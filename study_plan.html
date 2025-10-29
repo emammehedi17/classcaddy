@@ -1562,7 +1562,6 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  console.error("CRITICAL: Could not find '.vocab-button-container' to insert new pair.");
              }
          }
-         }
          function deleteVocabPairInputs(pairElement) {
              const container = pairElement.closest('.vocab-edit-container');
              if (container && container.querySelectorAll('.vocab-pair').length > 1) { pairElement.remove(); }
