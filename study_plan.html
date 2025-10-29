@@ -1192,12 +1192,10 @@ function attachWeekEventListeners(monthElement, monthId) {
                  if (target.classList.contains('completion-checkbox')) {
                      if (!daySection?.classList.contains('editing')) {
                          // --- Normal Mode Checkbox Click ---
-                         let scrollY = window.scrollY;
                          // Toggle class immediately for visual feedback
                          row?.classList.toggle('row-completed', target.checked);
                          await saveDayPlan(monthId, weekId, daySection); // Save the state
-                         updateWeeklyProgressUI(monthId, weekId);
-                         window.scrollTo({ top: scrollY, behavior: 'auto' });
+                         // (The scrollY and window.scrollTo lines have been removed)
                      } else {
                          // --- Edit Mode Checkbox Click (Prevent default action) ---
                          // Checkboxes are disabled in edit mode anyway, but this adds safety
