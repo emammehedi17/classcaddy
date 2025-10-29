@@ -877,6 +877,23 @@
                          return;
                      }
 
+                     // --- AUTOSAVE FIX START ---
+                     // Check if any day in this month is currently being edited
+                     const isCurrentlyEditing = currentMonthPlanDisplay.querySelector('.day-section.editing');
+                     if (isCurrentlyEditing) {
+                         console.log("Skipping full re-render because a day is in edit mode.");
+                         // We are editing, so don't re-render the whole month.
+                         // Just update the weekly progress bars with the new data.
+                         const monthData = docSnap.data();
+                         [1, 2, 3, 4].forEach(weekNum => {
+                             const weekId = `week${weekNum}`;
+                             updateWeeklyProgressUI(monthId, weekId, monthData.weeks?.[weekId]);
+                         });
+                         return; // Stop here to prevent redraw
+                     }
+                     // --- AUTOSAVE FIX END ---
+
+
                      // Save scroll position
                      let scrollY = window.scrollY;
                      let parentContainerRect = currentMonthPlanDisplay.getBoundingClientRect();
@@ -1675,17 +1692,28 @@ if (daySection && !daySection.classList.contains('editing')) {
              // Calculate average percentage based on number of rows
             return totalRows === 0 ? 0 : Math.min(Math.round(totalPercentage / totalRows), 100);
         }
-        async function updateWeeklyProgressUI(monthId, weekId) {
+        async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
              if (!currentUser || !userId) return;
              const weekSection = document.querySelector(`[data-month-id="${monthId}"] .week-section[data-week-id="${weekId}"]`);
              if (!weekSection) return;
              const progressBarFill = weekSection.querySelector('.progress-bar-fill');
              const progressPercentageSpan = weekSection.querySelector('.progress-percentage');
+
              try {
-                const docRef = doc(db, getUserPlansCollectionPath(), monthId); const docSnap = await getDoc(docRef);
-                 if (docSnap.exists()) {
-                     const weekData = docSnap.data().weeks?.[weekId]; const progress = calculateWeeklyProgress(weekData);
-                    progressBarFill.style.width = `${progress}%`; progressPercentageSpan.textContent = `${progress}%`;
+                 let dataToUse = weekData;
+                 if (!dataToUse) {
+                     // Data not provided, fetch it
+                     console.log("Progress UI fetching data...");
+                     const docRef = doc(db, getUserPlansCollectionPath(), monthId); const docSnap = await getDoc(docRef);
+                     if (docSnap.exists()) {
+                         dataToUse = docSnap.data().weeks?.[weekId];
+                     }
+                 }
+
+                 if (dataToUse) {
+                    const progress = calculateWeeklyProgress(dataToUse);
+                    progressBarFill.style.width = `${progress}%`;
+                    progressPercentageSpan.textContent = `${progress}%`;
                  }
              } catch (error) { console.error("Error fetching data for progress UI:", error); }
         }
