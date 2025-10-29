@@ -1704,15 +1704,27 @@ function addVocabPairInputs(container, word = '', meaning = '') {
          function deleteDay(monthId, weekId, daySection, dayIndex) {
             if (!currentUser || !userId) return;
             console.log(`Attempting to delete day index ${dayIndex} from week ${weekId}, month ${monthId}`);
+            
+            // --- THIS IS THE FIX ---
+            // Remove the day from the UI immediately.
+            // This also removes the .editing class, fixing the snapshot bug.
+            daySection.remove();
+            
             setSyncStatus("Syncing...", "yellow");
             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
              
-             // We must get the data first, so this part remains async
+             // Run the database update in the background
              getDoc(docRef).then(docSnap => {
                  if (!docSnap.exists()) throw new Error("Month document not found.");
                  let monthData = docSnap.data();
                  let daysArray = monthData.weeks?.[weekId]?.days || [];
-                 if (!daysArray[dayIndex]) throw new Error("Day not found in Firestore.");
+                 
+                 if (!daysArray[dayIndex]) {
+                    // This can happen if the day was already deleted but the UI was slow.
+                    console.warn("Day not found in Firestore, but delete was requested. UI is now in sync.");
+                    setSyncStatus("Synced", "green");
+                    return; 
+                 }
                  
                  // Perform the deletion and re-numbering
                  daysArray.splice(dayIndex, 1);
@@ -1720,15 +1732,14 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  
                  const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
                  
-                 // --- THIS IS THE FIX ---
-                 // Do NOT await this. Let the onSnapshot listener handle the UI update.
+                 // Do NOT await this. Let the onSnapshot listener handle the final "green" sync status.
                  updateDoc(docRef, updatePayload);
                  
-                 console.log("Delete command sent. Awaiting snapshot update.");
-                 // setSyncStatus("Synced", "green"); // The snapshot listener will handle this
+                 console.log("Delete command sent to Firestore.");
              }).catch(error => {
                  console.error("Error deleting day:", error); 
-                 showCustomAlert("Error deleting day. Please try again."); 
+                 // If the DB call fails, the UI is out of sync. Tell the user.
+                 showCustomAlert("Error deleting day. The UI may be out of sync. Please refresh the page.", "error"); 
                  setSyncStatus("Error", "red");
              });
          }
