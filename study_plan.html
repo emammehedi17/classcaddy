@@ -1781,8 +1781,9 @@ if (daySection && !daySection.classList.contains('editing')) {
                 }
             });
              
-             // Return the raw sum of *completed* rows, rounded.
-            return Math.round(totalPercentageSum);
+            // --- UPDATED CALCULATION ---
+            // Multiply the total sum by 7, as requested, and then round it.
+            return Math.round(totalPercentageSum * 7);
         }
 
         async function updateDailyProgressUI(monthId, weekId, dayIndex, dayData) {
