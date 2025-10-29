@@ -1541,7 +1541,13 @@
                                  <input type="text" class="vocab-input vocab-meaning-input" placeholder="Meaning" value="${escapeHtml(meaning)}">
                                  <button type="button" class="icon-button delete-vocab-pair-btn" title="Delete Pair"><i class="fas fa-times text-red-500"></i></button>
                              </div>`;
-             container.querySelector('.add-vocab-pair-btn').insertAdjacentHTML('beforebegin', pairHtml);
+
+             // --- FIX ---
+             // Find the container of the buttons (the <div> holding the '+' and 'Add with Code' buttons)
+             const buttonContainer = container.querySelector('.add-vocab-pair-btn').parentElement;
+             
+             // Insert the new pair *before* that button container
+             buttonContainer.insertAdjacentHTML('beforebegin', pairHtml);
          }
          function deleteVocabPairInputs(pairElement) {
              const container = pairElement.closest('.vocab-edit-container');
