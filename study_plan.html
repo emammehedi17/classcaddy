@@ -534,7 +534,7 @@
         // Import necessary functions from Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, setDoc, doc, getDoc, collection, query, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, setDoc, doc, getDoc, collection, query, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Firebase Configuration ---
         setLogLevel('debug'); // Keep debug logging enabled for now
@@ -774,7 +774,7 @@
         async function loadStudyPlans() {
             if (!currentUser || !userId) return;
             const plansCollectionPath = getUserPlansCollectionPath();
-            const q = query(collection(db, plansCollectionPath), orderBy("createdAt", "desc")); // Order by creation time
+            const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc")); // Order by document ID (YYYY-MM)
 
             if (unsubscribePlans) unsubscribePlans();
 
