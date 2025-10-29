@@ -889,12 +889,35 @@
                          console.log("Skipping all re-renders because a day is in edit mode.");
                          // We are editing, so we skip the full re-render AND the progress bar update.
                          // This prevents any DOM manipulation that could cause the header to reappear.
-                         // The progress bar will update when the user manually saves and exits edit mode.
                          return; // Stop here. Do nothing.
                      }
                      // --- AUTOSAVE FIX END ---
 
 
+                     // --- ANIMATION FIX START ---
+                     // Check if the change came from a local write (like clicking a checkbox)
+                     const hasPendingWrites = docSnap.metadata.hasPendingWrites;
+                     if (hasPendingWrites) {
+                         // This was a local change (e.g., checkbox click).
+                         // The click handler is already updating the row's completed-class.
+                         // We just need to update the progress bars smoothly.
+                         console.log("Local change detected. Updating progress bars only.");
+                         const monthData = docSnap.data();
+                         if (monthData) {
+                             currentMonthPlanDisplay.querySelectorAll('.week-section').forEach(weekSection => {
+                                 const weekId = weekSection.dataset.weekId;
+                                 if (weekId && monthData.weeks?.[weekId]) {
+                                     updateWeeklyProgressUI(monthId, weekId, monthData.weeks[weekId]);
+                                 }
+                             });
+                         }
+                         return; // Don't do the full, destructive re-render
+                     }
+                     // --- ANIMATION FIX END ---
+
+
+                     // --- Full re-render for changes from OTHER sources (e.g., another device) ---
+                     console.log("Full re-render from server data.");
                      // Save scroll position
                      let scrollY = window.scrollY;
                      let parentContainerRect = currentMonthPlanDisplay.getBoundingClientRect();
