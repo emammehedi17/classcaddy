@@ -521,6 +521,29 @@
 
         </div> </main>
 
+
+	<!-- --- NEW VOCAB-CODE-MODAL --- -->
+    <div id="vocab-code-modal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close" onclick="closeModal('vocab-code-modal')">&times;</span>
+        <h3 class="text-xl font-semibold mb-3 text-emerald-600">Add Vocabulary with Code</h3>
+        <p class="text-sm text-gray-500 mb-2">
+            Enter words and meanings. Separate words from meanings with a comma (`,`).
+            <br>
+            Separate each new pair with a semicolon (`;`).
+        </p>
+        <p class="text-xs text-gray-400 mb-4">Example: `Cow, গরু; Hen, মুরগী; Disrupt, ব্যাহত করা;`</p>
+        
+        <textarea id="vocab-code-textarea" rows="8" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-md text-gray-800 placeholder-gray-400 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Word, Meaning; Word, Meaning; ..."></textarea>
+        
+        <div class="mt-4 flex justify-end gap-3">
+             <button onclick="closeModal('vocab-code-modal')" class="action-button action-button-secondary">Cancel</button>
+             <button id="save-vocab-code-btn" class="action-button">Save & Add Pairs</button>
+        </div>
+      </div>
+    </div>
+    <!-- --- END VOCAB-CODE-MODAL --- -->
+	
     <div id="story-modal" class="modal">
       <div class="modal-content">
         <span class="modal-close" onclick="closeModal('story-modal')">&times;</span>
@@ -647,6 +670,9 @@
         let unsubscribeActiveMonth = null; // For the currently displayed month
         let currentStoryTarget = null;
         let currentConfirmAction = null;
+		let autosaveTimer = null;
+		let currentConfirmAction = null;
+        let currentVocabCodeTarget = null; // <-- ADD THIS LINE
 		let autosaveTimer = null;
 
 
@@ -1134,8 +1160,12 @@
                          <tbody> ${dayData.rows?.map((rowData, rowIndex) => createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)).join('') || ''} </tbody>
                      </table>
                      <div class="edit-mode-controls hidden mt-3 flex flex-wrap gap-2 justify-between items-center">
-                         <div class="flex flex-wrap gap-2"> <button class="action-button action-button-secondary text-xs add-normal-row-btn"><i class="fas fa-plus mr-1"></i> Add Row</button>
+                         <div class="flex flex-wrap gap-2"> 
+                             <button class="action-button action-button-secondary text-xs add-normal-row-btn"><i class="fas fa-plus mr-1"></i> Add Row</button>
                              <button class="action-button action-button-secondary text-xs add-vocab-row-btn"><i class="fas fa-book mr-1"></i> Add Vocabulary</button>
+                             <!-- --- NEW BUTTON --- -->
+                             <button class="action-button action-button-secondary text-xs add-vocab-code-btn"><i class="fas fa-code mr-1"></i> Add with Code</button>
+                             <!-- --- END NEW BUTTON --- -->
                              <button class="action-button action-button-secondary text-xs add-story-btn"><i class="fas fa-feather-alt mr-1"></i> Add/Edit Story</button>
                          </div>
                          <button class="action-button text-xs save-day-btn"><i class="fas fa-save mr-1"></i> Save</button>
@@ -1281,6 +1311,17 @@ function attachWeekEventListeners(monthElement, monthId) {
                      let vocabRowIndex = vocabRow ? parseInt(vocabRow.dataset.rowIndex) : -1;
                      openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex);
                  }
+				 // Add Vocab with Code Button (Edit Mode)
+                 else if (button.classList.contains('add-vocab-code-btn')) {
+                     const vocabRow = daySection.querySelector('tr.vocab-row');
+                     if (vocabRow) {
+                         const vocabContainer = vocabRow.querySelector('.vocab-edit-container');
+                         openVocabCodeModal(vocabContainer);
+                     } else {
+                         showCustomAlert("Please add a 'Vocabulary' row first.");
+                     }
+                 }
+                 // --- END NEW BLOCK ---
                  // Delete Row Button (Edit Mode)
                  else if (button.classList.contains('delete-row-btn')) {
                     if (row.classList.contains('vocab-row')) {
@@ -1505,9 +1546,13 @@ function attachWeekEventListeners(monthElement, monthId) {
          }
 
         // Add/Delete Vocab Pair Inputs
-         function addVocabPairInputs(container) {
+         function addVocabPairInputs(container, word = '', meaning = '') {
              const newPairIndex = container.querySelectorAll('.vocab-pair').length;
-             const pairHtml = `<div class="vocab-pair" data-pair-index="${newPairIndex}"><input type="text" class="vocab-input vocab-word-input" placeholder="Word" value=""><input type="text" class="vocab-input vocab-meaning-input" placeholder="Meaning" value=""><button type="button" class="icon-button delete-vocab-pair-btn" title="Delete Pair"><i class="fas fa-times text-red-500"></i></button></div>`;
+             const pairHtml = `<div class="vocab-pair" data-pair-index="${newPairIndex}">
+                                 <input type="text" class="vocab-input vocab-word-input" placeholder="Word" value="${escapeHtml(word)}">
+                                 <input type="text" class="vocab-input vocab-meaning-input" placeholder="Meaning" value="${escapeHtml(meaning)}">
+                                 <button type="button" class="icon-button delete-vocab-pair-btn" title="Delete Pair"><i class="fas fa-times text-red-500"></i></button>
+                             </div>`;
              container.querySelector('.add-vocab-pair-btn').insertAdjacentHTML('beforebegin', pairHtml);
          }
          function deleteVocabPairInputs(pairElement) {
@@ -1515,6 +1560,71 @@ function attachWeekEventListeners(monthElement, monthId) {
              if (container && container.querySelectorAll('.vocab-pair').length > 1) { pairElement.remove(); }
              else { showCustomAlert("Cannot delete the last word/meaning pair."); }
          }
+		 
+		 // --- NEW Vocab Code Modal Functions ---
+
+        function openVocabCodeModal(vocabContainer) {
+            if (!vocabContainer) return;
+            currentVocabCodeTarget = vocabContainer;
+            document.getElementById('vocab-code-textarea').value = ''; // Clear textarea
+            document.getElementById('vocab-code-modal').style.display = "block";
+            document.getElementById('vocab-code-textarea').focus();
+        }
+
+        function closeVocabCodeModal() {
+            document.getElementById('vocab-code-modal').style.display = "none";
+            document.getElementById('vocab-code-textarea').value = '';
+            currentVocabCodeTarget = null;
+        }
+
+        function handleSaveVocabCode() {
+            if (!currentVocabCodeTarget) return;
+            const container = currentVocabCodeTarget;
+            const text = document.getElementById('vocab-code-textarea').value.trim();
+            if (!text) {
+                closeVocabCodeModal();
+                return;
+            }
+
+            // Check if the last pair is empty and remove it, so we don't have an empty row.
+            const allPairs = container.querySelectorAll('.vocab-pair');
+            if (allPairs.length > 0) {
+                const lastPair = allPairs[allPairs.length - 1];
+                const lastWordInput = lastPair.querySelector('.vocab-word-input');
+                const lastMeaningInput = lastPair.querySelector('.vocab-meaning-input');
+                if (lastWordInput.value.trim() === '' && lastMeaningInput.value.trim() === '') {
+                    lastPair.remove();
+                }
+            }
+
+            const pairs = text.split(';');
+            pairs.forEach(pairStr => {
+                const pair = pairStr.trim();
+                if (pair) {
+                    const parts = pair.split(/,(.+)/); // Split on first comma
+                    let word = '';
+                    let meaning = '';
+                    if (parts.length === 2) { // "Word, Meaning"
+                        word = parts[0].trim();
+                        meaning = parts[1].trim();
+                    } else if (parts.length === 1 && parts[0]) { // "Word" (no comma)
+                        word = parts[0].trim();
+                    }
+
+                    if (word) {
+                        addVocabPairInputs(container, word, meaning);
+                    }
+                }
+            });
+
+            // Add one new empty pair for the user to manually add more
+            addVocabPairInputs(container, '', '');
+
+            closeVocabCodeModal();
+        }
+
+        // Add listener for the new modal's save button
+        document.getElementById('save-vocab-code-btn').addEventListener('click', handleSaveVocabCode);
 
         // --- Delete Operations ---
          function confirmDeleteRow(monthId, weekId, daySection, rowElement) {
