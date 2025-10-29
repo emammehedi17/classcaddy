@@ -1041,9 +1041,10 @@
                          <tbody> ${dayData.rows?.map((rowData, rowIndex) => createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)).join('') || ''} </tbody>
                      </table>
                      <div class="edit-mode-controls hidden mt-3 flex flex-wrap gap-2 justify-between items-center">
-                         <button class="action-button action-button-secondary text-xs add-normal-row-btn"><i class="fas fa-plus mr-1"></i> Add Row</button>
-                         <button class="action-button action-button-secondary text-xs add-vocab-row-btn"><i class="fas fa-book mr-1"></i> Add Vocabulary</button>
-                         <button class="action-button action-button-secondary text-xs add-story-btn"><i class="fas fa-feather-alt mr-1"></i> Add/Edit Story</button>
+                         <div class="flex flex-wrap gap-2"> <button class="action-button action-button-secondary text-xs add-normal-row-btn"><i class="fas fa-plus mr-1"></i> Add Row</button>
+                             <button class="action-button action-button-secondary text-xs add-vocab-row-btn"><i class="fas fa-book mr-1"></i> Add Vocabulary</button>
+                             <button class="action-button action-button-secondary text-xs add-story-btn"><i class="fas fa-feather-alt mr-1"></i> Add/Edit Story</button>
+                         </div>
                          <button class="action-button text-xs save-day-btn"><i class="fas fa-save mr-1"></i> Save</button>
                      </div>
                  </div>`;
