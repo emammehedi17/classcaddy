@@ -628,6 +628,7 @@
         let unsubscribeActiveMonth = null; // For the currently displayed month
         let currentStoryTarget = null;
         let currentConfirmAction = null;
+		let autosaveTimer = null;
 
 
         // --- Header Navigation & Scroll Logic (from script.js) ---
@@ -1224,7 +1225,7 @@ function attachWeekEventListeners(monthElement, monthId) {
         }
 
 
-        // Toggle Edit Mode - Updated for Button Swap
+        // Toggle Edit Mode - Updated for Button Swap AND Autosave
         async function toggleDayEditMode(monthId, weekId, daySection, enterEditMode) {
              const dayIndex = parseInt(daySection.dataset.dayIndex);
              const tableBody = daySection.querySelector('tbody');
@@ -1242,7 +1243,6 @@ function attachWeekEventListeners(monthElement, monthId) {
                  daySection.classList.add('editing');
                  editButton.classList.add('hidden'); // Hide Edit button
                  editModeControls.classList.remove('hidden'); // Show controls (including Save)
-                 // saveButton is already visible because editModeControls is shown
                  deleteDayButton.classList.remove('hidden');
                  actionsHeader.classList.remove('hidden');
                  completionPercHeader.classList.remove('hidden');
@@ -1257,14 +1257,45 @@ function attachWeekEventListeners(monthElement, monthId) {
                  daySection.querySelectorAll('.completion-checkbox').forEach(cb => cb.disabled = true);
                  setSyncStatus("Editing...", "blue");
 
+                 // --- AUTOSAVE LOGIC (START) ---
+                 // Define the autosave handler
+                 const autosaveHandler = (e) => {
+                     // Check if the event is from a valid input
+                     if (e.target.classList.contains('editable-input') || e.target.classList.contains('vocab-input')) {
+                         if (autosaveTimer) clearTimeout(autosaveTimer); // Clear existing timer
+                         setSyncStatus("Unsaved changes", "yellow");
+                         
+                         // Set a new timer
+                         autosaveTimer = setTimeout(() => {
+                             console.log("Autosaving changes...");
+                             saveDayPlan(monthId, weekId, daySection); // Call the save function
+                         }, 2500); // Wait 2.5 seconds after last input
+                     }
+                 };
+                 // Attach the listener to the whole day section using event delegation
+                 daySection.addEventListener('input', autosaveHandler);
+                 // Store the handler on the element so we can remove it later
+                 daySection.autosaveHandler = autosaveHandler;
+                 // --- AUTOSAVE LOGIC (END) ---
+
              } else {
                  // --- SAVING AND EXITING EDIT MODE ---
-                 await saveDayPlan(monthId, weekId, daySection); // Save first
+
+                 // --- AUTOSAVE LOGIC (START) ---
+                 // Clear any pending autosave timer
+                 if (autosaveTimer) clearTimeout(autosaveTimer);
+                 // Remove the event listener to stop autosaving
+                 if (daySection.autosaveHandler) {
+                     daySection.removeEventListener('input', daySection.autosaveHandler);
+                     daySection.autosaveHandler = null;
+                 }
+                 // --- AUTOSAVE LOGIC (END) ---
+                 
+                 await saveDayPlan(monthId, weekId, daySection); // Save final changes on click
 
                  daySection.classList.remove('editing');
                  editButton.classList.remove('hidden'); // Show Edit button
                  editModeControls.classList.add('hidden'); // Hide controls (including Save)
-                 // saveButton is hidden because editModeControls is hidden
                  deleteDayButton.classList.add('hidden');
                  actionsHeader.classList.add('hidden');
                  completionPercHeader.classList.add('hidden');
