@@ -1188,8 +1188,14 @@ function attachWeekEventListeners(monthElement, monthId) {
                  }
                  // Delete Row Button (Edit Mode)
                  else if (button.classList.contains('delete-row-btn')) {
-                    const rowIndex = parseInt(row.dataset.rowIndex);
-                    deleteRow(monthId, weekId, daySection, row, rowIndex);
+                    if (row.classList.contains('vocab-row')) {
+                        // Show confirmation modal ONLY for vocabulary rows
+                        confirmDeleteRow(monthId, weekId, daySection, row);
+                    } else {
+                        // Delete normal rows instantly
+                        const rowIndex = parseInt(row.dataset.rowIndex);
+                        deleteRow(monthId, weekId, daySection, row, rowIndex);
+                    }
                  }
                  // Delete Day Button (Edit Mode)
                  else if (button.classList.contains('delete-day-btn')) { confirmDeleteDay(monthId, weekId, daySection); }
