@@ -216,7 +216,13 @@
         textarea.editable-input { min-height: 40px; }
         tr.editing-mode td { background-color: transparent !important; } /* Remove row highlight in edit */
         .day-section.editing { background-color: #f0fdf4 !important; } /* Highlight whole card in edit */
-
+		
+		
+		.vocab-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
 
         /* --- Vocabulary Specific Styles --- */
         .vocab-word {
@@ -1197,12 +1203,16 @@
         // Generate Vocab HTML with new Tooltip style
         function generateVocabHtml(vocabData) {
             if (!vocabData || vocabData.length === 0) return '-';
-            return vocabData.map(v =>
+
+            const wordsHtml = vocabData.map(v =>
                 `<div class="vocab-word" tabindex="0">
                     ${escapeHtml(v.word || '')}
                     <span class="vocab-meaning">${escapeHtml(v.meaning || 'No meaning')}</span>
                  </div>`
-            ).join(' ');
+            ).join(''); // Join with no space, margin will handle it
+            
+            // Return the words inside our new flex container
+            return `<div class="vocab-container">${wordsHtml}</div>`;
         }
 
         function escapeHtml(unsafe) {
