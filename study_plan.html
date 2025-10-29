@@ -842,14 +842,22 @@
                         monthNavButtonsContainer.appendChild(button);
                     });
 
+
+                    // --- MODIFIED BLOCK START ---
                     if (currentMonthId && !monthExists) {
+                        // The month we were viewing was deleted. Show the 'select' message.
                         currentMonthPlanDisplay.innerHTML = '';
                         selectMonthMessage.classList.remove('hidden');
                         if (unsubscribeActiveMonth) unsubscribeActiveMonth(); // Stop listening to deleted month
                         unsubscribeActiveMonth = null;
                     } else if (!currentMonthId) {
-                         selectMonthMessage.classList.remove('hidden');
+                        // No month is currently selected (e.g., initial page load).
+                        // Default to the last month in the list.
+                        const lastMonthId = querySnapshot.docs[querySnapshot.docs.length - 1].id;
+                        console.log("No month selected. Defaulting to last month:", lastMonthId);
+                        displayMonthPlan(lastMonthId); // Automatically load the last month
                     }
+                    // --- MODIFIED BLOCK END ---
                 }
 
                 // Restore scroll position
