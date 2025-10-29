@@ -1281,12 +1281,12 @@ function attachWeekEventListeners(monthElement, monthId) {
                      // Check if the event is from a valid input
                      if (e.target.classList.contains('editable-input') || e.target.classList.contains('vocab-input')) {
                          if (autosaveTimer) clearTimeout(autosaveTimer); // Clear existing timer
-                         setSyncStatus("Unsaved changes", "yellow");
+                         // setSyncStatus("Unsaved changes", "yellow"); // <-- REMOVED this line
                          
                          // Set a new timer
                          autosaveTimer = setTimeout(() => {
                              console.log("Autosaving changes...");
-                             saveDayPlan(monthId, weekId, daySection); // Call the save function
+                             saveDayPlan(monthId, weekId, daySection, true); // <-- ADDED 'true'
                          }, 2500); // Wait 2.5 seconds after last input
                      }
                  };
@@ -1340,11 +1340,13 @@ function attachWeekEventListeners(monthElement, monthId) {
         }
 
         // Save Day Plan
-        async function saveDayPlan(monthId, weekId, daySection) {
+        async function saveDayPlan(monthId, weekId, daySection, isAutosave = false) {
             if (!currentUser || !userId) return;
             const dayIndex = parseInt(daySection.dataset.dayIndex);
             console.log(`Saving day plan for ${monthId}, ${weekId}, Day Index: ${dayIndex}`);
-            setSyncStatus("Syncing...", "yellow");
+            if (!isAutosave) {
+                setSyncStatus("Syncing...", "yellow");
+            }
 
             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
             try {
@@ -1398,7 +1400,9 @@ function attachWeekEventListeners(monthElement, monthId) {
                 const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
                 await updateDoc(docRef, updatePayload);
                 console.log(`Day ${dayIndex + 1} for ${weekId} saved successfully.`);
-                setSyncStatus("Synced", "green");
+                if (!isAutosave) {
+                    setSyncStatus("Synced", "green");
+                }
 
             } catch (error) {
                 console.error("Error saving day plan:", error);
