@@ -1185,7 +1185,7 @@
                              </div>`;
                      });
                      // --- MODIFIED BLOCK TO ADD BUTTON ---
-                     topicContent += `<div class="flex items-center gap-2 mt-2">
+                     topicContent += `<div class="flex items-center gap-2 mt-2 vocab-button-container">
                                         <button type="button" class="icon-button add-vocab-pair-btn" title="Add Word/Meaning Pair"><i class="fas fa-plus-circle text-emerald-500"></i></button>
                                         <button type="button" class="action-button action-button-secondary add-vocab-code-btn" style="padding: 4px 8px; font-size: 0.75rem;"><i class="fas fa-code mr-1"></i> Add with Code</button>
                                      </div>
@@ -1542,12 +1542,16 @@
                                  <button type="button" class="icon-button delete-vocab-pair-btn" title="Delete Pair"><i class="fas fa-times text-red-500"></i></button>
                              </div>`;
 
-             // --- FIX ---
-             // Find the container of the buttons (the <div> holding the '+' and 'Add with Code' buttons)
-             const buttonContainer = container.querySelector('.add-vocab-pair-btn').parentElement;
+             // --- ROBUST FIX ---
+             // Find the specific button container div we just named
+             const buttonContainer = container.querySelector('.vocab-button-container');
              
-             // Insert the new pair *before* that button container
-             buttonContainer.insertAdjacentHTML('beforebegin', pairHtml);
+             if (buttonContainer) {
+                 // Insert the new pair *before* that button container
+                 buttonContainer.insertAdjacentHTML('beforebegin', pairHtml);
+             } else {
+                 console.error("Could not find '.vocab-button-container' to insert new pair.");
+             }
          }
          function deleteVocabPairInputs(pairElement) {
              const container = pairElement.closest('.vocab-edit-container');
