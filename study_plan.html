@@ -1681,25 +1681,26 @@ if (daySection && !daySection.classList.contains('editing')) {
         }
 
         // --- Other Utility functions ---
-function calculateWeeklyProgress(weekData) {
+			function calculateWeeklyProgress(weekData) {
             if (!weekData || !weekData.days || weekData.days.length === 0) return 0;
             let totalPercentageSum = 0; 
             
             weekData.days.forEach(day => {
                 day.rows?.forEach(row => {
-                    // Get the percentage value from the row
-                    const perc = parsePercentage(row.completionPercentage);
-                    
-                    // If the percentage is a valid number (not null), add it to the sum
-                    if (perc !== null && !isNaN(perc)) {
-                         totalPercentageSum += perc;
+                    // Check if the "Done" checkbox is checked
+                    if (row.completed) {
+                        // If it is, get the percentage value from the row
+                        const perc = parsePercentage(row.completionPercentage);
+                        
+                        // If the percentage is a valid number (not null), add it to the sum
+                        if (perc !== null && !isNaN(perc)) {
+                             totalPercentageSum += perc;
+                        }
                     }
                 });
             });
              
-             // Return the raw sum, rounded.
-             // The CSS for the bar width will visually cap at 100%, 
-             // but the text label will show the true sum (e.g., "110%").
+             // Return the raw sum of *completed* rows, rounded.
             return Math.round(totalPercentageSum);
         }
         async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
