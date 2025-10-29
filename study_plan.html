@@ -1732,14 +1732,28 @@ if (daySection && !daySection.classList.contains('editing')) {
              if (!event.target.closest('.vocab-word')) { document.querySelectorAll('.vocab-word.active').forEach(v => v.classList.remove('active')); }
          }
         function parsePercentage(value) {
-            if (value === null || value === undefined) return null; let strVal = String(value).trim(); if (strVal === '') return null;
+            if (value === null || value === undefined) return null; 
+            let strVal = String(value).trim(); 
+            if (strVal === '') return null;
+
             if (strVal.includes('/')) {
-                const parts = strVal.split('/'); const num = parseFloat(parts[0]); const den = parseFloat(parts[1]);
-                if (!isNaN(num) && !isNaN(den) && den !== 0) { return Math.min(Math.max(parseFloat((num / den * 100).toFixed(10)), 0), 100); } // Convert fraction to percentage
+                const parts = strVal.split('/'); 
+                const num = parseFloat(parts[0]); 
+                const den = parseFloat(parts[1]);
+                if (!isNaN(num) && !isNaN(den) && den !== 0) { 
+                    // User wants 3/2 -> 1.5. Just do the division and round to 10 decimal places.
+                    return parseFloat((num / den).toFixed(10));
+                }
             }
+            
             strVal = strVal.replace(',', '.').replace('%', ''); // Allow comma, dot, and % sign
             const floatVal = parseFloat(strVal);
-            if (!isNaN(floatVal)) { return Math.min(Math.max(parseFloat(floatVal.toFixed(10)), 0), 100); } // Clamp between 0 and 100
+            
+            if (!isNaN(floatVal)) { 
+                // User wants to input any number. Do not clamp it.
+                return parseFloat(floatVal.toFixed(10));
+            } 
+            
             return null; // Invalid input
          }
          function setSyncStatus(text, color) {
