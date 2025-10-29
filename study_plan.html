@@ -1705,10 +1705,43 @@ function addVocabPairInputs(container, word = '', meaning = '') {
             if (!currentUser || !userId) return;
             console.log(`Attempting to delete day index ${dayIndex} from week ${weekId}, month ${monthId}`);
             
-            // --- THIS IS THE FIX ---
+            const weekSection = daySection.closest('.week-section'); // Get parent week
+            
+            // --- FIX START ---
             // Remove the day from the UI immediately.
-            // This also removes the .editing class, fixing the snapshot bug.
             daySection.remove();
+            
+            // Manually count remaining days in the DOM
+            const remainingDays = weekSection.querySelectorAll('.day-section').length;
+
+            // Find the button container (which is the element *after* .days-container)
+            const buttonContainer = weekSection.querySelector('.days-container').nextElementSibling;
+            
+            let newButtonHtml = '';
+            if (remainingDays < 7) {
+                if (remainingDays > 0) {
+                    // Show "Add New Day"
+                    newButtonHtml = `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>`;
+                } else {
+                    // Show "Add First Day"
+                    newButtonHtml = `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`;
+                    
+                    // Also add back the "No days" message
+                    const daysContainer = weekSection.querySelector('.days-container');
+                    if (daysContainer) {
+                        daysContainer.innerHTML = '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
+                    }
+                }
+            } else {
+                // Show "Max days"
+                newButtonHtml = '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>';
+            }
+            
+            // Replace the old button container (which has the wrong button)
+            if (buttonContainer) {
+                buttonContainer.outerHTML = newButtonHtml;
+            }
+            // --- FIX END ---
             
             setSyncStatus("Syncing...", "yellow");
             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
@@ -1720,7 +1753,6 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  let daysArray = monthData.weeks?.[weekId]?.days || [];
                  
                  if (!daysArray[dayIndex]) {
-                    // This can happen if the day was already deleted but the UI was slow.
                     console.warn("Day not found in Firestore, but delete was requested. UI is now in sync.");
                     setSyncStatus("Synced", "green");
                     return; 
@@ -1738,7 +1770,6 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  console.log("Delete command sent to Firestore.");
              }).catch(error => {
                  console.error("Error deleting day:", error); 
-                 // If the DB call fails, the UI is out of sync. Tell the user.
                  showCustomAlert("Error deleting day. The UI may be out of sync. Please refresh the page.", "error"); 
                  setSyncStatus("Error", "red");
              });
