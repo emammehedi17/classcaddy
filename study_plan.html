@@ -1352,22 +1352,16 @@ function attachWeekEventListeners(monthElement, monthId) {
          }
          async function deleteRow(monthId, weekId, daySection, rowElement, rowIndex) {
             rowElement.remove(); // Remove from UI
-            console.log("Row removed from UI. Saving updated day plan...");
-            setSyncStatus("Unsaved changes", "yellow");
-await saveDayPlan(monthId, weekId, daySection); // Save immediately
+            console.log("Row removed from UI. Awaiting final save.");
+            setSyncStatus("Unsaved changes", "yellow"); // Show that changes are pending
 
-// --- Keep editing mode active after deleting ---
-if (!daySection.classList.contains('editing')) {
-    toggleDayEditMode(monthId, weekId, daySection, true);
-}
+            // --- Database save removed. The save will happen when the user clicks the main 'Save' button. ---
 
-// Re-index remaining rows
-daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => {
-    tr.dataset.rowIndex = newIdx;
-    tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`;
-});
-
-
+            // Re-index remaining rows in the UI so the save function works correctly
+            daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => {
+                tr.dataset.rowIndex = newIdx;
+                tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`;
+            });
          }
          function confirmDeleteDay(monthId, weekId, daySection) {
              const dayIndex = parseInt(daySection.dataset.dayIndex);
