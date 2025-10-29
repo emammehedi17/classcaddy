@@ -934,54 +934,79 @@
                      }
 
                      // --- AUTOSAVE FIX START ---
-                     // Check if any day in this month is currently being edited
                      const isCurrentlyEditing = currentMonthPlanDisplay.querySelector('.day-section.editing');
                      if (isCurrentlyEditing) {
                          console.log("Skipping all re-renders because a day is in edit mode.");
-                         // We are editing, so we skip the full re-render AND the progress bar update.
-                         // This prevents any DOM manipulation that could cause the header to reappear.
                          return; // Stop here. Do nothing.
                      }
                      // --- AUTOSAVE FIX END ---
 
 
-                     // --- ANIMATION FIX START ---
-                     // Check if the change came from a local write (like clicking a checkbox)
+                     // --- ANIMATION FIX START (NOW WITH STRUCTURAL CHECK) ---
                      const hasPendingWrites = docSnap.metadata.hasPendingWrites;
                      if (hasPendingWrites) {
-                         // This was a local change (e.g., checkbox click).
-                         // The click handler is already updating the row's completed-class.
-                         // We just need to update the progress bars smoothly.
-                         console.log("Local change detected. Updating progress bars only.");
+                         console.log("Local change detected. Checking for structural changes...");
                          const monthData = docSnap.data();
-                         if (monthData) {
-                             currentMonthPlanDisplay.querySelectorAll('.week-section').forEach(weekSection => {
-                                 const weekId = weekSection.dataset.weekId;
-                                 const weekData = monthData.weeks?.[weekId];
-                                 if (weekId && weekData) {
-                                     // Update the weekly bar
-                                     updateWeeklyProgressUI(monthId, weekId, weekData);
+
+                         // --- NEW STRUCTURAL CHECK ---
+                         let structureHasChanged = false;
+                         if (monthData && monthData.weeks) {
+                             const weekSections = currentMonthPlanDisplay.querySelectorAll('.week-section');
+                             
+                             if (weekSections.length !== Object.keys(monthData.weeks).length) {
+                                 structureHasChanged = true;
+                             } else {
+                                 // Check each week for day count changes
+                                 for (const weekSection of weekSections) {
+                                     const weekId = weekSection.dataset.weekId;
+                                     const domDayCount = weekSection.querySelectorAll('.day-section').length;
+                                     const dataDayCount = monthData.weeks[weekId]?.days?.length || 0;
                                      
-                                     // --- NEW ---
-                                     // Loop through this week's days and update their bars too
-                                     weekData.days?.forEach((dayData, dayIndex) => {
-                                         updateDailyProgressUI(monthId, weekId, dayIndex, dayData);
-                                     });
-                                     // --- END NEW ---
+                                     if (domDayCount !== dataDayCount) {
+                                         structureHasChanged = true;
+                                         break; // Found a change, no need to check others
+                                     }
                                  }
-                             });
+                             }
+                         } else if (monthData) {
+                             // Month data exists but has no weeks, but UI might still show weeks
+                             if (currentMonthPlanDisplay.querySelectorAll('.week-section').length > 0) {
+                                 structureHasChanged = true;
+                             }
                          }
-                         return; // Don't do the full, destructive re-render
+                         // --- END NEW STRUCTURAL CHECK ---
+
+
+                         // --- MODIFIED LOGIC ---
+                         if (structureHasChanged) {
+                             console.log("Structural change (day added/deleted) detected. Forcing full re-render.");
+                             // DO NOT return. Fall through to the full re-render logic below.
+                         } else {
+                             // No structural change, just do the smooth progress bar update.
+                             console.log("Non-structural change. Updating progress bars only.");
+                             if (monthData) {
+                                 currentMonthPlanDisplay.querySelectorAll('.week-section').forEach(weekSection => {
+                                     const weekId = weekSection.dataset.weekId;
+                                     const weekData = monthData.weeks?.[weekId];
+                                     if (weekId && weekData) {
+                                         updateWeeklyProgressUI(monthId, weekId, weekData);
+                                         weekData.days?.forEach((dayData, dayIndex) => {
+                                             updateDailyProgressUI(monthId, weekId, dayIndex, dayData);
+                                         });
+                                     }
+                                 });
+                             }
+                             return; // Don't do the full, destructive re-render
+                         }
+                         // --- END MODIFIED LOGIC ---
                      }
                      // --- ANIMATION FIX END ---
 
 
-                     // --- Full re-render for changes from OTHER sources (e.g., another device) ---
+                     // --- Full re-render for changes from OTHER sources (or local structural changes) ---
                      console.log("Full re-render from server data.");
-                     // Save scroll position
                      let scrollY = window.scrollY;
                      let parentContainerRect = currentMonthPlanDisplay.getBoundingClientRect();
-                     // Only restore if we're scrolled past the *start* of the container
                      let shouldRestoreScroll = parentContainerRect.top < 0;
 
 
@@ -993,7 +1018,6 @@
                          currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">This plan was not found (it may have been deleted).</p>';
                      }
 
-                     // Restore scroll position
                      if (shouldRestoreScroll) {
                         console.log("Restoring scroll position to (displayMonthPlan):", scrollY);
                         window.scrollTo({ top: scrollY, behavior: 'auto' });
