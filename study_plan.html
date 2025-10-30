@@ -486,6 +486,14 @@
             /* Animation for the circle fill */
             transition: stroke-dashoffset 0.5s ease;
         }
+		
+		.circular .progress-cap {
+            /* This is the new circle "head" */
+            r: 7; /* Radius of the cap, slightly larger than stroke/2 */
+            transform-origin: 75px 75px; /* Set rotation origin to SVG center */
+            /* Use a matching transition for smooth updates */
+            transition: transform 0.5s ease;
+        }
 
         .circular .inner-text {
             position: absolute;
@@ -1134,25 +1142,40 @@
                                  // Update Monthly Tracker
                                  const monthlyCard = currentMonthPlanDisplay.querySelector(`#monthly-tracker-${monthId}`);
                                  if (monthlyCard) {
-                                     monthlyCard.querySelector('.tracker-score').textContent = monthlyPercent + '%'; // Add %
+                                     monthlyCard.querySelector('.tracker-score').textContent = monthlyPercent + '%';
                                      const monthlyOffset = circumference - (circumference * monthlyPercent) / 100;
                                      monthlyCard.querySelector('.progress').style.strokeDashoffset = monthlyOffset;
+                                     // --- ADDED ---
+                                     const monthlyRotation = (monthlyPercent / 100) * 360;
+                                     const monthlyCap = monthlyCard.querySelector('.progress-cap');
+                                     monthlyCap.style.transform = `rotate(${monthlyRotation}deg)`;
+                                     monthlyCap.style.visibility = monthlyPercent === 0 ? 'hidden' : 'visible';
                                  }
                                  
                                  // Update Weekly Tracker
                                  const weeklyCard = currentMonthPlanDisplay.querySelector(`#weekly-tracker-${monthId}`);
                                  if (weeklyCard) {
-                                     weeklyCard.querySelector('.tracker-score').textContent = lastWeekPercent + '%'; // Add %
+                                     weeklyCard.querySelector('.tracker-score').textContent = lastWeekPercent + '%';
                                      const weeklyOffset = circumference - (circumference * lastWeekPercent) / 100;
                                      weeklyCard.querySelector('.progress').style.strokeDashoffset = weeklyOffset;
+                                     // --- ADDED ---
+                                     const weeklyRotation = (lastWeekPercent / 100) * 360;
+                                     const weeklyCap = weeklyCard.querySelector('.progress-cap');
+                                     weeklyCap.style.transform = `rotate(${weeklyRotation}deg)`;
+                                     weeklyCap.style.visibility = lastWeekPercent === 0 ? 'hidden' : 'visible';
                                  }
 
                                  // Update Daily Tracker
                                  const dailyCard = currentMonthPlanDisplay.querySelector(`#daily-tracker-${monthId}`);
                                  if (dailyCard) {
-                                     dailyCard.querySelector('.tracker-score').textContent = lastDayPercent + '%'; // Add %
+                                     dailyCard.querySelector('.tracker-score').textContent = lastDayPercent + '%';
                                      const dailyOffset = circumference - (circumference * lastDayPercent) / 100;
                                      dailyCard.querySelector('.progress').style.strokeDashoffset = dailyOffset;
+                                     // --- ADDED ---
+                                     const dailyRotation = (lastDayPercent / 100) * 360;
+                                     const dailyCap = dailyCard.querySelector('.progress-cap');
+                                     dailyCap.style.transform = `rotate(${dailyRotation}deg)`;
+                                     dailyCap.style.visibility = lastDayPercent === 0 ? 'hidden' : 'visible';
                                      
                                      const continueBtn = dailyCard.querySelector('.tracker-continue-btn');
                                      if (continueLink) {
@@ -1163,7 +1186,7 @@
                                      }
                                  }
                              }
-                             // --- END NEW MANUAL TRACKAER UPDATE ---
+                             // --- END NEW MANUAL TRACKER UPDATE ---
                                  currentMonthPlanDisplay.querySelectorAll('.week-section').forEach(weekSection => {
                                      const weekId = weekSection.dataset.weekId;
                                      const weekData = monthData.weeks?.[weekId];
@@ -2315,7 +2338,14 @@ if (daySection && !daySection.classList.contains('editing')) {
                     <svg>
                         <circle class="bg"></circle>
                         <circle class="progress"></circle>
-                    </svg>
+                        
+                        <circle class="progress-cap" 
+                                cx="75" 
+                                cy="10" 
+                                fill="${colorEnd}"
+                                style="visibility: ${percentage === 0 ? 'hidden' : 'visible'};"
+                        ></circle>
+                        </svg>
                     
                     <div class="inner-text">
                         <div class="tracker-label-small">${label}</div>
@@ -2336,6 +2366,7 @@ if (daySection && !daySection.classList.contains('editing')) {
                 const percentage = +circle.dataset.percentage;
                 const score = circle.querySelector('.tracker-score'); 
                 const progress = circle.querySelector('.progress');
+                const cap = circle.querySelector('.progress-cap'); // <-- Find the cap
                 const startColor = circle.dataset.colorStart;
                 const endColor = circle.dataset.colorEnd;
 
@@ -2379,24 +2410,34 @@ if (daySection && !daySection.classList.contains('editing')) {
                 if (circle.animationInterval) {
                     clearInterval(circle.animationInterval);
                 }
+                
+                // Set initial visibility
+                if (percentage > 0 && current > 0) cap.style.visibility = 'visible';
+                else if (percentage === 0) cap.style.visibility = 'hidden';
 
                 // Start new animation
                 const interval = setInterval(() => {
                     if (current >= percentage) {
                         clearInterval(interval);
-                        score.textContent = percentage + '%'; // Add %
-                        // Set final dash offset
+                        score.textContent = percentage + '%'; 
                         const finalOffset = circumference - (circumference * percentage) / 100;
                         progress.style.strokeDashoffset = finalOffset;
+                        // --- SET FINAL CAP ROTATION ---
+                        const finalRotation = (percentage / 100) * 360;
+                        cap.style.transform = `rotate(${finalRotation}deg)`;
                     } else {
                         current++;
                         const offset = circumference - (circumference * current) / 100;
                         progress.style.strokeDashoffset = offset;
-                        score.textContent = current + '%'; // Add %
+                        score.textContent = current + '%'; 
+                        // --- SET LIVE CAP ROTATION ---
+                        const rotation = (current / 100) * 360;
+                        cap.style.transform = `rotate(${rotation}deg)`;
+                        if (current > 0) cap.style.visibility = 'visible';
                     }
-                }, 20); // 20ms interval for the animation
+                }, 20); 
                 
-                circle.animationInterval = interval; // Store interval ID
+                circle.animationInterval = interval; 
             });
         }
 
