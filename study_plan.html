@@ -305,7 +305,7 @@
         }
         .progress-bar-container { background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; height: 10px; } /* Slimmer bar */
         .progress-bar-fill { 
-            background-color: #10b981; 
+            
             height: 100%; 
             /* MODIFIED: Added opacity */
             transition: width 0.4s ease-in-out, opacity 0.4s ease-in-out; 
@@ -325,8 +325,24 @@
             border-radius: 50%;
             background-color: white;
             /* Matches the bar color and style */
-            border: 4px solid #10b981; 
+             
             box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+		
+		/* --- Gradient for Weekly Bar (Green -> Purple) --- */
+        .progress-bar-weekly {
+            background-image: linear-gradient(to right, #00ffb9, #6a5eff);
+        }
+        .progress-bar-weekly::after {
+            border: 4px solid #6a5eff; /* Matches end color of gradient */
+        }
+
+        /* --- Gradient for Daily Bar (Pink -> Purple) --- */
+        .progress-bar-daily {
+            background-image: linear-gradient(to right, #ff007f, #a85eff);
+        }
+        .progress-bar-daily::after {
+            border: 4px solid #a85eff; /* Matches end color of gradient */
         }
 
         /* --- Add Day Button --- */
@@ -1425,7 +1441,7 @@
                             <span>Weekly Progress</span>
                             <span class="progress-percentage font-medium">${initialProgress}%</span>
                         </div>
-                        <div class="progress-bar-container w-full"> <div class="progress-bar-fill" style="width: ${initialProgress}%;"></div> </div>
+                        <div class="progress-bar-container w-full"> <div class="progress-bar-fill progress-bar-weekly" style="width: ${initialProgress}%;"></div> </div>
                     </div>
                     <div class="days-container space-y-6 mt-4"> ${daysHtml} </div>
                      ${totalDays < 7 ? (totalDays > 0 ? `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>` : `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`) : '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>'}
@@ -1452,7 +1468,7 @@
                              <span class="progress-percentage font-medium">${initialDayProgress}%</span>
                          </div>
                          <div class="progress-bar-container w-full"> 
-                             <div class="progress-bar-fill" style="width: ${Math.min(initialDayProgress, 100)}%;"></div> 
+                             <div class="progress-bar-fill progress-bar-daily" style="width: ${Math.min(initialDayProgress, 100)}%;"></div> 
                          </div>
                      </div>
 
