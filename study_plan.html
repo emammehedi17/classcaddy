@@ -304,7 +304,30 @@
             border-bottom: 1px solid #e5e7eb; transition: top 0.3s ease-in-out;
         }
         .progress-bar-container { background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; height: 10px; } /* Slimmer bar */
-        .progress-bar-fill { background-color: #10b981; height: 100%; transition: width 0.4s ease-in-out; border-radius: 9999px; }
+        .progress-bar-fill { 
+            background-color: #10b981; 
+            height: 100%; 
+            /* MODIFIED: Added opacity */
+            transition: width 0.4s ease-in-out, opacity 0.4s ease-in-out; 
+            border-radius: 9999px; 
+            position: relative; /* ADDED */
+        }
+		
+		.progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 0;
+            /* This centers the cap on the end of the bar */
+            transform: translate(50%, -50%); 
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: white;
+            /* Matches the bar color and style */
+            border: 4px solid #10b981; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
 
         /* --- Add Day Button --- */
         .add-day-btn { display: flex; align-items: center; justify-content: center; background-color: #ecfdf5; color: #059669; border: 1px dashed #34d399; border-radius: 8px; padding: 12px; margin-top: 1rem; cursor: pointer; transition: all 0.2s; font-weight: 600; }
@@ -2473,7 +2496,7 @@ if (daySection && !daySection.classList.contains('editing')) {
 
        
 
-        async function updateDailyProgressUI(monthId, weekId, dayIndex, dayData) {
+async function updateDailyProgressUI(monthId, weekId, dayIndex, dayData) {
              if (!currentUser || !userId) return;
              const daySection = document.querySelector(`[data-month-id="${monthId}"] .week-section[data-week-id="${weekId}"] .day-section[data-day-index="${dayIndex}"]`);
              if (!daySection) return;
@@ -2485,7 +2508,6 @@ if (daySection && !daySection.classList.contains('editing')) {
              try {
                  let dataToUse = dayData;
                  if (!dataToUse) {
-                     // Data not provided, fetch it
                      console.log(`Daily Progress UI fetching data for day ${dayIndex}...`);
                      const docRef = doc(db, getUserPlansCollectionPath(), monthId); 
                      const docSnap = await getDoc(docRef);
@@ -2496,15 +2518,18 @@ if (daySection && !daySection.classList.contains('editing')) {
 
                  if (dataToUse) {
                     const progress = calculateDailyProgress(dataToUse);
-                    progressBarFill.style.width = `${Math.min(progress, 100)}%`; // Cap width at 100%
-                    progressPercentageSpan.textContent = `${progress}%`; // Show full sum
+                    progressBarFill.style.width = `${Math.min(progress, 100)}%`;
+                    // --- THIS IS THE CHANGE ---
+                    // Hide the bar (and cap) if progress is 0
+                    progressBarFill.style.opacity = progress > 0 ? '1' : '0';
+                    progressPercentageSpan.textContent = `${progress}%`;
                  }
              } catch (error) { console.error("Error fetching data for daily progress UI:", error); }
         }
 		
 		
 		
-        async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
+async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
              if (!currentUser || !userId) return;
              const weekSection = document.querySelector(`[data-month-id="${monthId}"] .week-section[data-week-id="${weekId}"]`);
              if (!weekSection) return;
@@ -2514,7 +2539,6 @@ if (daySection && !daySection.classList.contains('editing')) {
              try {
                  let dataToUse = weekData;
                  if (!dataToUse) {
-                     // Data not provided, fetch it
                      console.log("Progress UI fetching data...");
                      const docRef = doc(db, getUserPlansCollectionPath(), monthId); const docSnap = await getDoc(docRef);
                      if (docSnap.exists()) {
@@ -2525,10 +2549,14 @@ if (daySection && !daySection.classList.contains('editing')) {
                  if (dataToUse) {
                     const progress = calculateWeeklyProgress(dataToUse);
                     progressBarFill.style.width = `${progress}%`;
+                    // --- THIS IS THE CHANGE ---
+                    // Hide the bar (and cap) if progress is 0
+                    progressBarFill.style.opacity = progress > 0 ? '1' : '0';
                     progressPercentageSpan.textContent = `${progress}%`;
                  }
              } catch (error) { console.error("Error fetching data for progress UI:", error); }
         }
+		
         function showVocabMeaning(vocabWordElement) {
              document.querySelectorAll('.vocab-word.active').forEach(v => { if (v !== vocabWordElement) v.classList.remove('active'); });
              vocabWordElement.classList.toggle('active');
