@@ -430,6 +430,93 @@
              }
              .edit-mode-controls .save-day-btn { order: 99; } /* Push save button to end */
         }
+		
+		/* --- Circular Progress Trackers --- */
+        .progress-trackers-container {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr); /* Mobile-first: 1 column */
+            gap: 1.5rem; /* 24px */
+        }
+        @media (min-width: 768px) { /* md: */
+            .progress-trackers-container {
+                grid-template-columns: repeat(3, 1fr); /* 3 columns on desktop */
+            }
+        }
+
+        .tracker-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* rounded-xl */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            padding: 1.5rem; /* p-6 */
+            min-height: 200px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .tracker-circle-svg {
+            width: 130px;
+            height: 130px;
+            position: relative;
+        }
+        .tracker-circle-svg svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg); /* Start from the top */
+        }
+        .tracker-circle-svg circle {
+            fill: none;
+        }
+        .tracker-circle-svg .circle-bg {
+            stroke: #f3f4f6; /* gray-100 */
+            stroke-width: 12;
+        }
+        .tracker-circle-svg .circle-progress {
+            stroke-width: 12;
+            stroke-linecap: round; /* Rounded ends! */
+            /* This is the animation */
+            transition: stroke-dashoffset 1s 0.2s ease-out;
+        }
+
+        .tracker-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .tracker-percentage {
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 700; /* bold */
+            color: #1f2937; /* gray-800 */
+            line-height: 1.1;
+        }
+        .tracker-label {
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500; /* medium */
+            color: #6b7280; /* gray-500 */
+        }
+        .tracker-continue-btn {
+            margin-top: 0.5rem; /* mt-2 */
+            padding: 4px 10px;
+            font-size: 0.75rem; /* text-xs */
+            background-color: #10b981;
+            color: white;
+            border-radius: 9999px; /* rounded-full */
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .tracker-continue-btn:hover {
+            background-color: #059669;
+        }
 
         /* --- Day Progress Bar --- */
         .day-progress-wrapper {
@@ -1018,6 +1105,8 @@
                              // No structural change, just do the smooth progress bar update.
                              console.log("Non-structural change. Updating progress bars only.");
                              if (monthData) {
+							 
+								updateCircularTrackers(monthId, monthData);
                                  currentMonthPlanDisplay.querySelectorAll('.week-section').forEach(weekSection => {
                                      const weekId = weekSection.dataset.weekId;
                                      const weekData = monthData.weeks?.[weekId];
@@ -1105,7 +1194,8 @@
                 weeklyTargets: { week1: '', week2: '', week3: '', week4: '' },
                 weeks: {
                     week1: { days: [] }, week2: { days: [] }, week3: { days: [] }, week4: { days: [] }
-                }
+                },
+				lastEdited: null
              };
 
             try { await setDoc(docRef, newPlanData); console.log("New month added:", monthId); }
@@ -1123,10 +1213,41 @@
             const targetColors = { week1: 'text-indigo-700', week2: 'text-teal-700', week3: 'text-amber-700', week4: 'text-rose-700' };
             const targetHoverBgColors = { week1: 'hover:bg-indigo-50', week2: 'hover:bg-teal-50', week3: 'hover:bg-amber-50', week4: 'hover:bg-rose-50' };
 
+            // --- NEW CALCULATIONS ---
+            const monthlyPercent = calculateOverallMonthlyProgress(data);
+            const { 
+                weekly: lastWeekPercent, 
+                daily: lastDayPercent, 
+                link: continueLink 
+            } = getLastEditedProgress(monthId, data);
+            // --- END NEW ---
+
             monthDiv.innerHTML = `
                 <div class="flex justify-between items-start mb-6">
                      <h2 class="text-2xl font-bold text-emerald-600">${data.monthName || 'Unnamed Month'} <span class="text-lg text-gray-400 font-normal">(${monthId})</span></h2>
                      <button class="icon-button delete-month-btn" title="Delete Month"><i class="fas fa-trash-alt text-red-500"></i></button>
+                 </div>
+
+                 <div class="progress-trackers-container mb-10" data-month-id="${monthId}">
+                    ${createTrackerHTML(
+                        `monthly-tracker-${monthId}`,
+                        'Monthly Progress',
+                        monthlyPercent,
+                        '#3b82f6' // Blue-500
+                    )}
+                    ${createTrackerHTML(
+                        `weekly-tracker-${monthId}`,
+                        'Last Week',
+                        lastWeekPercent,
+                        '#10b981' // Emerald-500
+                    )}
+                    ${createTrackerHTML(
+                        `daily-tracker-${monthId}`,
+                        'Last Day',
+                        lastDayPercent,
+                        '#a855f7', // Purple-500
+                        continueLink
+                    )}
                  </div>
                  <div class="mb-8">
                     <div class="flex justify-between items-center mb-4">
@@ -1153,6 +1274,10 @@
              monthDiv.querySelector('.edit-targets-btn').addEventListener('click', (e) => handleEditTargets(e.target, monthId));
              monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId));
              attachWeekEventListeners(monthDiv, monthId);
+             
+             // Trigger the animation
+             animateTrackers(monthDiv);
+             
              return monthDiv;
         }
 
@@ -1182,7 +1307,7 @@
              const initialDayProgress = calculateDailyProgress(dayData);
              
              return `
-                 <div class="day-section" data-day-index="${dayIndex}"> 
+                 <div class="day-section" id="day-${monthId}-${weekId}-${dayIndex}" data-day-index="${dayIndex}"> 
                      <div class="flex justify-between items-center mb-3">
                          <div class="flex items-center gap-2">
                              <h4 class="font-semibold text-gray-700">Day ${dayData.dayNumber}</h4>
@@ -1568,6 +1693,19 @@
                  daysArray[dayIndex].rows = updatedRows;
                 const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
                 await updateDoc(docRef, updatePayload);
+
+                // --- ADD THIS BLOCK ---
+                // Update the 'lastEdited' timestamp
+                const lastEditedPayload = {
+                    lastEdited: {
+                        weekId: weekId,
+                        dayIndex: dayIndex,
+                        timestamp: Timestamp.now()
+                    }
+                };
+                await updateDoc(docRef, lastEditedPayload);
+                // --- END NEW BLOCK ---
+
                 console.log(`Day ${dayIndex + 1} for ${weekId} saved successfully.`);
                 if (!isAutosave) {
                     setSyncStatus("Synced", "green");
@@ -2051,6 +2189,149 @@ if (daySection && !daySection.classList.contains('editing')) {
             // --- UPDATED CALCULATION ---
             // Multiply the total sum by 7, as requested, and then round it.
             return Math.round(totalPercentageSum * 7);
+        }
+		
+		
+		function calculateOverallMonthlyProgress(monthData) {
+            if (!monthData || !monthData.weeks) return 0;
+            
+            let total = 0;
+            total += calculateWeeklyProgress(monthData.weeks.week1);
+            total += calculateWeeklyProgress(monthData.weeks.week2);
+            total += calculateWeeklyProgress(monthData.weeks.week3);
+            total += calculateWeeklyProgress(monthData.weeks.week4);
+            
+            // Return the average of the 4 weeks
+            return Math.round(total / 4);
+        }
+
+        function getLastEditedProgress(monthId, monthData) {
+            if (!monthData || !monthData.lastEdited) {
+                return { weekly: 0, daily: 0, link: null };
+            }
+            
+            const { weekId, dayIndex } = monthData.lastEdited;
+            const weekData = monthData.weeks?.[weekId];
+            if (!weekData) {
+                return { weekly: 0, daily: 0, link: null };
+            }
+
+            const weekly = calculateWeeklyProgress(weekData);
+            const dayData = weekData.days?.[dayIndex];
+            if (!dayData) {
+                return { weekly: weekly, daily: 0, link: null };
+            }
+
+            const daily = calculateDailyProgress(dayData);
+            // Create the anchor link for the "Continue" button
+            const dayLink = `#day-${monthId}-${weekId}-${dayIndex}`;
+            
+            return { weekly, daily, link: dayLink };
+        }
+
+        function createTrackerHTML(id, label, percentage, color, continueLink = null) {
+            // SVG circle calculations
+            const radius = 54; // 120/2 - 12/2 (viewBox/2 - stroke/2)
+            const circumference = 2 * Math.PI * radius; // ~339.3
+            const offset = circumference - (percentage / 100) * circumference;
+
+            const continueButton = continueLink 
+                ? `<a href="${continueLink}" class="tracker-continue-btn">Continue</a>` 
+                : '';
+
+            return `
+                <div class="tracker-card" id="${id}">
+                    <div class="tracker-circle-svg">
+                        <svg viewBox="0 0 120 120">
+                            <circle class="circle-bg" cx="60" cy="60" r="${radius}"></circle>
+                            <circle class="circle-progress" cx="60" cy="60" r="${radius}"
+                                style="stroke: ${color}; stroke-dasharray: ${circumference}; stroke-dashoffset: ${circumference};"
+                                data-offset="${offset}"
+                            ></circle>
+                        </svg>
+                        <div class="tracker-content">
+                            <div class="tracker-percentage">${percentage}%</div>
+                            <div class="tracker-label">${label}</div>
+                            ${continueButton}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function animateTrackers(containerElement) {
+            const trackers = containerElement.querySelectorAll('.circle-progress');
+            setTimeout(() => { // Small delay to ensure render before animation
+                trackers.forEach(circle => {
+                    const targetOffset = circle.dataset.offset;
+                    circle.style.strokeDashoffset = targetOffset;
+                });
+            }, 100); // 100ms delay
+        }
+
+        function updateCircularTrackers(monthId, monthData) {
+            const container = document.querySelector(`.progress-trackers-container[data-month-id="${monthId}"]`);
+            if (!container) return; // Not on screen
+
+            // 1. Calculate new values
+            const monthlyPercent = calculateOverallMonthlyProgress(monthData);
+            const { 
+                weekly: lastWeekPercent, 
+                daily: lastDayPercent, 
+                link: continueLink 
+            } = getLastEditedProgress(monthId, monthData);
+
+            // 2. Update Monthly Tracker
+            const monthlyCard = container.querySelector(`#monthly-tracker-${monthId}`);
+            if (monthlyCard) {
+                updateTrackerCard(monthlyCard, monthlyPercent, null);
+            }
+            
+            // 3. Update Weekly Tracker
+            const weeklyCard = container.querySelector(`#weekly-tracker-${monthId}`);
+            if (weeklyCard) {
+                updateTrackerCard(weeklyCard, lastWeekPercent, null);
+            }
+
+            // 4. Update Daily Tracker
+            const dailyCard = container.querySelector(`#daily-tracker-${monthId}`);
+            if (dailyCard) {
+                updateTrackerCard(dailyCard, lastDayPercent, continueLink);
+            }
+        }
+
+        function updateTrackerCard(cardElement, percentage, continueLink) {
+            if (!cardElement) return;
+            
+            // Update Percentage Text
+            const percentText = cardElement.querySelector('.tracker-percentage');
+            if (percentText) percentText.textContent = `${percentage}%`;
+
+            // Update SVG Circle
+            const circle = cardElement.querySelector('.circle-progress');
+            if (circle) {
+                const radius = 54;
+                const circumference = 2 * Math.PI * radius;
+                const offset = circumference - (percentage / 100) * circumference;
+                circle.style.strokeDashoffset = offset;
+                circle.dataset.offset = offset; // Store for next animation
+            }
+            
+            // Update "Continue" Button
+            const continueBtn = cardElement.querySelector('.tracker-continue-btn');
+            if (continueLink) {
+                if (continueBtn) {
+                    continueBtn.href = continueLink; // Update existing button
+                } else {
+                    // Add button if it doesn't exist
+                    const content = cardElement.querySelector('.tracker-content');
+                    content.insertAdjacentHTML('beforeend', `<a href="${continueLink}" class="tracker-continue-btn">Continue</a>`);
+                }
+            } else {
+                if (continueBtn) {
+                    continueBtn.remove(); // Remove button if no link
+                }
+            }
         }
 
         async function updateDailyProgressUI(monthId, weekId, dayIndex, dayData) {
