@@ -1128,21 +1128,21 @@
                                      daily: lastDayPercent, 
                                      link: continueLink 
                                  } = findLastProgressTrackers(monthId, monthData);
-
+                                 
                                  const circumference = 408;
 
                                  // Update Monthly Tracker
                                  const monthlyCard = currentMonthPlanDisplay.querySelector(`#monthly-tracker-${monthId}`);
                                  if (monthlyCard) {
-                                     monthlyCard.querySelector('.tracker-score').textContent = monthlyPercent;
+                                     monthlyCard.querySelector('.tracker-score').textContent = monthlyPercent + '%'; // Add %
                                      const monthlyOffset = circumference - (circumference * monthlyPercent) / 100;
                                      monthlyCard.querySelector('.progress').style.strokeDashoffset = monthlyOffset;
                                  }
-
+                                 
                                  // Update Weekly Tracker
                                  const weeklyCard = currentMonthPlanDisplay.querySelector(`#weekly-tracker-${monthId}`);
                                  if (weeklyCard) {
-                                     weeklyCard.querySelector('.tracker-score').textContent = lastWeekPercent;
+                                     weeklyCard.querySelector('.tracker-score').textContent = lastWeekPercent + '%'; // Add %
                                      const weeklyOffset = circumference - (circumference * lastWeekPercent) / 100;
                                      weeklyCard.querySelector('.progress').style.strokeDashoffset = weeklyOffset;
                                  }
@@ -1150,10 +1150,10 @@
                                  // Update Daily Tracker
                                  const dailyCard = currentMonthPlanDisplay.querySelector(`#daily-tracker-${monthId}`);
                                  if (dailyCard) {
-                                     dailyCard.querySelector('.tracker-score').textContent = lastDayPercent;
+                                     dailyCard.querySelector('.tracker-score').textContent = lastDayPercent + '%'; // Add %
                                      const dailyOffset = circumference - (circumference * lastDayPercent) / 100;
                                      dailyCard.querySelector('.progress').style.strokeDashoffset = dailyOffset;
-
+                                     
                                      const continueBtn = dailyCard.querySelector('.tracker-continue-btn');
                                      if (continueLink) {
                                          if (continueBtn) continueBtn.href = continueLink;
@@ -1163,7 +1163,7 @@
                                      }
                                  }
                              }
-                             // --- END NEW MANUAL TRACKER UPDATE ---
+                             // --- END NEW MANUAL TRACKAER UPDATE ---
                                  currentMonthPlanDisplay.querySelectorAll('.week-section').forEach(weekSection => {
                                      const weekId = weekSection.dataset.weekId;
                                      const weekData = monthData.weeks?.[weekId];
@@ -2320,7 +2320,7 @@ if (daySection && !daySection.classList.contains('editing')) {
                     <div class="inner-text">
                         <div class="tracker-label-small">${label}</div>
                         
-                        <div class="tracker-score">0</div>
+                        <div class="tracker-score">0%</div>
                         
                         ${continueButton}
                     </div>
@@ -2334,12 +2334,7 @@ if (daySection && !daySection.classList.contains('editing')) {
 
             circles.forEach(circle => {
                 const percentage = +circle.dataset.percentage;
-                
-                // --- THIS IS THE FIX ---
-                // Changed from '.score' to '.tracker-score'
                 const score = circle.querySelector('.tracker-score'); 
-                // --- END FIX ---
-                
                 const progress = circle.querySelector('.progress');
                 const startColor = circle.dataset.colorStart;
                 const endColor = circle.dataset.colorEnd;
@@ -2389,7 +2384,7 @@ if (daySection && !daySection.classList.contains('editing')) {
                 const interval = setInterval(() => {
                     if (current >= percentage) {
                         clearInterval(interval);
-                        score.textContent = percentage; // Ensure final value is exact
+                        score.textContent = percentage + '%'; // Add %
                         // Set final dash offset
                         const finalOffset = circumference - (circumference * percentage) / 100;
                         progress.style.strokeDashoffset = finalOffset;
@@ -2397,7 +2392,7 @@ if (daySection && !daySection.classList.contains('editing')) {
                         current++;
                         const offset = circumference - (circumference * current) / 100;
                         progress.style.strokeDashoffset = offset;
-                        score.textContent = current;
+                        score.textContent = current + '%'; // Add %
                     }
                 }, 20); // 20ms interval for the animation
                 
