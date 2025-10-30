@@ -2334,8 +2334,13 @@ if (daySection && !daySection.classList.contains('editing')) {
 
             circles.forEach(circle => {
                 const percentage = +circle.dataset.percentage;
+                
+                // --- THIS IS THE FIX ---
+                // Changed from '.score' to '.tracker-score'
+                const score = circle.querySelector('.tracker-score'); 
+                // --- END FIX ---
+                
                 const progress = circle.querySelector('.progress');
-                const score = circle.querySelector('.score');
                 const startColor = circle.dataset.colorStart;
                 const endColor = circle.dataset.colorEnd;
 
