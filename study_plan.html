@@ -1127,7 +1127,7 @@
                                      weekly: lastWeekPercent, 
                                      daily: lastDayPercent, 
                                      link: continueLink 
-                                 } = getLastEditedProgress(monthId, monthData);
+                                 } = findLastProgressTrackers(monthId, monthData);
 
                                  const circumference = 408;
 
@@ -1251,8 +1251,7 @@
                 weeklyTargets: { week1: '', week2: '', week3: '', week4: '' },
                 weeks: {
                     week1: { days: [] }, week2: { days: [] }, week3: { days: [] }, week4: { days: [] }
-                },
-				lastEdited: null
+                }
              };
 
             try { await setDoc(docRef, newPlanData); console.log("New month added:", monthId); }
@@ -1276,7 +1275,7 @@
                 weekly: lastWeekPercent, 
                 daily: lastDayPercent, 
                 link: continueLink 
-            } = getLastEditedProgress(monthId, data);
+            } = findLastProgressTrackers(monthId, data);
             // --- END NEW ---
 
             // --- THIS IS THE FIX: Added the opening backtick (`) ---
@@ -1755,17 +1754,7 @@
                 const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
                 await updateDoc(docRef, updatePayload);
 
-                // --- ADD THIS BLOCK ---
-                // Update the 'lastEdited' timestamp
-                const lastEditedPayload = {
-                    lastEdited: {
-                        weekId: weekId,
-                        dayIndex: dayIndex,
-                        timestamp: Timestamp.now()
-                    }
-                };
-                await updateDoc(docRef, lastEditedPayload);
-                // --- END NEW BLOCK ---
+                
 
                 console.log(`Day ${dayIndex + 1} for ${weekId} saved successfully.`);
                 if (!isAutosave) {
@@ -2265,31 +2254,49 @@ if (daySection && !daySection.classList.contains('editing')) {
             // Return the average of the 4 weeks
             return Math.round(total / 4);
         }
-
-        function getLastEditedProgress(monthId, monthData) {
-            if (!monthData || !monthData.lastEdited) {
+		
+		function findLastProgressTrackers(monthId, monthData) {
+            if (!monthData || !monthData.weeks) {
                 return { weekly: 0, daily: 0, link: null };
             }
+
+            let lastWeekData = null;
+            let lastDayData = null;
+            let lastWeekId = null;
+            let lastDayIndex = -1;
+
+            // Iterate backwards from week 4 to find the latest week with content
+            for (const weekId of ['week4', 'week3', 'week2', 'week1']) {
+                const weekData = monthData.weeks[weekId];
+                if (weekData && weekData.days && weekData.days.length > 0) {
+                    // This is the "last week"
+                    lastWeekData = weekData;
+                    lastWeekId = weekId;
+                    
+                    // This is the "last day" in that week
+                    lastDayIndex = weekData.days.length - 1;
+                    lastDayData = weekData.days[lastDayIndex];
+                    
+                    break; // Stop searching, we found the latest week
+                }
+            }
+
+            if (!lastWeekData) {
+                // No days found in any week
+                return { weekly: 0, daily: 0, link: null };
+            }
+
+            // We found the last week and day, now calculate their progress
+            const weeklyPercent = calculateWeeklyProgress(lastWeekData);
+            const dailyPercent = calculateDailyProgress(lastDayData);
             
-            const { weekId, dayIndex } = monthData.lastEdited;
-            const weekData = monthData.weeks?.[weekId];
-            if (!weekData) {
-                return { weekly: 0, daily: 0, link: null };
-            }
-
-            const weekly = calculateWeeklyProgress(weekData);
-            const dayData = weekData.days?.[dayIndex];
-            if (!dayData) {
-                return { weekly: weekly, daily: 0, link: null };
-            }
-
-            const daily = calculateDailyProgress(dayData);
             // Create the anchor link for the "Continue" button
-            const dayLink = `#day-${monthId}-${weekId}-${dayIndex}`;
-            
-            return { weekly, daily, link: dayLink };
+            const continueLink = `#day-${monthId}-${lastWeekId}-${lastDayIndex}`;
+
+            return { weekly: weeklyPercent, daily: dailyPercent, link: continueLink };
         }
 
+        
         function createTrackerHTML(id, label, percentage, colorStart, colorEnd, continueLink = null) {
             // 'label' is "Monthly Progress", "Last Week", "Last Day"
             // 'percentage' is the value
