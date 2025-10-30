@@ -478,6 +478,7 @@
             cy: 75;
             r: 65;
         }
+		
 
         .circular .bg {
             stroke: #f3f4f6; /* Lighter gray */
@@ -490,12 +491,20 @@
             transition: stroke-dashoffset 0.5s ease;
         }
 		
-		.circular .progress-cap {
-            /* This is the new circle "head" */
-            r: 7; /* Radius of the cap, slightly larger than stroke/2 */
-            transform-origin: 75px 75px; /* Set rotation origin to SVG center */
-            /* Use a matching transition for smooth updates */
-            transition: transform 0.5s ease;
+		.end-cap {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            border: 5px solid;
+            box-shadow: 0 0 6px rgba(0,0,0,0.2);
+            transform: translate(-50%, -50%);
+            /* Start it hidden and at the top */
+            visibility: hidden;
+            left: 75px; /* 12 o'clock X */
+            top: 10px;  /* 12 o'clock Y */
+            transition: left 0.02s linear, top 0.02s linear; /* Smooths the steps */
         }
 
         .circular .inner-text {
@@ -1141,6 +1150,9 @@
                                  } = findLastProgressTrackers(monthId, monthData);
                                  
                                  const circumference = 408;
+                                 // --- Trig constants ---
+                                 const radius = 65;
+                                 const center = 75;
 
                                  // Update Monthly Tracker
                                  const monthlyCard = currentMonthPlanDisplay.querySelector(`#monthly-tracker-${monthId}`);
@@ -1149,9 +1161,12 @@
                                      const monthlyOffset = circumference - (circumference * monthlyPercent) / 100;
                                      monthlyCard.querySelector('.progress').style.strokeDashoffset = monthlyOffset;
                                      // --- ADDED ---
-                                     const monthlyRotation = (monthlyPercent / 100) * 360;
-                                     const monthlyCap = monthlyCard.querySelector('.progress-cap');
-                                     monthlyCap.style.transform = `rotate(${monthlyRotation}deg)`;
+                                     const monthlyCap = monthlyCard.querySelector('.end-cap');
+                                     const angleM = (monthlyPercent / 100) * 360;
+                                     const radsM = (angleM - 90) * (Math.PI / 180);
+                                     monthlyCap.style.left = `${center + radius * Math.cos(radsM)}px`;
+                                     monthlyCap.style.top = `${center + radius * Math.sin(radsM)}px`;
+                                     monthlyCap.style.borderColor = monthlyCard.dataset.colorEnd;
                                      monthlyCap.style.visibility = monthlyPercent === 0 ? 'hidden' : 'visible';
                                  }
                                  
@@ -1162,9 +1177,12 @@
                                      const weeklyOffset = circumference - (circumference * lastWeekPercent) / 100;
                                      weeklyCard.querySelector('.progress').style.strokeDashoffset = weeklyOffset;
                                      // --- ADDED ---
-                                     const weeklyRotation = (lastWeekPercent / 100) * 360;
-                                     const weeklyCap = weeklyCard.querySelector('.progress-cap');
-                                     weeklyCap.style.transform = `rotate(${weeklyRotation}deg)`;
+                                     const weeklyCap = weeklyCard.querySelector('.end-cap');
+                                     const angleW = (lastWeekPercent / 100) * 360;
+                                     const radsW = (angleW - 90) * (Math.PI / 180);
+                                     weeklyCap.style.left = `${center + radius * Math.cos(radsW)}px`;
+                                     weeklyCap.style.top = `${center + radius * Math.sin(radsW)}px`;
+                                     weeklyCap.style.borderColor = weeklyCard.dataset.colorEnd;
                                      weeklyCap.style.visibility = lastWeekPercent === 0 ? 'hidden' : 'visible';
                                  }
 
@@ -1175,9 +1193,12 @@
                                      const dailyOffset = circumference - (circumference * lastDayPercent) / 100;
                                      dailyCard.querySelector('.progress').style.strokeDashoffset = dailyOffset;
                                      // --- ADDED ---
-                                     const dailyRotation = (lastDayPercent / 100) * 360;
-                                     const dailyCap = dailyCard.querySelector('.progress-cap');
-                                     dailyCap.style.transform = `rotate(${dailyRotation}deg)`;
+                                     const dailyCap = dailyCard.querySelector('.end-cap');
+                                     const angleD = (lastDayPercent / 100) * 360;
+                                     const radsD = (angleD - 90) * (Math.PI / 180);
+                                     dailyCap.style.left = `${center + radius * Math.cos(radsD)}px`;
+                                     dailyCap.style.top = `${center + radius * Math.sin(radsD)}px`;
+                                     dailyCap.style.borderColor = dailyCard.dataset.colorEnd;
                                      dailyCap.style.visibility = lastDayPercent === 0 ? 'hidden' : 'visible';
                                      
                                      const continueBtn = dailyCard.querySelector('.tracker-continue-btn');
@@ -2342,13 +2363,9 @@ if (daySection && !daySection.classList.contains('editing')) {
                         <circle class="bg"></circle>
                         <circle class="progress"></circle>
                         
-                        <circle class="progress-cap" 
-                                cx="75" 
-                                cy="10" 
-                                fill="${colorEnd}"
-                                style="visibility: ${percentage === 0 ? 'hidden' : 'visible'};"
-                        ></circle>
                         </svg>
+                    
+                    <div class="end-cap"></div>
                     
                     <div class="inner-text">
                         <div class="tracker-label-small">${label}</div>
@@ -2369,22 +2386,28 @@ if (daySection && !daySection.classList.contains('editing')) {
                 const percentage = +circle.dataset.percentage;
                 const score = circle.querySelector('.tracker-score'); 
                 const progress = circle.querySelector('.progress');
-                const cap = circle.querySelector('.progress-cap'); // <-- Find the cap
+                const cap = circle.querySelector('.end-cap'); // <-- Find the DIV cap
                 const startColor = circle.dataset.colorStart;
                 const endColor = circle.dataset.colorEnd;
+
+                // --- NEW cap logic ---
+                const radius = 65;
+                const center = 75;
+                cap.style.borderColor = endColor; // Set cap color
+                if (percentage === 0) {
+                    cap.style.visibility = 'hidden';
+                }
+                // --- END NEW ---
 
                 // Animate the number and circle
                 let current = 0;
                 const circumference = 408; // 2 * PI * 65
 
-                // --- Create and apply gradient ---
+                // --- Create and apply gradient (Your code is correct) ---
                 const gradientId = `grad-${Math.random().toString(36).substring(2, 9)}`;
                 const svg = circle.querySelector('svg');
-                
-                // Clear old defs if they exist
                 const oldDefs = svg.querySelector('defs');
                 if (oldDefs) oldDefs.remove();
-                
                 const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
                 const linearGradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
                 linearGradient.setAttribute('id', gradientId);
@@ -2392,20 +2415,16 @@ if (daySection && !daySection.classList.contains('editing')) {
                 linearGradient.setAttribute('y1', '0%');
                 linearGradient.setAttribute('x2', '100%');
                 linearGradient.setAttribute('y2', '100%');
-
                 const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
                 stop1.setAttribute('offset', '0%');
                 stop1.setAttribute('stop-color', startColor);
-
                 const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
                 stop2.setAttribute('offset', '100%');
                 stop2.setAttribute('stop-color', endColor);
-
                 linearGradient.appendChild(stop1);
                 linearGradient.appendChild(stop2);
                 defs.appendChild(linearGradient);
                 svg.prepend(defs);
-
                 progress.setAttribute('stroke', `url(#${gradientId})`);
                 // --- End gradient ---
 
@@ -2414,10 +2433,6 @@ if (daySection && !daySection.classList.contains('editing')) {
                     clearInterval(circle.animationInterval);
                 }
                 
-                // Set initial visibility
-                if (percentage > 0 && current > 0) cap.style.visibility = 'visible';
-                else if (percentage === 0) cap.style.visibility = 'hidden';
-
                 // Start new animation
                 const interval = setInterval(() => {
                     if (current >= percentage) {
@@ -2425,17 +2440,29 @@ if (daySection && !daySection.classList.contains('editing')) {
                         score.textContent = percentage + '%'; 
                         const finalOffset = circumference - (circumference * percentage) / 100;
                         progress.style.strokeDashoffset = finalOffset;
-                        // --- SET FINAL CAP ROTATION ---
-                        const finalRotation = (percentage / 100) * 360;
-                        cap.style.transform = `rotate(${finalRotation}deg)`;
+                        
+                        // --- SET FINAL CAP POSITION ---
+                        const angle = (percentage / 100) * 360;
+                        const radians = (angle - 90) * (Math.PI / 180);
+                        const x = center + radius * Math.cos(radians);
+                        const y = center + radius * Math.sin(radians);
+                        cap.style.left = `${x}px`;
+                        cap.style.top = `${y}px`;
+                        if (percentage > 0) cap.style.visibility = 'visible';
+
                     } else {
                         current++;
                         const offset = circumference - (circumference * current) / 100;
                         progress.style.strokeDashoffset = offset;
                         score.textContent = current + '%'; 
-                        // --- SET LIVE CAP ROTATION ---
-                        const rotation = (current / 100) * 360;
-                        cap.style.transform = `rotate(${rotation}deg)`;
+                        
+                        // --- SET LIVE CAP POSITION ---
+                        const angle = (current / 100) * 360;
+                        const radians = (angle - 90) * (Math.PI / 180);
+                        const x = center + radius * Math.cos(radians);
+                        const y = center + radius * Math.sin(radians);
+                        cap.style.left = `${x}px`;
+                        cap.style.top = `${y}px`;
                         if (current > 0) cap.style.visibility = 'visible';
                     }
                 }, 20); 
