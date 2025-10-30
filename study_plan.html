@@ -118,25 +118,27 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 12px; /* Space between logo and text */
+            gap: 12px;
             background-color: #ffffff;
-            color: #3c4043; /* Google's text color */
-            border: 1px solid #dadce0; /* Google's standard border color */
+            color: #3c4043;
+            border: 1px solid #dadce0;
             border-radius: 6px;
             padding: 10px 16px;
-            font-size: 0.875rem; /* text-sm */
+            font-size: 0.875rem;
             font-weight: 600;
             font-family: 'Inter', 'Poppins', sans-serif;
             cursor: pointer;
             box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
-            /* --- THIS IS THE FIX --- */
-            /* Added 'border-color' to the transition for a smooth hover */
-            transition: background-color 0.2s, box-shadow 0.2s, border-color 0.2s;
+            /* --- MODIFIED --- */
+            /* We added 'transform' to the transition */
+            transition: background-color 0.2s, box-shadow 0.2s, border-color 0.2s, transform 0.2s;
         }
         #google-login-btn:hover {
-            background-color: #f8fafe; /* Very light blue hover */
-            border-color: #d2e3fc;
-            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1);
+            /* --- MODIFIED --- */
+            background-color: #f0f6ff; /* A slightly more noticeable blue */
+            border-color: #d2e3fc; /* Google's blue hover border */
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1), 0 1px 6px 0 rgba(0,0,0,0.08); /* A stronger "lift" shadow */
+            transform: scale(1.02); /* Makes the button grow slightly */
         }
         #google-login-btn img {
             width: 18px;
