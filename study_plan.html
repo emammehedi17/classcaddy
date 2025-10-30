@@ -1120,7 +1120,50 @@
                              console.log("Non-structural change. Updating progress bars only.");
                              if (monthData) {
 							 
-								updateCircularTrackers(monthId, monthData);
+								// --- NEW MANUAL TRACKER UPDATE (NO ANIMATION) ---
+                             if (monthData) {
+                                 const monthlyPercent = calculateOverallMonthlyProgress(monthData);
+                                 const { 
+                                     weekly: lastWeekPercent, 
+                                     daily: lastDayPercent, 
+                                     link: continueLink 
+                                 } = getLastEditedProgress(monthId, monthData);
+
+                                 const circumference = 408;
+
+                                 // Update Monthly Tracker
+                                 const monthlyCard = currentMonthPlanDisplay.querySelector(`#monthly-tracker-${monthId}`);
+                                 if (monthlyCard) {
+                                     monthlyCard.querySelector('.tracker-score').textContent = monthlyPercent;
+                                     const monthlyOffset = circumference - (circumference * monthlyPercent) / 100;
+                                     monthlyCard.querySelector('.progress').style.strokeDashoffset = monthlyOffset;
+                                 }
+
+                                 // Update Weekly Tracker
+                                 const weeklyCard = currentMonthPlanDisplay.querySelector(`#weekly-tracker-${monthId}`);
+                                 if (weeklyCard) {
+                                     weeklyCard.querySelector('.tracker-score').textContent = lastWeekPercent;
+                                     const weeklyOffset = circumference - (circumference * lastWeekPercent) / 100;
+                                     weeklyCard.querySelector('.progress').style.strokeDashoffset = weeklyOffset;
+                                 }
+
+                                 // Update Daily Tracker
+                                 const dailyCard = currentMonthPlanDisplay.querySelector(`#daily-tracker-${monthId}`);
+                                 if (dailyCard) {
+                                     dailyCard.querySelector('.tracker-score').textContent = lastDayPercent;
+                                     const dailyOffset = circumference - (circumference * lastDayPercent) / 100;
+                                     dailyCard.querySelector('.progress').style.strokeDashoffset = dailyOffset;
+
+                                     const continueBtn = dailyCard.querySelector('.tracker-continue-btn');
+                                     if (continueLink) {
+                                         if (continueBtn) continueBtn.href = continueLink;
+                                         else dailyCard.querySelector('.inner-text').insertAdjacentHTML('beforeend', `<a href="${continueLink}" class="tracker-continue-btn">Continue</a>`);
+                                     } else {
+                                         if (continueBtn) continueBtn.remove();
+                                     }
+                                 }
+                             }
+                             // --- END NEW MANUAL TRACKER UPDATE ---
                                  currentMonthPlanDisplay.querySelectorAll('.week-section').forEach(weekSection => {
                                      const weekId = weekSection.dataset.weekId;
                                      const weekData = monthData.weeks?.[weekId];
@@ -1236,8 +1279,8 @@
             } = getLastEditedProgress(monthId, data);
             // --- END NEW ---
 
-            monthDiv.innerHTML = `
-                <div class="flex justify-between items-start mb-6">
+            monthDiv.innerHTML = 
+               <div class="flex justify-between items-start mb-6">
                      <h2 class="text-2xl font-bold text-emerald-600">${data.monthName || 'Unnamed Month'} <span class="text-lg text-gray-400 font-normal">(${monthId})</span></h2>
                      <button class="icon-button delete-month-btn" title="Delete Month"><i class="fas fa-trash-alt text-red-500"></i></button>
                  </div>
@@ -1266,64 +1309,6 @@
                         continueLink
                     )}
                  </div>
-                 ```
-
----
-
-### 4. Modify `displayMonthPlan` (The "Smooth Update" Fix)
-
-Finally, we need to update the `onSnapshot` listener to handle instant updates (like checking a box) *without* re-running the full number animation.
-
-Find the `--- ANIMATION FIX START ---` block (around line 938). Inside the `else { ... }` block (around line 976), **replace** this line:
-`updateCircularTrackers(monthId, monthData);`
-
-...with this **new block of code**:
-
-```javascript
-                             // --- NEW MANUAL TRACKER UPDATE (NO ANIMATION) ---
-                             if (monthData) {
-                                 const monthlyPercent = calculateOverallMonthlyProgress(monthData);
-                                 const { 
-                                     weekly: lastWeekPercent, 
-                                     daily: lastDayPercent, 
-                                     link: continueLink 
-                                 } = getLastEditedProgress(monthId, monthData);
-                                 
-                                 const circumference = 408;
-
-                                 // Update Monthly Tracker
-                                 const monthlyCard = currentMonthPlanDisplay.querySelector(`#monthly-tracker-${monthId}`);
-                                 if (monthlyCard) {
-                                     monthlyCard.querySelector('.tracker-score').textContent = monthlyPercent;
-                                     const monthlyOffset = circumference - (circumference * monthlyPercent) / 100;
-                                     monthlyCard.querySelector('.progress').style.strokeDashoffset = monthlyOffset;
-                                 }
-                                 
-                                 // Update Weekly Tracker
-                                 const weeklyCard = currentMonthPlanDisplay.querySelector(`#weekly-tracker-${monthId}`);
-                                 if (weeklyCard) {
-                                     weeklyCard.querySelector('.tracker-score').textContent = lastWeekPercent;
-                                     const weeklyOffset = circumference - (circumference * lastWeekPercent) / 100;
-                                     weeklyCard.querySelector('.progress').style.strokeDashoffset = weeklyOffset;
-                                 }
-
-                                 // Update Daily Tracker
-                                 const dailyCard = currentMonthPlanDisplay.querySelector(`#daily-tracker-${monthId}`);
-                                 if (dailyCard) {
-                                     dailyCard.querySelector('.tracker-score').textContent = lastDayPercent;
-                                     const dailyOffset = circumference - (circumference * lastDayPercent) / 100;
-                                     dailyCard.querySelector('.progress').style.strokeDashoffset = dailyOffset;
-                                     
-                                     const continueBtn = dailyCard.querySelector('.tracker-continue-btn');
-                                     if (continueLink) {
-                                         if (continueBtn) continueBtn.href = continueLink;
-                                         else dailyCard.querySelector('.inner-text').insertAdjacentHTML('beforeend', `<a href="${continueLink}" class="tracker-continue-btn">Continue</a>`);
-                                     } else {
-                                         if (continueBtn) continueBtn.remove();
-                                     }
-                                 }
-                             }
-                             // --- END NEW MANUAL TRACKER UPDATE ---
                  <div class="mb-8">
                     <div class="flex justify-between items-center mb-4">
                          <h3 class="text-2xl font-semibold text-gray-700">Monthly Targets</h3>
