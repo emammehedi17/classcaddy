@@ -431,11 +431,13 @@
              .edit-mode-controls .save-day-btn { order: 99; } /* Push save button to end */
         }
 		
-		/* --- Circular Progress Trackers --- */
+		/* --- Circular Progress Trackers (NEW) --- */
         .progress-trackers-container {
             display: grid;
             grid-template-columns: repeat(1, 1fr); /* Mobile-first: 1 column */
             gap: 1.5rem; /* 24px */
+            /* Center the circles in their grid cells */
+            justify-items: center; 
         }
         @media (min-width: 768px) { /* md: */
             .progress-trackers-container {
@@ -443,76 +445,88 @@
             }
         }
 
-        .tracker-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        .circular {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            /* Add the card background to the tracker itself */
             background-color: #ffffff;
             border-radius: 0.75rem; /* rounded-xl */
             border: 1px solid #e5e7eb; /* gray-200 */
-            padding: 1.5rem; /* p-6 */
-            min-height: 200px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        .tracker-circle-svg {
-            width: 130px;
-            height: 130px;
-            position: relative;
-        }
-        .tracker-circle-svg svg {
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg); /* Start from the top */
-        }
-        .tracker-circle-svg circle {
-            fill: none;
-        }
-        .tracker-circle-svg .circle-bg {
-            stroke: #f3f4f6; /* gray-100 */
-            stroke-width: 12;
-        }
-        .tracker-circle-svg .circle-progress {
-            stroke-width: 12;
-            stroke-linecap: round; /* Rounded ends! */
-            /* This is the animation */
-            transition: stroke-dashoffset 1s 0.2s ease-out;
-        }
-
-        .tracker-content {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            /* Use flex to center the SVG */
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
+        }
+
+        .circular svg {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            transform: rotate(-90deg);
+        }
+
+        .circular circle {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+            cx: 75;
+            cy: 75;
+            r: 65;
+        }
+
+        .circular .bg {
+            stroke: #f3f4f6; /* Lighter gray */
+        }
+
+        .circular .progress {
+            stroke-dasharray: 408; /* 2 * PI * 65 */
+            stroke-dashoffset: 408;
+            /* Animation for the circle fill */
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .circular .inner-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             text-align: center;
+            width: 100%; /* Ensure it's centered */
         }
-        .tracker-percentage {
-            font-size: 2.25rem; /* text-4xl */
-            font-weight: 700; /* bold */
-            color: #1f2937; /* gray-800 */
-            line-height: 1.1;
+
+        /* This is the user's 'Label' (the small green one) */
+        .tracker-label-small {
+            display: inline-block;
+            background: #e8f6ed;
+            color: #2f855a;
+            border-radius: 8px;
+            padding: 2px 8px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 5px;
         }
-        .tracker-label {
-            font-size: 0.875rem; /* text-sm */
-            font-weight: 500; /* medium */
-            color: #6b7280; /* gray-500 */
+        
+        /* This is the user's 'Score' (the big number) */
+        .tracker-score {
+            font-size: 28px;
+            font-weight: 700;
+            color: #222;
         }
+        
+        /* This is our new "Continue" button */
         .tracker-continue-btn {
-            margin-top: 0.5rem; /* mt-2 */
-            padding: 4px 10px;
-            font-size: 0.75rem; /* text-xs */
+            margin-top: 5px;
+            padding: 4px 12px;
+            font-size: 11px;
             background-color: #10b981;
             color: white;
             border-radius: 9999px; /* rounded-full */
             text-decoration: none;
             font-weight: 600;
             transition: background-color 0.2s;
+            display: inline-block;
         }
         .tracker-continue-btn:hover {
             background-color: #059669;
@@ -1233,22 +1247,83 @@
                         `monthly-tracker-${monthId}`,
                         'Monthly Progress',
                         monthlyPercent,
-                        '#3b82f6' // Blue-500
+                        '#2e8bff', // User's blue start
+                        '#00c3ff'  // User's blue end
                     )}
                     ${createTrackerHTML(
                         `weekly-tracker-${monthId}`,
                         'Last Week',
                         lastWeekPercent,
-                        '#10b981' // Emerald-500
+                        '#00ffb9', // User's green start
+                        '#6a5eff'  // User's green/purple end
                     )}
                     ${createTrackerHTML(
                         `daily-tracker-${monthId}`,
                         'Last Day',
                         lastDayPercent,
-                        '#a855f7', // Purple-500
+                        '#ff007f', // User's pink start
+                        '#a85eff', // User's purple end
                         continueLink
                     )}
                  </div>
+                 ```
+
+---
+
+### 4. Modify `displayMonthPlan` (The "Smooth Update" Fix)
+
+Finally, we need to update the `onSnapshot` listener to handle instant updates (like checking a box) *without* re-running the full number animation.
+
+Find the `--- ANIMATION FIX START ---` block (around line 938). Inside the `else { ... }` block (around line 976), **replace** this line:
+`updateCircularTrackers(monthId, monthData);`
+
+...with this **new block of code**:
+
+```javascript
+                             // --- NEW MANUAL TRACKER UPDATE (NO ANIMATION) ---
+                             if (monthData) {
+                                 const monthlyPercent = calculateOverallMonthlyProgress(monthData);
+                                 const { 
+                                     weekly: lastWeekPercent, 
+                                     daily: lastDayPercent, 
+                                     link: continueLink 
+                                 } = getLastEditedProgress(monthId, monthData);
+                                 
+                                 const circumference = 408;
+
+                                 // Update Monthly Tracker
+                                 const monthlyCard = currentMonthPlanDisplay.querySelector(`#monthly-tracker-${monthId}`);
+                                 if (monthlyCard) {
+                                     monthlyCard.querySelector('.tracker-score').textContent = monthlyPercent;
+                                     const monthlyOffset = circumference - (circumference * monthlyPercent) / 100;
+                                     monthlyCard.querySelector('.progress').style.strokeDashoffset = monthlyOffset;
+                                 }
+                                 
+                                 // Update Weekly Tracker
+                                 const weeklyCard = currentMonthPlanDisplay.querySelector(`#weekly-tracker-${monthId}`);
+                                 if (weeklyCard) {
+                                     weeklyCard.querySelector('.tracker-score').textContent = lastWeekPercent;
+                                     const weeklyOffset = circumference - (circumference * lastWeekPercent) / 100;
+                                     weeklyCard.querySelector('.progress').style.strokeDashoffset = weeklyOffset;
+                                 }
+
+                                 // Update Daily Tracker
+                                 const dailyCard = currentMonthPlanDisplay.querySelector(`#daily-tracker-${monthId}`);
+                                 if (dailyCard) {
+                                     dailyCard.querySelector('.tracker-score').textContent = lastDayPercent;
+                                     const dailyOffset = circumference - (circumference * lastDayPercent) / 100;
+                                     dailyCard.querySelector('.progress').style.strokeDashoffset = dailyOffset;
+                                     
+                                     const continueBtn = dailyCard.querySelector('.tracker-continue-btn');
+                                     if (continueLink) {
+                                         if (continueBtn) continueBtn.href = continueLink;
+                                         else dailyCard.querySelector('.inner-text').insertAdjacentHTML('beforeend', `<a href="${continueLink}" class="tracker-continue-btn">Continue</a>`);
+                                     } else {
+                                         if (continueBtn) continueBtn.remove();
+                                     }
+                                 }
+                             }
+                             // --- END NEW MANUAL TRACKER UPDATE ---
                  <div class="mb-8">
                     <div class="flex justify-between items-center mb-4">
                          <h3 class="text-2xl font-semibold text-gray-700">Monthly Targets</h3>
@@ -2229,110 +2304,110 @@ if (daySection && !daySection.classList.contains('editing')) {
             return { weekly, daily, link: dayLink };
         }
 
-        function createTrackerHTML(id, label, percentage, color, continueLink = null) {
-            // SVG circle calculations
-            const radius = 54; // 120/2 - 12/2 (viewBox/2 - stroke/2)
-            const circumference = 2 * Math.PI * radius; // ~339.3
-            const offset = circumference - (percentage / 100) * circumference;
-
+        function createTrackerHTML(id, label, percentage, colorStart, colorEnd, continueLink = null) {
+            // 'label' is "Monthly Progress", "Last Week", "Last Day"
+            // 'percentage' is the value
+            
             const continueButton = continueLink 
-                ? `<a href="${continueLink}" class="tracker-continue-btn">Continue</a>` 
-                : '';
+                ? `<a href="${continueLink}" class="tracker-continue-btn">Continue</a>`
+                : ''; // No timestamp
 
             return `
-                <div class="tracker-card" id="${id}">
-                    <div class="tracker-circle-svg">
-                        <svg viewBox="0 0 120 120">
-                            <circle class="circle-bg" cx="60" cy="60" r="${radius}"></circle>
-                            <circle class="circle-progress" cx="60" cy="60" r="${radius}"
-                                style="stroke: ${color}; stroke-dasharray: ${circumference}; stroke-dashoffset: ${circumference};"
-                                data-offset="${offset}"
-                            ></circle>
-                        </svg>
-                        <div class="tracker-content">
-                            <div class="tracker-percentage">${percentage}%</div>
-                            <div class="tracker-label">${label}</div>
-                            ${continueButton}
-                        </div>
+                <div class="circular" 
+                     id="${id}"
+                     data-percentage="${percentage}" 
+                     data-color-start="${colorStart}" 
+                     data-color-end="${colorEnd}">
+                    
+                    <svg>
+                        <circle class="bg"></circle>
+                        <circle class="progress"></circle>
+                    </svg>
+                    
+                    <div class="inner-text">
+                        <div class="tracker-label-small">${label}</div>
+                        
+                        <div class="tracker-score">0</div>
+                        
+                        ${continueButton}
                     </div>
                 </div>
             `;
         }
 
         function animateTrackers(containerElement) {
-            const trackers = containerElement.querySelectorAll('.circle-progress');
-            setTimeout(() => { // Small delay to ensure render before animation
-                trackers.forEach(circle => {
-                    const targetOffset = circle.dataset.offset;
-                    circle.style.strokeDashoffset = targetOffset;
-                });
-            }, 100); // 100ms delay
-        }
+            // Find trackers *only* within the newly created month element
+            const circles = containerElement.querySelectorAll('.circular');
 
-        function updateCircularTrackers(monthId, monthData) {
-            const container = document.querySelector(`.progress-trackers-container[data-month-id="${monthId}"]`);
-            if (!container) return; // Not on screen
+            circles.forEach(circle => {
+                const percentage = +circle.dataset.percentage;
+                const progress = circle.querySelector('.progress');
+                const score = circle.querySelector('.score');
+                const startColor = circle.dataset.colorStart;
+                const endColor = circle.dataset.colorEnd;
 
-            // 1. Calculate new values
-            const monthlyPercent = calculateOverallMonthlyProgress(monthData);
-            const { 
-                weekly: lastWeekPercent, 
-                daily: lastDayPercent, 
-                link: continueLink 
-            } = getLastEditedProgress(monthId, monthData);
+                // Animate the number and circle
+                let current = 0;
+                const circumference = 408; // 2 * PI * 65
 
-            // 2. Update Monthly Tracker
-            const monthlyCard = container.querySelector(`#monthly-tracker-${monthId}`);
-            if (monthlyCard) {
-                updateTrackerCard(monthlyCard, monthlyPercent, null);
-            }
-            
-            // 3. Update Weekly Tracker
-            const weeklyCard = container.querySelector(`#weekly-tracker-${monthId}`);
-            if (weeklyCard) {
-                updateTrackerCard(weeklyCard, lastWeekPercent, null);
-            }
+                // --- Create and apply gradient ---
+                const gradientId = `grad-${Math.random().toString(36).substring(2, 9)}`;
+                const svg = circle.querySelector('svg');
+                
+                // Clear old defs if they exist
+                const oldDefs = svg.querySelector('defs');
+                if (oldDefs) oldDefs.remove();
+                
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const linearGradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+                linearGradient.setAttribute('id', gradientId);
+                linearGradient.setAttribute('x1', '0%');
+                linearGradient.setAttribute('y1', '0%');
+                linearGradient.setAttribute('x2', '100%');
+                linearGradient.setAttribute('y2', '100%');
 
-            // 4. Update Daily Tracker
-            const dailyCard = container.querySelector(`#daily-tracker-${monthId}`);
-            if (dailyCard) {
-                updateTrackerCard(dailyCard, lastDayPercent, continueLink);
-            }
-        }
+                const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                stop1.setAttribute('offset', '0%');
+                stop1.setAttribute('stop-color', startColor);
 
-        function updateTrackerCard(cardElement, percentage, continueLink) {
-            if (!cardElement) return;
-            
-            // Update Percentage Text
-            const percentText = cardElement.querySelector('.tracker-percentage');
-            if (percentText) percentText.textContent = `${percentage}%`;
+                const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                stop2.setAttribute('offset', '100%');
+                stop2.setAttribute('stop-color', endColor);
 
-            // Update SVG Circle
-            const circle = cardElement.querySelector('.circle-progress');
-            if (circle) {
-                const radius = 54;
-                const circumference = 2 * Math.PI * radius;
-                const offset = circumference - (percentage / 100) * circumference;
-                circle.style.strokeDashoffset = offset;
-                circle.dataset.offset = offset; // Store for next animation
-            }
-            
-            // Update "Continue" Button
-            const continueBtn = cardElement.querySelector('.tracker-continue-btn');
-            if (continueLink) {
-                if (continueBtn) {
-                    continueBtn.href = continueLink; // Update existing button
-                } else {
-                    // Add button if it doesn't exist
-                    const content = cardElement.querySelector('.tracker-content');
-                    content.insertAdjacentHTML('beforeend', `<a href="${continueLink}" class="tracker-continue-btn">Continue</a>`);
+                linearGradient.appendChild(stop1);
+                linearGradient.appendChild(stop2);
+                defs.appendChild(linearGradient);
+                svg.prepend(defs);
+
+                progress.setAttribute('stroke', `url(#${gradientId})`);
+                // --- End gradient ---
+
+                // Clear any existing interval on this element
+                if (circle.animationInterval) {
+                    clearInterval(circle.animationInterval);
                 }
-            } else {
-                if (continueBtn) {
-                    continueBtn.remove(); // Remove button if no link
-                }
-            }
+
+                // Start new animation
+                const interval = setInterval(() => {
+                    if (current >= percentage) {
+                        clearInterval(interval);
+                        score.textContent = percentage; // Ensure final value is exact
+                        // Set final dash offset
+                        const finalOffset = circumference - (circumference * percentage) / 100;
+                        progress.style.strokeDashoffset = finalOffset;
+                    } else {
+                        current++;
+                        const offset = circumference - (circumference * current) / 100;
+                        progress.style.strokeDashoffset = offset;
+                        score.textContent = current;
+                    }
+                }, 20); // 20ms interval for the animation
+                
+                circle.animationInterval = interval; // Store interval ID
+            });
         }
+
+       
 
         async function updateDailyProgressUI(monthId, weekId, dayIndex, dayData) {
              if (!currentUser || !userId) return;
