@@ -1414,15 +1414,15 @@
                          </button>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 monthly-targets">
-                        ${[1, 2, 3, 4].map(weekNum => `
-                            <a href="#week-${monthId}-${weekNum}" class="target-card-link ${targetHoverBgColors[`week${weekNum}`] || ''}">
-                                <div class="target-card">
-                                    <h3 class="font-semibold text-lg ${targetColors[`week${weekNum}`] || 'text-gray-700'} mb-2">Week ${weekNum}</h3>
-                                    <textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" class="target-textarea w-full" placeholder="Enter target..." disabled>${escapeHtml(data.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
-                                </div>
-                            </a>
-                        `).join('')}
-                    </div>
+						${[1, 2, 3, 4].map(weekNum => `
+							<a href="#week-${monthId}-week${weekNum}" class="target-card-link ${targetHoverBgColors[`week${weekNum}`] || ''}">
+								<div class="target-card">
+									<h3 class="font-semibold text-lg ${targetColors[`week${weekNum}`] || 'text-gray-700'} mb-2">Week ${weekNum}</h3>
+									<textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" class="target-textarea w-full" placeholder="Enter target..." disabled>${escapeHtml(data.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
+								</div>
+							</a>
+						`).join('')}
+					</div>
                 </div>
                  <div class="space-y-8 weekly-plans-container">
                     ${[1, 2, 3, 4].map(weekNum => {
