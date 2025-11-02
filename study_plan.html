@@ -602,7 +602,17 @@
             font-weight: 500; /* medium */
             color: #4b5563; /* gray-600 */
         }
-
+		
+		.week-target-text {
+            font-size: 0.8rem; /* text-xs */
+            font-style: italic;
+            color: #4b5563; /* gray-600 */
+            padding: 0.25rem 0.1rem; /* 4px 1px */
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.4;
+            margin-top: 4px; /* Add space below the progress bar title */
+        }
 
     </style>
 </head>
@@ -1355,14 +1365,12 @@
             const targetColors = { week1: 'text-indigo-700', week2: 'text-teal-700', week3: 'text-amber-700', week4: 'text-rose-700' };
             const targetHoverBgColors = { week1: 'hover:bg-indigo-50', week2: 'hover:bg-teal-50', week3: 'hover:bg-amber-50', week4: 'hover:bg-rose-50' };
 
-            // --- NEW CALCULATIONS ---
             const monthlyPercent = calculateOverallMonthlyProgress(data);
             const { 
                 weekly: lastWeekPercent, 
                 daily: lastDayPercent, 
                 link: continueLink 
             } = findLastProgressTrackers(monthId, data);
-            // --- END NEW ---
 
             monthDiv.innerHTML = `
                  <div class="flex justify-between items-start mb-6">
@@ -1372,28 +1380,29 @@
 
                  <div class="progress-trackers-container mb-10" data-month-id="${monthId}">
                     ${createTrackerHTML(
-                        `daily-tracker-${monthId}`, // <-- NOW FIRST
+                        `daily-tracker-${monthId}`, 
                         'Last Day',
                         lastDayPercent,
-                        '#ff007f', // Pink start
-                        '#a85eff', // Purple end
+                        '#ff007f', 
+                        '#a85eff',
                         continueLink
                     )}
                     ${createTrackerHTML(
-                        `weekly-tracker-${monthId}`, // <-- STAYS IN MIDDLE
+                        `weekly-tracker-${monthId}`, 
                         'Last Week',
                         lastWeekPercent,
-                        '#00ffb9', // Green start
-                        '#6a5eff'  // Green/purple end
+                        '#00ffb9', 
+                        '#6a5eff'
                     )}
                     ${createTrackerHTML(
-                        `monthly-tracker-${monthId}`, // <-- NOW LAST
+                        `monthly-tracker-${monthId}`, 
                         'Monthly Progress',
                         monthlyPercent,
-                        '#2e8bff', // Blue start
-                        '#00c3ff'  // Blue end
+                        '#2e8bff', 
+                        '#00c3ff'
                     )}
                  </div>
+
                  <div class="mb-8">
                     <div class="flex justify-between items-center mb-4">
                          <h3 class="text-2xl font-semibold text-gray-700">Monthly Targets</h3>
@@ -1413,24 +1422,30 @@
                     </div>
                 </div>
                  <div class="space-y-8 weekly-plans-container">
-                    ${[1, 2, 3, 4].map(weekNum => createWeekElement(monthId, `week${weekNum}`, data.weeks?.[`week${weekNum}`], `week-${monthId}-${weekNum}`)).join('')}
-                </div>`;
+                    ${[1, 2, 3, 4].map(weekNum => {
+                        const weekId = `week${weekNum}`;
+                        const targetText = data.weeklyTargets?.[weekId] || ''; // Get the target text
+                        return createWeekElement(monthId, weekId, data.weeks?.[weekId], `week-${monthId}-${weekId}`, targetText); // Pass it
+                    }).join('')}
+                    </div>`;
 
              monthDiv.querySelector('.edit-targets-btn').addEventListener('click', (e) => handleEditTargets(e.target, monthId));
              monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId));
              attachWeekEventListeners(monthDiv, monthId);
              
-             // Trigger the animation
              animateTrackers(monthDiv);
              
              return monthDiv;
         }
 
-        function createWeekElement(monthId, weekId, weekData, sectionId) {
+        function createWeekElement(monthId, weekId, weekData, sectionId, targetText) {
             const daysHtml = weekData?.days?.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('') || '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
             const totalDays = weekData?.days?.length || 0;
             const initialProgress = calculateWeeklyProgress(weekData);
             const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px';
+            
+            // --- NEW: Create HTML for the target text ---
+            const targetHtml = `<p class="week-target-text" id="target-text-${monthId}-${weekId}">${escapeHtml(targetText)}</p>`;
 
             return `
                 <div id="${sectionId}" class="bg-white/60 border border-gray-200 p-4 rounded-lg shadow week-section" data-week-id="${weekId}">
@@ -1440,6 +1455,9 @@
                             <span>Weekly Progress</span>
                             <span class="progress-percentage font-medium">${initialProgress}%</span>
                         </div>
+                        
+                        ${targetHtml}
+                        
                         <div class="progress-bar-container w-full"> <div class="progress-bar-fill progress-bar-weekly" style="width: ${initialProgress}%;"></div> </div>
                     </div>
                     <div class="days-container space-y-6 mt-4"> ${daysHtml} </div>
@@ -2157,7 +2175,23 @@ function addVocabPairInputs(container, word = '', meaning = '') {
              const targets = {};
              targetsContainer.querySelectorAll('.target-textarea').forEach(textarea => { targets[textarea.dataset.week] = textarea.value.trim(); });
              const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-             try { await updateDoc(docRef, { weeklyTargets: targets }); console.log("Monthly targets saved."); showCustomAlert("Monthly targets saved!", "success"); setSyncStatus("Synced", "green"); }
+             try { 
+                 await updateDoc(docRef, { weeklyTargets: targets }); 
+                 console.log("Monthly targets saved."); 
+                 showCustomAlert("Monthly targets saved!", "success"); 
+                 setSyncStatus("Synced", "green");
+                 
+                 // --- NEW AUTO-UPDATE LOGIC ---
+                 // Manually update the text in the week sections
+                 for (const weekId in targets) {
+                     const targetTextElement = document.getElementById(`target-text-${monthId}-${weekId}`);
+                     if (targetTextElement) {
+                         targetTextElement.innerHTML = escapeHtml(targets[weekId]);
+                     }
+                 }
+                 // --- END NEW LOGIC ---
+                 
+             }
              catch (error) { console.error("Error saving targets:", error); showCustomAlert("Error saving targets."); setSyncStatus("Error", "red"); }
         }
 
