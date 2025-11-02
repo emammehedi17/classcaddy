@@ -176,7 +176,11 @@
             font-family: 'Inter', 'Poppins', sans-serif;
             background-color: transparent;
             border: none; padding: 0; margin: 0;
-            width: 100%; height: 100%; min-height: 60px;
+            width: 100%;
+            /* --- MODIFIED --- */
+            height: auto; /* Allow it to grow */
+            overflow: hidden; /* Hide scrollbar */
+            /* --- END MODIFIED --- */
             resize: none; color: #4b5563;
             font-size: 0.95rem; line-height: 1.5;
             outline: none; box-shadow: none;
@@ -1415,7 +1419,7 @@
                             <a href="#week-${monthId}-${weekNum}" class="target-card-link ${targetHoverBgColors[`week${weekNum}`] || ''}">
                                 <div class="target-card">
                                     <h3 class="font-semibold text-lg ${targetColors[`week${weekNum}`] || 'text-gray-700'} mb-2">Week ${weekNum}</h3>
-                                    <textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" rows="3" class="target-textarea w-full" placeholder="Enter target..." disabled>${escapeHtml(data.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
+                                    <textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" class="target-textarea w-full" placeholder="Enter target..." disabled>${escapeHtml(data.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
                                 </div>
                             </a>
                         `).join('')}
@@ -1424,15 +1428,18 @@
                  <div class="space-y-8 weekly-plans-container">
                     ${[1, 2, 3, 4].map(weekNum => {
                         const weekId = `week${weekNum}`;
-                        const targetText = data.weeklyTargets?.[weekId] || ''; // Get the target text
-                        return createWeekElement(monthId, weekId, data.weeks?.[weekId], `week-${monthId}-${weekId}`, targetText); // Pass it
+                        const targetText = data.weeklyTargets?.[weekId] || '';
+                        return createWeekElement(monthId, weekId, data.weeks?.[weekId], `week-${monthId}-${weekId}`, targetText);
                     }).join('')}
-                    </div>`;
+                </div>`;
 
              monthDiv.querySelector('.edit-targets-btn').addEventListener('click', (e) => handleEditTargets(e.target, monthId));
              monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId));
              attachWeekEventListeners(monthDiv, monthId);
              
+             // --- NEW: Auto-resize textareas on load ---
+             monthDiv.querySelectorAll('.target-textarea').forEach(autoResizeTextarea);
+
              animateTrackers(monthDiv);
              
              return monthDiv;
@@ -2152,20 +2159,36 @@ function addVocabPairInputs(container, word = '', meaning = '') {
             const targetsContainer = button.closest('.mb-8');
             const textareas = targetsContainer.querySelectorAll('.target-textarea');
             const links = targetsContainer.querySelectorAll('.target-card-link');
+            
+            // --- NEW: Define the input handler ---
+            const onInput = (e) => autoResizeTextarea(e.target);
 
             if (isEditing) {
+                // --- SAVING ---
                 saveMonthlyTargets(monthId, targetsContainer);
                 button.innerHTML = '<i class="fas fa-pencil-alt mr-1"></i> Edit Targets';
                 button.dataset.editing = 'false';
                 button.classList.add('action-button-secondary');
-                textareas.forEach(ta => ta.disabled = true );
+                textareas.forEach(ta => {
+                    ta.disabled = true;
+                    // --- NEW: Remove listener ---
+                    ta.removeEventListener('input', onInput);
+                    // Resize one last time after saving
+                    autoResizeTextarea(ta);
+                });
                 links.forEach(link => { if (link.dataset.href) { link.setAttribute('href', link.dataset.href); } });
             } else {
+                // --- EDITING ---
                 button.innerHTML = '<i class="fas fa-save mr-1"></i> Save Targets';
                 button.dataset.editing = 'true';
                 button.classList.remove('action-button-secondary');
                 links.forEach(link => { link.dataset.href = link.getAttribute('href'); link.removeAttribute('href'); });
-                textareas.forEach(ta => ta.disabled = false );
+                textareas.forEach(ta => {
+                    ta.disabled = false;
+                    // --- NEW: Add listener and resize ---
+                    ta.addEventListener('input', onInput);
+                    autoResizeTextarea(ta); // Resize now
+                });
                 textareas[0].focus();
             }
         }
@@ -2658,7 +2681,14 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
              alertBox.textContent = message; document.body.appendChild(alertBox);
              setTimeout(() => { alertBox.remove(); }, 3000);
          }
-
+		
+		function autoResizeTextarea(textarea) {
+            if (!textarea) return;
+            textarea.style.height = 'auto'; // Reset height
+            // Set new height based on the scroll height (the content)
+            textarea.style.height = (textarea.scrollHeight) + 'px'; 
+         }
+		 
     </script>
 </body>
 </html>
