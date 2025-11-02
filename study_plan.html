@@ -2159,42 +2159,58 @@ function addVocabPairInputs(container, word = '', meaning = '') {
         // --- Monthly Target Edit ---
         function handleEditTargets(button, monthId) {
             const isEditing = button.dataset.editing === 'true';
-            // --- MODIFIED: Find the group, not just the parent ---
-            const targetsContainer = button.closest('.mb-8').querySelector('.monthly-targets'); 
-            const textareas = targetsContainer.querySelectorAll('.target-textarea');
-            const links = targetsContainer.querySelectorAll('.target-card-link');
             
-            // --- MODIFIED: Define the input handler ---
-            // It now calls the sync function on the whole group
-            const onInput = () => syncTextareaHeights(targetsContainer);
+            // --- THIS IS THE FIX ---
+            // We go back to finding the main parent container
+            const targetsParent = button.closest('.mb-8'); 
+            // Find the grid *inside* the parent
+            const targetsGrid = targetsParent.querySelector('.monthly-targets'); 
+            // Find the links *inside* the parent
+            const links = targetsParent.querySelectorAll('.target-card-link'); 
+            // Find the textareas *inside* the parent
+            const textareas = targetsParent.querySelectorAll('.target-textarea'); 
+            
+            // Define the input handler to use the grid
+            const onInput = () => syncTextareaHeights(targetsGrid);
 
             if (isEditing) {
                 // --- SAVING ---
-                saveMonthlyTargets(monthId, targetsContainer);
+                saveMonthlyTargets(monthId, targetsGrid); // Pass the grid
                 button.innerHTML = '<i class="fas fa-pencil-alt mr-1"></i> Edit Targets';
                 button.dataset.editing = 'false';
                 button.classList.add('action-button-secondary');
+                
                 textareas.forEach(ta => {
                     ta.disabled = true;
                     ta.removeEventListener('input', onInput);
                 });
-                // --- MODIFIED: Resize one last time after saving ---
-                syncTextareaHeights(targetsContainer);
                 
-                links.forEach(link => { if (link.dataset.href) { link.setAttribute('href', link.dataset.href); } });
+                syncTextareaHeights(targetsGrid); // Pass the grid
+                
+                // This will work now because 'links' is found correctly
+                links.forEach(link => { 
+                    if (link.dataset.href) { 
+                        link.setAttribute('href', link.dataset.href); 
+                    } 
+                });
             } else {
                 // --- EDITING ---
                 button.innerHTML = '<i class="fas fa-save mr-1"></i> Save Targets';
                 button.dataset.editing = 'true';
                 button.classList.remove('action-button-secondary');
-                links.forEach(link => { link.dataset.href = link.getAttribute('href'); link.removeAttribute('href'); });
+                
+                // This will work now because 'links' is found correctly
+                links.forEach(link => { 
+                    link.dataset.href = link.getAttribute('href'); 
+                    link.removeAttribute('href'); 
+                });
                 
                 textareas.forEach(ta => {
                     ta.disabled = false;
                     ta.addEventListener('input', onInput);
                 });
-                // --- MODIFIED: Resize all on edit ---
-                syncTextareaHeights(targetsContainer); 
+                
+                syncTextareaHeights(targetsGrid); // Pass the grid
                 
                 textareas[0].focus();
             }
