@@ -1433,7 +1433,7 @@
                     }).join('')}
                 </div>`;
 
-             monthDiv.querySelector('.edit-targets-btn').addEventListener('click', (e) => handleEditTargets(e.target, monthId));
+             monthDiv.querySelector('.edit-targets-btn').addEventListener('click', (e) => handleEditTargets(e.currentTarget, monthId));
              monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId));
              attachWeekEventListeners(monthDiv, monthId);
              
