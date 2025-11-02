@@ -1364,7 +1364,6 @@
             } = findLastProgressTrackers(monthId, data);
             // --- END NEW ---
 
-            // --- THIS IS THE FIX: Added the opening backtick (`) ---
             monthDiv.innerHTML = `
                  <div class="flex justify-between items-start mb-6">
                      <h2 class="text-2xl font-bold text-emerald-600">${data.monthName || 'Unnamed Month'} <span class="text-lg text-gray-400 font-normal">(${monthId})</span></h2>
@@ -1373,26 +1372,26 @@
 
                  <div class="progress-trackers-container mb-10" data-month-id="${monthId}">
                     ${createTrackerHTML(
-                        `monthly-tracker-${monthId}`,
-                        'Monthly Progress',
-                        monthlyPercent,
-                        '#2e8bff', // User's blue start
-                        '#00c3ff'  // User's blue end
-                    )}
-                    ${createTrackerHTML(
-                        `weekly-tracker-${monthId}`,
-                        'Last Week',
-                        lastWeekPercent,
-                        '#00ffb9', // User's green start
-                        '#6a5eff'  // User's green/purple end
-                    )}
-                    ${createTrackerHTML(
-                        `daily-tracker-${monthId}`,
+                        `daily-tracker-${monthId}`, // <-- NOW FIRST
                         'Last Day',
                         lastDayPercent,
-                        '#ff007f', // User's pink start
-                        '#a85eff', // User's purple end
+                        '#ff007f', // Pink start
+                        '#a85eff', // Purple end
                         continueLink
+                    )}
+                    ${createTrackerHTML(
+                        `weekly-tracker-${monthId}`, // <-- STAYS IN MIDDLE
+                        'Last Week',
+                        lastWeekPercent,
+                        '#00ffb9', // Green start
+                        '#6a5eff'  // Green/purple end
+                    )}
+                    ${createTrackerHTML(
+                        `monthly-tracker-${monthId}`, // <-- NOW LAST
+                        'Monthly Progress',
+                        monthlyPercent,
+                        '#2e8bff', // Blue start
+                        '#00c3ff'  // Blue end
                     )}
                  </div>
                  <div class="mb-8">
