@@ -1437,8 +1437,11 @@
              monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId));
              attachWeekEventListeners(monthDiv, monthId);
              
-             // --- NEW: Auto-resize textareas on load ---
-             monthDiv.querySelectorAll('.target-textarea').forEach(autoResizeTextarea);
+             // --- MODIFIED: Auto-resize textareas on load ---
+             const targetGroup = monthDiv.querySelector('.monthly-targets');
+             setTimeout(() => {
+                syncTextareaHeights(targetGroup); // Call the new function
+             }, 0); // Defer to next "tick"
 
              animateTrackers(monthDiv);
              
@@ -2156,12 +2159,14 @@ function addVocabPairInputs(container, word = '', meaning = '') {
         // --- Monthly Target Edit ---
         function handleEditTargets(button, monthId) {
             const isEditing = button.dataset.editing === 'true';
-            const targetsContainer = button.closest('.mb-8');
+            // --- MODIFIED: Find the group, not just the parent ---
+            const targetsContainer = button.closest('.mb-8').querySelector('.monthly-targets'); 
             const textareas = targetsContainer.querySelectorAll('.target-textarea');
             const links = targetsContainer.querySelectorAll('.target-card-link');
             
-            // --- NEW: Define the input handler ---
-            const onInput = (e) => autoResizeTextarea(e.target);
+            // --- MODIFIED: Define the input handler ---
+            // It now calls the sync function on the whole group
+            const onInput = () => syncTextareaHeights(targetsContainer);
 
             if (isEditing) {
                 // --- SAVING ---
@@ -2171,11 +2176,11 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                 button.classList.add('action-button-secondary');
                 textareas.forEach(ta => {
                     ta.disabled = true;
-                    // --- NEW: Remove listener ---
                     ta.removeEventListener('input', onInput);
-                    // Resize one last time after saving
-                    autoResizeTextarea(ta);
                 });
+                // --- MODIFIED: Resize one last time after saving ---
+                syncTextareaHeights(targetsContainer);
+                
                 links.forEach(link => { if (link.dataset.href) { link.setAttribute('href', link.dataset.href); } });
             } else {
                 // --- EDITING ---
@@ -2183,12 +2188,14 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                 button.dataset.editing = 'true';
                 button.classList.remove('action-button-secondary');
                 links.forEach(link => { link.dataset.href = link.getAttribute('href'); link.removeAttribute('href'); });
+                
                 textareas.forEach(ta => {
                     ta.disabled = false;
-                    // --- NEW: Add listener and resize ---
                     ta.addEventListener('input', onInput);
-                    autoResizeTextarea(ta); // Resize now
                 });
+                // --- MODIFIED: Resize all on edit ---
+                syncTextareaHeights(targetsContainer); 
+                
                 textareas[0].focus();
             }
         }
@@ -2682,18 +2689,28 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
              setTimeout(() => { alertBox.remove(); }, 3000);
          }
 		
-		function autoResizeTextarea(textarea) {
-            if (!textarea) return;
+		function syncTextareaHeights(groupElement) {
+            if (!groupElement) return;
+
+            const textareas = groupElement.querySelectorAll('.target-textarea');
+            if (textareas.length === 0) return;
+
+            // 1. Reset all heights to auto to get the new natural scrollHeight
+            textareas.forEach(ta => {
+                ta.style.height = 'auto';
+            });
+
+            // 2. Find the maximum scrollHeight from the group
+            let maxHeight = 0;
+            textareas.forEach(ta => {
+                maxHeight = Math.max(maxHeight, ta.scrollHeight);
+            });
             
-            // --- THIS IS THE FIX ---
-            // We use a 0ms timeout to push this task to the end of the
-            // event queue, giving the browser time to render the
-            // textarea and calculate its scrollHeight.
-            setTimeout(() => {
-                textarea.style.height = 'auto'; // Reset height
-                // Set new height based on the scroll height (the content)
-                textarea.style.height = (textarea.scrollHeight) + 'px'; 
-            }, 0); // Defer execution to the next "tick"
+            // 3. Apply the new max height to all textareas in the group
+            textareas.forEach(ta => {
+                // Use a 60px min-height as a fallback
+                ta.style.height = (maxHeight > 60 ? maxHeight : 60) + 'px'; 
+            });
          }
 		 
     </script>
