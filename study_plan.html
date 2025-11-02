@@ -1444,19 +1444,20 @@
             const initialProgress = calculateWeeklyProgress(weekData);
             const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px';
             
-            // --- NEW: Create HTML for the target text ---
+            // --- Create HTML for the target text ---
             const targetHtml = `<p class="week-target-text" id="target-text-${monthId}-${weekId}">${escapeHtml(targetText)}</p>`;
 
             return `
                 <div id="${sectionId}" class="bg-white/60 border border-gray-200 p-4 rounded-lg shadow week-section" data-week-id="${weekId}">
                     <h3 class="text-lg font-semibold text-emerald-700 mb-4 capitalize">${weekId.replace('week', 'Week ')} Plan</h3>
+                    
+                    ${targetHtml}
+                    
                     <div class="sticky-progress-wrapper" style="top: ${headerHeight};">
                         <div class="flex justify-between text-xs text-gray-500 mb-1">
                             <span>Weekly Progress</span>
                             <span class="progress-percentage font-medium">${initialProgress}%</span>
                         </div>
-                        
-                        ${targetHtml}
                         
                         <div class="progress-bar-container w-full"> <div class="progress-bar-fill progress-bar-weekly" style="width: ${initialProgress}%;"></div> </div>
                     </div>
