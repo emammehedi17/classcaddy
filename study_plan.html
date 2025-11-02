@@ -870,9 +870,11 @@
         // --- Header Navigation & Scroll Logic (from script.js) ---
         if (pageHeader) {
             let lastScrollY = window.scrollY;
-            const headerHeight = pageHeader.offsetHeight; // Get header height
+            // const headerHeight = pageHeader.offsetHeight; // <-- REMOVED FROM HERE
 
             window.addEventListener('scroll', () => {
+                const headerHeight = pageHeader.offsetHeight || 65; // <-- ADDED HERE, INSIDE
+                
                 const currentScrollY = window.scrollY;
                 let isHeaderHidden = pageHeader.classList.contains('header-hidden'); // Get current state
 
@@ -885,8 +887,6 @@
                     pageHeader.classList.remove('header-hidden');
                     isHeaderHidden = false;
                 }
-                // If currentScrollY === lastScrollY (i.e., during autosave),
-                // neither condition is met, so nothing happens. This is the fix.
                 
                 lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
 
