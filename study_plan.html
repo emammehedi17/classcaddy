@@ -2684,9 +2684,16 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
 		function autoResizeTextarea(textarea) {
             if (!textarea) return;
-            textarea.style.height = 'auto'; // Reset height
-            // Set new height based on the scroll height (the content)
-            textarea.style.height = (textarea.scrollHeight) + 'px'; 
+            
+            // --- THIS IS THE FIX ---
+            // We use a 0ms timeout to push this task to the end of the
+            // event queue, giving the browser time to render the
+            // textarea and calculate its scrollHeight.
+            setTimeout(() => {
+                textarea.style.height = 'auto'; // Reset height
+                // Set new height based on the scroll height (the content)
+                textarea.style.height = (textarea.scrollHeight) + 'px'; 
+            }, 0); // Defer execution to the next "tick"
          }
 		 
     </script>
