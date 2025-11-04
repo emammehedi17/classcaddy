@@ -739,6 +739,21 @@
         #vocab-list-content td:nth-child(3) {
             color: #4b5563; /* gray-600 */
         }
+        /* --- New fixed footer for the modal --- */
+        .modal-footer-sticky {
+            border-top: 1px solid #e5e7eb; /* gray-200 */
+            padding-top: 0.75rem; /* pt-3 */
+            margin-top: 0.75rem; /* mt-3 */
+            flex-shrink: 0; /* Prevents footer from shrinking */
+            font-size: 0.875rem; /* text-sm */
+            color: #4b5563; /* gray-600 */
+            text-align: right;
+        }
+        
+        #total-vocab-count {
+            color: #ef4444; /* red-500 */
+            font-size: 1rem; /* text-base */
+        }
         /* --- END NEW STYLES --- */
 
     </style>
@@ -925,6 +940,10 @@
         
         <div id="vocab-list-content" style="overflow-y: auto; flex-grow: 1;">
             </div>
+			
+			<div id="vocab-modal-footer" class="modal-footer-sticky">
+				Total Vocabularies: <span id="total-vocab-count" class="font-bold">0</span>
+			</div>
 
       </div>
     </div>
@@ -1515,9 +1534,11 @@
 
             const modal = document.getElementById('all-vocab-modal');
             const contentDiv = document.getElementById('vocab-list-content');
+            const totalVocabCountSpan = document.getElementById('total-vocab-count'); // <-- 1. GET THE SPAN
             
             modal.style.display = "block";
             contentDiv.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading all vocabularies...</p>';
+            if (totalVocabCountSpan) totalVocabCountSpan.textContent = "..."; // <-- 2. SET TO LOADING
             setSyncStatus("Loading...", "blue");
 
             try {
@@ -1530,6 +1551,7 @@
 
                 if (querySnapshot.empty) {
                     contentDiv.innerHTML = '<p class="text-center text-gray-500 italic py-10">No study plans found.</p>';
+                    if (totalVocabCountSpan) totalVocabCountSpan.textContent = "0"; // <-- 3. SET TO 0
                     setSyncStatus("Synced", "green");
                     return;
                 }
@@ -1585,11 +1607,14 @@
                 } else {
                     contentDiv.innerHTML = allVocabsHtml;
                 }
+                
+                if (totalVocabCountSpan) totalVocabCountSpan.textContent = totalVocabCount; // <-- 4. SET THE FINAL COUNT
                 setSyncStatus("Synced", "green");
 
             } catch (error) {
                 console.error("Error fetching all vocabularies:", error);
                 contentDiv.innerHTML = '<p class="text-center text-red-500 py-10">Could not load vocabularies. Please try again.</p>';
+                if (totalVocabCountSpan) totalVocabCountSpan.textContent = "Error"; // <-- 5. SET ON ERROR
                 setSyncStatus("Error", "red");
             }
         }
