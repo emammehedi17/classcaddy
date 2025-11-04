@@ -618,6 +618,46 @@
             line-height: 1.4;
             margin-top: 4px; /* Add space below the progress bar title */
         }
+		
+		}
+
+        /* --- ADD THESE NEW STYLES --- */
+        .all-vocab-modal-content h4 {
+            font-size: 1.1rem; /* text-lg */
+            font-weight: 600; /* semibold */
+            color: #059669; /* emerald-600 */
+            background-color: #f0fdfa; /* teal-50 */
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 1.25rem; /* mt-5 */
+            margin-bottom: 0.75rem; /* mb-3 */
+        }
+        .all-vocab-modal-content table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem; /* text-sm */
+        }
+        .all-vocab-modal-content th, .all-vocab-modal-content td {
+            border: 1px solid #e5e7eb; /* gray-200 */
+            padding: 8px 12px;
+            text-align: left;
+        }
+        .all-vocab-modal-content th {
+            background-color: #f9fafb; /* gray-50 */
+            font-weight: 600;
+            color: #374151; /* gray-700 */
+        }
+        .all-vocab-modal-content td:first-child {
+            font-weight: 500;
+            color: #1f2937; /* gray-800 */
+        }
+        .all-vocab-modal-content td:last-child {
+            color: #4b5563; /* gray-600 */
+        }
+        /* --- END NEW STYLES --- */
+
+    </style>
+</head>
 
     </style>
 </head>
@@ -717,17 +757,17 @@
                  <span class="text-sm font-medium text-gray-500 mr-2">Months:</span>
                  <div id="month-nav-buttons" class="flex-grow flex flex-wrap gap-2">
                      </div>
-                 <button id="add-month-btn" class="action-button flex items-center gap-1.5 ml-auto flex-shrink-0">
-                     <i class="fas fa-plus-circle text-sm"></i> Add Month
-                 </button>
-            </div>
+                <div class="ml-auto flex-shrink-0 flex gap-2">
+                     <button id="show-all-vocab-btn" class="action-button action-button-secondary flex items-center gap-1.5">
+                        <i class="fas fa-book-open text-sm"></i> Vocab List
+                     </button>
+                     <button id="add-month-btn" class="action-button flex items-center gap-1.5">
+                         <i class="fas fa-plus-circle text-sm"></i> Add Month
+                     </button>
+                 </div>
+                </div>
 
-            <div id="current-month-plan-display">
-                <p id="no-plans-message" class="text-center text-gray-500 italic py-10">No study plans found. Click "Add Month" to create one.</p>
-                 <p id="select-month-message" class="text-center text-gray-500 italic py-10 hidden">Select a month from the buttons above to view its plan.</p>
-            </div>
-
-        </div> </main>
+	</main>
 
 
 	<!-- --- NEW VOCAB-CODE-MODAL --- -->
@@ -847,6 +887,7 @@
         const noPlansMessage = document.getElementById('no-plans-message');
         const selectMonthMessage = document.getElementById('select-month-message');
         const syncStatusText = document.getElementById('sync-status-text');
+		const showAllVocabBtn = document.getElementById('show-all-vocab-btn');
 
         const authContainerDesktop = document.getElementById('auth-container-desktop');
         const authContainerMobile = document.getElementById('auth-container-mobile');
@@ -1358,8 +1399,99 @@
             try { await setDoc(docRef, newPlanData); console.log("New month added:", monthId); }
             catch (error) { console.error("Error adding new month:", error); showCustomAlert("Error adding month."); }
         });
+		
+		showAllVocabBtn.addEventListener('click', displayAllVocabs);
 
+		
+		function createMonthElement(monthId, data) {
+			// --- START: ADD THIS NEW FUNCTION ---
+        async function displayAllVocabs() {
+            if (!currentUser || !userId) {
+                showCustomAlert("Please log in to see your vocabulary list.");
+                return;
+            }
 
+            const modal = document.getElementById('all-vocab-modal');
+            const contentDiv = document.getElementById('vocab-list-content');
+            
+            modal.style.display = "block";
+            contentDiv.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading all vocabularies...</p>';
+            setSyncStatus("Loading...", "blue");
+
+            try {
+                const plansCollectionPath = getUserPlansCollectionPath();
+                const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+                const querySnapshot = await getDocs(q);
+
+                let allVocabsHtml = '';
+                let totalVocabCount = 0;
+
+                if (querySnapshot.empty) {
+                    contentDiv.innerHTML = '<p class="text-center text-gray-500 italic py-10">No study plans found.</p>';
+                    setSyncStatus("Synced", "green");
+                    return;
+                }
+
+                for (const docSnap of querySnapshot.docs) {
+                    const monthData = docSnap.data();
+                    const monthName = monthData.monthName || docSnap.id;
+
+                    for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
+                        const weekData = monthData.weeks?.[weekId];
+                        if (!weekData || !weekData.days) continue;
+
+                        let weekVocabs = [];
+                        for (const day of weekData.days) {
+                            for (const row of day.rows) {
+                                if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
+                                    weekVocabs.push(...row.vocabData);
+                                }
+                            }
+                        }
+
+                        if (weekVocabs.length > 0) {
+                            totalVocabCount += weekVocabs.length;
+                            const weekTitle = weekId.replace('week', 'Week ');
+                            
+                            allVocabsHtml += `<h4>${weekTitle} - ${monthName}</h4>`;
+                            allVocabsHtml += `
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Word</th>
+                                            <th>Meaning</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${weekVocabs.map(v => `
+                                            <tr>
+                                                <td>${escapeHtml(v.word || '')}</td>
+                                                <td>${escapeHtml(v.meaning || '')}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            `;
+                        }
+                    }
+                }
+
+                if (totalVocabCount === 0) {
+                    contentDiv.innerHTML = '<p class="text-center text-gray-500 italic py-10">You have not added any vocabularies to your study plans yet.</p>';
+                } else {
+                    contentDiv.innerHTML = allVocabsHtml;
+                }
+                setSyncStatus("Synced", "green");
+
+            } catch (error) {
+                console.error("Error fetching all vocabularies:", error);
+                contentDiv.innerHTML = '<p class="text-center text-red-500 py-10">Could not load vocabularies. Please try again.</p>';
+                setSyncStatus("Error", "red");
+            }
+        }
+        // --- END: ADD THIS FUNCTION ---
+		
+		
         // --- UI Creation ---
 
         function createMonthElement(monthId, data) {
@@ -2730,6 +2862,27 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             });
          }
 		 
+		<div id="confirm-modal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close" onclick="closeModal('confirm-modal')">&times;</span>
+        <h3 id="confirm-modal-title" class="text-lg font-semibold mb-4 text-gray-800">Confirm Action</h3>
+        <p id="confirm-modal-message" class="text-gray-600 mb-6">Are you sure?</p>
+        <div class="flex justify-end gap-3">
+             <button id="confirm-modal-cancel" class="action-button action-button-secondary">Cancel</button>
+             <button id="confirm-modal-confirm" class="action-button action-button-danger">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="all-vocab-modal" class="modal">
+      <div class="modal-content all-vocab-modal-content" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
+        <span class="modal-close" onclick="closeModal('all-vocab-modal')">&times;</span>
+        <h3 class="text-2xl font-semibold mb-5 text-emerald-600">Master Vocabulary List</h3>
+        <div id="vocab-list-content">
+            </div>
+      </div>
+    </div>
+		
     </script>
 </body>
 </html>
