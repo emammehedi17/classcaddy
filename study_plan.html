@@ -655,6 +655,91 @@
             color: #4b5563; /* gray-600 */
         }
         /* --- END NEW STYLES --- */
+		/* --- STYLES FOR ALL-VOCAB MODAL --- */
+        
+        /* New fixed header for the modal */
+        .modal-header-sticky {
+            position: relative;
+            padding-bottom: 1.25rem; /* mb-5 */
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+            flex-shrink: 0; /* Prevents header from shrinking */
+        }
+        /* Reposition the close button */
+        .all-vocab-modal-content .modal-close {
+            top: -5px; /* Adjust as needed */
+            right: 0;
+        }
+
+        /* The scrolling part */
+        #vocab-list-content {
+            padding-top: 1.25rem; /* Give space from the header */
+        }
+        
+        /* Subtitles (Week X - Month Y) - BOLD & HIGHLIGHTED */
+        #vocab-list-content h4 {
+            font-size: 1.1rem; /* text-lg */
+            font-weight: 700; /* bold */
+            color: #047857; /* emerald-700 */
+            background-color: #d1fae5; /* emerald-100 */
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-top: 1.25rem; /* mt-5 */
+            margin-bottom: 0.75rem; /* mb-3 */
+            text-align: center; /* Center align subtitle */
+        }
+        /* Don't add margin-top to the very first subtitle */
+        #vocab-list-content h4:first-child {
+            margin-top: 0;
+        }
+
+        /* Table */
+        #vocab-list-content table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem; /* text-sm */
+        }
+        
+        /* Table Header (TH) and Data (TD) - CENTERED */
+        #vocab-list-content th, #vocab-list-content td {
+            border: 1px solid #e5e7eb; /* gray-200 */
+            padding: 10px 12px;
+            text-align: center; /* Center align all text */
+        }
+        
+        /* Table Header (TH) - COLORFUL */
+        #vocab-list-content th {
+            background-color: #1f2937; /* gray-800 */
+            color: #ffffff; /* white */
+            font-weight: 600;
+        }
+        
+        /* SL. Column */
+        #vocab-list-content th.sl-column,
+        #vocab-list-content td.sl-column {
+            width: 50px;
+            font-weight: 500;
+            color: #1f2937; /* gray-800 */
+        }
+
+        /* Zebra-striping for rows - COLORFUL */
+        #vocab-list-content tbody tr:nth-child(odd) {
+            background-color: #f9fafb; /* gray-50 */
+        }
+        #vocab-list-content tbody tr:hover {
+            background-color: #f0f9ff; /* blue-50 */
+        }
+
+        /* Word column */
+        #vocab-list-content td:nth-child(2) {
+            font-weight: 500;
+            color: #1f2937; /* gray-800 */
+        }
+        
+        /* Meaning column */
+        #vocab-list-content td:nth-child(3) {
+            color: #4b5563; /* gray-600 */
+        }
+        /* --- END NEW STYLES --- */
 
     </style>
 </head>
@@ -831,11 +916,16 @@
     </div>
 
     <div id="all-vocab-modal" class="modal">
-      <div class="modal-content all-vocab-modal-content" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
-        <span class="modal-close" onclick="closeModal('all-vocab-modal')">&times;</span>
-        <h3 class="text-2xl font-semibold mb-5 text-emerald-600">Master Vocabulary List</h3>
-        <div id="vocab-list-content">
+      <div class="modal-content all-vocab-modal-content" style="max-width: 700px; max-height: 80vh; display: flex; flex-direction: column;">
+        
+        <div class="modal-header-sticky">
+          <h3 class="text-2xl font-semibold text-emerald-600">Master Vocabulary List</h3>
+          <span class="modal-close" onclick="closeModal('all-vocab-modal')">&times;</span>
+        </div>
+        
+        <div id="vocab-list-content" style="overflow-y: auto; flex-grow: 1;">
             </div>
+
       </div>
     </div>
 
@@ -1470,13 +1560,15 @@
                                 <table>
                                     <thead>
                                         <tr>
+                                            <th class="sl-column">SL.</th>
                                             <th>Word</th>
                                             <th>Meaning</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        ${weekVocabs.map(v => `
+                                        ${weekVocabs.map((v, index) => `
                                             <tr>
+                                                <td class="sl-column">${index + 1}</td>
                                                 <td>${escapeHtml(v.word || '')}</td>
                                                 <td>${escapeHtml(v.meaning || '')}</td>
                                             </tr>
