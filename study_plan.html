@@ -3255,19 +3255,26 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          * Handles the user's answer selection.
          */
         function selectQuizAnswer(selectedButton, selectedOption, correctAnswer) {
-            // Disable all option buttons
+            let isCorrect = (selectedOption === correctAnswer);
+
+            // --- OPTIMIZED LOGIC: ONE LOOP ---
             Array.from(quizOptionsContainer.children).forEach(btn => {
-                btn.disabled = true;
-                if (btn.textContent === correctAnswer) {
-                    btn.classList.add('correct');
+                btn.disabled = true; // 1. Disable all buttons
+                
+                const optionText = btn.textContent;
+
+                if (optionText === correctAnswer) {
+                    btn.classList.add('correct'); // 2. Always show correct answer
+                } else if (optionText === selectedOption) {
+                    btn.classList.add('incorrect'); // 3. Show user's wrong choice
                 }
             });
+            // --- END OPTIMIZED LOGIC ---
 
-            if (selectedOption === correctAnswer) {
+            if (isCorrect) {
                 currentQuizScore++;
             } else {
-                selectedButton.classList.add('incorrect');
-                currentQuizScore -= 0.25; // <-- NEW: Deduct 0.25 for wrong answer
+                currentQuizScore -= 0.25; // Deduct 0.25 for wrong answer
             }
             
             // Update score display, showing 2 decimal places
