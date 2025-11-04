@@ -982,6 +982,10 @@
         <div id="quiz-start-screen" class="text-center py-10">
             <h3 class="text-2xl font-semibold mb-4 text-indigo-600">Vocabulary Quiz</h3>
             <p id="quiz-start-message" class="text-gray-600 mb-6">Loading vocabulary...</p>
+            
+            <p class="text-sm font-medium text-red-600 -mt-2 mb-6">
+                <i class="fas fa-exclamation-triangle mr-1"></i> Warning: 0.25 marks will be deducted for each wrong answer.
+            </p>
             <button id="quiz-start-btn" class="hidden action-button" style="background-color: #4f46e5; padding: 10px 24px; font-size: 1rem;">
                 <i class="fas fa-play mr-2"></i>Start Quiz
             </button>
@@ -1006,11 +1010,17 @@
         
         <div id="quiz-results-screen" class="hidden text-center py-10">
             <h2 class="text-3xl font-bold text-gray-900 mb-4">Quiz Completed!</h2>
-            <p class="text-xl text-gray-700 mb-8">
-                Your final score is 
-                <span id="quiz-final-score" class="font-bold text-indigo-600">0</span> out of 
-                <span id="quiz-total-questions" class="font-bold">0</span>.
+            
+            <p class="text-xl text-gray-700 mb-2">
+                Your final score is:
+                <span id="quiz-final-score" class="font-bold text-indigo-600">0.00</span>
             </p>
+            
+            <p class="text-xl text-gray-700 mb-8">
+                Percentage:
+                <span id="quiz-percentage" class="font-bold text-emerald-600">0%</span>
+            </p>
+            
             <button id="quiz-restart-btn" class="action-button" style="background-color: #4f46e5; padding: 10px 24px; font-size: 1rem;">
                 <i class="fas fa-redo mr-2"></i>Try Again
             </button>
@@ -1117,7 +1127,7 @@
         const quizNextBtn = document.getElementById('quiz-next-btn');
         const quizResultsScreen = document.getElementById('quiz-results-screen');
         const quizFinalScore = document.getElementById('quiz-final-score');
-        const quizTotalQuestions = document.getElementById('quiz-total-questions');
+        const quizPercentage = document.getElementById('quiz-percentage'); // <-- MODIFIED
         const quizRestartBtn = document.getElementById('quiz-restart-btn');
         // --- END: QUIZ ELEMENTS ---
 
@@ -3210,7 +3220,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             currentQuizQuestionIndex = 0;
             currentQuizScore = 0;
 
-            quizScoreEl.textContent = `Score: 0`;
+            quizScoreEl.textContent = `Score: 0.00`;
             quizRestartBtn.onclick = runQuizGame; // Hook up restart button
             
             loadQuizQuestion();
@@ -3255,10 +3265,13 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
             if (selectedOption === correctAnswer) {
                 currentQuizScore++;
-                quizScoreEl.textContent = `Score: ${currentQuizScore}`;
             } else {
                 selectedButton.classList.add('incorrect');
+                currentQuizScore -= 0.25; // <-- NEW: Deduct 0.25 for wrong answer
             }
+            
+            // Update score display, showing 2 decimal places
+            quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`;
             
             quizNextBtn.classList.remove('hidden');
         }
@@ -3270,8 +3283,17 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.remove('hidden');
 
-            quizFinalScore.textContent = currentQuizScore;
-            quizTotalQuestions.textContent = currentQuizQuestions.length;
+            const totalQuestions = currentQuizQuestions.length;
+            
+            // Don't let the final *percentage* go below zero
+            const finalScoreForPercentage = Math.max(0, currentQuizScore);
+            const percentage = (finalScoreForPercentage / totalQuestions) * 100;
+
+            // Show the raw score (it can be negative)
+            quizFinalScore.textContent = currentQuizScore.toFixed(2);
+            
+            // Show the percentage (capped at 0%)
+            quizPercentage.textContent = `${percentage.toFixed(1)}%`;
         }
 
         // --- HOOK UP QUIZ MODAL BUTTONS ---
