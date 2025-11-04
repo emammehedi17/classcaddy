@@ -785,6 +785,16 @@
             cursor: not-allowed;
             opacity: 0.9;
         }
+		
+		
+
+        /* --- START: ADD THIS STYLE --- */
+        .action-button:disabled {
+            background-color: #a5b4fc !important; /* indigo-300 */
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+		
         /* --- END: QUIZ STYLES --- */
 
     </style>
@@ -1000,12 +1010,25 @@
                 Loading question...
             </h2>
             <div id="quiz-options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                </div>
-            <div class="flex justify-end mt-8">
-                <button id="quiz-next-btn" class="hidden action-button" style="background-color: #4f46e5;">
+                <!-- Options will be dynamically inserted here -->
+            </div>
+
+            <!-- --- START: NEW NAVIGATION BUTTONS --- -->
+            <div class="flex justify-between items-center flex-wrap gap-2 mt-8">
+                <button id="quiz-prev-btn" class="action-button action-button-secondary">
+                    &larr; Previous
+                </button>
+                
+                <button id="quiz-skip-btn" class="action-button action-button-secondary" style="color: #4f46e5; border-color: #6366f1;">
+                    Skip <i class="fas fa-fast-forward ml-1"></i>
+                </button>
+
+                <button id="quiz-next-btn" class="action-button" style="background-color: #4f46e5;">
                     Next Question &rarr;
                 </button>
             </div>
+            <!-- --- END: NEW NAVIGATION BUTTONS --- -->
+
         </div>
         
         <div id="quiz-results-screen" class="hidden text-center py-10">
@@ -1125,6 +1148,8 @@
         const quizQuestionText = document.getElementById('quiz-question-text');
         const quizOptionsContainer = document.getElementById('quiz-options-container');
         const quizNextBtn = document.getElementById('quiz-next-btn');
+		const quizPrevBtn = document.getElementById('quiz-prev-btn');
+        const quizSkipBtn = document.getElementById('quiz-skip-btn');
         const quizResultsScreen = document.getElementById('quiz-results-screen');
         const quizFinalScore = document.getElementById('quiz-final-score');
         const quizPercentage = document.getElementById('quiz-percentage'); // <-- MODIFIED
@@ -3174,6 +3199,63 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         /**
          * Generates a set of MCQ questions from a vocab list.
          */
+        // --- START: REFACTORED QUIZ FUNCTIONS ---
+
+        /**
+         * Shuffles array in place using Fisher-Yates shuffle.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        /**
+         * Fetches vocab data and prepares the quiz modal.
+         */
+        async function startQuiz(monthId, weekId, dayIndex, rowIndex) {
+            quizModal.style.display = "block";
+            quizMainScreen.classList.add('hidden');
+            quizResultsScreen.classList.add('hidden');
+            quizStartScreen.classList.remove('hidden');
+            
+            quizStartMessage.textContent = "Loading vocabulary...";
+            quizStartBtn.classList.add('hidden');
+            
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+                
+                const vocabData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex]?.vocabData;
+                
+                if (!vocabData || vocabData.length < 4) {
+                    quizStartMessage.textContent = "You need at least 4 vocabulary words in this day's list to start a quiz.";
+                    quizStartBtn.classList.add('hidden');
+                    return;
+                }
+                
+                currentQuizData = vocabData;
+                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words?`;
+                quizStartBtn.classList.remove('hidden');
+                
+                const newStartBtn = quizStartBtn.cloneNode(true);
+                quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
+                newStartBtn.addEventListener('click', runQuizGame);
+                quizStartBtn = newStartBtn; 
+                
+            } catch (error) {
+                console.error("Error loading quiz data:", error);
+                quizStartMessage.textContent = "Could not load quiz data. Please try again.";
+            }
+        }
+
+        /**
+         * Generates a set of MCQ questions as objects to store answers.
+         */
         function generateQuizData(vocabData) {
             let questions = [];
             const allWords = vocabData.map(v => v.word);
@@ -3191,7 +3273,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 questions.push({
                     question: `What is the meaning of "${correctWord}"?`,
                     options: meaningOptions,
-                    correctAnswer: correctMeaning
+                    correctAnswer: correctMeaning,
+                    userAnswer: null, // null = unanswered
+                    isCorrect: null  // null, true, or false
                 });
 
                 // --- Question 2: Meaning -> Word ---
@@ -3202,7 +3286,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 questions.push({
                     question: `What is the English word for "${correctMeaning}"?`,
                     options: wordOptions,
-                    correctAnswer: correctWord
+                    correctAnswer: correctWord,
+                    userAnswer: null,
+                    isCorrect: null
                 });
             }
             return shuffleArray(questions);
@@ -3221,7 +3307,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             currentQuizScore = 0;
 
             quizScoreEl.textContent = `Score: 0.00`;
-            quizRestartBtn.onclick = runQuizGame; // Hook up restart button
+            quizRestartBtn.onclick = runQuizGame;
             
             loadQuizQuestion();
         }
@@ -3230,23 +3316,39 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          * Displays the current question and options.
          */
         function loadQuizQuestion() {
-            quizNextBtn.classList.add('hidden');
             quizOptionsContainer.innerHTML = '';
-
-            if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
-                showQuizResults();
-                return;
-            }
-
+            
             const q = currentQuizQuestions[currentQuizQuestionIndex];
+            
             quizQuestionNumber.textContent = `Question ${currentQuizQuestionIndex + 1}/${currentQuizQuestions.length}`;
             quizQuestionText.textContent = q.question;
 
+            // --- Button State Logic ---
+            // "Next" button is disabled if no answer is selected
+            quizNextBtn.disabled = (q.userAnswer === null);
+            // "Skip" button is hidden if an answer IS selected
+            quizSkipBtn.hidden = (q.userAnswer !== null);
+            // "Previous" button is hidden on the first question
+            quizPrevBtn.hidden = (currentQuizQuestionIndex === 0);
+
+            // --- Render Options ---
             q.options.forEach(option => {
                 const button = document.createElement('button');
                 button.textContent = option;
                 button.className = "quiz-option-btn";
-                button.onclick = () => selectQuizAnswer(button, option, q.correctAnswer);
+
+                if (q.userAnswer !== null) {
+                    // This question has been answered, show feedback
+                    button.disabled = true;
+                    if (option === q.correctAnswer) {
+                        button.classList.add('correct');
+                    } else if (option === q.userAnswer) {
+                        button.classList.add('incorrect');
+                    }
+                } else {
+                    // This question is new, add click listener
+                    button.onclick = () => selectQuizAnswer(button, option);
+                }
                 quizOptionsContainer.appendChild(button);
             });
         }
@@ -3254,33 +3356,37 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         /**
          * Handles the user's answer selection.
          */
-        function selectQuizAnswer(selectedButton, selectedOption, correctAnswer) {
-            let isCorrect = (selectedOption === correctAnswer);
+        function selectQuizAnswer(selectedButton, selectedOption) {
+            const q = currentQuizQuestions[currentQuizQuestionIndex];
+            
+            // Do nothing if already answered
+            if (q.userAnswer !== null) return;
 
-            // --- OPTIMIZED LOGIC: ONE LOOP ---
-            Array.from(quizOptionsContainer.children).forEach(btn => {
-                btn.disabled = true; // 1. Disable all buttons
-                
-                const optionText = btn.textContent;
-
-                if (optionText === correctAnswer) {
-                    btn.classList.add('correct'); // 2. Always show correct answer
-                } else if (optionText === selectedOption) {
-                    btn.classList.add('incorrect'); // 3. Show user's wrong choice
-                }
-            });
-            // --- END OPTIMIZED LOGIC ---
-
-            if (isCorrect) {
+            // Store the answer
+            q.userAnswer = selectedOption;
+            q.isCorrect = (selectedOption === q.correctAnswer);
+            
+            // Apply scoring
+            if (q.isCorrect) {
                 currentQuizScore++;
             } else {
-                currentQuizScore -= 0.25; // Deduct 0.25 for wrong answer
+                currentQuizScore -= 0.25;
             }
-            
-            // Update score display, showing 2 decimal places
             quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`;
+
+            // Apply visual feedback
+            Array.from(quizOptionsContainer.children).forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === q.correctAnswer) {
+                    btn.classList.add('correct');
+                } else if (btn.textContent === selectedOption) {
+                    btn.classList.add('incorrect');
+                }
+            });
             
-            quizNextBtn.classList.remove('hidden');
+            // Update button states
+            quizNextBtn.disabled = false;
+            quizSkipBtn.hidden = true;
         }
 
         /**
@@ -3290,27 +3396,55 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.remove('hidden');
 
+            // Recalculate score from scratch to be safe
+            let finalScore = 0;
+            currentQuizQuestions.forEach(q => {
+                if (q.isCorrect === true) {
+                    finalScore += 1;
+                } else if (q.isCorrect === false) {
+                    finalScore -= 0.25;
+                }
+                // Skipped questions (isCorrect === null) are ignored
+            });
+            currentQuizScore = finalScore;
+
             const totalQuestions = currentQuizQuestions.length;
-            
-            // Don't let the final *percentage* go below zero
             const finalScoreForPercentage = Math.max(0, currentQuizScore);
             const percentage = (finalScoreForPercentage / totalQuestions) * 100;
 
-            // Show the raw score (it can be negative)
             quizFinalScore.textContent = currentQuizScore.toFixed(2);
-            
-            // Show the percentage (capped at 0%)
             quizPercentage.textContent = `${percentage.toFixed(1)}%`;
         }
-
-        // --- HOOK UP QUIZ MODAL BUTTONS ---
+		
+		
+        // --- START: ADD NEW QUIZ NAV LISTENERS ---
         quizNextBtn.addEventListener('click', () => {
             currentQuizQuestionIndex++;
-            loadQuizQuestion();
+            if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
+                showQuizResults();
+            } else {
+                loadQuizQuestion();
+            }
         });
 
-        // --- END: ALL NEW QUIZ FUNCTIONS ---
-		
+        quizSkipBtn.addEventListener('click', () => {
+            // "Skip" just acts like "Next" but guarantees no answer is saved
+            currentQuizQuestionIndex++;
+            if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
+                showQuizResults();
+            } else {
+                loadQuizQuestion();
+            }
+        });
+
+        quizPrevBtn.addEventListener('click', () => {
+            if (currentQuizQuestionIndex > 0) {
+                currentQuizQuestionIndex--;
+                loadQuizQuestion();
+            }
+        });
+        // --- END: ADD NEW QUIZ NAV LISTENERS ---
+    
     </script>
 </body>
 </html>
