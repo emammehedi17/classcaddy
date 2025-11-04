@@ -3137,68 +3137,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
 		
 		
-		// --- START: ALL NEW QUIZ FUNCTIONS ---
-
-        /**
-         * Shuffles array in place using Fisher-Yates shuffle.
-         * (Copied from your example)
-         */
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        /**
-         * Fetches vocab data and prepares the quiz modal.
-         */
-        async function startQuiz(monthId, weekId, dayIndex, rowIndex) {
-            quizModal.style.display = "block";
-            quizMainScreen.classList.add('hidden');
-            quizResultsScreen.classList.add('hidden');
-            quizStartScreen.classList.remove('hidden');
-            
-            quizStartMessage.textContent = "Loading vocabulary...";
-            quizStartBtn.classList.add('hidden');
-            
-            try {
-                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-                const docSnap = await getDoc(docRef);
-                
-                if (!docSnap.exists()) throw new Error("Month document not found.");
-                
-                const vocabData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex]?.vocabData;
-                
-                if (!vocabData || vocabData.length < 4) {
-                    quizStartMessage.textContent = "You need at least 4 vocabulary words in this day's list to start a quiz.";
-                    quizStartBtn.classList.add('hidden');
-                    return;
-                }
-                
-                // Store data globally for the quiz game
-                currentQuizData = vocabData;
-                
-                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words?`;
-                quizStartBtn.classList.remove('hidden');
-                
-                // Remove old listener and add a new one to prevent duplicates
-                const newStartBtn = quizStartBtn.cloneNode(true);
-                quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
-                newStartBtn.addEventListener('click', runQuizGame);
-                // Re-assign global var to new button
-                quizStartBtn = newStartBtn; 
-                
-            } catch (error) {
-                console.error("Error loading quiz data:", error);
-                quizStartMessage.textContent = "Could not load quiz data. Please try again.";
-            }
-        }
-
-        /**
-         * Generates a set of MCQ questions from a vocab list.
-         */
+		
         // --- START: REFACTORED QUIZ FUNCTIONS ---
 
         /**
