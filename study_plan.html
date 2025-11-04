@@ -1108,7 +1108,7 @@
         const quizModal = document.getElementById('quiz-modal');
         const quizStartScreen = document.getElementById('quiz-start-screen');
         const quizStartMessage = document.getElementById('quiz-start-message');
-        const quizStartBtn = document.getElementById('quiz-start-btn');
+        let quizStartBtn = document.getElementById('quiz-start-btn');
         const quizMainScreen = document.getElementById('quiz-main-screen');
         const quizQuestionNumber = document.getElementById('quiz-question-number');
         const quizScoreEl = document.getElementById('quiz-score');
@@ -3153,7 +3153,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
                 newStartBtn.addEventListener('click', runQuizGame);
                 // Re-assign global var to new button
-                window.quizStartBtn = newStartBtn; 
+                quizStartBtn = newStartBtn; 
                 
             } catch (error) {
                 console.error("Error loading quiz data:", error);
