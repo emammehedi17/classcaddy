@@ -1330,15 +1330,8 @@
 
         googleLoginBtn.addEventListener('click', async () => { 
             try { 
-                if (isMobileDevice()) {
-                    // Use REDIRECT for mobile
-                    console.log("Mobile device detected. Using signInWithRedirect.");
-                    await signInWithRedirect(auth, googleProvider);
-                } else {
-                    // Use POPUP for desktop
-                    console.log("Desktop device detected. Using signInWithPopup.");
-                    await signInWithPopup(auth, googleProvider); 
-                }
+                console.log("Using signInWithRedirect for all devices to avoid COOP error.");
+                await signInWithRedirect(auth, googleProvider);
             } catch (error) { 
                 console.error("Google Sign-In Error:", error); 
                 showCustomAlert(`Sign-in error: ${error.code}`, "error");
