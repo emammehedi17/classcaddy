@@ -1240,6 +1240,21 @@
         // --- End Header Logic ---
 
 
+
+		// --- START: ADD REDIRECT HANDLER ---
+        // This runs on page load to "catch" a redirect login
+        getRedirectResult(auth)
+            .then((result) => {
+                if (result) {
+                    // Successfully signed in from a redirect.
+                    // onAuthStateChanged will now fire with this user.
+                    console.log("Login successful (from redirect):", result.user);
+                }
+            }).catch((error) => {
+                console.error("Google Redirect Sign-In Error:", error);
+            });
+        // --- END: ADD REDIRECT HANDLER ---
+		
         // --- Authentication ---
         function updateAuthUI(user) {
              if (user) {
@@ -1313,11 +1328,31 @@
              }
         });
 
-        googleLoginBtn.addEventListener('click', async () => { try { await signInWithPopup(auth, googleProvider); } catch (error) { console.error("Google Sign-In Error:", error); } });
+        googleLoginBtn.addEventListener('click', async () => { 
+            try { 
+                if (isMobileDevice()) {
+                    // Use REDIRECT for mobile
+                    console.log("Mobile device detected. Using signInWithRedirect.");
+                    await signInWithRedirect(auth, googleProvider);
+                } else {
+                    // Use POPUP for desktop
+                    console.log("Desktop device detected. Using signInWithPopup.");
+                    await signInWithPopup(auth, googleProvider); 
+                }
+            } catch (error) { 
+                console.error("Google Sign-In Error:", error); 
+                showCustomAlert(`Sign-in error: ${error.code}`, "error");
+            } 
+        });
         async function handleLogout() { try { if (unsubscribeActiveMonth) unsubscribeActiveMonth(); unsubscribeActiveMonth = null; await signOut(auth); console.log("Logout successful."); } catch (error) { console.error("Logout Error:", error); } }
         logoutBtn.addEventListener('click', handleLogout);
 
-
+        // --- START: ADD MOBILE DETECT HELPER ---
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+        // --- END: ADD MOBILE DETECT HELPER ---
+		
         // --- Firestore ---
         function getUserPlansCollectionPath() { if (!userId) throw new Error("User ID is not available."); return `artifacts/${appId}/users/${userId}/studyPlans`; }
 
