@@ -1302,14 +1302,13 @@
                  if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                      try {
                          await signInWithCustomToken(auth, __initial_auth_token);
-                     } catch (error) {
-                         console.error("Error custom token, trying anonymous:", error);
-                         try { await signInAnonymously(auth); }
-                         catch (anonError) { console.error("Error anonymous:", anonError); updateAuthUI(null); }
-                     }
+                    } catch (error) {
+                     console.error("Error signing in with custom token:", error);
+                     updateAuthUI(null); // Show login prompt
+					}
                  } else {
-                     try { await signInAnonymously(auth); }
-                     catch (anonError) { console.error("Error anonymous:", anonError); updateAuthUI(null); }
+                     // No user and no custom token, show login prompt
+                     updateAuthUI(null);
                  }
              }
         });
