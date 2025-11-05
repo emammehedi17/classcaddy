@@ -1331,7 +1331,8 @@
         googleLoginBtn.addEventListener('click', async () => { 
             try { 
                 console.log("Using signInWithRedirect for all devices to avoid COOP error.");
-                await signInWithRedirect(auth, googleProvider);
+                await signInWithPopup(auth, googleProvider);
+
             } catch (error) { 
                 console.error("Google Sign-In Error:", error); 
                 showCustomAlert(`Sign-in error: ${error.code}`, "error");
