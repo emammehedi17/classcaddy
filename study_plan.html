@@ -991,6 +991,7 @@
             color: #059669; /* emerald-600 */
         }
         /* --- END: MASTER MCQ LIST STYLES --- */
+		
 		/* --- START: QUIZ SLIDE ANIMATIONS --- */
         @keyframes slideInFromRight {
             from { transform: translateX(100%); opacity: 0; }
@@ -1457,6 +1458,11 @@
         let quizStartBtn = document.getElementById('quiz-start-btn');
 		const quizTitle = document.getElementById('quiz-title');
         const quizMainScreen = document.getElementById('quiz-main-screen');
+		// --- NEW: Add this listener to clean up animation classes ---
+        quizMainScreen.addEventListener('animationend', () => {
+            quizMainScreen.classList.remove('slide-in-right', 'slide-in-left');
+        });
+        // --- END NEW ---
         const quizQuestionNumber = document.getElementById('quiz-question-number');
         const quizScoreEl = document.getElementById('quiz-score');
         const quizQuestionText = document.getElementById('quiz-question-text');
@@ -3804,6 +3810,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         showQuizResults();
                     } else {
                         loadQuizQuestion();
+                        quizMainScreen.classList.add('slide-in-right'); // <-- ADD THIS
                     }
                 }, 300); // 0.3-second (300ms) delay. This will be much faster.
                 
@@ -3850,6 +3857,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 showQuizResults();
             } else {
                 loadQuizQuestion();
+                quizMainScreen.classList.add('slide-in-right'); // <-- ADD THIS
             }
         });
 
@@ -3860,6 +3868,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 showQuizResults();
             } else {
                 loadQuizQuestion();
+                quizMainScreen.classList.add('slide-in-right'); // <-- ADD THIS
             }
         });
 
@@ -3867,6 +3876,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             if (currentQuizQuestionIndex > 0) {
                 currentQuizQuestionIndex--;
                 loadQuizQuestion();
+                quizMainScreen.classList.add('slide-in-left'); // <-- ADD THIS
             }
         });
         // --- END: ADD NEW QUIZ NAV LISTENERS ---
