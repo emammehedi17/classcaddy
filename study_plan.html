@@ -1012,7 +1012,7 @@
     
     <div id="quiz-modal" class="modal">
       <div class="modal-content" style="max-width: 600px; padding-top: 35px; padding-right: 45px;">
-        <span class="modal-close" onclick="closeModal('quiz-modal')">&times;</span>
+        <span class="modal-close" onclick="closeQuizModal()">&times;</span>
         
         <div id="quiz-start-screen" class="text-center py-10">
             <h3 class="text-2xl font-semibold mb-4 text-indigo-600">Vocabulary Quiz</h3>
@@ -3129,8 +3129,16 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
              vocabWordElement.classList.toggle('active');
         }
         window.closeModal = function(modalId) { document.getElementById(modalId).style.display = "none"; }
-        window.onclick = function(event) {
-             if (event.target.classList.contains('modal')) { event.target.style.display = "none"; }
+		window.onclick = function(event) {
+             if (event.target.classList.contains('modal')) { 
+                // --- MODIFIED BLOCK ---
+                if (event.target.id === 'quiz-modal') {
+                    closeQuizModal(); // Use the new function
+                } else {
+                    event.target.style.display = "none"; // Close other modals
+                }
+                // --- END MODIFIED BLOCK ---
+             }
              if (!event.target.closest('.vocab-word')) { document.querySelectorAll('.vocab-word.active').forEach(v => v.classList.remove('active')); }
          }
         function parsePercentage(value) {
@@ -3506,6 +3514,30 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             }
         });
         // --- END: ADD NEW QUIZ NAV LISTENERS ---
+
+        // --- START: ADD THIS NEW FUNCTION ---
+        /**
+         * Checks if a quiz is in progress before closing the modal.
+         */
+        window.closeQuizModal = function() {
+            const mainScreen = document.getElementById('quiz-main-screen');
+            const isQuizInProgress = !mainScreen.classList.contains('hidden');
+
+            if (isQuizInProgress) {
+                // If quiz is running, show a confirmation
+                showConfirmationModal(
+                    "Exit Quiz?", 
+                    "Are you sure you want to exit? Your current quiz progress will be lost.", 
+                    () => {
+                        closeModal('quiz-modal'); // This is the *actual* close
+                    }
+                );
+            } else {
+                // Not in progress (on start or results screen), just close it.
+                closeModal('quiz-modal');
+            }
+        }
+        // --- END: ADD THIS NEW FUNCTION ---
 
         // --- START: NEW QUIZ CENTER LOGIC ---
 
