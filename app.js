@@ -1,0 +1,3319 @@
+
+        // Import necessary functions from Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, signInWithCustomToken, signInAnonymously, getRedirectResult, signInWithRedirect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, setDoc, doc, getDoc, collection, query, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- Firebase Configuration ---
+        setLogLevel('debug'); // Keep debug logging enabled for now
+
+        // PASTE YOUR ACTUAL FIREBASE CONFIG HERE:
+        const firebaseConfig = {
+          apiKey: "AIzaSyAj7MDnrnzKUO73BXG0jeM-uBGrAH3XiAY", // <-- YOUR ACTUAL KEY
+          authDomain: "study-plan17.firebaseapp.com", // <-- YOURS
+          projectId: "study-plan17", // <-- YOURS
+          storageBucket: "study-plan17.appspot.com", // <-- YOURS
+          messagingSenderId: "394648483332", // <-- YOURS
+          appId: "1:394648483332:web:31c0d7a8b3f7065ce4e751", // <-- YOURS
+          measurementId: "G-61TH4D55J3" // <-- YOURS (Optional)
+        };
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId; // Use projectId as fallback app identifier if __app_id is missing
+
+        console.log("Using manually added Firebase config:", firebaseConfig); // Log that manual config is used
+
+
+        // Initialize Firebase
+        let app;
+        let auth;
+        let db;
+        let googleProvider;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            googleProvider = new GoogleAuthProvider();
+            console.log("Firebase initialized successfully.");
+        } catch (error) {
+            console.error("CRITICAL ERROR initializing Firebase:", error);
+            console.error("Firebase Config Used:", firebaseConfig);
+             const authSection = document.getElementById('auth-section');
+             if(authSection) authSection.innerHTML = `<p class="text-red-500 font-bold text-center">Error: Could not initialize Firebase. Please check the console.</p>`;
+             throw new Error("Firebase initialization failed.");
+        }
+        // --- End Firebase Configuration ---
+
+        // --- DOM Elements ---
+        const authSection = document.getElementById('auth-section');
+        const loginPrompt = document.getElementById('login-prompt');
+        const userInfo = document.getElementById('user-info');
+        const userDisplay = document.getElementById('user-display');
+        const userEmailDisplay = document.getElementById('user-email-display');
+        const userIdDisplay = document.getElementById('user-id-display');
+        const googleLoginBtn = document.getElementById('google-login-btn');
+        const logoutBtn = document.getElementById('logout-btn'); // Main logout button
+        const studyPlanContent = document.getElementById('study-plan-content');
+        const addMonthBtn = document.getElementById('add-month-btn');
+        const monthNavButtonsContainer = document.getElementById('month-nav-buttons');
+        const currentMonthPlanDisplay = document.getElementById('current-month-plan-display');
+        const noPlansMessage = document.getElementById('no-plans-message');
+        const selectMonthMessage = document.getElementById('select-month-message');
+        const syncStatusText = document.getElementById('sync-status-text');
+		const showAllVocabBtn = document.getElementById('show-all-vocab-btn');
+
+        const authContainerDesktop = document.getElementById('auth-container-desktop');
+        const authContainerMobile = document.getElementById('auth-container-mobile');
+
+        // Header navigation elements
+        const pageHeader = document.querySelector('header.main-website-ui');
+        const academicDropdown = document.getElementById('academic-dropdown');
+        const academicMenu = document.getElementById('academic-menu');
+        const academicButton = document.getElementById('academic-button');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileAcademicButton = document.getElementById('mobile-academic-button');
+        const mobileAcademicMenu = document.getElementById('mobile-academic-menu');
+
+        // Modals
+        const storyModal = document.getElementById('story-modal');
+        const editStoryModal = document.getElementById('edit-story-modal');
+        const saveStoryBtn = document.getElementById('save-story-btn');
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmModalTitle = document.getElementById('confirm-modal-title');
+        const confirmModalMessage = document.getElementById('confirm-modal-message');
+        const confirmModalConfirmBtn = document.getElementById('confirm-modal-confirm');
+        const confirmModalCancelBtn = document.getElementById('confirm-modal-cancel');
+		// --- START: ADD THESE QUIZ ELEMENTS ---
+        const quizModal = document.getElementById('quiz-modal');
+        const quizStartScreen = document.getElementById('quiz-start-screen');
+        const quizStartMessage = document.getElementById('quiz-start-message');
+        let quizStartBtn = document.getElementById('quiz-start-btn');
+		const quizTitle = document.getElementById('quiz-title');
+        const quizMainScreen = document.getElementById('quiz-main-screen');
+        const quizQuestionArea = document.getElementById('quiz-question-area'); // <-- ADD THIS
+        
+        // --- MODIFIED: Moved listener to the new wrapper ---
+        quizQuestionArea.addEventListener('animationend', () => {
+            quizQuestionArea.classList.remove('slide-in-right', 'slide-in-left');
+        });
+        // --- END MODIFIED ---
+        const quizQuestionNumber = document.getElementById('quiz-question-number');
+        const quizScoreEl = document.getElementById('quiz-score');
+        const quizQuestionText = document.getElementById('quiz-question-text');
+        const quizOptionsContainer = document.getElementById('quiz-options-container');
+        const quizNextBtn = document.getElementById('quiz-next-btn');
+		const quizPrevBtn = document.getElementById('quiz-prev-btn');
+        const quizSkipBtn = document.getElementById('quiz-skip-btn');
+        const quizResultsScreen = document.getElementById('quiz-results-screen');
+        const quizFinalScore = document.getElementById('quiz-final-score');
+        const quizPercentage = document.getElementById('quiz-percentage'); // <-- MODIFIED
+        const quizRestartBtn = document.getElementById('quiz-restart-btn');
+        // --- END: QUIZ ELEMENTS ---
+
+        let currentUser = null;
+        let userId = null;
+        let unsubscribePlans = null; // For the list of month buttons
+        let unsubscribeActiveMonth = null; // For the currently displayed month
+        let currentStoryTarget = null;
+        let currentConfirmAction = null;
+        let currentVocabCodeTarget = null; // <-- ADD THIS LINE
+		let currentMcqTarget = null;
+		let autosaveTimer = null;
+		
+		// --- START: ADD THESE QUIZ STATE VARIABLES ---
+        let currentVocabData = []; // Renamed from currentQuizData
+        let currentMcqData = []; // NEW variable for MCQ quizzes
+        let currentQuizQuestions = [];
+        let currentQuizQuestionIndex = 0;
+        let currentQuizScore = 0;
+		let quizTimerInterval = null;
+        // --- END: QUIZ STATE VARIABLES ---
+
+        // --- Header Navigation & Scroll Logic (from script.js) ---
+        if (pageHeader) {
+            let lastScrollY = window.scrollY;
+            // const headerHeight = pageHeader.offsetHeight; // <-- REMOVED FROM HERE
+
+            window.addEventListener('scroll', () => {
+                const headerHeight = pageHeader.offsetHeight || 65; // <-- ADDED HERE, INSIDE
+                
+                const currentScrollY = window.scrollY;
+                let isHeaderHidden = pageHeader.classList.contains('header-hidden'); // Get current state
+
+                if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                    // Scrolling DOWN: Hide header
+                    pageHeader.classList.add('header-hidden');
+                    isHeaderHidden = true;
+                } else if (currentScrollY < lastScrollY || currentScrollY <= 0) {
+                    // Scrolling UP (or at the top): Show header
+                    pageHeader.classList.remove('header-hidden');
+                    isHeaderHidden = false;
+                }
+                
+                lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+
+                // Update sticky progress bars
+                const newTop = isHeaderHidden ? '0px' : `${headerHeight}px`;
+                document.querySelectorAll('.sticky-progress-wrapper').forEach(bar => {
+                    bar.style.top = newTop;
+                });
+            });
+        }
+
+        if (academicDropdown && academicMenu && academicButton) {
+            let hideTimeout;
+            const showMenu = () => { clearTimeout(hideTimeout); academicMenu.classList.remove('hidden'); };
+            const hideMenu = () => { academicMenu.classList.add('hidden'); };
+            const hideMenuWithDelay = () => { hideTimeout = setTimeout(hideMenu, 2000); };
+
+            academicButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                academicMenu.classList.toggle('hidden');
+            });
+            academicDropdown.addEventListener('mouseenter', showMenu);
+            academicDropdown.addEventListener('mouseleave', hideMenuWithDelay);
+            window.addEventListener('click', (event) => {
+                if (!academicDropdown.contains(event.target)) {
+                    hideMenu();
+                }
+            });
+        }
+
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        if (mobileAcademicButton && mobileAcademicMenu) {
+            mobileAcademicButton.addEventListener('click', () => {
+                mobileAcademicMenu.classList.toggle('hidden');
+                const arrowIcon = mobileAcademicButton.querySelector('svg');
+                if (arrowIcon) {
+                    arrowIcon.classList.toggle('rotate-180');
+                }
+            });
+        }
+        // --- End Header Logic ---
+
+
+
+		// --- START: ADD REDIRECT HANDLER ---
+        // This runs on page load to "catch" a redirect login
+        getRedirectResult(auth)
+            .then((result) => {
+                if (result) {
+                    // Successfully signed in from a redirect.
+                    // onAuthStateChanged will now fire with this user.
+                    console.log("Login successful (from redirect):", result.user);
+                }
+            }).catch((error) => {
+                console.error("Google Redirect Sign-In Error:", error);
+            });
+        // --- END: ADD REDIRECT HANDLER ---
+		
+        // --- Authentication ---
+        function updateAuthUI(user) {
+             if (user) {
+                currentUser = user;
+                userId = user.uid;
+                console.log("User logged in:", userId);
+
+                loginPrompt.style.display = 'none';
+                userInfo.classList.remove('hidden');
+                userDisplay.textContent = user.displayName || 'User';
+                userEmailDisplay.textContent = user.email || (user.isAnonymous ? 'Anonymous User' : '');
+                userIdDisplay.textContent = `ID: ${userId}`;
+                userIdDisplay.title = 'Your unique User ID';
+                logoutBtn.classList.remove('hidden');
+
+                const loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700">${user.displayName || 'User'}</p><p class="text-gray-500 text-xs">${user.email || (user.isAnonymous ? 'Anonymous' : '')}</p></div><button id="logout-btn-header" class="ml-3 action-button action-button-danger text-xs px-3 py-1">Log Out</button>`;
+                authContainerDesktop.innerHTML = loggedInHTML;
+                authContainerMobile.innerHTML = loggedInHTML.replace('ml-3', 'w-full mt-2').replace('logout-btn-header', 'logout-btn-mobile');
+
+                document.getElementById('logout-btn-header')?.addEventListener('click', handleLogout);
+                document.getElementById('logout-btn-mobile')?.addEventListener('click', handleLogout);
+
+                studyPlanContent.classList.remove('hidden');
+                loadStudyPlans(); // Load plans AND month buttons
+            } else {
+                currentUser = null;
+                userId = null;
+                console.log("User logged out");
+
+                loginPrompt.style.display = 'block';
+                userInfo.classList.add('hidden');
+                logoutBtn.classList.add('hidden');
+
+                 const loggedOutHTML = `<a href="index.html#signup" class="px-5 py-2 font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors signup-button text-sm">Sign Up</a>`;
+                 authContainerDesktop.innerHTML = loggedOutHTML;
+                 authContainerMobile.innerHTML = loggedOutHTML.replace('px-5 py-2', 'block w-full text-center py-2');
+
+                studyPlanContent.classList.add('hidden');
+                monthNavButtonsContainer.innerHTML = '';
+                currentMonthPlanDisplay.innerHTML = '';
+                noPlansMessage.style.display = 'block';
+                 selectMonthMessage.classList.add('hidden');
+
+                if (unsubscribePlans) unsubscribePlans();
+                if (unsubscribeActiveMonth) unsubscribeActiveMonth();
+                unsubscribePlans = null;
+                unsubscribeActiveMonth = null;
+            }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+             console.log("Auth state changed. User:", user);
+             if (user) {
+                updateAuthUI(user);
+             } else {
+                 if (auth.currentUser) {
+                     updateAuthUI(auth.currentUser);
+                     return;
+                 }
+                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                     try {
+                         await signInWithCustomToken(auth, __initial_auth_token);
+                    } catch (error) {
+                     console.error("Error signing in with custom token:", error);
+                     updateAuthUI(null); // Show login prompt
+					}
+                 } else {
+                     // No user and no custom token, show login prompt
+                     updateAuthUI(null);
+                 }
+             }
+        });
+
+        googleLoginBtn.addEventListener('click', async () => { 
+            try { 
+                console.log("Using signInWithRedirect for all devices to avoid COOP error.");
+                await signInWithPopup(auth, googleProvider);
+
+            } catch (error) { 
+                console.error("Google Sign-In Error:", error); 
+                showCustomAlert(`Sign-in error: ${error.code}`, "error");
+            } 
+        });
+        async function handleLogout() { try { if (unsubscribeActiveMonth) unsubscribeActiveMonth(); unsubscribeActiveMonth = null; await signOut(auth); console.log("Logout successful."); } catch (error) { console.error("Logout Error:", error); } }
+        logoutBtn.addEventListener('click', handleLogout);
+
+        // --- START: ADD MOBILE DETECT HELPER ---
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+        // --- END: ADD MOBILE DETECT HELPER ---
+		
+        // --- Firestore ---
+        function getUserPlansCollectionPath() { if (!userId) throw new Error("User ID is not available."); return `artifacts/${appId}/users/${userId}/studyPlans`; }
+
+        // Load plans AND setup month navigation
+        async function loadStudyPlans() {
+            if (!currentUser || !userId) return;
+            const plansCollectionPath = getUserPlansCollectionPath();
+            const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc")); // Order by document ID (YYYY-MM)
+
+            if (unsubscribePlans) unsubscribePlans();
+
+            unsubscribePlans = onSnapshot(q, (querySnapshot) => {
+                console.log("Received plans snapshot. Number of plans:", querySnapshot.size);
+                monthNavButtonsContainer.innerHTML = '';
+
+                let currentMonthElement = currentMonthPlanDisplay.querySelector('.card[data-month-id]');
+                let currentMonthId = currentMonthElement ? currentMonthElement.dataset.monthId : null;
+                let monthExists = false;
+
+                // Save scroll position
+                let scrollY = window.scrollY;
+                let parentContainerRect = monthNavButtonsContainer.getBoundingClientRect();
+                let shouldRestoreScroll = scrollY > (parentContainerRect.top + window.scrollY);
+
+                if (querySnapshot.empty) {
+                    currentMonthPlanDisplay.innerHTML = '';
+                    noPlansMessage.style.display = 'block';
+                    selectMonthMessage.classList.add('hidden');
+                } else {
+                    noPlansMessage.style.display = 'none';
+
+                    querySnapshot.forEach((docSnap) => {
+                        const monthId = docSnap.id;
+                        if (monthId === currentMonthId) monthExists = true;
+                        const monthData = docSnap.data();
+
+                        const button = document.createElement('button');
+                        button.textContent = monthData.monthName || monthId;
+                        button.dataset.monthId = monthId;
+                        button.classList.add('action-button', 'action-button-secondary', 'text-xs');
+                        if (monthId === currentMonthId) {
+                             button.classList.add('active-month');
+                             button.classList.remove('action-button-secondary');
+                        }
+                        button.addEventListener('click', (e) => {
+                            e.preventDefault(); // Prevent page jump
+                            displayMonthPlan(monthId);
+                        });
+                        monthNavButtonsContainer.appendChild(button);
+                    });
+
+
+                    // --- MODIFIED BLOCK START ---
+                    if (currentMonthId && !monthExists) {
+                        // The month we were viewing was deleted. Show the 'select' message.
+                        currentMonthPlanDisplay.innerHTML = '';
+                        selectMonthMessage.classList.remove('hidden');
+                        if (unsubscribeActiveMonth) unsubscribeActiveMonth(); // Stop listening to deleted month
+                        unsubscribeActiveMonth = null;
+                    } else if (!currentMonthId) {
+                        // No month is currently selected (e.g., initial page load).
+                        // Default to the last month in the list.
+                        const lastMonthId = querySnapshot.docs[querySnapshot.docs.length - 1].id;
+                        console.log("No month selected. Defaulting to last month:", lastMonthId);
+                        displayMonthPlan(lastMonthId); // Automatically load the last month
+                    }
+                    // --- MODIFIED BLOCK END ---
+                }
+
+                // Restore scroll position
+                if (shouldRestoreScroll) {
+                    console.log("Restoring scroll position to (loadStudyPlans):", scrollY);
+                    window.scrollTo({ top: scrollY, behavior: 'auto' }); // Use 'auto' for instant jump
+                }
+            }, (error) => {
+                console.error("Error fetching study plans:", error);
+                currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">Error loading plans.</p>';
+                noPlansMessage.style.display = 'none';
+                selectMonthMessage.classList.add('hidden');
+            });
+        }
+
+         // Display a specific month's plan
+        async function displayMonthPlan(monthId) {
+            if (!currentUser || !userId) return;
+             console.log("Displaying plan for month:", monthId);
+
+             monthNavButtonsContainer.querySelectorAll('button').forEach(btn => {
+                 btn.classList.toggle('active-month', btn.dataset.monthId === monthId);
+                 btn.classList.toggle('action-button-secondary', btn.dataset.monthId !== monthId);
+             });
+
+             currentMonthPlanDisplay.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading...</p>';
+             selectMonthMessage.classList.add('hidden');
+
+             // Stop listening to the previously active month
+             if (unsubscribeActiveMonth) {
+                 unsubscribeActiveMonth();
+             }
+
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             try {
+                 // Listen for real-time updates ONLY on the selected month
+                 unsubscribeActiveMonth = onSnapshot(docRef, (docSnap) => {
+                     // Check if this is still the active month before re-rendering
+                     const activeBtn = monthNavButtonsContainer.querySelector('button.active-month');
+                     if (!activeBtn || activeBtn.dataset.monthId !== monthId) {
+                         console.log("Snapshot received for non-active month. Ignoring render.");
+                         if (unsubscribeActiveMonth) unsubscribeActiveMonth(); // Stop listening
+                         return;
+                     }
+
+                     // --- AUTOSAVE FIX START ---
+                     const isCurrentlyEditing = currentMonthPlanDisplay.querySelector('.day-section.editing');
+                     if (isCurrentlyEditing) {
+                         console.log("Skipping all re-renders because a day is in edit mode.");
+                         return; // Stop here. Do nothing.
+                     }
+                     // --- AUTOSAVE FIX END ---
+
+
+                     // --- ANIMATION FIX START (NOW WITH STRUCTURAL CHECK) ---
+                     const hasPendingWrites = docSnap.metadata.hasPendingWrites;
+                     if (hasPendingWrites) {
+                         console.log("Local change detected. Checking for structural changes...");
+                         const monthData = docSnap.data();
+
+                         // --- NEW STRUCTURAL CHECK ---
+                         let structureHasChanged = false;
+                         if (monthData && monthData.weeks) {
+                             const weekSections = currentMonthPlanDisplay.querySelectorAll('.week-section');
+                             
+                             if (weekSections.length !== Object.keys(monthData.weeks).length) {
+                                 structureHasChanged = true;
+                             } else {
+                                 // Check each week for day count changes
+                                 for (const weekSection of weekSections) {
+                                     const weekId = weekSection.dataset.weekId;
+                                     const domDayCount = weekSection.querySelectorAll('.day-section').length;
+                                     const dataDayCount = monthData.weeks[weekId]?.days?.length || 0;
+                                     
+                                     if (domDayCount !== dataDayCount) {
+                                         structureHasChanged = true;
+                                         break; // Found a change, no need to check others
+                                     }
+                                 }
+                             }
+                         } else if (monthData) {
+                             // Month data exists but has no weeks, but UI might still show weeks
+                             if (currentMonthPlanDisplay.querySelectorAll('.week-section').length > 0) {
+                                 structureHasChanged = true;
+                             }
+                         }
+                         // --- END NEW STRUCTURAL CHECK ---
+
+
+                         // --- MODIFIED LOGIC ---
+                         if (structureHasChanged) {
+                             console.log("Structural change (day added/deleted) detected. Forcing full re-render.");
+                             // DO NOT return. Fall through to the full re-render logic below.
+                         } else {
+                             // No structural change, just do the smooth progress bar update.
+                             console.log("Non-structural change. Updating progress bars only.");
+                             if (monthData) {
+							 
+								// --- NEW MANUAL TRACKER UPDATE (NO ANIMATION) ---
+                             if (monthData) {
+                                 const monthlyPercent = calculateOverallMonthlyProgress(monthData);
+                                 const { 
+                                     weekly: lastWeekPercent, 
+                                     daily: lastDayPercent, 
+                                     link: continueLink 
+                                 } = findLastProgressTrackers(monthId, monthData);
+                                 
+                                 const circumference = 408;
+                                 // --- Trig constants ---
+                                 const radius = 65;
+                                 const center = 75;
+
+                                 // Update Monthly Tracker
+                                 const monthlyCard = currentMonthPlanDisplay.querySelector(`#monthly-tracker-${monthId}`);
+                                 if (monthlyCard) {
+                                     monthlyCard.querySelector('.tracker-score').textContent = monthlyPercent + '%';
+                                     const monthlyOffset = circumference - (circumference * monthlyPercent) / 100;
+                                     monthlyCard.querySelector('.progress').style.strokeDashoffset = monthlyOffset;
+                                     // --- ADDED ---
+                                     const monthlyCap = monthlyCard.querySelector('.end-cap');
+                                     const angleM = (monthlyPercent / 100) * 360;
+                                     const radsM = (angleM - 90) * (Math.PI / 180);
+                                     monthlyCap.style.left = `${center + radius * Math.cos(radsM)}px`;
+                                     monthlyCap.style.top = `${center + radius * Math.sin(radsM)}px`;
+                                     monthlyCap.style.borderColor = monthlyCard.dataset.colorEnd;
+                                     monthlyCap.style.visibility = monthlyPercent === 0 ? 'hidden' : 'visible';
+                                 }
+                                 
+                                 // Update Weekly Tracker
+                                 const weeklyCard = currentMonthPlanDisplay.querySelector(`#weekly-tracker-${monthId}`);
+                                 if (weeklyCard) {
+                                     weeklyCard.querySelector('.tracker-score').textContent = lastWeekPercent + '%';
+                                     const weeklyOffset = circumference - (circumference * lastWeekPercent) / 100;
+                                     weeklyCard.querySelector('.progress').style.strokeDashoffset = weeklyOffset;
+                                     // --- ADDED ---
+                                     const weeklyCap = weeklyCard.querySelector('.end-cap');
+                                     const angleW = (lastWeekPercent / 100) * 360;
+                                     const radsW = (angleW - 90) * (Math.PI / 180);
+                                     weeklyCap.style.left = `${center + radius * Math.cos(radsW)}px`;
+                                     weeklyCap.style.top = `${center + radius * Math.sin(radsW)}px`;
+                                     weeklyCap.style.borderColor = weeklyCard.dataset.colorEnd;
+                                     weeklyCap.style.visibility = lastWeekPercent === 0 ? 'hidden' : 'visible';
+                                 }
+
+                                 // Update Daily Tracker
+                                 const dailyCard = currentMonthPlanDisplay.querySelector(`#daily-tracker-${monthId}`);
+                                 if (dailyCard) {
+                                     dailyCard.querySelector('.tracker-score').textContent = lastDayPercent + '%';
+                                     const dailyOffset = circumference - (circumference * lastDayPercent) / 100;
+                                     dailyCard.querySelector('.progress').style.strokeDashoffset = dailyOffset;
+                                     // --- ADDED ---
+                                     const dailyCap = dailyCard.querySelector('.end-cap');
+                                     const angleD = (lastDayPercent / 100) * 360;
+                                     const radsD = (angleD - 90) * (Math.PI / 180);
+                                     dailyCap.style.left = `${center + radius * Math.cos(radsD)}px`;
+                                     dailyCap.style.top = `${center + radius * Math.sin(radsD)}px`;
+                                     dailyCap.style.borderColor = dailyCard.dataset.colorEnd;
+                                     dailyCap.style.visibility = lastDayPercent === 0 ? 'hidden' : 'visible';
+                                     
+                                     const continueBtn = dailyCard.querySelector('.tracker-continue-btn');
+                                     if (continueLink) {
+                                         if (continueBtn) continueBtn.href = continueLink;
+                                         else dailyCard.querySelector('.inner-text').insertAdjacentHTML('beforeend', `<a href="${continueLink}" class="tracker-continue-btn">Continue</a>`);
+                                     } else {
+                                         if (continueBtn) continueBtn.remove();
+                                     }
+                                 }
+                             }
+                             // --- END NEW MANUAL TRACKER UPDATE ---
+                                 currentMonthPlanDisplay.querySelectorAll('.week-section').forEach(weekSection => {
+                                     const weekId = weekSection.dataset.weekId;
+                                     const weekData = monthData.weeks?.[weekId];
+                                     if (weekId && weekData) {
+                                         updateWeeklyProgressUI(monthId, weekId, weekData);
+                                         weekData.days?.forEach((dayData, dayIndex) => {
+                                             updateDailyProgressUI(monthId, weekId, dayIndex, dayData);
+                                         });
+                                     }
+                                 });
+                             }
+                             return; // Don't do the full, destructive re-render
+                         }
+                         // --- END MODIFIED LOGIC ---
+                     }
+                     // --- ANIMATION FIX END ---
+
+
+                     // --- Full re-render for changes from OTHER sources (or local structural changes) ---
+                     console.log("Full re-render from server data.");
+                     let scrollY = window.scrollY;
+                     let parentContainerRect = currentMonthPlanDisplay.getBoundingClientRect();
+                     let shouldRestoreScroll = parentContainerRect.top < 0;
+
+
+                     if (docSnap.exists()) {
+                         currentMonthPlanDisplay.innerHTML = '';
+                         currentMonthPlanDisplay.appendChild(createMonthElement(monthId, docSnap.data()));
+                     } else {
+                         console.error("Document for monthId not found (or deleted):", monthId);
+                         currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">This plan was not found (it may have been deleted).</p>';
+                     }
+
+                     if (shouldRestoreScroll) {
+                        console.log("Restoring scroll position to (displayMonthPlan):", scrollY);
+                        window.scrollTo({ top: scrollY, behavior: 'auto' });
+                     }
+                 });
+             } catch (error) {
+                 console.error("Error fetching specific month plan:", error);
+                 currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">Error loading this month\'s plan.</p>';
+             }
+         }
+
+
+       // Add a new month
+        addMonthBtn.addEventListener('click', async (e) => {
+             e.preventDefault(); // Prevent page jump
+             if (!currentUser || !userId) return;
+             const currentYear = new Date().getFullYear();
+             const currentMonthIndex = new Date().getMonth();
+             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+             // Default to *current* month
+             const suggestedMonthName = `${monthNames[currentMonthIndex]} ${currentYear}`;
+             const monthNameInput = prompt("Enter month name (e.g., 'October 2025'):", suggestedMonthName);
+             if (!monthNameInput || monthNameInput.trim() === '') return;
+             const monthName = monthNameInput.trim();
+
+             let monthId = '';
+             let monthYear = currentYear;
+             let monthIndex = currentMonthIndex;
+
+             try {
+                const parts = monthName.split(' ');
+                const year = parseInt(parts[1]);
+                const index = monthNames.findIndex(m => m.toLowerCase() === parts[0].toLowerCase());
+                if (year && index !== -1 && year > 1900 && year < 3000) {
+                    monthId = `${year}-${(index + 1).toString().padStart(2, '0')}`;
+                    monthYear = year;
+                    monthIndex = index;
+                } else { throw new Error("Invalid format"); }
+             } catch (e) {
+                 monthId = `${monthYear}-${(monthIndex + 1).toString().padStart(2, '0')}`;
+                 console.warn("Could not parse month name, using generated ID:", monthId);
+             }
+
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             const docSnap = await getDoc(docRef);
+             if (docSnap.exists()) { showCustomAlert(`Month ID ${monthId} (${monthName}) already exists.`); return; }
+
+             const newPlanData = {
+                monthName: monthName,
+                createdAt: Timestamp.now(), // Used for sorting
+                weeklyTargets: { week1: '', week2: '', week3: '', week4: '' },
+                weeks: {
+                    week1: { days: [] }, week2: { days: [] }, week3: { days: [] }, week4: { days: [] }
+                }
+             };
+
+            try { await setDoc(docRef, newPlanData); console.log("New month added:", monthId); }
+            catch (error) { console.error("Error adding new month:", error); showCustomAlert("Error adding month."); }
+        });
+		
+		showAllVocabBtn.addEventListener('click', displayAllVocabs);
+			// --- START: ADD THIS NEW FUNCTION ---
+        async function displayAllVocabs() {
+            if (!currentUser || !userId) {
+                showCustomAlert("Please log in to see your vocabulary list.");
+                return;
+            }
+
+            const modal = document.getElementById('all-vocab-modal');
+            const contentDiv = document.getElementById('vocab-list-content');
+            const totalVocabCountSpan = document.getElementById('total-vocab-count'); // <-- 1. GET THE SPAN
+            
+            modal.style.display = "block";
+            contentDiv.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading all vocabularies...</p>';
+            if (totalVocabCountSpan) totalVocabCountSpan.textContent = "..."; // <-- 2. SET TO LOADING
+            setSyncStatus("Loading...", "blue");
+
+            try {
+                const plansCollectionPath = getUserPlansCollectionPath();
+                const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+                const querySnapshot = await getDocs(q);
+
+                let allVocabsHtml = '';
+                let totalVocabCount = 0;
+
+                if (querySnapshot.empty) {
+                    contentDiv.innerHTML = '<p class="text-center text-gray-500 italic py-10">No study plans found.</p>';
+                    if (totalVocabCountSpan) totalVocabCountSpan.textContent = "0"; // <-- 3. SET TO 0
+                    setSyncStatus("Synced", "green");
+                    return;
+                }
+
+                for (const docSnap of querySnapshot.docs) {
+                    const monthData = docSnap.data();
+                    const monthName = monthData.monthName || docSnap.id;
+
+                    for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
+                        const weekData = monthData.weeks?.[weekId];
+                        if (!weekData || !weekData.days) continue;
+
+                        let weekVocabs = [];
+                        for (const day of weekData.days) {
+                            for (const row of day.rows) {
+                                if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
+                                    weekVocabs.push(...row.vocabData);
+                                }
+                            }
+                        }
+
+                        if (weekVocabs.length > 0) {
+                            totalVocabCount += weekVocabs.length;
+                            const weekTitle = weekId.replace('week', 'Week ');
+                            
+                            allVocabsHtml += `<h4>${weekTitle} - ${monthName}</h4>`;
+                            allVocabsHtml += `
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th class="sl-column">SL.</th>
+                                            <th>Word</th>
+                                            <th>Meaning</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${weekVocabs.map((v, index) => `
+                                            <tr>
+                                                <td class="sl-column">${index + 1}</td>
+                                                <td>${escapeHtml(v.word || '')}</td>
+                                                <td>${escapeHtml(v.meaning || '')}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            `;
+                        }
+                    }
+                }
+
+                if (totalVocabCount === 0) {
+                    contentDiv.innerHTML = '<p class="text-center text-gray-500 italic py-10">You have not added any vocabularies to your study plans yet.</p>';
+                } else {
+                    contentDiv.innerHTML = allVocabsHtml;
+                }
+                
+                if (totalVocabCountSpan) totalVocabCountSpan.textContent = totalVocabCount; // <-- 4. SET THE FINAL COUNT
+                setSyncStatus("Synced", "green");
+
+            } catch (error) {
+                console.error("Error fetching all vocabularies:", error);
+                contentDiv.innerHTML = '<p class="text-center text-red-500 py-10">Could not load vocabularies. Please try again.</p>';
+                if (totalVocabCountSpan) totalVocabCountSpan.textContent = "Error"; // <-- 5. SET ON ERROR
+                setSyncStatus("Error", "red");
+            }
+        }
+        // --- END: ADD THIS FUNCTION ---
+		
+
+		
+		
+		
+        // --- UI Creation ---
+        function createMonthElement(monthId, data) {
+            const monthDiv = document.createElement('div');
+            monthDiv.className = 'mb-12 p-6 card';
+            monthDiv.dataset.monthId = monthId;
+
+            const targetColors = { week1: 'text-indigo-700', week2: 'text-teal-700', week3: 'text-amber-700', week4: 'text-rose-700' };
+            const targetHoverBgColors = { week1: 'hover:bg-indigo-50', week2: 'hover:bg-teal-50', week3: 'hover:bg-amber-50', week4: 'hover:bg-rose-50' };
+
+            const monthlyPercent = calculateOverallMonthlyProgress(data);
+            const { 
+                weekly: lastWeekPercent, 
+                daily: lastDayPercent, 
+                link: continueLink 
+            } = findLastProgressTrackers(monthId, data);
+
+            monthDiv.innerHTML = `
+                 <div class="flex justify-between items-start mb-6">
+                     <h2 class="text-2xl font-bold text-emerald-600">${data.monthName || 'Unnamed Month'} <span class="text-lg text-gray-400 font-normal">(${monthId})</span></h2>
+                     <button class="icon-button delete-month-btn" title="Delete Month"><i class="fas fa-trash-alt text-red-500"></i></button>
+                 </div>
+
+                 <div class="progress-trackers-container mb-10" data-month-id="${monthId}">
+                    ${createTrackerHTML(
+                        `daily-tracker-${monthId}`, 
+                        'Last Day',
+                        lastDayPercent,
+                        '#ff007f', 
+                        '#a85eff',
+                        continueLink
+                    )}
+                    ${createTrackerHTML(
+                        `weekly-tracker-${monthId}`, 
+                        'Last Week',
+                        lastWeekPercent,
+                        '#00ffb9', 
+                        '#6a5eff'
+                    )}
+                    ${createTrackerHTML(
+                        `monthly-tracker-${monthId}`, 
+                        'Monthly Progress',
+                        monthlyPercent,
+                        '#2e8bff', 
+                        '#00c3ff'
+                    )}
+                 </div>
+
+                 <div class="mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                         <h3 class="text-2xl font-semibold text-gray-700">Monthly Targets</h3>
+                         <button class="action-button action-button-secondary text-xs edit-targets-btn" data-editing="false">
+                            <i class="fas fa-pencil-alt mr-1"></i> Edit Targets
+                         </button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 monthly-targets">
+						${[1, 2, 3, 4].map(weekNum => `
+							<a href="#week-${monthId}-week${weekNum}" class="target-card-link ${targetHoverBgColors[`week${weekNum}`] || ''}">
+								<div class="target-card">
+									<h3 class="font-semibold text-lg ${targetColors[`week${weekNum}`] || 'text-gray-700'} mb-2">Week ${weekNum}</h3>
+									<textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" class="target-textarea w-full" placeholder="Enter target..." disabled>${escapeHtml(data.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
+								</div>
+							</a>
+						`).join('')}
+					</div>
+                </div>
+                 <div class="space-y-8 weekly-plans-container">
+                    ${[1, 2, 3, 4].map(weekNum => {
+                        const weekId = `week${weekNum}`;
+                        const targetText = data.weeklyTargets?.[weekId] || '';
+                        return createWeekElement(monthId, weekId, data.weeks?.[weekId], `week-${monthId}-${weekId}`, targetText);
+                    }).join('')}
+                </div>`;
+
+             monthDiv.querySelector('.edit-targets-btn').addEventListener('click', (e) => handleEditTargets(e.currentTarget, monthId));
+             monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId));
+             attachWeekEventListeners(monthDiv, monthId);
+             
+             // --- MODIFIED: Auto-resize textareas on load ---
+             const targetGroup = monthDiv.querySelector('.monthly-targets');
+             setTimeout(() => {
+                syncTextareaHeights(targetGroup); // Call the new function
+             }, 0); // Defer to next "tick"
+
+             animateTrackers(monthDiv);
+             
+             return monthDiv;
+        }
+
+        function createWeekElement(monthId, weekId, weekData, sectionId, targetText) {
+            const daysHtml = weekData?.days?.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('') || '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
+            const totalDays = weekData?.days?.length || 0;
+            const initialProgress = calculateWeeklyProgress(weekData);
+            const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px';
+            
+            // --- Create HTML for the target text ---
+            const targetHtml = `<p class="week-target-text" id="target-text-${monthId}-${weekId}">${escapeHtml(targetText)}</p>`;
+
+            return `
+                <div id="${sectionId}" class="bg-white/60 border border-gray-200 p-4 rounded-lg shadow week-section" data-week-id="${weekId}">
+                    <h3 class="text-lg font-semibold text-emerald-700 mb-4 capitalize">${weekId.replace('week', 'Week ')} Plan</h3>
+                    
+                    ${targetHtml}
+                    
+                    <div class="sticky-progress-wrapper" style="top: ${headerHeight};">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>Weekly Progress</span>
+                            <span class="progress-percentage font-medium">${initialProgress}%</span>
+                        </div>
+                        
+                        <div class="progress-bar-container w-full"> <div class="progress-bar-fill progress-bar-weekly" style="width: ${initialProgress}%;"></div> </div>
+                    </div>
+                    <div class="days-container space-y-6 mt-4"> ${daysHtml} </div>
+                     ${totalDays < 7 ? (totalDays > 0 ? `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>` : `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`) : '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>'}
+                </div>`;
+        }
+
+        function createDayElement(monthId, weekId, dayIndex, dayData) {
+             const tableId = `table-${monthId}-${weekId}-${dayIndex}`;
+             const initialDayProgress = calculateDailyProgress(dayData);
+             
+             // --- NEW: MCQ Button Logic for Normal Mode ---
+             let mcqButtonsNormalMode = '';
+             if (dayData.mcqData && dayData.mcqData.length > 0) {
+                 mcqButtonsNormalMode = `
+                     <button class="action-button action-button-secondary text-xs view-mcq-btn"><i class="fas fa-eye mr-1"></i> View MCQ</button>
+                     <button class="action-button action-button-secondary text-xs mcq-test-btn" style="border-color: #6366f1; color: #4f46e5;"><i class="fas fa-tasks mr-1"></i> MCQ Test</button>
+                 `;
+             }
+
+             return `
+                 <div class="day-section" id="day-${monthId}-${weekId}-${dayIndex}" data-day-index="${dayIndex}"> 
+                     <div class="flex justify-between items-center mb-3">
+                         <div class="flex items-center gap-2">
+                             <h4 class="font-semibold text-gray-700">Day ${dayData.dayNumber}</h4>
+                             <button class="icon-button delete-day-btn hidden" title="Delete Day"><i class="fas fa-calendar-times text-red-500"></i></button>
+                         </div>
+                         <div class="flex items-center gap-2 flex-wrap justify-end">
+                             ${mcqButtonsNormalMode}
+                             <button class="action-button action-button-secondary text-xs edit-day-btn"> <i class="fas fa-pencil-alt mr-1"></i> Edit </button>
+                         </div>
+                     </div>
+
+                     <div class="day-progress-wrapper" data-day-index="${dayIndex}">
+                         <div class="flex justify-between text-xs text-gray-500 mb-1">
+                             <span>Day Progress</span>
+                             <span class="progress-percentage font-medium">${initialDayProgress}%</span>
+                         </div>
+                         <div class="progress-bar-container w-full"> 
+                             <div class="progress-bar-fill progress-bar-daily" style="width: ${Math.min(initialDayProgress, 100)}%;"></div> 
+                         </div>
+                     </div>
+
+                     <table class="w-full text-sm text-left text-gray-600 study-table" id="${tableId}">
+                         <thead class="text-xs text-gray-500 uppercase">
+                             <tr>
+                                 <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Subject</th>
+                                 <th scope="col" class="px-3 py-2 md:w-[60%] text-center">Topic / Vocab</th>
+                                 <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Comment</th>
+                                 <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell text-center">Done</th>
+                                 <th scope="col" class="px-3 py-2 w-[10%] md:w-[5%] center-cell completion-perc-header hidden text-center">%</th>
+                                 <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell actions-header hidden text-center"></th> 
+                             </tr>
+                         </thead>
+                         <tbody> ${dayData.rows?.map((rowData, rowIndex) => createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)).join('') || ''} </tbody>
+                     </table>
+                     <div class="edit-mode-controls hidden mt-3 flex flex-wrap gap-2 justify-between items-center">
+                         <div class="flex flex-wrap gap-2"> 
+                             <button class="action-button action-button-secondary text-xs add-normal-row-btn"><i class="fas fa-plus mr-1"></i> Add Row</button>
+                             <button class="action-button action-button-secondary text-xs add-vocab-row-btn"><i class="fas fa-book mr-1"></i> Add Vocabulary</button>
+                             <button class="action-button action-button-secondary text-xs add-story-btn"><i class="fas fa-feather-alt mr-1"></i> Add/Edit Story</button>
+                             <button class="action-button action-button-secondary text-xs add-mcq-btn"><i class="fas fa-plus mr-1"></i> Add/Edit MCQ</button>
+                             </div>
+                         <button class="action-button text-xs save-day-btn"><i class="fas fa-save mr-1"></i> Save</button>
+                     </div>
+                 </div>`;
+        }
+
+        function createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, isEditing) {
+             const uniqueRowId = `row-${monthId}-${weekId}-${dayIndex}-${rowIndex}`;
+             const isVocabRow = rowData.subject?.toLowerCase() === 'vocabulary';
+
+             let topicContent = '';
+             if (isEditing) {
+                 if (isVocabRow) {
+                     topicContent = `<div class="vocab-edit-container space-y-2">`;
+                     (rowData.vocabData || [{ word: '', meaning: '' }]).forEach((pair, pairIndex) => {
+                         topicContent += `
+                             <div class="vocab-pair" data-pair-index="${pairIndex}">
+                                 <input type="text" class="vocab-input vocab-word-input" placeholder="Word" value="${escapeHtml(pair.word || '')}">
+                                 <input type="text" class="vocab-input vocab-meaning-input" placeholder="Meaning" value="${escapeHtml(pair.meaning || '')}">
+                                 <button type="button" class="icon-button delete-vocab-pair-btn" title="Delete Pair"><i class="fas fa-times text-red-500"></i></button>
+                             </div>`;
+                     });
+                     // --- MODIFIED BLOCK TO ADD BUTTON ---
+                     topicContent += `<div class="flex items-center gap-2 mt-2 vocab-button-container">
+                                        <button type="button" class="icon-button add-vocab-pair-btn" title="Add Word/Meaning Pair"><i class="fas fa-plus-circle text-emerald-500"></i></button>
+                                        <button type="button" class="action-button action-button-secondary add-vocab-code-btn" style="padding: 4px 8px; font-size: 0.75rem;"><i class="fas fa-code mr-1"></i> Add with Code</button>
+                                     </div>
+                                </div>`; // Closed container
+                     // --- END MODIFIED BLOCK ---
+                 } else {
+                     topicContent = `<textarea class="editable-input topic-input text-xs" rows="2" placeholder="Topic details...">${escapeHtml(rowData.topic || '')}</textarea>`;
+                 }
+             } else {
+                 if (isVocabRow) {
+                     topicContent = generateVocabHtml(rowData.vocabData);
+                 } else {
+                     topicContent = `<span class="topic-display">${escapeHtml(rowData.topic || '-')}</span>`;
+                 }
+             }
+
+             // --- NEW BUTTONS LOGIC ---
+             let buttonsHtml = '';
+             if (!isEditing && isVocabRow) {
+                 if (rowData.story) {
+                    buttonsHtml += `<button class="action-button action-button-secondary text-xs read-story-btn"><i class="fas fa-book-open mr-1"></i> Read Story</button>`;
+                 }
+                 // Only show quiz button if there are at least 4 vocab words
+                 if (rowData.vocabData && rowData.vocabData.length >= 4) {
+                     buttonsHtml += `<button class="action-button action-button-secondary text-xs quiz-btn" style="border-color: #6366f1; color: #4f46e5;"><i class="fas fa-question-circle mr-1"></i> Quiz</button>`;
+                 }
+             }
+			
+			
+			
+             const completedClass = (!isEditing && rowData.completed) ? 'row-completed' : '';
+
+             return `
+                 <tr id="${uniqueRowId}" data-row-index="${rowIndex}" class="${isEditing ? 'editing-mode' : ''} ${isVocabRow ? 'vocab-row' : 'normal-row'} ${completedClass}">
+                     <td class="px-3 py-2 align-top" data-label="Subject"> ${isEditing ? `<input type="text" class="editable-input subject-input" placeholder="Subject" value="${escapeHtml(rowData.subject || '')}" ${isVocabRow ? 'readonly style="background-color:#e5e7eb;"' : ''}>` : `<span class="subject-display font-medium text-gray-700">${escapeHtml(rowData.subject || '-')}</span>`}
+                     </td>
+                     <td class="px-3 py-2 align-top vocab-topic-cell" data-label="Topic / Vocab"> 
+                        ${topicContent}
+                        ${buttonsHtml ? `<div class="flex gap-2 mt-2 flex-wrap">${buttonsHtml}</div>` : ''}
+                     </td>
+                     <td class="px-3 py-2 align-top" data-label="Comment"> ${isEditing ? `<textarea class="editable-input comment-input text-xs" rows="2" placeholder="Comment...">${escapeHtml(rowData.comment || '')}</textarea>` : `<span class="comment-display text-xs text-gray-500">${escapeHtml(rowData.comment || '-')}</span>`}
+                     </td>
+                     <td class="px-3 py-2 align-middle center-cell" data-label="Done"> <input type="checkbox" class="form-checkbox h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 completion-checkbox" ${rowData.completed ? 'checked' : ''} ${isEditing ? 'disabled' : ''}>
+                     </td>
+                      <td class="px-3 py-2 align-middle center-cell completion-perc-cell ${isEditing ? '' : 'hidden'}" data-label="%"> ${isEditing ? `<input type="text" inputmode="decimal" class="editable-input completion-perc-input w-16 text-center text-xs" placeholder="%" value="${rowData.completionPercentage ?? ''}">` : ''}
+                      </td>
+                     <td class="px-3 py-2 align-middle center-cell actions-cell ${isEditing ? '' : 'hidden'}" data-label="Actions"> ${isEditing ? `<button class="icon-button delete-row-btn" title="Delete Row"><i class="fas fa-trash-alt text-red-500"></i></button>` : ''}
+                     </td>
+                 </tr>
+             `;
+        }
+
+
+        // Generate Vocab HTML with new Tooltip style
+        function generateVocabHtml(vocabData) {
+            if (!vocabData || vocabData.length === 0) return '-';
+
+            const wordsHtml = vocabData.map(v =>
+                `<div class="vocab-word" tabindex="0">
+                    ${escapeHtml(v.word || '')}
+                    <span class="vocab-meaning">${escapeHtml(v.meaning || 'No meaning')}</span>
+                 </div>`
+            ).join(''); // Join with no space, margin will handle it
+            
+            // Return the words inside our new flex container
+            return `<div class="vocab-container">${wordsHtml}</div>`;
+        }
+
+        function escapeHtml(unsafe) {
+            if (unsafe === null || unsafe === undefined) return '';
+             return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+
+        // --- Event Listeners ---
+
+		function attachWeekEventListeners(monthElement, monthId) {
+             const weeklyPlansContainer = monthElement.querySelector('.weekly-plans-container');
+
+             weeklyPlansContainer.addEventListener('click', async (e) => {
+                 const target = e.target;
+                 const button = target.closest('button');
+                 const weekSection = target.closest('.week-section');
+                 if (!weekSection) return;
+                 const weekId = weekSection.dataset.weekId;
+                 const daySection = target.closest('.day-section');
+                 const row = target.closest('tr');
+
+                 // Handle vocab word click
+                 if (target.closest('.vocab-word') && !daySection?.classList.contains('editing')) {
+                     e.preventDefault();
+                     showVocabMeaning(target.closest('.vocab-word'));
+                     return;
+                 }
+
+                 // Handle checkbox click
+                 if (target.classList.contains('completion-checkbox')) {
+                     if (!daySection?.classList.contains('editing')) {
+                         row?.classList.toggle('row-completed', target.checked);
+                         await saveDayPlan(monthId, weekId, daySection); 
+                     } else {
+                         e.preventDefault();
+                     }
+                     return; 
+                 }
+
+                 // Handle other button clicks
+                 if (!button) return;
+                 e.preventDefault();
+
+                 // Edit/Save Day Button
+                 if (button.classList.contains('edit-day-btn') || button.classList.contains('save-day-btn')) {
+                     const isEditing = daySection.classList.contains('editing');
+                     toggleDayEditMode(monthId, weekId, daySection, !isEditing);
+                 }
+                 // Add Normal Row Button (Edit Mode)
+                 else if (button.classList.contains('add-normal-row-btn')) { addRowToDay(monthId, weekId, daySection, 'normal'); }
+                 // Add Vocab Row Button (Edit Mode)
+                 else if (button.classList.contains('add-vocab-row-btn')) { addRowToDay(monthId, weekId, daySection, 'vocabulary'); }
+                 // Add/Edit Story Button (Edit Mode)
+                 else if (button.classList.contains('add-story-btn')) {
+                     const dayIndex = parseInt(daySection.dataset.dayIndex);
+                     const vocabRow = daySection.querySelector('tr.vocab-row');
+                     let vocabRowIndex = vocabRow ? parseInt(vocabRow.dataset.rowIndex) : -1;
+                     openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex);
+                 }
+				 // --- MODIFIED CLICK HANDLER WITH LOGS ---
+                 else if (button.classList.contains('add-vocab-code-btn')) {
+                     console.log("Checkpoint 1: 'Add with Code' button clicked.");
+                     const vocabRow = target.closest('tr.vocab-row'); // Find parent row
+                     if (vocabRow) {
+                         console.log("Checkpoint 2: Found vocabRow:", vocabRow);
+                         const vocabContainer = vocabRow.querySelector('.vocab-edit-container');
+                         if (vocabContainer) {
+                             console.log("Checkpoint 3: Found vocabContainer:", vocabContainer);
+                             openVocabCodeModal(vocabContainer);
+                         } else {
+                             console.error("CRITICAL: Found row, but NOT '.vocab-edit-container' inside it.");
+                         }
+                     } else {
+                         console.error("CRITICAL: Could not find parent 'tr.vocab-row'.");
+                     }
+                 }
+                 // --- END MODIFIED BLOCK ---
+                 // Delete Row Button (Edit Mode)
+                 else if (button.classList.contains('delete-row-btn')) {
+                    if (row.classList.contains('vocab-row')) {
+                        confirmDeleteRow(monthId, weekId, daySection, row);
+                    } else {
+                        const rowIndex = parseInt(row.dataset.rowIndex);
+                        deleteRow(monthId, weekId, daySection, row, rowIndex);
+                    }
+                 }
+                 // Delete Day Button (Edit Mode)
+                 else if (button.classList.contains('delete-day-btn')) { confirmDeleteDay(monthId, weekId, daySection); }
+                 // Add Vocab Pair Button (Edit Mode)
+                 else if (button.classList.contains('add-vocab-pair-btn')) { addVocabPairInputs(button.closest('.vocab-edit-container')); }
+                 // Delete Vocab Pair Button (Edit Mode)
+                 else if (button.classList.contains('delete-vocab-pair-btn')) { deleteVocabPairInputs(button.closest('.vocab-pair')); }
+                 // Read Story Button (Normal Mode)
+                 else if (button.classList.contains('read-story-btn')) {
+                     const dayIndex = parseInt(daySection.dataset.dayIndex);
+                     const rowIndex = parseInt(row.dataset.rowIndex);
+                     readStory(monthId, weekId, dayIndex, rowIndex);
+                 }
+				 
+                 else if (button.classList.contains('quiz-btn')) {
+                     const dayIndex = parseInt(daySection.dataset.dayIndex);
+                     const rowIndex = parseInt(row.dataset.rowIndex);
+                     startQuiz(monthId, weekId, dayIndex, rowIndex);
+                 }
+                 // --- END: QUIZ BUTTON HANDLER ---
+
+                 // --- START: NEW MCQ BUTTON HANDLERS ---
+				 else if (button.classList.contains('add-mcq-btn')) {
+                     const dayIndex = parseInt(daySection.dataset.dayIndex);
+                     openAddMcqModal(monthId, weekId, dayIndex);
+                 }
+                 else if (button.classList.contains('view-mcq-btn')) {
+                     const dayIndex = parseInt(daySection.dataset.dayIndex);
+                     openViewMcqModal(monthId, weekId, dayIndex);
+                 }
+                 else if (button.classList.contains('mcq-test-btn')) {
+                     const dayIndex = parseInt(daySection.dataset.dayIndex);
+                     startMcqQuiz(monthId, weekId, dayIndex);
+                 }
+                 // --- END: NEW MCQ BUTTON HANDLERS ---
+
+                 // Add Day Button / Add First Day
+                 else if (button.classList.contains('add-day-btn') || button.classList.contains('add-first-day-btn')) {
+                     addNewDay(monthId, weekId, weekSection);
+                 }
+             });
+
+            // Add global click listener to close vocab popups
+            document.addEventListener('click', function (event) {
+                if (!event.target.closest('.vocab-word')) {
+                    document.querySelectorAll('.vocab-word.active').forEach(v => v.classList.remove('active'));
+                }
+            });
+        }
+
+
+        // Toggle Edit Mode - Updated for Button Swap AND Autosave
+        async function toggleDayEditMode(monthId, weekId, daySection, enterEditMode) {
+             const dayIndex = parseInt(daySection.dataset.dayIndex);
+             const tableBody = daySection.querySelector('tbody');
+             const editButton = daySection.querySelector('.edit-day-btn'); // Top right button
+             const saveButton = daySection.querySelector('.save-day-btn'); // Bottom button
+             const editModeControls = daySection.querySelector('.edit-mode-controls');
+             const deleteDayButton = daySection.querySelector('.delete-day-btn');
+             const actionsHeader = daySection.querySelector('.actions-header');
+             const completionPercHeader = daySection.querySelector('.completion-perc-header');
+
+             setSyncStatus("Syncing...", "yellow");
+
+             if (enterEditMode) {
+                 // --- ENTERING EDIT MODE ---
+                 daySection.classList.add('editing');
+                 editButton.classList.add('hidden'); // Hide Edit button
+                 editModeControls.classList.remove('hidden'); // Show controls (including Save)
+                 deleteDayButton.classList.remove('hidden');
+                 actionsHeader.classList.remove('hidden');
+                 completionPercHeader.classList.remove('hidden');
+
+                 const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
+                 const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
+                 if (!dayData) { console.error("Could not find day data to edit."); setSyncStatus("Error", "red"); return; }
+
+                 tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
+                    createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, true) // Render in edit mode
+                 ).join('');
+                 daySection.querySelectorAll('.completion-checkbox').forEach(cb => cb.disabled = true);
+                 setSyncStatus("Editing...", "blue");
+
+                 // --- AUTOSAVE LOGIC (START) ---
+                 // Define the autosave handler
+                 const autosaveHandler = (e) => {
+                     // Check if the event is from a valid input
+                     if (e.target.classList.contains('editable-input') || e.target.classList.contains('vocab-input')) {
+                         if (autosaveTimer) clearTimeout(autosaveTimer); // Clear existing timer
+                         // setSyncStatus("Unsaved changes", "yellow"); // <-- REMOVED this line
+                         
+                         // Set a new timer
+                         autosaveTimer = setTimeout(() => {
+                             console.log("Autosaving changes...");
+                             saveDayPlan(monthId, weekId, daySection, true); // <-- ADDED 'true'
+                         }, 2500); // Wait 2.5 seconds after last input
+                     }
+                 };
+                 // Attach the listener to the whole day section using event delegation
+                 daySection.addEventListener('input', autosaveHandler);
+                 // Store the handler on the element so we can remove it later
+                 daySection.autosaveHandler = autosaveHandler;
+                 // --- AUTOSAVE LOGIC (END) ---
+
+             } else {
+                 // --- SAVING AND EXITING EDIT MODE ---
+
+                 // --- AUTOSAVE LOGIC (START) ---
+                 // Clear any pending autosave timer
+                 if (autosaveTimer) clearTimeout(autosaveTimer);
+                 // Remove the event listener to stop autosaving
+                 if (daySection.autosaveHandler) {
+                     daySection.removeEventListener('input', daySection.autosaveHandler);
+                     daySection.autosaveHandler = null;
+                 }
+                 // --- AUTOSAVE LOGIC (END) ---
+                 
+                 await saveDayPlan(monthId, weekId, daySection); // Save final changes on click
+
+                 daySection.classList.remove('editing');
+                 editButton.classList.remove('hidden'); // Show Edit button
+                 editModeControls.classList.add('hidden'); // Hide controls (including Save)
+                 deleteDayButton.classList.add('hidden');
+                 actionsHeader.classList.add('hidden');
+                 completionPercHeader.classList.add('hidden');
+
+                 // Re-render rows in normal mode
+                 try {
+                     const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
+                     const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
+
+                     if (!dayData) { tableBody.innerHTML = ''; }
+                     else {
+                         tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
+                            createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false) // Render non-edit mode
+                         ).join('');
+                     }
+
+                     updateWeeklyProgressUI(monthId, weekId);
+                     updateDailyProgressUI(monthId, weekId, dayIndex, dayData); // <-- ADD THIS LINE
+                     setSyncStatus("Synced", "green");
+                 } catch (renderError) {
+                     console.error("Error re-rendering day after save:", renderError);
+                     setSyncStatus("Error", "red");
+                 }
+             }
+        }
+
+        // Save Day Plan
+        async function saveDayPlan(monthId, weekId, daySection, isAutosave = false) {
+            if (!currentUser || !userId) return;
+            const dayIndex = parseInt(daySection.dataset.dayIndex);
+            console.log(`Saving day plan for ${monthId}, ${weekId}, Day Index: ${dayIndex}`);
+            if (!isAutosave) {
+                setSyncStatus("Syncing...", "yellow");
+            }
+
+            const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+            try {
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                let monthData = docSnap.data();
+                let daysArray = monthData.weeks?.[weekId]?.days || [];
+                const currentDayData = daysArray[dayIndex];
+                 if (!currentDayData) throw new Error(`Day data for index ${dayIndex} not found in Firestore.`);
+
+                const updatedRows = [];
+                const rowElements = daySection.querySelectorAll('tbody tr');
+
+                rowElements.forEach((row) => {
+                    let existingRowIndex = parseInt(row.dataset.rowIndex);
+                    const existingRowData = !isNaN(existingRowIndex) && currentDayData.rows?.[existingRowIndex] ? currentDayData.rows[existingRowIndex] : {};
+
+                    let subject, topic, comment, completed, completionPercentage, vocabData = null, story; // <-- mcqData এখান থেকে সরানো হয়েছে
+
+                    if (daySection.classList.contains('editing')) {
+                         subject = row.querySelector('.subject-input')?.value.trim() || '';
+                         comment = row.querySelector('.comment-input')?.value.trim() || '';
+                         completed = existingRowData.completed || false;
+                         const percInput = row.querySelector('.completion-perc-input')?.value;
+                         completionPercentage = parsePercentage(percInput);
+                         story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
+
+                         if (row.classList.contains('vocab-row')) {
+                             subject = 'Vocabulary';
+                             vocabData = [];
+                             row.querySelectorAll('.vocab-pair').forEach(pairEl => {
+                                 const word = pairEl.querySelector('.vocab-word-input')?.value.trim();
+                                 const meaning = pairEl.querySelector('.vocab-meaning-input')?.value.trim();
+                                 if (word) { vocabData.push({ word: word, meaning: meaning || '' }); }
+                             });
+                             topic = null;
+                         } else {
+                             topic = row.querySelector('.topic-input')?.value.trim() || '';
+                             vocabData = null;
+                         }
+                    } else { // Handle saving checkbox clicks in normal mode
+                         completed = row.querySelector('.completion-checkbox')?.checked || false;
+                         subject = existingRowData.subject; topic = existingRowData.topic; comment = existingRowData.comment;
+                         completionPercentage = existingRowData.completionPercentage; vocabData = existingRowData.vocabData; story = existingRowData.story;
+                     }
+                     
+                     // --- mcqData সেভ করার কোড এখান থেকে সরানো হয়েছে ---
+                     updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null });
+                });
+				
+                 // --- নতুন: mcqData সরাসরি DAY অবজেক্টে সেভ করুন ---
+                 daysArray[dayIndex].mcqData = currentDayData.mcqData || null;
+                 // --- শেষ ---
+
+                 daysArray[dayIndex].rows = updatedRows;
+                const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
+                await updateDoc(docRef, updatePayload);
+                
+                console.log(`Day ${dayIndex + 1} for ${weekId} saved successfully.`);
+                if (!isAutosave) {
+                    setSyncStatus("Synced", "green");
+                }
+
+            } catch (error) {
+                console.error("Error saving day plan:", error);
+                showCustomAlert("Error saving changes. Please check your connection and try again.");
+                setSyncStatus("Error", "red");
+            }
+        }
+
+         // Add Row (normal or vocab)
+        function addRowToDay(monthId, weekId, daySection, type = 'normal') {
+             const dayIndex = parseInt(daySection.dataset.dayIndex);
+             const tableBody = daySection.querySelector('tbody');
+             let maxIndex = -1;
+             tableBody.querySelectorAll('tr').forEach(tr => { const idx = parseInt(tr.dataset.rowIndex); if (idx > maxIndex) maxIndex = idx; });
+             const newRowIndex = maxIndex + 1;
+
+             let newRowData;
+             if (type === 'vocabulary') { newRowData = { subject: 'Vocabulary', topic: null, completed: false, comment: '', completionPercentage: null, vocabData: [{ word: '', meaning: '' }], story: null }; }
+             else { newRowData = { subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }; }
+
+             const newRowHtml = createTableRow(monthId, weekId, dayIndex, newRowIndex, newRowData, true);
+             tableBody.insertAdjacentHTML('beforeend', newRowHtml);
+         }
+
+        // Add/Delete Vocab Pair Inputs
+function addVocabPairInputs(container, word = '', meaning = '') {
+             console.log("Checkpoint 8: addVocabPairInputs called with:", word, meaning);
+             const newPairIndex = container.querySelectorAll('.vocab-pair').length;
+             const pairHtml = `<div class="vocab-pair" data-pair-index="${newPairIndex}">
+                                 <input type="text" class="vocab-input vocab-word-input" placeholder="Word" value="${escapeHtml(word)}">
+                                 <input type="text" class="vocab-input vocab-meaning-input" placeholder="Meaning" value="${escapeHtml(meaning)}">
+                                 <button type="button" class="icon-button delete-vocab-pair-btn" title="Delete Pair"><i class="fas fa-times text-red-500"></i></button>
+                             </div>`;
+
+             // --- ROBUST FIX ---
+             // Find the specific button container div we just named
+             const buttonContainer = container.querySelector('.vocab-button-container');
+             
+             if (buttonContainer) {
+                 console.log("Checkpoint 9: Found button container, inserting HTML.");
+                 // Insert the new pair *before* that button container
+                 buttonContainer.insertAdjacentHTML('beforebegin', pairHtml);
+             } else {
+                 // This will now show a RED error if it fails
+                 console.error("CRITICAL: Could not find '.vocab-button-container' to insert new pair.");
+             }
+         }
+         function deleteVocabPairInputs(pairElement) {
+             const container = pairElement.closest('.vocab-edit-container');
+             if (container && container.querySelectorAll('.vocab-pair').length > 1) { pairElement.remove(); }
+             else { showCustomAlert("Cannot delete the last word/meaning pair."); }
+         }
+		 
+		 // --- NEW Vocab Code Modal Functions ---
+
+        function openVocabCodeModal(vocabContainer) {
+            console.log("Checkpoint 4: openVocabCodeModal called.");
+            if (!vocabContainer) {
+                console.error("CRITICAL: openVocabCodeModal was called with a NULL container. Target will not be set.");
+                // We still show the modal, but it won't work
+            }
+            currentVocabCodeTarget = vocabContainer;
+            console.log("Checkpoint 5: currentVocabCodeTarget set to:", currentVocabCodeTarget);
+            document.getElementById('vocab-code-textarea').value = ''; // Clear textarea
+            document.getElementById('vocab-code-modal').style.display = "block";
+            document.getElementById('vocab-code-textarea').focus();
+        }
+
+        function closeVocabCodeModal() {
+            document.getElementById('vocab-code-modal').style.display = "none";
+            document.getElementById('vocab-code-textarea').value = '';
+            currentVocabCodeTarget = null;
+        }
+
+        function handleSaveVocabCode() {
+            console.log("Checkpoint 6: 'Save & Add Pairs' button clicked. handleSaveVocabCode FIRED.");
+            
+            if (!currentVocabCodeTarget) {
+                console.error("CRITICAL: Save failed because currentVocabCodeTarget is NULL.");
+                return;
+            }
+            
+            console.log("Checkpoint 7: Save function has a valid target:", currentVocabCodeTarget);
+            const container = currentVocabCodeTarget;
+            const text = document.getElementById('vocab-code-textarea').value.trim();
+            if (!text) {
+                console.log("Text area is empty. Closing modal.");
+                closeVocabCodeModal();
+                return;
+            }
+
+            // Check if the last pair is empty and remove it, so we don't have an empty row.
+            const allPairs = container.querySelectorAll('.vocab-pair');
+            if (allPairs.length > 0) {
+                const lastPair = allPairs[allPairs.length - 1];
+                const lastWordInput = lastPair.querySelector('.vocab-word-input');
+                const lastMeaningInput = lastPair.querySelector('.vocab-meaning-input');
+                if (lastWordInput.value.trim() === '' && lastMeaningInput.value.trim() === '') {
+                    lastPair.remove();
+                }
+            }
+
+            console.log("Parsing text:", text);
+            const pairs = text.split(';');
+
+            // --- REPLACED LOGIC ---
+            pairs.forEach(pairStr => {
+                const pair = pairStr.trim();
+                if (pair) {
+                    let word = '';
+                    let meaning = '';
+                    
+                    const commaIndex = pair.indexOf(',');
+
+                    if (commaIndex === -1) {
+                        // No comma found, treat the whole thing as a word
+                        word = pair.trim();
+                    } else {
+                        // Comma found, split into word and meaning
+                        word = pair.substring(0, commaIndex).trim();
+                        meaning = pair.substring(commaIndex + 1).trim();
+                    }
+
+                    if (word) { // Check if the word is not empty
+                        console.log("Adding pair:", word, meaning); 
+                        addVocabPairInputs(container, word, meaning);
+                    }
+                }
+            });
+            // --- END REPLACED LOGIC ---
+
+            // Add one new empty pair for the user to manually add more
+            addVocabPairInputs(container, '', '');
+
+            closeVocabCodeModal();
+        }
+        // Add listener for the new modal's save button
+        document.getElementById('save-vocab-code-btn').addEventListener('click', handleSaveVocabCode);
+
+        // --- Delete Operations ---
+         function confirmDeleteRow(monthId, weekId, daySection, rowElement) {
+             const rowIndex = parseInt(rowElement.dataset.rowIndex);
+             showConfirmationModal("Delete Row", "Are you sure you want to delete this row? This action cannot be undone.", () => deleteRow(monthId, weekId, daySection, rowElement, rowIndex));
+         }
+         async function deleteRow(monthId, weekId, daySection, rowElement, rowIndex) {
+            rowElement.remove(); // Remove from UI
+            console.log("Row removed from UI. Awaiting final save.");
+            setSyncStatus("Unsaved changes", "yellow"); // Show that changes are pending
+
+            // --- Database save removed. The save will happen when the user clicks the main 'Save' button. ---
+
+            // Re-index remaining rows in the UI so the save function works correctly
+            daySection.querySelectorAll('tbody tr').forEach((tr, newIdx) => {
+                tr.dataset.rowIndex = newIdx;
+                tr.id = `row-${monthId}-${weekId}-${daySection.dataset.dayIndex}-${newIdx}`;
+            });
+         }
+         function confirmDeleteDay(monthId, weekId, daySection) {
+             const dayIndex = parseInt(daySection.dataset.dayIndex);
+             const dayNum = daySection.querySelector('h4').textContent;
+             showConfirmationModal(`Delete ${dayNum}`, `Are you sure you want to delete all entries for ${dayNum}? This action cannot be undone.`, () => deleteDay(monthId, weekId, daySection, dayIndex));
+         }
+         function deleteDay(monthId, weekId, daySection, dayIndex) {
+            if (!currentUser || !userId) return;
+            console.log(`Attempting to delete day index ${dayIndex} from week ${weekId}, month ${monthId}`);
+            
+            const weekSection = daySection.closest('.week-section'); // Get parent week
+            
+            // --- FIX START ---
+            // Remove the day from the UI immediately.
+            daySection.remove();
+            
+            // Manually count remaining days in the DOM
+            const remainingDays = weekSection.querySelectorAll('.day-section').length;
+
+            // Find the button container (which is the element *after* .days-container)
+            const buttonContainer = weekSection.querySelector('.days-container').nextElementSibling;
+            
+            let newButtonHtml = '';
+            if (remainingDays < 7) {
+                if (remainingDays > 0) {
+                    // Show "Add New Day"
+                    newButtonHtml = `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>`;
+                } else {
+                    // Show "Add First Day"
+                    newButtonHtml = `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`;
+                    
+                    // Also add back the "No days" message
+                    const daysContainer = weekSection.querySelector('.days-container');
+                    if (daysContainer) {
+                        daysContainer.innerHTML = '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
+                    }
+                }
+            } else {
+                // Show "Max days"
+                newButtonHtml = '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>';
+            }
+            
+            // Replace the old button container (which has the wrong button)
+            if (buttonContainer) {
+                buttonContainer.outerHTML = newButtonHtml;
+            }
+            // --- FIX END ---
+            
+            setSyncStatus("Syncing...", "yellow");
+            const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             
+             // Run the database update in the background
+             getDoc(docRef).then(docSnap => {
+                 if (!docSnap.exists()) throw new Error("Month document not found.");
+                 let monthData = docSnap.data();
+                 let daysArray = monthData.weeks?.[weekId]?.days || [];
+                 
+                 if (!daysArray[dayIndex]) {
+                    console.warn("Day not found in Firestore, but delete was requested. UI is now in sync.");
+                    setSyncStatus("Synced", "green");
+                    return; 
+                 }
+                 
+                 // Perform the deletion and re-numbering
+                 daysArray.splice(dayIndex, 1);
+                 for (let i = dayIndex; i < daysArray.length; i++) { daysArray[i].dayNumber = i + 1; }
+                 
+                 const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
+                 
+                 // Do NOT await this. Let the onSnapshot listener handle the final "green" sync status.
+                 updateDoc(docRef, updatePayload);
+                 
+                 console.log("Delete command sent to Firestore.");
+             }).catch(error => {
+                 console.error("Error deleting day:", error); 
+                 showCustomAlert("Error deleting day. The UI may be out of sync. Please refresh the page.", "error"); 
+                 setSyncStatus("Error", "red");
+             });
+         }
+         function confirmDeleteMonth(monthId) {
+             const monthButton = monthNavButtonsContainer.querySelector(`button[data-month-id="${monthId}"]`);
+             const monthName = monthButton ? monthButton.textContent : monthId;
+             showConfirmationModal(`Delete Month: ${monthName}`, `Are you sure you want to delete the entire study plan for ${monthName}? This action cannot be undone.`, () => deleteMonth(monthId));
+         }
+         async function deleteMonth(monthId) {
+             if (!currentUser || !userId) return;
+             console.log("Attempting to delete month:", monthId);
+             setSyncStatus("Syncing...", "yellow");
+             const activeBtn = monthNavButtonsContainer.querySelector('button.active-month');
+             if (activeBtn && activeBtn.dataset.monthId === monthId && unsubscribeActiveMonth) { unsubscribeActiveMonth(); unsubscribeActiveMonth = null; }
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             try { await deleteDoc(docRef); console.log("Month deleted successfully."); setSyncStatus("Synced", "green"); }
+             catch (error) { console.error("Error deleting month:", error); showCustomAlert("Error deleting month. Please try again."); setSyncStatus("Error", "red"); }
+         }
+         function showConfirmationModal(title, message, onConfirm) {
+             confirmModalTitle.textContent = title; confirmModalMessage.textContent = message; currentConfirmAction = onConfirm;
+             confirmModalConfirmBtn.onclick = () => { if (currentConfirmAction) currentConfirmAction(); closeModal('confirm-modal'); };
+             confirmModalCancelBtn.onclick = () => closeModal('confirm-modal');
+             confirmModal.style.display = 'block';
+         }
+
+        // Add New Day
+        async function addNewDay(monthId, weekId, weekSection) {
+            if (!currentUser || !userId) return;
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             try {
+                 const docSnap = await getDoc(docRef);
+                 if (!docSnap.exists()) throw new Error("Month document not found.");
+                 const monthData = docSnap.data();
+                 let daysArray = monthData.weeks?.[weekId]?.days || [];
+                 if (daysArray.length >= 7) { showCustomAlert("You cannot add more than 7 days to a week."); return; }
+                console.log(`Adding new day to ${monthId}, ${weekId} (Current count: ${daysArray.length})`);
+                setSyncStatus("Syncing...", "yellow");
+                 const lastDayIndex = daysArray.length - 1;
+                 let newDayData;
+                  if (lastDayIndex >= 0) {
+                     const lastDayRows = daysArray[lastDayIndex].rows || [];
+                     newDayData = { dayNumber: daysArray.length + 1, date: '', rows: lastDayRows.map(row => ({ subject: row.subject || '', topic: (row.subject?.toLowerCase() === 'vocabulary') ? null : (row.topic || ''), completed: false, comment: '', completionPercentage: row.completionPercentage ?? null, vocabData: (row.subject?.toLowerCase() === 'vocabulary') ? (row.vocabData || null) : null, story: null })) };
+                 } else { newDayData = { dayNumber: 1, date: '', rows: [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }] }; }
+                 const updatePayload = { [`weeks.${weekId}.days`]: arrayUnion(newDayData) };
+                 await updateDoc(docRef, updatePayload);
+                 console.log("New day added successfully.");
+                 setSyncStatus("Synced", "green");
+             } catch (error) { console.error("Error adding new day:", error); showCustomAlert("Error adding new day."); setSyncStatus("Error", "red"); }
+        }
+
+        // --- Monthly Target Edit ---
+        function handleEditTargets(button, monthId) {
+            const isEditing = button.dataset.editing === 'true';
+            
+            // --- THIS IS THE FIX ---
+            // We go back to finding the main parent container
+            const targetsParent = button.closest('.mb-8'); 
+            // Find the grid *inside* the parent
+            const targetsGrid = targetsParent.querySelector('.monthly-targets'); 
+            // Find the links *inside* the parent
+            const links = targetsParent.querySelectorAll('.target-card-link'); 
+            // Find the textareas *inside* the parent
+            const textareas = targetsParent.querySelectorAll('.target-textarea'); 
+            
+            // Define the input handler to use the grid
+            const onInput = () => syncTextareaHeights(targetsGrid);
+
+            if (isEditing) {
+                // --- SAVING ---
+                saveMonthlyTargets(monthId, targetsGrid); // Pass the grid
+                button.innerHTML = '<i class="fas fa-pencil-alt mr-1"></i> Edit Targets';
+                button.dataset.editing = 'false';
+                button.classList.add('action-button-secondary');
+                
+                textareas.forEach(ta => {
+                    ta.disabled = true;
+                    ta.removeEventListener('input', onInput);
+                });
+                
+                syncTextareaHeights(targetsGrid); // Pass the grid
+                
+                // This will work now because 'links' is found correctly
+                links.forEach(link => { 
+                    if (link.dataset.href) { 
+                        link.setAttribute('href', link.dataset.href); 
+                    } 
+                });
+            } else {
+                // --- EDITING ---
+                button.innerHTML = '<i class="fas fa-save mr-1"></i> Save Targets';
+                button.dataset.editing = 'true';
+                button.classList.remove('action-button-secondary');
+                
+                // This will work now because 'links' is found correctly
+                links.forEach(link => { 
+                    link.dataset.href = link.getAttribute('href'); 
+                    link.removeAttribute('href'); 
+                });
+                
+                textareas.forEach(ta => {
+                    ta.disabled = false;
+                    ta.addEventListener('input', onInput);
+                });
+                
+                syncTextareaHeights(targetsGrid); // Pass the grid
+                
+                textareas[0].focus();
+            }
+        }
+        async function saveMonthlyTargets(monthId, targetsContainer) {
+             if (!currentUser || !userId) return;
+             console.log("Saving targets for month:", monthId);
+             setSyncStatus("Syncing...", "yellow");
+             const targets = {};
+             targetsContainer.querySelectorAll('.target-textarea').forEach(textarea => { targets[textarea.dataset.week] = textarea.value.trim(); });
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             try { 
+                 await updateDoc(docRef, { weeklyTargets: targets }); 
+                 console.log("Monthly targets saved."); 
+                 showCustomAlert("Monthly targets saved!", "success"); 
+                 setSyncStatus("Synced", "green");
+                 
+                 // --- NEW AUTO-UPDATE LOGIC ---
+                 // Manually update the text in the week sections
+                 for (const weekId in targets) {
+                     const targetTextElement = document.getElementById(`target-text-${monthId}-${weekId}`);
+                     if (targetTextElement) {
+                         targetTextElement.innerHTML = escapeHtml(targets[weekId]);
+                     }
+                 }
+                 // --- END NEW LOGIC ---
+                 
+             }
+             catch (error) { console.error("Error saving targets:", error); showCustomAlert("Error saving targets."); setSyncStatus("Error", "red"); }
+        }
+
+        // --- Story Modals ---
+         async function openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex) {
+             if (!currentUser || !userId) return;
+             let daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
+             if (vocabRowIndex === -1) {
+                 const vocabRow = daySection ? daySection.querySelector('tr.vocab-row') : null;
+                 if(vocabRow) { vocabRowIndex = parseInt(vocabRow.dataset.rowIndex); }
+                 else { showCustomAlert("Please add and save a Vocabulary row before adding a story."); return; }
+             }
+             let existingStory = ''; const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             setSyncStatus("Syncing...", "yellow");
+             try {
+                 const docSnap = await getDoc(docRef); let dayData;
+                 if (docSnap.exists()) {
+                     dayData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex];
+                     if (dayData && dayData.rows && dayData.rows[vocabRowIndex]) { existingStory = dayData.rows[vocabRowIndex].story || ''; }
+                     else if (daySection.classList.contains('editing')) { console.log("New row detected. Saving day plan..."); await saveDayPlan(monthId, weekId, daySection); }
+                     else { throw new Error("Target row not found."); }
+                 }
+                 setSyncStatus("Synced", "green"); currentStoryTarget = { monthId, weekId, dayIndex, rowIndex: vocabRowIndex };
+                 document.getElementById('story-textarea').value = existingStory; editStoryModal.style.display = "block";
+             } catch (error) { console.error("Error fetching/prepping story:", error); showCustomAlert("Could not open story editor. Please save your day plan first."); setSyncStatus("Error", "red"); }
+         }
+         saveStoryBtn.addEventListener('click', async () => {
+             if (!currentUser || !userId || !currentStoryTarget) return;
+             const { monthId, weekId, dayIndex, rowIndex } = currentStoryTarget;
+             if (rowIndex === -1) { showCustomAlert("Error: No associated vocabulary row found."); return; }
+             const newStory = document.getElementById('story-textarea').value.trim();
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             setSyncStatus("Syncing...", "yellow");
+             try {
+                 const docSnap = await getDoc(docRef); if (!docSnap.exists()) throw new Error("Month document not found.");
+                 let monthData = docSnap.data(); let daysArray = monthData.weeks?.[weekId]?.days || [];
+                 if (daysArray[dayIndex]?.rows?.[rowIndex]) {
+                     daysArray[dayIndex].rows[rowIndex].story = newStory || null;
+                     const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
+                     await updateDoc(docRef, updatePayload);
+console.log("Story saved successfully for row:", rowIndex);
+closeModal('edit-story-modal');
+setSyncStatus("Synced", "green");
+
+// --- Keep day editing mode active ---
+const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
+if (daySection && !daySection.classList.contains('editing')) {
+    toggleDayEditMode(monthId, weekId, daySection, true);
+}
+
+                 } else { throw new Error("Target row for story not found."); }
+             } catch (error) { console.error("Error saving story:", error); showCustomAlert("Error saving story."); setSyncStatus("Error", "red"); }
+             finally { currentStoryTarget = null; }
+         });
+         async function readStory(monthId, weekId, dayIndex, rowIndex) {
+            if (!currentUser || !userId) return;
+            const storyModalContent = document.getElementById('story-modal-content');
+            storyModalContent.innerHTML = '<p class="text-gray-500 italic">Loading story...</p>'; // Clear previous content and show loading
+            storyModal.style.display = "block"; // Show modal immediately
+
+             try {
+                 const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                 const docSnap = await getDoc(docRef);
+                 if (docSnap.exists()) {
+                     const dayData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex];
+                     const rowData = dayData?.rows?.[rowIndex];
+                     const story = rowData?.story;
+                     const vocabData = rowData?.vocabData; // Get the vocab data for this row
+
+                     if (story) {
+                         let highlightedStory = escapeHtml(story); // Start with escaped story text
+
+                         if (vocabData && vocabData.length > 0) {
+                             // Create a sorted list of vocab words (longer words first to avoid partial matches)
+                             const wordsToHighlight = vocabData
+                                 .map(v => v.word?.trim())
+                                 .filter(Boolean) // Remove empty words
+                                 .sort((a, b) => b.length - a.length); // Sort longest first
+
+                             wordsToHighlight.forEach(word => {
+                                 // Use RegExp for case-insensitive, whole word matching
+                                 // \b ensures word boundaries (prevents matching 'cat' inside 'category')
+                                 // 'gi' flags: global (all occurrences) and case-insensitive
+                                 const regex = new RegExp(`\\b(${escapeRegExp(word)})\\b`, 'gi');
+
+                                 // Replace found words with highlighted span, preserving original casing
+                                 highlightedStory = highlightedStory.replace(regex, (match) => {
+                                     // Check if already inside a span (avoid nested highlighting)
+                                     // This is a basic check; complex HTML might need a more robust parser
+                                     const surroundingChars = highlightedStory.substring(
+                                         Math.max(0, highlightedStory.indexOf(match) - 25),
+                                         highlightedStory.indexOf(match) + match.length + 10
+                                     );
+                                     if (surroundingChars.includes('<span class="highlighted-vocab">')) {
+                                         return match; // Already highlighted (or part of one), skip
+                                     }
+                                     return `<span class="highlighted-vocab">${match}</span>`;
+                                 });
+                             });
+                         }
+                         // Use innerHTML to render the spans
+                         storyModalContent.innerHTML = highlightedStory.replace(/\n/g, '<br>'); // Replace newlines with <br> for display
+
+                     } else {
+                         storyModalContent.textContent = "No story found for this entry.";
+                     }
+                 } else {
+                     storyModalContent.textContent = "Study plan data not found.";
+                 }
+             } catch (error) {
+                 console.error("Error reading or highlighting story:", error);
+                 storyModalContent.textContent = "Could not load or process the story.";
+                 showCustomAlert("Could not load story.");
+             }
+        }
+
+        // Helper function to escape special characters for RegExp
+        function escapeRegExp(string) {
+          return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+        }
+
+        // --- Other Utility functions ---
+			function calculateWeeklyProgress(weekData) {
+            if (!weekData || !weekData.days || weekData.days.length === 0) return 0;
+            let totalPercentageSum = 0; 
+            
+            weekData.days.forEach(day => {
+                day.rows?.forEach(row => {
+                    // Check if the "Done" checkbox is checked
+                    if (row.completed) {
+                        // If it is, get the percentage value from the row
+                        const perc = parsePercentage(row.completionPercentage);
+                        
+                        // If the percentage is a valid number (not null), add it to the sum
+                        if (perc !== null && !isNaN(perc)) {
+                             totalPercentageSum += perc;
+                        }
+                    }
+                });
+            });
+             
+             // Return the raw sum of *completed* rows, rounded.
+            return Math.round(totalPercentageSum);
+        }
+		
+		
+		function calculateDailyProgress(dayData) {
+            if (!dayData || !dayData.rows || dayData.rows.length === 0) return 0;
+            let totalPercentageSum = 0; 
+            
+            dayData.rows.forEach(row => {
+                // Check if the "Done" checkbox is checked
+                if (row.completed) {
+                    // If it is, get the percentage value from the row
+                    const perc = parsePercentage(row.completionPercentage);
+                    
+                    // If the percentage is a valid number (not null), add it to the sum
+                    if (perc !== null && !isNaN(perc)) {
+                         totalPercentageSum += perc;
+                    }
+                }
+            });
+             
+            // --- UPDATED CALCULATION ---
+            // Multiply the total sum by 7, as requested, and then round it.
+            return Math.round(totalPercentageSum * 7);
+        }
+		
+		
+		function calculateOverallMonthlyProgress(monthData) {
+            if (!monthData || !monthData.weeks) return 0;
+            
+            let total = 0;
+            total += calculateWeeklyProgress(monthData.weeks.week1);
+            total += calculateWeeklyProgress(monthData.weeks.week2);
+            total += calculateWeeklyProgress(monthData.weeks.week3);
+            total += calculateWeeklyProgress(monthData.weeks.week4);
+            
+            // Return the average of the 4 weeks
+            return Math.round(total / 4);
+        }
+		
+		function findLastProgressTrackers(monthId, monthData) {
+            if (!monthData || !monthData.weeks) {
+                return { weekly: 0, daily: 0, link: null };
+            }
+
+            let lastWeekData = null;
+            let lastDayData = null;
+            let lastWeekId = null;
+            let lastDayIndex = -1;
+
+            // Iterate backwards from week 4 to find the latest week with content
+            for (const weekId of ['week4', 'week3', 'week2', 'week1']) {
+                const weekData = monthData.weeks[weekId];
+                if (weekData && weekData.days && weekData.days.length > 0) {
+                    // This is the "last week"
+                    lastWeekData = weekData;
+                    lastWeekId = weekId;
+                    
+                    // This is the "last day" in that week
+                    lastDayIndex = weekData.days.length - 1;
+                    lastDayData = weekData.days[lastDayIndex];
+                    
+                    break; // Stop searching, we found the latest week
+                }
+            }
+
+            if (!lastWeekData) {
+                // No days found in any week
+                return { weekly: 0, daily: 0, link: null };
+            }
+
+            // We found the last week and day, now calculate their progress
+            const weeklyPercent = calculateWeeklyProgress(lastWeekData);
+            const dailyPercent = calculateDailyProgress(lastDayData);
+            
+            // Create the anchor link for the "Continue" button
+            const continueLink = `#day-${monthId}-${lastWeekId}-${lastDayIndex}`;
+
+            return { weekly: weeklyPercent, daily: dailyPercent, link: continueLink };
+        }
+
+        
+        function createTrackerHTML(id, label, percentage, colorStart, colorEnd, continueLink = null) {
+            // 'label' is "Monthly Progress", "Last Week", "Last Day"
+            // 'percentage' is the value
+            
+            const continueButton = continueLink 
+                ? `<a href="${continueLink}" class="tracker-continue-btn">Continue</a>`
+                : ''; // No timestamp
+
+            return `
+                <div class="circular" 
+                     id="${id}"
+                     data-percentage="${percentage}" 
+                     data-color-start="${colorStart}" 
+                     data-color-end="${colorEnd}">
+                    
+                    <svg>
+                        <circle class="bg"></circle>
+                        <circle class="progress"></circle>
+                        
+                        </svg>
+                    
+                    <div class="end-cap"></div>
+                    
+                    <div class="inner-text">
+                        <div class="tracker-label-small">${label}</div>
+                        
+                        <div class="tracker-score">0%</div>
+                        
+                        ${continueButton}
+                    </div>
+                </div>
+            `;
+        }
+
+        function animateTrackers(containerElement) {
+            // Find trackers *only* within the newly created month element
+            const circles = containerElement.querySelectorAll('.circular');
+
+            circles.forEach(circle => {
+                const percentage = +circle.dataset.percentage;
+                const score = circle.querySelector('.tracker-score'); 
+                const progress = circle.querySelector('.progress');
+                const cap = circle.querySelector('.end-cap'); // <-- Find the DIV cap
+                const startColor = circle.dataset.colorStart;
+                const endColor = circle.dataset.colorEnd;
+
+                // --- NEW cap logic ---
+                const radius = 65;
+                const center = 75;
+                cap.style.borderColor = endColor; // Set cap color
+                if (percentage === 0) {
+                    cap.style.visibility = 'hidden';
+                }
+                // --- END NEW ---
+
+                // Animate the number and circle
+                let current = 0;
+                const circumference = 408; // 2 * PI * 65
+
+                // --- Create and apply gradient (Your code is correct) ---
+                const gradientId = `grad-${Math.random().toString(36).substring(2, 9)}`;
+                const svg = circle.querySelector('svg');
+                const oldDefs = svg.querySelector('defs');
+                if (oldDefs) oldDefs.remove();
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const linearGradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+                linearGradient.setAttribute('id', gradientId);
+                linearGradient.setAttribute('x1', '0%');
+                linearGradient.setAttribute('y1', '0%');
+                linearGradient.setAttribute('x2', '100%');
+                linearGradient.setAttribute('y2', '100%');
+                const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                stop1.setAttribute('offset', '0%');
+                stop1.setAttribute('stop-color', startColor);
+                const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+                stop2.setAttribute('offset', '100%');
+                stop2.setAttribute('stop-color', endColor);
+                linearGradient.appendChild(stop1);
+                linearGradient.appendChild(stop2);
+                defs.appendChild(linearGradient);
+                svg.prepend(defs);
+                progress.setAttribute('stroke', `url(#${gradientId})`);
+                // --- End gradient ---
+
+                // Clear any existing interval on this element
+                if (circle.animationInterval) {
+                    clearInterval(circle.animationInterval);
+                }
+                
+                // Start new animation
+                const interval = setInterval(() => {
+                    if (current >= percentage) {
+                        clearInterval(interval);
+                        score.textContent = percentage + '%'; 
+                        const finalOffset = circumference - (circumference * percentage) / 100;
+                        progress.style.strokeDashoffset = finalOffset;
+                        
+                        // --- SET FINAL CAP POSITION ---
+                        const angle = (percentage / 100) * 360;
+                        const radians = (angle - 90) * (Math.PI / 180);
+                        const x = center + radius * Math.cos(radians);
+                        const y = center + radius * Math.sin(radians);
+                        cap.style.left = `${x}px`;
+                        cap.style.top = `${y}px`;
+                        if (percentage > 0) cap.style.visibility = 'visible';
+
+                    } else {
+                        current++;
+                        const offset = circumference - (circumference * current) / 100;
+                        progress.style.strokeDashoffset = offset;
+                        score.textContent = current + '%'; 
+                        
+                        // --- SET LIVE CAP POSITION ---
+                        const angle = (current / 100) * 360;
+                        const radians = (angle - 90) * (Math.PI / 180);
+                        const x = center + radius * Math.cos(radians);
+                        const y = center + radius * Math.sin(radians);
+                        cap.style.left = `${x}px`;
+                        cap.style.top = `${y}px`;
+                        if (current > 0) cap.style.visibility = 'visible';
+                    }
+                }, 20); 
+                
+                circle.animationInterval = interval; 
+            });
+        }
+
+       
+
+async function updateDailyProgressUI(monthId, weekId, dayIndex, dayData) {
+             if (!currentUser || !userId) return;
+             const daySection = document.querySelector(`[data-month-id="${monthId}"] .week-section[data-week-id="${weekId}"] .day-section[data-day-index="${dayIndex}"]`);
+             if (!daySection) return;
+             
+             const progressBarFill = daySection.querySelector('.day-progress-wrapper .progress-bar-fill');
+             const progressPercentageSpan = daySection.querySelector('.day-progress-wrapper .progress-percentage');
+             if (!progressBarFill || !progressPercentageSpan) return;
+
+             try {
+                 let dataToUse = dayData;
+                 if (!dataToUse) {
+                     console.log(`Daily Progress UI fetching data for day ${dayIndex}...`);
+                     const docRef = doc(db, getUserPlansCollectionPath(), monthId); 
+                     const docSnap = await getDoc(docRef);
+                     if (docSnap.exists()) {
+                         dataToUse = docSnap.data().weeks?.[weekId]?.days?.[dayIndex];
+                     }
+                 }
+
+                 if (dataToUse) {
+                    const progress = calculateDailyProgress(dataToUse);
+                    progressBarFill.style.width = `${Math.min(progress, 100)}%`;
+                    // --- THIS IS THE CHANGE ---
+                    // Hide the bar (and cap) if progress is 0
+                    progressBarFill.style.opacity = progress > 0 ? '1' : '0';
+                    progressPercentageSpan.textContent = `${progress}%`;
+                 }
+             } catch (error) { console.error("Error fetching data for daily progress UI:", error); }
+        }
+		
+		
+		
+async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
+             if (!currentUser || !userId) return;
+             const weekSection = document.querySelector(`[data-month-id="${monthId}"] .week-section[data-week-id="${weekId}"]`);
+             if (!weekSection) return;
+             const progressBarFill = weekSection.querySelector('.progress-bar-fill');
+             const progressPercentageSpan = weekSection.querySelector('.progress-percentage');
+
+             try {
+                 let dataToUse = weekData;
+                 if (!dataToUse) {
+                     console.log("Progress UI fetching data...");
+                     const docRef = doc(db, getUserPlansCollectionPath(), monthId); const docSnap = await getDoc(docRef);
+                     if (docSnap.exists()) {
+                         dataToUse = docSnap.data().weeks?.[weekId];
+                     }
+                 }
+
+                 if (dataToUse) {
+                    const progress = calculateWeeklyProgress(dataToUse);
+                    progressBarFill.style.width = `${progress}%`;
+                    // --- THIS IS THE CHANGE ---
+                    // Hide the bar (and cap) if progress is 0
+                    progressBarFill.style.opacity = progress > 0 ? '1' : '0';
+                    progressPercentageSpan.textContent = `${progress}%`;
+                 }
+             } catch (error) { console.error("Error fetching data for progress UI:", error); }
+        }
+		
+        function showVocabMeaning(vocabWordElement) {
+             document.querySelectorAll('.vocab-word.active').forEach(v => { if (v !== vocabWordElement) v.classList.remove('active'); });
+             vocabWordElement.classList.toggle('active');
+        }
+        window.closeModal = function(modalId) { document.getElementById(modalId).style.display = "none"; }
+		window.onclick = function(event) {
+             if (event.target.classList.contains('modal')) { 
+                // --- MODIFIED BLOCK ---
+                if (event.target.id === 'quiz-modal') {
+                    closeQuizModal(); // Use the new function
+                } else {
+                    event.target.style.display = "none"; // Close other modals
+                }
+                // --- END MODIFIED BLOCK ---
+             }
+             if (!event.target.closest('.vocab-word')) { document.querySelectorAll('.vocab-word.active').forEach(v => v.classList.remove('active')); }
+         }
+        function parsePercentage(value) {
+            if (value === null || value === undefined) return null; 
+            let strVal = String(value).trim(); 
+            if (strVal === '') return null;
+
+            if (strVal.includes('/')) {
+                const parts = strVal.split('/'); 
+                const num = parseFloat(parts[0]); 
+                const den = parseFloat(parts[1]);
+                if (!isNaN(num) && !isNaN(den) && den !== 0) { 
+                    // User wants 3/2 -> 1.5. Just do the division and round to 10 decimal places.
+                    return parseFloat((num / den).toFixed(10));
+                }
+            }
+            
+            strVal = strVal.replace(',', '.').replace('%', ''); // Allow comma, dot, and % sign
+            const floatVal = parseFloat(strVal);
+            
+            if (!isNaN(floatVal)) { 
+                // User wants to input any number. Do not clamp it.
+                return parseFloat(floatVal.toFixed(10));
+            } 
+            
+            return null; // Invalid input
+         }
+         function setSyncStatus(text, color) {
+             if (!syncStatusText) return; syncStatusText.textContent = text;
+             syncStatusText.classList.remove('text-emerald-500', 'text-yellow-500', 'text-red-500', 'text-blue-500');
+             if (color === 'green') syncStatusText.classList.add('text-emerald-500');
+             else if (color === 'yellow') syncStatusText.classList.add('text-yellow-500');
+             else if (color === 'red') syncStatusText.classList.add('text-red-500');
+             else if (color === 'blue') syncStatusText.classList.add('text-blue-500');
+         }
+         function showCustomAlert(message, type = "error") {
+             console.log(`ALERT (${type}): ${message}`);
+             const alertBox = document.createElement('div');
+             alertBox.style.cssText = `position:fixed; top:80px; left:50%; transform:translateX(-50%); padding:12px 24px; border-radius:8px; z-index:200; box-shadow:0 4px 12px rgba(0,0,0,0.15); font-size: 0.9rem; font-weight: 500;`;
+             if (type === 'success') { alertBox.style.backgroundColor = '#10b981'; alertBox.style.color = 'white'; }
+             else { alertBox.style.backgroundColor = '#ef4444'; alertBox.style.color = 'white'; }
+             alertBox.textContent = message; document.body.appendChild(alertBox);
+             setTimeout(() => { alertBox.remove(); }, 3000);
+         }
+		
+		function syncTextareaHeights(groupElement) {
+            if (!groupElement) return;
+
+            const textareas = groupElement.querySelectorAll('.target-textarea');
+            if (textareas.length === 0) return;
+
+            // 1. Reset all heights to auto to get the new natural scrollHeight
+            textareas.forEach(ta => {
+                ta.style.height = 'auto';
+            });
+
+            // 2. Find the maximum scrollHeight from the group
+            let maxHeight = 0;
+            textareas.forEach(ta => {
+                maxHeight = Math.max(maxHeight, ta.scrollHeight);
+            });
+            
+            // 3. Apply the new max height to all textareas in the group
+            textareas.forEach(ta => {
+                // Use a 60px min-height as a fallback
+                ta.style.height = (maxHeight > 60 ? maxHeight : 60) + 'px'; 
+            });
+         }
+		
+		
+		
+		
+        // --- START: REFACTORED QUIZ FUNCTIONS ---
+
+        /**
+         * Shuffles array in place using Fisher-Yates shuffle.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        /**
+         * Fetches vocab data and prepares the quiz modal.
+         */
+        // UPGRADED: Generates questions first to set timer
+        async function startQuiz(monthId, weekId, dayIndex, rowIndex) {
+            quizTitle.textContent = 'Vocabulary Quiz';
+            quizModal.style.display = "block";
+            quizMainScreen.classList.add('hidden');
+            quizResultsScreen.classList.add('hidden');
+            quizStartScreen.classList.remove('hidden');
+            
+            quizStartMessage.textContent = "Loading vocabulary...";
+            quizStartBtn.classList.add('hidden');
+            document.getElementById('quiz-total-time-warning').style.display = 'none';
+
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+                
+                const vocabData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex]?.vocabData;
+                if (!vocabData || vocabData.length < 4) {
+                    quizStartMessage.textContent = "You need at least 4 vocabulary words to start a quiz.";
+                    return;
+                }
+                
+                // --- TIMER LOGIC: Generate questions NOW ---
+                currentVocabData = preProcessVocab(vocabData);
+                currentMcqData = null;
+                currentQuizQuestions = generateQuizData(currentVocabData); // Generate questions
+                
+                const totalQuestions = currentQuizQuestions.length;
+                const totalTimeInSeconds = totalQuestions * 36;
+                
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
+                // --- END TIMER LOGIC ---
+
+                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words?`;
+                quizStartBtn.classList.remove('hidden');
+                
+                const newStartBtn = quizStartBtn.cloneNode(true);
+                quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
+                newStartBtn.addEventListener('click', runQuizGame);
+                quizStartBtn = newStartBtn; 
+                
+            } catch (error) {
+                console.error("Error loading quiz data:", error);
+                quizStartMessage.textContent = "Could not load quiz data. Please try again.";
+            }
+        }
+
+        /**
+         * Generates a set of MCQ questions as objects to store answers.
+         */
+        /**
+         * NEW: Parses vocab data to separate Bangla meanings and synonyms.
+         * Input: [{word: "Albeit", meaning: "যদিও-Although"}]
+         * Output: [{word: "Albeit", banglaMeaning: "যদিও", synonym: "Although"}]
+         */
+        function preProcessVocab(vocabData) {
+            return vocabData.map(item => {
+                const word = item.word?.trim();
+                const meaningStr = item.meaning?.trim() || '';
+                
+                let banglaMeaning = meaningStr;
+                let synonym = null;
+
+                // Check for a hyphen that is not at the very beginning or end
+                const hyphenIndex = meaningStr.indexOf('-');
+                if (hyphenIndex > 0 && hyphenIndex < meaningStr.length - 1) {
+                    banglaMeaning = meaningStr.substring(0, hyphenIndex).trim();
+                    synonym = meaningStr.substring(hyphenIndex + 1).trim();
+                }
+                
+                return {
+                    word: word,
+                    banglaMeaning: banglaMeaning,
+                    synonym: synonym
+                };
+            });
+        }
+
+        /**
+         * UPGRADED: Generates 3 types of questions from pre-processed vocab data.
+         */
+        function generateQuizData(parsedVocabList) {
+            let questions = [];
+            const allWords = parsedVocabList.map(v => v.word);
+            const allBanglaMeanings = parsedVocabList.map(v => v.banglaMeaning);
+            const allSynonyms = parsedVocabList.map(v => v.synonym).filter(Boolean); // Only get valid synonyms
+
+            for (const item of parsedVocabList) {
+                const { word, banglaMeaning, synonym } = item;
+
+                // --- Question 1: Word -> Bangla Meaning ---
+                let wrongMeanings = allBanglaMeanings.filter(m => m !== banglaMeaning);
+                let options1 = shuffleArray([...new Set(wrongMeanings)]).slice(0, 3); // 'Set' avoids duplicate wrong answers
+                options1.push(banglaMeaning);
+                
+                questions.push({
+                    question: `What is the meaning of "${word}"?`,
+                    options: shuffleArray(options1),
+                    correctAnswer: banglaMeaning,
+                    userAnswer: null,
+                    isCorrect: null
+                });
+
+                // --- Question 2: Bangla Meaning -> Word ---
+                let wrongWords = allWords.filter(w => w !== word);
+                let options2 = shuffleArray([...new Set(wrongWords)]).slice(0, 3);
+                options2.push(word);
+                
+                questions.push({
+                    question: `What is the English word for "${banglaMeaning}"?`,
+                    options: shuffleArray(options2),
+                    correctAnswer: word,
+                    userAnswer: null,
+                    isCorrect: null
+                });
+
+                // --- Question 3: Word -> Synonym (NEW) ---
+                if (synonym) {
+                    // Use other synonyms, or words, or meanings as wrong options
+                    let wrongSynonyms = allSynonyms.filter(s => s !== synonym && s !== word);
+                    let wrongOptions = wrongSynonyms;
+                    
+                    // If we don't have 3 wrong synonyms, add wrong words
+                    if (wrongOptions.length < 3) {
+                        wrongOptions.push(...allWords.filter(w => w !== word && w !== synonym));
+                    }
+                    
+                    let options3 = shuffleArray([...new Set(wrongOptions)]).slice(0, 3);
+                    options3.push(synonym);
+
+                    questions.push({
+                        question: `What is the synonym of "${word}"?`,
+                        options: shuffleArray(options3),
+                        correctAnswer: synonym,
+                        userAnswer: null,
+                        isCorrect: null
+                    });
+                }
+            }
+            return shuffleArray(questions);
+        }
+
+        
+        /**
+         * Resets state and starts the quiz game.
+         */
+        function runQuizGame() {
+            quizStartScreen.classList.add('hidden');
+            quizResultsScreen.classList.add('hidden');
+            quizMainScreen.classList.remove('hidden');
+
+            // --- REMOVED: Question generation is now done *before* this ---
+            // We just need to shuffle the questions that are already generated
+            currentQuizQuestions = shuffleArray(currentQuizQuestions);
+
+            // Reset state
+            currentQuizQuestionIndex = 0;
+            currentQuizScore = 0;
+
+            quizScoreEl.textContent = `Score: 0.00`;
+            quizRestartBtn.onclick = runQuizGame;
+            
+            // --- START: TIMER LOGIC ---
+            const totalQuestions = currentQuizQuestions.length;
+            const totalTimeInSeconds = totalQuestions * 36;
+            startTimer(totalTimeInSeconds); // Start the countdown!
+            // --- END: TIMER LOGIC ---
+            
+            loadQuizQuestion();
+        }
+
+		/**
+         * NEW: Starts the countdown timer
+         */
+        function startTimer(totalSeconds) {
+            if (quizTimerInterval) clearInterval(quizTimerInterval); // Clear any old timer
+
+            let remaining = totalSeconds;
+            const timerEl = document.getElementById('quiz-timer');
+            
+            timerEl.textContent = formatTime(remaining); // Show initial time
+            timerEl.style.color = '#374151'; // Reset to default color (gray-700)
+
+            quizTimerInterval = setInterval(() => {
+                remaining--;
+                timerEl.textContent = formatTime(remaining);
+                
+                // Make timer red in the last 10 seconds
+                if (remaining <= 10 && remaining > 0) {
+                    timerEl.style.color = '#ef4444'; // red-500
+                }
+                
+                // TIME'S UP!
+                if (remaining <= 0) {
+                    clearInterval(quizTimerInterval);
+                    timerEl.textContent = "Time's Up!";
+                    showCustomAlert("Time's up! Showing your results.", "error");
+                    showQuizResults(); // Auto-submit the quiz
+                }
+            }, 1000);
+        }
+		
+        /**
+         * Displays the current question and options.
+         */
+        function loadQuizQuestion() {
+            quizOptionsContainer.innerHTML = '';
+            
+            const q = currentQuizQuestions[currentQuizQuestionIndex];
+            
+            quizQuestionNumber.textContent = `Question ${currentQuizQuestionIndex + 1}/${currentQuizQuestions.length}`;
+            quizQuestionText.textContent = q.question;
+
+            // --- Button State Logic ---
+            // "Next" button is disabled if no answer is selected
+            quizNextBtn.disabled = (q.userAnswer === null);
+            // "Skip" button is hidden if an answer IS selected
+            quizSkipBtn.hidden = (q.userAnswer !== null);
+            // "Previous" button is hidden on the first question
+            quizPrevBtn.hidden = (currentQuizQuestionIndex === 0);
+
+            // --- Render Options ---
+            q.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = "quiz-option-btn";
+
+                if (q.userAnswer !== null) {
+                    // This question has been answered, show feedback
+                    button.disabled = true;
+                    if (option === q.correctAnswer) {
+                        button.classList.add('correct');
+                    } else if (option === q.userAnswer) {
+                        button.classList.add('incorrect');
+                    }
+                } else {
+                    // This question is new, add click listener
+                    button.onclick = () => selectQuizAnswer(button, option);
+                }
+                quizOptionsContainer.appendChild(button);
+            });
+        }
+        
+        /**
+         * Handles the user's answer selection. (UPGRADED with Auto-Advance)
+         */
+        function selectQuizAnswer(selectedButton, selectedOption) {
+            const q = currentQuizQuestions[currentQuizQuestionIndex];
+            
+            // Do nothing if already answered
+            if (q.userAnswer !== null) return;
+
+            // Store the answer
+            q.userAnswer = selectedOption;
+            const isCorrect = (selectedOption === q.correctAnswer); // Check correctness
+            q.isCorrect = isCorrect;
+            
+            // Apply scoring
+            if (isCorrect) {
+                currentQuizScore++;
+            } else {
+                currentQuizScore -= 0.25;
+            }
+            quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`;
+
+            // Apply visual feedback
+            Array.from(quizOptionsContainer.children).forEach(btn => {
+                btn.disabled = true;
+                if (btn.textContent === q.correctAnswer) {
+                    btn.classList.add('correct');
+                } else if (btn.textContent === selectedOption) {
+                    btn.classList.add('incorrect');
+                }
+            });
+            
+            // --- START: NEW AUTO-ADVANCE LOGIC ---
+            if (isCorrect) {
+                // Answer is correct: Hide "Skip" and wait 1 second, then auto-advance
+                quizSkipBtn.hidden = true;
+                quizNextBtn.disabled = true; // Prevent clicking "Next" during the delay
+                
+                setTimeout(() => {
+                    // Logic copied from the 'quizNextBtn' listener
+                    currentQuizQuestionIndex++;
+                    if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
+                        showQuizResults();
+                    } else {
+                        loadQuizQuestion();
+                        quizQuestionArea.classList.add('slide-in-right'); // <-- ADD THIS
+                    }
+                }, 300); // 0.3-second (300ms) delay. This will be much faster.
+                
+            } else {
+                // Answer is wrong: Stay on the page and enable "Next"
+                quizNextBtn.disabled = false;
+                quizSkipBtn.hidden = true;
+            }
+            // --- END: NEW AUTO-ADVANCE LOGIC ---
+        }
+
+        /**
+         * Shows the final score.
+         */
+        function showQuizResults() {
+			if (quizTimerInterval) clearInterval(quizTimerInterval);
+            quizMainScreen.classList.add('hidden');
+            quizResultsScreen.classList.remove('hidden');
+
+            // Recalculate score from scratch to be safe
+            let finalScore = 0;
+            currentQuizQuestions.forEach(q => {
+                if (q.isCorrect === true) {
+                    finalScore += 1;
+                } else if (q.isCorrect === false) {
+                    finalScore -= 0.25;
+                }
+                // Skipped questions (isCorrect === null) are ignored
+            });
+            currentQuizScore = finalScore;
+
+            const totalQuestions = currentQuizQuestions.length;
+            const finalScoreForPercentage = Math.max(0, currentQuizScore);
+            const percentage = (finalScoreForPercentage / totalQuestions) * 100;
+
+            quizFinalScore.textContent = currentQuizScore.toFixed(2);
+            quizPercentage.textContent = `${percentage.toFixed(1)}%`;
+        }
+		
+		
+        // --- START: ADD NEW QUIZ NAV LISTENERS ---
+        quizNextBtn.addEventListener('click', () => {
+            currentQuizQuestionIndex++;
+            if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
+                showQuizResults();
+            } else {
+                loadQuizQuestion();
+                quizQuestionArea.classList.add('slide-in-right'); // <-- ADD THIS
+            }
+        });
+
+        quizSkipBtn.addEventListener('click', () => {
+            // "Skip" just acts like "Next" but guarantees no answer is saved
+            currentQuizQuestionIndex++;
+            if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
+                showQuizResults();
+            } else {
+                loadQuizQuestion();
+                quizQuestionArea.classList.add('slide-in-right'); // <-- ADD THIS
+            }
+        });
+
+        quizPrevBtn.addEventListener('click', () => {
+            if (currentQuizQuestionIndex > 0) {
+                currentQuizQuestionIndex--;
+                loadQuizQuestion();
+                quizQuestionArea.classList.add('slide-in-left'); // <-- ADD THIS
+            }
+        });
+        // --- END: ADD NEW QUIZ NAV LISTENERS ---
+
+        // --- START: ADD THIS NEW FUNCTION ---
+		
+		// --- START: ADD THIS NEW FUNCTION ---
+        /**
+         * Shows the new 3-button quiz confirmation modal
+         */
+        function showQuizConfirmationModal() {
+            const modal = document.getElementById('quiz-confirm-modal');
+            const quitBtn = document.getElementById('quiz-confirm-quit');
+            const submitBtn = document.getElementById('quiz-confirm-submit');
+            const continueBtn = document.getElementById('quiz-confirm-continue');
+
+            modal.style.display = 'block';
+
+            // 1. "Quit" Button (Gray)
+            // Quits the quiz, closes both modals
+            quitBtn.onclick = () => {
+				if (quizTimerInterval) clearInterval(quizTimerInterval);
+                modal.style.display = 'none';
+                closeModal('quiz-modal'); // Close the main quiz modal
+            };
+
+            // 2. "Submit Test" Button (Green)
+            // Quits the quiz, closes both modals, and shows results
+            submitBtn.onclick = () => {
+                modal.style.display = 'none';
+                
+                showQuizResults(); // Jump straight to the results page
+            };
+
+            // 3. "Continue" Button (Blue)
+            // Closes only the warning modal, resumes the quiz
+            continueBtn.onclick = () => {
+                modal.style.display = 'none'; // Just close this warning
+            };
+        }
+        // --- END: ADD THIS NEW FUNCTION ---
+		
+		
+        /**
+         * Checks if a quiz is in progress before closing the modal.
+         */
+        window.closeQuizModal = function() {
+            const mainScreen = document.getElementById('quiz-main-screen');
+            const isQuizInProgress = !mainScreen.classList.contains('hidden');
+
+            if (isQuizInProgress) {
+                // If quiz is running, show our new custom 3-button modal
+                showQuizConfirmationModal();
+            } else {
+                // Not in progress (on start or results screen), just close it.
+                closeModal('quiz-modal');
+            }
+        }
+
+        // --- START: NEW QUIZ CENTER LOGIC ---
+
+        const quizCenterModal = document.getElementById('quiz-center-modal');
+        const quizCenterContent = document.getElementById('quiz-center-content');
+
+        // 1. Add listener to the "Test Yourself" button
+        document.getElementById('show-quiz-center-btn').addEventListener('click', () => {
+            openQuizCenter();
+        });
+
+        // 2. Function to open and populate the Quiz Center
+        async function openQuizCenter() {
+            quizCenterModal.style.display = "block";
+            quizCenterContent.innerHTML = '<p class="text-center text-gray-500 italic py-5">Loading available quizzes...</p>';
+            
+            try {
+                const plansCollectionPath = getUserPlansCollectionPath();
+                const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+                const querySnapshot = await getDocs(q);
+                
+                let quizButtonsHtml = '';
+                let quizzesFound = 0;
+
+                for (const docSnap of querySnapshot.docs) {
+                    const monthId = docSnap.id;
+                    const monthData = docSnap.data();
+                    const monthName = monthData.monthName || monthId;
+
+                    for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
+                        const weekData = monthData.weeks?.[weekId];
+                        if (!weekData || !weekData.days) continue;
+
+                        // Aggregate all vocab from this week
+                        let weekVocab = [];
+                        for (const day of weekData.days) {
+                            for (const row of day.rows) {
+                                if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
+                                    weekVocab.push(...row.vocabData);
+                                }
+                            }
+                        }
+
+                        // Only create a button if there are enough words
+                        if (weekVocab.length >= 4) {
+                            quizzesFound++;
+                            const weekTitle = weekId.replace('week', 'Week ');
+                            quizButtonsHtml += `<button class="quiz-week-btn" data-month-id="${monthId}" data-week-id="${weekId}">
+                                ${weekTitle} - ${monthName} (${weekVocab.length} words)
+                            </button>`;
+                        }
+                    }
+                }
+
+                if (quizzesFound === 0) {
+                    quizCenterContent.innerHTML = '<p class="text-center text-gray-500 italic py-5">No weekly quizzes available. Add at least 4 vocab words to any week to start.</p>';
+                } else {
+                    quizCenterContent.innerHTML = quizButtonsHtml;
+                }
+
+            } catch (error) {
+                console.error("Error loading quizzes:", error);
+                quizCenterContent.innerHTML = '<p class="text-center text-red-500 py-5">Could not load quizzes. Please try again.</p>';
+            }
+        }
+
+        // 3. Add a global click listener for the new week buttons
+        quizCenterContent.addEventListener('click', (e) => {
+            const button = e.target.closest('.quiz-week-btn');
+            if (button) {
+                const { monthId, weekId } = button.dataset;
+                startWeekQuiz(monthId, weekId);
+            }
+        });
+
+        // 4. Function to start a week-long quiz
+        // UPGRADED: Generates questions first to set timer
+        async function startWeekQuiz(monthId, weekId) {
+            quizTitle.textContent = 'Vocabulary Quiz';
+            closeModal('quiz-center-modal');
+            quizModal.style.display = "block";
+            quizMainScreen.classList.add('hidden');
+            quizResultsScreen.classList.add('hidden');
+            quizStartScreen.classList.remove('hidden');
+            
+            quizStartMessage.textContent = "Loading week's vocabulary...";
+            quizStartBtn.classList.add('hidden');
+            document.getElementById('quiz-total-time-warning').style.display = 'none';
+
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                const weekData = docSnap.data().weeks?.[weekId];
+                if (!weekData || !weekData.days) throw new Error("Week data not found.");
+                
+                let allWeekVocab = [];
+                for (const day of weekData.days) {
+                    for (const row of day.rows) {
+                        if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
+                            allWeekVocab.push(...row.vocabData);
+                        }
+                    }
+                }
+                if (allWeekVocab.length < 4) {
+                    quizStartMessage.textContent = "You need at least 4 vocabulary words to start a quiz.";
+                    return;
+                }
+
+                // --- TIMER LOGIC: Generate questions NOW ---
+                currentVocabData = preProcessVocab(allWeekVocab);
+                currentMcqData = null;
+                currentQuizQuestions = generateQuizData(currentVocabData); // Generate questions
+                
+                const totalQuestions = currentQuizQuestions.length;
+                const totalTimeInSeconds = totalQuestions * 36;
+                
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
+                // --- END TIMER LOGIC ---
+
+                quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week?`;
+                quizStartBtn.classList.remove('hidden');
+                
+                const newStartBtn = quizStartBtn.cloneNode(true);
+                quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
+                newStartBtn.addEventListener('click', runQuizGame);
+                quizStartBtn = newStartBtn; 
+                
+            } catch (error) {
+                console.error("Error loading week quiz data:", error);
+                quizStartMessage.textContent = "Could not load week quiz data. Please try again.";
+            }
+        }
+
+        // --- END: NEW QUIZ CENTER LOGIC ---
+		
+		// --- START: NEW MCQ FEATURE LOGIC ---
+
+        const addMcqModal = document.getElementById('add-mcq-modal');
+        const saveMcqBtn = document.getElementById('save-mcq-btn');
+        const mcqPasteTextarea = document.getElementById('mcq-paste-textarea');
+        const viewMcqModal = document.getElementById('view-mcq-modal');
+        const viewMcqContent = document.getElementById('view-mcq-content');
+
+        // 1. "Add/Edit MCQ" বাটনে ক্লিক করলে এই ফাংশনটি কল হবে
+        async function openAddMcqModal(monthId, weekId, dayIndex) {
+            currentMcqTarget = { monthId, weekId, dayIndex };
+            
+            // ডেটাবেস থেকে বিদ্যমান MCQ ডেটা আনুন (যদি থাকে)
+            setSyncStatus("Loading...", "blue");
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                let rawText = '';
+                if (docSnap.exists()) {
+                    // --- MODIFIED: Get mcqData from DAY object ---
+                    const mcqData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.mcqData;
+                    
+                    if (mcqData) {
+                        // যদি ডেটা থাকে, তাহলে টেক্সট এরিয়াতে দেখানোর জন্য ফরম্যাট করি
+                        rawText = mcqData.map((mcq, index) => {
+                            const options = mcq.options.map((opt, i) => `${['ক', 'খ', 'গ', 'ঘ'][i]}. ${opt}`).join('\n');
+                            const correctPrefix = ['ক', 'খ', 'গ', 'ঘ'][mcq.options.indexOf(mcq.correctAnswer)];
+                            return `${['০১', '০২', '০৩', '০৪', '০৫', '০৬', '০৭', '০৮', '০৯'][index] || (index + 1)}. ${mcq.question}\n${options}\nসঠিক উত্তর: ${correctPrefix}. ${mcq.correctAnswer}`;
+                        }).join('\n');
+                    }
+                }
+                mcqPasteTextarea.value = rawText; // এখানে সেভ করা MCQ গুলো দেখাবে
+                setSyncStatus("Synced", "green");
+            } catch (error) {
+                console.error("Error fetching MCQ data for modal:", error);
+                setSyncStatus("Error", "red");
+            }
+
+            addMcqModal.style.display = 'block';
+        }
+
+        // 2. Modal এর "Parse & Save MCQs" বাটনে ক্লিক করলে এই ফাংশনটি কল হবে
+        saveMcqBtn.addEventListener('click', async () => {
+            if (!currentMcqTarget) return;
+
+            // --- MODIFIED: rowIndex is removed ---
+            const { monthId, weekId, dayIndex } = currentMcqTarget;
+            const rawText = mcqPasteTextarea.value;
+            
+            try {
+                const parsedData = parseMcqText(rawText);
+                
+                // --- MODIFIED: Allow saving 0 MCQs (to clear the list) ---
+                if (rawText.trim() !== '' && parsedData.length === 0) {
+                    showCustomAlert("No valid MCQs found. Please check the format.", "error");
+                    return;
+                }
+
+                // ডেটা সরাসরি Firestore-এ সেভ করুন
+                setSyncStatus("Syncing...", "yellow");
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                let monthData = docSnap.data();
+                let daysArray = monthData.weeks?.[weekId]?.days || [];
+                
+                // --- MODIFIED: Save data to DAY object ---
+                if (daysArray[dayIndex]) {
+                    // কাঁচা টেক্সট এবং পার্স করা ডেটা উভয়ই সেভ করি
+                    daysArray[dayIndex].mcqData = parsedData.length > 0 ? parsedData : null; // সেভ করুন বা খালি করতে null করুন
+                    
+                    const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
+                    await updateDoc(docRef, updatePayload);
+                    
+                    console.log("MCQs saved successfully for day:", dayIndex);
+                    closeModal('add-mcq-modal');
+                    setSyncStatus("Synced", "green");
+                    showCustomAlert(`${parsedData.length} MCQs saved successfully!`, "success");
+                } else {
+                    throw new Error("Target day for MCQs not found.");
+                }
+                // --- END MODIFIED BLOCK ---
+
+            } catch (error) {
+                console.error("Error parsing or saving MCQs:", error);
+                showCustomAlert("Error saving MCQs. Please try again.", "error");
+                setSyncStatus("Error", "red");
+            } finally {
+                currentMcqTarget = null;
+            }
+        });
+
+        // 3. ✨ The Magic Parser Function (Regex) - (UPGRADED)
+        function parseMcqText(text) {
+            const mcqData = [];
+            // এই Regex টি আপনার দেওয়া ফরম্যাট অনুযায়ী প্রশ্ন, অপশন এবং উত্তর খুঁজে বের করবে
+            const mcqRegex = /(?:[০-৯]+)\.\s*([\s\S]+?)\n(?:ক\.)\s*([\s\S]+?)\n(?:খ\.)\s*([\s\S]+?)\n(?:গ\.)\s*([\s\S]+?)\n(?:ঘ\.)\s*([\s\S]+?)\nসঠিক উত্তর:\s*([কখগঘ])\.\s*([\s\S]+?)(?=\n[০-৯]+\.|\n*$)/g;
+            
+            let match;
+            while ((match = mcqRegex.exec(text)) !== null) {
+                try {
+                    const question = match[1].trim();
+                    const options = [
+                        match[2].trim(), // অপশন ক
+                        match[3].trim(), // অপশন খ
+                        match[4].trim(), // অপশন গ
+                        match[5].trim()  // অপশন ঘ
+                    ];
+                    
+                    const correctPrefix = match[6].trim(); // ক, খ, গ, বা ঘ
+                    
+                    // --- START: LOGIC FIX ---
+                    // আমরা এখন আর টেক্সট মিলিয়ে দেখবো না।
+                    // আমরা সরাসরি প্রিফিক্সের ওপর বিশ্বাস করবো।
+                    let correctAnswer;
+                    if (correctPrefix === 'ক') {
+                        correctAnswer = options[0];
+                    } else if (correctPrefix === 'খ') {
+                        correctAnswer = options[1];
+                    } else if (correctPrefix === 'গ') {
+                        correctAnswer = options[2];
+                    } else if (correctPrefix === 'ঘ') {
+                        correctAnswer = options[3];
+                    } else {
+                        // যদি কোনো কারণে প্রিফিক্স না মেলে (যদিও regex এটা হতে দেবে না)
+                        // আমরা আগের মতো টেক্সট ব্যবহারের চেষ্টা করবো
+                        correctAnswer = match[7].trim();
+                         console.warn("Could not match prefix, using text as fallback.");
+                    }
+                    // --- END: LOGIC FIX ---
+
+                    mcqData.push({
+                        question: question,
+                        options: options,
+                        correctAnswer: correctAnswer // সেভ করা উত্তরটি এখন পরিষ্কার এবং সঠিক
+                    });
+                } catch (e) {
+                    console.error("Failed to parse one MCQ block:", e, match);
+                }
+            }
+            return mcqData;
+        }
+
+        // 4. "View MCQ" বাটনে ক্লিক করলে
+        async function openViewMcqModal(monthId, weekId, dayIndex) { // <-- rowIndex সরানো হয়েছে
+            viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading MCQs...</p>';
+            viewMcqModal.style.display = 'block';
+
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                // --- MODIFIED: Get data from DAY ---
+                const mcqData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.mcqData;
+
+                
+
+                if (!mcqData || mcqData.length < 1) {
+                    viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">No MCQs found for this entry.</p>';
+                    return;
+                }
+
+                let html = '';
+                mcqData.forEach((mcq, index) => {
+                    html += `
+                        <div class="mcq-item">
+                            <p class="mcq-question">${index + 1}. ${escapeHtml(mcq.question)}</p>
+                            <ol class="mcq-options">
+                                ${mcq.options.map((opt, i) => `
+                                    <li class="mcq-option ${opt === mcq.correctAnswer ? 'mcq-correct-answer' : ''}">
+                                        ${['ক', 'খ', 'গ', 'ঘ'][i]}. ${escapeHtml(opt)}
+                                    </li>
+                                `).join('')}
+                            </ol>
+                            <p class="mcq-final-answer">সঠিক উত্তর: ${escapeHtml(mcq.correctAnswer)}</p>
+                        </div>
+                    `;
+                });
+                viewMcqContent.innerHTML = html;
+
+            } catch (error) {
+                console.error("Error loading MCQs for viewing:", error);
+                viewMcqContent.innerHTML = '<p class="text-center text-red-500 py-10">Could not load MCQs.</p>';
+            }
+        }
+
+        // 5. "MCQ Test" বাটনে ক্লিক করলে (UPGRADED)
+        // UPGRADED: Generates questions first to set timer
+        async function startMcqQuiz(monthId, weekId, dayIndex) {
+            quizTitle.textContent = 'MCQ Quiz';
+            quizModal.style.display = "block";
+            quizMainScreen.classList.add('hidden');
+            quizResultsScreen.classList.add('hidden');
+            quizStartScreen.classList.remove('hidden');
+            
+            quizStartMessage.textContent = "Loading MCQ Quiz...";
+            quizStartBtn.classList.add('hidden');
+            document.getElementById('quiz-total-time-warning').style.display = 'none';
+
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                const mcqData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.mcqData;
+                if (!mcqData || mcqData.length < 1) { 
+                    quizStartMessage.textContent = "No MCQs found to start a quiz.";
+                    return;
+                }
+
+                // --- TIMER LOGIC: Generate questions NOW ---
+                currentMcqData = mcqData; 
+                currentVocabData = null;
+                currentQuizQuestions = currentMcqData.map(mcq => ({ // Generate questions
+                    question: mcq.question,
+                    options: shuffleArray([...mcq.options]),
+                    correctAnswer: mcq.correctAnswer,
+                    userAnswer: null,
+                    isCorrect: null
+                }));
+                
+                const totalQuestions = currentQuizQuestions.length;
+                const totalTimeInSeconds = totalQuestions * 36;
+                
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
+                // --- END TIMER LOGIC ---
+                
+                quizStartMessage.textContent = `Ready to test yourself on ${mcqData.length} MCQs?`;
+                quizStartBtn.classList.remove('hidden');
+                
+                const newStartBtn = quizStartBtn.cloneNode(true);
+                quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
+                newStartBtn.addEventListener('click', runQuizGame);
+                quizStartBtn = newStartBtn; 
+                
+            } catch (error) {
+                console.error("Error loading MCQ quiz data:", error);
+                quizStartMessage.textContent = "Could not load quiz data. Please try again.";
+            }
+        }
+
+        // --- END: NEW MCQ FEATURE LOGIC ---
+		
+		// --- START: NEW MASTER MCQ LIST & QUIZ CENTER LOGIC ---
+
+        // 1. DOM Elements
+        const masterMcqModal = document.getElementById('master-mcq-modal');
+        const masterMcqContent = document.getElementById('master-mcq-content');
+        const totalMcqCountSpan = document.getElementById('total-mcq-count');
+        const mcqQuizCenterModal = document.getElementById('mcq-quiz-center-modal');
+        const mcqQuizCenterContent = document.getElementById('mcq-quiz-center-content');
+
+        // 2. Add listener to the main "MCQ List" header button
+        document.getElementById('show-master-mcq-btn').addEventListener('click', displayMasterMcqList);
+
+        // 3. Function to open and populate the Master MCQ List (UPGRADED STYLE & LOGIC)
+        async function displayMasterMcqList() {
+            if (!currentUser || !userId) {
+                showCustomAlert("Please log in to see your MCQ list.");
+                return;
+            }
+
+            masterMcqModal.style.display = "block";
+            masterMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading all MCQs...</p>';
+            totalMcqCountSpan.textContent = "...";
+            setSyncStatus("Loading...", "blue");
+
+            let allMcqsHtml = '';
+            let totalMcqCount = 0;
+
+            try {
+                const plansCollectionPath = getUserPlansCollectionPath();
+                const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    masterMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">No study plans found.</p>';
+                    totalMcqCountSpan.textContent = "0";
+                    setSyncStatus("Synced", "green"); // Added this
+                    return;
+                }
+
+                for (const docSnap of querySnapshot.docs) {
+                    const monthId = docSnap.id;
+                    const monthData = docSnap.data();
+                    const monthName = monthData.monthName || monthId;
+
+                    let monthHasMcqs = false;
+                    let monthWeekContainerHtml = ''; // Holds the week blocks for this month
+
+                    for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
+                        const weekData = monthData.weeks?.[weekId];
+                        if (!weekData || !weekData.days) continue;
+
+                        let weekHasMcqs = false;
+                        let weekDayContainerHtml = ''; // Holds the day blocks for this week
+
+                        for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
+                            const day = weekData.days[dayIndex];
+                            
+                            // --- LOGIC FIX: Check day.mcqData, not row.mcqData ---
+                            if (day.mcqData && day.mcqData.length > 0) {
+                                monthHasMcqs = true;
+                                weekHasMcqs = true;
+                                totalMcqCount += day.mcqData.length;
+                                
+                                let dayMcqItemsHtml = '';
+                                day.mcqData.forEach((mcq, index) => {
+                                    dayMcqItemsHtml += `
+                                        <div class="mcq-item">
+                                            <p class="mcq-question">${index + 1}. ${escapeHtml(mcq.question)}</p>
+                                            <ol class="mcq-options">
+                                                ${mcq.options.map((opt, i) => `
+                                                    <li class="mcq-option ${opt === mcq.correctAnswer ? 'mcq-correct-answer' : ''}">
+                                                        ${['ক', 'খ', 'গ', 'ঘ'][i]}. ${escapeHtml(opt)}
+                                                    </li>
+                                                `).join('')}
+                                            </ol>
+                                            <p class="mcq-final-answer">সঠিক উত্তর: ${escapeHtml(mcq.correctAnswer)}</p>
+                                        </div>
+                                    `;
+                                });
+
+                                weekDayContainerHtml += `
+                                    <div class="day-container">
+                                        <h5 class="day-header">Day ${day.dayNumber}</h5>
+                                        ${dayMcqItemsHtml}
+                                    </div>
+                                `;
+                            }
+                            // --- END LOGIC FIX ---
+                        }
+                        if (weekHasMcqs) {
+                            monthWeekContainerHtml += `
+                                <div class="week-container">
+                                    <h4 class="week-header">${weekId.replace('week', 'Week ')}</h4>
+                                    ${weekDayContainerHtml}
+                                </div>
+                            `;
+                        }
+                    }
+                    if (monthHasMcqs) {
+                        allMcqsHtml += `
+                            <div class="month-container">
+                                <h3 class="month-header">${monthName}</h3>
+                                ${monthWeekContainerHtml}
+                            </div>
+                        `;
+                    }
+                }
+
+                if (totalMcqCount === 0) {
+                    masterMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">You have not added any MCQs to your study plans yet.</p>';
+                } else {
+                    masterMcqContent.innerHTML = allMcqsHtml;
+                }
+                totalMcqCountSpan.textContent = totalMcqCount;
+                setSyncStatus("Synced", "green");
+
+            } catch (error) {
+                console.error("Error fetching all MCQs:", error);
+                masterMcqContent.innerHTML = '<p class="text-center text-red-500 py-10">Could not load MCQs. Please try again.</p>';
+                totalMcqCountSpan.textContent = "Error";
+                setSyncStatus("Error", "red");
+            }
+        }
+
+        // 4. Add listener for the "Test Yourself" button in the Master MCQ List
+        document.getElementById('show-mcq-quiz-center-btn').addEventListener('click', openMcqQuizCenter);
+
+        // 5. Function to build the MCQ Quiz Center (LOGIC FIXED)
+        async function openMcqQuizCenter() {
+            mcqQuizCenterModal.style.display = "block";
+            mcqQuizCenterContent.innerHTML = '<p class="text-center text-gray-500 italic py-5">Loading available quizzes...</p>';
+
+            let quizCenterHtml = '';
+            let quizzesFound = 0;
+
+            try {
+                const plansCollectionPath = getUserPlansCollectionPath();
+                const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+                const querySnapshot = await getDocs(q);
+
+                for (const docSnap of querySnapshot.docs) {
+                    const monthId = docSnap.id;
+                    const monthData = docSnap.data();
+                    const monthName = monthData.monthName || monthId;
+
+                    let monthMcqs = [];
+                    let monthHtml = `<h3>${monthName}</h3>`;
+                    let monthHasMcqs = false;
+
+                    for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
+                        const weekData = monthData.weeks?.[weekId];
+                        if (!weekData || !weekData.days) continue;
+
+                        let weekMcqs = [];
+                        let weekHtml = `<h4>${weekId.replace('week', 'Week ')}</h4>`;
+                        let weekHasMcqs = false;
+
+                        for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
+                            const day = weekData.days[dayIndex];
+                            
+                            // --- LOGIC FIX: Check day.mcqData ---
+                            if (day.mcqData && day.mcqData.length > 0) {
+                                const dayMcqs = day.mcqData;
+                                quizzesFound++;
+                                monthHasMcqs = true;
+                                weekHasMcqs = true;
+                                weekMcqs.push(...dayMcqs);
+                                
+                                // Add Day Button
+                                weekHtml += `<button class="mcq-center-btn day-btn" data-quiz-type="day" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}">
+                                    Day ${day.dayNumber} (${dayMcqs.length} MCQs)
+                                </button>`;
+                            }
+                            // --- END LOGIC FIX ---
+                        }
+
+                        if (weekHasMcqs) {
+                            monthMcqs.push(...weekMcqs);
+                            // Add Week Total Button
+                            weekHtml = `
+                                <h4>${weekId.replace('week', 'Week ')}</h4>
+                                <button class="mcq-center-btn week-btn" data-quiz-type="week" data-month-id="${monthId}" data-week-id="${weekId}">
+                                    Test All Week ${weekId.replace('week', '')} MCQs (${weekMcqs.length})
+                                </button>
+                                ${weekHtml.substring(weekHtml.indexOf('</h4>') + 5)}
+                            `;
+                            monthHtml += weekHtml;
+                        }
+                    }
+
+                    if (monthHasMcqs) {
+                        // Add Month Total Button
+                        monthHtml = `
+                            <h3>${monthName}</h3>
+                            <button class="mcq-center-btn month-btn" data-quiz-type="month" data-month-id="${monthId}">
+                                Test All ${monthName} MCQs (${monthMcqs.length})
+                            </button>
+                            ${monthHtml.substring(monthHtml.indexOf('</h3>') + 5)}
+                        `;
+                        quizCenterHtml += monthHtml;
+                    }
+                }
+
+                if (quizzesFound === 0) {
+                    mcqQuizCenterContent.innerHTML = '<p class="text-center text-gray-500 italic py-5">No MCQ quizzes available. Add MCQs to any day to start.</p>';
+                } else {
+                    mcqQuizCenterContent.innerHTML = quizCenterHtml;
+                }
+
+            } catch (error) {
+                console.error("Error loading MCQ quizzes:", error);
+                mcqQuizCenterContent.innerHTML = '<p class="text-center text-red-500 py-5">Could not load quizzes.</p>';
+            }
+        }
+
+        // 6. Add listener for the new MCQ Quiz Center buttons
+        mcqQuizCenterContent.addEventListener('click', (e) => {
+            const button = e.target.closest('.mcq-center-btn');
+            if (button) {
+                const { quizType, monthId, weekId, dayIndex } = button.dataset;
+                startAggregatedMcqQuiz(quizType, monthId, weekId, dayIndex);
+            }
+        });
+
+        // 7. Function to start a quiz (day, week, or month) (LOGIC FIXED)
+        // UPGRADED: Generates questions first to set timer
+        async function startAggregatedMcqQuiz(quizType, monthId, weekId = null, dayIndex = null) {
+            quizTitle.textContent = 'MCQ Quiz';
+            closeModal('mcq-quiz-center-modal');
+            quizModal.style.display = "block";
+            quizMainScreen.classList.add('hidden');
+            quizResultsScreen.classList.add('hidden');
+            quizStartScreen.classList.remove('hidden');
+            
+            quizStartMessage.textContent = `Loading ${quizType} quiz...`;
+            quizStartBtn.classList.add('hidden');
+            document.getElementById('quiz-total-time-warning').style.display = 'none';
+
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                const monthData = docSnap.data();
+                let aggregatedMcqs = [];
+                let quizTitle = '';
+
+                if (quizType === 'day') {
+                    // ... (day logic) ...
+                    const day = monthData.weeks?.[weekId]?.days?.[dayIndex];
+                    if (!day) throw new Error("Day data not found.");
+                    if (day.mcqData) aggregatedMcqs.push(...day.mcqData);
+                    quizTitle = `Day ${day.dayNumber} - ${weekId.replace('week', 'Week ')}`;
+                } else if (quizType === 'week') {
+                    // ... (week logic) ...
+                    const week = monthData.weeks?.[weekId];
+                    if (!week) throw new Error("Week data not found.");
+                    for (const day of week.days) {
+                        if (day.mcqData) aggregatedMcqs.push(...day.mcqData);
+                    }
+                    quizTitle = `${weekId.replace('week', 'Week ')} - ${monthData.monthName}`;
+                } else if (quizType === 'month') {
+                    // ... (month logic) ...
+                    for (const wId of ['week1', 'week2', 'week3', 'week4']) {
+                        const week = monthData.weeks?.[wId];
+                        if (week && week.days) {
+                            for (const day of week.days) {
+                                if (day.mcqData) aggregatedMcqs.push(...day.mcqData);
+                            }
+                        }
+                    }
+                    quizTitle = `${monthData.monthName} - All MCQs`;
+                }
+
+                if (aggregatedMcqs.length === 0) {
+                    quizStartMessage.textContent = "No MCQs found for this selection.";
+                    return;
+                }
+                
+                // --- TIMER LOGIC: Generate questions NOW ---
+                currentMcqData = aggregatedMcqs; 
+                currentVocabData = null;
+                currentQuizQuestions = currentMcqData.map(mcq => ({ // Generate questions
+                    question: mcq.question,
+                    options: shuffleArray([...mcq.options]),
+                    correctAnswer: mcq.correctAnswer,
+                    userAnswer: null,
+                    isCorrect: null
+                }));
+                
+                const totalQuestions = currentQuizQuestions.length;
+                const totalTimeInSeconds = totalQuestions * 36;
+                
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
+                // --- END TIMER LOGIC ---
+                
+                quizStartMessage.textContent = `Ready to test yourself on ${aggregatedMcqs.length} MCQs from: ${quizTitle}?`;
+                quizStartBtn.classList.remove('hidden');
+                
+                const newStartBtn = quizStartBtn.cloneNode(true);
+                quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
+                newStartBtn.addEventListener('click', runQuizGame);
+                quizStartBtn = newStartBtn; 
+                
+            } catch (error) {
+                console.error("Error loading aggregated MCQ quiz data:", error);
+                quizStartMessage.textContent = "Could not load quiz data. Please try again.";
+            }
+        }
+
+        // --- END: NEW MASTER MCQ LIST & QUIZ CENTER LOGIC ---
+		
+		// --- START: NEW TIMER HELPER FUNCTIONS ---
+        function pad(num) {
+            return num.toString().padStart(2, '0');
+        }
+
+        function formatTime(totalSeconds) {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            
+            if (hours > 0) {
+                return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+            }
+            return `${pad(minutes)}:${pad(seconds)}`;
+        }
+        // --- END: NEW TIMER HELPER FUNCTIONS ---
