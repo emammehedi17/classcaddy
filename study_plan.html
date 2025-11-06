@@ -1290,7 +1290,8 @@
 		let autosaveTimer = null;
 		
 		// --- START: ADD THESE QUIZ STATE VARIABLES ---
-        let currentQuizData = [];
+        let currentVocabData = []; // Renamed from currentQuizData
+        let currentMcqData = []; // NEW variable for MCQ quizzes
         let currentQuizQuestions = [];
         let currentQuizQuestionIndex = 0;
         let currentQuizScore = 0;
@@ -3373,7 +3374,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
                 
                 // --- MODIFIED: Pre-process the vocab for synonyms ---
-                currentQuizData = preProcessVocab(vocabData);
+                currentVocabData = preProcessVocab(vocabData);
+                currentMcqData = null; // Signal this is a vocab quiz
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words?`;
                 quizStartBtn.classList.remove('hidden');
@@ -3494,12 +3496,32 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizResultsScreen.classList.add('hidden');
             quizMainScreen.classList.remove('hidden');
 
-            currentQuizQuestions = generateQuizData(currentQuizData);
+            // --- START: NEW GENERATION LOGIC ---
+            if (currentVocabData) {
+                // It's a Vocab quiz
+                currentQuizQuestions = generateQuizData(currentVocabData);
+            } else if (currentMcqData) {
+                // It's an MCQ quiz
+                currentQuizQuestions = currentMcqData.map(mcq => ({
+                    question: mcq.question,
+                    options: shuffleArray([...mcq.options]), // Re-shuffle options
+                    correctAnswer: mcq.correctAnswer,
+                    userAnswer: null, // Reset answer
+                    isCorrect: null // Reset status
+                }));
+            } else {
+                // No data, something went wrong
+                console.error("runQuizGame called, but no vocab or MCQ data is loaded.");
+                return;
+            }
+            // --- END: NEW GENERATION LOGIC ---
+
+            // Reset state
             currentQuizQuestionIndex = 0;
             currentQuizScore = 0;
 
             quizScoreEl.textContent = `Score: 0.00`;
-            quizRestartBtn.onclick = runQuizGame;
+            quizRestartBtn.onclick = runQuizGame; // Hook up "Try Again"
             
             loadQuizQuestion();
         }
@@ -3800,7 +3822,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
 
                 // --- NEW: PRE-PROCESS THE VOCAB ---
-                currentQuizData = preProcessVocab(allWeekVocab);
+                currentVocabData = preProcessVocab(allWeekVocab);
+                currentMcqData = null; // Signal this is a vocab quiz
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week?`;
                 quizStartBtn.classList.remove('hidden');
@@ -4004,7 +4027,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             }
         }
 
-        // 5. "MCQ Test" বাটনে ক্লিক করলে
+        // 5. "MCQ Test" বাটনে ক্লিক করলে (UPGRADED)
         async function startMcqQuiz(monthId, weekId, dayIndex, rowIndex) {
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
@@ -4021,21 +4044,16 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
                 const mcqData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex]?.mcqData;
 
-                if (!mcqData || mcqData.length < 1) { // কুইজের জন্য ১টি প্রশ্নই যথেষ্ট
+                if (!mcqData || mcqData.length < 1) { 
                     quizStartMessage.textContent = "No MCQs found to start a quiz.";
                     return;
                 }
 
-                // বিদ্যমান কুইজ ইঞ্জিন ব্যবহারের জন্য ডেটা প্রস্তুত করি
-                currentQuizQuestions = mcqData.map(mcq => ({
-                    question: mcq.question,
-                    options: shuffleArray([...mcq.options]), // অপশনগুলো এলোমেলো করি
-                    correctAnswer: mcq.correctAnswer,
-                    userAnswer: null,
-                    isCorrect: null
-                }));
-                
-                currentQuizData = null; // vocab কুইজের সাথে যেন কনফ্লিক্ট না হয়
+                // --- START MODIFIED BLOCK ---
+                // Set the *source* data. runQuizGame will generate the questions.
+                currentMcqData = mcqData; 
+                currentVocabData = null; // Signal this is an MCQ quiz
+                // --- END MODIFIED BLOCK ---
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${mcqData.length} MCQs?`;
                 quizStartBtn.classList.remove('hidden');
