@@ -817,6 +817,45 @@
             color: #4f46e5; /* indigo-600 */
         }
         /* --- END: QUIZ CENTER STYLES --- */
+    
+
+        /* --- START: VIEW MCQ MODAL STYLES --- */
+        #view-mcq-content .mcq-item {
+            padding: 1rem;
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-radius: 8px;
+            background-color: #f9fafb; /* gray-50 */
+            margin-bottom: 1rem;
+        }
+        #view-mcq-content .mcq-question {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1f2937; /* gray-800 */
+            margin-bottom: 0.75rem;
+        }
+        #view-mcq-content .mcq-options {
+            list-style-type: none;
+            padding-left: 0;
+            margin-bottom: 0.75rem;
+        }
+        #view-mcq-content .mcq-option {
+            font-size: 0.9rem;
+            color: #4b5563; /* gray-600 */
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        #view-mcq-content .mcq-correct-answer {
+            background-color: #d1fae5; /* emerald-100 */
+            color: #065f46; /* emerald-800 */
+            font-weight: 500;
+        }
+        #view-mcq-content .mcq-final-answer {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #059669; /* emerald-600 */
+        }
+        /* --- END: VIEW MCQ MODAL STYLES --- */
+
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -1104,6 +1143,37 @@
         </div>
       </div>
     </div>
+    <div id="add-mcq-modal" class="modal" style="z-index: 105;">
+      <div class="modal-content" style="max-width: 600px;">
+        <span class="modal-close" onclick="closeModal('add-mcq-modal')">&times;</span>
+        <h3 class="text-xl font-semibold mb-3 text-emerald-600">Add/Edit MCQs</h3>
+        <p class="text-sm text-gray-500 mb-4">
+            আপনার MCQ প্রশ্নগুলো নিচের ফরম্যাটে পেস্ট করুন। সিস্টেম স্বয়ংক্রিয়ভাবে প্রশ্ন, অপশন এবং সঠিক উত্তর সনাক্ত করে নেবে।
+        </p>
+        <textarea id="mcq-paste-textarea" rows="10" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-md text-gray-800 placeholder-gray-400 focus:ring-emerald-500 focus:border-emerald-500 kalpurush" placeholder="০১. প্রশ্ন...?
+ক. অপশন ১
+খ. অপশন ২
+গ. অপশন ৩
+ঘ. অপশন ৪
+সঠিক উত্তর: খ. অপশন ২
+০২. পরবর্তী প্রশ্ন..."></textarea>
+        
+        <div class="mt-4 flex justify-end gap-3">
+             <button onclick="closeModal('add-mcq-modal')" class="action-button action-button-secondary">Cancel</button>
+             <button id="save-mcq-btn" class="action-button">Parse & Save MCQs</button>
+        </div>
+      </div>
+    </div>
+    <div id="view-mcq-modal" class="modal">
+      <div class="modal-content" style="max-width: 700px; max-height: 80vh; display: flex; flex-direction: column;">
+        <div class="modal-header-sticky">
+            <h3 class="text-2xl font-semibold text-emerald-600">View MCQs</h3>
+            <span class="modal-close" onclick="closeModal('view-mcq-modal')">&times;</span>
+        </div>
+        <div id="view-mcq-content" class="kalpurush" style="overflow-y: auto; flex-grow: 1; padding-top: 1.25rem;">
+            </div>
+      </div>
+    </div>
     <script type="module">
         // Import necessary functions from Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -1216,6 +1286,7 @@
         let currentStoryTarget = null;
         let currentConfirmAction = null;
         let currentVocabCodeTarget = null; // <-- ADD THIS LINE
+		let currentMcqTarget = null;
 		let autosaveTimer = null;
 		
 		// --- START: ADD THESE QUIZ STATE VARIABLES ---
@@ -2039,7 +2110,19 @@
                      buttonsHtml += `<button class="action-button action-button-secondary text-xs quiz-btn" style="border-color: #6366f1; color: #4f46e5;"><i class="fas fa-question-circle mr-1"></i> Quiz</button>`;
                  }
              }
-
+			
+			
+			// --- START: MCQ Button Logic ---
+             if (isEditing) {
+                // "Add/Edit MCQ" button for edit mode
+                 buttonsHtml += `<button class="action-button action-button-secondary text-xs add-mcq-btn mt-2"><i class="fas fa-plus mr-1"></i> Add/Edit MCQ</button>`;
+             }
+             if (!isEditing && rowData.mcqData && rowData.mcqData.length > 0) {
+                 // "View" and "Test" buttons for normal mode
+                 buttonsHtml += `<button class="action-button action-button-secondary text-xs view-mcq-btn"><i class="fas fa-eye mr-1"></i> View MCQ</button>`;
+                 buttonsHtml += `<button class="action-button action-button-secondary text-xs mcq-test-btn" style="border-color: #6366f1; color: #4f46e5;"><i class="fas fa-tasks mr-1"></i> MCQ Test</button>`;
+             }
+             // --- END: MCQ Button Logic ---
              const completedClass = (!isEditing && rowData.completed) ? 'row-completed' : '';
 
              return `
@@ -2175,13 +2258,34 @@
                      const rowIndex = parseInt(row.dataset.rowIndex);
                      readStory(monthId, weekId, dayIndex, rowIndex);
                  }
-                 // --- START: ADD THIS QUIZ BUTTON HANDLER ---
+// 
                  else if (button.classList.contains('quiz-btn')) {
                      const dayIndex = parseInt(daySection.dataset.dayIndex);
                      const rowIndex = parseInt(row.dataset.rowIndex);
                      startQuiz(monthId, weekId, dayIndex, rowIndex);
                  }
                  // --- END: QUIZ BUTTON HANDLER ---
+
+                 // --- START: NEW MCQ BUTTON HANDLERS ---
+                 else if (button.classList.contains('add-mcq-btn')) {
+                     const dayIndex = parseInt(daySection.dataset.dayIndex);
+                     const rowIndex = parseInt(row.dataset.rowIndex);
+                     openAddMcqModal(monthId, weekId, dayIndex, rowIndex);
+                 }
+                 else if (button.classList.contains('view-mcq-btn')) {
+                     const dayIndex = parseInt(daySection.dataset.dayIndex);
+                     const rowIndex = parseInt(row.dataset.rowIndex);
+                     openViewMcqModal(monthId, weekId, dayIndex, rowIndex);
+                 }
+                 else if (button.classList.contains('mcq-test-btn')) {
+                     const dayIndex = parseInt(daySection.dataset.dayIndex);
+                     const rowIndex = parseInt(row.dataset.rowIndex);
+                     startMcqQuiz(monthId, weekId, dayIndex, rowIndex);
+                 }
+                 // --- END: NEW MCQ BUTTON HANDLERS ---
+
+                 
+...
                  // Add Day Button / Add First Day
                  else if (button.classList.contains('add-day-btn') || button.classList.contains('add-first-day-btn')) {
                      addNewDay(monthId, weekId, weekSection);
@@ -2320,7 +2424,7 @@
                     let existingRowIndex = parseInt(row.dataset.rowIndex);
                     const existingRowData = !isNaN(existingRowIndex) && currentDayData.rows?.[existingRowIndex] ? currentDayData.rows[existingRowIndex] : {};
 
-                    let subject, topic, comment, completed, completionPercentage, vocabData = null, story;
+                    let subject, topic, comment, completed, completionPercentage, vocabData = null, story, mcqData = null;
 
                     if (daySection.classList.contains('editing')) {
                          subject = row.querySelector('.subject-input')?.value.trim() || '';
@@ -2348,7 +2452,11 @@
                          subject = existingRowData.subject; topic = existingRowData.topic; comment = existingRowData.comment;
                          completionPercentage = existingRowData.completionPercentage; vocabData = existingRowData.vocabData; story = existingRowData.story;
                      }
-                     updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null });
+                     // --- ADDED mcqData to save ---
+                     mcqData = existingRowData.mcqData || null; // Preserve existing MCQ data
+
+                     updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null, mcqData: mcqData || null });
+                });
                 });
 
                  daysArray[dayIndex].rows = updatedRows;
@@ -3711,7 +3819,241 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         // --- END: NEW QUIZ CENTER LOGIC ---
-    
+		
+		// --- START: NEW MCQ FEATURE LOGIC ---
+
+        const addMcqModal = document.getElementById('add-mcq-modal');
+        const saveMcqBtn = document.getElementById('save-mcq-btn');
+        const mcqPasteTextarea = document.getElementById('mcq-paste-textarea');
+        const viewMcqModal = document.getElementById('view-mcq-modal');
+        const viewMcqContent = document.getElementById('view-mcq-content');
+
+        // 1. "Add/Edit MCQ" বাটনে ক্লিক করলে এই ফাংশনটি কল হবে
+        async function openAddMcqModal(monthId, weekId, dayIndex, rowIndex) {
+            currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
+            
+            // ডেটাবেস থেকে বিদ্যমান MCQ ডেটা আনুন (যদি থাকে)
+            setSyncStatus("Loading...", "blue");
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                let rawText = '';
+                if (docSnap.exists()) {
+                    // আমরা এখানে পার্স করা ডেটা নয়, বরং কাঁচা টেক্সট (rawText) সেভ করবো
+                    // কিন্তু প্রথমবার তাই rawText সেভ করা নেই। তাই আমরা কিছুই দেখাবো না।
+                    // ভবিষ্যতে আপডেটের জন্য: আমরা mcqRawText নামে একটি ফিল্ড সেভ করতে পারি।
+                    // আপাতত, টেক্সট এরিয়া খালি থাকবে।
+                    const mcqData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex]?.mcqData;
+                    if (mcqData) {
+                        // যদি ডেটা থাকে, তাহলে টেক্সট এরিয়াতে দেখানোর জন্য ফরম্যাট করি
+                        rawText = mcqData.map((mcq, index) => {
+                            const options = mcq.options.map((opt, i) => `${['ক', 'খ', 'গ', 'ঘ'][i]}. ${opt}`).join('\n');
+                            const correctPrefix = ['ক', 'খ', 'গ', 'ঘ'][mcq.options.indexOf(mcq.correctAnswer)];
+                            return `${['০১', '০২', '০৩', '০৪', '০৫', '০৬', '০৭', '০৮', '০৯'][index] || (index + 1)}.\s${mcq.question}\n${options}\nসঠিক উত্তর: ${correctPrefix}. ${mcq.correctAnswer}`;
+                        }).join('\n');
+                    }
+                }
+                mcqPasteTextarea.value = rawText; // আপাতত খালি থাকবে, কারণ রি-ফরম্যাটিং জটিল
+                setSyncStatus("Synced", "green");
+            } catch (error) {
+                console.error("Error fetching MCQ data for modal:", error);
+                setSyncStatus("Error", "red");
+            }
+
+            mcqPasteTextarea.value = ''; // ইউজারকে প্রতিবার নতুন করে পেস্ট করতে হবে
+            addMcqModal.style.display = 'block';
+        }
+
+        // 2. Modal এর "Parse & Save MCQs" বাটনে ক্লিক করলে এই ফাংশনটি কল হবে
+        saveMcqBtn.addEventListener('click', async () => {
+            if (!currentMcqTarget) return;
+
+            const { monthId, weekId, dayIndex, rowIndex } = currentMcqTarget;
+            const rawText = mcqPasteTextarea.value;
+            
+            try {
+                const parsedData = parseMcqText(rawText); // আমাদের পার্সার ফাংশন
+                if (parsedData.length === 0) {
+                    showCustomAlert("No valid MCQs found. Please check the format.", "error");
+                    return;
+                }
+
+                // ডেটা সরাসরি Firestore-এ সেভ করুন (Story এর মতো)
+                setSyncStatus("Syncing...", "yellow");
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                let monthData = docSnap.data();
+                let daysArray = monthData.weeks?.[weekId]?.days || [];
+                
+                if (daysArray[dayIndex]?.rows?.[rowIndex]) {
+                    // কাঁচা টেক্সট এবং পার্স করা ডেটা উভয়ই সেভ করি
+                    daysArray[dayIndex].rows[rowIndex].mcqData = parsedData;
+                    // daysArray[dayIndex].rows[rowIndex].mcqRawText = rawText; // (ভবিষ্যতের জন্য)
+                    
+                    const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
+                    await updateDoc(docRef, updatePayload);
+                    
+                    console.log("MCQs saved successfully for row:", rowIndex);
+                    closeModal('add-mcq-modal');
+                    setSyncStatus("Synced", "green");
+                    showCustomAlert(`${parsedData.length} MCQs saved successfully!`, "success");
+                } else {
+                    throw new Error("Target row for MCQs not found.");
+                }
+
+            } catch (error) {
+                console.error("Error parsing or saving MCQs:", error);
+                showCustomAlert("Error saving MCQs. Please try again.", "error");
+                setSyncStatus("Error", "red");
+            } finally {
+                currentMcqTarget = null;
+            }
+        });
+
+        // 3. ✨ The Magic Parser Function (Regex) ✨
+        function parseMcqText(text) {
+            const mcqData = [];
+            // এই Regex টি আপনার দেওয়া ফরম্যাট অনুযায়ী প্রশ্ন, অপশন এবং উত্তর খুঁজে বের করবে
+            const mcqRegex = /(?:[০-৯]+)\.\s*([\s\S]+?)\n(?:ক\.)\s*([\s\S]+?)\n(?:খ\.)\s*([\s\S]+?)\n(?:গ\.)\s*([\s\S]+?)\n(?:ঘ\.)\s*([\s\S]+?)\nসঠিক উত্তর:\s*([কখগঘ])\.\s*([\s\S]+?)(?=\n[০-৯]+\.|\n*$)/g;
+            
+            let match;
+            while ((match = mcqRegex.exec(text)) !== null) {
+                try {
+                    const question = match[1].trim();
+                    const options = [
+                        match[2].trim(), // অপশন ক
+                        match[3].trim(), // অপশন খ
+                        match[4].trim(), // অপশন গ
+                        match[5].trim()  // অপশন ঘ
+                    ];
+                    
+                    const correctPrefix = match[6].trim(); // ক, খ, গ, বা ঘ
+                    const correctAnswerText = match[7].trim(); // উত্তরটি
+                    
+                    let correctAnswer;
+                    
+                    // সঠিক উত্তর কোনটি তা ম্যাচ করি
+                    if (correctPrefix === 'ক' && options[0] === correctAnswerText) {
+                        correctAnswer = options[0];
+                    } else if (correctPrefix === 'খ' && options[1] === correctAnswerText) {
+                        correctAnswer = options[1];
+                    } else if (correctPrefix === 'গ' && options[2] === correctAnswerText) {
+                        correctAnswer = options[2];
+                    } else if (correctPrefix === 'ঘ' && options[3] === correctAnswerText) {
+                        correctAnswer = options[3];
+                    } else {
+                        // যদি প্রিফিক্স এবং টেক্সট না মেলে (যেমন: "সঠিক উত্তর: খ. বিপ্লব", কিন্তু 'খ' তে আছে 'পুনর্জাগরণ')
+                        // আমরা টেক্সট-কেই সঠিক বলে ধরে নেবো
+                        correctAnswer = correctAnswerText;
+                        if (!options.includes(correctAnswer)) {
+                             console.warn("Correct answer text not found in options, but adding it:", question, correctAnswer);
+                        }
+                    }
+
+                    mcqData.push({
+                        question: question,
+                        options: options,
+                        correctAnswer: correctAnswer
+                    });
+                } catch (e) {
+                    console.error("Failed to parse one MCQ block:", e, match);
+                }
+            }
+            return mcqData;
+        }
+
+        // 4. "View MCQ" বাটনে ক্লিক করলে
+        async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
+            viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading MCQs...</p>';
+            viewMcqModal.style.display = 'block';
+
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                const mcqData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex]?.mcqData;
+
+                if (!mcqData || mcqData.length === 0) {
+                    viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">No MCQs found for this entry.</p>';
+                    return;
+                }
+
+                let html = '';
+                mcqData.forEach((mcq, index) => {
+                    html += `
+                        <div class="mcq-item">
+                            <p class="mcq-question">${index + 1}. ${escapeHtml(mcq.question)}</p>
+                            <ol class="mcq-options">
+                                ${mcq.options.map((opt, i) => `
+                                    <li class="mcq-option ${opt === mcq.correctAnswer ? 'mcq-correct-answer' : ''}">
+                                        ${['ক', 'খ', 'গ', 'ঘ'][i]}. ${escapeHtml(opt)}
+                                    </li>
+                                `).join('')}
+                            </ol>
+                            <p class="mcq-final-answer">সঠিক উত্তর: ${escapeHtml(mcq.correctAnswer)}</p>
+                        </div>
+                    `;
+                });
+                viewMcqContent.innerHTML = html;
+
+            } catch (error) {
+                console.error("Error loading MCQs for viewing:", error);
+                viewMcqContent.innerHTML = '<p class="text-center text-red-500 py-10">Could not load MCQs.</p>';
+            }
+        }
+
+        // 5. "MCQ Test" বাটনে ক্লিক করলে
+        async function startMcqQuiz(monthId, weekId, dayIndex, rowIndex) {
+            quizModal.style.display = "block";
+            quizMainScreen.classList.add('hidden');
+            quizResultsScreen.classList.add('hidden');
+            quizStartScreen.classList.remove('hidden');
+            
+            quizStartMessage.textContent = "Loading MCQ Quiz...";
+            quizStartBtn.classList.add('hidden');
+
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                const mcqData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex]?.mcqData;
+
+                if (!mcqData || mcqData.length < 1) { // কুইজের জন্য ১টি প্রশ্নই যথেষ্ট
+                    quizStartMessage.textContent = "No MCQs found to start a quiz.";
+                    return;
+                }
+
+                // বিদ্যমান কুইজ ইঞ্জিন ব্যবহারের জন্য ডেটা প্রস্তুত করি
+                currentQuizQuestions = mcqData.map(mcq => ({
+                    question: mcq.question,
+                    options: shuffleArray([...mcq.options]), // অপশনগুলো এলোমেলো করি
+                    correctAnswer: mcq.correctAnswer,
+                    userAnswer: null,
+                    isCorrect: null
+                }));
+                
+                currentQuizData = null; // vocab কুইজের সাথে যেন কনফ্লিক্ট না হয়
+                
+                quizStartMessage.textContent = `Ready to test yourself on ${mcqData.length} MCQs?`;
+                quizStartBtn.classList.remove('hidden');
+                
+                const newStartBtn = quizStartBtn.cloneNode(true);
+                quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
+                newStartBtn.addEventListener('click', runQuizGame);
+                quizStartBtn = newStartBtn; 
+                
+            } catch (error) {
+                console.error("Error loading MCQ quiz data:", error);
+                quizStartMessage.textContent = "Could not load quiz data. Please try again.";
+            }
+        }
+
+        // --- END: NEW MCQ FEATURE LOGIC ---
     </script>
 </body>
 </html>
