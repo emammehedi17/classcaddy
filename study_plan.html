@@ -855,6 +855,59 @@
             color: #059669; /* emerald-600 */
         }
         /* --- END: VIEW MCQ MODAL STYLES --- */
+		
+		/* --- START: MCQ QUIZ CENTER STYLES --- */
+        #mcq-quiz-center-content h3 { /* Month Header */
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937; /* gray-800 */
+            margin-top: 1rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 2px solid #10b981; /* emerald-500 */
+        }
+        #mcq-quiz-center-content h3:first-child {
+            margin-top: 0;
+        }
+        #mcq-quiz-center-content h4 { /* Week Header */
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151; /* gray-700 */
+            margin-top: 0.75rem;
+            margin-left: 0.5rem;
+        }
+        .mcq-center-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 6px;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+        .mcq-center-btn.month-btn { /* Month Total Button */
+            background-color: #d1fae5; /* emerald-100 */
+            color: #065f46; /* emerald-800 */
+            border: 1px solid #a7f3d0; /* emerald-200 */
+        }
+        .mcq-center-btn.week-btn { /* Week Total Button */
+            background-color: #eef2ff; /* indigo-50 */
+            color: #3730a3; /* indigo-800 */
+            border: 1px solid #c7d2fe; /* indigo-200 */
+            margin-left: 0.5rem;
+        }
+        .mcq-center-btn.day-btn { /* Day Button */
+            background-color: #f9fafb; /* gray-50 */
+            color: #374151; /* gray-700 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            margin-left: 1rem;
+        }
+        .mcq-center-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        /* --- END: MCQ QUIZ CENTER STYLES --- */
 
     </style>
 </head>
@@ -955,7 +1008,11 @@
                  <div id="month-nav-buttons" class="flex-grow flex flex-wrap gap-2">
                      </div>
                 <div class="ml-auto flex-shrink-0 flex gap-2">
-                     <button id="show-all-vocab-btn" class="action-button action-button-secondary flex items-center gap-1.5">
+                     <button id="show-master-mcq-btn" class="action-button action-button-secondary flex items-center gap-1.5">
+                        <i class="fas fa-tasks text-sm"></i> MCQ List
+                     </button>
+					 
+					 <button id="show-all-vocab-btn" class="action-button action-button-secondary flex items-center gap-1.5">
                         <i class="fas fa-book-open text-sm"></i> Vocab List
                      </button>
                      <button id="add-month-btn" class="action-button flex items-center gap-1.5">
@@ -1172,6 +1229,38 @@
         </div>
         <div id="view-mcq-content" class="kalpurush" style="overflow-y: auto; flex-grow: 1; padding-top: 1.25rem;">
             </div>
+      </div>
+    </div>
+    <div id="master-mcq-modal" class="modal">
+      <div class="modal-content" style="max-width: 700px; max-height: 80vh; display: flex; flex-direction: column;">
+        
+        <div class="modal-header-sticky">
+          <h3 class="text-2xl font-semibold text-emerald-600">Master MCQ List</h3>
+          <span class="modal-close" onclick="closeModal('master-mcq-modal')">&times;</span>
+        </div>
+        
+        <div id="master-mcq-content" class="kalpurush" style="overflow-y: auto; flex-grow: 1; padding-top: 1.25rem;">
+            </div>
+
+        <div id="mcq-modal-footer" class="modal-footer-sticky" style="display: flex; justify-content: space-between; align-items: center;">
+            <button id="show-mcq-quiz-center-btn" class="action-button" style="background-color: #4f46e5;">
+                <i class="fas fa-brain mr-1.5"></i> Test Yourself
+            </button>
+            <span>
+                Total MCQs: <span id="total-mcq-count" class="font-bold">0</span>
+            </span>
+        </div>
+
+      </div>
+    </div>
+    <div id="mcq-quiz-center-modal" class="modal">
+      <div class="modal-content" style="max-width: 500px;">
+        <span class="modal-close" onclick="closeModal('mcq-quiz-center-modal')">&times;</span>
+        <h3 class="text-2xl font-semibold mb-5 text-indigo-600">MCQ Quiz Center</h3>
+        
+        <div id="mcq-quiz-center-content" class="kalpurush" style="max-height: 60vh; overflow-y: auto; padding-top: 5px;">
+            </div>
+        
       </div>
     </div>
     <script type="module">
@@ -4070,6 +4159,293 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         // --- END: NEW MCQ FEATURE LOGIC ---
+		
+		// --- START: NEW MASTER MCQ LIST & QUIZ CENTER LOGIC ---
+
+        // 1. DOM Elements
+        const masterMcqModal = document.getElementById('master-mcq-modal');
+        const masterMcqContent = document.getElementById('master-mcq-content');
+        const totalMcqCountSpan = document.getElementById('total-mcq-count');
+        const mcqQuizCenterModal = document.getElementById('mcq-quiz-center-modal');
+        const mcqQuizCenterContent = document.getElementById('mcq-quiz-center-content');
+
+        // 2. Add listener to the main "MCQ List" header button
+        document.getElementById('show-master-mcq-btn').addEventListener('click', displayMasterMcqList);
+
+        // 3. Function to open and populate the Master MCQ List
+        async function displayMasterMcqList() {
+            if (!currentUser || !userId) {
+                showCustomAlert("Please log in to see your MCQ list.");
+                return;
+            }
+
+            masterMcqModal.style.display = "block";
+            masterMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading all MCQs...</p>';
+            totalMcqCountSpan.textContent = "...";
+            setSyncStatus("Loading...", "blue");
+
+            let allMcqsHtml = '';
+            let totalMcqCount = 0;
+
+            try {
+                const plansCollectionPath = getUserPlansCollectionPath();
+                const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    masterMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">No study plans found.</p>';
+                    totalMcqCountSpan.textContent = "0";
+                    return;
+                }
+
+                for (const docSnap of querySnapshot.docs) {
+                    const monthId = docSnap.id;
+                    const monthData = docSnap.data();
+                    const monthName = monthData.monthName || monthId;
+
+                    let monthHasMcqs = false;
+                    let monthHtml = `<h3>${monthName}</h3>`; // Use <h3> for month
+
+                    for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
+                        const weekData = monthData.weeks?.[weekId];
+                        if (!weekData || !weekData.days) continue;
+
+                        let weekHasMcqs = false;
+                        let weekHtml = `<h4>${weekId.replace('week', 'Week ')}</h4>`; // Use <h4> for week
+
+                        for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
+                            const day = weekData.days[dayIndex];
+                            
+                            let dayHasMcqs = false;
+                            let dayHtml = `<h5>Day ${day.dayNumber}</h5>`; // Use <h5> for day
+                            
+                            for (const row of day.rows) {
+                                if (row.mcqData && row.mcqData.length > 0) {
+                                    monthHasMcqs = true;
+                                    weekHasMcqs = true;
+                                    dayHasMcqs = true;
+                                    
+                                    totalMcqCount += row.mcqData.length;
+                                    
+                                    row.mcqData.forEach((mcq, index) => {
+                                        dayHtml += `
+                                            <div class="mcq-item">
+                                                <p class="mcq-question">${index + 1}. ${escapeHtml(mcq.question)}</p>
+                                                <ol class="mcq-options">
+                                                    ${mcq.options.map((opt, i) => `
+                                                        <li class="mcq-option ${opt === mcq.correctAnswer ? 'mcq-correct-answer' : ''}">
+                                                            ${['ক', 'খ', 'গ', 'ঘ'][i]}. ${escapeHtml(opt)}
+                                                        </li>
+                                                    `).join('')}
+                                                </ol>
+                                                <p class="mcq-final-answer">সঠিক উত্তর: ${escapeHtml(mcq.correctAnswer)}</p>
+                                            </div>
+                                        `;
+                                    });
+                                }
+                            }
+                            if (dayHasMcqs) weekHtml += dayHtml;
+                        }
+                        if (weekHasMcqs) monthHtml += weekHtml;
+                    }
+                    if (monthHasMcqs) allMcqsHtml += monthHtml;
+                }
+
+                if (totalMcqCount === 0) {
+                    masterMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">You have not added any MCQs to your study plans yet.</p>';
+                } else {
+                    masterMcqContent.innerHTML = allMcqsHtml;
+                }
+                totalMcqCountSpan.textContent = totalMcqCount;
+                setSyncStatus("Synced", "green");
+
+            } catch (error) {
+                console.error("Error fetching all MCQs:", error);
+                masterMcqContent.innerHTML = '<p class="text-center text-red-500 py-10">Could not load MCQs. Please try again.</p>';
+                totalMcqCountSpan.textContent = "Error";
+                setSyncStatus("Error", "red");
+            }
+        }
+
+        // 4. Add listener for the "Test Yourself" button in the Master MCQ List
+        document.getElementById('show-mcq-quiz-center-btn').addEventListener('click', openMcqQuizCenter);
+
+        // 5. Function to build the MCQ Quiz Center
+        async function openMcqQuizCenter() {
+            mcqQuizCenterModal.style.display = "block";
+            mcqQuizCenterContent.innerHTML = '<p class="text-center text-gray-500 italic py-5">Loading available quizzes...</p>';
+
+            let quizCenterHtml = '';
+            let quizzesFound = 0;
+
+            try {
+                const plansCollectionPath = getUserPlansCollectionPath();
+                const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+                const querySnapshot = await getDocs(q);
+
+                for (const docSnap of querySnapshot.docs) {
+                    const monthId = docSnap.id;
+                    const monthData = docSnap.data();
+                    const monthName = monthData.monthName || monthId;
+
+                    let monthMcqs = [];
+                    let monthHtml = `<h3>${monthName}</h3>`;
+                    let monthHasMcqs = false;
+
+                    for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
+                        const weekData = monthData.weeks?.[weekId];
+                        if (!weekData || !weekData.days) continue;
+
+                        let weekMcqs = [];
+                        let weekHtml = `<h4>${weekId.replace('week', 'Week ')}</h4>`;
+                        let weekHasMcqs = false;
+
+                        for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
+                            const day = weekData.days[dayIndex];
+                            let dayMcqs = [];
+
+                            for (const row of day.rows) {
+                                if (row.mcqData && row.mcqData.length > 0) {
+                                    dayMcqs.push(...row.mcqData);
+                                }
+                            }
+
+                            if (dayMcqs.length > 0) {
+                                quizzesFound++;
+                                monthHasMcqs = true;
+                                weekHasMcqs = true;
+                                weekMcqs.push(...dayMcqs);
+                                // Add Day Button
+                                weekHtml += `<button class="mcq-center-btn day-btn" data-quiz-type="day" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}">
+                                    Day ${day.dayNumber} (${dayMcqs.length} MCQs)
+                                </button>`;
+                            }
+                        }
+
+                        if (weekHasMcqs) {
+                            monthMcqs.push(...weekMcqs);
+                            // Add Week Total Button
+                            weekHtml = `
+                                <h4>${weekId.replace('week', 'Week ')}</h4>
+                                <button class="mcq-center-btn week-btn" data-quiz-type="week" data-month-id="${monthId}" data-week-id="${weekId}">
+                                    Test All Week ${weekId.replace('week', '')} MCQs (${weekMcqs.length})
+                                </button>
+                                ${weekHtml.substring(weekHtml.indexOf('</h4>') + 5)}
+                            `;
+                            monthHtml += weekHtml;
+                        }
+                    }
+
+                    if (monthHasMcqs) {
+                        // Add Month Total Button
+                        monthHtml = `
+                            <h3>${monthName}</h3>
+                            <button class="mcq-center-btn month-btn" data-quiz-type="month" data-month-id="${monthId}">
+                                Test All ${monthName} MCQs (${monthMcqs.length})
+                            </button>
+                            ${monthHtml.substring(monthHtml.indexOf('</h3>') + 5)}
+                        `;
+                        quizCenterHtml += monthHtml;
+                    }
+                }
+
+                if (quizzesFound === 0) {
+                    mcqQuizCenterContent.innerHTML = '<p class="text-center text-gray-500 italic py-5">No MCQ quizzes available. Add MCQs to any day to start.</p>';
+                } else {
+                    mcqQuizCenterContent.innerHTML = quizCenterHtml;
+                }
+
+            } catch (error) {
+                console.error("Error loading MCQ quizzes:", error);
+                mcqQuizCenterContent.innerHTML = '<p class="text-center text-red-500 py-5">Could not load quizzes.</p>';
+            }
+        }
+
+        // 6. Add listener for the new MCQ Quiz Center buttons
+        mcqQuizCenterContent.addEventListener('click', (e) => {
+            const button = e.target.closest('.mcq-center-btn');
+            if (button) {
+                const { quizType, monthId, weekId, dayIndex } = button.dataset;
+                startAggregatedMcqQuiz(quizType, monthId, weekId, dayIndex);
+            }
+        });
+
+        // 7. Function to start a quiz (day, week, or month)
+        async function startAggregatedMcqQuiz(quizType, monthId, weekId = null, dayIndex = null) {
+            closeModal('mcq-quiz-center-modal');
+            
+            quizModal.style.display = "block";
+            quizMainScreen.classList.add('hidden');
+            quizResultsScreen.classList.add('hidden');
+            quizStartScreen.classList.remove('hidden');
+            
+            quizStartMessage.textContent = `Loading ${quizType} quiz...`;
+            quizStartBtn.classList.add('hidden');
+
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                const monthData = docSnap.data();
+                let aggregatedMcqs = [];
+                let quizTitle = '';
+
+                if (quizType === 'day') {
+                    const day = monthData.weeks?.[weekId]?.days?.[dayIndex];
+                    if (!day) throw new Error("Day data not found.");
+                    for (const row of day.rows) {
+                        if (row.mcqData) aggregatedMcqs.push(...row.mcqData);
+                    }
+                    quizTitle = `Day ${day.dayNumber} - ${weekId.replace('week', 'Week ')}`;
+                    
+                } else if (quizType === 'week') {
+                    const week = monthData.weeks?.[weekId];
+                    if (!week) throw new Error("Week data not found.");
+                    for (const day of week.days) {
+                        for (const row of day.rows) {
+                            if (row.mcqData) aggregatedMcqs.push(...row.mcqData);
+                        }
+                    }
+                    quizTitle = `${weekId.replace('week', 'Week ')} - ${monthData.monthName}`;
+                    
+                } else if (quizType === 'month') {
+                    for (const wId of ['week1', 'week2', 'week3', 'week4']) {
+                        const week = monthData.weeks?.[wId];
+                        if (week && week.days) {
+                            for (const day of week.days) {
+                                for (const row of day.rows) {
+                                    if (row.mcqData) aggregatedMcqs.push(...row.mcqData);
+                                }
+                            }
+                        }
+                    }
+                    quizTitle = `${monthData.monthName} - All MCQs`;
+                }
+
+                if (aggregatedMcqs.length === 0) {
+                    quizStartMessage.textContent = "No MCQs found for this selection.";
+                    return;
+                }
+                
+                currentMcqData = aggregatedMcqs; 
+                currentVocabData = null; 
+                
+                quizStartMessage.textContent = `Ready to test yourself on ${aggregatedMcqs.length} MCQs from: ${quizTitle}?`;
+                quizStartBtn.classList.remove('hidden');
+                
+                const newStartBtn = quizStartBtn.cloneNode(true);
+                quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
+                newStartBtn.addEventListener('click', runQuizGame);
+                quizStartBtn = newStartBtn; 
+                
+            } catch (error) {
+                console.error("Error loading aggregated MCQ quiz data:", error);
+                quizStartMessage.textContent = "Could not load quiz data. Please try again.";
+            }
+        }
+
+        // --- END: NEW MASTER MCQ LIST & QUIZ CENTER LOGIC ---
     </script>
 </body>
 </html>
