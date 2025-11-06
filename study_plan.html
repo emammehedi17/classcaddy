@@ -1219,6 +1219,9 @@
             <p class="text-sm font-medium text-red-600 -mt-2 mb-6">
                 <i class="fas fa-exclamation-triangle mr-1"></i> Warning: 0.25 marks will be deducted for each wrong answer.
             </p>
+			<p id="quiz-total-time-warning" class="text-sm font-medium text-blue-600 -mt-2 mb-6" style="display: none;">
+                <i class="fas fa-clock mr-1"></i> You will be given <span class="font-bold">00:00:00</span> to finish the test.
+            </p>
             <button id="quiz-start-btn" class="hidden action-button" style="background-color: #4f46e5; padding: 10px 24px; font-size: 1rem;">
                 <i class="fas fa-play mr-2"></i>Start Quiz
             </button>
@@ -1227,6 +1230,11 @@
         <div id="quiz-main-screen" class="hidden">
             <div class="flex justify-between items-center mb-6">
                 <div id="quiz-question-number" class="text-lg font-bold text-indigo-600">Question 1/10</div>
+                
+                <div id="quiz-timer" class="text-xl font-bold text-red-600" style="font-family: 'Courier New', monospace;">
+                    00:00
+                </div>
+                
                 <div id="quiz-score" class="text-lg font-bold text-gray-700">Score: 0</div>
             </div>
             <h2 id="quiz-question-text" class="text-xl sm:text-2xl font-semibold text-gray-900 mb-6 min-h-[60px]">
@@ -1492,6 +1500,7 @@
         let currentQuizQuestions = [];
         let currentQuizQuestionIndex = 0;
         let currentQuizScore = 0;
+		let quizTimerInterval = null;
         // --- END: QUIZ STATE VARIABLES ---
 
         // --- Header Navigation & Scroll Logic (from script.js) ---
@@ -3547,8 +3556,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         /**
          * Fetches vocab data and prepares the quiz modal.
          */
+        // UPGRADED: Generates questions first to set timer
         async function startQuiz(monthId, weekId, dayIndex, rowIndex) {
-			quizTitle.textContent = 'Vocabulary Quiz';
+            quizTitle.textContent = 'Vocabulary Quiz';
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.add('hidden');
@@ -3556,33 +3566,38 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             quizStartMessage.textContent = "Loading vocabulary...";
             quizStartBtn.classList.add('hidden');
-            
+            document.getElementById('quiz-total-time-warning').style.display = 'none';
+
             try {
                 const docRef = doc(db, getUserPlansCollectionPath(), monthId);
                 const docSnap = await getDoc(docRef);
-                
                 if (!docSnap.exists()) throw new Error("Month document not found.");
                 
                 const vocabData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex]?.vocabData;
-                
                 if (!vocabData || vocabData.length < 4) {
-                    quizStartMessage.textContent = "You need at least 4 vocabulary words in this day's list to start a quiz.";
-                    quizStartBtn.classList.add('hidden');
+                    quizStartMessage.textContent = "You need at least 4 vocabulary words to start a quiz.";
                     return;
                 }
                 
-                // --- MODIFIED: Pre-process the vocab for synonyms ---
+                // --- TIMER LOGIC: Generate questions NOW ---
                 currentVocabData = preProcessVocab(vocabData);
-                currentMcqData = null; // Signal this is a vocab quiz
+                currentMcqData = null;
+                currentQuizQuestions = generateQuizData(currentVocabData); // Generate questions
                 
+                const totalQuestions = currentQuizQuestions.length;
+                const totalTimeInSeconds = totalQuestions * 36;
+                
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
+                // --- END TIMER LOGIC ---
+
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words?`;
                 quizStartBtn.classList.remove('hidden');
                 
-                // Remove old listener and add a new one to prevent duplicates
                 const newStartBtn = quizStartBtn.cloneNode(true);
                 quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
                 newStartBtn.addEventListener('click', runQuizGame);
-                // Re-assign global var to new button
                 quizStartBtn = newStartBtn; 
                 
             } catch (error) {
@@ -3686,6 +3701,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             return shuffleArray(questions);
         }
 
+        
         /**
          * Resets state and starts the quiz game.
          */
@@ -3694,36 +3710,57 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizResultsScreen.classList.add('hidden');
             quizMainScreen.classList.remove('hidden');
 
-            // --- START: NEW GENERATION LOGIC ---
-            if (currentVocabData) {
-                // It's a Vocab quiz
-                currentQuizQuestions = generateQuizData(currentVocabData);
-            } else if (currentMcqData) {
-                // It's an MCQ quiz
-                currentQuizQuestions = currentMcqData.map(mcq => ({
-                    question: mcq.question,
-                    options: shuffleArray([...mcq.options]), // Re-shuffle options
-                    correctAnswer: mcq.correctAnswer,
-                    userAnswer: null, // Reset answer
-                    isCorrect: null // Reset status
-                }));
-            } else {
-                // No data, something went wrong
-                console.error("runQuizGame called, but no vocab or MCQ data is loaded.");
-                return;
-            }
-            // --- END: NEW GENERATION LOGIC ---
+            // --- REMOVED: Question generation is now done *before* this ---
+            // We just need to shuffle the questions that are already generated
+            currentQuizQuestions = shuffleArray(currentQuizQuestions);
 
             // Reset state
             currentQuizQuestionIndex = 0;
             currentQuizScore = 0;
 
             quizScoreEl.textContent = `Score: 0.00`;
-            quizRestartBtn.onclick = runQuizGame; // Hook up "Try Again"
+            quizRestartBtn.onclick = runQuizGame;
+            
+            // --- START: TIMER LOGIC ---
+            const totalQuestions = currentQuizQuestions.length;
+            const totalTimeInSeconds = totalQuestions * 36;
+            startTimer(totalTimeInSeconds); // Start the countdown!
+            // --- END: TIMER LOGIC ---
             
             loadQuizQuestion();
         }
 
+		/**
+         * NEW: Starts the countdown timer
+         */
+        function startTimer(totalSeconds) {
+            if (quizTimerInterval) clearInterval(quizTimerInterval); // Clear any old timer
+
+            let remaining = totalSeconds;
+            const timerEl = document.getElementById('quiz-timer');
+            
+            timerEl.textContent = formatTime(remaining); // Show initial time
+            timerEl.style.color = '#374151'; // Reset to default color (gray-700)
+
+            quizTimerInterval = setInterval(() => {
+                remaining--;
+                timerEl.textContent = formatTime(remaining);
+                
+                // Make timer red in the last 10 seconds
+                if (remaining <= 10 && remaining > 0) {
+                    timerEl.style.color = '#ef4444'; // red-500
+                }
+                
+                // TIME'S UP!
+                if (remaining <= 0) {
+                    clearInterval(quizTimerInterval);
+                    timerEl.textContent = "Time's Up!";
+                    showCustomAlert("Time's up! Showing your results.", "error");
+                    showQuizResults(); // Auto-submit the quiz
+                }
+            }, 1000);
+        }
+		
         /**
          * Displays the current question and options.
          */
@@ -3826,6 +3863,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          * Shows the final score.
          */
         function showQuizResults() {
+			if (quizTimerInterval) clearInterval(quizTimerInterval);
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.remove('hidden');
 
@@ -3898,6 +3936,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             // 1. "Quit" Button (Gray)
             // Quits the quiz, closes both modals
             quitBtn.onclick = () => {
+				if (quizTimerInterval) clearInterval(quizTimerInterval);
                 modal.style.display = 'none';
                 closeModal('quiz-modal'); // Close the main quiz modal
             };
@@ -4010,10 +4049,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         });
 
         // 4. Function to start a week-long quiz
+        // UPGRADED: Generates questions first to set timer
         async function startWeekQuiz(monthId, weekId) {
-			quizTitle.textContent = 'Vocabulary Quiz';
+            quizTitle.textContent = 'Vocabulary Quiz';
             closeModal('quiz-center-modal');
-            
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.add('hidden');
@@ -4021,6 +4060,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             quizStartMessage.textContent = "Loading week's vocabulary...";
             quizStartBtn.classList.add('hidden');
+            document.getElementById('quiz-total-time-warning').style.display = 'none';
 
             try {
                 const docRef = doc(db, getUserPlansCollectionPath(), monthId);
@@ -4038,16 +4078,24 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         }
                     }
                 }
-                
                 if (allWeekVocab.length < 4) {
-                    quizStartMessage.textContent = "You need at least 4 vocabulary words in this week's list to start a quiz.";
+                    quizStartMessage.textContent = "You need at least 4 vocabulary words to start a quiz.";
                     return;
                 }
 
-                // --- NEW: PRE-PROCESS THE VOCAB ---
+                // --- TIMER LOGIC: Generate questions NOW ---
                 currentVocabData = preProcessVocab(allWeekVocab);
-                currentMcqData = null; // Signal this is a vocab quiz
+                currentMcqData = null;
+                currentQuizQuestions = generateQuizData(currentVocabData); // Generate questions
                 
+                const totalQuestions = currentQuizQuestions.length;
+                const totalTimeInSeconds = totalQuestions * 36;
+                
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
+                // --- END TIMER LOGIC ---
+
                 quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week?`;
                 quizStartBtn.classList.remove('hidden');
                 
@@ -4254,8 +4302,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         // 5. "MCQ Test" বাটনে ক্লিক করলে (UPGRADED)
-        async function startMcqQuiz(monthId, weekId, dayIndex) { // <-- rowIndex সরানো হয়েছে
-			quizTitle.textContent = 'MCQ Quiz';
+        // UPGRADED: Generates questions first to set timer
+        async function startMcqQuiz(monthId, weekId, dayIndex) {
+            quizTitle.textContent = 'MCQ Quiz';
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.add('hidden');
@@ -4263,24 +4312,37 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             quizStartMessage.textContent = "Loading MCQ Quiz...";
             quizStartBtn.classList.add('hidden');
+            document.getElementById('quiz-total-time-warning').style.display = 'none';
 
             try {
                 const docRef = doc(db, getUserPlansCollectionPath(), monthId);
                 const docSnap = await getDoc(docRef);
                 if (!docSnap.exists()) throw new Error("Month document not found.");
 
-                // --- MODIFIED: Get data from DAY object ---
                 const mcqData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.mcqData;
-
                 if (!mcqData || mcqData.length < 1) { 
                     quizStartMessage.textContent = "No MCQs found to start a quiz.";
                     return;
                 }
 
-                // --- START MODIFIED BLOCK ---
+                // --- TIMER LOGIC: Generate questions NOW ---
                 currentMcqData = mcqData; 
-                currentVocabData = null; // Signal this is an MCQ quiz
-                // --- END MODIFIED BLOCK ---
+                currentVocabData = null;
+                currentQuizQuestions = currentMcqData.map(mcq => ({ // Generate questions
+                    question: mcq.question,
+                    options: shuffleArray([...mcq.options]),
+                    correctAnswer: mcq.correctAnswer,
+                    userAnswer: null,
+                    isCorrect: null
+                }));
+                
+                const totalQuestions = currentQuizQuestions.length;
+                const totalTimeInSeconds = totalQuestions * 36;
+                
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
+                // --- END TIMER LOGIC ---
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${mcqData.length} MCQs?`;
                 quizStartBtn.classList.remove('hidden');
@@ -4523,10 +4585,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         });
 
         // 7. Function to start a quiz (day, week, or month) (LOGIC FIXED)
+        // UPGRADED: Generates questions first to set timer
         async function startAggregatedMcqQuiz(quizType, monthId, weekId = null, dayIndex = null) {
-			quizTitle.textContent = 'MCQ Quiz';
+            quizTitle.textContent = 'MCQ Quiz';
             closeModal('mcq-quiz-center-modal');
-            
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.add('hidden');
@@ -4534,6 +4596,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             quizStartMessage.textContent = `Loading ${quizType} quiz...`;
             quizStartBtn.classList.add('hidden');
+            document.getElementById('quiz-total-time-warning').style.display = 'none';
 
             try {
                 const docRef = doc(db, getUserPlansCollectionPath(), monthId);
@@ -4545,23 +4608,21 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 let quizTitle = '';
 
                 if (quizType === 'day') {
+                    // ... (day logic) ...
                     const day = monthData.weeks?.[weekId]?.days?.[dayIndex];
                     if (!day) throw new Error("Day data not found.");
-                    // --- LOGIC FIX ---
                     if (day.mcqData) aggregatedMcqs.push(...day.mcqData);
                     quizTitle = `Day ${day.dayNumber} - ${weekId.replace('week', 'Week ')}`;
-                    
                 } else if (quizType === 'week') {
+                    // ... (week logic) ...
                     const week = monthData.weeks?.[weekId];
                     if (!week) throw new Error("Week data not found.");
-                    // --- LOGIC FIX ---
                     for (const day of week.days) {
                         if (day.mcqData) aggregatedMcqs.push(...day.mcqData);
                     }
                     quizTitle = `${weekId.replace('week', 'Week ')} - ${monthData.monthName}`;
-                    
                 } else if (quizType === 'month') {
-                    // --- LOGIC FIX ---
+                    // ... (month logic) ...
                     for (const wId of ['week1', 'week2', 'week3', 'week4']) {
                         const week = monthData.weeks?.[wId];
                         if (week && week.days) {
@@ -4578,8 +4639,24 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     return;
                 }
                 
+                // --- TIMER LOGIC: Generate questions NOW ---
                 currentMcqData = aggregatedMcqs; 
-                currentVocabData = null; 
+                currentVocabData = null;
+                currentQuizQuestions = currentMcqData.map(mcq => ({ // Generate questions
+                    question: mcq.question,
+                    options: shuffleArray([...mcq.options]),
+                    correctAnswer: mcq.correctAnswer,
+                    userAnswer: null,
+                    isCorrect: null
+                }));
+                
+                const totalQuestions = currentQuizQuestions.length;
+                const totalTimeInSeconds = totalQuestions * 36;
+                
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
+                // --- END TIMER LOGIC ---
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${aggregatedMcqs.length} MCQs from: ${quizTitle}?`;
                 quizStartBtn.classList.remove('hidden');
@@ -4596,6 +4673,23 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         // --- END: NEW MASTER MCQ LIST & QUIZ CENTER LOGIC ---
+		
+		// --- START: NEW TIMER HELPER FUNCTIONS ---
+        function pad(num) {
+            return num.toString().padStart(2, '0');
+        }
+
+        function formatTime(totalSeconds) {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            
+            if (hours > 0) {
+                return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+            }
+            return `${pad(minutes)}:${pad(seconds)}`;
+        }
+        // --- END: NEW TIMER HELPER FUNCTIONS ---
     </script>
 </body>
 </html>
