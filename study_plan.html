@@ -4110,7 +4110,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             }
         });
 
-        // 3. ✨ The Magic Parser Function (Regex) ✨
+        // 3. ✨ The Magic Parser Function (Regex) - (UPGRADED)
         function parseMcqText(text) {
             const mcqData = [];
             // এই Regex টি আপনার দেওয়া ফরম্যাট অনুযায়ী প্রশ্ন, অপশন এবং উত্তর খুঁজে বের করবে
@@ -4128,32 +4128,31 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     ];
                     
                     const correctPrefix = match[6].trim(); // ক, খ, গ, বা ঘ
-                    const correctAnswerText = match[7].trim(); // উত্তরটি
                     
+                    // --- START: LOGIC FIX ---
+                    // আমরা এখন আর টেক্সট মিলিয়ে দেখবো না।
+                    // আমরা সরাসরি প্রিফিক্সের ওপর বিশ্বাস করবো।
                     let correctAnswer;
-                    
-                    // সঠিক উত্তর কোনটি তা ম্যাচ করি
-                    if (correctPrefix === 'ক' && options[0] === correctAnswerText) {
+                    if (correctPrefix === 'ক') {
                         correctAnswer = options[0];
-                    } else if (correctPrefix === 'খ' && options[1] === correctAnswerText) {
+                    } else if (correctPrefix === 'খ') {
                         correctAnswer = options[1];
-                    } else if (correctPrefix === 'গ' && options[2] === correctAnswerText) {
+                    } else if (correctPrefix === 'গ') {
                         correctAnswer = options[2];
-                    } else if (correctPrefix === 'ঘ' && options[3] === correctAnswerText) {
+                    } else if (correctPrefix === 'ঘ') {
                         correctAnswer = options[3];
                     } else {
-                        // যদি প্রিফিক্স এবং টেক্সট না মেলে (যেমন: "সঠিক উত্তর: খ. বিপ্লব", কিন্তু 'খ' তে আছে 'পুনর্জাগরণ')
-                        // আমরা টেক্সট-কেই সঠিক বলে ধরে নেবো
-                        correctAnswer = correctAnswerText;
-                        if (!options.includes(correctAnswer)) {
-                             console.warn("Correct answer text not found in options, but adding it:", question, correctAnswer);
-                        }
+                        // যদি কোনো কারণে প্রিফিক্স না মেলে (যদিও regex এটা হতে দেবে না)
+                        // আমরা আগের মতো টেক্সট ব্যবহারের চেষ্টা করবো
+                        correctAnswer = match[7].trim();
+                         console.warn("Could not match prefix, using text as fallback.");
                     }
+                    // --- END: LOGIC FIX ---
 
                     mcqData.push({
                         question: question,
                         options: options,
-                        correctAnswer: correctAnswer
+                        correctAnswer: correctAnswer // সেভ করা উত্তরটি এখন পরিষ্কার এবং সঠিক
                     });
                 } catch (e) {
                     console.error("Failed to parse one MCQ block:", e, match);
