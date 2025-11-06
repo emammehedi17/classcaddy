@@ -3742,7 +3742,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
         
         /**
-         * Handles the user's answer selection.
+         * Handles the user's answer selection. (UPGRADED with Auto-Advance)
          */
         function selectQuizAnswer(selectedButton, selectedOption) {
             const q = currentQuizQuestions[currentQuizQuestionIndex];
@@ -3752,10 +3752,11 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
             // Store the answer
             q.userAnswer = selectedOption;
-            q.isCorrect = (selectedOption === q.correctAnswer);
+            const isCorrect = (selectedOption === q.correctAnswer); // Check correctness
+            q.isCorrect = isCorrect;
             
             // Apply scoring
-            if (q.isCorrect) {
+            if (isCorrect) {
                 currentQuizScore++;
             } else {
                 currentQuizScore -= 0.25;
@@ -3772,9 +3773,28 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
             });
             
-            // Update button states
-            quizNextBtn.disabled = false;
-            quizSkipBtn.hidden = true;
+            // --- START: NEW AUTO-ADVANCE LOGIC ---
+            if (isCorrect) {
+                // Answer is correct: Hide "Skip" and wait 1 second, then auto-advance
+                quizSkipBtn.hidden = true;
+                quizNextBtn.disabled = true; // Prevent clicking "Next" during the delay
+                
+                setTimeout(() => {
+                    // Logic copied from the 'quizNextBtn' listener
+                    currentQuizQuestionIndex++;
+                    if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
+                        showQuizResults();
+                    } else {
+                        loadQuizQuestion();
+                    }
+                }, 1000); // 1-second (1000ms) delay to show the correct answer
+                
+            } else {
+                // Answer is wrong: Stay on the page and enable "Next"
+                quizNextBtn.disabled = false;
+                quizSkipBtn.hidden = true;
+            }
+            // --- END: NEW AUTO-ADVANCE LOGIC ---
         }
 
         /**
