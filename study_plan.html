@@ -1455,7 +1455,7 @@
         googleLoginBtn.addEventListener('click', async () => { 
             try { 
                 console.log("Using signInWithRedirect for all devices to avoid COOP error.");
-                await signInWithPopup(auth, googleProvider);
+                await signInWithRedirect(auth, googleProvider);
 
             } catch (error) { 
                 console.error("Google Sign-In Error:", error); 
@@ -2457,7 +2457,7 @@
 
                      updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null, mcqData: mcqData || null });
                 });
-                });
+                
 
                  daysArray[dayIndex].rows = updatedRows;
                 const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
@@ -3849,7 +3849,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         rawText = mcqData.map((mcq, index) => {
                             const options = mcq.options.map((opt, i) => `${['ক', 'খ', 'গ', 'ঘ'][i]}. ${opt}`).join('\n');
                             const correctPrefix = ['ক', 'খ', 'গ', 'ঘ'][mcq.options.indexOf(mcq.correctAnswer)];
-                            return `${['০১', '০২', '০৩', '০৪', '০৫', '০৬', '০৭', '০৮', '০৯'][index] || (index + 1)}.\s${mcq.question}\n${options}\nসঠিক উত্তর: ${correctPrefix}. ${mcq.correctAnswer}`;
+                            return `${['০১', '০২', '০৩', '০৪', '০৫', '০৬', '০৭', '০৮', '০৯'][index] || (index + 1)}. ${mcq.question}\n${options}\nসঠিক উত্তর: ${correctPrefix}. ${mcq.correctAnswer}`;
                         }).join('\n');
                     }
                 }
@@ -3860,7 +3860,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 setSyncStatus("Error", "red");
             }
 
-            mcqPasteTextarea.value = ''; // ইউজারকে প্রতিবার নতুন করে পেস্ট করতে হবে
+
             addMcqModal.style.display = 'block';
         }
 
