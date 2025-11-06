@@ -908,6 +908,89 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         /* --- END: MCQ QUIZ CENTER STYLES --- */
+		
+		/* --- START: MASTER MCQ LIST STYLES --- */
+        #master-mcq-content .month-container {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-radius: 8px;
+            margin-bottom: 1.5rem; /* mb-6 */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            overflow: hidden; /* To contain the rounded corners */
+        }
+        #master-mcq-content .month-header {
+            background-color: #ecfdf5; /* emerald-50 */
+            color: #065f46; /* emerald-800 */
+            padding: 12px 16px;
+            font-size: 1.25rem; /* xl */
+            font-weight: 600; /* semibold */
+            border-bottom: 1px solid #d1fae5; /* emerald-200 */
+        }
+        #master-mcq-content .week-container {
+            padding: 16px;
+            border-bottom: 1px solid #f3f4f6; /* gray-100 */
+        }
+        #master-mcq-content .week-container:last-child {
+            border-bottom: none;
+        }
+        #master-mcq-content .week-header {
+            background-color: #f9fafb; /* gray-50 */
+            color: #374151; /* gray-700 */
+            padding: 8px 12px;
+            font-size: 1rem; /* lg */
+            font-weight: 600; /* semibold */
+            border-radius: 6px;
+            border: 1px solid #e5e7eb; /* gray-200 */
+            margin-bottom: 0.75rem; /* mb-3 */
+        }
+        #master-mcq-content .day-container {
+            padding-left: 12px;
+            margin-top: 0.75rem; /* mb-3 */
+            border-left: 3px solid #e0e7ff; /* indigo-200 */
+        }
+        #master-mcq-content .day-header {
+            font-size: 0.9rem; /* sm */
+            font-weight: 500; /* medium */
+            color: #4338ca; /* indigo-700 */
+            margin-bottom: 0.5rem; /* mb-2 */
+        }
+
+        /* Re-using the mcq-item styles from the other modal */
+        #master-mcq-content .mcq-item {
+            padding: 0.75rem; /* p-3 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-radius: 6px;
+            background-color: #ffffff;
+            margin-bottom: 0.75rem; /* mb-3 */
+        }
+        #master-mcq-content .mcq-question {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1f2937; /* gray-800 */
+            margin-bottom: 0.5rem; /* mb-2 */
+        }
+        #master-mcq-content .mcq-options {
+            list-style-type: none;
+            padding-left: 0;
+            margin-bottom: 0.5rem; /* mb-2 */
+        }
+        #master-mcq-content .mcq-option {
+            font-size: 0.875rem; /* sm */
+            color: #4b5563; /* gray-600 */
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        #master-mcq-content .mcq-correct-answer {
+            background-color: #d1fae5; /* emerald-100 */
+            color: #065f46; /* emerald-800 */
+            font-weight: 500;
+        }
+        #master-mcq-content .mcq-final-answer {
+            font-size: 0.875rem; /* sm */
+            font-weight: 500;
+            color: #059669; /* emerald-600 */
+        }
+        /* --- END: MASTER MCQ LIST STYLES --- */
 
     </style>
 </head>
@@ -4172,7 +4255,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         // 2. Add listener to the main "MCQ List" header button
         document.getElementById('show-master-mcq-btn').addEventListener('click', displayMasterMcqList);
 
-        // 3. Function to open and populate the Master MCQ List
+        // 3. Function to open and populate the Master MCQ List (UPGRADED STYLE)
         async function displayMasterMcqList() {
             if (!currentUser || !userId) {
                 showCustomAlert("Please log in to see your MCQ list.");
@@ -4195,6 +4278,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 if (querySnapshot.empty) {
                     masterMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">No study plans found.</p>';
                     totalMcqCountSpan.textContent = "0";
+                    setSyncStatus("Synced", "green"); // Added this
                     return;
                 }
 
@@ -4204,20 +4288,20 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     const monthName = monthData.monthName || monthId;
 
                     let monthHasMcqs = false;
-                    let monthHtml = `<h3>${monthName}</h3>`; // Use <h3> for month
+                    let monthWeekContainerHtml = ''; // Holds the week blocks for this month
 
                     for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
                         const weekData = monthData.weeks?.[weekId];
                         if (!weekData || !weekData.days) continue;
 
                         let weekHasMcqs = false;
-                        let weekHtml = `<h4>${weekId.replace('week', 'Week ')}</h4>`; // Use <h4> for week
+                        let weekDayContainerHtml = ''; // Holds the day blocks for this week
 
                         for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
                             const day = weekData.days[dayIndex];
                             
                             let dayHasMcqs = false;
-                            let dayHtml = `<h5>Day ${day.dayNumber}</h5>`; // Use <h5> for day
+                            let dayMcqItemsHtml = ''; // Holds the mcq items for this day
                             
                             for (const row of day.rows) {
                                 if (row.mcqData && row.mcqData.length > 0) {
@@ -4228,7 +4312,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                                     totalMcqCount += row.mcqData.length;
                                     
                                     row.mcqData.forEach((mcq, index) => {
-                                        dayHtml += `
+                                        // This re-uses the CSS from your other modal
+                                        dayMcqItemsHtml += `
                                             <div class="mcq-item">
                                                 <p class="mcq-question">${index + 1}. ${escapeHtml(mcq.question)}</p>
                                                 <ol class="mcq-options">
@@ -4244,11 +4329,32 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                                     });
                                 }
                             }
-                            if (dayHasMcqs) weekHtml += dayHtml;
+                            if (dayHasMcqs) {
+                                weekDayContainerHtml += `
+                                    <div class="day-container">
+                                        <h5 class="day-header">Day ${day.dayNumber}</h5>
+                                        ${dayMcqItemsHtml}
+                                    </div>
+                                `;
+                            }
                         }
-                        if (weekHasMcqs) monthHtml += weekHtml;
+                        if (weekHasMcqs) {
+                            monthWeekContainerHtml += `
+                                <div class="week-container">
+                                    <h4 class="week-header">${weekId.replace('week', 'Week ')}</h4>
+                                    ${weekDayContainerHtml}
+                                </div>
+                            `;
+                        }
                     }
-                    if (monthHasMcqs) allMcqsHtml += monthHtml;
+                    if (monthHasMcqs) {
+                        allMcqsHtml += `
+                            <div class="month-container">
+                                <h3 class="month-header">${monthName}</h3>
+                                ${monthWeekContainerHtml}
+                            </div>
+                        `;
+                    }
                 }
 
                 if (totalMcqCount === 0) {
