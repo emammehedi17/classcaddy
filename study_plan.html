@@ -796,7 +796,27 @@
         }
 		
         /* --- END: QUIZ STYLES --- */
-
+		
+        .quiz-week-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #374151; /* gray-700 */
+            background-color: #f9fafb; /* gray-50 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-radius: 6px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+        .quiz-week-btn:hover {
+            background-color: #eef2ff; /* indigo-50 */
+            border-color: #6366f1; /* indigo-500 */
+            color: #4f46e5; /* indigo-600 */
+        }
+        /* --- END: QUIZ CENTER STYLES --- */
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -979,9 +999,14 @@
         <div id="vocab-list-content" style="overflow-y: auto; flex-grow: 1;">
             </div>
 			
-			<div id="vocab-modal-footer" class="modal-footer-sticky">
-				Total Vocabularies: <span id="total-vocab-count" class="font-bold">0</span>
-			</div>
+		<div id="vocab-modal-footer" class="modal-footer-sticky" style="display: flex; justify-content: space-between; align-items: center;">
+            <button id="show-quiz-center-btn" class="action-button" style="background-color: #4f46e5;">
+                <i class="fas fa-brain mr-1.5"></i> Test Yourself
+            </button>
+            <span>
+                Total Vocabularies: <span id="total-vocab-count" class="font-bold">0</span>
+            </span>
+        </div>
       </div>
     </div>
     
@@ -1051,6 +1076,18 @@
 
       </div>
     </div>
+	<div id="quiz-center-modal" class="modal">
+      <div class="modal-content" style="max-width: 500px;">
+        <span class="modal-close" onclick="closeModal('quiz-center-modal')">&times;</span>
+        <h3 class="text-2xl font-semibold mb-5 text-indigo-600">Weekly Quiz Center</h3>
+        
+        <p class="text-sm text-gray-500 mb-4">Select a week to start a quiz. You need at least 4 words in a week's total vocabulary to generate a quiz.</p>
+        
+        <div id="quiz-center-content" style="max-height: 50vh; overflow-y: auto; padding-top: 5px;">
+            </div>
+        
+      </div>
+	</div>
     <script type="module">
         // Import necessary functions from Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -3205,13 +3242,17 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     return;
                 }
                 
-                currentQuizData = vocabData;
+                // --- MODIFIED: Pre-process the vocab for synonyms ---
+                currentQuizData = preProcessVocab(vocabData);
+                
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words?`;
                 quizStartBtn.classList.remove('hidden');
                 
+                // Remove old listener and add a new one to prevent duplicates
                 const newStartBtn = quizStartBtn.cloneNode(true);
                 quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
                 newStartBtn.addEventListener('click', runQuizGame);
+                // Re-assign global var to new button
                 quizStartBtn = newStartBtn; 
                 
             } catch (error) {
@@ -3223,40 +3264,94 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         /**
          * Generates a set of MCQ questions as objects to store answers.
          */
-        function generateQuizData(vocabData) {
+        /**
+         * NEW: Parses vocab data to separate Bangla meanings and synonyms.
+         * Input: [{word: "Albeit", meaning: "যদিও-Although"}]
+         * Output: [{word: "Albeit", banglaMeaning: "যদিও", synonym: "Although"}]
+         */
+        function preProcessVocab(vocabData) {
+            return vocabData.map(item => {
+                const word = item.word?.trim();
+                const meaningStr = item.meaning?.trim() || '';
+                
+                let banglaMeaning = meaningStr;
+                let synonym = null;
+
+                // Check for a hyphen that is not at the very beginning or end
+                const hyphenIndex = meaningStr.indexOf('-');
+                if (hyphenIndex > 0 && hyphenIndex < meaningStr.length - 1) {
+                    banglaMeaning = meaningStr.substring(0, hyphenIndex).trim();
+                    synonym = meaningStr.substring(hyphenIndex + 1).trim();
+                }
+                
+                return {
+                    word: word,
+                    banglaMeaning: banglaMeaning,
+                    synonym: synonym
+                };
+            });
+        }
+
+        /**
+         * UPGRADED: Generates 3 types of questions from pre-processed vocab data.
+         */
+        function generateQuizData(parsedVocabList) {
             let questions = [];
-            const allWords = vocabData.map(v => v.word);
-            const allMeanings = vocabData.map(v => v.meaning);
+            const allWords = parsedVocabList.map(v => v.word);
+            const allBanglaMeanings = parsedVocabList.map(v => v.banglaMeaning);
+            const allSynonyms = parsedVocabList.map(v => v.synonym).filter(Boolean); // Only get valid synonyms
 
-            for (const item of vocabData) {
-                const correctWord = item.word;
-                const correctMeaning = item.meaning;
+            for (const item of parsedVocabList) {
+                const { word, banglaMeaning, synonym } = item;
 
-                // --- Question 1: Word -> Meaning ---
-                let wrongMeanings = allMeanings.filter(m => m !== correctMeaning);
-                wrongMeanings = shuffleArray(wrongMeanings).slice(0, 3);
-                const meaningOptions = shuffleArray([correctMeaning, ...wrongMeanings]);
+                // --- Question 1: Word -> Bangla Meaning ---
+                let wrongMeanings = allBanglaMeanings.filter(m => m !== banglaMeaning);
+                let options1 = shuffleArray([...new Set(wrongMeanings)]).slice(0, 3); // 'Set' avoids duplicate wrong answers
+                options1.push(banglaMeaning);
                 
                 questions.push({
-                    question: `What is the meaning of "${correctWord}"?`,
-                    options: meaningOptions,
-                    correctAnswer: correctMeaning,
-                    userAnswer: null, // null = unanswered
-                    isCorrect: null  // null, true, or false
-                });
-
-                // --- Question 2: Meaning -> Word ---
-                let wrongWords = allWords.filter(w => w !== correctWord);
-                wrongWords = shuffleArray(wrongWords).slice(0, 3);
-                const wordOptions = shuffleArray([correctWord, ...wrongWords]);
-                
-                questions.push({
-                    question: `What is the English word for "${correctMeaning}"?`,
-                    options: wordOptions,
-                    correctAnswer: correctWord,
+                    question: `What is the meaning of "${word}"?`,
+                    options: shuffleArray(options1),
+                    correctAnswer: banglaMeaning,
                     userAnswer: null,
                     isCorrect: null
                 });
+
+                // --- Question 2: Bangla Meaning -> Word ---
+                let wrongWords = allWords.filter(w => w !== word);
+                let options2 = shuffleArray([...new Set(wrongWords)]).slice(0, 3);
+                options2.push(word);
+                
+                questions.push({
+                    question: `What is the English word for "${banglaMeaning}"?`,
+                    options: shuffleArray(options2),
+                    correctAnswer: word,
+                    userAnswer: null,
+                    isCorrect: null
+                });
+
+                // --- Question 3: Word -> Synonym (NEW) ---
+                if (synonym) {
+                    // Use other synonyms, or words, or meanings as wrong options
+                    let wrongSynonyms = allSynonyms.filter(s => s !== synonym && s !== word);
+                    let wrongOptions = wrongSynonyms;
+                    
+                    // If we don't have 3 wrong synonyms, add wrong words
+                    if (wrongOptions.length < 3) {
+                        wrongOptions.push(...allWords.filter(w => w !== word && w !== synonym));
+                    }
+                    
+                    let options3 = shuffleArray([...new Set(wrongOptions)]).slice(0, 3);
+                    options3.push(synonym);
+
+                    questions.push({
+                        question: `What is the synonym of "${word}"?`,
+                        options: shuffleArray(options3),
+                        correctAnswer: synonym,
+                        userAnswer: null,
+                        isCorrect: null
+                    });
+                }
             }
             return shuffleArray(questions);
         }
@@ -3411,6 +3506,133 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             }
         });
         // --- END: ADD NEW QUIZ NAV LISTENERS ---
+
+        // --- START: NEW QUIZ CENTER LOGIC ---
+
+        const quizCenterModal = document.getElementById('quiz-center-modal');
+        const quizCenterContent = document.getElementById('quiz-center-content');
+
+        // 1. Add listener to the "Test Yourself" button
+        document.getElementById('show-quiz-center-btn').addEventListener('click', () => {
+            openQuizCenter();
+        });
+
+        // 2. Function to open and populate the Quiz Center
+        async function openQuizCenter() {
+            quizCenterModal.style.display = "block";
+            quizCenterContent.innerHTML = '<p class="text-center text-gray-500 italic py-5">Loading available quizzes...</p>';
+            
+            try {
+                const plansCollectionPath = getUserPlansCollectionPath();
+                const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+                const querySnapshot = await getDocs(q);
+                
+                let quizButtonsHtml = '';
+                let quizzesFound = 0;
+
+                for (const docSnap of querySnapshot.docs) {
+                    const monthId = docSnap.id;
+                    const monthData = docSnap.data();
+                    const monthName = monthData.monthName || monthId;
+
+                    for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
+                        const weekData = monthData.weeks?.[weekId];
+                        if (!weekData || !weekData.days) continue;
+
+                        // Aggregate all vocab from this week
+                        let weekVocab = [];
+                        for (const day of weekData.days) {
+                            for (const row of day.rows) {
+                                if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
+                                    weekVocab.push(...row.vocabData);
+                                }
+                            }
+                        }
+
+                        // Only create a button if there are enough words
+                        if (weekVocab.length >= 4) {
+                            quizzesFound++;
+                            const weekTitle = weekId.replace('week', 'Week ');
+                            quizButtonsHtml += `<button class="quiz-week-btn" data-month-id="${monthId}" data-week-id="${weekId}">
+                                ${weekTitle} - ${monthName} (${weekVocab.length} words)
+                            </button>`;
+                        }
+                    }
+                }
+
+                if (quizzesFound === 0) {
+                    quizCenterContent.innerHTML = '<p class="text-center text-gray-500 italic py-5">No weekly quizzes available. Add at least 4 vocab words to any week to start.</p>';
+                } else {
+                    quizCenterContent.innerHTML = quizButtonsHtml;
+                }
+
+            } catch (error) {
+                console.error("Error loading quizzes:", error);
+                quizCenterContent.innerHTML = '<p class="text-center text-red-500 py-5">Could not load quizzes. Please try again.</p>';
+            }
+        }
+
+        // 3. Add a global click listener for the new week buttons
+        quizCenterContent.addEventListener('click', (e) => {
+            const button = e.target.closest('.quiz-week-btn');
+            if (button) {
+                const { monthId, weekId } = button.dataset;
+                startWeekQuiz(monthId, weekId);
+            }
+        });
+
+        // 4. Function to start a week-long quiz
+        async function startWeekQuiz(monthId, weekId) {
+            closeModal('quiz-center-modal');
+            
+            quizModal.style.display = "block";
+            quizMainScreen.classList.add('hidden');
+            quizResultsScreen.classList.add('hidden');
+            quizStartScreen.classList.remove('hidden');
+            
+            quizStartMessage.textContent = "Loading week's vocabulary...";
+            quizStartBtn.classList.add('hidden');
+
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                const weekData = docSnap.data().weeks?.[weekId];
+                if (!weekData || !weekData.days) throw new Error("Week data not found.");
+                
+                let allWeekVocab = [];
+                for (const day of weekData.days) {
+                    for (const row of day.rows) {
+                        if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
+                            allWeekVocab.push(...row.vocabData);
+                        }
+                    }
+                }
+                
+                if (allWeekVocab.length < 4) {
+                    quizStartMessage.textContent = "You need at least 4 vocabulary words in this week's list to start a quiz.";
+                    return;
+                }
+
+                // --- NEW: PRE-PROCESS THE VOCAB ---
+                currentQuizData = preProcessVocab(allWeekVocab);
+                
+                quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week?`;
+                quizStartBtn.classList.remove('hidden');
+                
+                const newStartBtn = quizStartBtn.cloneNode(true);
+                quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
+                newStartBtn.addEventListener('click', runQuizGame);
+                quizStartBtn = newStartBtn; 
+                
+            } catch (error) {
+                console.error("Error loading week quiz data:", error);
+                quizStartMessage.textContent = "Could not load week quiz data. Please try again.";
+            }
+        }
+
+        // --- END: NEW QUIZ CENTER LOGIC ---
     
     </script>
 </body>
