@@ -2455,7 +2455,7 @@
 
                      updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null, mcqData: mcqData || null });
                 
-                
+                });
 
                  daysArray[dayIndex].rows = updatedRows;
                 const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
