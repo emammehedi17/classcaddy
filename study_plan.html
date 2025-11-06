@@ -3787,7 +3787,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     } else {
                         loadQuizQuestion();
                     }
-                }, 1000); // 1-second (1000ms) delay to show the correct answer
+                }, 300); // 0.3-second (300ms) delay. This will be much faster.
                 
             } else {
                 // Answer is wrong: Stay on the page and enable "Next"
