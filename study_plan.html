@@ -991,6 +991,24 @@
             color: #059669; /* emerald-600 */
         }
         /* --- END: MASTER MCQ LIST STYLES --- */
+		/* --- START: QUIZ SLIDE ANIMATIONS --- */
+        @keyframes slideInFromRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .slide-in-right {
+            /* 0.3s = 300ms (This is fast) */
+            animation: slideInFromRight 0.3s ease-out;
+        }
+        .slide-in-left {
+            animation: slideInFromLeft 0.3s ease-out;
+        }
+        /* --- END: QUIZ SLIDE ANIMATIONS --- */
 
     </style>
 </head>
@@ -1190,7 +1208,7 @@
     </div>
     
     <div id="quiz-modal" class="modal" style="z-index: 105;">
-      <div class="modal-content" style="max-width: 600px; padding-top: 35px; padding-right: 45px;">
+      <div class="modal-content" style="max-width: 600px; padding-top: 35px; padding-right: 45px; overflow: hidden;">
         <span class="modal-close" onclick="closeQuizModal()">&times;</span>
         
         <div id="quiz-start-screen" class="text-center py-10">
