@@ -1189,12 +1189,12 @@
       </div>
     </div>
     
-    <div id="quiz-modal" class="modal">
+    <div id="quiz-modal" class="modal" style="z-index: 105;">
       <div class="modal-content" style="max-width: 600px; padding-top: 35px; padding-right: 45px;">
         <span class="modal-close" onclick="closeQuizModal()">&times;</span>
         
         <div id="quiz-start-screen" class="text-center py-10">
-            <h3 class="text-2xl font-semibold mb-4 text-indigo-600">Vocabulary Quiz</h3>
+            <h3 id="quiz-title" class="text-2xl font-semibold mb-4 text-indigo-600">Vocabulary Quiz</h3>
             <p id="quiz-start-message" class="text-gray-600 mb-6">Loading vocabulary...</p>
             
             <p class="text-sm font-medium text-red-600 -mt-2 mb-6">
@@ -1437,6 +1437,7 @@
         const quizStartScreen = document.getElementById('quiz-start-screen');
         const quizStartMessage = document.getElementById('quiz-start-message');
         let quizStartBtn = document.getElementById('quiz-start-btn');
+		const quizTitle = document.getElementById('quiz-title');
         const quizMainScreen = document.getElementById('quiz-main-screen');
         const quizQuestionNumber = document.getElementById('quiz-question-number');
         const quizScoreEl = document.getElementById('quiz-score');
@@ -3523,6 +3524,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          * Fetches vocab data and prepares the quiz modal.
          */
         async function startQuiz(monthId, weekId, dayIndex, rowIndex) {
+			quizTitle.textContent = 'Vocabulary Quiz';
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.add('hidden');
@@ -3961,6 +3963,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
         // 4. Function to start a week-long quiz
         async function startWeekQuiz(monthId, weekId) {
+			quizTitle.textContent = 'Vocabulary Quiz';
             closeModal('quiz-center-modal');
             
             quizModal.style.display = "block";
@@ -4205,6 +4208,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
         // 5. "MCQ Test" বাটনে ক্লিক করলে (UPGRADED)
         async function startMcqQuiz(monthId, weekId, dayIndex) { // <-- rowIndex সরানো হয়েছে
+			quizTitle.textContent = 'MCQ Quiz';
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.add('hidden');
@@ -4473,6 +4477,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
         // 7. Function to start a quiz (day, week, or month) (LOGIC FIXED)
         async function startAggregatedMcqQuiz(quizType, monthId, weekId = null, dayIndex = null) {
+			quizTitle.textContent = 'MCQ Quiz';
             closeModal('mcq-quiz-center-modal');
             
             quizModal.style.display = "block";
