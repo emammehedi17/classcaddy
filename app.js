@@ -148,7 +148,13 @@
         const deleteMonthError = document.getElementById('delete-month-error');
         const deleteMonthCancelBtn = document.getElementById('delete-month-cancel-btn');
         const deleteMonthConfirmBtn = document.getElementById('delete-month-confirm-btn');
-        // --- END: ADD THESE ---
+		// --- START: ADD THIS LISTENER ---
+        // অ্যানিমেশন শেষ হলে 'modal-shake' ক্লাসটি স্বয়ংক্রিয়ভাবে রিমুভ করুন
+        deleteMonthConfirmModal.querySelector('.modal-content').addEventListener('animationend', function() {
+            this.classList.remove('modal-shake');
+        });
+        // --- END: ADD THIS LISTENER ---
+        
 
         // --- Header Navigation & Scroll Logic (from script.js) ---
         if (pageHeader) {
@@ -2142,14 +2148,25 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             // --- END: NEW QUIZ RESET LOGIC ---
         }
 		window.onclick = function(event) {
-             if (event.target.classList.contains('modal')) { 
-                // --- MODIFIED BLOCK ---
+             if (event.target.classList.contains('modal')) {
+                
                 if (event.target.id === 'quiz-modal') {
-                    closeQuizModal(); // Use the new function
+                    // এটি কুইজ মোডাল, বিশেষ ফাংশনটি কল করুন
+                    closeQuizModal();
+                
+                } else if (event.target.id === 'delete-month-confirm-modal') {
+                    // --- START: NEW LOGIC ---
+                    // এটি ডিলিট মোডাল। এটি বন্ধ করবেন না। একে ঝাঁকুনি দিন!
+                    const modalContent = event.target.querySelector('.modal-content');
+                    if (modalContent) {
+                        modalContent.classList.add('modal-shake');
+                    }
+                    // --- END: NEW LOGIC ---
+                
                 } else {
-                    event.target.style.display = "none"; // Close other modals
+                    // এটি অন্য কোনো সাধারণ মোডাল, এটি বন্ধ করুন
+                    event.target.style.display = "none";
                 }
-                // --- END MODIFIED BLOCK ---
              }
              if (!event.target.closest('.vocab-word')) { document.querySelectorAll('.vocab-word.active').forEach(v => v.classList.remove('active')); }
          }

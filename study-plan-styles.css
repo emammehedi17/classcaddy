@@ -1048,3 +1048,18 @@
             box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
         }
         /* --- END: 2-FACTOR DELETE MODAL STYLES --- */
+		
+		/* --- START: NEW MODAL SHAKE ANIMATION --- */
+        @keyframes shake-animation {
+            0%   { transform: translateX(0); }
+            25%  { transform: translateX(-6px); }
+            50%  { transform: translateX(6px); }
+            75%  { transform: translateX(-6px); }
+            100% { transform: translateX(0); }
+        }
+
+        .modal-shake {
+            /* 0.3s = 300ms. এটি একটি দ্রুত ঝাঁকুনি দেবে। */
+            animation: shake-animation 0.3s ease-out;
+        }
+        /* --- END: NEW MODAL SHAKE ANIMATION --- */
