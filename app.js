@@ -2093,7 +2093,38 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
              document.querySelectorAll('.vocab-word.active').forEach(v => { if (v !== vocabWordElement) v.classList.remove('active'); });
              vocabWordElement.classList.toggle('active');
         }
-        window.closeModal = function(modalId) { document.getElementById(modalId).style.display = "none"; }
+        window.closeModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            
+            modal.style.display = "none"; 
+
+            // --- START: NEW QUIZ RESET LOGIC ---
+            // If we are closing the quiz modal, check if it needs to be reset
+            if (modalId === 'quiz-modal') {
+                const resultsScreen = document.getElementById('quiz-results-screen');
+                const reviewScreen = document.getElementById('quiz-review-screen');
+                
+                // Check if either the results or review screen is visible
+                if (!resultsScreen.classList.contains('hidden') || !reviewScreen.classList.contains('hidden')) {
+                    console.log("Resetting quiz modal state to start screen.");
+                    
+                    // Hide results and review screens
+                    resultsScreen.classList.add('hidden');
+                    reviewScreen.classList.add('hidden');
+                    
+                    // Show the start screen
+                    const startScreen = document.getElementById('quiz-start-screen');
+                    startScreen.classList.remove('hidden');
+
+                    // Clear old quiz data to be safe
+                    currentQuizQuestions = [];
+                    currentVocabData = null;
+                    currentMcqData = null;
+                }
+            }
+            // --- END: NEW QUIZ RESET LOGIC ---
+        }
 		window.onclick = function(event) {
              if (event.target.classList.contains('modal')) { 
                 // --- MODIFIED BLOCK ---
