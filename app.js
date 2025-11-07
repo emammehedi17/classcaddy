@@ -2994,7 +2994,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             let cleanText = text.replace(/\n*([০-৯0-9]+\.)/g, '\n$1');
             const mcqData = [];
             // এই Regex টি আপনার দেওয়া ফরম্যাট অনুযায়ী প্রশ্ন, অপশন এবং উত্তর খুঁজে বের করবে
-            const mcqRegex = /(?:[০-৯0-9]+)\.\s*([\s\S]+?)\n(?:ক\.)\s*([\s\S]+?)\n(?:খ\.)\s*([\s\S]+?)\n(?:গ\.)\s*([\s\S]+?)\n(?:ঘ\.)\s*([\s\S]+?)\nসঠিক উত্তর:\s*([কখগঘ])\.\s*([\s\S]+?)(?=\n[০-৯0-9]+\.|\n*$)/g;
+            const mcqRegex = /(?:[০-৯0-9]+)\.\s*([\s\S]+?)\n(?:ক\.)\s*([\s\S]+?)\n(?:খ\.)\s*([\s\S]+?)\n(?:গ\.)\s*([\s\S]+?)\n(?:ঘ\.)\s*([\s\S]+?)\n.*:\s*([কখগঘ])\.\s*([\s\S]+?)(?=\n[০-৯0-9]+\.|\n*$)/g;
             
             let match;
             while ((match = mcqRegex.exec(cleanText)) !== null) {
