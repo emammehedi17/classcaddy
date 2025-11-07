@@ -2688,17 +2688,35 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
 		
         /**
-         * Checks if a quiz is in progress before closing the modal.
+         * Checks if a quiz is in progress OR review is active before closing the modal.
          */
         window.closeQuizModal = function() {
             const mainScreen = document.getElementById('quiz-main-screen');
+            const reviewScreen = document.getElementById('quiz-review-screen'); // <-- NEW: Get review screen
+            
             const isQuizInProgress = !mainScreen.classList.contains('hidden');
+            const isReviewing = !reviewScreen.classList.contains('hidden'); // <-- NEW: Check if visible
 
             if (isQuizInProgress) {
-                // If quiz is running, show our new custom 3-button modal
+                // Case 1: Quiz is in progress. Show 3-button "Yes/No/Submit" modal.
                 showQuizConfirmationModal();
+                
+            } else if (isReviewing) {
+                // --- START: NEW LOGIC ---
+                // Case 2: Review screen is visible. Show a simple "Yes/No" modal.
+                // We re-use the generic confirmation modal for this.
+                showConfirmationModal(
+                    "Close Review",
+                    "Are you sure you want to close the quiz? You can review your answers again from the results page.",
+                    () => {
+                        // This is the 'onConfirm' action (user clicks "Confirm")
+                        closeModal('quiz-modal'); // This is the *real* close function
+                    }
+                );
+                // --- END: NEW LOGIC ---
+                
             } else {
-                // Not in progress (on start or results screen), just close it.
+                // Case 3: On Start or Results screen. Close without warning.
                 closeModal('quiz-modal');
             }
         }
