@@ -2919,7 +2919,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         rawText = mcqData.map((mcq, index) => {
                             const options = mcq.options.map((opt, i) => `${['ক', 'খ', 'গ', 'ঘ'][i]}. ${opt}`).join('\n');
                             const correctPrefix = ['ক', 'খ', 'গ', 'ঘ'][mcq.options.indexOf(mcq.correctAnswer)];
-                            return `${['০১', '০২', '০৩', '০৪', '০৫', '০৬', '০৭', '০৮', '০৯'][index] || (index + 1)}. ${mcq.question}\n${options}\nসঠিক উত্তর: ${correctPrefix}. ${mcq.correctAnswer}`;
+                            return `${['০১', '০২', '০৩', '০৪', '০৫', '০৬', '০৭', '০৮', '০৯'][index] || (index + 1)}. ${mcq.question}\n${options}\nসঠিক উত্তর: ${correctPrefix}. ${mcq.correctAnswer}\n`;
                         }).join('\n');
                     }
                 }
