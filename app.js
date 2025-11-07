@@ -109,6 +109,13 @@
         const quizFinalScore = document.getElementById('quiz-final-score');
         const quizPercentage = document.getElementById('quiz-percentage'); // <-- MODIFIED
         const quizRestartBtn = document.getElementById('quiz-restart-btn');
+		// --- START: ADD THESE NEW ELEMENTS ---
+        const quizReviewBtn = document.getElementById('quiz-review-btn');
+        const quizTimeTaken = document.getElementById('quiz-time-taken');
+        const quizReviewScreen = document.getElementById('quiz-review-screen');
+        const quizReviewContent = document.getElementById('quiz-review-content');
+        const quizBackToResultsBtn = document.getElementById('quiz-back-to-results-btn');
+        // --- END: ADD THESE NEW ELEMENTS ---
         // --- END: QUIZ ELEMENTS ---
 
         let currentUser = null;
@@ -128,6 +135,8 @@
         let currentQuizQuestionIndex = 0;
         let currentQuizScore = 0;
 		let quizTimerInterval = null;
+		let quizTotalSeconds = 0; // <-- এই লাইনটি যোগ করুন
+        let quizRemainingSeconds = 0; // <-- এই লাইনটি যোগ করুন
         // --- END: QUIZ STATE VARIABLES ---
 
         // --- Header Navigation & Scroll Logic (from script.js) ---
@@ -2336,6 +2345,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizStartScreen.classList.add('hidden');
             quizResultsScreen.classList.add('hidden');
             quizMainScreen.classList.remove('hidden');
+			quizReviewScreen.classList.add('hidden');
 
             // --- REMOVED: Question generation is now done *before* this ---
             // We just need to shuffle the questions that are already generated
@@ -2363,7 +2373,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         function startTimer(totalSeconds) {
             if (quizTimerInterval) clearInterval(quizTimerInterval); // Clear any old timer
 
+            quizTotalSeconds = totalSeconds; // <-- ADDED
+            quizRemainingSeconds = totalSeconds; // <-- ADDED
             let remaining = totalSeconds;
+            
             const timerEl = document.getElementById('quiz-timer');
             
             timerEl.textContent = formatTime(remaining); // Show initial time
@@ -2371,6 +2384,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
             quizTimerInterval = setInterval(() => {
                 remaining--;
+                quizRemainingSeconds = remaining; // <-- ADDED: Update global remaining time
                 timerEl.textContent = formatTime(remaining);
                 
                 // Make timer red in the last 10 seconds
@@ -2493,6 +2507,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 			if (quizTimerInterval) clearInterval(quizTimerInterval);
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.remove('hidden');
+            quizReviewScreen.classList.add('hidden'); // <-- ADDED: Hide review screen
 
             // Recalculate score from scratch to be safe
             let finalScore = 0;
@@ -2512,6 +2527,12 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
             quizFinalScore.textContent = currentQuizScore.toFixed(2);
             quizPercentage.textContent = `${percentage.toFixed(1)}%`;
+            
+            // --- NEW: TIME TAKEN LOGIC ---
+            const timeTakenInSeconds = quizTotalSeconds - quizRemainingSeconds;
+            // Get element by ID, not from a variable
+            document.getElementById('quiz-time-taken').querySelector('span').textContent = formatTime(timeTakenInSeconds);
+            // --- END: TIME TAKEN LOGIC ---
         }
 		
 		
@@ -2546,7 +2567,57 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         });
         // --- END: ADD NEW QUIZ NAV LISTENERS ---
 
-        // --- START: ADD THIS NEW FUNCTION ---
+        // --- START: NEW REVIEW SCREEN LOGIC ---
+        
+        // 1. Button on Results Page: "Review Wrong"
+        quizReviewBtn.addEventListener('click', () => {
+            showReviewScreen();
+        });
+        
+        // 2. Button on Review Page: "Back to Results"
+        quizBackToResultsBtn.addEventListener('click', () => {
+            // Just show/hide the correct screens
+            quizReviewScreen.classList.add('hidden');
+            quizResultsScreen.classList.remove('hidden');
+        });
+        
+        // 3. The function to build and show the review screen
+        function showReviewScreen() {
+            quizResultsScreen.classList.add('hidden');
+            quizReviewScreen.classList.remove('hidden');
+            quizReviewContent.innerHTML = ''; // Clear old content
+            
+            const wrongAnswers = currentQuizQuestions.filter(q => q.isCorrect === false);
+            
+            if (wrongAnswers.length === 0) {
+                quizReviewContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">You got all questions correct!</p>';
+                return;
+            }
+            
+            let html = '';
+            wrongAnswers.forEach(q => {
+                html += `
+                <div class="review-item">
+                    <p class="review-question">${escapeHtml(q.question)}</p>
+                    <div class="review-options">
+                        ${q.options.map(option => {
+                            let className = 'review-option';
+                            if (option === q.correctAnswer) {
+                                className += ' correct'; // This is the correct one
+                            } else if (option === q.userAnswer) {
+                                className += ' incorrect'; // This is the one the user (wrongly) chose
+                            }
+                            return `<div class="${className}">${escapeHtml(option)}</div>`;
+                        }).join('')}
+                    </div>
+                </div>
+                `;
+            });
+            
+            quizReviewContent.innerHTML = html;
+        }
+        
+        // --- END: NEW REVIEW SCREEN LOGIC ---
 		
 		// --- START: ADD THIS NEW FUNCTION ---
         /**

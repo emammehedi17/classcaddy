@@ -972,6 +972,54 @@
         }
         /* --- END: MASTER MCQ LIST STYLES --- */
 		
+		
+		/* --- START: QUIZ REVIEW STYLES --- */
+        .review-item {
+            background-color: #f9fafb; /* gray-50 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .review-question {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #1f2937; /* gray-800 */
+            margin-bottom: 0.75rem;
+        }
+        .review-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+        @media (min-width: 640px) {
+            .review-options {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .review-option {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            background-color: #fff;
+            color: #374151; /* gray-700 */
+            font-weight: 500;
+        }
+        .review-option.correct {
+            /* এটি সঠিক উত্তর */
+            border-color: #10B981;
+            background-color: #ecfdf5; /* emerald-50 */
+            color: #065f46; /* emerald-800 */
+        }
+        .review-option.incorrect {
+            /* এটি ইউজারের ভুল উত্তর */
+            border-color: #EF4444;
+            background-color: #fef2f2; /* red-50 */
+            color: #991b1b; /* red-800 */
+            text-decoration: line-through;
+        }
+        /* --- END: QUIZ REVIEW STYLES --- */
+		
 		/* --- START: QUIZ SLIDE ANIMATIONS --- */
         @keyframes slideInFromRight {
             from { transform: translateX(100%); opacity: 0; }
