@@ -1037,3 +1037,14 @@
 			animation: slideInFromLeft 0.15s ease-out;
 		}
         /* --- END: QUIZ SLIDE ANIMATIONS --- */
+		
+		/* --- START: 2-FACTOR DELETE MODAL STYLES --- */
+        #delete-month-input.input-error {
+            border-color: #ef4444; /* red-500 */
+            background-color: #fef2f2; /* red-50 */
+        }
+        #delete-month-input.input-error:focus {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+        /* --- END: 2-FACTOR DELETE MODAL STYLES --- */

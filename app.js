@@ -138,6 +138,17 @@
 		let quizTotalSeconds = 0; // <-- এই লাইনটি যোগ করুন
         let quizRemainingSeconds = 0; // <-- এই লাইনটি যোগ করুন
         // --- END: QUIZ STATE VARIABLES ---
+		
+		// --- START: ADD THESE ---
+        let currentMonthDeleteTarget = null; // Stores {monthId, monthName}
+        const deleteMonthConfirmModal = document.getElementById('delete-month-confirm-modal');
+        const deleteMonthTitle = document.getElementById('delete-month-title');
+        const deleteMonthChallengeText = document.getElementById('delete-month-challenge-text');
+        const deleteMonthInput = document.getElementById('delete-month-input');
+        const deleteMonthError = document.getElementById('delete-month-error');
+        const deleteMonthCancelBtn = document.getElementById('delete-month-cancel-btn');
+        const deleteMonthConfirmBtn = document.getElementById('delete-month-confirm-btn');
+        // --- END: ADD THESE ---
 
         // --- Header Navigation & Scroll Logic (from script.js) ---
         if (pageHeader) {
@@ -818,7 +829,7 @@
                 </div>`;
 
              monthDiv.querySelector('.edit-targets-btn').addEventListener('click', (e) => handleEditTargets(e.currentTarget, monthId));
-             monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId));
+             monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId, data.monthName || monthId));
              attachWeekEventListeners(monthDiv, monthId);
              
              // --- MODIFIED: Auto-resize textareas on load ---
@@ -1545,10 +1556,15 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  setSyncStatus("Error", "red");
              });
          }
-         function confirmDeleteMonth(monthId) {
-             const monthButton = monthNavButtonsContainer.querySelector(`button[data-month-id="${monthId}"]`);
-             const monthName = monthButton ? monthButton.textContent : monthId;
-             showConfirmationModal(`Delete Month: ${monthName}`, `Are you sure you want to delete the entire study plan for ${monthName}? This action cannot be undone.`, () => deleteMonth(monthId));
+         function confirmDeleteMonth(monthId, monthName) {
+             showConfirmationModal(
+                 `Delete Month: ${monthName}`, 
+                 `Are you sure you want to delete ${monthName}? This action cannot be undone.`, 
+                 () => {
+                     // ধাপ ১ শেষ। এখন ধাপ ২ চালু করুন।
+                     showDeleteMonthSecondStep(monthId, monthName);
+                 }
+             );
          }
          async function deleteMonth(monthId) {
              if (!currentUser || !userId) return;
@@ -3437,3 +3453,72 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             return `${pad(minutes)}:${pad(seconds)}`;
         }
         // --- END: NEW TIMER HELPER FUNCTIONS ---
+		
+		// --- START: NEW 2-FACTOR DELETE FUNCTIONS ---
+
+        /**
+         * ধাপ ২: দ্বিতীয় কনফার্মেশন মোডালটি দেখায়
+         */
+        function showDeleteMonthSecondStep(monthId, monthName) {
+            currentMonthDeleteTarget = { monthId, monthName }; // টার্গেট সেভ করুন
+            const challengePhrase = `I want to delete ${monthId}'s entirely`;
+
+            // মোডালটি প্রস্তুত করুন
+            deleteMonthTitle.textContent = `Final Confirmation: Delete ${monthName}?`;
+            deleteMonthChallengeText.textContent = challengePhrase;
+            deleteMonthInput.value = ''; // ইনপুট ক্লিয়ার করুন
+            deleteMonthError.classList.add('hidden'); // এরর হাইড করুন
+            deleteMonthInput.classList.remove('input-error');
+            deleteMonthConfirmBtn.disabled = true; // বাটনটি ডিজেবল করুন
+
+            deleteMonthConfirmModal.style.display = 'block';
+            deleteMonthInput.focus();
+        }
+
+        /**
+         * ইনপুট টাইপ করার সময় বাটন এনাবল/ডিজেবল করে
+         */
+        deleteMonthInput.addEventListener('input', () => {
+            if (!currentMonthDeleteTarget) return;
+            const challengePhrase = `I want to delete ${currentMonthDeleteTarget.monthId}'s entirely`;
+            
+            if (deleteMonthInput.value === challengePhrase) {
+                deleteMonthConfirmBtn.disabled = false;
+                deleteMonthError.classList.add('hidden');
+                deleteMonthInput.classList.remove('input-error');
+            } else {
+                deleteMonthConfirmBtn.disabled = true;
+            }
+        });
+
+        /**
+         * ধাপ ৩: "ফাইনাল ডিলিট" বাটনে ক্লিক করলে কল হয়
+         */
+        deleteMonthConfirmBtn.addEventListener('click', () => {
+            if (!currentMonthDeleteTarget) return;
+            
+            const { monthId } = currentMonthDeleteTarget;
+            const challengePhrase = `I want to delete ${monthId}'s entirely`;
+
+            if (deleteMonthInput.value === challengePhrase) {
+                // ম্যাচ করেছে!
+                closeModal('delete-month-confirm-modal');
+                deleteMonth(monthId); // আসল ডিলিট ফাংশনটি কল করুন
+                currentMonthDeleteTarget = null;
+            } else {
+                // ম্যাচ করেনি
+                deleteMonthError.classList.remove('hidden');
+                deleteMonthInput.classList.add('input-error');
+                deleteMonthInput.value = '';
+            }
+        });
+
+        /**
+         * ক্যানসেল বাটনে ক্লিক করলে
+         */
+        deleteMonthCancelBtn.addEventListener('click', () => {
+            closeModal('delete-month-confirm-modal');
+            currentMonthDeleteTarget = null;
+        });
+
+        // --- END: NEW 2-FACTOR DELETE FUNCTIONS ---

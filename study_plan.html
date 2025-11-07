@@ -184,7 +184,7 @@
     </div>
 
      
-		<div id="confirm-modal" class="modal">
+	<div id="confirm-modal" class="modal">
       <div class="modal-content">
         <span class="modal-close" onclick="closeModal('confirm-modal')">&times;</span>
         <h3 id="confirm-modal-title" class="text-lg font-semibold mb-4 text-gray-800">Confirm Action</h3>
@@ -195,6 +195,36 @@
         </div>
       </div>
     </div>
+	
+	
+	<div id="delete-month-confirm-modal" class="modal" style="z-index: 110;">
+      <div class="modal-content" style="max-width: 500px;">
+        <h3 id="delete-month-title" class="text-xl font-semibold mb-4 text-red-700">
+            Final Confirmation
+        </h3>
+        <p class="text-gray-600 mb-4">
+            এটি একটি অপরিবর্তনযোগ্য (irreversible) পদক্ষেপ। আপনার এই মাসের সমস্ত ডেটা, টার্গেট, এবং কুইজ স্থায়ীভাবে মুছে ফেলা হবে।
+        </p>
+        <p class="text-gray-700 mb-3 font-medium">
+            নিশ্চিত করতে, অনুগ্রহ করে নিচের টেক্সটটি হুবহু টাইপ করুন:
+        </p>
+        <p class="text-gray-800 bg-gray-100 p-2 rounded-md text-sm font-mono mb-4" id="delete-month-challenge-text">
+            I want to delete 2025-10's entirely
+        </p>
+        
+        <input type="text" id="delete-month-input" class="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500" placeholder="Type the text above...">
+        
+        <p id="delete-month-error" class="text-red-600 text-sm mt-2 font-medium hidden">
+            <i class="fas fa-times-circle mr-1"></i> The text does not match. Please try again.
+        </p>
+        
+        <div class="flex justify-end gap-3 mt-6">
+             <button id="delete-month-cancel-btn" class="action-button action-button-secondary">Cancel</button>
+             <button id="delete-month-confirm-btn" class="action-button action-button-danger">Delete This Month</button>
+        </div>
+      </div>
+    </div>
+	
 
     <div id="all-vocab-modal" class="modal">
       <div class="modal-content all-vocab-modal-content" style="max-width: 700px; max-height: 80vh; display: flex; flex-direction: column;">
