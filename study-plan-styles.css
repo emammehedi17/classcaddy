@@ -1126,3 +1126,92 @@
             animation: shake-animation 0.3s ease-out;
         }
         /* --- END: NEW MODAL SHAKE ANIMATION --- */
+		
+		
+	/* --- START: RESULT SHEET MODAL STYLES --- */
+		.result-tab-btn {
+			padding: 10px 20px;
+			font-size: 0.95rem;
+			font-weight: 600;
+			color: #6b7280; /* gray-500 */
+			border: none;
+			background: none;
+			cursor: pointer;
+			border-bottom: 3px solid transparent;
+			transition: color 0.2s, border-color 0.2s;
+		}
+		.result-tab-btn:hover {
+			color: #1f2937; /* gray-800 */
+		}
+		.result-tab-btn.active-tab {
+			color: #10b981; /* emerald-500 */
+			border-bottom-color: #10b981;
+		}
+		.result-tab-content.hidden {
+			display: none;
+		}
+		.results-table-container {
+			width: 100%;
+		}
+		.results-table-container table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 0.875rem; /* text-sm */
+		}
+		.results-table-container th,
+		.results-table-container td {
+			border: 1px solid #e5e7eb; /* gray-200 */
+			padding: 10px 12px;
+			text-align: left;
+			vertical-align: middle;
+		}
+		.results-table-container th {
+			background-color: #f9fafb; /* gray-50 */
+			font-weight: 600;
+			color: #374151; /* gray-700 */
+		}
+		.results-table-container td.sl-col {
+			width: 5%;
+			text-align: center;
+			font-weight: 500;
+		}
+		.results-table-container td.topic-col {
+			width: 35%;
+			font-weight: 500;
+		}
+		.results-table-container td.score-col {
+			width: 10%;
+			text-align: center;
+		}
+		.results-table-container td.percent-col {
+			width: 10%;
+			text-align: center;
+			font-weight: 600;
+		}
+		.results-table-container td.date-col {
+			width: 15%;
+			text-align: center;
+		}
+		.results-table-container td.view-col {
+			width: 15%;
+			text-align: center;
+		}
+		/* --- END: RESULT SHEET MODAL STYLES --- */
+
+		/* --- START: QUIZ SAVE BUTTON STYLES --- */
+		#quiz-save-btn {
+			background-color: #10b981; /* emerald-500 */
+			border-color: #10b981;
+			padding: 10px 24px;
+			font-size: 1rem;
+		}
+		#quiz-save-btn:hover {
+			background-color: #059669; /* emerald-600 */
+		}
+		#quiz-save-btn:disabled {
+			background-color: #a7f3d0; /* emerald-200 */
+			color: #065f46; /* emerald-800 */
+			cursor: not-allowed;
+			opacity: 0.7;
+		}
+		/* --- END: QUIZ SAVE BUTTON STYLES --- */

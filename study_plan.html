@@ -127,7 +127,11 @@
 					 <button id="show-all-vocab-btn" class="action-button action-button-secondary flex items-center gap-1.5">
                         <i class="fas fa-book-open text-sm"></i> Vocab List
                      </button>
-                     <button id="add-month-btn" class="action-button flex items-center gap-1.5">
+
+                     <button id="show-results-sheet-btn" class="action-button action-button-secondary flex items-center gap-1.5">
+                        <i class="fas fa-poll text-sm"></i> Results
+                     </button>
+                     <button id="add-month-btn" class="action-button flex items-center gap-1.5 hidden">
                          <i class="fas fa-plus-circle text-sm"></i> Add Month
                      </button>
                  </div>
@@ -138,6 +142,93 @@
                 </div>
 
             </div> 
+			
+			<div id="result-sheet-modal" class="modal">
+      <div class="modal-content" style="max-width: 900px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header-sticky">
+          <h3 class="text-2xl font-semibold text-emerald-600">My Quiz Results</h3>
+          <span class="modal-close" onclick="closeModal('result-sheet-modal')">&times;</span>
+        </div>
+    
+        <div class="flex border-b border-gray-200 mt-2">
+            <button id="tab-btn-mcq" class="result-tab-btn active-tab">
+                <i class="fas fa-tasks mr-2"></i> MCQ Results
+            </button>
+            <button id="tab-btn-vocab" class="result-tab-btn">
+                <i class="fas fa-book-open mr-2"></i> Vocab Quiz Results
+            </button>
+        </div>
+    
+        <div class="" style="overflow-y: auto; flex-grow: 1; padding-top: 1rem;">
+            <div id="tab-content-mcq" class="result-tab-content">
+                <div id="mcq-results-list" class="results-table-container">
+                    <p class="text-center text-gray-500 italic py-10">Loading MCQ results...</p>
+                </div>
+            </div>
+            <div id="tab-content-vocab" class="result-tab-content hidden">
+                <div id="vocab-results-list" class="results-table-container">
+                    <p class="text-center text-gray-500 italic py-10">Loading Vocab quiz results...</p>
+                </div>
+            </div>
+        </div>
+    
+      </div>
+    </div>
+    <div id="view-saved-result-modal" class="modal" style="z-index: 110;">
+      <div class="modal-content" style="max-width: 600px;">
+        <span class="modal-close" onclick="closeModal('view-saved-result-modal')">&times;</span>
+        
+        <div id="saved-result-content" class="text-center py-10">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Quiz Result</h2>
+            <p id="saved-result-topic-name" class="text-sm text-gray-500 mb-6"></p>
+            
+            <div class="result-summary-list kalpurush">
+                <div class="result-summary-row">
+                    <span class="result-label">Total Answered:</span>
+                    <span id="saved-summary-answered-count" class="result-count">0</span>
+                    <span class="result-score-impact"></span>
+                </div>
+                <div class="result-summary-row">
+                    <span class="result-label text-green-700">Correct Answered:</span>
+                    <span id="saved-summary-correct-count" class="result-count text-green-700">0</span>
+                    <span id="saved-summary-correct-score" class="result-score-impact text-green-700">+0.00</span>
+                </div>
+                <div class="result-summary-row">
+                    <span class="result-label text-red-700">Wrong Answered:</span>
+                    <span id="saved-summary-wrong-count" class="result-count text-red-700">0</span>
+                    <span id="saved-summary-wrong-score" class="result-score-impact text-red-700">-0.00</span>
+                </div>
+                <div class="result-summary-row">
+                    <span class="result-label text-gray-600">Not Answered:</span>
+                    <span id="saved-summary-not-answered-count" class="result-count text-gray-600">0</span>
+                    <span id="saved-summary-not-answered-score" class="result-score-impact">0.00</span>
+                </div>
+                <hr class="my-3 border-gray-300">
+                <div class="result-summary-row final-score">
+                    <span class="result-label">Final Score:</span>
+                    <span id="saved-summary-final-score" class="result-score-impact">0.00</span>
+                </div>
+                <div class="result-summary-row final-stat">
+                    <span class="result-label">Percentage:</span>
+                    <span id="saved-summary-percentage" class="result-score-impact">0.0%</span>
+                </div>
+                <div class="result-summary-row final-stat">
+                    <span class="result-label">Time Taken:</span>
+                    <span id="saved-summary-time-taken" class="result-score-impact">00:00</span>
+                </div>
+            </div>
+            <div class="flex justify-center gap-4 mt-8">
+                <button id="saved-quiz-review-btn" class="action-button action-button-secondary">
+                    <i class="fas fa-search-minus mr-1.5"></i> Review Wrong
+                </button>
+                <button class="action-button" onclick="closeModal('view-saved-result-modal')">
+                    Close
+                </button>
+            </div>
+        </div>
+    
+      </div>
+    </div>
             </main>
 
 
@@ -355,6 +446,9 @@
                 </button>
                 <button id="quiz-restart-btn" class="action-button" style="background-color: #4f46e5; padding: 10px 24px; font-size: 1rem;">
                     <i class="fas fa-redo mr-2"></i>Try Again
+                </button>
+                <button id="quiz-save-btn" class="action-button" disabled>
+                    <i class="fas fa-save mr-2"></i>Save
                 </button>
             </div>
         </div>

@@ -120,7 +120,8 @@
 		
         
         
-
+		let currentQuizResultData = null; // <-- ADD THIS
+		let savedResultsCache = null; // <-- ADD THIS, for caching results
         let currentUser = null;
         let userId = null;
         let unsubscribePlans = null; // For the list of month buttons
@@ -337,6 +338,11 @@
 		
         // --- Firestore ---
         function getUserPlansCollectionPath() { if (!userId) throw new Error("User ID is not available."); return `artifacts/${appId}/users/${userId}/studyPlans`; }
+		
+		function getUserResultsCollectionPath() {
+			if (!userId) throw new Error("User ID is not available.");
+			return `artifacts/${appId}/users/${userId}/quizResults`;
+		}
 
         // Load plans AND setup month navigation
         async function loadStudyPlans() {
@@ -349,6 +355,9 @@
             unsubscribePlans = onSnapshot(q, (querySnapshot) => {
                 console.log("Received plans snapshot. Number of plans:", querySnapshot.size);
                 monthNavButtonsContainer.innerHTML = '';
+                // --- START: ADD THIS LINE ---
+                const addMonthBtnHTML = `<button id="add-month-btn-inline" class="action-button flex items-center gap-1.5"><i class="fas fa-plus-circle text-sm"></i> Add Month</button>`;
+                // --- END: ADD THIS LINE ---
 
                 let currentMonthElement = currentMonthPlanDisplay.querySelector('.card[data-month-id]');
                 let currentMonthId = currentMonthElement ? currentMonthElement.dataset.monthId : null;
@@ -384,6 +393,7 @@
                             displayMonthPlan(monthId);
                         });
                         monthNavButtonsContainer.appendChild(button);
+						monthNavButtonsContainer.insertAdjacentHTML('beforeend', addMonthBtnHTML);
                     });
 
 
@@ -617,7 +627,13 @@
 
 
        // Add a new month
-        addMonthBtn.addEventListener('click', async (e) => {
+        // Add a new month
+        document.addEventListener('click', async (e) => {
+            // Check if the clicked element or its parent is the inline add button
+            if (!e.target.matches('#add-month-btn-inline') && !e.target.closest('#add-month-btn-inline')) {
+                return; // Not our button, do nothing
+            }
+            
              e.preventDefault(); // Prevent page jump
              if (!currentUser || !userId) return;
              const currentYear = new Date().getFullYear();
@@ -2257,13 +2273,74 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             return array;
         }
 
+
+		// --- START: ADD THIS MISSING FUNCTION ---
+
+        /**
+         * Fetches vocab data FOR A SINGLE ROW and prepares the quiz modal.
+         */
+        async function startQuiz(monthId, weekId, dayIndex, rowIndex) {
+            quizTitle.textContent = 'Vocabulary Quiz';
+            // Set the source info for the topic name
+            window.currentQuizSourceInfo = { monthId, weekId, dayIndex, rowIndex };
+            
+            quizModal.style.display = "block";
+            quizMainScreen.classList.add('hidden');
+            quizResultsScreen.classList.add('hidden');
+            quizStartScreen.classList.remove('hidden');
+            
+            quizStartMessage.textContent = "Loading vocabulary...";
+            quizStartBtn.classList.add('hidden');
+            document.getElementById('quiz-total-time-warning').style.display = 'none';
+
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+                
+                const vocabData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex]?.vocabData;
+                if (!vocabData || vocabData.length < 4) {
+                    quizStartMessage.textContent = "You need at least 4 vocabulary words in this row to start a quiz.";
+                    return;
+                }
+                
+                // --- TIMER LOGIC: Generate questions NOW ---
+                currentVocabData = preProcessVocab(vocabData);
+                currentMcqData = null;
+                currentQuizQuestions = generateQuizData(currentVocabData); // Generate questions
+                
+                const totalQuestions = currentQuizQuestions.length;
+                const totalTimeInSeconds = totalQuestions * 36; // 36 seconds per question
+                
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
+                // --- END TIMER LOGIC ---
+
+                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words?`;
+                quizStartBtn.classList.remove('hidden');
+                
+                // Re-create the button listener to avoid old closures
+                const newStartBtn = quizStartBtn.cloneNode(true);
+                quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
+                newStartBtn.addEventListener('click', runQuizGame);
+                quizStartBtn = newStartBtn; 
+                
+            } catch (error) {
+                console.error("Error loading quiz data:", error);
+                quizStartMessage.textContent = "Could not load quiz data. Please try again.";
+            }
+        }
+        // --- END: ADD THIS MISSING FUNCTION ---
+		
         /**
          * Fetches vocab data and prepares the quiz modal.
          */
         // UPGRADED: Generates questions first to set timer
-        async function startQuiz(monthId, weekId, dayIndex, rowIndex) {
+        async function startWeekQuiz(monthId, weekId) {
             quizTitle.textContent = 'Vocabulary Quiz';
-            quizModal.style.display = "block";
+            window.currentQuizSourceInfo = { monthId, weekId }; // <-- এই লাইনটি যোগ করুন
+            closeModal('quiz-center-modal');
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.add('hidden');
             quizStartScreen.classList.remove('hidden');
@@ -2631,6 +2708,52 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const timeTakenInSeconds = Math.round((quizEndTime - quizStartTime) / 1000);
             // --- END: NEW CALCULATIONS ---
             
+			// --- START: CAPTURE RESULT DATA FOR SAVING ---
+            const quizType = currentMcqData ? 'MCQ' : 'Vocab';
+            const quizTopicEl = document.getElementById('quiz-title');
+            let quizTopic = quizTopicEl ? quizTopicEl.textContent : (quizType === 'MCQ' ? 'MCQ Quiz' : 'Vocabulary Quiz');
+
+            // --- Topic Name Logic ---
+            if (currentMcqTarget) { // For MCQ quizzes
+                const { monthId, weekId, dayIndex } = currentMcqTarget;
+                quizTopic = `MCQ - Day ${dayIndex + 1}, ${weekId}, ${monthId}`;
+            } else if (currentVocabData && currentVocabData.length > 0) { // For Vocab quizzes
+                // This is harder as we don't store the source. We'll use the title.
+                // If the title is generic, we try to get more specific
+                if (quizTopic === 'Vocabulary Quiz' && window.currentQuizSourceInfo) {
+                     const { monthId, weekId } = window.currentQuizSourceInfo;
+                     quizTopic = `Vocab - ${weekId}, ${monthId}`;
+                }
+            }
+            // --- End Topic Name Logic ---
+            
+            currentQuizResultData = {
+                quizType: quizType,
+                topicName: quizTopic,
+                saveTimestamp: null, // Will be set on save
+                // Summary Stats
+                correctCount: correctCount,
+                wrongCount: wrongCount,
+                notAnsweredCount: notAnsweredCount,
+                answeredCount: answeredCount,
+                correctScore: correctScore,
+                wrongScore: wrongScore,
+                finalScore: finalScore,
+                totalQuestions: totalQuestions,
+                percentage: parseFloat(percentage.toFixed(1)),
+                timeTakenInSeconds: timeTakenInSeconds,
+                // Full Data for Review
+                questions: currentQuizQuestions // Save the full question set
+            };
+            
+            // Enable the save button
+            const saveBtn = document.getElementById('quiz-save-btn');
+            if(saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = `<i class="fas fa-save mr-2"></i>Save`;
+            }
+            // --- END: CAPTURE RESULT DATA FOR SAVING ---
+			
             // --- START: POPULATE SUMMARY TABLE ---
             document.getElementById('summary-answered-count').textContent = answeredCount;
             
@@ -3146,6 +3269,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         // UPGRADED: Generates questions first to set timer
         async function startMcqQuiz(monthId, weekId, dayIndex) {
             quizTitle.textContent = 'MCQ Quiz';
+			currentMcqTarget = { monthId, weekId, dayIndex };
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.add('hidden');
@@ -3429,6 +3553,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         // UPGRADED: Generates questions first to set timer
         async function startAggregatedMcqQuiz(quizType, monthId, weekId = null, dayIndex = null) {
             quizTitle.textContent = 'MCQ Quiz';
+			currentMcqTarget = { quizType, monthId, weekId, dayIndex };
             closeModal('mcq-quiz-center-modal');
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
@@ -3600,3 +3725,255 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         });
 
         // --- END: NEW 2-FACTOR DELETE FUNCTIONS ---
+		
+		// --- START: NEW SAVE QUIZ RESULT LOGIC ---
+document.getElementById('quiz-save-btn').addEventListener('click', async () => {
+    if (!currentQuizResultData) {
+        showCustomAlert("No result data to save.", "error");
+        return;
+    }
+    if (!currentUser || !userId) {
+        showCustomAlert("You must be logged in to save results.", "error");
+        return;
+    }
+
+    const saveBtn = document.getElementById('quiz-save-btn');
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Saving...`;
+
+    try {
+        const resultsCollectionPath = getUserResultsCollectionPath();
+        const resultsCollection = collection(db, resultsCollectionPath);
+        
+        // Add the timestamp *now*
+        currentQuizResultData.saveTimestamp = Timestamp.now();
+        
+        await addDoc(resultsCollection, currentQuizResultData);
+
+        // Invalidate cache
+        savedResultsCache = null;
+
+        showCustomAlert("Result saved successfully!", "success");
+        saveBtn.innerHTML = `<i class="fas fa-check mr-2"></i>Saved!`;
+        // We leave it disabled to prevent duplicate saves
+
+    } catch (error) {
+        console.error("Error saving quiz result:", error);
+        showCustomAlert("Could not save result. Please try again.", "error");
+        saveBtn.disabled = false; // Re-enable on error
+        saveBtn.innerHTML = `<i class="fas fa-save mr-2"></i>Save`;
+    }
+});
+// --- END: NEW SAVE QUIZ RESULT LOGIC ---
+
+
+// --- START: NEW RESULT SHEET LOGIC ---
+
+// --- DOM Elements for Result Sheet ---
+const resultSheetModal = document.getElementById('result-sheet-modal');
+const showResultsSheetBtn = document.getElementById('show-results-sheet-btn');
+const tabBtnMcq = document.getElementById('tab-btn-mcq');
+const tabBtnVocab = document.getElementById('tab-btn-vocab');
+const tabContentMcq = document.getElementById('tab-content-mcq');
+const tabContentVocab = document.getElementById('tab-content-vocab');
+const mcqResultsList = document.getElementById('mcq-results-list');
+const vocabResultsList = document.getElementById('vocab-results-list');
+const savedQuizReviewBtn = document.getElementById('saved-quiz-review-btn');
+let tempSavedReviewData = null; // Holds questions for the review button
+
+// --- Open the Result Sheet ---
+showResultsSheetBtn.addEventListener('click', () => {
+    resultSheetModal.style.display = 'block';
+    loadAndDisplayResults();
+});
+
+// --- Tab Switching ---
+tabBtnMcq.addEventListener('click', () => {
+    tabBtnMcq.classList.add('active-tab');
+    tabBtnVocab.classList.remove('active-tab');
+    tabContentMcq.classList.remove('hidden');
+    tabContentVocab.classList.add('hidden');
+});
+tabBtnVocab.addEventListener('click', () => {
+    tabBtnVocab.classList.add('active-tab');
+    tabBtnMcq.classList.remove('active-tab');
+    tabContentVocab.classList.remove('hidden');
+    tabContentMcq.classList.add('hidden');
+});
+
+// --- Fetch and Render Data ---
+async function loadAndDisplayResults() {
+    if (!currentUser || !userId) {
+        mcqResultsList.innerHTML = `<p class="text-center text-red-500 py-10">Please log in to see results.</p>`;
+        vocabResultsList.innerHTML = `<p class="text-center text-red-500 py-10">Please log in to see results.</p>`;
+        return;
+    }
+
+    // Use cache if available
+    if (savedResultsCache) {
+        console.log("Loading results from cache...");
+        renderResults(savedResultsCache);
+        return;
+    }
+
+    // Set loading state
+    mcqResultsList.innerHTML = `<p class="text-center text-gray-500 italic py-10">Loading MCQ results...</p>`;
+    vocabResultsList.innerHTML = `<p class="text-center text-gray-500 italic py-10">Loading Vocab quiz results...</p>`;
+
+    try {
+        console.log("Fetching results from Firestore...");
+        const resultsCollectionPath = getUserResultsCollectionPath();
+        const q = query(collection(db, resultsCollectionPath), orderBy("saveTimestamp", "desc"));
+        
+        const querySnapshot = await getDocs(q);
+        
+        const allResults = [];
+        querySnapshot.forEach((doc) => {
+            allResults.push({ id: doc.id, ...doc.data() });
+        });
+
+        savedResultsCache = allResults; // Store in cache
+        renderResults(allResults);
+
+    } catch (error) {
+        console.error("Error fetching results:", error);
+        mcqResultsList.innerHTML = `<p class="text-center text-red-500 py-10">Error loading results.</p>`;
+        vocabResultsList.innerHTML = `<p class="text-center text-red-500 py-10">Error loading results.</p>`;
+    }
+}
+
+// --- Render Helper ---
+function renderResults(allResults) {
+    const mcqResults = allResults.filter(r => r.quizType === 'MCQ');
+    const vocabResults = allResults.filter(r => r.quizType === 'Vocab');
+
+    mcqResultsList.innerHTML = createResultsTable(mcqResults, 'mcq');
+    vocabResultsList.innerHTML = createResultsTable(vocabResults, 'vocab');
+
+    // Add listeners to the new buttons
+    attachViewResultListeners(allResults);
+}
+
+// --- Create Table HTML ---
+function createResultsTable(results, type) {
+    if (results.length === 0) {
+        return `<p class="text-center text-gray-500 italic py-10">No ${type} results found.</p>`;
+    }
+
+    const rows = results.map((res, index) => {
+        const date = res.saveTimestamp?.toDate ? res.saveTimestamp.toDate().toLocaleDateString('en-US', {
+            year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        }) : 'N/A';
+        
+        return `
+            <tr>
+                <td class="sl-col">${index + 1}</td>
+                <td class="date-col">${date}</td>
+                <td class="topic-col">${escapeHtml(res.topicName)}</td>
+                <td class="score-col">${res.finalScore.toFixed(2)}</td>
+                <td class="score-col">${res.totalQuestions}</td>
+                <td class="percent-col ${res.percentage >= 50 ? 'text-emerald-600' : 'text-red-600'}">${res.percentage}%</td>
+                <td class="view-col">
+                    <button class="action-button action-button-secondary text-xs view-saved-result-btn" data-result-id="${res.id}">
+                        <i class="fas fa-eye mr-1"></i> View
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    return `
+        <table>
+            <thead>
+                <tr>
+                    <th class="sl-col">SL.</th>
+                    <th class="date-col">Date</th>
+                    <th class="topic-col">Exam Topic</th>
+                    <th class="score-col">Obtained</th>
+                    <th class="score-col">Total</th>
+                    <th class="percent-col">Percentage</th>
+                    <th class="view-col">View</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${rows}
+            </tbody>
+        </table>
+    `;
+}
+
+// --- Attach Listeners for "View" Buttons ---
+function attachViewResultListeners(allResults) {
+    const allButtons = document.querySelectorAll('.view-saved-result-btn');
+    allButtons.forEach(btn => {
+        // Prevent multiple listeners
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.addEventListener('click', () => {
+            const resultId = newBtn.dataset.resultId;
+            // Find the full result object from our cached array
+            const resultData = allResults.find(r => r.id === resultId);
+            if (resultData) {
+                openSavedResultModal(resultData);
+            } else {
+                showCustomAlert("Could not find result data.", "error");
+            }
+        });
+    });
+}
+
+// --- Open the "View Saved Result" Modal ---
+function openSavedResultModal(resultData) {
+    document.getElementById('saved-result-topic-name').textContent = resultData.topicName;
+    document.getElementById('saved-summary-answered-count').textContent = resultData.answeredCount;
+    document.getElementById('saved-summary-correct-count').textContent = resultData.correctCount;
+    document.getElementById('saved-summary-correct-score').textContent = `+${resultData.correctScore.toFixed(2)}`;
+    document.getElementById('saved-summary-wrong-count').textContent = resultData.wrongCount;
+    document.getElementById('saved-summary-wrong-score').textContent = resultData.wrongScore.toFixed(2);
+    document.getElementById('saved-summary-not-answered-count').textContent = resultData.notAnsweredCount;
+    document.getElementById('saved-summary-not-answered-score').textContent = `0.00`;
+    document.getElementById('saved-summary-final-score').textContent = resultData.finalScore.toFixed(2);
+    document.getElementById('saved-summary-percentage').textContent = `${resultData.percentage.toFixed(1)}%`;
+    document.getElementById('saved-summary-time-taken').textContent = formatTime(resultData.timeTakenInSeconds);
+
+    // Show/Hide review button
+    if (resultData.wrongCount > 0) {
+        savedQuizReviewBtn.style.display = 'inline-flex';
+        // Pass the question data to a temp variable for the review button to use
+        tempSavedReviewData = resultData.questions;
+    } else {
+        savedQuizReviewBtn.style.display = 'none';
+        tempSavedReviewData = null;
+    }
+
+    document.getElementById('view-saved-result-modal').style.display = 'block';
+}
+
+// --- Listener for the "Review Wrong" button in the SAVED modal ---
+savedQuizReviewBtn.addEventListener('click', () => {
+    if (!tempSavedReviewData) {
+        showCustomAlert("No review data found.", "error");
+        return;
+    }
+    
+    // We re-use the *existing* quiz review screen, but populate it with saved data
+    
+    // 1. Set the main quiz variable to our saved data
+    currentQuizQuestions = tempSavedReviewData;
+    
+    // 2. Call the existing review function
+    showReviewScreen(); // This is the function from line ~1890
+    
+    // 3. Show the main quiz modal and hide the "saved result" modal
+    closeModal('view-saved-result-modal');
+    quizModal.style.display = 'block';
+    
+    // 4. Ensure the quiz modal is showing the *review* screen, not the start/main/results screen
+    quizStartScreen.classList.add('hidden');
+    quizMainScreen.classList.add('hidden');
+    quizResultsScreen.classList.add('hidden');
+    quizReviewScreen.classList.remove('hidden');
+});
+
+// --- END: NEW RESULT SHEET LOGIC ---
