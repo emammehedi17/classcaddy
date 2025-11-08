@@ -331,7 +331,7 @@
         }
 
         /* --- Add Day Button --- */
-        .add-day-btn { display: flex; align-items: center; justify-content: center; background-color: #ecfdf5; color: #059669; border: 1px dashed #34d399; border-radius: 8px; padding: 12px; margin-top: 1rem; cursor: pointer; transition: all 0.2s; font-weight: 600; }
+        .add-day-btn { display: flex; align-items: center; justify-content: center; background-color: #ecfdf5; color: #059669; border: 1px dashed #34d399; border-radius: 8px; padding: 12px; margin-top: 1rem; cursor: pointer;  font-weight: 600; }
         .add-day-btn:hover { background-color: #d1fae5; color: #047857; border-color: #6ee7b7; }
         .add-day-btn i { margin-right: 8px; }
 
