@@ -2451,10 +2451,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             loadQuizQuestion();
         }
 
-		/**
-         * NEW: Starts the countdown timer
-         */
-        function startTimer(totalSeconds) {
+		function startTimer(totalSeconds) {
             if (quizTimerInterval) clearInterval(quizTimerInterval); // Clear any old timer
             quizStartTime = Date.now(); // <-- এই লাইনটি কুইজ শুরুর সময় সেভ করবে
 
@@ -2591,12 +2588,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             // --- END: NEW AUTO-ADVANCE LOGIC ---
         }
 
-        /**
-         * Shows the final score. (UPGRADED for Result Summary)
-         */
         function showQuizResults() {
 			if (quizTimerInterval) clearInterval(quizTimerInterval);
-            const quizEndTime = Date.now(); // <-- ১. কুইজ শেষ হওয়ার সময় সেভ করুন
+            const quizEndTime = Date.now(); // <-- এই লাইনটি কুইজ শেষ হওয়ার সময় সেভ করবে
             
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.remove('hidden');
@@ -2622,18 +2616,17 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const correctScore = correctCount * 1;
             const wrongScore = wrongCount * -0.25;
             
-            // ২. (মূল সমাধান) পুনরায় স্কোর গণনা না করে, কুইজ চলাকালীন গণনা করা 'currentQuizScore' ব্যবহার করুন
-            const finalScore = currentQuizScore;
+            // [স্কোর ফিক্স]: আপনার স্ক্রিনশট অনুযায়ী, এই গণনাকারাই সঠিক
+            const finalScore = correctScore + wrongScore;
             
-            // ৩. (মূল সমাধান) শতাংশ গণনার জন্য 'finalScore' ব্যবহার করুন
+            // [পার্সেন্টেজ ফিক্স]: উপরের 'finalScore' ঠিক হওয়ায় এটিও ঠিক হয়ে যাবে
             const percentage = (totalQuestions > 0) ? (Math.max(0, finalScore) / totalQuestions) * 100 : 0;
             
-            // ৪. (মূল সমাধান) সঠিক 'timeTakenInSeconds' গণনা করুন
+            // [টাইম ফিক্স]: ধাপ ১ ও ২ থেকে পাওয়া ভেরিয়েবল দিয়ে সঠিক সময় গণনা
             const timeTakenInSeconds = Math.round((quizEndTime - quizStartTime) / 1000);
             // --- END: NEW CALCULATIONS ---
             
             // --- START: POPULATE SUMMARY TABLE ---
-            // Get elements directly by ID
             document.getElementById('summary-answered-count').textContent = answeredCount;
             
             document.getElementById('summary-correct-count').textContent = correctCount;
