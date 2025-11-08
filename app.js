@@ -4117,7 +4117,21 @@ document.getElementById('saved-quiz-restart-btn').addEventListener('click', () =
     // ১. গ্লোবাল কুইজ স্টেট সেট করুন
     currentVocabData = null; // সোর্স ক্লিয়ার করুন
     currentMcqData = null; // সোর্স ক্লিয়ার করুন
-    currentQuizQuestions = tempSavedReviewData; // সেভ করা প্রশ্নগুলো ব্যবহার করুন
+
+    // --- START: FIX ---
+    // প্রশ্নগুলোকে " পরিষ্কার" করতে হবে (পুরনো উত্তর মুছে ফেলতে হবে)
+    const cleanQuestions = tempSavedReviewData.map(q => {
+        // ...q (স্প্রেড অপারেটর) দিয়ে পুরনো প্রশ্নটি কপি করুন
+        // তারপর userAnswer এবং isCorrect রিসেট করুন
+        return {
+            ...q, // প্রশ্ন, অপশন, সঠিক উত্তর কপি করুন
+            userAnswer: null, // পুরনো উত্তর রিসেট করুন
+            isCorrect: null   // পুরনো স্ট্যাটাস রিসেট করুন
+        };
+    });
+    
+    currentQuizQuestions = cleanQuestions; // পরিষ্কার প্রশ্নগুলো গ্লোবাল ভেরিয়েবলে সেট করুন
+    // --- END: FIX ---
     
     // ২. "View Saved Result" মোডালটি বন্ধ করুন
     closeModal('view-saved-result-modal');
