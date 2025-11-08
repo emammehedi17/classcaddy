@@ -119,7 +119,7 @@
         // --- END: ADD THESE NEW ELEMENTS ---
 		
         
-        
+        let progressChart = null; // Holds the chart instance
 		let currentQuizResultData = null; // <-- ADD THIS
 		let savedResultsCache = null; // <-- ADD THIS, for caching results
         let currentUser = null;
@@ -3942,8 +3942,9 @@ function renderResults(allResults) {
     // Add listeners to the new buttons
     attachViewResultListeners(allResults);
     attachTopicLinkListeners(); // <-- ৩. লিঙ্কগুলোর জন্য লিসেনার যোগ করুন
+	
 }
-
+	attachChartButtonListeners(); // <-- ৪. চার্ট বাটনের জন্য লিসেনার যোগ করুন
 // --- ৫. মোট হিসাব করার জন্য নতুন ফাংশন ---
 function calculateOverallStats(results) {
     let totalObtained = 0;
@@ -4026,7 +4027,11 @@ function createResultsTable(results, type, stats) { // <-- ৩. 'stats' না�
                     <th class="score-col">${stats.totalFull}</th>
                     <th class="time-col">${formatTime(stats.totalTime)}</th>
                     <th class="percent-col">${stats.overallPercentage}%</th>
-                    <th class="view-col"></th>
+                    <th class="view-col">
+                        <button class="action-button progress-chart-btn" data-chart-type="${type}">
+                            <i class="fas fa-chart-line mr-1"></i> Your Progress
+                        </button>
+                        </th>
                 </tr>
             </tfoot>
         </table>
@@ -4183,3 +4188,134 @@ document.getElementById('saved-quiz-restart-btn').addEventListener('click', () =
 });
 
 // --- END: NEW RESULT SHEET LOGIC ---
+
+		// --- START: NEW PROGRESS CHART LOGIC ---
+
+/**
+ * Attaches click listeners to the "Your Progress" buttons in the footer
+ */
+function attachChartButtonListeners() {
+    document.querySelectorAll('.progress-chart-btn').forEach(btn => {
+        // Prevent multiple listeners
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.addEventListener('click', () => {
+            if (!savedResultsCache) {
+                showCustomAlert("Results data not found.", "error");
+                return;
+            }
+            
+            const type = newBtn.dataset.chartType; // 'mcq' or 'vocab'
+            
+            // Get the correct data from cache
+            const results = (type === 'mcq')
+                ? savedResultsCache.filter(r => r.quizType === 'MCQ')
+                : savedResultsCache.filter(r => r.quizType === 'Vocab');
+            
+            openProgressChart(results, type);
+        });
+    });
+}
+
+/**
+ * Prepares data and opens the chart modal
+ */
+function openProgressChart(results, type) {
+    if (results.length === 0) {
+        showCustomAlert("No data to display in chart.", "error");
+        return;
+    }
+
+    const labels = [];
+    const data = [];
+
+    // Results are (desc), we must reverse them to (asc) for the chart
+    results.slice().reverse().forEach(res => {
+        // Format date as YYYY-MM-DD for consistency
+        const date = res.saveTimestamp?.toDate ? res.saveTimestamp.toDate().toLocaleDateString('en-CA') : 'Unknown';
+        labels.push(date);
+        data.push(res.percentage);
+    });
+    
+    const title = (type === 'mcq') ? 'MCQ Quiz Progress' : 'Vocabulary Quiz Progress';
+    document.getElementById('chart-modal-title').textContent = title;
+    
+    // Render the chart
+    renderProgressChart(labels, data, title);
+    
+    // Show the modal
+    document.getElementById('chart-modal').style.display = 'block';
+}
+
+/**
+ * Renders the line chart using Chart.js
+ */
+function renderProgressChart(labels, data, title) {
+    // Destroy the old chart instance if it exists
+    if (progressChart) {
+        progressChart.destroy();
+    }
+    
+    const ctx = document.getElementById('progress-chart-canvas').getContext('2d');
+    
+    // Create a gradient fill
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.6)'); // emerald-500
+    gradient.addColorStop(1, 'rgba(16, 185, 129, 0.05)');
+
+    progressChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Percentage (%)',
+                data: data,
+                fill: true,
+                backgroundColor: gradient, // Gradient fill
+                borderColor: '#10b981', // emerald-500
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#10b981',
+                pointHoverRadius: 7,
+                pointHoverBackgroundColor: '#10b981',
+                pointHoverBorderColor: '#ffffff',
+                borderWidth: 3,
+                tension: 0.1 // Smooth curves
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%'; // Add % to Y-axis
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false // Hide the "Percentage (%)" label
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Score: ${context.parsed.y}%`; // Tooltip text
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+// --- END: NEW PROGRESS CHART LOGIC ---

@@ -1265,3 +1265,17 @@
 			/* font-size: 0.8rem; (ডিফল্ট) */
 		}
 		/* --- END: BANGLA MEANING TOOLTIP STYLE --- */
+		
+		/* --- START: PROGRESS CHART BUTTON STYLE --- */
+		.progress-chart-btn {
+			padding: 4px 8px; /* Make it small */
+			font-size: 0.75rem; /* text-xs */
+			background-color: #f0fdfa; /* teal-50 */
+			color: #0d9488; /* teal-600 */
+			border-color: #99f6e4; /* teal-200 */
+		}
+		.progress-chart-btn:hover {
+			background-color: #ccfbf1; /* teal-100 */
+			color: #115e59; /* teal-800 */
+		}
+		/* --- END: PROGRESS CHART BUTTON STYLE --- */

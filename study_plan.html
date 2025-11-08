@@ -9,6 +9,7 @@
 
 	  gtag('config', 'G-JWZXVQC68L');
 	</script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Caddy - My Study Plan</title>
@@ -562,7 +563,17 @@
         
       </div>
     </div>
-    
+    <div id="chart-modal" class="modal">
+      <div class="modal-content" style="max-width: 800px;">
+        <span class="modal-close" onclick="closeModal('chart-modal')">&times;</span>
+        <h3 id="chart-modal-title" class="text-2xl font-semibold mb-5 text-emerald-600">Your Progress</h3>
+        
+        <div style="width: 100%; height: 400px;">
+            <canvas id="progress-chart-canvas"></canvas>
+        </div>
+
+      </div>
+    </div>
 	
 	<script type="module" src="app.js"></script>
 </body>
