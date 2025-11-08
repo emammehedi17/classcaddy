@@ -1072,12 +1072,50 @@
         function generateVocabHtml(vocabData) {
             if (!vocabData || vocabData.length === 0) return '-';
 
-            const wordsHtml = vocabData.map(v =>
-                `<div class="vocab-word" tabindex="0">
+            // এই Regex গ্লোবাল স্কোপে ডিফাইন করা আছে (লাইন ১০১)
+            // const banglaRegex = /[\u0980-\u09FF]/; 
+
+            const wordsHtml = vocabData.map(v => {
+                const meaningStr = v.meaning || 'No meaning';
+                let meaningHtml = '';
+
+                const hyphenIndex = meaningStr.indexOf('-');
+                
+                // চেক করুন হাইফেন আছে কি না
+                if (hyphenIndex > 0 && hyphenIndex < meaningStr.length - 1) {
+                    let part1 = meaningStr.substring(0, hyphenIndex).trim();
+                    let part2 = meaningStr.substring(hyphenIndex + 1).trim();
+
+                    // কোন অংশটি বাংলা তা চেক করুন
+                    const part1IsBangla = banglaRegex.test(part1);
+                    const part2IsBangla = banglaRegex.test(part2);
+
+                    if (part1IsBangla && !part2IsBangla) {
+                        // ফরম্যাট: বাংলা - English
+                        meaningHtml = `<span class="bangla-meaning-text">${escapeHtml(part1)}</span> - <span class="english-meaning-text">${escapeHtml(part2)}</span>`;
+                    } else if (!part1IsBangla && part2IsBangla) {
+                        // ফরম্যাট: English - বাংলা
+                        meaningHtml = `<span class="english-meaning-text">${escapeHtml(part1)}</span> - <span class="bangla-meaning-text">${escapeHtml(part2)}</span>`;
+                    } else {
+                        // যদি উভয়ই বাংলা হয় বা কোনোটিই না হয়
+                        if (part1IsBangla) part1 = `<span class="bangla-meaning-text">${escapeHtml(part1)}</span>`;
+                        if (part2IsBangla) part2 = `<span class="bangla-meaning-text">${escapeHtml(part2)}</span>`;
+                        meaningHtml = `${part1} - ${part2}`;
+                    }
+                } else {
+                    // কোনো হাইফেন নেই, পুরো স্ট্রিং চেক করুন
+                    if (banglaRegex.test(meaningStr)) {
+                        meaningHtml = `<span class="bangla-meaning-text">${escapeHtml(meaningStr)}</span>`;
+                    } else {
+                        meaningHtml = escapeHtml(meaningStr);
+                    }
+                }
+
+                return `<div class="vocab-word" tabindex="0">
                     ${escapeHtml(v.word || '')}
-                    <span class="vocab-meaning">${escapeHtml(v.meaning || 'No meaning')}</span>
-                 </div>`
-            ).join(''); // Join with no space, margin will handle it
+                    <span class="vocab-meaning">${meaningHtml}</span>
+                 </div>`;
+            }).join(''); // Join with no space, margin will handle it
             
             // Return the words inside our new flex container
             return `<div class="vocab-container">${wordsHtml}</div>`;
