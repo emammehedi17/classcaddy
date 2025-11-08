@@ -745,7 +745,7 @@
             text-align: left;
             font-weight: 500; /* medium */
             color: #374151; /* text-gray-700 */
-            transition: all 0.2s;
+            
         }
         .quiz-option-btn:hover:not(:disabled) {
             border-color: #6366f1; /* hover:border-indigo-500 */
