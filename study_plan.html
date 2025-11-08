@@ -304,22 +304,52 @@
         </div>
         
         <div id="quiz-results-screen" class="hidden text-center py-10">
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Quiz Completed!</h2>
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">Quiz Completed!</h2>
             
-            <p class="text-xl text-gray-700 mb-2">
-                Your final score is:
-                <span id="quiz-final-score" class="font-bold text-indigo-600">0.00</span>
-            </p>
-            
-            <p class="text-xl text-gray-700 mb-2">
-                Percentage:
-                <span id="quiz-percentage" class="font-bold text-emerald-600">0%</span>
-            </p>
-            
-            <p id="quiz-time-taken" class="text-base text-gray-600 mb-8">
-                Time Taken: <span class="font-bold text-gray-800">00:00</span>
-            </p>
-            <div class="flex justify-center gap-4">
+            <div class="result-summary-list kalpurush">
+                
+                <div class="result-summary-row">
+                    <span class="result-label">Total Answered:</span>
+                    <span id="summary-answered-count" class="result-count">0</span>
+                    <span class="result-score-impact"></span> </div>
+                
+                <div class="result-summary-row">
+                    <span class="result-label text-green-700">Correct Answered:</span>
+                    <span id="summary-correct-count" class="result-count text-green-700">0</span>
+                    <span id="summary-correct-score" class="result-score-impact text-green-700">+0.00</span>
+                </div>
+                
+                <div class="result-summary-row">
+                    <span class="result-label text-red-700">Wrong Answered:</span>
+                    <span id="summary-wrong-count" class="result-count text-red-700">0</span>
+                    <span id="summary-wrong-score" class="result-score-impact text-red-700">-0.00</span>
+                </div>
+                
+                <div class="result-summary-row">
+                    <span class="result-label text-gray-600">Not Answered:</span>
+                    <span id="summary-not-answered-count" class="result-count text-gray-600">0</span>
+                    <span class="result-score-impact text-gray-600">0.00</span>
+                </div>
+                
+                <hr class="my-3 border-gray-300">
+                
+                <div class="result-summary-row final-score">
+                    <span class="result-label">Final Score:</span>
+                    <span id="summary-final-score" class="result-score-impact">0.00</span>
+                </div>
+                
+                <div class="result-summary-row final-stat">
+                    <span class="result-label">Percentage:</span>
+                    <span id="summary-percentage" class="result-score-impact">0.0%</span>
+                </div>
+                
+                <div class="result-summary-row final-stat">
+                    <span class="result-label">Time Taken:</span>
+                    <span id="summary-time-taken" class="result-score-impact">00:00</span>
+                </div>
+                
+            </div>
+            <div class="flex justify-center gap-4 mt-8">
                 <button id="quiz-review-btn" class="action-button action-button-secondary">
                     <i class="fas fa-search-minus mr-1.5"></i> Review Wrong
                 </button>

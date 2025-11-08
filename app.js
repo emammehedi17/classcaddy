@@ -111,12 +111,14 @@
         const quizRestartBtn = document.getElementById('quiz-restart-btn');
 		// --- START: ADD THESE NEW ELEMENTS ---
         const quizReviewBtn = document.getElementById('quiz-review-btn');
-        const quizTimeTaken = document.getElementById('quiz-time-taken');
+        
         const quizReviewScreen = document.getElementById('quiz-review-screen');
         const quizReviewContent = document.getElementById('quiz-review-content');
         const quizBackToResultsBtn = document.getElementById('quiz-back-to-results-btn');
         // --- END: ADD THESE NEW ELEMENTS ---
-        // --- END: QUIZ ELEMENTS ---
+		
+        
+        
 
         let currentUser = null;
         let userId = null;
@@ -2571,38 +2573,65 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         /**
-         * Shows the final score.
+         * Shows the final score. (UPGRADED for Result Summary)
          */
         function showQuizResults() {
 			if (quizTimerInterval) clearInterval(quizTimerInterval);
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.remove('hidden');
-            quizReviewScreen.classList.add('hidden'); // <-- ADDED: Hide review screen
+            quizReviewScreen.classList.add('hidden');
 
-            // Recalculate score from scratch to be safe
-            let finalScore = 0;
+            // --- START: NEW CALCULATIONS ---
+            const totalQuestions = currentQuizQuestions.length;
+            let correctCount = 0;
+            let wrongCount = 0;
+            let notAnsweredCount = 0;
+
             currentQuizQuestions.forEach(q => {
                 if (q.isCorrect === true) {
-                    finalScore += 1;
+                    correctCount++;
                 } else if (q.isCorrect === false) {
-                    finalScore -= 0.25;
+                    wrongCount++;
+                } else {
+                    notAnsweredCount++;
                 }
-                // Skipped questions (isCorrect === null) are ignored
             });
-            currentQuizScore = finalScore;
 
-            const totalQuestions = currentQuizQuestions.length;
-            const finalScoreForPercentage = Math.max(0, currentQuizScore);
-            const percentage = (finalScoreForPercentage / totalQuestions) * 100;
-
-            quizFinalScore.textContent = currentQuizScore.toFixed(2);
-            quizPercentage.textContent = `${percentage.toFixed(1)}%`;
+            const answeredCount = correctCount + wrongCount;
+            const correctScore = correctCount * 1;
+            const wrongScore = wrongCount * -0.25;
+            const finalScore = correctScore + wrongScore;
             
-            // --- NEW: TIME TAKEN LOGIC ---
+            // Percentage should be based on total questions, but final score can be negative
+            const percentage = (totalQuestions > 0) ? (Math.max(0, finalScore) / totalQuestions) * 100 : 0;
+            
             const timeTakenInSeconds = quizTotalSeconds - quizRemainingSeconds;
-            // Get element by ID, not from a variable
-            document.getElementById('quiz-time-taken').querySelector('span').textContent = formatTime(timeTakenInSeconds);
-            // --- END: TIME TAKEN LOGIC ---
+            // --- END: NEW CALCULATIONS ---
+            
+            // --- START: POPULATE SUMMARY TABLE ---
+            // Get elements directly by ID
+            document.getElementById('summary-answered-count').textContent = answeredCount;
+            
+            document.getElementById('summary-correct-count').textContent = correctCount;
+            document.getElementById('summary-correct-score').textContent = `+${correctScore.toFixed(2)}`;
+            
+            document.getElementById('summary-wrong-count').textContent = wrongCount;
+            document.getElementById('summary-wrong-score').textContent = wrongScore.toFixed(2);
+            
+            document.getElementById('summary-not-answered-count').textContent = notAnsweredCount;
+            document.getElementById('summary-not-answered-score').textContent = `0.00`;
+            
+            document.getElementById('summary-final-score').textContent = finalScore.toFixed(2);
+            document.getElementById('summary-percentage').textContent = `${percentage.toFixed(1)}%`;
+            document.getElementById('summary-time-taken').textContent = formatTime(timeTakenInSeconds);
+            // --- END: POPULATE SUMMARY TABLE ---
+            
+            // Show/Hide the "Review Wrong" button
+            if (wrongCount > 0) {
+                quizReviewBtn.style.display = 'inline-flex';
+            } else {
+                quizReviewBtn.style.display = 'none';
+            }
         }
 		
 		

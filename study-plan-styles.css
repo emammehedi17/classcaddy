@@ -1020,6 +1020,60 @@
         }
         /* --- END: QUIZ REVIEW STYLES --- */
 		
+		/* --- START: NEW RESULT SUMMARY STYLES --- */
+        .result-summary-list {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #f9fafb; /* gray-50 */
+            border: 1px solid #e5e7eb; /* gray-200 */
+            border-radius: 8px;
+            padding: 1.25rem; /* p-5 */
+            text-align: left;
+        }
+        .result-summary-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr; /* 3 columns: Label, Count, Score */
+            align-items: center;
+            gap: 1rem; /* gap-4 */
+            padding: 0.5rem 0; /* py-2 */
+            font-size: 0.95rem; /* text-base */
+        }
+        .result-label {
+            font-weight: 600; /* semibold */
+            color: #1f2937; /* gray-800 */
+        }
+        .result-count {
+            font-weight: 500;
+            text-align: right;
+            padding-right: 0.5rem;
+        }
+        .result-score-impact {
+            font-weight: 700; /* bold */
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* Final Score row (2 columns) */
+        .result-summary-row.final-score {
+            grid-template-columns: 1fr 1fr;
+            font-size: 1.15rem; /* text-lg */
+            color: #4f46e5; /* indigo-600 */
+        }
+        .result-summary-row.final-score .result-label {
+            color: #4f46e5; /* indigo-600 */
+        }
+        
+        /* Percentage/Time rows (2 columns) */
+        .result-summary-row.final-stat {
+            grid-template-columns: 1fr 1fr;
+            font-size: 0.9rem;
+            color: #374151; /* gray-700 */
+        }
+        .result-summary-row.final-stat .result-label {
+            color: #374151; /* gray-700 */
+        }
+        /* --- END: NEW RESULT SUMMARY STYLES --- */
+		
 		/* --- START: QUIZ SLIDE ANIMATIONS --- */
         @keyframes slideInFromRight {
             from { transform: translateX(100%); opacity: 0; }
