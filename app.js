@@ -139,6 +139,7 @@
 		let quizTimerInterval = null;
 		let quizTotalSeconds = 0; // <-- এই লাইনটি যোগ করুন
         let quizRemainingSeconds = 0; // <-- এই লাইনটি যোগ করুন
+		let quizStartTime = 0;
         // --- END: QUIZ STATE VARIABLES ---
 		
 		// --- START: ADD THESE ---
@@ -2455,9 +2456,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          */
         function startTimer(totalSeconds) {
             if (quizTimerInterval) clearInterval(quizTimerInterval); // Clear any old timer
+            quizStartTime = Date.now(); // <-- এই লাইনটি কুইজ শুরুর সময় সেভ করবে
 
-            quizTotalSeconds = totalSeconds; // <-- ADDED
-            quizRemainingSeconds = totalSeconds; // <-- ADDED
+            quizTotalSeconds = totalSeconds; 
+            quizRemainingSeconds = totalSeconds; 
             let remaining = totalSeconds;
             
             const timerEl = document.getElementById('quiz-timer');
@@ -2594,6 +2596,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          */
         function showQuizResults() {
 			if (quizTimerInterval) clearInterval(quizTimerInterval);
+            const quizEndTime = Date.now(); // <-- ১. কুইজ শেষ হওয়ার সময় সেভ করুন
+            
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.remove('hidden');
             quizReviewScreen.classList.add('hidden');
@@ -2617,12 +2621,15 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const answeredCount = correctCount + wrongCount;
             const correctScore = correctCount * 1;
             const wrongScore = wrongCount * -0.25;
-            const finalScore = correctScore + wrongScore;
             
-            // Percentage should be based on total questions, but final score can be negative
+            // ২. (মূল সমাধান) পুনরায় স্কোর গণনা না করে, কুইজ চলাকালীন গণনা করা 'currentQuizScore' ব্যবহার করুন
+            const finalScore = currentQuizScore;
+            
+            // ৩. (মূল সমাধান) শতাংশ গণনার জন্য 'finalScore' ব্যবহার করুন
             const percentage = (totalQuestions > 0) ? (Math.max(0, finalScore) / totalQuestions) * 100 : 0;
             
-            const timeTakenInSeconds = quizTotalSeconds - quizRemainingSeconds;
+            // ৪. (মূল সমাধান) সঠিক 'timeTakenInSeconds' গণনা করুন
+            const timeTakenInSeconds = Math.round((quizEndTime - quizStartTime) / 1000);
             // --- END: NEW CALCULATIONS ---
             
             // --- START: POPULATE SUMMARY TABLE ---
