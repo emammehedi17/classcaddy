@@ -3019,6 +3019,71 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 quizCenterContent.innerHTML = '<p class="text-center text-red-500 py-5">Could not load quizzes. Please try again.</p>';
             }
         }
+		
+		// 4. Function to start a week-long quiz
+        // This is the CORRECT version
+        async function startWeekQuiz(monthId, weekId) {
+            quizTitle.textContent = 'Vocabulary Quiz';
+            // Set the source info for the topic name
+            window.currentQuizSourceInfo = { monthId, weekId };
+
+            closeModal('quiz-center-modal');
+            quizModal.style.display = "block";
+            quizMainScreen.classList.add('hidden');
+            quizResultsScreen.classList.add('hidden');
+            quizStartScreen.classList.remove('hidden');
+            
+            quizStartMessage.textContent = "Loading week's vocabulary...";
+            quizStartBtn.classList.add('hidden');
+            document.getElementById('quiz-total-time-warning').style.display = 'none';
+
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                const weekData = docSnap.data().weeks?.[weekId];
+                if (!weekData || !weekData.days) throw new Error("Week data not found.");
+                
+                let allWeekVocab = [];
+                for (const day of weekData.days) {
+                    for (const row of day.rows) {
+                        if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
+                            allWeekVocab.push(...row.vocabData);
+                        }
+                    }
+                }
+                if (allWeekVocab.length < 4) {
+                    quizStartMessage.textContent = "You need at least 4 vocabulary words to start a quiz.";
+                    return;
+                }
+
+                // --- TIMER LOGIC: Generate questions NOW ---
+                currentVocabData = preProcessVocab(allWeekVocab);
+                currentMcqData = null;
+                currentQuizQuestions = generateQuizData(currentVocabData); // Generate questions
+                
+                const totalQuestions = currentQuizQuestions.length;
+                const totalTimeInSeconds = totalQuestions * 36;
+                
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
+                // --- END TIMER LOGIC ---
+
+                quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week?`;
+                quizStartBtn.classList.remove('hidden');
+                
+                const newStartBtn = quizStartBtn.cloneNode(true);
+                quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
+                newStartBtn.addEventListener('click', runQuizGame);
+                quizStartBtn = newStartBtn; 
+                
+            } catch (error) {
+                console.error("Error loading week quiz data:", error);
+                quizStartMessage.textContent = "Could not load week quiz data. Please try again.";
+            }
+        }
 
         // 3. Add a global click listener for the new week buttons
         quizCenterContent.addEventListener('click', (e) => {
