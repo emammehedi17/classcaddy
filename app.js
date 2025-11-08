@@ -393,9 +393,9 @@
                             displayMonthPlan(monthId);
                         });
                         monthNavButtonsContainer.appendChild(button);
-						monthNavButtonsContainer.insertAdjacentHTML('beforeend', addMonthBtnHTML);
+						
                     });
-
+						monthNavButtonsContainer.insertAdjacentHTML('beforeend', addMonthBtnHTML);
 
                     // --- MODIFIED BLOCK START ---
                     if (currentMonthId && !monthExists) {
@@ -2714,23 +2714,57 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const quizTopicEl = document.getElementById('quiz-title');
             let quizTopic = quizTopicEl ? quizTopicEl.textContent : (quizType === 'MCQ' ? 'MCQ Quiz' : 'Vocabulary Quiz');
 
-            // --- Topic Name Logic ---
+            // --- Topic Name Logic (UPGRADED) ---
+            let topicLink = null; // লিঙ্ক সেভ করার জন্য নতুন ভেরিয়েবল
+
             if (currentMcqTarget) { // For MCQ quizzes
-                const { monthId, weekId, dayIndex } = currentMcqTarget;
-                quizTopic = `MCQ - Day ${dayIndex + 1}, ${weekId}, ${monthId}`;
-            } else if (currentVocabData && currentVocabData.length > 0) { // For Vocab quizzes
-                // This is harder as we don't store the source. We'll use the title.
-                // If the title is generic, we try to get more specific
-                if (quizTopic === 'Vocabulary Quiz' && window.currentQuizSourceInfo) {
-                     const { monthId, weekId } = window.currentQuizSourceInfo;
-                     quizTopic = `Vocab - ${weekId}, ${monthId}`;
+                const { quizType, monthId, weekId, dayIndex } = currentMcqTarget;
+                
+                if (quizType === 'day' || dayIndex !== null) {
+                    // এটি একটি নির্দিষ্ট দিনের MCQ টেস্ট
+                    const dayNum = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`)?.textContent || `Day ${parseInt(dayIndex) + 1}`;
+                    quizTopic = `MCQ - ${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
+                    topicLink = `#day-${monthId}-${weekId}-${dayIndex}`; // দিনের সেকশনের ID
+                } else if (quizType === 'week') {
+                    // সাপ্তাহিক MCQ টেস্ট
+                    quizTopic = `MCQ - ${weekId.replace('week', 'Week ')}, ${monthId}`;
+                    topicLink = `#mcq-quiz-center`; // কুইজ সেন্টার লিঙ্ক
+                } else if (quizType === 'month') {
+                    // মাসিক MCQ টেস্ট
+                    quizTopic = `MCQ - ${monthId} (All)`;
+                    topicLink = `#mcq-quiz-center`; // কুইজ সেন্টার লিঙ্ক
+                } else {
+                    // সাধারণ MCQ টেস্ট (ফলব্যাক)
+                    quizTopic = `MCQ Quiz - ${monthId}, ${weekId}`;
+                    topicLink = `#mcq-quiz-center`;
                 }
+
+            } else if (currentVocabData && currentVocabData.length > 0) { // For Vocab quizzes
+                if (window.currentQuizSourceInfo) {
+                    const { monthId, weekId, dayIndex, rowIndex } = window.currentQuizSourceInfo;
+                    
+                    if (dayIndex !== undefined && rowIndex !== undefined) {
+                        // এটি একটি নির্দিষ্ট দিনের, নির্দিষ্ট সারির Vocab টেস্ট
+                        const dayNum = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`)?.textContent || `Day ${parseInt(dayIndex) + 1}`;
+                        quizTopic = `Vocab - ${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
+                        topicLink = `#day-${monthId}-${weekId}-${dayIndex}`;
+                    } else if (weekId) {
+                        // এটি সাপ্তাহিক Vocab টেস্ট (কুইজ সেন্টার থেকে)
+                        quizTopic = `Vocab - ${weekId.replace('week', 'Week ')}, ${monthId}`;
+                        topicLink = `#vocab-quiz-center`;
+                    }
+                }
+            }
+            
+            if (!quizTopic) { // যদি কোনো কারণে টপিক সেট না হয়
+                quizTopic = (quizType === 'MCQ' ? 'MCQ Quiz' : 'Vocabulary Quiz');
             }
             // --- End Topic Name Logic ---
             
             currentQuizResultData = {
                 quizType: quizType,
                 topicName: quizTopic,
+                topicLink: topicLink, // ✅ নতুন লিঙ্কটি এখানে সেভ করুন
                 saveTimestamp: null, // Will be set on save
                 // Summary Stats
                 correctCount: correctCount,
@@ -3785,20 +3819,48 @@ async function loadAndDisplayResults() {
     }
 }
 
-// --- Render Helper ---
+// --- Render Helper (UPGRADED for Request 5) ---
 function renderResults(allResults) {
     const mcqResults = allResults.filter(r => r.quizType === 'MCQ');
     const vocabResults = allResults.filter(r => r.quizType === 'Vocab');
 
-    mcqResultsList.innerHTML = createResultsTable(mcqResults, 'mcq');
-    vocabResultsList.innerHTML = createResultsTable(vocabResults, 'vocab');
+    // --- ৫. মোট হিসাব করুন ---
+    const mcqStats = calculateOverallStats(mcqResults);
+    const vocabStats = calculateOverallStats(vocabResults);
+
+    mcqResultsList.innerHTML = createResultsTable(mcqResults, 'mcq', mcqStats);
+    vocabResultsList.innerHTML = createResultsTable(vocabResults, 'vocab', vocabStats);
 
     // Add listeners to the new buttons
     attachViewResultListeners(allResults);
+    attachTopicLinkListeners(); // <-- ৩. লিঙ্কগুলোর জন্য লিসেনার যোগ করুন
+}
+
+// --- ৫. মোট হিসাব করার জন্য নতুন ফাংশন ---
+function calculateOverallStats(results) {
+    let totalObtained = 0;
+    let totalFull = 0;
+    let totalTime = 0;
+
+    results.forEach(res => {
+        totalObtained += res.finalScore;
+        totalFull += res.totalQuestions;
+        totalTime += res.timeTakenInSeconds;
+    });
+
+    const overallPercentage = (totalFull > 0) ? (Math.max(0, totalObtained) / totalFull) * 100 : 0;
+
+    return {
+        totalObtained: totalObtained,
+        totalFull: totalFull,
+        totalTime: totalTime,
+        overallPercentage: overallPercentage.toFixed(1)
+    };
 }
 
 // --- Create Table HTML ---
-function createResultsTable(results, type) {
+// --- Create Table HTML (UPGRADED for Requests 2, 4, 5) ---
+function createResultsTable(results, type, stats) { // <-- ৩. 'stats' নামে নতুন প্যারামিটার যোগ করুন
     if (results.length === 0) {
         return `<p class="text-center text-gray-500 italic py-10">No ${type} results found.</p>`;
     }
@@ -3808,14 +3870,23 @@ function createResultsTable(results, type) {
             year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
         }) : 'N/A';
         
+        // --- ৩. টপিক লিঙ্ক রেন্ডার করুন ---
+        const topicLinkHtml = `
+            <a href="${res.topicLink || '#'}" class="topic-link" 
+               data-link="${res.topicLink || '#'}" 
+               data-link-type="${res.topicLink?.startsWith('#day') ? 'day' : (res.topicLink ? 'modal' : 'none')}">
+                ${escapeHtml(res.topicName)}
+            </a>
+        `;
+        
         return `
             <tr>
                 <td class="sl-col">${index + 1}</td>
                 <td class="date-col">${date}</td>
-                <td class="topic-col">${escapeHtml(res.topicName)}</td>
+                <td class="topic-col">${topicLinkHtml}</td>
                 <td class="score-col">${res.finalScore.toFixed(2)}</td>
                 <td class="score-col">${res.totalQuestions}</td>
-                <td class="percent-col ${res.percentage >= 50 ? 'text-emerald-600' : 'text-red-600'}">${res.percentage}%</td>
+                <td class="time-col">${formatTime(res.timeTakenInSeconds)}</td> <td class="percent-col ${res.percentage >= 50 ? 'text-emerald-600' : 'text-red-600'}">${res.percentage}%</td>
                 <td class="view-col">
                     <button class="action-button action-button-secondary text-xs view-saved-result-btn" data-result-id="${res.id}">
                         <i class="fas fa-eye mr-1"></i> View
@@ -3833,14 +3904,23 @@ function createResultsTable(results, type) {
                     <th class="date-col">Date</th>
                     <th class="topic-col">Exam Topic</th>
                     <th class="score-col">Obtained</th>
-                    <th class="score-col">Total</th>
-                    <th class="percent-col">Percentage</th>
+                    <th class="score-col">Full</th> <th class="time-col">Time Taken</th> <th class="percent-col">Percentage</th>
                     <th class="view-col">View</th>
                 </tr>
             </thead>
             <tbody>
                 ${rows}
             </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3">Overall Performance</th>
+                    <th class="score-col">${stats.totalObtained.toFixed(2)}</th>
+                    <th class="score-col">${stats.totalFull}</th>
+                    <th class="time-col">${formatTime(stats.totalTime)}</th>
+                    <th class="percent-col">${stats.overallPercentage}%</th>
+                    <th class="view-col"></th>
+                </tr>
+            </tfoot>
         </table>
     `;
 }
@@ -3862,6 +3942,58 @@ function attachViewResultListeners(allResults) {
             } else {
                 showCustomAlert("Could not find result data.", "error");
             }
+        });
+    });
+}
+
+// --- ৩. টপিক লিঙ্কের জন্য নতুন লিসেনার ---
+function attachTopicLinkListeners() {
+    document.querySelectorAll('.topic-link').forEach(link => {
+        // একাধিক লিসেনার যোগ করা এড়াতে লিঙ্কটি প্রতিস্থাপন করুন
+        const newLink = link.cloneNode(true);
+        link.parentNode.replaceChild(newLink, link);
+
+        newLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const linkUrl = newLink.dataset.link;
+            const linkType = newLink.dataset.linkType;
+
+            if (linkType === 'day') {
+                // এটি একটি দিনের লিঙ্ক
+                closeModal('result-sheet-modal'); // রেজাল্ট মোডাল বন্ধ করুন
+                
+                // লিঙ্কটি একটি অ্যাঙ্কর লিঙ্ক (e.g., #day-2025-10-week1-0)
+                // আমাদের প্রথমে মাসটি লোড করতে হবে
+                const parts = linkUrl.substring(1).split('-'); // #day-2025-10-week1-0
+                const monthId = `${parts[1]}-${parts[2]}`; // 2025-10
+                
+                // মাসটি প্রদর্শন করুন
+                displayMonthPlan(monthId);
+                
+                // একটি ছোট ডিলে দিন যাতে DOM রেন্ডার হয়
+                setTimeout(() => {
+                    const targetElement = document.getElementById(linkUrl.substring(1));
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // হাইলাইট করার জন্য একটি ফ্ল্যাশ দিন
+                        targetElement.style.transition = 'background-color 0.3s ease-out';
+                        targetElement.style.backgroundColor = '#d1fae5'; // emerald-100
+                        setTimeout(() => {
+                            targetElement.style.backgroundColor = '';
+                        }, 2000);
+                    }
+                }, 500); // 0.5 সেকেন্ড ডিলে
+
+            } else if (linkType === 'modal') {
+                // এটি একটি কুইজ সেন্টার লিঙ্ক
+                closeModal('result-sheet-modal');
+                if (linkUrl === '#mcq-quiz-center') {
+                    openMcqQuizCenter();
+                } else if (linkUrl === '#vocab-quiz-center') {
+                    openQuizCenter();
+                }
+            }
+            // যদি linkType 'none' হয় তবে কিছুই করবেন না
         });
     });
 }
