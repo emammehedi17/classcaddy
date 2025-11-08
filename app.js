@@ -2466,8 +2466,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             }, 1000);
         }
 		
+        
         /**
-         * Displays the current question and options.
+         * Displays the current question and options. (UPGRADED with DocumentFragment)
          */
         function loadQuizQuestion() {
             quizOptionsContainer.innerHTML = '';
@@ -2478,14 +2479,15 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizQuestionText.textContent = q.question;
 
             // --- Button State Logic ---
-            // "Next" button is disabled if no answer is selected
             quizNextBtn.disabled = (q.userAnswer === null);
-            // "Skip" button is hidden if an answer IS selected
             quizSkipBtn.hidden = (q.userAnswer !== null);
-            // "Previous" button is hidden on the first question
             quizPrevBtn.hidden = (currentQuizQuestionIndex === 0);
 
-            // --- Render Options ---
+            // --- START: OPTIMIZED RENDERING ---
+            // 1. একটি ভার্চুয়াল কন্টেইনার তৈরি করুন (এটি দ্রুত)
+            const fragment = new DocumentFragment();
+
+            // 2. অপশন বাটনগুলো তৈরি করুন এবং সেগুলোকে fragment-এ যোগ করুন
             q.options.forEach(option => {
                 const button = document.createElement('button');
                 button.textContent = option;
@@ -2503,8 +2505,12 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     // This question is new, add click listener
                     button.onclick = () => selectQuizAnswer(button, option);
                 }
-                quizOptionsContainer.appendChild(button);
+                fragment.appendChild(button); // fragment-এ যোগ করুন
             });
+
+            // 3. সবশেষে, fragment-টিকে মাত্র একবার পেইজে যোগ করুন
+            quizOptionsContainer.appendChild(fragment);
+            // --- END: OPTIMIZED RENDERING ---
         }
         
         /**
@@ -2554,7 +2560,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         loadQuizQuestion();
                         quizQuestionArea.classList.add('slide-in-right'); // <-- ADD THIS
                     }
-                }, 300); // 0.3-second (300ms) delay. This will be much faster.
+                }, 100); // 0.1-second (100ms) delay.
                 
             } else {
                 // Answer is wrong: Stay on the page and enable "Next"
