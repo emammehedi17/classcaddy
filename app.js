@@ -2409,65 +2409,84 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          * UPGRADED: Generates 3 types of questions from pre-processed vocab data.
          */
         function generateQuizData(parsedVocabList) {
-            let questions = [];
-            const allWords = parsedVocabList.map(v => v.word);
-            const allBanglaMeanings = parsedVocabList.map(v => v.banglaMeaning);
-            const allSynonyms = parsedVocabList.map(v => v.synonym).filter(Boolean); // Only get valid synonyms
+        let questions = [];
+        
+        // --- ১. ভুল উত্তরের জন্য হেল্পার অ্যারে তৈরি করুন ---
+        const allWords = parsedVocabList.map(v => v.word);
+        const allBanglaMeanings = parsedVocabList.map(v => v.banglaMeaning);
+        const allSynonyms = parsedVocabList.map(v => v.synonym).filter(Boolean); // শুধু বৈধ Synonym নিন
 
-            for (const item of parsedVocabList) {
-                const { word, banglaMeaning, synonym } = item;
+        // --- ২. টাইপ ১: Synonym প্রশ্ন তৈরি করুন (Eng -> Syn) ---
+        // (এই লুপটি প্রতিটি শব্দের জন্য একটি করে Synonym প্রশ্ন তৈরি করবে, যদি Synonym থাকে)
+        for (const item of parsedVocabList) {
+            const { word, synonym } = item;
 
-                // --- Question 1: Word -> Bangla Meaning ---
-                let wrongMeanings = allBanglaMeanings.filter(m => m !== banglaMeaning);
-                let options1 = shuffleArray([...new Set(wrongMeanings)]).slice(0, 3); // 'Set' avoids duplicate wrong answers
-                options1.push(banglaMeaning);
-                
-                questions.push({
-                    question: `What is the meaning of "${word}"?`,
-                    options: shuffleArray(options1),
-                    correctAnswer: banglaMeaning,
-                    userAnswer: null,
-                    isCorrect: null
-                });
-
-                // --- Question 2: Bangla Meaning -> Word ---
-                let wrongWords = allWords.filter(w => w !== word);
-                let options2 = shuffleArray([...new Set(wrongWords)]).slice(0, 3);
-                options2.push(word);
-                
-                questions.push({
-                    question: `What is the English word for "${banglaMeaning}"?`,
-                    options: shuffleArray(options2),
-                    correctAnswer: word,
-                    userAnswer: null,
-                    isCorrect: null
-                });
-
-                // --- Question 3: Word -> Synonym (NEW) ---
-                if (synonym) {
-                    // Use other synonyms, or words, or meanings as wrong options
-                    let wrongSynonyms = allSynonyms.filter(s => s !== synonym && s !== word);
-                    let wrongOptions = wrongSynonyms;
-                    
-                    // If we don't have 3 wrong synonyms, add wrong words
-                    if (wrongOptions.length < 3) {
-                        wrongOptions.push(...allWords.filter(w => w !== word && w !== synonym));
-                    }
-                    
-                    let options3 = shuffleArray([...new Set(wrongOptions)]).slice(0, 3);
-                    options3.push(synonym);
-
-                    questions.push({
-                        question: `What is the synonym of "${word}"?`,
-                        options: shuffleArray(options3),
-                        correctAnswer: synonym,
-                        userAnswer: null,
-                        isCorrect: null
-                    });
+            if (synonym) {
+                // ভুল অপশনগুলো অন্য Synonym বা শব্দ থেকে নিন
+                let wrongOptions = allSynonyms.filter(s => s !== synonym && s !== word);
+                if (wrongOptions.length < 3) {
+                    wrongOptions.push(...allWords.filter(w => w !== word && w !== synonym));
                 }
+                
+                let options = shuffleArray([...new Set(wrongOptions)]).slice(0, 3);
+                options.push(synonym); // সঠিক উত্তর যোগ করুন
+
+                questions.push({
+                    question: `What is the synonym of "${word}"?`,
+                    options: shuffleArray(options),
+                    correctAnswer: synonym,
+                    userAnswer: null,
+                    isCorrect: null
+                });
             }
-            return shuffleArray(questions);
         }
+
+        // --- ৩. টাইপ ২ ও ৩-এর জন্য তালিকাটি ভাগ করুন ---
+        let shuffledList = shuffleArray([...parsedVocabList]); // তালিকার একটি কপি শাফল করুন
+        const n = shuffledList.length;
+        const halfN = Math.ceil(n / 2); // ১০টি শব্দ হলে ৫টি, ১১টি হলে ৬টি
+
+        const engToBanList = shuffledList.slice(0, halfN); // প্রথম অর্ধেক
+        const banToEngList = shuffledList.slice(halfN); // দ্বিতীয় অর্ধেক
+
+        // --- ৪. টাইপ ২: Eng -> Ban প্রশ্ন তৈরি করুন ---
+        for (const item of engToBanList) {
+            const { word, banglaMeaning } = item;
+            
+            let wrongMeanings = allBanglaMeanings.filter(m => m !== banglaMeaning);
+            let options = shuffleArray([...new Set(wrongMeanings)]).slice(0, 3);
+            options.push(banglaMeaning); // সঠিক উত্তর যোগ করুন
+            
+            questions.push({
+                question: `What is the meaning of "${word}"?`,
+                options: shuffleArray(options),
+                correctAnswer: banglaMeaning,
+                userAnswer: null,
+                isCorrect: null
+            });
+        }
+
+        // --- ৫. টাইপ ৩: Ban -> Eng প্রশ্ন তৈরি করুন ---
+        for (const item of banToEngList) {
+            const { word, banglaMeaning } = item;
+            
+            let wrongWords = allWords.filter(w => w !== word);
+            let options = shuffleArray([...new Set(wrongWords)]).slice(0, 3);
+            options.push(word); // সঠিক উত্তর যোগ করুন
+            
+            questions.push({
+                question: `What is the English word for "${banglaMeaning}"?`,
+                options: shuffleArray(options),
+                correctAnswer: word,
+                userAnswer: null,
+                isCorrect: null
+            });
+        }
+
+        // --- ৬. চূড়ান্ত শাফল ---
+        // সব ধরনের প্রশ্ন তৈরি করার পর, সেগুলোকে একসাথে শাফল করুন
+        return shuffleArray(questions);
+    }
 
         
         /**
