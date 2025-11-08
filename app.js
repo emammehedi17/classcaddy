@@ -106,8 +106,8 @@
 		const quizPrevBtn = document.getElementById('quiz-prev-btn');
         const quizSkipBtn = document.getElementById('quiz-skip-btn');
         const quizResultsScreen = document.getElementById('quiz-results-screen');
-        const quizFinalScore = document.getElementById('quiz-final-score');
-        const quizPercentage = document.getElementById('quiz-percentage'); // <-- MODIFIED
+        const quizFinalScore = document.getElementById('summary-final-score');
+		const quizPercentage = document.getElementById('summary-percentage'); // <-- MODIFIED
         const quizRestartBtn = document.getElementById('quiz-restart-btn');
 		// --- START: ADD THESE NEW ELEMENTS ---
         const quizReviewBtn = document.getElementById('quiz-review-btn');
@@ -2590,7 +2590,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
         function showQuizResults() {
 			if (quizTimerInterval) clearInterval(quizTimerInterval);
-            const quizEndTime = Date.now(); // <-- এই লাইনটি কুইজ শেষ হওয়ার সময় সেভ করবে
+            const quizEndTime = Date.now(); // <-- কুইজ শেষ হওয়ার সময় সেভ করুন
             
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.remove('hidden');
@@ -2616,7 +2616,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const correctScore = correctCount * 1;
             const wrongScore = wrongCount * -0.25;
             
-            // [স্কোর ফিক্স]: আপনার স্ক্রিনশট অনুযায়ী, এই গণনাকারাই সঠিক
+            // [স্কোর ফিক্স]: এই গণনাটি এখন সঠিক
             const finalScore = correctScore + wrongScore;
             
             // [পার্সেন্টেজ ফিক্স]: উপরের 'finalScore' ঠিক হওয়ায় এটিও ঠিক হয়ে যাবে
