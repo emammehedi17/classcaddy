@@ -86,6 +86,7 @@
         const confirmModalCancelBtn = document.getElementById('confirm-modal-cancel');
 		// --- START: ADD THESE QUIZ ELEMENTS ---
         const quizModal = document.getElementById('quiz-modal');
+		const banglaRegex = /[\u0980-\u09FF]/; // Bengali Unicode Range
         const quizStartScreen = document.getElementById('quiz-start-screen');
         const quizStartMessage = document.getElementById('quiz-start-message');
         let quizStartBtn = document.getElementById('quiz-start-btn');
@@ -2510,6 +2511,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 const button = document.createElement('button');
                 button.textContent = option;
                 button.className = "quiz-option-btn";
+				
+				if (banglaRegex.test(option)) {
+					button.classList.add('quiz-option-bangla');
+				}
 
                 if (q.userAnswer !== null) {
                     // This question has been answered, show feedback

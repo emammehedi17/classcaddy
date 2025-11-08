@@ -777,6 +777,15 @@
 		
         /* --- END: QUIZ STYLES --- */
 		
+		/* --- START: BANGLA QUIZ OPTION STYLE --- */
+		.quiz-option-btn.quiz-option-bangla {
+			font-family: 'Kalpurush', sans-serif;
+			font-size: 1.15rem;  /* 1rem হলো ডিফল্ট। আপনার পছন্দমতো সাইজ দিন। */
+			font-weight: 600;    /* বাংলা ফন্টকে একটু বোল্ড করবে */
+			line-height: 1.5;  /* লাইনগুলোর মধ্যে একটু ফাঁকা জায়গা দেবে */
+		}
+		/* --- END: BANGLA QUIZ OPTION STYLE --- */
+		
         .quiz-week-btn {
             display: block;
             width: 100%;
