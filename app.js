@@ -4107,4 +4107,27 @@ savedQuizReviewBtn.addEventListener('click', () => {
     quizReviewScreen.classList.remove('hidden');
 });
 
+// --- Listener for the "Try Again" button in the SAVED modal ---
+document.getElementById('saved-quiz-restart-btn').addEventListener('click', () => {
+    if (!tempSavedReviewData) {
+        showCustomAlert("No quiz data found to restart.", "error");
+        return;
+    }
+    
+    // ১. গ্লোবাল কুইজ স্টেট সেট করুন
+    currentVocabData = null; // সোর্স ক্লিয়ার করুন
+    currentMcqData = null; // সোর্স ক্লিয়ার করুন
+    currentQuizQuestions = tempSavedReviewData; // সেভ করা প্রশ্নগুলো ব্যবহার করুন
+    
+    // ২. "View Saved Result" মোডালটি বন্ধ করুন
+    closeModal('view-saved-result-modal');
+    
+    // ৩. প্রধান কুইজ মোডালটি দেখান
+    quizModal.style.display = 'block';
+    
+    // ৪. runQuizGame() ফাংশনটি কল করুন
+    // এটি null সোর্স দেখে ফলব্যাক লজিক ব্যবহার করবে, অর্থাৎ সেভ করা প্রশ্নগুলোকেই আবার শাফল (shuffle) করবে
+    runQuizGame();
+});
+
 // --- END: NEW RESULT SHEET LOGIC ---
