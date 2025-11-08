@@ -4013,7 +4013,7 @@ function createResultsTable(results, type, stats) { // <-- ৩. 'stats' না�
                     <th class="topic-col">Exam Topic</th>
                     <th class="score-col">Obtained</th>
                     <th class="score-col">Full</th> <th class="time-col">Time Taken</th> <th class="percent-col">Percentage</th>
-                    <th class="view-col">View</th>
+                    <th class="view-col">Summary</th>
                 </tr>
             </thead>
             <tbody>
