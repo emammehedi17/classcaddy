@@ -4023,7 +4023,7 @@ function attachTopicLinkListeners() {
 
             } else if (linkType === 'modal') {
                 // এটি একটি কুইজ সেন্টার লিঙ্ক
-                closeModal('result-sheet-modal');
+                // closeModal('result-sheet-modal'); // <-- এই লাইনটি রিমুভ করা হয়েছে
                 if (linkUrl === '#mcq-quiz-center') {
                     openMcqQuizCenter();
                 } else if (linkUrl === '#vocab-quiz-center') {
