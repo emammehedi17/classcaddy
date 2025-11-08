@@ -789,7 +789,7 @@
             border: 1px solid #e5e7eb; /* gray-200 */
             border-radius: 6px;
             margin-bottom: 8px;
-            transition: all 0.2s;
+            
         }
         .quiz-week-btn:hover {
             background-color: #eef2ff; /* indigo-50 */
@@ -864,7 +864,7 @@
             font-weight: 500;
             border-radius: 6px;
             margin-top: 8px;
-            transition: all 0.2s;
+            
         }
         .mcq-center-btn.month-btn { /* Month Total Button */
             background-color: #d1fae5; /* emerald-100 */
