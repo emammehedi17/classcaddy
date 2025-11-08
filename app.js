@@ -428,14 +428,36 @@
         }
 
          // Display a specific month's plan
-        async function displayMonthPlan(monthId) {
+        async function displayMonthPlan(monthId, anchorId = null) {
             if (!currentUser || !userId) return;
              console.log("Displaying plan for month:", monthId);
+
+             // Check if this month is *already* active
+             const activeBtn = monthNavButtonsContainer.querySelector('button.active-month');
+             const isAlreadyActive = (activeBtn && activeBtn.dataset.monthId === monthId);
 
              monthNavButtonsContainer.querySelectorAll('button').forEach(btn => {
                  btn.classList.toggle('active-month', btn.dataset.monthId === monthId);
                  btn.classList.toggle('action-button-secondary', btn.dataset.monthId !== monthId);
              });
+
+             // --- NEW LOGIC: If month is active, just scroll ---
+             if (isAlreadyActive && anchorId) {
+                // Month is already displayed. Just scroll to the anchor.
+                console.log("Month already active. Scrolling to anchor:", anchorId);
+                const targetElement = document.getElementById(anchorId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Highlight flash
+                    targetElement.style.transition = 'background-color 0.3s ease-out';
+                    targetElement.style.backgroundColor = '#d1fae5'; // emerald-100
+                    setTimeout(() => {
+                        targetElement.style.backgroundColor = '';
+                    }, 2000);
+                }
+                return; // Stop here. Do not reload the month.
+             }
+             // --- END NEW LOGIC ---
 
              currentMonthPlanDisplay.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading...</p>';
              selectMonthMessage.classList.add('hidden');
@@ -617,6 +639,23 @@
                      if (shouldRestoreScroll) {
                         console.log("Restoring scroll position to (displayMonthPlan):", scrollY);
                         window.scrollTo({ top: scrollY, behavior: 'auto' });
+                     } else if (anchorId) {
+                        // --- NEW ANCHOR LOGIC ---
+                        console.log("Scrolling to anchor:", anchorId);
+                        const targetElement = document.getElementById(anchorId);
+                        if (targetElement) {
+                            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            // Highlight flash
+                            targetElement.style.transition = 'background-color 0.3s ease-out';
+                            targetElement.style.backgroundColor = '#d1fae5'; // emerald-100
+                            setTimeout(() => {
+                                targetElement.style.backgroundColor = '';
+                            }, 2000);
+                        } else {
+                            console.warn("Anchor element not found:", anchorId);
+                        }
+                        anchorId = null; // Scroll only once
+                        // --- END NEW ANCHOR LOGIC ---
                      }
                  });
              } catch (error) {
@@ -3959,30 +3998,16 @@ function attachTopicLinkListeners() {
             const linkType = newLink.dataset.linkType;
 
             if (linkType === 'day') {
-                // এটি একটি দিনের লিঙ্ক
                 closeModal('result-sheet-modal'); // রেজাল্ট মোডাল বন্ধ করুন
                 
                 // লিঙ্কটি একটি অ্যাঙ্কর লিঙ্ক (e.g., #day-2025-10-week1-0)
                 // আমাদের প্রথমে মাসটি লোড করতে হবে
                 const parts = linkUrl.substring(1).split('-'); // #day-2025-10-week1-0
                 const monthId = `${parts[1]}-${parts[2]}`; // 2025-10
+                const anchor = linkUrl.substring(1); // The full ID, e.g., "day-2025-10-week1-0"
                 
-                // মাসটি প্রদর্শন করুন
-                displayMonthPlan(monthId);
-                
-                // একটি ছোট ডিলে দিন যাতে DOM রেন্ডার হয়
-                setTimeout(() => {
-                    const targetElement = document.getElementById(linkUrl.substring(1));
-                    if (targetElement) {
-                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        // হাইলাইট করার জন্য একটি ফ্ল্যাশ দিন
-                        targetElement.style.transition = 'background-color 0.3s ease-out';
-                        targetElement.style.backgroundColor = '#d1fae5'; // emerald-100
-                        setTimeout(() => {
-                            targetElement.style.backgroundColor = '';
-                        }, 2000);
-                    }
-                }, 500); // 0.5 সেকেন্ড ডিলে
+                // মাসটি প্রদর্শন করুন এবং অ্যাঙ্কর লিঙ্কটি পাস করুন
+                displayMonthPlan(monthId, anchor);
 
             } else if (linkType === 'modal') {
                 // এটি একটি কুইজ সেন্টার লিঙ্ক
