@@ -3942,9 +3942,10 @@ function renderResults(allResults) {
     // Add listeners to the new buttons
     attachViewResultListeners(allResults);
     attachTopicLinkListeners(); // <-- ৩. লিঙ্কগুলোর জন্য লিসেনার যোগ করুন
+	attachChartButtonListeners(); // <-- ৪. চার্ট বাটনের জন্য লিসেনার যোগ করুন
 	
 }
-	attachChartButtonListeners(); // <-- ৪. চার্ট বাটনের জন্য লিসেনার যোগ করুন
+	
 // --- ৫. মোট হিসাব করার জন্য নতুন ফাংশন ---
 function calculateOverallStats(results) {
     let totalObtained = 0;
