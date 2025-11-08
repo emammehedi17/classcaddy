@@ -1257,8 +1257,8 @@
 		/* --- START: BANGLA MEANING TOOLTIP STYLE --- */
 		.vocab-meaning .bangla-meaning-text {
 			font-family: 'Kalpurush', sans-serif;
-			font-size: 1.1rem;  /* ডিফল্ট 0.8rem, এটি ফন্টকে বড় করবে */
-			font-weight: 600;   /* ফন্টকে কিছুটা বোল্ড করবে */
+			font-size: 1.0rem;  /* ডিফল্ট 0.8rem, এটি ফন্টকে বড় করবে */
+			font-weight: 300;   /* ফন্টকে কিছুটা বোল্ড করবে */
 		}
 		.vocab-meaning .english-meaning-text {
 			font-weight: 500;
