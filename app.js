@@ -2413,9 +2413,26 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizMainScreen.classList.remove('hidden');
 			quizReviewScreen.classList.add('hidden');
 
-            // --- REMOVED: Question generation is now done *before* this ---
-            // We just need to shuffle the questions that are already generated
-            currentQuizQuestions = shuffleArray(currentQuizQuestions);
+            // --- START: NEW RE-GENERATION LOGIC ---
+            // "Try Again" বাটনের জন্য প্রশ্নগুলো রি-জেনারেট করুন
+            if (currentVocabData) {
+                // এটি একটি Vocab কুইজ, সোর্স থেকে রি-জেনারেট করুন
+                currentQuizQuestions = generateQuizData(currentVocabData);
+            } else if (currentMcqData) {
+                // এটি একটি MCQ কুইজ, সোর্স থেকে রি-জেনারেট করুন
+                currentQuizQuestions = currentMcqData.map(mcq => ({
+                    question: mcq.question,
+                    options: shuffleArray([...mcq.options]), // অপশনগুলো আবার শাফল করুন
+                    correctAnswer: mcq.correctAnswer,
+                    userAnswer: null, // উত্তর রিসেট করুন
+                    isCorrect: null // স্ট্যাটাস রিসেট করুন
+                }));
+            } else {
+                // এটি হওয়া উচিত নয়, তবে ফলব্যাক হিসেবে পুরনো প্রশ্নগুলো শাফল করুন
+                console.warn("No source data found for restart, re-shuffling old questions.");
+                currentQuizQuestions = shuffleArray(currentQuizQuestions);
+            }
+            // --- END: NEW RE-GENERATION LOGIC ---
 
             // Reset state
             currentQuizQuestionIndex = 0;
