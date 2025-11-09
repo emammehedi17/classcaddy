@@ -952,7 +952,7 @@
 
              if (allDayMcqs.length > 0) {
                  allMcqButtonsNormalMode = `
-                     <button class="action-button action-button-secondary text-xs view-all-mcq-btn"><i class="fas fa-eye mr-1"></i> View All MCQ (${allDayMcqs.length})</button>
+                     <button class="action-button action-button-secondary text-xs view-all-mcq-btn"><i class="fas fa-eye mr-1"></i> View All MCQ</button>
                      <button class="action-button action-button-secondary text-xs test-all-mcq-btn" style="border-color: #6366f1; color: #4f46e5;"><i class="fas fa-tasks mr-1"></i> Test All MCQ</button>
                  `;
              }
@@ -1065,7 +1065,7 @@
              } else {
                 // Normal Mode: Show "View Qs" and "Quiz" buttons if data exists
                 if (rowData.mcqData && rowData.mcqData.length > 0) {
-                    questionsCellHtml = `<button class="action-button view-row-mcq-btn" data-row-index="${rowIndex}"><i class="fas fa-eye mr-1"></i> View Qs (${rowData.mcqData.length})</button>`;
+                    questionsCellHtml = `<button class="action-button view-row-mcq-btn" data-row-index="${rowIndex}"><i class="fas fa-eye mr-1"></i> View Qs</button>`;
                     
                     if (rowData.mcqData.length >= 1) { // 1 বা তার বেশি প্রশ্ন থাকলেই কুইজ বাটন দেখাবে
                         testCellHtml = `<button class="action-button test-row-mcq-btn" data-row-index="${rowIndex}"><i class="fas fa-tasks mr-1"></i> Quiz</button>`;
