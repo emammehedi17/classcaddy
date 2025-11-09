@@ -2543,13 +2543,13 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 currentQuizQuestions = generateQuizData(currentVocabData);
             } else if (currentMcqData) {
                 // এটি একটি MCQ কুইজ, সোর্স থেকে রি-জেনারেট করুন
-				currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({
+                currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ // <-- ১. এখানে shuffleArray যোগ করুন
                     question: mcq.question,
-                    options: [...mcq.options], // অপশন শাফল বন্ধ করা হয়েছে
+                    options: [...mcq.options], // <-- ২. এখান থেকে shuffleArray রিমুভ করুন
                     correctAnswer: mcq.correctAnswer,
                     userAnswer: null, // উত্তর রিসেট করুন
                     isCorrect: null // স্ট্যাটাস রিসেট করুন
-                }));
+                }))); // <-- ৩. এখানে একটি অতিরিক্ত ')' বন্ধনী যোগ করুন
             } else {
                 // এটি হওয়া উচিত নয়, তবে ফলব্যাক হিসেবে পুরনো প্রশ্নগুলো শাফল করুন
                 console.warn("No source data found for restart, re-shuffling old questions.");
