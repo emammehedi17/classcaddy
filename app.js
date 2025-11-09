@@ -2543,9 +2543,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 currentQuizQuestions = generateQuizData(currentVocabData);
             } else if (currentMcqData) {
                 // এটি একটি MCQ কুইজ, সোর্স থেকে রি-জেনারেট করুন
-                currentQuizQuestions = currentMcqData.map(mcq => ({
+				currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({
                     question: mcq.question,
-                    options: shuffleArray([...mcq.options]), // অপশনগুলো আবার শাফল করুন
+                    options: [...mcq.options], // অপশন শাফল বন্ধ করা হয়েছে
                     correctAnswer: mcq.correctAnswer,
                     userAnswer: null, // উত্তর রিসেট করুন
                     isCorrect: null // স্ট্যাটাস রিসেট করুন
@@ -3380,7 +3380,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 currentVocabData = null;
                 currentQuizQuestions = currentMcqData.map(mcq => ({ // Generate questions
                     question: mcq.question,
-                    options: shuffleArray([...mcq.options]),
+                    options: [...mcq.options],
                     correctAnswer: mcq.correctAnswer,
                     userAnswer: null,
                     isCorrect: null
@@ -3695,7 +3695,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 currentVocabData = null;
                 currentQuizQuestions = currentMcqData.map(mcq => ({ // Generate questions
                     question: mcq.question,
-                    options: shuffleArray([...mcq.options]),
+                    options: [...mcq.options],
                     correctAnswer: mcq.correctAnswer,
                     userAnswer: null,
                     isCorrect: null
