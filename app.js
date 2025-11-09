@@ -983,7 +983,7 @@
                          <thead class="text-xs text-gray-500 uppercase">
                              <tr>
                                  <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Subject</th>
-                                 <th scope="col" class="px-3 py-2 md:w-[44%] text-center">Topic / Vocab</th>
+                                 <th scope="col" class="px-3 py-2 md:w-[38%] text-center">Topic / Vocab</th>
                                  <th scope="col" class="px-3 py-2 questions-col text-center">Questions</th>
                                  <th scope="col" class="px-3 py-2 test-col text-center">Test</th>
                                  <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Comment</th>
@@ -1436,17 +1436,94 @@
 
                     let subject, topic, comment, completed, completionPercentage, vocabData = null, story, mcqData = null; // <-- mcqData এখানে যোগ করা হয়েছে
 
-                     if (daySection.classList.contains('editing')) {
-                         // ... (কোড)
+                    // Save Day Plan
+        async function saveDayPlan(monthId, weekId, daySection, isAutosave = false) {
+            if (!currentUser || !userId) return;
+            const dayIndex = parseInt(daySection.dataset.dayIndex);
+            console.log(`Saving day plan for ${monthId}, ${weekId}, Day Index: ${dayIndex}`);
+            if (!isAutosave) {
+                setSyncStatus("Syncing...", "yellow");
+            }
+
+            const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+            try {
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                let monthData = docSnap.data();
+                let daysArray = monthData.weeks?.[weekId]?.days || [];
+                const currentDayData = daysArray[dayIndex];
+                 if (!currentDayData) throw new Error(`Day data for index ${dayIndex} not found in Firestore.`);
+
+                const updatedRows = [];
+                const rowElements = daySection.querySelectorAll('tbody tr');
+
+                rowElements.forEach((row) => {
+                    let existingRowIndex = parseInt(row.dataset.rowIndex);
+                    const existingRowData = !isNaN(existingRowIndex) && currentDayData.rows?.[existingRowIndex] ? currentDayData.rows[existingRowIndex] : {};
+
+                    let subject, topic, comment, completed, completionPercentage, vocabData = null, story, mcqData = null; // <-- mcqData এখানে যোগ করা হয়েছে
+
+                    if (daySection.classList.contains('editing')) {
+                         // --- START: BUG FIX (Define subject and comment FIRST) ---
+                         subject = (row.querySelector('.subject-input')?.value || '').trim();
+                         comment = (row.querySelector('.comment-input')?.value || '').trim();
+                         // --- END: BUG FIX ---
+                        
+                         completed = existingRowData.completed || false;
+                         const percInput = row.querySelector('.completion-perc-input')?.value;
+                         completionPercentage = parsePercentage(percInput);
+                         
+                         // Now we can safely use subject
                          story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
-                         mcqData = existingRowData.mcqData || null; // <-- সম্পাদনা মোডে mcqData সংরক্ষণ করুন
+                         mcqData = existingRowData.mcqData || null; // Preserve existing mcqData
 
                          if (row.classList.contains('vocab-row')) {
-                             // ... (vocab-row-এর লজিক)
+                             subject = 'Vocabulary'; // Force subject to 'Vocabulary'
+                             vocabData = [];
+                             row.querySelectorAll('.vocab-pair').forEach(pairEl => {
+                                 const word = pairEl.querySelector('.vocab-word-input')?.value.trim();
+                                 const meaning = pairEl.querySelector('.vocab-meaning-input')?.value.trim();
+                                 if (word) { vocabData.push({ word: word, meaning: meaning || '' }); }
+                             });
+                             topic = null;
                          } else {
-                             // ... (normal-row-এর লজিক)
+                             // --- START: BUG FIX ---
+                             topic = (row.querySelector('.topic-input')?.value || '').trim();
+                             // --- END: BUG FIX ---
+                             vocabData = null;
                          }
                     } else { // Handle saving checkbox clicks in normal mode
+                         completed = row.querySelector('.completion-checkbox')?.checked || false;
+                         subject = existingRowData.subject; 
+                         topic = existingRowData.topic; 
+                         comment = existingRowData.comment;
+                         completionPercentage = existingRowData.completionPercentage; 
+                         vocabData = existingRowData.vocabData; 
+                         story = existingRowData.story;
+                         mcqData = existingRowData.mcqData; // <-- Also preserve this in normal mode
+                     }
+                     
+                     // --- mcqData এখন সারিতে (row) সেভ হবে ---
+                     updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null, mcqData: mcqData || null });
+                });
+				
+                 // --- পুরনো mcqData সেভ করার লজিকটি ডিলিট করা হয়েছে ---
+                 daysArray[dayIndex].rows = updatedRows;
+                const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
+                await updateDoc(docRef, updatePayload);
+                
+                console.log(`Day ${dayIndex + 1} for ${weekId} saved successfully.`);
+                if (!isAutosave) {
+                    setSyncStatus("Synced", "green");
+                }
+
+            } catch (error) {
+                console.error("Error saving day plan:", error);
+                showCustomAlert("Error saving changes. Please check your connection and try again.");
+                setSyncStatus("Error", "red");
+            }
+        } else { // Handle saving checkbox clicks in normal mode
                          completed = row.querySelector('.completion-checkbox')?.checked || false;
                          subject = existingRowData.subject; topic = existingRowData.topic; comment = existingRowData.comment;
                          completionPercentage = existingRowData.completionPercentage; vocabData = existingRowData.vocabData; story = existingRowData.story;
