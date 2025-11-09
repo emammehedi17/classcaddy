@@ -940,12 +940,20 @@
              const tableId = `table-${monthId}-${weekId}-${dayIndex}`;
              const initialDayProgress = calculateDailyProgress(dayData);
              
-             // --- NEW: MCQ Button Logic for Normal Mode ---
-             let mcqButtonsNormalMode = '';
-             if (dayData.mcqData && dayData.mcqData.length > 0) {
-                 mcqButtonsNormalMode = `
-                     <button class="action-button action-button-secondary text-xs view-mcq-btn"><i class="fas fa-eye mr-1"></i> View MCQ</button>
-                     <button class="action-button action-button-secondary text-xs mcq-test-btn" style="border-color: #6366f1; color: #4f46e5;"><i class="fas fa-tasks mr-1"></i> MCQ Test</button>
+             // --- UPDATED: All MCQ Button Logic (Req 2, 3) ---
+             let allMcqButtonsNormalMode = '';
+             // Aggregate all MCQs from all rows for this day
+             const allDayMcqs = dayData.rows?.reduce((acc, row) => {
+                if (row.mcqData) {
+                    acc.push(...row.mcqData);
+                }
+                return acc;
+             }, []) || [];
+
+             if (allDayMcqs.length > 0) {
+                 allMcqButtonsNormalMode = `
+                     <button class="action-button action-button-secondary text-xs view-all-mcq-btn"><i class="fas fa-eye mr-1"></i> View All MCQ (${allDayMcqs.length})</button>
+                     <button class="action-button action-button-secondary text-xs test-all-mcq-btn" style="border-color: #6366f1; color: #4f46e5;"><i class="fas fa-tasks mr-1"></i> Test All MCQ</button>
                  `;
              }
 
@@ -957,9 +965,8 @@
                              <button class="icon-button delete-day-btn hidden" title="Delete Day"><i class="fas fa-calendar-times text-red-500"></i></button>
                          </div>
                          <div class="flex items-center gap-2 flex-wrap justify-end">
-                             ${mcqButtonsNormalMode}
-                             <button class="action-button action-button-secondary text-xs edit-day-btn"> <i class="fas fa-pencil-alt mr-1"></i> Edit </button>
-                         </div>
+                             ${allMcqButtonsNormalMode} <button class="action-button action-button-secondary text-xs edit-day-btn"> <i class="fas fa-pencil-alt mr-1"></i> Edit </button>
+						</div>
                      </div>
 
                      <div class="day-progress-wrapper" data-day-index="${dayIndex}">
@@ -976,7 +983,9 @@
                          <thead class="text-xs text-gray-500 uppercase">
                              <tr>
                                  <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Subject</th>
-                                 <th scope="col" class="px-3 py-2 md:w-[60%] text-center">Topic / Vocab</th>
+                                 <th scope="col" class="px-3 py-2 md:w-[44%] text-center">Topic / Vocab</th>
+                                 <th scope="col" class="px-3 py-2 questions-col text-center">Questions</th>
+                                 <th scope="col" class="px-3 py-2 test-col text-center">Test</th>
                                  <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Comment</th>
                                  <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell text-center">Done</th>
                                  <th scope="col" class="px-3 py-2 w-[10%] md:w-[5%] center-cell completion-perc-header hidden text-center">%</th>
@@ -989,11 +998,9 @@
                          <div class="flex flex-wrap gap-2"> 
                              <button class="action-button action-button-secondary text-xs add-normal-row-btn"><i class="fas fa-plus mr-1"></i> Add Row</button>
                              <button class="action-button action-button-secondary text-xs add-vocab-row-btn"><i class="fas fa-book mr-1"></i> Add Vocabulary</button>
-                             <button class="action-button action-button-secondary text-xs add-story-btn"><i class="fas fa-feather-alt mr-1"></i> Add/Edit Story</button>
-                             <button class="action-button action-button-secondary text-xs add-mcq-btn"><i class="fas fa-plus mr-1"></i> Add/Edit MCQ</button>
                              </div>
                          <button class="action-button text-xs save-day-btn"><i class="fas fa-save mr-1"></i> Save</button>
-                     </div>
+						</div>
                  </div>`;
         }
 
@@ -1017,7 +1024,8 @@
                      topicContent += `<div class="flex items-center gap-2 mt-2 vocab-button-container">
                                         <button type="button" class="icon-button add-vocab-pair-btn" title="Add Word/Meaning Pair"><i class="fas fa-plus-circle text-emerald-500"></i></button>
                                         <button type="button" class="action-button action-button-secondary add-vocab-code-btn" style="padding: 4px 8px; font-size: 0.75rem;"><i class="fas fa-code mr-1"></i> Add with Code</button>
-                                     </div>
+                                        <button type="button" class="action-button action-button-secondary add-story-btn" style="padding: 4px 8px; font-size: 0.75rem;"><i class="fas fa-feather-alt mr-1"></i> Story</button>
+                                        </div>
                                 </div>`; // Closed container
                      // --- END MODIFIED BLOCK ---
                  } else {
@@ -1047,6 +1055,25 @@
 			
              const completedClass = (!isEditing && rowData.completed) ? 'row-completed' : '';
 
+             // --- START: Req 1 - Button logic for new columns ---
+             let questionsCellHtml = '';
+             let testCellHtml = '';
+
+             if (isEditing) {
+                // Edit Mode: Show "Add Qs" button
+                questionsCellHtml = `<button class="action-button add-row-mcq-btn" data-row-index="${rowIndex}"><i class="fas fa-plus mr-1"></i> Add Qs</button>`;
+             } else {
+                // Normal Mode: Show "View Qs" and "Quiz" buttons if data exists
+                if (rowData.mcqData && rowData.mcqData.length > 0) {
+                    questionsCellHtml = `<button class="action-button view-row-mcq-btn" data-row-index="${rowIndex}"><i class="fas fa-eye mr-1"></i> View Qs (${rowData.mcqData.length})</button>`;
+                    
+                    if (rowData.mcqData.length >= 1) { // 1 বা তার বেশি প্রশ্ন থাকলেই কুইজ বাটন দেখাবে
+                        testCellHtml = `<button class="action-button test-row-mcq-btn" data-row-index="${rowIndex}"><i class="fas fa-tasks mr-1"></i> Quiz</button>`;
+                    }
+                }
+             }
+             // --- END: Req 1 ---
+
              return `
                  <tr id="${uniqueRowId}" data-row-index="${rowIndex}" class="${isEditing ? 'editing-mode' : ''} ${isVocabRow ? 'vocab-row' : 'normal-row'} ${completedClass}">
                      <td class="px-3 py-2 align-top" data-label="Subject"> ${isEditing ? `<input type="text" class="editable-input subject-input" placeholder="Subject" value="${escapeHtml(rowData.subject || '')}" ${isVocabRow ? 'readonly style="background-color:#e5e7eb;"' : ''}>` : `<span class="subject-display font-medium text-gray-700">${escapeHtml(rowData.subject || '-')}</span>`}
@@ -1054,6 +1081,12 @@
                      <td class="px-3 py-2 align-top vocab-topic-cell" data-label="Topic / Vocab"> 
                         ${topicContent}
                         ${buttonsHtml ? `<div class="flex gap-2 mt-2 flex-wrap">${buttonsHtml}</div>` : ''}
+                     </td>
+                     <td class="px-3 py-2 align-middle questions-col" data-label="Questions">
+                        ${questionsCellHtml}
+                     </td>
+                     <td class="px-3 py-2 align-middle test-col" data-label="Test">
+                        ${testCellHtml}
                      </td>
                      <td class="px-3 py-2 align-top" data-label="Comment"> ${isEditing ? `<textarea class="editable-input comment-input text-xs" rows="2" placeholder="Comment...">${escapeHtml(rowData.comment || '')}</textarea>` : `<span class="comment-display text-xs text-gray-500">${escapeHtml(rowData.comment || '-')}</span>`}
                      </td>
@@ -1172,13 +1205,38 @@
                  else if (button.classList.contains('add-normal-row-btn')) { addRowToDay(monthId, weekId, daySection, 'normal'); }
                  // Add Vocab Row Button (Edit Mode)
                  else if (button.classList.contains('add-vocab-row-btn')) { addRowToDay(monthId, weekId, daySection, 'vocabulary'); }
-                 // Add/Edit Story Button (Edit Mode)
+                 // Add/Edit Story Button (Edit Mode - Req 5)
                  else if (button.classList.contains('add-story-btn')) {
                      const dayIndex = parseInt(daySection.dataset.dayIndex);
-                     const vocabRow = daySection.querySelector('tr.vocab-row');
-                     let vocabRowIndex = vocabRow ? parseInt(vocabRow.dataset.rowIndex) : -1;
-                     openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex);
+                     // Find the parent row
+                     const vocabRow = button.closest('tr.vocab-row');
+                     if (vocabRow) {
+                        const vocabRowIndex = parseInt(vocabRow.dataset.rowIndex);
+                        openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex);
+                     } else {
+                        showCustomAlert("Error finding vocab row for story.", "error");
+                     }
                  }
+				 
+				 // --- START: NEW ROW-LEVEL MCQ LISTENERS (Req 1) ---
+                 else if (button.classList.contains('add-row-mcq-btn')) {
+                    const dayIndex = parseInt(daySection.dataset.dayIndex);
+                    const rowIndex = parseInt(button.dataset.rowIndex);
+                    openAddMcqModal(monthId, weekId, dayIndex, rowIndex);
+                 }
+                 else if (button.classList.contains('view-row-mcq-btn')) {
+                    const dayIndex = parseInt(daySection.dataset.dayIndex);
+                    const rowIndex = parseInt(button.dataset.rowIndex);
+                    openViewMcqModal(monthId, weekId, dayIndex, rowIndex);
+                 }
+                 else if (button.classList.contains('test-row-mcq-btn')) {
+                    const dayIndex = parseInt(daySection.dataset.dayIndex);
+                    const rowIndex = parseInt(button.dataset.rowIndex);
+                    startMcqQuiz(monthId, weekId, dayIndex, rowIndex);
+                 }
+                 // --- END: NEW ROW-LEVEL MCQ LISTENERS ---
+				 
+				 
 				 // --- MODIFIED CLICK HANDLER WITH LOGS ---
                  else if (button.classList.contains('add-vocab-code-btn')) {
                      console.log("Checkpoint 1: 'Add with Code' button clicked.");
@@ -1227,17 +1285,14 @@
                  // --- END: QUIZ BUTTON HANDLER ---
 
                  // --- START: NEW MCQ BUTTON HANDLERS ---
-				 else if (button.classList.contains('add-mcq-btn')) {
+				 
+                 else if (button.classList.contains('view-all-mcq-btn')) {
                      const dayIndex = parseInt(daySection.dataset.dayIndex);
-                     openAddMcqModal(monthId, weekId, dayIndex);
+                     openViewMcqModal(monthId, weekId, dayIndex, null); // null signifies "All MCQs"
                  }
-                 else if (button.classList.contains('view-mcq-btn')) {
+                 else if (button.classList.contains('test-all-mcq-btn')) {
                      const dayIndex = parseInt(daySection.dataset.dayIndex);
-                     openViewMcqModal(monthId, weekId, dayIndex);
-                 }
-                 else if (button.classList.contains('mcq-test-btn')) {
-                     const dayIndex = parseInt(daySection.dataset.dayIndex);
-                     startMcqQuiz(monthId, weekId, dayIndex);
+                     startMcqQuiz(monthId, weekId, dayIndex, null); // null signifies "All MCQs"
                  }
                  // --- END: NEW MCQ BUTTON HANDLERS ---
 
@@ -1379,42 +1434,30 @@
                     let existingRowIndex = parseInt(row.dataset.rowIndex);
                     const existingRowData = !isNaN(existingRowIndex) && currentDayData.rows?.[existingRowIndex] ? currentDayData.rows[existingRowIndex] : {};
 
-                    let subject, topic, comment, completed, completionPercentage, vocabData = null, story; // <-- mcqData এখান থেকে সরানো হয়েছে
+                    let subject, topic, comment, completed, completionPercentage, vocabData = null, story, mcqData = null; // <-- mcqData এখানে যোগ করা হয়েছে
 
-                    if (daySection.classList.contains('editing')) {
-                         subject = row.querySelector('.subject-input')?.value.trim() || '';
-                         comment = row.querySelector('.comment-input')?.value.trim() || '';
-                         completed = existingRowData.completed || false;
-                         const percInput = row.querySelector('.completion-perc-input')?.value;
-                         completionPercentage = parsePercentage(percInput);
+                     if (daySection.classList.contains('editing')) {
+                         // ... (কোড)
                          story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
+                         mcqData = existingRowData.mcqData || null; // <-- সম্পাদনা মোডে mcqData সংরক্ষণ করুন
 
                          if (row.classList.contains('vocab-row')) {
-                             subject = 'Vocabulary';
-                             vocabData = [];
-                             row.querySelectorAll('.vocab-pair').forEach(pairEl => {
-                                 const word = pairEl.querySelector('.vocab-word-input')?.value.trim();
-                                 const meaning = pairEl.querySelector('.vocab-meaning-input')?.value.trim();
-                                 if (word) { vocabData.push({ word: word, meaning: meaning || '' }); }
-                             });
-                             topic = null;
+                             // ... (vocab-row-এর লজিক)
                          } else {
-                             topic = row.querySelector('.topic-input')?.value.trim() || '';
-                             vocabData = null;
+                             // ... (normal-row-এর লজিক)
                          }
                     } else { // Handle saving checkbox clicks in normal mode
                          completed = row.querySelector('.completion-checkbox')?.checked || false;
                          subject = existingRowData.subject; topic = existingRowData.topic; comment = existingRowData.comment;
                          completionPercentage = existingRowData.completionPercentage; vocabData = existingRowData.vocabData; story = existingRowData.story;
+                         mcqData = existingRowData.mcqData; // <-- সাধারণ মোডে mcqData সংরক্ষণ করুন
                      }
                      
-                     // --- mcqData সেভ করার কোড এখান থেকে সরানো হয়েছে ---
-                     updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null });
+                     // --- mcqData এখন সারিতে (row) সেভ হবে ---
+                     updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null, mcqData: mcqData || null });
                 });
 				
-                 // --- নতুন: mcqData সরাসরি DAY অবজেক্টে সেভ করুন ---
-                 daysArray[dayIndex].mcqData = currentDayData.mcqData || null;
-                 // --- শেষ ---
+                 // --- পুরনো mcqData সেভ করার লজিকটি ডিলিট করা হয়েছে ---
 
                  daysArray[dayIndex].rows = updatedRows;
                 const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
@@ -3166,8 +3209,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         const viewMcqContent = document.getElementById('view-mcq-content');
 
         // 1. "Add/Edit MCQ" বাটনে ক্লিক করলে এই ফাংশনটি কল হবে
-        async function openAddMcqModal(monthId, weekId, dayIndex) {
-            currentMcqTarget = { monthId, weekId, dayIndex };
+        async function openAddMcqModal(monthId, weekId, dayIndex, rowIndex) {
+            currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
             
             // ডেটাবেস থেকে বিদ্যমান MCQ ডেটা আনুন (যদি থাকে)
             setSyncStatus("Loading...", "blue");
@@ -3176,8 +3219,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 const docSnap = await getDoc(docRef);
                 let rawText = '';
                 if (docSnap.exists()) {
-                    // --- MODIFIED: Get mcqData from DAY object ---
-                    const mcqData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.mcqData;
+                    // --- MODIFIED: Get mcqData from ROW object ---
+                    const mcqData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex]?.mcqData;
                     
                     if (mcqData) {
                         // যদি ডেটা থাকে, তাহলে টেক্সট এরিয়াতে দেখানোর জন্য ফরম্যাট করি
@@ -3202,8 +3245,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         saveMcqBtn.addEventListener('click', async () => {
             if (!currentMcqTarget) return;
 
-            // --- MODIFIED: rowIndex is removed ---
-            const { monthId, weekId, dayIndex } = currentMcqTarget;
+            const { monthId, weekId, dayIndex, rowIndex } = currentMcqTarget;
             const rawText = mcqPasteTextarea.value;
             
             try {
@@ -3225,10 +3267,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 let monthData = docSnap.data();
                 let daysArray = monthData.weeks?.[weekId]?.days || [];
                 
-                // --- MODIFIED: Save data to DAY object ---
-                if (daysArray[dayIndex]) {
-                    // কাঁচা টেক্সট এবং পার্স করা ডেটা উভয়ই সেভ করি
-                    daysArray[dayIndex].mcqData = parsedData.length > 0 ? parsedData : null; // সেভ করুন বা খালি করতে null করুন
+                // --- MODIFIED: Save data to ROW object ---
+                if (daysArray[dayIndex] && daysArray[dayIndex].rows[rowIndex]) {
+                    
+                    daysArray[dayIndex].rows[rowIndex].mcqData = parsedData.length > 0 ? parsedData : null;
                     
                     const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
                     await updateDoc(docRef, updatePayload);
@@ -3307,7 +3349,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         // 4. "View MCQ" বাটনে ক্লিক করলে
-        async function openViewMcqModal(monthId, weekId, dayIndex) { // <-- rowIndex সরানো হয়েছে
+        async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
             viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading MCQs...</p>';
             viewMcqModal.style.display = 'block';
 
@@ -3316,8 +3358,23 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 const docSnap = await getDoc(docRef);
                 if (!docSnap.exists()) throw new Error("Month document not found.");
 
-                // --- MODIFIED: Get data from DAY ---
-                const mcqData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.mcqData;
+                const dayData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex];
+                if (!dayData) throw new Error("Day data not found.");
+
+                let mcqData = [];
+
+                if (rowIndex !== null) {
+                    // Req 1: Load MCQs for a specific row
+                    mcqData = dayData.rows?.[rowIndex]?.mcqData || [];
+                } else {
+                    // Req 2: Load ALL MCQs for the day
+                    mcqData = dayData.rows?.reduce((acc, row) => {
+                        if (row.mcqData) {
+                            acc.push(...row.mcqData);
+                        }
+                        return acc;
+                    }, []) || [];
+                }
 
                 
 
@@ -3352,24 +3409,34 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
         // 5. "MCQ Test" বাটনে ক্লিক করলে (UPGRADED)
         // UPGRADED: Generates questions first to set timer
-        async function startMcqQuiz(monthId, weekId, dayIndex) {
+        async function startMcqQuiz(monthId, weekId, dayIndex, rowIndex) {
             quizTitle.textContent = 'MCQ Quiz';
-			currentMcqTarget = { monthId, weekId, dayIndex };
+			currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
             quizModal.style.display = "block";
-            quizMainScreen.classList.add('hidden');
-            quizResultsScreen.classList.add('hidden');
-            quizStartScreen.classList.remove('hidden');
-            
-            quizStartMessage.textContent = "Loading MCQ Quiz...";
-            quizStartBtn.classList.add('hidden');
-            document.getElementById('quiz-total-time-warning').style.display = 'none';
-
+            // ... (কোড)
             try {
                 const docRef = doc(db, getUserPlansCollectionPath(), monthId);
                 const docSnap = await getDoc(docRef);
                 if (!docSnap.exists()) throw new Error("Month document not found.");
 
-                const mcqData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.mcqData;
+                const dayData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex];
+                if (!dayData) throw new Error("Day data not found.");
+
+                let mcqData = [];
+
+                if (rowIndex !== null) {
+                    // Req 1: Load MCQs for a specific row
+                    mcqData = dayData.rows?.[rowIndex]?.mcqData || [];
+                } else {
+                    // Req 3: Load ALL MCQs for the day
+                    mcqData = dayData.rows?.reduce((acc, row) => {
+                        if (row.mcqData) {
+                            acc.push(...row.mcqData);
+                        }
+                        return acc;
+                    }, []) || [];
+                }
+
                 if (!mcqData || mcqData.length < 1) { 
                     quizStartMessage.textContent = "No MCQs found to start a quiz.";
                     return;
@@ -3467,14 +3534,19 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
                             const day = weekData.days[dayIndex];
                             
-                            // --- LOGIC FIX: Check day.mcqData, not row.mcqData ---
-                            if (day.mcqData && day.mcqData.length > 0) {
+                            // --- REQ 6: Aggregate MCQs from all rows in this day ---
+                            const dayMcqs = day.rows?.reduce((acc, row) => {
+                                if (row.mcqData) acc.push(...row.mcqData);
+                                return acc;
+                            }, []) || [];
+
+                            if (dayMcqs.length > 0) {
                                 monthHasMcqs = true;
                                 weekHasMcqs = true;
-                                totalMcqCount += day.mcqData.length;
+                                totalMcqCount += dayMcqs.length;
                                 
                                 let dayMcqItemsHtml = '';
-                                day.mcqData.forEach((mcq, index) => {
+                                dayMcqs.forEach((mcq, index) => { // Use aggregated dayMcqs
                                     dayMcqItemsHtml += `
                                         <div class="mcq-item">
                                             <p class="mcq-question">${index + 1}. ${escapeHtml(mcq.question)}</p>
@@ -3570,9 +3642,13 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
                             const day = weekData.days[dayIndex];
                             
-                            // --- LOGIC FIX: Check day.mcqData ---
-                            if (day.mcqData && day.mcqData.length > 0) {
-                                const dayMcqs = day.mcqData;
+                            // --- REQ 6: Aggregate MCQs from all rows in this day ---
+                            const dayMcqs = day.rows?.reduce((acc, row) => {
+                                if (row.mcqData) acc.push(...row.mcqData);
+                                return acc;
+                            }, []) || [];
+
+                            if (dayMcqs.length > 0) {
                                 quizzesFound++;
                                 monthHasMcqs = true;
                                 weekHasMcqs = true;
@@ -3658,27 +3734,33 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 let aggregatedMcqs = [];
                 let quizTitle = '';
 
-                if (quizType === 'day') {
-                    // ... (day logic) ...
+					if (quizType === 'day') {
                     const day = monthData.weeks?.[weekId]?.days?.[dayIndex];
                     if (!day) throw new Error("Day data not found.");
-                    if (day.mcqData) aggregatedMcqs.push(...day.mcqData);
+                    // REQ 6: Aggregate from rows
+                    day.rows?.forEach(row => {
+                        if (row.mcqData) aggregatedMcqs.push(...row.mcqData);
+                    });
                     quizTitle = `Day ${day.dayNumber} - ${weekId.replace('week', 'Week ')}`;
                 } else if (quizType === 'week') {
-                    // ... (week logic) ...
                     const week = monthData.weeks?.[weekId];
                     if (!week) throw new Error("Week data not found.");
+                    // REQ 6: Aggregate from rows
                     for (const day of week.days) {
-                        if (day.mcqData) aggregatedMcqs.push(...day.mcqData);
+                        day.rows?.forEach(row => {
+                            if (row.mcqData) aggregatedMcqs.push(...row.mcqData);
+                        });
                     }
                     quizTitle = `${weekId.replace('week', 'Week ')} - ${monthData.monthName}`;
                 } else if (quizType === 'month') {
-                    // ... (month logic) ...
                     for (const wId of ['week1', 'week2', 'week3', 'week4']) {
                         const week = monthData.weeks?.[wId];
                         if (week && week.days) {
+                            // REQ 6: Aggregate from rows
                             for (const day of week.days) {
-                                if (day.mcqData) aggregatedMcqs.push(...day.mcqData);
+                                day.rows?.forEach(row => {
+                                    if (row.mcqData) aggregatedMcqs.push(...row.mcqData);
+                                });
                             }
                         }
                     }
@@ -3698,7 +3780,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     options: [...mcq.options],
                     correctAnswer: mcq.correctAnswer,
                     userAnswer: null,
-                    isCorrect: null
+                    isCorrect: null1111111111111111111111
                 }));
                 
                 const totalQuestions = currentQuizQuestions.length;
