@@ -1434,35 +1434,7 @@
                     let existingRowIndex = parseInt(row.dataset.rowIndex);
                     const existingRowData = !isNaN(existingRowIndex) && currentDayData.rows?.[existingRowIndex] ? currentDayData.rows[existingRowIndex] : {};
 
-                    let subject, topic, comment, completed, completionPercentage, vocabData = null, story, mcqData = null; // <-- mcqData এখানে যোগ করা হয়েছে
-
-                    // Save Day Plan
-        async function saveDayPlan(monthId, weekId, daySection, isAutosave = false) {
-            if (!currentUser || !userId) return;
-            const dayIndex = parseInt(daySection.dataset.dayIndex);
-            console.log(`Saving day plan for ${monthId}, ${weekId}, Day Index: ${dayIndex}`);
-            if (!isAutosave) {
-                setSyncStatus("Syncing...", "yellow");
-            }
-
-            const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-            try {
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists()) throw new Error("Month document not found.");
-
-                let monthData = docSnap.data();
-                let daysArray = monthData.weeks?.[weekId]?.days || [];
-                const currentDayData = daysArray[dayIndex];
-                 if (!currentDayData) throw new Error(`Day data for index ${dayIndex} not found in Firestore.`);
-
-                const updatedRows = [];
-                const rowElements = daySection.querySelectorAll('tbody tr');
-
-                rowElements.forEach((row) => {
-                    let existingRowIndex = parseInt(row.dataset.rowIndex);
-                    const existingRowData = !isNaN(existingRowIndex) && currentDayData.rows?.[existingRowIndex] ? currentDayData.rows[existingRowIndex] : {};
-
-                    let subject, topic, comment, completed, completionPercentage, vocabData = null, story, mcqData = null; // <-- mcqData এখানে যোগ করা হয়েছে
+                    let subject, topic, comment, completed, completionPercentage, vocabData = null, story, mcqData = null;
 
                     if (daySection.classList.contains('editing')) {
                          // --- START: BUG FIX (Define subject and comment FIRST) ---
@@ -1523,7 +1495,9 @@
                 showCustomAlert("Error saving changes. Please check your connection and try again.");
                 setSyncStatus("Error", "red");
             }
-        } else { // Handle saving checkbox clicks in normal mode
+        }
+		
+		else { // Handle saving checkbox clicks in normal mode
                          completed = row.querySelector('.completion-checkbox')?.checked || false;
                          subject = existingRowData.subject; topic = existingRowData.topic; comment = existingRowData.comment;
                          completionPercentage = existingRowData.completionPercentage; vocabData = existingRowData.vocabData; story = existingRowData.story;
