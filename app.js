@@ -3318,53 +3318,56 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             }
         });
 
-        // 3. ✨ The Magic Parser Function (Regex) - (UPGRADED)
+        // 3. ✨ The Magic Parser Function (Regex) - (UPGRADED for Dual Language)
         function parseMcqText(text) {
 			// --- START: NEW PRE-PROCESSING FIX ---
             // এটি Regex চালানোর আগে আপনার ডেটা পরিষ্কার করবে।
             // এটি প্রতিটি প্রশ্ন নম্বরের আগে একটি নতুন লাইন যোগ করবে (যদি না থাকে)।
             let cleanText = text.replace(/\n*([০-৯0-9]+\.)/g, '\n$1');
             const mcqData = [];
-            // এই Regex টি আপনার দেওয়া ফরম্যাট অনুযায়ী প্রশ্ন, অপশন এবং উত্তর খুঁজে বের করবে
-            const mcqRegex = /(?:[০-৯0-9]+)\.\s*([\s\S]+?)\n(?:ক\.)\s*([\s\S]+?)\n(?:খ\.)\s*([\s\S]+?)\n(?:গ\.)\s*([\s\S]+?)\n(?:ঘ\.)\s*([\s\S]+?)\n.*:\s*([কখগঘ])\.\s*([\s\S]+?)(?=\n[০-৯0-9]+\.|\n*$)/g;
+            
+            // --- START: UPGRADED Regex ---
+            // এই Regex এখন বাংলা (ক, খ, গ, ঘ) এবং ইংরেজি (a, b, c, d) উভয় ফরম্যাটই গ্রহণ করবে।
+            const mcqRegex = 
+/(?:[০-৯0-9]+)\.\s*([\s\S]+?)\n(?:(?:ক\.)|(?:a\.))\s*([\s\S]+?)\n(?:(?:খ\.)|(?:b\.))\s*([\s\S]+?)\n(?:(?:গ\.)|(?:c\.))\s*([\s\S]+?)\n(?:(?:ঘ\.)|(?:d\.))\s*([\s\S]+?)\n(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([কখগঘa-d])\.*\s*([\s\S]+?)(?=\n[০-৯0-9]+\.|\n*$)/gi;
+            // 'g' (global) এবং 'i' (case-insensitive) ফ্ল্যাগ যোগ করা হয়েছে
+            // --- END: UPGRADED Regex ---
             
             let match;
             while ((match = mcqRegex.exec(cleanText)) !== null) {
                 try {
                     const question = match[1].trim();
                     const options = [
-                        match[2].trim(), // অপশন ক
-                        match[3].trim(), // অপশন খ
-                        match[4].trim(), // অপশন গ
-                        match[5].trim()  // অপশন ঘ
+                        match[2].trim(), // অপশন ক / a
+                        match[3].trim(), // অপশন খ / b
+                        match[4].trim(), // অপশন গ / c
+                        match[5].trim()  // অপশন ঘ / d
                     ];
                     
-                    const correctPrefix = match[6].trim(); // ক, খ, গ, বা ঘ
+                    // --- START: UPGRADED Logic ---
+                    // এটি এখন 'ক' বা 'a' উভয়কেই চিনবে
+                    const correctPrefix = match[6].trim().toLowerCase(); // ক, খ, গ, ঘ বা a, b, c, d
                     
-                    // --- START: LOGIC FIX ---
-                    // আমরা এখন আর টেক্সট মিলিয়ে দেখবো না।
-                    // আমরা সরাসরি প্রিফিক্সের ওপর বিশ্বাস করবো।
                     let correctAnswer;
-                    if (correctPrefix === 'ক') {
+                    if (correctPrefix === 'ক' || correctPrefix === 'a') {
                         correctAnswer = options[0];
-                    } else if (correctPrefix === 'খ') {
+                    } else if (correctPrefix === 'খ' || correctPrefix === 'b') {
                         correctAnswer = options[1];
-                    } else if (correctPrefix === 'গ') {
+                    } else if (correctPrefix === 'গ' || correctPrefix === 'c') {
                         correctAnswer = options[2];
-                    } else if (correctPrefix === 'ঘ') {
+                    } else if (correctPrefix === 'ঘ' || correctPrefix === 'd') {
                         correctAnswer = options[3];
                     } else {
-                        // যদি কোনো কারণে প্রিফিক্স না মেলে (যদিও regex এটা হতে দেবে না)
-                        // আমরা আগের মতো টেক্সট ব্যবহারের চেষ্টা করবো
+                        // ফলব্যাক হিসেবে Regex-এর ৭ নম্বর গ্রুপটি ব্যবহার করবে
                         correctAnswer = match[7].trim();
                          console.warn("Could not match prefix, using text as fallback.");
                     }
-                    // --- END: LOGIC FIX ---
+                    // --- END: UPGRADED Logic ---
 
                     mcqData.push({
                         question: question,
                         options: options,
-                        correctAnswer: correctAnswer // সেভ করা উত্তরটি এখন পরিষ্কার এবং সঠিক
+                        correctAnswer: correctAnswer
                     });
                 } catch (e) {
                     console.error("Failed to parse one MCQ block:", e, match);
