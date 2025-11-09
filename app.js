@@ -1497,34 +1497,8 @@
             }
         }
 		
-		else { // Handle saving checkbox clicks in normal mode
-                         completed = row.querySelector('.completion-checkbox')?.checked || false;
-                         subject = existingRowData.subject; topic = existingRowData.topic; comment = existingRowData.comment;
-                         completionPercentage = existingRowData.completionPercentage; vocabData = existingRowData.vocabData; story = existingRowData.story;
-                         mcqData = existingRowData.mcqData; // <-- সাধারণ মোডে mcqData সংরক্ষণ করুন
-                     }
-                     
-                     // --- mcqData এখন সারিতে (row) সেভ হবে ---
-                     updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null, mcqData: mcqData || null });
-                });
-				
-                 // --- পুরনো mcqData সেভ করার লজিকটি ডিলিট করা হয়েছে ---
-
-                 daysArray[dayIndex].rows = updatedRows;
-                const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
-                await updateDoc(docRef, updatePayload);
-                
-                console.log(`Day ${dayIndex + 1} for ${weekId} saved successfully.`);
-                if (!isAutosave) {
-                    setSyncStatus("Synced", "green");
-                }
-
-            } catch (error) {
-                console.error("Error saving day plan:", error);
-                showCustomAlert("Error saving changes. Please check your connection and try again.");
-                setSyncStatus("Error", "red");
-            }
-        }
+		
+        
 
          // Add Row (normal or vocab)
         function addRowToDay(monthId, weekId, daySection, type = 'normal') {
