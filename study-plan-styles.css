@@ -205,10 +205,27 @@
 
         /* --- Table & Editing Styles --- */
         .study-table { width: 100%; text-align: left; color: #4b5563; font-size: 0.875rem; /* sm */ }
-        .study-table thead { background-color: rgba(249, 250, 251, 0.6); /* gray-50/60 */ color: #4b5563; font-size: 0.75rem; text-transform: uppercase; }
-        .study-table tbody tr { border-bottom: 1px solid #e5e7eb; }
+        .study-table thead { 
+    background-color: rgba(249, 250, 251, 0.6); /* gray-50/60 */ 
+    color: #4b5563; 
+    font-size: 0.75rem; 
+    text-transform: uppercase; 
+    border-top: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+}
+        .study-table tbody tr { border-bottom: 1px solid #000000; }
         .study-table tbody tr:hover { background-color: rgba(249, 250, 251, 0.5); } /* Lighter hover */
-        .study-table td, .study-table th { padding: 10px 8px; vertical-align: middle; } /* Reduced horizontal padding */
+        .study-table td, .study-table th { 
+    padding: 10px 8px; 
+    vertical-align: middle; 
+    border-right: 1px solid #000000;
+}
+
+/* Add border to the far left of the table */
+.study-table th:first-child,
+.study-table td:first-child {
+    border-left: 1px solid #000000;
+}
         .study-table th { text-align: center; }
         .study-table td.center-cell { text-align: center; }
 /* --- Style for Completed Table Row (FIXED) --- */
@@ -425,7 +442,7 @@
             .study-table thead { display: none; } /* Hide table header */
             .study-table tbody, .study-table tr, .study-table td { display: block; width: 100%; } /* Stack elements */
             .study-table tr {
-                border: 1px solid #e5e7eb; /* Add border around each stacked row */
+                border: 1px solid #000000; /* Add border around each stacked row */
                 border-radius: 6px;
                 margin-bottom: 1rem;
                 padding: 0.75rem; /* Add internal padding */
