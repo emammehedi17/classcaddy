@@ -210,11 +210,11 @@
     color: #4b5563; 
     font-size: 0.75rem; 
     text-transform: uppercase; 
-    border-top: none;
-    border-bottom: none;
+    border-collapse: separate; 
+    border-spacing: 0 6px; /* 0 horizontal, 6px vertical spacing */
 }
         .study-table tbody tr { border-bottom: none; }
-        .study-table tbody tr:hover { background-color: rgba(249, 250, 251, 0.5); } /* Lighter hover */
+        
         .study-table td, .study-table th { 
     padding: 10px 8px; 
     vertical-align: middle; 
@@ -226,80 +226,127 @@
 .study-table td:first-child {
     border-left: none;
 }
+
+/* --- Style for UNCOMPLETED Table Row --- */
+.study-table tbody tr:not(.row-completed) td {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb; /* gray-200 border */
+    border-right: none;
+    border-left: none;
+    padding-top: 12px; /* Add some padding */
+    padding-bottom: 12px;
+    color: #4b5563; /* gray-600 */
+}
+.study-table tbody tr:not(.row-completed) td:first-child {
+    border-left: 1px solid #e5e7eb;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+/* Find the last visible cell in NORMAL mode */
+.study-table tbody tr:not(.row-completed):not(.editing-mode) td.center-cell {
+    border-right: 1px solid #e5e7eb;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+/* Find the last visible cell in EDIT mode */
+.study-table tbody tr:not(.row-completed).editing-mode td.actions-cell {
+    border-right: 1px solid #e5e7eb;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+/* Hover for uncompleted rows */
+.study-table tbody tr:not(.row-completed):hover td {
+    background-color: #f9fafb; /* gray-50 */
+}
         .study-table th { text-align: center; }
         .study-table td.center-cell { text-align: center; }
 /* --- Style for Completed Table Row (NEW) --- */
-.study-table tbody tr.row-completed {
-    border: 2px solid; /* Color will be set by parent */
-    border-radius: 12px; /* Rounded corners for the whole row */
-    color: #065f46; /* emerald-800 */
-}
-
-/* Make the cells transparent so the row's background shows */
 .study-table tbody tr.row-completed td {
-    background-color: transparent;
+    border-width: 2px 0 2px 0; /* Top/Bottom border, no left/right */
+    border-style: solid;
+    color: #065f46; /* emerald-800 */
+    padding-top: 12px; /* Match padding */
+    padding-bottom: 12px;
+}
+/* First cell */
+.study-table tbody tr.row-completed td:first-child {
+    border-left-width: 2px;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+/* Last visible cell in NORMAL mode */
+.study-table tbody tr.row-completed:not(.editing-mode) td.center-cell {
+    border-right-width: 2px;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+/* Last visible cell in EDIT mode */
+.study-table tbody tr.row-completed.editing-mode td.actions-cell {
+    border-right-width: 2px;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
 }
 
 /* --- 1. Day 1 Color (Emerald) --- */
-.days-container > .day-section:nth-of-type(7n+1) .study-table tbody tr.row-completed {
+.days-container > .day-section:nth-of-type(7n+1) .study-table tbody tr.row-completed td {
     background-color: #d1fae5; /* emerald-100 */
     border-color: #10b981;
 }
-.days-container > .day-section:nth-of-type(7n+1) .study-table tbody tr.row-completed:hover {
+.days-container > .day-section:nth-of-type(7n+1) .study-table tbody tr.row-completed:hover td {
     background-color: #a7f3d0; /* emerald-200 */
 }
 
 /* --- 2. Day 2 Color (Sky) --- */
-.days-container > .day-section:nth-of-type(7n+2) .study-table tbody tr.row-completed {
+.days-container > .day-section:nth-of-type(7n+2) .study-table tbody tr.row-completed td {
     background-color: #e0f2fe; /* sky-100 */
     border-color: #0ea5e9;
 }
-.days-container > .day-section:nth-of-type(7n+2) .study-table tbody tr.row-completed:hover {
+.days-container > .day-section:nth-of-type(7n+2) .study-table tbody tr.row-completed:hover td {
     background-color: #bae6fd; /* sky-200 */
 }
 
 /* --- 3. Day 3 Color (Amber) --- */
-.days-container > .day-section:nth-of-type(7n+3) .study-table tbody tr.row-completed {
+.days-container > .day-section:nth-of-type(7n+3) .study-table tbody tr.row-completed td {
     background-color: #fef3c7; /* amber-100 */
     border-color: #f59e0b;
 }
-.days-container > .day-section:nth-of-type(7n+3) .study-table tbody tr.row-completed:hover {
+.days-container > .day-section:nth-of-type(7n+3) .study-table tbody tr.row-completed:hover td {
     background-color: #fde68a; /* amber-200 */
 }
 
 /* --- 4. Day 4 Color (Red) --- */
-.days-container > .day-section:nth-of-type(7n+4) .study-table tbody tr.row-completed {
+.days-container > .day-section:nth-of-type(7n+4) .study-table tbody tr.row-completed td {
     background-color: #fee2e2; /* red-100 */
     border-color: #ef4444;
 }
-.days-container > .day-section:nth-of-type(7n+4) .study-table tbody tr.row-completed:hover {
+.days-container > .day-section:nth-of-type(7n+4) .study-table tbody tr.row-completed:hover td {
     background-color: #fecaca; /* red-200 */
 }
 
 /* --- 5. Day 5 Color (Purple) --- */
-.days-container > .day-section:nth-of-type(7n+5) .study-table tbody tr.row-completed {
+.days-container > .day-section:nth-of-type(7n+5) .study-table tbody tr.row-completed td {
     background-color: #f3e8ff; /* purple-100 */
     border-color: #a855f7;
 }
-.days-container > .day-section:nth-of-type(7n+5) .study-table tbody tr.row-completed:hover {
+.days-container > .day-section:nth-of-type(7n+5) .study-table tbody tr.row-completed:hover td {
     background-color: #e9d5ff; /* purple-200 */
 }
 
 /* --- 6. Day 6 Color (Indigo) --- */
-.days-container > .day-section:nth-of-type(7n+6) .study-table tbody tr.row-completed {
+.days-container > .day-section:nth-of-type(7n+6) .study-table tbody tr.row-completed td {
     background-color: #e0e7ff; /* indigo-100 */
     border-color: #8b5cf6;
 }
-.days-container > .day-section:nth-of-type(7n+6) .study-table tbody tr.row-completed:hover {
+.days-container > .day-section:nth-of-type(7n+6) .study-table tbody tr.row-completed:hover td {
     background-color: #c7d2fe; /* indigo-200 */
 }
 
 /* --- 7. Day 7 Color (Cyan) --- */
-.days-container > .day-section:nth-of-type(7n+7) .study-table tbody tr.row-completed {
+.days-container > .day-section:nth-of-type(7n+7) .study-table tbody tr.row-completed td {
     background-color: #cffafe; /* cyan-100 */
     border-color: #06b6d4;
 }
-.days-container > .day-section:nth-of-type(7n+7) .study-table tbody tr.row-completed:hover {
+.days-container > .day-section:nth-of-type(7n+7) .study-table tbody tr.row-completed:hover td {
     background-color: #a5f3fc; /* cyan-200 */
 }
 
