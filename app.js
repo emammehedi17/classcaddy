@@ -1228,7 +1228,44 @@
                  if (target.classList.contains('completion-checkbox')) {
                      if (!daySection?.classList.contains('editing')) {
                          row?.classList.toggle('row-completed', target.checked);
-                         await saveDayPlan(monthId, weekId, daySection); 
+                         
+                         // --- START: NEW OPTIMISTIC CHECKBOX SAVE ---
+                         // চেকবক্স ক্লিক সেভ করার নতুন লজিক
+                         (async () => {
+                            setSyncStatus("Syncing...", "yellow");
+                            const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                            let daysArray;
+                            try {
+                                const docSnap = await getDoc(docRef);
+                                if (!docSnap.exists()) throw new Error("Month document not found.");
+                                daysArray = docSnap.data().weeks?.[weekId]?.days || [];
+                            } catch (error) {
+                                console.error("Error fetching data for checkbox save:", error);
+                                setSyncStatus("Error", "red");
+                                return;
+                            }
+                            
+                            // DOM থেকে ডেটা পড়ুন (চেকবক্সের নতুন অবস্থা সহ)
+                            const dayIndex = parseInt(daySection.dataset.dayIndex);
+                            const parseResult = parseAndPrepareSaveData(daySection, daysArray, weekId, true); // true = isCheckboxClick
+                            
+                            if (parseResult === null) {
+                                setSyncStatus("Error", "red");
+                                return;
+                            }
+                            
+                            const { updatedRows, updatePayload } = parseResult;
+                            
+                            // তৎক্ষণাৎ প্রোগ্রেস বার আপডেট করুন
+                            const dayDataForProgress = { rows: updatedRows };
+                            updateWeeklyProgressUI(monthId, weekId); // এটি রি-ফেচ করবে
+                            updateDailyProgressUI(monthId, weekId, dayIndex, dayDataForProgress);
+                            
+                            // ব্যাকগ্রাউন্ডে সেভ করুন
+                            saveDataToFirebase(docRef, updatePayload, true); // true = isAutosave (no green "Synced" popup)
+                         })();
+                         // --- END: NEW OPTIMISTIC CHECKBOX SAVE ---
+
                      } else {
                          e.preventDefault();
                      }
@@ -1483,7 +1520,10 @@
         /**
          * ধাপ ১ (নতুন): DOM থেকে ডেটা পড়ে এবং সেভের জন্য প্রস্তুত করে (Synchronous)
          */
-        function parseAndPrepareSaveData(daySection, daysArray, weekId) {
+        /**
+         * ধাপ ১ (নতুন): DOM থেকে ডেটা পড়ে এবং সেভের জন্য প্রস্তুত করে (Synchronous)
+         */
+        function parseAndPrepareSaveData(daySection, daysArray, weekId, isCheckboxClick = false) {
             try {
                 const dayIndex = parseInt(daySection.dataset.dayIndex);
                 const currentDayData = daysArray[dayIndex];
@@ -1500,8 +1540,8 @@
 
                     let subject, topic, comment, completed, completionPercentage, vocabData = null, story, mcqData = null;
 
-                    // এই লজিকটি আপনার পুরনো saveDayPlan ফাংশন থেকে কপি করা হয়েছে
-                    if (daySection.classList.contains('editing')) {
+                    if (daySection.classList.contains('editing') && !isCheckboxClick) {
+                         // --- এটি এডিট মোড থেকে সেভ করা হচ্ছে ---
                          subject = (row.querySelector('.subject-input')?.value || '').trim();
                          comment = (row.querySelector('.comment-input')?.value || '').trim();
                          completed = existingRowData.completed || false;
@@ -1509,7 +1549,11 @@
                          completionPercentage = parsePercentage(percInput);
                          
                          story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
-                         mcqData = existingRowData.mcqData || null; // Preserve existing mcqData
+                         
+                         // --- START: BUG FIX ---
+                         // mcqData-কে existingRowData থেকে পড়ুন
+                         mcqData = existingRowData.mcqData || null; 
+                         // --- END: BUG FIX ---
 
                          if (row.classList.contains('vocab-row')) {
                              subject = 'Vocabulary';
@@ -1525,7 +1569,7 @@
                              vocabData = null;
                          }
                     } else { 
-                         // এটি একটি ফলব্যাক, যদিও 'editing' ক্লাসের ভেতরেই থাকার কথা
+                         // --- এটি একটি চেকবক্স ক্লিক বা অন্য কোনো সাধারণ মোড সেভ ---
                          completed = row.querySelector('.completion-checkbox')?.checked || false;
                          subject = existingRowData.subject; 
                          topic = existingRowData.topic; 
@@ -1533,7 +1577,7 @@
                          completionPercentage = existingRowData.completionPercentage; 
                          vocabData = existingRowData.vocabData; 
                          story = existingRowData.story;
-                         mcqData = existingRowData.mcqData;
+                         mcqData = existingRowData.mcqData; // <-- এখানেও mcqData সংরক্ষণ করুন
                      }
                      
                      updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null, mcqData: mcqData || null });
