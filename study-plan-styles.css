@@ -211,32 +211,37 @@
         .study-table td, .study-table th { padding: 10px 8px; vertical-align: middle; } /* Reduced horizontal padding */
         .study-table th { text-align: center; }
         .study-table td.center-cell { text-align: center; }
-/* --- Style for Completed Table Row --- */
+/* --- Style for Completed Table Row (FIXED) --- */
 .study-table tbody tr.row-completed {
     /* background-color: #d1fae5; <-- REMOVED from the row */
     color: #065f46; /* emerald-800 */
 }
 
-/* Apply background to the cells instead of the row */
+/* Apply background to ALL cells in the completed row */
 .study-table tbody tr.row-completed td {
     background-color: #d1fae5; /* Light emerald (emerald-100) */
 }
 
-/* Apply border-radius to the first and last cell */
+/* 1. Round the FIRST cell */
 .study-table tbody tr.row-completed td:first-child {
-    border-top-left-radius: 8px;    /* rounded-l-lg */
-    border-bottom-left-radius: 8px;
+    border-top-left-radius: 12px;    /* Increased from 8px */
+    border-bottom-left-radius: 12px;
 }
-.study-table tbody tr.row-completed td:last-child {
-    border-top-right-radius: 8px;   /* rounded-r-lg */
-    border-bottom-right-radius: 8px;
+
+/* 2. Round the LAST VISIBLE cell */
+
+/* In NORMAL mode, the "Done" cell is the last visible one */
+.study-table tbody tr.row-completed:not(.editing-mode) td.center-cell {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
 }
-.study-table tbody tr.row-completed .text-gray-500 { /* Make comment text readable */
-    color: #047857; /* emerald-700 */
+
+/* In EDIT mode, the "Actions" cell is the last visible one */
+.study-table tbody tr.row-completed.editing-mode td.actions-cell {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
 }
-.study-table tbody tr.row-completed .subject-display { /* Make subject text readable */
-    color: #065f46; /* emerald-800 */
-}
+
 /* Ensure hover effect doesn't clash too much */
 .study-table tbody tr.row-completed:hover td {
     background-color: #a7f3d0; /* Slightly darker emerald on hover (emerald-200) */
