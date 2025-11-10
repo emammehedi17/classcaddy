@@ -1506,7 +1506,13 @@
 }
 
 .day-section-header {
-    /* ...other styles... */
+    display: flex;
+    /* justify-content: space-between; <-- REMOVED THIS LINE */
+    align-items: center;
+    gap: 1rem; /* 16px */
+    padding: 0.25rem 1rem; /* 4px 16px - Height further reduced */
+    cursor: pointer;
+    
     /* We add borders and radius back to the header */
     border: none;
     border-radius: 0.75rem; /* rounded-xl */
