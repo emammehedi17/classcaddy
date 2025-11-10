@@ -1384,6 +1384,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem; /* 8px */
+    min-width: 6rem; /* 96px - This gives the title enough space */
 }
 .day-header-title h4 {
     font-size: 0.9rem; /* 1rem (16px) থেকে কমানো হলো */
