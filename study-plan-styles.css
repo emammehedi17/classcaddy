@@ -202,7 +202,13 @@
         .day-section .flex.justify-between { margin-bottom: 1rem; }
         .day-section .study-table { margin-top: 0.5rem; }
         .day-section .edit-mode-controls { margin-top: 1rem; }
-
+		
+		
+	.study-table { 
+    border-collapse: separate; 
+    border-spacing: 0 8px; /* 0 horizontal, 8px vertical spacing */
+    padding: 2px; /* সামান্য প্যাডিং, যেন বর্ডার কেটে না যায় */
+}
         /* --- Table & Editing Styles --- */
         .study-table { width: 100%; text-align: left; color: #4b5563; font-size: 0.875rem; /* sm */ }
         .study-table thead { 
@@ -212,6 +218,8 @@
     text-transform: uppercase; 
     border-collapse: separate; 
     border-spacing: 0 6px; /* 0 horizontal, 6px vertical spacing */
+	border-top: none;
+    border-bottom: none;
 }
         .study-table tbody tr { border-bottom: none; }
         
@@ -260,106 +268,123 @@
 }
         .study-table th { text-align: center; }
         .study-table td.center-cell { text-align: center; }
-/* --- Style for Completed Table Row (NEW) --- */
+/* --- START: NEW ROW CARD STYLES --- */
+
+/* --- স্টাইল ১: সাধারণ (Uncompleted) সারি --- */
+
+.study-table tbody tr:not(.row-completed) td {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb; /* gray-200 border */
+    border-right: none;
+    border-left: none;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    color: #4b5563; /* gray-600 */
+}
+/* প্রথম সেল: বাম দিকের বর্ডার এবং কর্নার */
+.study-table tbody tr:not(.row-completed) td:first-child {
+    border-left: 1px solid #e5e7eb;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+/* সাধারণ মোডে শেষ সেল (Done - ৬ নম্বর কলাম) */
+.study-table tbody tr:not(.row-completed):not(.editing-mode) td:nth-child(6) {
+    border-right: 1px solid #e5e7eb;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+/* এডিট মোডে শেষ সেল (Actions - ৮ নম্বর কলাম) */
+.study-table tbody tr:not(.row-completed).editing-mode td:nth-child(8) {
+    border-right: 1px solid #e5e7eb;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+/* সাধারণ সারির হোভার (Hover) */
+.study-table tbody tr:not(.row-completed):hover td {
+    background-color: #f9fafb; /* gray-50 */
+}
+
+
+/* --- স্টাইল ২: কমপ্লিটেড (Completed) সারি --- */
+
 .study-table tbody tr.row-completed td {
-    border-width: 2px 0 2px 0; /* Top/Bottom border, no left/right */
+    border-width: 2px 0 2px 0; /* Top/Bottom border */
     border-style: solid;
     color: #065f46; /* emerald-800 */
-    padding-top: 12px; /* Match padding */
+    padding-top: 12px;
     padding-bottom: 12px;
 }
-/* First cell */
+/* প্রথম সেল: বাম দিকের বর্ডার এবং কর্নার */
 .study-table tbody tr.row-completed td:first-child {
     border-left-width: 2px;
     border-top-left-radius: 12px;
     border-bottom-left-radius: 12px;
 }
-/* Last visible cell in NORMAL mode */
-.study-table tbody tr.row-completed:not(.editing-mode) td.center-cell {
+/* সাধারণ মোডে শেষ সেল (Done - ৬ নম্বর কলাম) */
+.study-table tbody tr.row-completed:not(.editing-mode) td:nth-child(6) {
     border-right-width: 2px;
     border-top-right-radius: 12px;
     border-bottom-right-radius: 12px;
 }
-/* Last visible cell in EDIT mode */
-.study-table tbody tr.row-completed.editing-mode td.actions-cell {
+/* এডিট মোডে শেষ সেল (Actions - ৮ নম্বর কলাম) */
+.study-table tbody tr.row-completed.editing-mode td:nth-child(8) {
     border-right-width: 2px;
     border-top-right-radius: 12px;
     border-bottom-right-radius: 12px;
 }
 
-/* --- 1. Day 1 Color (Emerald) --- */
+/* --- কমপ্লিটেড সারির রঙ --- */
+
+/* দিন ১: Emerald */
 .days-container > .day-section:nth-of-type(7n+1) .study-table tbody tr.row-completed td {
-    background-color: #d1fae5; /* emerald-100 */
-    border-color: #10b981;
+    background-color: #d1fae5; border-color: #10b981;
 }
 .days-container > .day-section:nth-of-type(7n+1) .study-table tbody tr.row-completed:hover td {
-    background-color: #a7f3d0; /* emerald-200 */
+    background-color: #a7f3d0;
 }
-
-/* --- 2. Day 2 Color (Sky) --- */
+/* দিন ২: Sky */
 .days-container > .day-section:nth-of-type(7n+2) .study-table tbody tr.row-completed td {
-    background-color: #e0f2fe; /* sky-100 */
-    border-color: #0ea5e9;
+    background-color: #e0f2fe; border-color: #0ea5e9;
 }
 .days-container > .day-section:nth-of-type(7n+2) .study-table tbody tr.row-completed:hover td {
-    background-color: #bae6fd; /* sky-200 */
+    background-color: #bae6fd;
 }
-
-/* --- 3. Day 3 Color (Amber) --- */
+/* দিন ৩: Amber */
 .days-container > .day-section:nth-of-type(7n+3) .study-table tbody tr.row-completed td {
-    background-color: #fef3c7; /* amber-100 */
-    border-color: #f59e0b;
+    background-color: #fef3c7; border-color: #f59e0b;
 }
 .days-container > .day-section:nth-of-type(7n+3) .study-table tbody tr.row-completed:hover td {
-    background-color: #fde68a; /* amber-200 */
+    background-color: #fde68a;
 }
-
-/* --- 4. Day 4 Color (Red) --- */
+/* দিন ৪: Red */
 .days-container > .day-section:nth-of-type(7n+4) .study-table tbody tr.row-completed td {
-    background-color: #fee2e2; /* red-100 */
-    border-color: #ef4444;
+    background-color: #fee2e2; border-color: #ef4444;
 }
 .days-container > .day-section:nth-of-type(7n+4) .study-table tbody tr.row-completed:hover td {
-    background-color: #fecaca; /* red-200 */
+    background-color: #fecaca;
 }
-
-/* --- 5. Day 5 Color (Purple) --- */
+/* দিন ৫: Purple */
 .days-container > .day-section:nth-of-type(7n+5) .study-table tbody tr.row-completed td {
-    background-color: #f3e8ff; /* purple-100 */
-    border-color: #a855f7;
+    background-color: #f3e8ff; border-color: #a855f7;
 }
 .days-container > .day-section:nth-of-type(7n+5) .study-table tbody tr.row-completed:hover td {
-    background-color: #e9d5ff; /* purple-200 */
+    background-color: #e9d5ff;
 }
-
-/* --- 6. Day 6 Color (Indigo) --- */
+/* দিন ৬: Indigo */
 .days-container > .day-section:nth-of-type(7n+6) .study-table tbody tr.row-completed td {
-    background-color: #e0e7ff; /* indigo-100 */
-    border-color: #8b5cf6;
+    background-color: #e0e7ff; border-color: #8b5cf6;
 }
 .days-container > .day-section:nth-of-type(7n+6) .study-table tbody tr.row-completed:hover td {
-    background-color: #c7d2fe; /* indigo-200 */
+    background-color: #c7d2fe;
 }
-
-/* --- 7. Day 7 Color (Cyan) --- */
+/* দিন ৭: Cyan */
 .days-container > .day-section:nth-of-type(7n+7) .study-table tbody tr.row-completed td {
-    background-color: #cffafe; /* cyan-100 */
-    border-color: #06b6d4;
+    background-color: #cffafe; border-color: #06b6d4;
 }
 .days-container > .day-section:nth-of-type(7n+7) .study-table tbody tr.row-completed:hover td {
-    background-color: #a5f3fc; /* cyan-200 */
+    background-color: #a5f3fc;
 }
-
-/* In EDIT mode, the "Actions" cell is the last visible one */
-.study-table tbody tr.row-completed.editing-mode td.actions-cell {
-    border-top-right-radius: 12px;
-    border-bottom-right-radius: 12px;
-}
-
-/* Ensure hover effect doesn't clash too much */
-.study-table tbody tr.row-completed:hover td {
-    background-color: #a7f3d0; /* Slightly darker emerald on hover (emerald-200) */
-}
+/* --- END: NEW ROW CARD STYLES --- */
 
         .editable-input, .vocab-input { background-color: #f9fafb; border: 1px solid #d1d5db; border-radius: 4px; padding: 6px 8px; color: #1f2937; width: 100%; font-size: 0.875rem; transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s; }
         .editable-input:focus, .vocab-input:focus { outline: none; border-color: #34d399; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); background-color: white; }
