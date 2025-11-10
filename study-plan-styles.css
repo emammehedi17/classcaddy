@@ -1340,11 +1340,11 @@
 /* --- START: DAY SECTION COLLAPSE STYLES --- */
 
 .day-section {
-    /* ডিফল্ট বর্ডার সরিয়ে ফেলি, এখন হেডার এটি নিয়ন্ত্রণ করবে */
-    border: none; 
+    /* ১. রঙ এবং বর্ডার মূল সেকশনে ফিরিয়ে আনা হলো */
+    border: 1px solid #e5e7eb; 
     border-radius: 0.75rem; /* rounded-xl */
     overflow: hidden; /* অ্যানিমেশনের জন্য জরুরি */
-    background-color: transparent; /* মূল ব্যাকগ্রাউন্ড এখন হেডারে */
+    /* background-color: transparent; <-- লাইনটি রিমুভ করা হয়েছে */
 }
 
 .day-section-header {
@@ -1355,39 +1355,28 @@
     padding: 0.75rem 1rem; /* 12px 16px */
     cursor: pointer;
     
-    /* সেকশনের মূল বর্ডার এবং ব্যাকগ্রাউন্ড এখানে থাকবে */
-    border: 1px solid #e5e7eb; /* gray-200 */
-    border-radius: 0.75rem; /* rounded-xl */
+    /* হেডার এখন স্বচ্ছ থাকবে */
+    background-color: transparent;
+    border: none;
+    border-radius: 0; /* কোনো বর্ডার রেডিয়াস নেই */
     
-    /* এই সেকশনের nth-of-type স্টাইলগুলো এখানে কপি করুন */
-    transition: background-color 0.2s, border-color 0.2s;
+    transition: background-color 0.2s;
 }
 
-/* Day-specific colors (copied from .day-section) */
-.days-container > .day-section:nth-of-type(7n+1) .day-section-header { background-color: var(--day-color-1); border-left: 4px solid #10b981; }
-.days-container > .day-section:nth-of-type(7n+2) .day-section-header { background-color: var(--day-color-2); border-left: 4px solid #0ea5e9; }
-.days-container > .day-section:nth-of-type(7n+3) .day-section-header { background-color: var(--day-color-3); border-left: 4px solid #f59e0b; }
-.days-container > .day-section:nth-of-type(7n+4) .day-section-header { background-color: var(--day-color-4); border-left: 4px solid #ef4444; }
-.days-container > .day-section:nth-of-type(7n+5) .day-section-header { background-color: var(--day-color-5); border-left: 4px solid #a855f7; }
-.days-container > .day-section:nth-of-type(7n+6) .day-section-header { background-color: var(--day-color-6); border-left: 4px solid #8b5cf6; }
-.days-container > .day-section:nth-of-type(7n+7) .day-section-header { background-color: var(--day-color-7); border-left: 4px solid #06b6d4; }
+/* Day-specific colors: এগুলো এখন আর হেডারে নয়, .day-section-এ প্রযোজ্য (আপনার পুরনো কোড থেকে) */
 
 /* হোভার ইফেক্ট */
 .day-section-header:hover {
-    background-color: #ffffff;
-    border-color: #d1d5db; /* gray-300 */
+    background-color: rgba(255, 255, 255, 0.3); /* সামান্য সাদা হোভার */
 }
 
-/* কলাপসড হলে বর্ডার সামান্য হালকা দেখাবে */
+/* কলাপসড হলে হেডারের নিচে বর্ডার থাকবে না */
 .day-section.is-collapsed .day-section-header {
-    border-bottom-color: transparent;
-    box-shadow: none;
+     border-bottom: 1px solid transparent; /* লে-আউট যেন না ভাঙে */
 }
-/* কলাপসড না হলে, হেডারটি বর্ডারের সাথে মিশে যাবে */
+/* এক্সপান্ডেড হলে হেডার এবং বডির মাঝে একটি বর্ডার থাকবে */
 .day-section:not(.is-collapsed) .day-section-header {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    border-bottom-color: #e5e7eb; /* gray-200 */
+    border-bottom: 1px solid #e5e7eb; /* gray-200 */
 }
 
 /* হেডারের ভেতরের কন্টেন্ট */
@@ -1398,7 +1387,7 @@
 }
 .day-header-progress {
     flex-grow: 1; /* এটি মাঝখানের সবটুকু জায়গা নেবে */
-    max-width: 400px; /* একটি সর্বোচ্চ প্রস্থ দিন */
+    /* max-width: 400px; <-- ২. এই লাইনটি রিমুভ করা হয়েছে */
 }
 
 /* টগল বাটন */
@@ -1426,25 +1415,18 @@
     
     /* বডির নিজস্ব বর্ডার এবং প্যাডিং */
     padding: 1rem 1.25rem; /* 16px 20px */
-    border: 1px solid #e5e7eb; /* gray-200 */
-    border-top: none;
-    border-bottom-left-radius: 0.75rem;
-    border-bottom-right-radius: 0.75rem;
-    background-color: #ffffff;
+    border: none; /* মূল বর্ডার এখন .day-section-এ */
+    background-color: #ffffff; /* টেবিলের জন্য সাদা ব্যাকগ্রাউন্ড */
 }
 
 .day-section.is-collapsed .day-section-body {
     max-height: 0;
     padding-top: 0;
     padding-bottom: 0;
-    border-bottom-color: transparent;
-    border-left-color: transparent;
-    border-right-color: transparent;
 }
 
 /* এডিট মোডে গেলে বডিটি ভিন্ন দেখাবে */
 .day-section.editing .day-section-body {
     background-color: #f0fdf4 !important; /* emerald-50 */
-    border-color: #a7f3d0; /* emerald-200 */
 }
 /* --- END: DAY SECTION COLLAPSE STYLES --- */

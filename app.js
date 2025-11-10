@@ -1207,13 +1207,7 @@
                         const dayToToggle = target.closest('.day-section');
                         const isExpanding = dayToToggle.classList.contains('is-collapsed');
 
-                        // Accordion Logic: Collapse all other days in this week
-                        if (isExpanding) {
-                            const parentWeek = target.closest('.week-section');
-                            parentWeek.querySelectorAll('.day-section:not(.is-collapsed)').forEach(openDay => {
-                                openDay.classList.add('is-collapsed');
-                            });
-                        }
+                        // Accordion Logic: REMOVED
                         
                         // Toggle the clicked day
                         dayToToggle.classList.toggle('is-collapsed');
