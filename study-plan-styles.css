@@ -1575,8 +1575,9 @@
 
 .day-header-progress {
     flex-grow: 1; /* এটি মাঝখানের সবটুকু জায়গা নেবে */
-    margin-top: 0;    /* এই লাইনটি যোগ করুন */
-    margin-bottom: 0; /* এই লাইনটি যোগ করুন */
+    margin-top: 0;
+    margin-bottom: 0;
+    min-width: 0; /* <-- This line fixes the wrapping issue */
 }
 /* টগল বাটন */
 .day-toggle-btn {
