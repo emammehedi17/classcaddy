@@ -1280,14 +1280,17 @@
 		}
 		/* --- END: PROGRESS CHART BUTTON STYLE --- */
 		
-		/* --- START: NEW ROW-LEVEL MCQ/TEST COLUMN STYLES --- */
+/* --- START: NEW ROW-LEVEL MCQ/TEST COLUMN STYLES --- */
 
-/* 1. Add width for new columns in Desktop view */
+/* 1. Add width for new columns in Desktop view (Width Increased) */
 .study-table th.questions-col,
-.study-table td.questions-col,
+.study-table td.questions-col {
+    width: 12%; /* Was 8% */
+    text-align: center;
+}
 .study-table th.test-col,
 .study-table td.test-col {
-    width: 8%;
+    width: 10%; /* Was 8% */
     text-align: center;
 }
 
@@ -1332,3 +1335,116 @@
     }
 }
 /* --- END: NEW ROW-LEVEL MCQ/TEST COLUMN STYLES --- */
+
+
+/* --- START: DAY SECTION COLLAPSE STYLES --- */
+
+.day-section {
+    /* ডিফল্ট বর্ডার সরিয়ে ফেলি, এখন হেডার এটি নিয়ন্ত্রণ করবে */
+    border: none; 
+    border-radius: 0.75rem; /* rounded-xl */
+    overflow: hidden; /* অ্যানিমেশনের জন্য জরুরি */
+    background-color: transparent; /* মূল ব্যাকগ্রাউন্ড এখন হেডারে */
+}
+
+.day-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem; /* 16px */
+    padding: 0.75rem 1rem; /* 12px 16px */
+    cursor: pointer;
+    
+    /* সেকশনের মূল বর্ডার এবং ব্যাকগ্রাউন্ড এখানে থাকবে */
+    border: 1px solid #e5e7eb; /* gray-200 */
+    border-radius: 0.75rem; /* rounded-xl */
+    
+    /* এই সেকশনের nth-of-type স্টাইলগুলো এখানে কপি করুন */
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* Day-specific colors (copied from .day-section) */
+.days-container > .day-section:nth-of-type(7n+1) .day-section-header { background-color: var(--day-color-1); border-left: 4px solid #10b981; }
+.days-container > .day-section:nth-of-type(7n+2) .day-section-header { background-color: var(--day-color-2); border-left: 4px solid #0ea5e9; }
+.days-container > .day-section:nth-of-type(7n+3) .day-section-header { background-color: var(--day-color-3); border-left: 4px solid #f59e0b; }
+.days-container > .day-section:nth-of-type(7n+4) .day-section-header { background-color: var(--day-color-4); border-left: 4px solid #ef4444; }
+.days-container > .day-section:nth-of-type(7n+5) .day-section-header { background-color: var(--day-color-5); border-left: 4px solid #a855f7; }
+.days-container > .day-section:nth-of-type(7n+6) .day-section-header { background-color: var(--day-color-6); border-left: 4px solid #8b5cf6; }
+.days-container > .day-section:nth-of-type(7n+7) .day-section-header { background-color: var(--day-color-7); border-left: 4px solid #06b6d4; }
+
+/* হোভার ইফেক্ট */
+.day-section-header:hover {
+    background-color: #ffffff;
+    border-color: #d1d5db; /* gray-300 */
+}
+
+/* কলাপসড হলে বর্ডার সামান্য হালকা দেখাবে */
+.day-section.is-collapsed .day-section-header {
+    border-bottom-color: transparent;
+    box-shadow: none;
+}
+/* কলাপসড না হলে, হেডারটি বর্ডারের সাথে মিশে যাবে */
+.day-section:not(.is-collapsed) .day-section-header {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-color: #e5e7eb; /* gray-200 */
+}
+
+/* হেডারের ভেতরের কন্টেন্ট */
+.day-header-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* 8px */
+}
+.day-header-progress {
+    flex-grow: 1; /* এটি মাঝখানের সবটুকু জায়গা নেবে */
+    max-width: 400px; /* একটি সর্বোচ্চ প্রস্থ দিন */
+}
+
+/* টগল বাটন */
+.day-toggle-btn {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: #9ca3af; /* gray-400 */
+    transition: transform 0.3s ease, color 0.2s;
+    flex-shrink: 0; /* এটি যেন ছোট না হয়ে যায় */
+}
+.day-toggle-btn:hover {
+    color: #1f2937; /* gray-800 */
+}
+.day-section.is-collapsed .day-toggle-btn {
+    transform: rotate(-90deg);
+}
+
+/* কলাপসিবল বডি (অ্যানিমেশনের জন্য) */
+.day-section-body {
+    max-height: 2000px; /* কনটেন্টের জন্য যথেষ্ট বড় একটি উচ্চতা দিন */
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+    
+    /* বডির নিজস্ব বর্ডার এবং প্যাডিং */
+    padding: 1rem 1.25rem; /* 16px 20px */
+    border: 1px solid #e5e7eb; /* gray-200 */
+    border-top: none;
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+    background-color: #ffffff;
+}
+
+.day-section.is-collapsed .day-section-body {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+    border-right-color: transparent;
+}
+
+/* এডিট মোডে গেলে বডিটি ভিন্ন দেখাবে */
+.day-section.editing .day-section-body {
+    background-color: #f0fdf4 !important; /* emerald-50 */
+    border-color: #a7f3d0; /* emerald-200 */
+}
+/* --- END: DAY SECTION COLLAPSE STYLES --- */

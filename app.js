@@ -940,9 +940,8 @@
              const tableId = `table-${monthId}-${weekId}-${dayIndex}`;
              const initialDayProgress = calculateDailyProgress(dayData);
              
-             // --- UPDATED: All MCQ Button Logic (Req 2, 3) ---
+             // --- All MCQ Button Logic ---
              let allMcqButtonsNormalMode = '';
-             // Aggregate all MCQs from all rows for this day
              const allDayMcqs = dayData.rows?.reduce((acc, row) => {
                 if (row.mcqData) {
                     acc.push(...row.mcqData);
@@ -957,51 +956,69 @@
                  `;
              }
 
+             // --- START: NEW HTML STRUCTURE ---
              return `
-                 <div class="day-section" id="day-${monthId}-${weekId}-${dayIndex}" data-day-index="${dayIndex}"> 
-                     <div class="flex justify-between items-center mb-3">
-                         <div class="flex items-center gap-2">
+                 <div class="day-section is-collapsed" id="day-${monthId}-${weekId}-${dayIndex}" data-day-index="${dayIndex}"> 
+                     
+                     <div class="day-section-header">
+                         
+                         <div class="day-header-title">
                              <h4 class="font-semibold text-gray-700">Day ${dayData.dayNumber}</h4>
                              <button class="icon-button delete-day-btn hidden" title="Delete Day"><i class="fas fa-calendar-times text-red-500"></i></button>
                          </div>
-                         <div class="flex items-center gap-2 flex-wrap justify-end">
-                             ${allMcqButtonsNormalMode} <button class="action-button action-button-secondary text-xs edit-day-btn"> <i class="fas fa-pencil-alt mr-1"></i> Edit </button>
-						</div>
-                     </div>
-
-                     <div class="day-progress-wrapper" data-day-index="${dayIndex}">
-                         <div class="flex justify-between text-xs text-gray-500 mb-1">
-                             <span>Day Progress</span>
-                             <span class="progress-percentage font-medium">${initialDayProgress}%</span>
-                         </div>
-                         <div class="progress-bar-container w-full"> 
-                             <div class="progress-bar-fill progress-bar-daily" style="width: ${Math.min(initialDayProgress, 100)}%;"></div> 
-                         </div>
-                     </div>
-
-                     <table class="w-full text-sm text-left text-gray-600 study-table" id="${tableId}">
-                         <thead class="text-xs text-gray-500 uppercase">
-                             <tr>
-                                 <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Subject</th>
-                                 <th scope="col" class="px-3 py-2 md:w-[38%] text-center">Topic / Vocab</th>
-                                 <th scope="col" class="px-3 py-2 questions-col text-center">Questions</th>
-                                 <th scope="col" class="px-3 py-2 test-col text-center">Test</th>
-                                 <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Comment</th>
-                                 <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell text-center">Done</th>
-                                 <th scope="col" class="px-3 py-2 w-[10%] md:w-[5%] center-cell completion-perc-header hidden text-center">%</th>
-                                 <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell actions-header hidden text-center"></th> 
-                             </tr>
-                         </thead>
-                         <tbody> ${dayData.rows?.map((rowData, rowIndex) => createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)).join('') || ''} </tbody>
-                     </table>
-                     <div class="edit-mode-controls hidden mt-3 flex flex-wrap gap-2 justify-between items-center">
-                         <div class="flex flex-wrap gap-2"> 
-                             <button class="action-button action-button-secondary text-xs add-normal-row-btn"><i class="fas fa-plus mr-1"></i> Add Row</button>
-                             <button class="action-button action-button-secondary text-xs add-vocab-row-btn"><i class="fas fa-book mr-1"></i> Add Vocabulary</button>
+                         
+                         <div class="day-header-progress day-progress-wrapper" data-day-index="${dayIndex}">
+                             <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                 <span>Day Progress</span>
+                                 <span class="progress-percentage font-medium">${initialDayProgress}%</span>
                              </div>
-                         <button class="action-button text-xs save-day-btn"><i class="fas fa-save mr-1"></i> Save</button>
-						</div>
-                 </div>`;
+                             <div class="progress-bar-container w-full"> 
+                                 <div class="progress-bar-fill progress-bar-daily" style="width: ${Math.min(initialDayProgress, 100)}%;"></div> 
+                             </div>
+                         </div>
+                         
+                         <button class="day-toggle-btn" title="Expand/Collapse">
+                             <i class="fas fa-chevron-down fa-lg"></i>
+                         </button>
+
+                     </div>
+                     
+                     <div class="day-section-body">
+                         
+                         <div class="flex justify-end items-center gap-2 flex-wrap mb-4">
+                             ${allMcqButtonsNormalMode}
+                             <button class="action-button action-button-secondary text-xs edit-day-btn">
+                                 <i class="fas fa-pencil-alt mr-1"></i> Edit
+                             </button>
+                         </div>
+                         
+                         <table class="w-full text-sm text-left text-gray-600 study-table" id="${tableId}">
+                             <thead class="text-xs text-gray-500 uppercase">
+                                 <tr>
+                                     <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Subject</th>
+                                     <th scope="col" class="px-3 py-2 md:w-[38%] text-center">Topic / Vocab</th>
+                                     <th scope="col" class="px-3 py-2 questions-col text-center">Questions</th>
+                                     <th scope="col" class="px-3 py-2 test-col text-center">Test</th>
+                                     <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Comment</th>
+                                     <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell text-center">Done</th>
+                                     <th scope="col" class="px-3 py-2 w-[10%] md:w-[5%] center-cell completion-perc-header hidden text-center">%</th>
+                                     <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell actions-header hidden text-center"></th> 
+                                 </tr>
+                             </thead>
+                             <tbody> ${dayData.rows?.map((rowData, rowIndex) => createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)).join('') || ''} </tbody>
+                         </table>
+                         
+                         <div class="edit-mode-controls hidden mt-3 flex flex-wrap gap-2 justify-between items-center">
+                             <div class="flex flex-wrap gap-2"> 
+                                 <button class="action-button action-button-secondary text-xs add-normal-row-btn"><i class="fas fa-plus mr-1"></i> Add Row</button>
+                                 <button class="action-button action-button-secondary text-xs add-vocab-row-btn"><i class="fas fa-book mr-1"></i> Add Vocabulary</button>
+                             </div>
+                             <button class="action-button text-xs save-day-btn"><i class="fas fa-save mr-1"></i> Save</button>
+                         </div>
+                         
+                     </div>
+                     </div>`;
+             // --- END: NEW HTML STRUCTURE ---
         }
 
         function createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, isEditing) {
@@ -1178,7 +1195,34 @@
                  const weekId = weekSection.dataset.weekId;
                  const daySection = target.closest('.day-section');
                  const row = target.closest('tr');
+				
+				
+				// --- START: NEW COLLAPSE/EXPAND LOGIC ---
+                 if (target.closest('.day-toggle-btn') || target.closest('.day-section-header')) {
+                    // বাটন বা হেডারের যেকোনো জায়গায় ক্লিক করলে
+                    if (button && button.classList.contains('delete-day-btn')) {
+                        // ডিলিট বাটনে ক্লিক করলে টগল হবে না
+                    } else {
+                        e.preventDefault();
+                        const dayToToggle = target.closest('.day-section');
+                        const isExpanding = dayToToggle.classList.contains('is-collapsed');
 
+                        // Accordion Logic: Collapse all other days in this week
+                        if (isExpanding) {
+                            const parentWeek = target.closest('.week-section');
+                            parentWeek.querySelectorAll('.day-section:not(.is-collapsed)').forEach(openDay => {
+                                openDay.classList.add('is-collapsed');
+                            });
+                        }
+                        
+                        // Toggle the clicked day
+                        dayToToggle.classList.toggle('is-collapsed');
+                    }
+                    return; // টগল করার পর আর কিছু করার দরকার নেই
+                 }
+                 // --- END: NEW COLLAPSE/EXPAND LOGIC ---
+				 
+				 
                  // Handle vocab word click
                  if (target.closest('.vocab-word') && !daySection?.classList.contains('editing')) {
                      e.preventDefault();
@@ -1332,6 +1376,7 @@
              if (enterEditMode) {
                  // --- ENTERING EDIT MODE ---
                  daySection.classList.add('editing');
+				 daySection.classList.remove('is-collapsed'); // Force expand on edit
                  editButton.classList.add('hidden'); // Hide Edit button
                  editModeControls.classList.remove('hidden'); // Show controls (including Save)
                  deleteDayButton.classList.remove('hidden');
