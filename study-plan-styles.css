@@ -446,15 +446,14 @@
             padding-left: 1.5rem; padding-right: 1.5rem; /* Restore side padding */
             border-bottom: 1px solid #e5e7eb; transition: top 0.3s ease-in-out;
         }
-        .progress-bar-container { background-color: #e5e7eb; border-radius: 9999px; height: 10px; } /* Slimmer bar */
+        .progress-bar-container { background-color: #e5e7eb; height: 10px; } /* Slimmer bar */
         .progress-bar-fill { 
-            
-            height: 100%; 
-            /* MODIFIED: Added opacity */
-            transition: width 0.4s ease-in-out, opacity 0.4s ease-in-out; 
-            border-radius: 9999px; 
-            position: relative; /* ADDED */
-        }
+    
+			height: 100%; 
+			/* MODIFIED: Added opacity */
+			transition: width 0.4s ease-in-out, opacity 0.4s ease-in-out; 
+			position: relative; /* ADDED */
+		}
 		
 		.progress-bar-fill::after {
             content: '';
