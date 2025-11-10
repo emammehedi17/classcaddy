@@ -1040,15 +1040,13 @@
              }
 
              // --- NEW BUTTONS LOGIC ---
+             // --- NEW BUTTONS LOGIC ---
              let buttonsHtml = '';
              if (!isEditing && isVocabRow) {
                  if (rowData.story) {
                     buttonsHtml += `<button class="action-button action-button-secondary text-xs read-story-btn"><i class="fas fa-book-open mr-1"></i> Read Story</button>`;
                  }
-                 // Only show quiz button if there are at least 4 vocab words
-                 if (rowData.vocabData && rowData.vocabData.length >= 4) {
-                     buttonsHtml += `<button class="action-button action-button-secondary text-xs quiz-btn" style="border-color: #6366f1; color: #4f46e5;"><i class="fas fa-question-circle mr-1"></i> Quiz</button>`;
-                 }
+                 // Vocab Quiz button logic removed from here
              }
 			
 			
@@ -1071,6 +1069,13 @@
                         testCellHtml = `<button class="action-button test-row-mcq-btn" data-row-index="${rowIndex}"><i class="fas fa-tasks mr-1"></i> Quiz</button>`;
                     }
                 }
+
+                // --- START: ADDED THIS BLOCK ---
+                // If it's a Vocab row, show the Vocab Quiz button in this column
+                if (isVocabRow && rowData.vocabData && rowData.vocabData.length >= 4) {
+                    testCellHtml = `<button class="action-button action-button-secondary text-xs quiz-btn" style="border-color: #6366f1; color: #4f46e5;"><i class="fas fa-question-circle mr-1"></i> Quiz</button>`;
+                }
+                // --- END: ADDED THIS BLOCK ---
              }
              // --- END: Req 1 ---
 
