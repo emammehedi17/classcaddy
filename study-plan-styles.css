@@ -1340,11 +1340,11 @@
 /* --- START: DAY SECTION COLLAPSE STYLES --- */
 
 .day-section {
-    /* ১. রঙ এবং বর্ডার মূল সেকশনে ফিরিয়ে আনা হলো */
-    border: 1px solid #e5e7eb; 
+    border: none; /* No default border */
     border-radius: 0.75rem; /* rounded-xl */
     overflow: hidden; /* অ্যানিমেশনের জন্য জরুরি */
-    /* background-color: transparent; <-- লাইনটি রিমুভ করা হয়েছে */
+    /* Add the border-left here, but transparent for now */
+    border-left: 4px solid transparent; 
 }
 
 .day-section-header {
@@ -1352,15 +1352,14 @@
     justify-content: space-between;
     align-items: center;
     gap: 1rem; /* 16px */
-    padding: 0.15rem 1rem; /* 4px 16px - Height further reduced */
+    padding: 0.25rem 1rem; /* 4px 16px - Height further reduced */
     cursor: pointer;
     
-    /* হেডার এখন স্বচ্ছ থাকবে */
-    background-color: transparent;
-    border: none;
-    border-radius: 0; /* কোনো বর্ডার রেডিয়াস নেই */
+    /* We add borders and radius back to the header */
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem; /* rounded-xl */
     
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, border-color 0.2s, border-radius 0.2s;
 }
 
 /* Day-specific colors: এগুলো এখন আর হেডারে নয়, .day-section-এ প্রযোজ্য (আপনার পুরনো কোড থেকে) */
@@ -1370,13 +1369,16 @@
     background-color: rgba(255, 255, 255, 0.3); /* সামান্য সাদা হোভার */
 }
 
-/* কলাপসড হলে হেডারের নিচে বর্ডার থাকবে না */
+/* কলাপসড হলে হেডারের সব কর্নার গোল থাকবে */
 .day-section.is-collapsed .day-section-header {
-     border-bottom: 1px solid transparent; /* লে-আউট যেন না ভাঙে */
+    border-radius: 0.75rem;
+    border-bottom-color: #e5e7eb;
 }
 /* এক্সপান্ডেড হলে হেডার এবং বডির মাঝে একটি বর্ডার থাকবে */
 .day-section:not(.is-collapsed) .day-section-header {
-    border-bottom: 1px solid #e5e7eb; /* gray-200 */
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-color: #e5e7eb; /* gray-200 */
 }
 
 /* হেডারের ভেতরের কন্টেন্ট */
@@ -1389,6 +1391,36 @@
 .day-header-title h4 {
     font-size: 0.9rem; /* 1rem (16px) থেকে কমানো হলো */
 }
+
+/* Apply Day-specific colors to Header, Body, and Border */
+.days-container > .day-section:nth-of-type(7n+1) .day-section-header,
+.days-container > .day-section:nth-of-type(7n+1) .day-section-body { background-color: var(--day-color-1); }
+.days-container > .day-section:nth-of-type(7n+1) { border-left-color: #10b981; }
+
+.days-container > .day-section:nth-of-type(7n+2) .day-section-header,
+.days-container > .day-section:nth-of-type(7n+2) .day-section-body { background-color: var(--day-color-2); }
+.days-container > .day-section:nth-of-type(7n+2) { border-left-color: #0ea5e9; }
+
+.days-container > .day-section:nth-of-type(7n+3) .day-section-header,
+.days-container > .day-section:nth-of-type(7n+3) .day-section-body { background-color: var(--day-color-3); }
+.days-container > .day-section:nth-of-type(7n+3) { border-left-color: #f59e0b; }
+
+.days-container > .day-section:nth-of-type(7n+4) .day-section-header,
+.days-container > .day-section:nth-of-type(7n+4) .day-section-body { background-color: var(--day-color-4); }
+.days-container > .day-section:nth-of-type(7n+4) { border-left-color: #ef4444; }
+
+.days-container > .day-section:nth-of-type(7n+5) .day-section-header,
+.days-container > .day-section:nth-of-type(7n+5) .day-section-body { background-color: var(--day-color-5); }
+.days-container > .day-section:nth-of-type(7n+5) { border-left-color: #a855f7; }
+
+.days-container > .day-section:nth-of-type(7n+6) .day-section-header,
+.days-container > .day-section:nth-of-type(7n+6) .day-section-body { background-color: var(--day-color-6); }
+.days-container > .day-section:nth-of-type(7n+6) { border-left-color: #8b5cf6; }
+
+.days-container > .day-section:nth-of-type(7n+7) .day-section-header,
+.days-container > .day-section:nth-of-type(7n+7) .day-section-body { background-color: var(--day-color-7); }
+.days-container > .day-section:nth-of-type(7n+7) { border-left-color: #06b6d4; }
+
 .day-header-progress {
     flex-grow: 1; /* এটি মাঝখানের সবটুকু জায়গা নেবে */
     margin-top: 0;    /* এই লাইনটি যোগ করুন */
@@ -1419,8 +1451,11 @@
     
     /* বডির নিজস্ব বর্ডার এবং প্যাডিং */
     padding: 1rem 1.25rem; /* 16px 20px */
-    border: none; /* মূল বর্ডার এখন .day-section-এ */
-    background-color: #ffffff; /* টেবিলের জন্য সাদা ব্যাকগ্রাউন্ড */
+    border: 1px solid #e5e7eb; /* gray-200 */
+    border-top: none;
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+    /* background-color: #ffffff; <-- REMOVED */
 }
 
 .day-section.is-collapsed .day-section-body {
