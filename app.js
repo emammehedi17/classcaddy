@@ -924,7 +924,7 @@
                     ${targetHtml}
                     
                     <div class="sticky-progress-wrapper" style="top: ${headerHeight};">
-                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                        <div class="flex justify-between text-xs text-gray-500">
                             <span>Weekly Progress</span>
                             <span class="progress-percentage font-medium">${initialProgress}%</span>
                         </div>
@@ -968,7 +968,7 @@
                          </div>
                          
                          <div class="day-header-progress day-progress-wrapper" data-day-index="${dayIndex}">
-                             <div class="flex justify-between text-xs text-gray-500 mb-1">
+                             <div class="flex justify-between text-xs text-gray-500">
                                  <span>Day Progress</span>
                                  <span class="progress-percentage font-medium">${initialDayProgress}%</span>
                              </div>

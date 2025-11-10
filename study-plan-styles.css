@@ -1391,9 +1391,9 @@
 }
 .day-header-progress {
     flex-grow: 1; /* এটি মাঝখানের সবটুকু জায়গা নেবে */
-    /* max-width: 400px; <-- ২. এই লাইনটি রিমুভ করা হয়েছে */
+    margin-top: 0;    /* এই লাইনটি যোগ করুন */
+    margin-bottom: 0; /* এই লাইনটি যোগ করুন */
 }
-
 /* টগল বাটন */
 .day-toggle-btn {
     background: none;
