@@ -1409,46 +1409,47 @@
                  // --- AUTOSAVE LOGIC (END) ---
 
              } else {
-                 // --- SAVING AND EXITING EDIT MODE ---
-
-                 // --- AUTOSAVE LOGIC (START) ---
-                 // Clear any pending autosave timer
+                 // --- SAVING AND EXITING EDIT MODE (OPTIMIZED) ---
+                 
                  if (autosaveTimer) clearTimeout(autosaveTimer);
-                 // Remove the event listener to stop autosaving
                  if (daySection.autosaveHandler) {
                      daySection.removeEventListener('input', daySection.autosaveHandler);
                      daySection.autosaveHandler = null;
                  }
-                 // --- AUTOSAVE LOGIC (END) ---
                  
-                 await saveDayPlan(monthId, weekId, daySection); // Save final changes on click
+                 // --- START: FASTER SAVE LOGIC ---
+                 
+                 // ১. saveDayPlan কল করুন এবং এটি থেকে DOM-এর পার্স করা ডেটা return নিন
+                 const updatedRows = await saveDayPlan(monthId, weekId, daySection);
 
+                 if (updatedRows === null) {
+                     // সেভ ব্যর্থ হয়েছে। এডিট মোড থেকে বের হবেন না।
+                     // saveDayPlan ফাংশনটিই এরর অ্যালার্ট দেখাবে।
+                     return; 
+                 }
+
+                 // ২. এডিট মোড থেকে বের হওয়ার জন্য ক্লাস টগল করুন
                  daySection.classList.remove('editing');
-                 editButton.classList.remove('hidden'); // Show Edit button
-                 editModeControls.classList.add('hidden'); // Hide controls (including Save)
+                 daySection.classList.remove('is-collapsed'); // নিশ্চিত করুন সেকশনটি খোলা আছে
+                 editButton.classList.remove('hidden'); 
+                 editModeControls.classList.add('hidden');
                  deleteDayButton.classList.add('hidden');
                  actionsHeader.classList.add('hidden');
                  completionPercHeader.classList.add('hidden');
 
-                 // Re-render rows in normal mode
-                 try {
-                     const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
-                     const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
-
-                     if (!dayData) { tableBody.innerHTML = ''; }
-                     else {
-                         tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
-                            createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false) // Render non-edit mode
-                         ).join('');
-                     }
-
-                     updateWeeklyProgressUI(monthId, weekId);
-                     updateDailyProgressUI(monthId, weekId, dayIndex, dayData); // <-- ADD THIS LINE
-                     setSyncStatus("Synced", "green");
-                 } catch (renderError) {
-                     console.error("Error re-rendering day after save:", renderError);
-                     setSyncStatus("Error", "red");
-                 }
+                 // ৩. টেবিলটি রি-রেন্ডার করুন (return পাওয়া ডেটা দিয়ে)
+                 // এটি দ্বিতীয়বার getDoc() কল করা থেকে বিরত রাখবে
+                 tableBody.innerHTML = updatedRows.map((rowData, rowIndex) =>
+                    createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)
+                 ).join('');
+                 
+                 // ৪. প্রোগ্রেস বার আপডেট করুন
+                 const dayDataForProgress = { rows: updatedRows };
+                 updateWeeklyProgressUI(monthId, weekId); // এটি পুরো সপ্তাহের জন্য ডেটা রি-ফেচ করবে
+                 updateDailyProgressUI(monthId, weekId, dayIndex, dayDataForProgress);
+                 
+                 // setSyncStatus("Synced", "green") - এটি saveDayPlan নিজেই করে দিয়েছে
+                 // --- END: FASTER SAVE LOGIC ---
              }
         }
 
@@ -1529,15 +1530,18 @@
                 const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
                 await updateDoc(docRef, updatePayload);
                 
-                console.log(`Day ${dayIndex + 1} for ${weekId} saved successfully.`);
-                if (!isAutosave) {
-                    setSyncStatus("Synced", "green");
-                }
+                 console.log(`Day ${dayIndex + 1} for ${weekId} saved successfully.`);
+                 if (!isAutosave) {
+                     setSyncStatus("Synced", "green");
+                 }
+                 
+                 return updatedRows; // <-- এই লাইনটি যোগ করুন
 
             } catch (error) {
                 console.error("Error saving day plan:", error);
                 showCustomAlert("Error saving changes. Please check your connection and try again.");
                 setSyncStatus("Error", "red");
+                return null; // <-- এই লাইনটি যোগ করুন
             }
         }
 		
