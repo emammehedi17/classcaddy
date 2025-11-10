@@ -3388,55 +3388,61 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         // 2. Modal এর "Parse & Save MCQs" বাটনে ক্লিক করলে এই ফাংশনটি কল হবে
-        saveMcqBtn.addEventListener('click', async () => {
+        saveMcqBtn.addEventListener('click', () => { // <-- 'async' removed
             if (!currentMcqTarget) return;
 
+            // --- START: FAST (INSTANT) PART ---
             const { monthId, weekId, dayIndex, rowIndex } = currentMcqTarget;
             const rawText = mcqPasteTextarea.value;
+            const parsedData = parseMcqText(rawText);
             
-            try {
-                const parsedData = parseMcqText(rawText);
-                
-                // --- MODIFIED: Allow saving 0 MCQs (to clear the list) ---
-                if (rawText.trim() !== '' && parsedData.length === 0) {
-                    showCustomAlert("No valid MCQs found. Please check the format.", "error");
-                    return;
-                }
-
-                // ডেটা সরাসরি Firestore-এ সেভ করুন
-                setSyncStatus("Syncing...", "yellow");
-                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-                const docSnap = await getDoc(docRef);
-
-                if (!docSnap.exists()) throw new Error("Month document not found.");
-
-                let monthData = docSnap.data();
-                let daysArray = monthData.weeks?.[weekId]?.days || [];
-                
-                // --- MODIFIED: Save data to ROW object ---
-                if (daysArray[dayIndex] && daysArray[dayIndex].rows[rowIndex]) {
-                    
-                    daysArray[dayIndex].rows[rowIndex].mcqData = parsedData.length > 0 ? parsedData : null;
-                    
-                    const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
-                    await updateDoc(docRef, updatePayload);
-                    
-                    console.log("MCQs saved successfully for day:", dayIndex);
-                    closeModal('add-mcq-modal');
-                    setSyncStatus("Synced", "green");
-                    showCustomAlert(`${parsedData.length} MCQs saved successfully!`, "success");
-                } else {
-                    throw new Error("Target day for MCQs not found.");
-                }
-                // --- END MODIFIED BLOCK ---
-
-            } catch (error) {
-                console.error("Error parsing or saving MCQs:", error);
-                showCustomAlert("Error saving MCQs. Please try again.", "error");
-                setSyncStatus("Error", "red");
-            } finally {
-                currentMcqTarget = null;
+            // 1. Validation check (this is fast)
+            if (rawText.trim() !== '' && parsedData.length === 0) {
+                showCustomAlert("No valid MCQs found. Please check the format.", "error");
+                return; // Stay in the modal
             }
+
+            // 2. Optimistic Update: Close the modal immediately
+            closeModal('add-mcq-modal');
+            setSyncStatus("Syncing...", "yellow");
+            
+            // --- END: FAST PART ---
+
+
+            // --- START: SLOW (BACKGROUND) PART ---
+            // Create a new async function to run in the background
+            (async () => {
+                try {
+                    const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                    const docSnap = await getDoc(docRef);
+
+                    if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                    let monthData = docSnap.data();
+                    let daysArray = monthData.weeks?.[weekId]?.days || [];
+                    
+                    if (daysArray[dayIndex] && daysArray[dayIndex].rows[rowIndex]) {
+                        
+                        daysArray[dayIndex].rows[rowIndex].mcqData = parsedData.length > 0 ? parsedData : null;
+                        
+                        const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
+                        await updateDoc(docRef, updatePayload);
+                        
+                        console.log("MCQs saved successfully in background for day:", dayIndex);
+                        setSyncStatus("Synced", "green");
+                        showCustomAlert(`${parsedData.length} MCQs saved successfully!`, "success");
+                    } else {
+                        throw new Error("Target day for MCQs not found.");
+                    }
+                } catch (error) {
+                    console.error("Error parsing or saving MCQs in background:", error);
+                    showCustomAlert("Error saving MCQs. Please try again.", "error");
+                    setSyncStatus("Error", "red");
+                } finally {
+                    currentMcqTarget = null; // Clear target after operation is complete
+                }
+            })(); // <-- Immediately invoke the background function
+            // --- END: SLOW PART ---
         });
 
         // 3. ✨ The Magic Parser Function (Regex) - (UPGRADED for Dual Language)
