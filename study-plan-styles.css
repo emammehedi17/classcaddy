@@ -1352,7 +1352,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 1rem; /* 16px */
-    padding: 0.75rem 1rem; /* 12px 16px */
+    padding: 0.5rem 1rem; /* 8px 16px - Height reduced */
     cursor: pointer;
     
     /* হেডার এখন স্বচ্ছ থাকবে */
@@ -1384,6 +1384,9 @@
     display: flex;
     align-items: center;
     gap: 0.5rem; /* 8px */
+}
+.day-header-title h4 {
+    font-size: 0.9rem; /* 1rem (16px) থেকে কমানো হলো */
 }
 .day-header-progress {
     flex-grow: 1; /* এটি মাঝখানের সবটুকু জায়গা নেবে */
