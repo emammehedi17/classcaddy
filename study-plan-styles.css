@@ -181,7 +181,7 @@
 
         /* --- Day Card Styles --- */
         .day-section {
-            border-radius: 0.75rem; padding: 1.5rem;
+            border-radius: 0.75rem; padding: 0.65rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
             border: 1px solid #e5e7eb;
             transition: box-shadow 0.2s ease-out;
@@ -442,8 +442,7 @@
         .sticky-progress-wrapper {
             position: sticky; z-index: 10; background-color: rgba(255, 255, 255, 0.85); /* Slightly transparent */
             backdrop-filter: blur(4px); padding: 10px 0; /* Reduced padding */
-            margin: 0 -1.5rem 1rem -1.5rem; /* Counteract parent padding and add bottom margin */
-            padding-left: 1.5rem; padding-right: 1.5rem; /* Restore side padding */
+            
             border-bottom: 1px solid #e5e7eb; transition: top 0.3s ease-in-out;
         }
         .progress-bar-container { background-color: #e5e7eb; border-radius: 9999px; height: 10px; } /* Slimmer bar */
@@ -1544,7 +1543,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem; /* 8px */
-    min-width: 6rem; /* 96px - This gives the title enough space */
+    min-width: 3rem; /* 96px - This gives the title enough space */
 }
 .day-header-title h4 {
     font-size: 0.9rem; /* 1rem (16px) থেকে কমানো হলো */
@@ -1610,7 +1609,7 @@
     transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
     
     /* বডির নিজস্ব বর্ডার এবং প্যাডিং */
-    padding: 1rem 1.25rem; /* 16px 20px */
+    
     border: none;
     border-top: none;
     border-bottom-left-radius: 0.75rem;
