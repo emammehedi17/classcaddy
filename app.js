@@ -1466,6 +1466,11 @@
                  // তৎক্ষণাৎ ডেইলি প্রোগ্রেস বার আপডেট করুন
                  const dayDataForProgress = { rows: updatedRows };
                  updateDailyProgressUI(monthId, weekId, dayIndex, dayDataForProgress);
+				 
+				 // --- START: NEW FIX ---
+                 // সেভ করার পর, স্ক্রল করে এই সেকশনটিকে ভিউতে রাখুন
+                 daySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                 // --- END: NEW FIX ---
                  
                  // ৬. আসল সেভ রিকোয়েস্টটি ব্যাকগ্রাউন্ডে পাঠান (await ছাড়া)
                  saveDataToFirebase(docRef, updatePayload, false);
