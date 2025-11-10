@@ -210,47 +210,97 @@
     color: #4b5563; 
     font-size: 0.75rem; 
     text-transform: uppercase; 
-    border-top: 1px solid #000000;
-    border-bottom: 1px solid #000000;
+    border-top: none;
+    border-bottom: none;
 }
-        .study-table tbody tr { border-bottom: 1px solid #000000; }
+        .study-table tbody tr { border-bottom: none; }
         .study-table tbody tr:hover { background-color: rgba(249, 250, 251, 0.5); } /* Lighter hover */
         .study-table td, .study-table th { 
     padding: 10px 8px; 
     vertical-align: middle; 
-    border-right: 1px solid #000000;
+    border-right: none;
 }
 
 /* Add border to the far left of the table */
 .study-table th:first-child,
 .study-table td:first-child {
-    border-left: 1px solid #000000;
+    border-left: none;
 }
         .study-table th { text-align: center; }
         .study-table td.center-cell { text-align: center; }
-/* --- Style for Completed Table Row (FIXED) --- */
+/* --- Style for Completed Table Row (NEW) --- */
 .study-table tbody tr.row-completed {
-    /* background-color: #d1fae5; <-- REMOVED from the row */
+    border: 2px solid; /* Color will be set by parent */
+    border-radius: 12px; /* Rounded corners for the whole row */
     color: #065f46; /* emerald-800 */
 }
 
-/* Apply background to ALL cells in the completed row */
+/* Make the cells transparent so the row's background shows */
 .study-table tbody tr.row-completed td {
-    background-color: #d1fae5; /* Light emerald (emerald-100) */
+    background-color: transparent;
 }
 
-/* 1. Round the FIRST cell */
-.study-table tbody tr.row-completed td:first-child {
-    border-top-left-radius: 12px;    /* Increased from 8px */
-    border-bottom-left-radius: 12px;
+/* --- 1. Day 1 Color (Emerald) --- */
+.days-container > .day-section:nth-of-type(7n+1) .study-table tbody tr.row-completed {
+    background-color: #d1fae5; /* emerald-100 */
+    border-color: #10b981;
+}
+.days-container > .day-section:nth-of-type(7n+1) .study-table tbody tr.row-completed:hover {
+    background-color: #a7f3d0; /* emerald-200 */
 }
 
-/* 2. Round the LAST VISIBLE cell */
+/* --- 2. Day 2 Color (Sky) --- */
+.days-container > .day-section:nth-of-type(7n+2) .study-table tbody tr.row-completed {
+    background-color: #e0f2fe; /* sky-100 */
+    border-color: #0ea5e9;
+}
+.days-container > .day-section:nth-of-type(7n+2) .study-table tbody tr.row-completed:hover {
+    background-color: #bae6fd; /* sky-200 */
+}
 
-/* In NORMAL mode, the "Done" cell is the last visible one */
-.study-table tbody tr.row-completed:not(.editing-mode) td.center-cell {
-    border-top-right-radius: 12px;
-    border-bottom-right-radius: 12px;
+/* --- 3. Day 3 Color (Amber) --- */
+.days-container > .day-section:nth-of-type(7n+3) .study-table tbody tr.row-completed {
+    background-color: #fef3c7; /* amber-100 */
+    border-color: #f59e0b;
+}
+.days-container > .day-section:nth-of-type(7n+3) .study-table tbody tr.row-completed:hover {
+    background-color: #fde68a; /* amber-200 */
+}
+
+/* --- 4. Day 4 Color (Red) --- */
+.days-container > .day-section:nth-of-type(7n+4) .study-table tbody tr.row-completed {
+    background-color: #fee2e2; /* red-100 */
+    border-color: #ef4444;
+}
+.days-container > .day-section:nth-of-type(7n+4) .study-table tbody tr.row-completed:hover {
+    background-color: #fecaca; /* red-200 */
+}
+
+/* --- 5. Day 5 Color (Purple) --- */
+.days-container > .day-section:nth-of-type(7n+5) .study-table tbody tr.row-completed {
+    background-color: #f3e8ff; /* purple-100 */
+    border-color: #a855f7;
+}
+.days-container > .day-section:nth-of-type(7n+5) .study-table tbody tr.row-completed:hover {
+    background-color: #e9d5ff; /* purple-200 */
+}
+
+/* --- 6. Day 6 Color (Indigo) --- */
+.days-container > .day-section:nth-of-type(7n+6) .study-table tbody tr.row-completed {
+    background-color: #e0e7ff; /* indigo-100 */
+    border-color: #8b5cf6;
+}
+.days-container > .day-section:nth-of-type(7n+6) .study-table tbody tr.row-completed:hover {
+    background-color: #c7d2fe; /* indigo-200 */
+}
+
+/* --- 7. Day 7 Color (Cyan) --- */
+.days-container > .day-section:nth-of-type(7n+7) .study-table tbody tr.row-completed {
+    background-color: #cffafe; /* cyan-100 */
+    border-color: #06b6d4;
+}
+.days-container > .day-section:nth-of-type(7n+7) .study-table tbody tr.row-completed:hover {
+    background-color: #a5f3fc; /* cyan-200 */
 }
 
 /* In EDIT mode, the "Actions" cell is the last visible one */
@@ -442,7 +492,7 @@
             .study-table thead { display: none; } /* Hide table header */
             .study-table tbody, .study-table tr, .study-table td { display: block; width: 100%; } /* Stack elements */
             .study-table tr {
-                border: 1px solid #000000; /* Add border around each stacked row */
+                border: none; /* Removed border */
                 border-radius: 6px;
                 margin-bottom: 1rem;
                 padding: 0.75rem; /* Add internal padding */
