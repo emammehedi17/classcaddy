@@ -1593,12 +1593,13 @@
     color: #9ca3af; /* gray-400 */
     transition: transform 0.3s ease, color 0.2s;
     flex-shrink: 0; /* এটি যেন ছোট না হয়ে যায় */
+    transform: rotate(180deg); /* Default state is UP (expanded) */
 }
 .day-toggle-btn:hover {
     color: #1f2937; /* gray-800 */
 }
 .day-section.is-collapsed .day-toggle-btn {
-    transform: rotate(-90deg);
+    transform: rotate(0deg); /* Collapsed state is DOWN */
 }
 
 /* কলাপসিবল বডি (অ্যানিমেশনের জন্য) */
