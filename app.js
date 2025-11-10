@@ -1409,69 +1409,83 @@
                  // --- AUTOSAVE LOGIC (END) ---
 
              } else {
-                 // --- SAVING AND EXITING EDIT MODE (OPTIMIZED) ---
+                 // --- SAVING AND EXITING EDIT MODE (OPTIMISTIC) ---
                  
+                 // ১. অটোসেভ বন্ধ করুন
                  if (autosaveTimer) clearTimeout(autosaveTimer);
                  if (daySection.autosaveHandler) {
                      daySection.removeEventListener('input', daySection.autosaveHandler);
                      daySection.autosaveHandler = null;
                  }
                  
-                 // --- START: FASTER SAVE LOGIC ---
+                 // --- START: OPTIMISTIC UI LOGIC ---
                  
-                 // ১. saveDayPlan কল করুন এবং এটি থেকে DOM-এর পার্স করা ডেটা return নিন
-                 const updatedRows = await saveDayPlan(monthId, weekId, daySection);
+                 // ২. তৎক্ষণাৎ "Syncing..." দেখান
+                 setSyncStatus("Syncing...", "yellow");
 
-                 if (updatedRows === null) {
-                     // সেভ ব্যর্থ হয়েছে। এডিট মোড থেকে বের হবেন না।
-                     // saveDayPlan ফাংশনটিই এরর অ্যালার্ট দেখাবে।
-                     return; 
+                 // ৩. ডেটাবেস থেকে বর্তমান ডেটা পড়ুন (গল্প, MCQ ইত্যাদি সংরক্ষণের জন্য)
+                 // এটিই এখন ব্যবহারকারীর একমাত্র অপেক্ষার ধাপ
+                 const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                 let daysArray;
+                 try {
+                     const docSnap = await getDoc(docRef);
+                     if (!docSnap.exists()) throw new Error("Month document not found.");
+                     daysArray = docSnap.data().weeks?.[weekId]?.days || [];
+                 } catch (error) {
+                     console.error("Error fetching data before save:", error);
+                     showCustomAlert("Error fetching plan data. Cannot save.");
+                     setSyncStatus("Error", "red");
+                     return; // সেভ বাতিল করুন
                  }
 
-                 // ২. এডিট মোড থেকে বের হওয়ার জন্য ক্লাস টগল করুন
+                 // ৪. DOM থেকে ডেটা পড়ুন এবং সেভের জন্য প্রস্তুত করুন (খুব দ্রুত)
+                 const parseResult = parseAndPrepareSaveData(daySection, daysArray, weekId);
+                 
+                 if (parseResult === null) {
+                     // পার্সিং ব্যর্থ হলে সেভ বাতিল করুন
+                     setSyncStatus("Error", "red");
+                     return; 
+                 }
+                 
+                 const { updatedRows, updatePayload } = parseResult;
+
+                 // ৫. তৎক্ষণাৎ UI আপডেট করুন (অপেক্ষা না করে)
                  daySection.classList.remove('editing');
-                 daySection.classList.remove('is-collapsed'); // নিশ্চিত করুন সেকশনটি খোলা আছে
+                 daySection.classList.remove('is-collapsed'); // সেকশনটি খোলা রাখুন
                  editButton.classList.remove('hidden'); 
                  editModeControls.classList.add('hidden');
                  deleteDayButton.classList.add('hidden');
                  actionsHeader.classList.add('hidden');
                  completionPercHeader.classList.add('hidden');
 
-                 // ৩. টেবিলটি রি-রেন্ডার করুন (return পাওয়া ডেটা দিয়ে)
-                 // এটি দ্বিতীয়বার getDoc() কল করা থেকে বিরত রাখবে
+                 // তৎক্ষণাৎ টেবিল রি-রেন্ডার করুন
                  tableBody.innerHTML = updatedRows.map((rowData, rowIndex) =>
                     createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)
                  ).join('');
                  
-                 // ৪. প্রোগ্রেস বার আপডেট করুন
+                 // তৎক্ষণাৎ ডেইলি প্রোগ্রেস বার আপডেট করুন
                  const dayDataForProgress = { rows: updatedRows };
-                 updateWeeklyProgressUI(monthId, weekId); // এটি পুরো সপ্তাহের জন্য ডেটা রি-ফেচ করবে
                  updateDailyProgressUI(monthId, weekId, dayIndex, dayDataForProgress);
                  
-                 // setSyncStatus("Synced", "green") - এটি saveDayPlan নিজেই করে দিয়েছে
-                 // --- END: FASTER SAVE LOGIC ---
+                 // ৬. আসল সেভ রিকোয়েস্টটি ব্যাকগ্রাউন্ডে পাঠান (await ছাড়া)
+                 saveDataToFirebase(docRef, updatePayload, false);
+
+                 // --- END: OPTIMISTIC UI LOGIC ---
              }
         }
 
         // Save Day Plan
-        async function saveDayPlan(monthId, weekId, daySection, isAutosave = false) {
-            if (!currentUser || !userId) return;
-            const dayIndex = parseInt(daySection.dataset.dayIndex);
-            console.log(`Saving day plan for ${monthId}, ${weekId}, Day Index: ${dayIndex}`);
-            if (!isAutosave) {
-                setSyncStatus("Syncing...", "yellow");
-            }
-
-            const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+        /**
+         * ধাপ ১ (নতুন): DOM থেকে ডেটা পড়ে এবং সেভের জন্য প্রস্তুত করে (Synchronous)
+         */
+        function parseAndPrepareSaveData(daySection, daysArray, weekId) {
             try {
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists()) throw new Error("Month document not found.");
-
-                let monthData = docSnap.data();
-                let daysArray = monthData.weeks?.[weekId]?.days || [];
+                const dayIndex = parseInt(daySection.dataset.dayIndex);
                 const currentDayData = daysArray[dayIndex];
-                 if (!currentDayData) throw new Error(`Day data for index ${dayIndex} not found in Firestore.`);
-
+                if (!currentDayData) {
+                    throw new Error(`Day data for index ${dayIndex} not found.`);
+                }
+                
                 const updatedRows = [];
                 const rowElements = daySection.querySelectorAll('tbody tr');
 
@@ -1481,22 +1495,19 @@
 
                     let subject, topic, comment, completed, completionPercentage, vocabData = null, story, mcqData = null;
 
+                    // এই লজিকটি আপনার পুরনো saveDayPlan ফাংশন থেকে কপি করা হয়েছে
                     if (daySection.classList.contains('editing')) {
-                         // --- START: BUG FIX (Define subject and comment FIRST) ---
                          subject = (row.querySelector('.subject-input')?.value || '').trim();
                          comment = (row.querySelector('.comment-input')?.value || '').trim();
-                         // --- END: BUG FIX ---
-                        
                          completed = existingRowData.completed || false;
                          const percInput = row.querySelector('.completion-perc-input')?.value;
                          completionPercentage = parsePercentage(percInput);
                          
-                         // Now we can safely use subject
                          story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
                          mcqData = existingRowData.mcqData || null; // Preserve existing mcqData
 
                          if (row.classList.contains('vocab-row')) {
-                             subject = 'Vocabulary'; // Force subject to 'Vocabulary'
+                             subject = 'Vocabulary';
                              vocabData = [];
                              row.querySelectorAll('.vocab-pair').forEach(pairEl => {
                                  const word = pairEl.querySelector('.vocab-word-input')?.value.trim();
@@ -1505,12 +1516,11 @@
                              });
                              topic = null;
                          } else {
-                             // --- START: BUG FIX ---
                              topic = (row.querySelector('.topic-input')?.value || '').trim();
-                             // --- END: BUG FIX ---
                              vocabData = null;
                          }
-                    } else { // Handle saving checkbox clicks in normal mode
+                    } else { 
+                         // এটি একটি ফলব্যাক, যদিও 'editing' ক্লাসের ভেতরেই থাকার কথা
                          completed = row.querySelector('.completion-checkbox')?.checked || false;
                          subject = existingRowData.subject; 
                          topic = existingRowData.topic; 
@@ -1518,30 +1528,44 @@
                          completionPercentage = existingRowData.completionPercentage; 
                          vocabData = existingRowData.vocabData; 
                          story = existingRowData.story;
-                         mcqData = existingRowData.mcqData; // <-- Also preserve this in normal mode
+                         mcqData = existingRowData.mcqData;
                      }
                      
-                     // --- mcqData এখন সারিতে (row) সেভ হবে ---
                      updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null, mcqData: mcqData || null });
                 });
-				
-                 // --- পুরনো mcqData সেভ করার লজিকটি ডিলিট করা হয়েছে ---
-                 daysArray[dayIndex].rows = updatedRows;
-                const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
-                await updateDoc(docRef, updatePayload);
                 
-                 console.log(`Day ${dayIndex + 1} for ${weekId} saved successfully.`);
-                 if (!isAutosave) {
-                     setSyncStatus("Synced", "green");
-                 }
-                 
-                 return updatedRows; // <-- এই লাইনটি যোগ করুন
+                daysArray[dayIndex].rows = updatedRows;
+                const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
+                
+                // সফলভাবে ডেটা প্রস্তুত হয়েছে
+                return { updatedRows, updatePayload };
 
             } catch (error) {
-                console.error("Error saving day plan:", error);
+                console.error("Error parsing day plan from DOM:", error);
+                showCustomAlert("Error reading data from fields. Cannot save.");
+                return null; // পার্সিং ব্যর্থ হয়েছে
+            }
+        }
+
+        /**
+         * ধাপ ২ (নতুন): ডেটাবেসে সেভ করে (Asynchronous)
+         */
+        async function saveDataToFirebase(docRef, updatePayload, isAutosave = false) {
+            try {
+                if (!isAutosave) {
+                    setSyncStatus("Syncing...", "yellow");
+                }
+                
+                await updateDoc(docRef, updatePayload);
+                
+                console.log("Save successful.");
+                if (!isAutosave) {
+                    setSyncStatus("Synced", "green");
+                }
+            } catch (error) {
+                console.error("Error saving day plan to Firebase:", error);
                 showCustomAlert("Error saving changes. Please check your connection and try again.");
                 setSyncStatus("Error", "red");
-                return null; // <-- এই লাইনটি যোগ করুন
             }
         }
 		
