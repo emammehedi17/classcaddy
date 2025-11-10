@@ -1527,7 +1527,11 @@
     background-color: rgba(255, 255, 255, 0.3); /* সামান্য সাদা হোভার */
 }
 
-
+/* কলাপসড হলে হেডারের সব কর্নার গোল থাকবে */
+.day-section.is-collapsed .day-section-header {
+    border-radius: 0.75rem;
+    /* border-bottom-color: #e5e7eb; <-- REMOVED */
+}
 /* এক্সপান্ডেড হলে হেডার এবং বডির মাঝে একটি বর্ডার থাকবে */
 .day-section:not(.is-collapsed) .day-section-header {
     border-bottom-left-radius: 0;
@@ -1607,7 +1611,7 @@
     
     /* বডির নিজস্ব বর্ডার এবং প্যাডিং */
     padding: 1rem 1.25rem; /* 16px 20px */
-    border: 1px solid #e5e7eb; /* gray-200 */
+    border: none;
     border-top: none;
     border-bottom-left-radius: 0.75rem;
     border-bottom-right-radius: 0.75rem;
