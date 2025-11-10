@@ -1352,7 +1352,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 1rem; /* 16px */
-    padding: 0.5rem 1rem; /* 8px 16px - Height reduced */
+    padding: 0.25rem 1rem; /* 8px 16px - Height reduced */
     cursor: pointer;
     
     /* হেডার এখন স্বচ্ছ থাকবে */
