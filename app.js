@@ -4054,38 +4054,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     return;
                 }
                 
-                // --- TIMER LOGIC: Generate questions NOW ---
-                currentMcqData = aggregatedMcqs; 
-                currentVocabData = null;
-                currentQuizQuestions = currentMcqData.map(mcq => ({ // Generate questions
-                    question: mcq.question,
-                    options: [...mcq.options],
-                    correctAnswer: mcq.correctAnswer,
-                    userAnswer: null,
-                    isCorrect: null
-                }));
                 
-                const totalQuestions = currentQuizQuestions.length;
-                const totalTimeInSeconds = totalQuestions * 36;
-                
-                const warningP = document.getElementById('quiz-total-time-warning');
-                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
-                warningP.style.display = 'block';
-                // --- END TIMER LOGIC ---
-                
-                quizStartMessage.textContent = `Ready to test yourself on ${aggregatedMcqs.length} MCQs from: ${quizTitle}?`;
-                quizStartBtn.classList.remove('hidden');
-                
-                const newStartBtn = quizStartBtn.cloneNode(true);
-                quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
-                newStartBtn.addEventListener('click', runQuizGame);
-                quizStartBtn = newStartBtn; 
-                
-            } catch (error) {
-                console.error("Error loading aggregated MCQ quiz data:", error);
-                quizStartMessage.textContent = "Could not load quiz data. Please try again.";
-                window.currentQuizSubjectInfo = { subjectName: 'Aggregated', topicDetail: 'Error loading topic' }; // <-- ADD FALLBACK
-            }
         }
 
         // --- END: NEW MASTER MCQ LIST & QUIZ CENTER LOGIC ---
