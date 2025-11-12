@@ -4232,48 +4232,6 @@ tabBtnSubject.addEventListener('click', () => {
                 tabContentSubject.innerHTML = `<p class="text-center text-red-500 py-10">Error loading results.</p>`;
             }
         }
-// --- Fetch and Render Data ---
-        async function loadAndDisplayResults() {
-            if (!currentUser || !userId) {
-                // Use the new, correct variable names
-                tabContentDay.innerHTML = `<p class="text-center text-red-500 py-10">Please log in to see results.</p>`;
-                tabContentSubject.innerHTML = `<p class="text-center text-red-500 py-10">Please log in to see results.</p>`;
-                return;
-            }
-
-            // Use cache if available
-            if (savedResultsCache) {
-                console.log("Loading results from cache...");
-                renderResults(savedResultsCache);
-                return;
-            }
-
-            // Set loading state using the new, correct variable names
-            tabContentDay.innerHTML = `<p class="text-center text-gray-500 italic py-10">Loading results...</p>`;
-            tabContentSubject.innerHTML = `<p class="text-center text-gray-500 italic py-10">Loading subject data...</p>`;
-
-            try {
-                console.log("Fetching results from Firestore...");
-                const resultsCollectionPath = getUserResultsCollectionPath();
-                const q = query(collection(db, resultsCollectionPath), orderBy("saveTimestamp", "desc"));
-                
-                const querySnapshot = await getDocs(q);
-                
-                const allResults = [];
-                querySnapshot.forEach((doc) => {
-                    allResults.push({ id: doc.id, ...doc.data() });
-                });
-
-                savedResultsCache = allResults; // Store in cache
-                renderResults(allResults);
-
-            } catch (error) {
-                console.error("Error fetching results:", error);
-                // Use the new, correct variable names
-                tabContentDay.innerHTML = `<p class="text-center text-red-500 py-10">Error loading results.</p>`;
-                tabContentSubject.innerHTML = `<p class="text-center text-red-500 py-10">Error loading results.</p>`;
-            }
-        }
 
 // --- Render Helper (UPGRADED for New Tabs) ---
 function renderResults(allResults) {
