@@ -4358,7 +4358,7 @@ function createResultsTable(results, type, stats) { // <-- ৩. 'stats' না�
         return `
             return `
             <tr>
-                <td class="sl-col">${index + 1}</td>
+                <td class="sl-col">${index + 1} </td>
                 <td class="date-col">${date}</td>
                 <td class="topic-col">${topicLinkHtml}</td>
                 <td class="score-col">${(res.finalScore || 0).toFixed(2)}</td>
