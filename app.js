@@ -4626,5 +4626,5 @@ function renderProgressChart(labels, data, title) {
             }
         }
     });
-}
+
 // --- END: NEW PROGRESS CHART LOGIC ---
