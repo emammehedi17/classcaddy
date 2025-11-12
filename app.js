@@ -4001,7 +4001,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     options: [...mcq.options],
                     correctAnswer: mcq.correctAnswer,
                     userAnswer: null,
-                    isCorrect: null1111111111111111111111
+                    isCorrect: null
                 }));
                 
                 const totalQuestions = currentQuizQuestions.length;
@@ -4358,7 +4358,7 @@ function createResultsTable(results, type, stats) { // <-- ৩. 'stats' না�
         return `
             return `
             <tr>
-                <td class="sl-col">${index + 1} </td>
+                <td class="sl-col">${index + 1}</td>
                 <td class="date-col">${date}</td>
                 <td class="topic-col">${topicLinkHtml}</td>
                 <td class="score-col">${(res.finalScore || 0).toFixed(2)}</td>
