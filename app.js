@@ -2548,7 +2548,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         async function startQuiz(monthId, weekId, dayIndex, rowIndex) {
             quizTitle.textContent = 'Vocabulary Quiz';
             // Set the source info for the topic name
-            window.currentQuizSourceInfo = { monthId, weekId, dayIndex, rowIndex };
+            window.currentQuizSourceInfo = { monthId, weekId, dayIndex, rowIndex, subjectName: null, topicContent: null };
             
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
@@ -2945,17 +2945,17 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const quizType = currentMcqData ? 'MCQ' : 'Vocab';
             const quizTopicEl = document.getElementById('quiz-title');
             let quizTopic = quizTopicEl ? quizTopicEl.textContent : (quizType === 'MCQ' ? 'MCQ Quiz' : 'Vocabulary Quiz');
-
+            
             // --- Topic Name Logic (UPGRADED) ---
             let topicLink = null; // লিঙ্ক সেভ করার জন্য নতুন ভেরিয়েবল
+            const sourceInfo = window.currentQuizSourceInfo || {}; // <-- এই লাইনটি যোগ করুন
 
             if (currentMcqTarget) { // For MCQ quizzes
                 const { quizType, monthId, weekId, dayIndex } = currentMcqTarget;
                 
                 if (quizType === 'day' || dayIndex !== null) {
-                    // এটি একটি নির্দিষ্ট দিনের MCQ টেস্ট
                     const dayNum = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`)?.textContent || `Day ${parseInt(dayIndex) + 1}`;
-                    quizTopic = `MCQ - ${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
+                    quizTopic = `${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`; // "MCQ - " রিমুভ করা হয়েছে
                     topicLink = `#day-${monthId}-${weekId}-${dayIndex}`; // দিনের সেকশনের ID
                 } else if (quizType === 'week') {
                     // সাপ্তাহিক MCQ টেস্ট
@@ -2988,6 +2988,13 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
             }
             
+			// --- START: NEW SUBJECT PREPEND LOGIC ---
+            if (sourceInfo.subjectName) {
+                quizTopic = `${sourceInfo.subjectName} - ${quizTopic}`;
+            } else if (quizType === 'MCQ') {
+                quizTopic = `MCQ - ${quizTopic}`; // পুরনো ডেটার জন্য ফলব্যাক
+            }
+            // --- END: NEW SUBJECT PREPEND LOGIC ---
             if (!quizTopic) { // যদি কোনো কারণে টপিক সেট না হয়
                 quizTopic = (quizType === 'MCQ' ? 'MCQ Quiz' : 'Vocabulary Quiz');
             }
@@ -2998,6 +3005,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 topicName: quizTopic,
                 topicLink: topicLink, // ✅ নতুন লিঙ্কটি এখানে সেভ করুন
                 saveTimestamp: null, // Will be set on save
+				subjectName: sourceInfo.subjectName || (quizType === 'Vocab' ? 'Vocabulary' : null), // Vocab-এর পুরনো ডেটার জন্য ফলব্যাক
+                topicContent: sourceInfo.topicContent || null,
                 // Summary Stats
                 correctCount: correctCount,
                 wrongCount: wrongCount,
@@ -3602,6 +3611,11 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         async function startMcqQuiz(monthId, weekId, dayIndex, rowIndex) {
             quizTitle.textContent = 'MCQ Quiz';
 			currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
+            // --- START: NEW SUBJECT/TOPIC LOGIC ---
+            let subjectName = null;
+            let topicContent = null;
+            // --- END: NEW SUBJECT/TOPIC LOGIC ---
+
             quizModal.style.display = "block";
             // ... (কোড)
             try {
@@ -3615,6 +3629,15 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 let mcqData = [];
 
                 if (rowIndex !== null) {
+					// --- START: NEW SUBJECT/TOPIC LOGIC ---
+                    const rowData = dayData.rows?.[rowIndex];
+                    if (rowData) {
+                        subjectName = rowData.subject;
+                        topicContent = rowData.topic;
+                    }
+                    // --- END: NEW SUBJECT/TOPIC LOGIC ---
+					
+
                     // Req 1: Load MCQs for a specific row
                     mcqData = dayData.rows?.[rowIndex]?.mcqData || [];
                 } else {
@@ -3658,6 +3681,11 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
                 newStartBtn.addEventListener('click', runQuizGame);
                 quizStartBtn = newStartBtn; 
+				
+				// --- START: ADD THIS LINE ---
+                window.currentQuizSourceInfo = { ...currentMcqTarget, subjectName, topicContent };
+                // --- END: ADD THIS LINE ---
+			
                 
             } catch (error) {
                 console.error("Error loading MCQ quiz data:", error);
@@ -3905,6 +3933,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         async function startAggregatedMcqQuiz(quizType, monthId, weekId = null, dayIndex = null) {
             quizTitle.textContent = 'MCQ Quiz';
 			currentMcqTarget = { quizType, monthId, weekId, dayIndex };
+			// --- START: ADD THIS LINE ---
+            window.currentQuizSourceInfo = { ...currentMcqTarget, subjectName: null, topicContent: null };
+            // --- END: ADD THIS LINE ---
             closeModal('mcq-quiz-center-modal');
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
@@ -4129,12 +4160,13 @@ document.getElementById('quiz-save-btn').addEventListener('click', async () => {
 // --- DOM Elements for Result Sheet ---
 const resultSheetModal = document.getElementById('result-sheet-modal');
 const showResultsSheetBtn = document.getElementById('show-results-sheet-btn');
-const tabBtnMcq = document.getElementById('tab-btn-mcq');
-const tabBtnVocab = document.getElementById('tab-btn-vocab');
-const tabContentMcq = document.getElementById('tab-content-mcq');
-const tabContentVocab = document.getElementById('tab-content-vocab');
-const mcqResultsList = document.getElementById('mcq-results-list');
-const vocabResultsList = document.getElementById('vocab-results-list');
+const tabBtnDay = document.getElementById('tab-btn-day');
+const tabBtnSubject = document.getElementById('tab-btn-subject');
+const tabContentDay = document.getElementById('tab-content-day');
+const tabContentSubject = document.getElementById('tab-content-subject');
+// Sub-tab containers
+const subjectSubTabs = document.getElementById('subject-sub-tabs');
+const subjectSubContent = document.getElementById('subject-sub-content');
 const savedQuizReviewBtn = document.getElementById('saved-quiz-review-btn');
 let tempSavedReviewData = null; // Holds questions for the review button
 
@@ -4145,17 +4177,17 @@ showResultsSheetBtn.addEventListener('click', () => {
 });
 
 // --- Tab Switching ---
-tabBtnMcq.addEventListener('click', () => {
-    tabBtnMcq.classList.add('active-tab');
-    tabBtnVocab.classList.remove('active-tab');
-    tabContentMcq.classList.remove('hidden');
-    tabContentVocab.classList.add('hidden');
+tabBtnDay.addEventListener('click', () => {
+    tabBtnDay.classList.add('active-tab');
+    tabBtnSubject.classList.remove('active-tab');
+    tabContentDay.classList.remove('hidden');
+    tabContentSubject.classList.add('hidden');
 });
-tabBtnVocab.addEventListener('click', () => {
-    tabBtnVocab.classList.add('active-tab');
-    tabBtnMcq.classList.remove('active-tab');
-    tabContentVocab.classList.remove('hidden');
-    tabContentMcq.classList.add('hidden');
+tabBtnSubject.addEventListener('click', () => {
+    tabBtnSubject.classList.add('active-tab');
+    tabBtnDay.classList.remove('active-tab');
+    tabContentSubject.classList.remove('hidden');
+    tabContentDay.classList.add('hidden');
 });
 
 // --- Fetch and Render Data ---
@@ -4199,23 +4231,76 @@ async function loadAndDisplayResults() {
     }
 }
 
-// --- Render Helper (UPGRADED for Request 5) ---
+// --- Render Helper (UPGRADED for New Tabs) ---
 function renderResults(allResults) {
-    const mcqResults = allResults.filter(r => r.quizType === 'MCQ');
-    const vocabResults = allResults.filter(r => r.quizType === 'Vocab');
+    // --- ১. "By Day" ট্যাব রেন্ডার করুন ---
+    const dayStats = calculateOverallStats(allResults);
+    tabContentDay.innerHTML = createResultsTable(allResults, 'byDay', dayStats);
 
-    // --- ৫. মোট হিসাব করুন ---
-    const mcqStats = calculateOverallStats(mcqResults);
-    const vocabStats = calculateOverallStats(vocabResults);
+    // --- ২. "By Subject" ট্যাবের জন্য ডেটা প্রস্তুত করুন ---
+    let subjectResults = {};
+    let combinedResults = [];
 
-    mcqResultsList.innerHTML = createResultsTable(mcqResults, 'mcq', mcqStats);
-    vocabResultsList.innerHTML = createResultsTable(vocabResults, 'vocab', vocabStats);
+    allResults.forEach(res => {
+        if (res.topicLink?.includes('center')) {
+            combinedResults.push(res); // সাপ্তাহিক/মাসিক টেস্ট
+        } else if (res.subjectName) {
+            if (!subjectResults[res.subjectName]) {
+                subjectResults[res.subjectName] = [];
+            }
+            subjectResults[res.subjectName].push(res);
+        } else if (res.quizType === 'Vocab') {
+            // পুরনো Vocab ডেটা
+            if (!subjectResults['Vocabulary']) subjectResults['Vocabulary'] = [];
+            subjectResults['Vocabulary'].push(res);
+        } else {
+            // পুরনো MCQ ডেটা, কোনো সাবজেক্ট নেই
+            combinedResults.push(res);
+        }
+    });
 
-    // Add listeners to the new buttons
+    // --- ৩. "By Subject" সাব-ট্যাব রেন্ডার করুন ---
+    let subTabsHtml = '';
+    let subContentHtml = '';
+    let firstTab = true;
+
+    // "Combined Tests" ট্যাব (যদি ডেটা থাকে)
+    if (combinedResults.length > 0) {
+        const combinedStats = calculateOverallStats(combinedResults);
+        subTabsHtml += `<button class="subject-sub-tab-btn active-sub-tab" data-tab="combined">Combined Tests</button>`;
+        subContentHtml += `<div class="subject-sub-tab-content" data-tab="combined">
+            ${createResultsTable(combinedResults, 'bySubject', combinedStats)}
+        </div>`;
+        firstTab = false;
+    }
+
+    // সাবজেক্ট ট্যাবগুলো
+    Object.keys(subjectResults).sort().forEach((subjectName, index) => {
+        const results = subjectResults[subjectName];
+        const stats = calculateOverallStats(results);
+        const isActive = firstTab && index === 0;
+        
+        subTabsHtml += `<button class="subject-sub-tab-btn ${isActive ? 'active-sub-tab' : ''}" data-tab="${escapeHtml(subjectName)}">
+            ${escapeHtml(subjectName)}
+        </button>`;
+        
+        subContentHtml += `<div class="subject-sub-tab-content ${isActive ? '' : 'hidden'}" data-tab="${escapeHtml(subjectName)}">
+            ${createResultsTable(results, 'bySubject', stats)}
+        </div>`;
+    });
+
+    if (subTabsHtml === '') {
+        subTabsHtml = '<p class="text-gray-500 text-sm italic">No subject-specific results found yet.</p>';
+    }
+
+    subjectSubTabs.innerHTML = subTabsHtml;
+    subjectSubContent.innerHTML = subContentHtml;
+
+    // --- ৪. সব লিসেনার যোগ করুন ---
     attachViewResultListeners(allResults);
-    attachTopicLinkListeners(); // <-- ৩. লিঙ্কগুলোর জন্য লিসেনার যোগ করুন
-	attachChartButtonListeners(); // <-- ৪. চার্ট বাটনের জন্য লিসেনার যোগ করুন
-	
+    attachTopicLinkListeners();
+    attachChartButtonListeners();
+    attachSubjectSubTabListeners(); // <-- নতুন লিসেনার
 }
 	
 // --- ৫. মোট হিসাব করার জন্য নতুন ফাংশন ---
@@ -4253,11 +4338,18 @@ function createResultsTable(results, type, stats) { // <-- ৩. 'stats' না�
         }) : 'N/A';
         
         // --- ৩. টপিক লিঙ্ক রেন্ডার করুন ---
+        let topicDisplay = '';
+        if (type === 'bySubject' && res.topicContent) {
+            topicDisplay = escapeHtml(res.topicContent); // সাবজেক্ট ট্যাবে Topic কলামের কন্টেন্ট দেখান
+        } else {
+            topicDisplay = escapeHtml(res.topicName); // By Day ট্যাবে জেনারেট করা নাম দেখান
+        }
+
         const topicLinkHtml = `
             <a href="${res.topicLink || '#'}" class="topic-link" 
                data-link="${res.topicLink || '#'}" 
                data-link-type="${res.topicLink?.startsWith('#day') ? 'day' : (res.topicLink ? 'modal' : 'none')}">
-                ${escapeHtml(res.topicName)}
+                ${topicDisplay}
             </a>
         `;
         
@@ -4592,3 +4684,24 @@ function renderProgressChart(labels, data, title) {
     });
 }
 // --- END: NEW PROGRESS CHART LOGIC ---
+
+// --- START: NEW SUBJECT SUB-TAB LOGIC ---
+function attachSubjectSubTabListeners() {
+    subjectSubTabs.addEventListener('click', (e) => {
+        const button = e.target.closest('.subject-sub-tab-btn');
+        if (!button) return;
+
+        // 1. Deactivate all buttons and hide all content
+        subjectSubTabs.querySelectorAll('.subject-sub-tab-btn').forEach(btn => btn.classList.remove('active-sub-tab'));
+        subjectSubContent.querySelectorAll('.subject-sub-tab-content').forEach(content => content.classList.add('hidden'));
+
+        // 2. Activate the clicked button and show its content
+        button.classList.add('active-sub-tab');
+        const tabName = button.dataset.tab;
+        const contentToShow = subjectSubContent.querySelector(`.subject-sub-tab-content[data-tab="${tabName}"]`);
+        if (contentToShow) {
+            contentToShow.classList.remove('hidden');
+        }
+    });
+}
+// --- END: NEW SUBJECT SUB-TAB LOGIC ---
