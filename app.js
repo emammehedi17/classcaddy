@@ -325,7 +325,7 @@
 
             } catch (error) { 
                 console.error("Google Sign-In Error:", error); 
-                showCustomAlert(`Sign-in error: ${error.code}`, "error");
+                 showCustomAlert(`Sign-in error: ${error.code}`, "error");
             } 
         });
         async function handleLogout() { try { if (unsubscribeActiveMonth) unsubscribeActiveMonth(); unsubscribeActiveMonth = null; await signOut(auth); console.log("Logout successful."); } catch (error) { console.error("Logout Error:", error); } }
@@ -3579,7 +3579,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
 
                 // --- TIMER LOGIC: Generate questions NOW ---
-                currentMcqData = mcqData; 
+                currentMcqData = aggregatedMcqs; 
                 currentVocabData = null;
                 currentQuizQuestions = currentMcqData.map(mcq => ({ // Generate questions
                     question: mcq.question,
@@ -4626,4 +4626,4 @@ function renderProgressChart(labels, data, title) {
             }
         }
     });
-}
+
