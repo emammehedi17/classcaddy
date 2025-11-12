@@ -3720,7 +3720,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
 
                 // --- TIMER LOGIC: Generate questions NOW ---
-                currentMcqData = aggregatedMcqs; 
+                currentMcqData = mcqData;
                 currentVocabData = null;
                 currentQuizQuestions = currentMcqData.map(mcq => ({ // Generate questions
                     question: mcq.question,
