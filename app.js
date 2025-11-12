@@ -3537,7 +3537,73 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 viewMcqContent.innerHTML = '<p class="text-center text-red-500 py-10">Could not load MCQs.</p>';
             }
         }
+		
+		
+		// 5. "Quiz" বাটনে ক্লিক করলে (Vocabulary-এর জন্য)
+        async function startQuiz(monthId, weekId, dayIndex, rowIndex) {
+            quizTitle.textContent = 'Vocabulary Quiz';
+            // This global variable will be used to build the topic name when saving
+            window.currentQuizSourceInfo = { monthId, weekId, dayIndex, rowIndex };
+            currentMcqTarget = null; // Ensure this is null for vocab quizzes
 
+            quizModal.style.display = "block";
+            quizMainScreen.classList.add('hidden');
+            quizResultsScreen.classList.add('hidden');
+            quizReviewScreen.classList.add('hidden');
+            quizStartScreen.classList.remove('hidden');
+            
+            quizStartMessage.textContent = "Loading vocabulary...";
+            quizStartBtn.classList.add('hidden');
+            document.getElementById('quiz-total-time-warning').style.display = 'none';
+
+            try {
+                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) throw new Error("Month document not found.");
+
+                const rowData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex];
+                if (!rowData) throw new Error("Row data not found.");
+
+                // Set the subject info for the results page
+                window.currentQuizSubjectInfo = { subjectName: rowData.subject || "Vocabulary", topicDetail: "Row Vocabulary" };
+
+                const vocabData = rowData.vocabData;
+
+                if (!vocabData || vocabData.length < 4) { 
+                    quizStartMessage.textContent = "You need at least 4 vocabulary words in this row to start a quiz.";
+                    return;
+                }
+
+                // --- TIMER LOGIC: Generate questions NOW ---
+                currentVocabData = preProcessVocab(vocabData); // Use the vocab data
+                currentMcqData = null; // Clear MCQ data
+                currentQuizQuestions = generateQuizData(currentVocabData); // Generate questions
+                
+                const totalQuestions = currentQuizQuestions.length;
+                const totalTimeInSeconds = totalQuestions * 36;
+                
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
+                // --- END TIMER LOGIC ---
+                
+                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this row?`;
+                quizStartBtn.classList.remove('hidden');
+                
+                // Re-clone the button to remove old listeners
+                const newStartBtn = quizStartBtn.cloneNode(true);
+                quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
+                newStartBtn.addEventListener('click', runQuizGame);
+                quizStartBtn = newStartBtn; 
+                
+            } catch (error) {
+                console.error("Error loading vocab quiz data:", error);
+                quizStartMessage.textContent = "Could not load quiz data. Please try again.";
+                window.currentQuizSubjectInfo = { subjectName: 'Vocabulary', topicDetail: 'Error loading topic' }; // Fallback
+            }
+        }
+		
+		
         // 5. "MCQ Test" বাটনে ক্লিক করলে (UPGRADED)
         // UPGRADED: Generates questions first to set timer
         async function startMcqQuiz(monthId, weekId, dayIndex, rowIndex) {
