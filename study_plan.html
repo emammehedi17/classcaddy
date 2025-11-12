@@ -349,9 +349,9 @@
       <div class="modal-content" style="max-width: 600px; padding-top: 35px; padding-right: 45px; overflow: hidden;">
         <span class="modal-close" onclick="closeQuizModal()">&times;</span>
         
-        <div id="quiz-start-screen" class="text-center flex flex-col" style="min-height: 40vh; max-height: 70vh;">
+        <div id="quiz-start-screen" class="quiz-start-container">
             
-            <div class="flex-grow overflow-y-auto px-6 py-10">
+            <div class="quiz-start-content">
                 <h3 id="quiz-title" class="text-2xl font-semibold mb-4 text-indigo-600">Vocabulary Quiz</h3>
                 <p id="quiz-start-message" class="text-gray-600 mb-6">Loading vocabulary...</p>
                 
@@ -363,11 +363,12 @@
                 </p>
             </div>
             
-            <div class="flex-shrink-0 pt-4 pb-8 px-6">
+            <div class="quiz-start-footer">
                 <button id="quiz-start-btn" class="hidden action-button w-full sm:w-auto" style="background-color: #4f46e5; padding: 10px 24px; font-size: 1rem;">
                     <i class="fas fa-play mr-2"></i>Start Quiz
                 </button>
             </div>
+
         </div>
 
 
