@@ -3448,17 +3448,15 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         // 3. ✨ The Magic Parser Function (Regex) - (UPGRADED for Dual Language)
         function parseMcqText(text) {
 			// --- START: NEW PRE-PROCESSING FIX ---
-            // এটি Regex চালানোর আগে আপনার ডেটা পরিষ্কার করবে।
-            // এটি প্রতিটি প্রশ্ন নম্বরের আগে একটি নতুন লাইন যোগ করবে (যদি না থাকে)।
             let cleanText = text.replace(/\n*([০-৯0-9]+\.)/g, '\n$1');
             const mcqData = [];
             
-            // --- START: UPGRADED Regex ---
+            // --- START: UPGRADED Regex (FIXED) ---
             // এই Regex এখন বাংলা (ক, খ, গ, ঘ) এবং ইংরেজি (a, b, c, d) উভয় ফরম্যাটই গ্রহণ করবে।
+            // শেষ ক্যাপচার গ্রুপটি (+) থেকে (*)-এ পরিবর্তন করা হয়েছে, যাতে এটি খালি টেক্সটও গ্রহণ করতে পারে।
             const mcqRegex = 
-/(?:[০-৯0-9]+)\.\s*([\s\S]+?)\n(?:(?:ক\.)|(?:a\.))\s*([\s\S]+?)\n(?:(?:খ\.)|(?:b\.))\s*([\s\S]+?)\n(?:(?:গ\.)|(?:c\.))\s*([\s\S]+?)\n(?:(?:ঘ\.)|(?:d\.))\s*([\s\S]+?)\n(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([কখগঘa-d])\.*\s*([\s\S]+?)(?=\n[০-৯0-9]+\.|\n*$)/gi;
-            // 'g' (global) এবং 'i' (case-insensitive) ফ্ল্যাগ যোগ করা হয়েছে
-            // --- END: UPGRADED Regex ---
+/(?:[০-৯0-9]+)\.\s*([\s\S]+?)\n(?:(?:ক\.)|(?:a\.))\s*([\s\S]+?)\n(?:(?:খ\.)|(?:b\.))\s*([\s\S]+?)\n(?:(?:গ\.)|(?:c\.))\s*([\s\S]+?)\n(?:(?:ঘ\.)|(?:d\.))\s*([\s\S]+?)\n(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([কখগঘa-d])\.*\s*([\s\S]*?)(?=\n[০-৯0-9]+\.|\n*$)/gi;
+            // --- END: UPGRADED Regex (FIXED) ---
             
             let match;
             while ((match = mcqRegex.exec(cleanText)) !== null) {
@@ -3475,7 +3473,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     // এটি এখন 'ক' বা 'a' উভয়কেই চিনবে
                     const correctPrefix = match[6].trim().toLowerCase(); // ক, খ, গ, ঘ বা a, b, c, d
                     
-                    let correctAnswer;
+                    let correctAnswer = null; // ডিফল্ট
+
                     if (correctPrefix === 'ক' || correctPrefix === 'a') {
                         correctAnswer = options[0];
                     } else if (correctPrefix === 'খ' || correctPrefix === 'b') {
@@ -3485,9 +3484,16 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     } else if (correctPrefix === 'ঘ' || correctPrefix === 'd') {
                         correctAnswer = options[3];
                     } else {
-                        // ফলব্যাক হিসেবে Regex-এর ৭ নম্বর গ্রুপটি ব্যবহার করবে
+                        // যদি কোনো কারণে প্রিফিক্স না মেলে, তাহলে পুরনো লজিক ব্যবহার করবে
                         correctAnswer = match[7].trim();
                          console.warn("Could not match prefix, using text as fallback.");
+                    }
+                    
+                    // যদি প্রিফিক্স ম্যাচ করে কিন্তু উত্তর খালি থাকে (যেমন "Correct answer: b")
+                    // এবং ফলব্যাক থেকেও উত্তর না পাওয়া যায়, তাহলে স্কিপ করুন
+                    if (!correctAnswer) {
+                        console.warn("Could not determine correct answer for:", question);
+                        continue; // এই প্রশ্নটি বাদ দিন
                     }
                     // --- END: UPGRADED Logic ---
 
