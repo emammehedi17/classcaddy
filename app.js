@@ -135,7 +135,7 @@
 		let autosaveTimer = null;
 		
 		// --- START: GUEST MODE VARS ---
-        const MEHEDI_UID = "YOUR_OWN_USER_ID_HERE"; // <-- PASTE YOUR UID
+        const MEHEDI_UID = "0RngZmzJioaZB4XiKKvGB7lKlxv1"; // <-- PASTE YOUR UID
         let isGuestMode = false;
         // --- END: GUEST MODE VARS ---
 		
