@@ -2541,7 +2541,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
 
-       
+		
+        
         /**
          * Generates a set of MCQ questions as objects to store answers.
          */
@@ -3211,7 +3212,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizTitle.textContent = 'Vocabulary Quiz';
             // Set the source info for the topic name
             window.currentQuizSourceInfo = { monthId, weekId };
-
+			
+			window.currentQuizSubjectInfo = { subjectName: "Vocabulary", topicDetail: "Weekly Vocabulary" }; // <-- ADD THIS LINE
             closeModal('quiz-center-modal');
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
