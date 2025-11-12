@@ -960,8 +960,15 @@
                     }).join('')}
                 </div>`;
 
-             monthDiv.querySelector('.edit-targets-btn').addEventListener('click', (e) => handleEditTargets(e.currentTarget, monthId));
-             monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId, data.monthName || monthId));
+             // --- START: GUEST MODE FIX ---
+             // Only add listeners for buttons that actually exist.
+             // In Guest Mode, these buttons are not rendered, so we must skip this.
+             if (!isGuestMode) {
+                 monthDiv.querySelector('.edit-targets-btn').addEventListener('click', (e) => handleEditTargets(e.currentTarget, monthId));
+                 monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId, data.monthName || monthId));
+             }
+             // --- END: GUEST MODE FIX ---
+             
              attachWeekEventListeners(monthDiv, monthId);
              
              // --- MODIFIED: Auto-resize textareas on load ---
