@@ -117,6 +117,7 @@
         const quizReviewContent = document.getElementById('quiz-review-content');
         const quizBackToResultsBtn = document.getElementById('quiz-back-to-results-btn');
         // --- END: ADD THESE NEW ELEMENTS ---
+		const saveBtn = document.getElementById('quiz-save-btn'); // <-- ADD THIS LINE
 		
         
         let progressChart = null; // Holds the chart instance
@@ -3011,16 +3012,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 questions: currentQuizQuestions // Save the full question set
             };
             
-            // Enable the save button
-            const saveBtn = document.getElementById('quiz-save-btn');
-            if(saveBtn) {
-                saveBtn.disabled = false;
-                saveBtn.innerHTML = `<i class="fas fa-save mr-2"></i>Save`;
-            }
-            // --- END: CAPTURE RESULT DATA FOR SAVING ---
+            
             
             // Enable the save button
-            const saveBtn = document.getElementById('quiz-save-btn');
             if(saveBtn) {
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = `<i class="fas fa-save mr-2"></i>Save`;
@@ -4111,7 +4105,7 @@ document.getElementById('quiz-save-btn').addEventListener('click', async () => {
         return;
     }
 
-    const saveBtn = document.getElementById('quiz-save-btn');
+    // const saveBtn = document.getElementById('quiz-save-btn'); // <-- REMOVED CONST
     saveBtn.disabled = true;
     saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Saving...`;
 
