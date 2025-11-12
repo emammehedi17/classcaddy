@@ -4211,16 +4211,16 @@ tabBtnSubject.addEventListener('click', () => {
             tabContentSubject.innerHTML = `<p class="text-center text-gray-500 italic py-10">Loading subject data...</p>`;
 
             try {
-                console.log("Fetching results from Firestore...");
+                console.log("Fetching results from Firestore (NEW QUERY)...");
                 const resultsCollectionPath = getUserResultsCollectionPath();
                 
                 // --- START: NEW QUERY ---
-                // This query only fetches *new* results that have the 'subjectName' field
-                // (where it's either null or a string), ignoring all old, broken data.
+                // এই কোডটি শুধুমাত্র নতুন রেজাল্টগুলো লোড করবে (যেখানে 'subjectName' ফিল্ডটি আছে)
+                // এটি আপনার পুরনো, ভাঙা ডেটা উপেক্ষা করবে।
                 const q = query(collection(db, resultsCollectionPath),
                             where("subjectName", ">=", null),
-                            orderBy("subjectName"), // First, order by the field in the inequality
-                            orderBy("saveTimestamp", "desc") // Then, order by timestamp
+                            orderBy("subjectName"), // প্রথমে 'subjectName' অনুযায়ী সাজান
+                            orderBy("saveTimestamp", "desc") // তারপর সময় অনুযায়ী সাজান
                           );
                 // --- END: NEW QUERY ---
                 
@@ -4238,7 +4238,7 @@ tabBtnSubject.addEventListener('click', () => {
                 console.error("Error fetching results:", error);
                 
                 // --- START: NEW ERROR MESSAGE ---
-                // Show a helpful error if the index is missing
+                // যদি ইনডেক্স না থাকে, তাহলে এই এররটি দেখাবে
                 if (error.code === 'failed-precondition') {
                     const errorMsg = '<b>Database Index Required.</b><br>Please open the console (F12), click the link in the error message, and create the required Firestore index to view results.';
                     tabContentDay.innerHTML = `<p class="text-center text-red-500 py-10">${errorMsg}</p>`;
