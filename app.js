@@ -52,6 +52,7 @@
         const userEmailDisplay = document.getElementById('user-email-display');
         const userIdDisplay = document.getElementById('user-id-display');
         const googleLoginBtn = document.getElementById('google-login-btn');
+		const guestLoginBtn = document.getElementById('guest-login-btn');
         const logoutBtn = document.getElementById('logout-btn'); // Main logout button
         const studyPlanContent = document.getElementById('study-plan-content');
         const addMonthBtn = document.getElementById('add-month-btn');
@@ -132,6 +133,11 @@
         let currentVocabCodeTarget = null; // <-- ADD THIS LINE
 		let currentMcqTarget = null;
 		let autosaveTimer = null;
+		
+		// --- START: GUEST MODE VARS ---
+        const MEHEDI_UID = "YOUR_OWN_USER_ID_HERE"; // <-- PASTE YOUR UID
+        let isGuestMode = false;
+        // --- END: GUEST MODE VARS ---
 		
 		// --- START: ADD THESE QUIZ STATE VARIABLES ---
         let currentVocabData = []; // Renamed from currentQuizData
@@ -248,19 +254,41 @@
         // --- Authentication ---
         function updateAuthUI(user) {
              if (user) {
+                // --- START: GUEST MODE LOGIC ---
+                if (user.isAnonymous && user.uid === MEHEDI_UID) {
+                    isGuestMode = true;
+                } else {
+                    isGuestMode = false; // Reset for real users
+                }
+                // --- END: GUEST MODE LOGIC ---
+
                 currentUser = user;
-                userId = user.uid;
+                userId = user.uid; // This will be MEHEDI_UID in guest mode
                 console.log("User logged in:", userId);
+                console.log("Is Guest Mode:", isGuestMode); // <-- Good for debugging
 
                 loginPrompt.style.display = 'none';
                 userInfo.classList.remove('hidden');
                 userDisplay.textContent = user.displayName || 'User';
-                userEmailDisplay.textContent = user.email || (user.isAnonymous ? 'Anonymous User' : '');
+                userEmailDisplay.textContent = user.email || (user.isAnonymous ? 'Guest (Read-Only)' : ''); // <-- MODIFIED
                 userIdDisplay.textContent = `ID: ${userId}`;
                 userIdDisplay.title = 'Your unique User ID';
+
+                // --- MODIFIED: HIDE/SHOW LOGOUT BUTTON ---
+                if (isGuestMode) {
+                    logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt mr-1"></i> Exit Guest Mode'; // Change button text
+                } else {
+                    logoutBtn.innerHTML = 'Log Out'; // Default text
+                }
                 logoutBtn.classList.remove('hidden');
 
-                const loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700">${user.displayName || 'User'}</p><p class="text-gray-500 text-xs">${user.email || (user.isAnonymous ? 'Anonymous' : '')}</p></div><button id="logout-btn-header" class="ml-3 action-button action-button-danger text-xs px-3 py-1">Log Out</button>`;
+                // --- MODIFIED: GUEST MODE HEADER ---
+                let loggedInHTML = '';
+                if (isGuestMode) {
+                    loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700">Guest Mode</p><p class="text-gray-500 text-xs">Viewing Mehedi's Plan</p></div><button id="logout-btn-header" class="ml-3 action-button action-button-secondary text-xs px-3 py-1">Exit</button>`;
+                } else {
+                    loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700">${user.displayName || 'User'}</p><p class="text-gray-500 text-xs">${user.email || (user.isAnonymous ? 'Anonymous' : '')}</p></div><button id="logout-btn-header" class="ml-3 action-button action-button-danger text-xs px-3 py-1">Log Out</button>`;
+                }
                 authContainerDesktop.innerHTML = loggedInHTML;
                 authContainerMobile.innerHTML = loggedInHTML.replace('ml-3', 'w-full mt-2').replace('logout-btn-header', 'logout-btn-mobile');
 
@@ -268,8 +296,11 @@
                 document.getElementById('logout-btn-mobile')?.addEventListener('click', handleLogout);
 
                 studyPlanContent.classList.remove('hidden');
-                loadStudyPlans(); // Load plans AND month buttons
+                loadStudyPlans(); // Load plans (will load Mehedi's data)
             } else {
+                // --- START: GUEST MODE LOGIC (LOGOUT) ---
+                isGuestMode = false;
+                // --- END: GUEST MODE LOGIC ---
                 currentUser = null;
                 userId = null;
                 console.log("User logged out");
@@ -328,7 +359,38 @@
                  showCustomAlert(`Sign-in error: ${error.code}`, "error");
             } 
         });
-        async function handleLogout() { try { if (unsubscribeActiveMonth) unsubscribeActiveMonth(); unsubscribeActiveMonth = null; await signOut(auth); console.log("Logout successful."); } catch (error) { console.error("Logout Error:", error); } }
+		
+		guestLoginBtn.addEventListener('click', () => {
+            isGuestMode = true;
+            // Create a "fake" user object for the guest session
+            const guestUser = {
+                uid: MEHEDI_UID,
+                displayName: "Guest (Viewing Mehedi's Plan)",
+                email: "read-only@guest.com",
+                isAnonymous: true // Use this to check for guest mode
+            };
+            // Manually call updateAuthUI with this guest user
+            updateAuthUI(guestUser);
+        });
+        async function handleLogout() { 
+            try { 
+                if (isGuestMode) {
+                    // This is a guest, just reload the UI to the logged-out state
+                    isGuestMode = false;
+                    updateAuthUI(null); // This will reset everything
+                } else {
+                    // This is a real user, sign them out
+                    if (unsubscribeActiveMonth) unsubscribeActiveMonth(); 
+                    unsubscribeActiveMonth = null; 
+                    await signOut(auth); 
+                    console.log("Logout successful.");
+                    // onAuthStateChanged will fire and call updateAuthUI(null)
+                }
+            } catch (error) { 
+                console.error("Logout Error:", error); 
+            } 
+        }
+		
         logoutBtn.addEventListener('click', handleLogout);
 
         // --- START: ADD MOBILE DETECT HELPER ---
@@ -357,7 +419,7 @@
                 console.log("Received plans snapshot. Number of plans:", querySnapshot.size);
                 monthNavButtonsContainer.innerHTML = '';
                 // --- START: ADD THIS LINE ---
-                const addMonthBtnHTML = `<button id="add-month-btn-inline" class="action-button flex items-center gap-1.5"><i class="fas fa-plus-circle text-sm"></i> Add Month</button>`;
+                const addMonthBtnHTML = isGuestMode ? '' : `<button id="add-month-btn-inline" class="action-button flex items-center gap-1.5"><i class="fas fa-plus-circle text-sm"></i> Add Month</button>`;
                 // --- END: ADD THIS LINE ---
 
                 let currentMonthElement = currentMonthPlanDisplay.querySelector('.card[data-month-id]');
@@ -846,8 +908,8 @@
             monthDiv.innerHTML = `
                  <div class="flex justify-between items-start mb-6">
                      <h2 class="text-2xl font-bold text-emerald-600">${data.monthName || 'Unnamed Month'} <span class="text-lg text-gray-400 font-normal">(${monthId})</span></h2>
-                     <button class="icon-button delete-month-btn" title="Delete Month"><i class="fas fa-trash-alt text-red-500"></i></button>
-                 </div>
+                     ${isGuestMode ? '' : '<button class="icon-button delete-month-btn" title="Delete Month"><i class="fas fa-trash-alt text-red-500"></i></button>'}
+                     </div>
 
                  <div class="progress-trackers-container mb-10" data-month-id="${monthId}">
                     ${createTrackerHTML(
@@ -877,9 +939,7 @@
                  <div class="mb-8">
                     <div class="flex justify-between items-center mb-4">
                          <h3 class="text-2xl font-semibold text-gray-700">Monthly Targets</h3>
-                         <button class="action-button action-button-secondary text-xs edit-targets-btn" data-editing="false">
-                            <i class="fas fa-pencil-alt mr-1"></i> Edit Targets
-                         </button>
+                         ${isGuestMode ? '' : '<button class="action-button action-button-secondary text-xs edit-targets-btn" data-editing="false"><i class="fas fa-pencil-alt mr-1"></i> Edit Targets</button>'}
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 monthly-targets">
 						${[1, 2, 3, 4].map(weekNum => `
@@ -939,8 +999,8 @@
                         <div class="progress-bar-container w-full"> <div class="progress-bar-fill progress-bar-weekly" style="width: ${initialProgress}%;"></div> </div>
                     </div>
                     <div class="days-container space-y-6 mt-4"> ${daysHtml} </div>
-                     ${totalDays < 7 ? (totalDays > 0 ? `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>` : `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`) : '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>'}
-                </div>`;
+                     ${isGuestMode ? '' : (totalDays < 7 ? (totalDays > 0 ? `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>` : `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`) : '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>')}
+                     </div>`;
         }
 
         function createDayElement(monthId, weekId, dayIndex, dayData) {
@@ -971,8 +1031,8 @@
                          
                          <div class="day-header-title">
                              <h4 class="font-semibold text-gray-700">Day ${dayData.dayNumber}</h4>
-                             <button class="icon-button delete-day-btn hidden" title="Delete Day"><i class="fas fa-calendar-times text-red-500"></i></button>
-                         </div>
+                             ${isGuestMode ? '' : '<button class="icon-button delete-day-btn hidden" title="Delete Day"><i class="fas fa-calendar-times text-red-500"></i></button>'}
+                             </div>
                          
                          <div class="day-header-progress day-progress-wrapper" data-day-index="${dayIndex}">
                              <div class="flex justify-between text-xs text-gray-500">
@@ -994,10 +1054,8 @@
                          
                          <div class="flex justify-end items-center gap-2 flex-wrap mb-4">
                              ${allMcqButtonsNormalMode}
-                             <button class="action-button action-button-secondary text-xs edit-day-btn">
-                                 <i class="fas fa-pencil-alt mr-1"></i> Edit
-                             </button>
-                         </div>
+                             ${isGuestMode ? '' : '<button class="action-button action-button-secondary text-xs edit-day-btn"><i class="fas fa-pencil-alt mr-1"></i> Edit</button>'}
+                             </div>
                          
                          <table class="w-full text-sm text-left text-gray-600 study-table" id="${tableId}">
                              <thead class="text-xs text-gray-500 uppercase">
@@ -1119,7 +1177,7 @@
                      </td>
                      <td class="px-3 py-2 align-top" data-label="Comment"> ${isEditing ? `<textarea class="editable-input comment-input text-xs" rows="2" placeholder="Comment...">${escapeHtml(rowData.comment || '')}</textarea>` : `<span class="comment-display text-xs text-gray-500">${escapeHtml(rowData.comment || '-')}</span>`}
                      </td>
-                     <td class="px-3 py-2 align-middle center-cell" data-label="Done"> <input type="checkbox" class="form-checkbox h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 completion-checkbox" ${rowData.completed ? 'checked' : ''} ${isEditing ? 'disabled' : ''}>
+                     <td class="px-3 py-2 align-middle center-cell" data-label="Done"> <input type="checkbox" class="form-checkbox h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 completion-checkbox" ${rowData.completed ? 'checked' : ''} ${isEditing || isGuestMode ? 'disabled' : ''}>
                      </td>
                       <td class="px-3 py-2 align-middle center-cell completion-perc-cell ${isEditing ? '' : 'hidden'}" data-label="%"> ${isEditing ? `<input type="text" inputmode="decimal" class="editable-input completion-perc-input w-16 text-center text-xs" placeholder="%" value="${rowData.completionPercentage ?? ''}">` : ''}
                       </td>
@@ -2966,8 +3024,15 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             // Enable the save button
             if(saveBtn) {
-                saveBtn.disabled = false;
-                saveBtn.innerHTML = `<i class="fas fa-save mr-2"></i>Save`;
+                // --- START: GUEST MODE HIDE ---
+                if (isGuestMode) {
+                    saveBtn.style.display = 'none'; // Hide save button for guests
+                } else {
+                    saveBtn.style.display = 'inline-flex'; // Show for real users
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = `<i class="fas fa-save mr-2"></i>Save`;
+                }
+                // --- END: GUEST MODE HIDE ---
             }
             // --- END: CAPTURE RESULT DATA FOR SAVING ---
 			
