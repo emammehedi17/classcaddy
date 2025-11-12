@@ -3445,57 +3445,86 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             // --- END: SLOW PART ---
         });
 
-        // 3. ✨ The Magic Parser Function (Regex) - (UPGRADED for Dual Language)
+        // 3. ✨ The Magic Parser Function (Regex) - (UPGRADED for ALL Formats)
         function parseMcqText(text) {
-			// --- START: NEW PRE-PROCESSING FIX ---
             let cleanText = text.replace(/\n*([০-৯0-9]+\.)/g, '\n$1');
             const mcqData = [];
             
-            // --- START: UPGRADED Regex (FIXED) ---
-            // এই Regex এখন বাংলা (ক, খ, গ, ঘ) এবং ইংরেজি (a, b, c, d) উভয় ফরম্যাটই গ্রহণ করবে।
-            // শেষ ক্যাপচার গ্রুপটি (+) থেকে (*)-এ পরিবর্তন করা হয়েছে, যাতে এটি খালি টেক্সটও গ্রহণ করতে পারে।
+            // --- START: NEW SIMPLER Regex ---
+            // This Regex now captures everything after "Correct answer:" into ONE group
             const mcqRegex = 
-/(?:[০-৯0-9]+)\.\s*([\s\S]+?)\n(?:(?:ক\.)|(?:a\.))\s*([\s\S]+?)\n(?:(?:খ\.)|(?:b\.))\s*([\s\S]+?)\n(?:(?:গ\.)|(?:c\.))\s*([\s\S]+?)\n(?:(?:ঘ\.)|(?:d\.))\s*([\s\S]+?)\n(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([কখগঘa-d])\.*\s*([\s\S]*?)(?=\n[০-৯0-9]+\.|\n*$)/gi;
-            // --- END: UPGRADED Regex (FIXED) ---
+/(?:[০-৯0-9]+)\.\s*([\s\S]+?)\n(?:(?:ক\.)|(?:a\.))\s*([\s\S]+?)\n(?:(?:খ\.)|(?:b\.))\s*([\s\S]+?)\n(?:(?:গ\.)|(?:c\.))\s*([\s\S]+?)\n(?:(?:ঘ\.)|(?:d\.))\s*([\s\S]+?)\n(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([\s\S]+?)(?=\n[০-৯0-9]+\.|\n*$)/gi;
+            // --- END: NEW SIMPLER Regex ---
             
             let match;
             while ((match = mcqRegex.exec(cleanText)) !== null) {
                 try {
                     const question = match[1].trim();
                     const options = [
-                        match[2].trim(), // অপশন ক / a
-                        match[3].trim(), // অপশন খ / b
-                        match[4].trim(), // অপশন গ / c
-                        match[5].trim()  // অপশন ঘ / d
+                        match[2].trim(), // opt a/ক
+                        match[3].trim(), // opt b/খ
+                        match[4].trim(), // opt c/গ
+                        match[5].trim()  // opt d/ঘ
                     ];
                     
-                    // --- START: UPGRADED Logic ---
-                    // এটি এখন 'ক' বা 'a' উভয়কেই চিনবে
-                    const correctPrefix = match[6].trim().toLowerCase(); // ক, খ, গ, ঘ বা a, b, c, d
-                    
-                    let correctAnswer = null; // ডিফল্ট
+                    // --- START: NEW ROBUST LOGIC ---
+                    // match[6] contains EVERYTHING after the colon.
+                    // e.g., "b", "b. The ...", "The ..."
+                    const answerString = match[6].trim();
+                    const answerStringLower = answerString.toLowerCase();
+                    let correctAnswer = null;
 
-                    if (correctPrefix === 'ক' || correctPrefix === 'a') {
+                    // Test 1: Check for short prefix (e.g., "b" or "খ")
+                    if (answerStringLower === 'a' || answerStringLower === 'ক') {
                         correctAnswer = options[0];
-                    } else if (correctPrefix === 'খ' || correctPrefix === 'b') {
+                    } else if (answerStringLower === 'b' || answerStringLower === 'খ') {
                         correctAnswer = options[1];
-                    } else if (correctPrefix === 'গ' || correctPrefix === 'c') {
+                    } else if (answerStringLower === 'c' || answerStringLower === 'গ') {
                         correctAnswer = options[2];
-                    } else if (correctPrefix === 'ঘ' || correctPrefix === 'd') {
+                    } else if (answerStringLower === 'd' || answerStringLower === 'ঘ') {
                         correctAnswer = options[3];
-                    } else {
-                        // যদি কোনো কারণে প্রিফিক্স না মেলে, তাহলে পুরনো লজিক ব্যবহার করবে
-                        correctAnswer = match[7].trim();
-                         console.warn("Could not match prefix, using text as fallback.");
+                    }
+
+                    // Test 2: If no match, check for prefix with text (e.g., "b. The...")
+                    if (correctAnswer === null) {
+                        if (answerStringLower.startsWith('a.') || answerStringLower.startsWith('ক.')) {
+                            correctAnswer = options[0];
+                        } else if (answerStringLower.startsWith('b.') || answerStringLower.startsWith('খ.')) {
+                            correctAnswer = options[1];
+                        } else if (answerStringLower.startsWith('c.') || answerStringLower.startsWith('গ.')) {
+                            correctAnswer = options[2];
+                        } else if (answerStringLower.startsWith('d.') || answerStringLower.startsWith('ঘ.')) {
+                            correctAnswer = options[3];
+                        }
+                    }
+
+                    // Test 3: If still no match, check if the full string matches an option
+                    if (correctAnswer === null) {
+                        // Check for an exact (case-sensitive) match
+                        let found = false;
+                        for (const opt of options) {
+                            if (opt === answerString) {
+                                correctAnswer = opt;
+                                found = true;
+                                break;
+                            }
+                        }
+                        // If no exact match, check for a case-insensitive match
+                        if (!found) {
+                             for (const opt of options) {
+                                if (opt.toLowerCase() === answerStringLower) {
+                                    correctAnswer = opt;
+                                    break;
+                                }
+                            }
+                        }
                     }
                     
-                    // যদি প্রিফিক্স ম্যাচ করে কিন্তু উত্তর খালি থাকে (যেমন "Correct answer: b")
-                    // এবং ফলব্যাক থেকেও উত্তর না পাওয়া যায়, তাহলে স্কিপ করুন
                     if (!correctAnswer) {
-                        console.warn("Could not determine correct answer for:", question);
-                        continue; // এই প্রশ্নটি বাদ দিন
+                        console.warn("Could not determine correct answer for:", question, "--- Got:", answerString);
+                        continue; // Skip this question
                     }
-                    // --- END: UPGRADED Logic ---
+                    // --- END: NEW ROBUST LOGIC ---
 
                     mcqData.push({
                         question: question,
