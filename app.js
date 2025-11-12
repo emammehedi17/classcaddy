@@ -4582,8 +4582,10 @@ function attachChartButtonListeners() {
                 results = savedResultsCache;
                 title = 'Overall Quiz Progress';
             } else { // 'subject'
-                // Find the active subject tab
-                const subjectTab = newBtn.closest('.result-tab-content')?.querySelector('.result-tab-btn.active-tab');
+                // --- START: FIX ---
+                // Find the active subject tab *from the nav container*
+                const subjectTab = subjectSubTabsNav.querySelector('.result-tab-btn.active-tab'); 
+                // --- END: FIX ---
                 const subjectName = subjectTab ? subjectTab.dataset.subjectTab : 'Unknown';
                 results = savedResultsCache.filter(r => (r.subjectName || 'Aggregated') === subjectName);
                 title = `${subjectName} Quiz Progress`;
