@@ -1391,34 +1391,6 @@
     padding-right: 1.5rem;
     font-size: 1rem;
 }
-
-/* --- START: NEW SUB-TAB STYLES --- */
-.subject-sub-tab-btn {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #4b5563; /* gray-600 */
-    border: none;
-    background: none;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: color 0.2s, border-color 0.2s;
-    margin-right: 8px;
-    margin-bottom: -1px; /* Overlap the border */
-}
-.subject-sub-tab-btn:hover {
-    color: #1f2937; /* gray-800 */
-}
-.subject-sub-tab-btn.active-sub-tab {
-    color: #4f46e5; /* indigo-600 */
-    border-bottom-color: #4f46e5;
-    font-weight: 600;
-}
-.subject-sub-tab-content.hidden {
-    display: none;
-}
-/* --- END: NEW SUB-TAB STYLES --- */
-
 /* --- END: RESULT SHEET MODAL STYLES --- */
 
 		/* --- START: QUIZ SAVE BUTTON STYLES --- */
