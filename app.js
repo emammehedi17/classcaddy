@@ -4328,7 +4328,7 @@ function calculateOverallStats(results) {
 }
 
 // --- Create Table HTML ---
-// --- Create Table HTML (UPGRADED for Requests 2, 4, 5) ---
+		// --- Create Table HTML (UPGRADED for Requests 2, 4, 5) ---
 function createResultsTable(results, type, stats) { // <-- ৩. 'stats' নামে নতুন প্যারামিটার যোগ করুন
     if (results.length === 0) {
         return `<p class="text-center text-gray-500 italic py-10">No ${type} results found.</p>`;
@@ -4356,7 +4356,6 @@ function createResultsTable(results, type, stats) { // <-- ৩. 'stats' না�
         `;
         
         return `
-            return `
             <tr>
                 <td class="sl-col">${index + 1}</td>
                 <td class="date-col">${date}</td>
@@ -4382,7 +4381,7 @@ function createResultsTable(results, type, stats) { // <-- ৩. 'stats' না�
                     <th class="topic-col">Exam Topic</th>
                     <th class="score-col">Obtained</th>
                     <th class="score-col">Full</th> <th class="time-col">Time Taken</th> <th class="percent-col">Percentage</th>
-                    <th class="view-col">Summary</th>
+                    <th class="view-col">View</th>
                 </tr>
             </thead>
             <tbody>
@@ -4391,15 +4390,15 @@ function createResultsTable(results, type, stats) { // <-- ৩. 'stats' না�
             <tfoot>
                 <tr>
                     <th colspan="3">Overall Performance</th>
-                    <th class="score-col">${stats.totalObtained.toFixed(2)}</th>
-                    <th class="score-col">${stats.totalFull}</th>
-                    <th class="time-col">${formatTime(stats.totalTime)}</th>
-                    <th class="percent-col">${stats.overallPercentage}%</th>
+                    <th class="score-col">${(stats.totalObtained || 0).toFixed(2)}</th>
+                    <th class="score-col">${stats.totalFull || 0}</th>
+                    <th class="time-col">${formatTime(stats.totalTime || 0)}</th>
+                    <th class="percent-col">${stats.overallPercentage || 0}%</th>
                     <th class="view-col">
                         <button class="action-button progress-chart-btn" data-chart-type="${type}">
                             <i class="fas fa-chart-line mr-1"></i> Your Progress
                         </button>
-                        </th>
+                    </th>
                 </tr>
             </tfoot>
         </table>
