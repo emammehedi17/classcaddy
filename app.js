@@ -4312,9 +4312,9 @@ function calculateOverallStats(results) {
     let totalTime = 0;
 
     results.forEach(res => {
-        totalObtained += res.finalScore;
-        totalFull += res.totalQuestions;
-        totalTime += res.timeTakenInSeconds;
+        totalObtained += (res.finalScore || 0);
+        totalFull += (res.totalQuestions || 0);
+        totalTime += (res.timeTakenInSeconds || 0);
     });
 
     const overallPercentage = (totalFull > 0) ? (Math.max(0, totalObtained) / totalFull) * 100 : 0;
@@ -4356,13 +4356,14 @@ function createResultsTable(results, type, stats) { // <-- ৩. 'stats' না�
         `;
         
         return `
+            return `
             <tr>
                 <td class="sl-col">${index + 1}</td>
                 <td class="date-col">${date}</td>
                 <td class="topic-col">${topicLinkHtml}</td>
-                <td class="score-col">${res.finalScore.toFixed(2)}</td>
-                <td class="score-col">${res.totalQuestions}</td>
-                <td class="time-col">${formatTime(res.timeTakenInSeconds)}</td> <td class="percent-col ${res.percentage >= 50 ? 'text-emerald-600' : 'text-red-600'}">${res.percentage}%</td>
+                <td class="score-col">${(res.finalScore || 0).toFixed(2)}</td>
+                <td class="score-col">${res.totalQuestions || 0}</td>
+                <td class="time-col">${formatTime(res.timeTakenInSeconds || 0)}</td> <td class="percent-col ${res.percentage >= 50 ? 'text-emerald-600' : 'text-red-600'}">${res.percentage || 0}%</td>
                 <td class="view-col">
                     <button class="action-button action-button-secondary text-xs view-saved-result-btn" data-result-id="${res.id}">
                         <i class="fas fa-eye mr-1"></i> View
