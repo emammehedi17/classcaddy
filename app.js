@@ -1208,7 +1208,11 @@
                  if (target.closest('.day-toggle-btn') || target.closest('.day-section-header')) {
                     // বাটন বা হেডারের যেকোনো জায়গায় ক্লিক করলে
                     if (button && button.classList.contains('delete-day-btn')) {
-                        // ডিলিট বাটনে ক্লিক করলে টগল হবে না
+                        // --- START: FIX ---
+                        // This is the delete button, handle it here
+                        e.preventDefault(); // Stop it from toggling
+                        confirmDeleteDay(monthId, weekId, daySection);
+                        // --- END: FIX ---
                     } else {
                         e.preventDefault();
                         const dayToToggle = target.closest('.day-section');
