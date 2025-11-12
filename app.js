@@ -2548,7 +2548,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         async function startQuiz(monthId, weekId, dayIndex, rowIndex) {
             quizTitle.textContent = 'Vocabulary Quiz';
             // Set the source info for the topic name
-            window.currentQuizSourceInfo = { monthId, weekId, dayIndex, rowIndex, subjectName: null, topicContent: null };
+            window.currentQuizSourceInfo = { monthId, weekId, dayIndex, rowIndex };
             
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
@@ -2945,17 +2945,17 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const quizType = currentMcqData ? 'MCQ' : 'Vocab';
             const quizTopicEl = document.getElementById('quiz-title');
             let quizTopic = quizTopicEl ? quizTopicEl.textContent : (quizType === 'MCQ' ? 'MCQ Quiz' : 'Vocabulary Quiz');
-            
+
             // --- Topic Name Logic (UPGRADED) ---
             let topicLink = null; // লিঙ্ক সেভ করার জন্য নতুন ভেরিয়েবল
-            const sourceInfo = window.currentQuizSourceInfo || {}; // <-- এই লাইনটি যোগ করুন
 
             if (currentMcqTarget) { // For MCQ quizzes
                 const { quizType, monthId, weekId, dayIndex } = currentMcqTarget;
                 
                 if (quizType === 'day' || dayIndex !== null) {
+                    // এটি একটি নির্দিষ্ট দিনের MCQ টেস্ট
                     const dayNum = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`)?.textContent || `Day ${parseInt(dayIndex) + 1}`;
-                    quizTopic = `${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`; // "MCQ - " রিমুভ করা হয়েছে
+                    quizTopic = `MCQ - ${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
                     topicLink = `#day-${monthId}-${weekId}-${dayIndex}`; // দিনের সেকশনের ID
                 } else if (quizType === 'week') {
                     // সাপ্তাহিক MCQ টেস্ট
@@ -2988,13 +2988,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
             }
             
-			// --- START: NEW SUBJECT PREPEND LOGIC ---
-            if (sourceInfo.subjectName) {
-                quizTopic = `${sourceInfo.subjectName} - ${quizTopic}`;
-            } else if (quizType === 'MCQ') {
-                quizTopic = `MCQ - ${quizTopic}`; // পুরনো ডেটার জন্য ফলব্যাক
-            }
-            // --- END: NEW SUBJECT PREPEND LOGIC ---
             if (!quizTopic) { // যদি কোনো কারণে টপিক সেট না হয়
                 quizTopic = (quizType === 'MCQ' ? 'MCQ Quiz' : 'Vocabulary Quiz');
             }
@@ -3005,8 +2998,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 topicName: quizTopic,
                 topicLink: topicLink, // ✅ নতুন লিঙ্কটি এখানে সেভ করুন
                 saveTimestamp: null, // Will be set on save
-				subjectName: sourceInfo.subjectName || (quizType === 'Vocab' ? 'Vocabulary' : null), // Vocab-এর পুরনো ডেটার জন্য ফলব্যাক
-                topicContent: sourceInfo.topicContent || null,
                 // Summary Stats
                 correctCount: correctCount,
                 wrongCount: wrongCount,
@@ -3611,11 +3602,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         async function startMcqQuiz(monthId, weekId, dayIndex, rowIndex) {
             quizTitle.textContent = 'MCQ Quiz';
 			currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
-            // --- START: NEW SUBJECT/TOPIC LOGIC ---
-            let subjectName = null;
-            let topicContent = null;
-            // --- END: NEW SUBJECT/TOPIC LOGIC ---
-
             quizModal.style.display = "block";
             // ... (কোড)
             try {
@@ -3629,15 +3615,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 let mcqData = [];
 
                 if (rowIndex !== null) {
-					// --- START: NEW SUBJECT/TOPIC LOGIC ---
-                    const rowData = dayData.rows?.[rowIndex];
-                    if (rowData) {
-                        subjectName = rowData.subject;
-                        topicContent = rowData.topic;
-                    }
-                    // --- END: NEW SUBJECT/TOPIC LOGIC ---
-					
-
                     // Req 1: Load MCQs for a specific row
                     mcqData = dayData.rows?.[rowIndex]?.mcqData || [];
                 } else {
@@ -3681,11 +3658,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
                 newStartBtn.addEventListener('click', runQuizGame);
                 quizStartBtn = newStartBtn; 
-				
-				// --- START: ADD THIS LINE ---
-                window.currentQuizSourceInfo = { ...currentMcqTarget, subjectName, topicContent };
-                // --- END: ADD THIS LINE ---
-			
                 
             } catch (error) {
                 console.error("Error loading MCQ quiz data:", error);
@@ -3933,9 +3905,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         async function startAggregatedMcqQuiz(quizType, monthId, weekId = null, dayIndex = null) {
             quizTitle.textContent = 'MCQ Quiz';
 			currentMcqTarget = { quizType, monthId, weekId, dayIndex };
-			// --- START: ADD THIS LINE ---
-            window.currentQuizSourceInfo = { ...currentMcqTarget, subjectName: null, topicContent: null };
-            // --- END: ADD THIS LINE ---
             closeModal('mcq-quiz-center-modal');
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
@@ -4001,7 +3970,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     options: [...mcq.options],
                     correctAnswer: mcq.correctAnswer,
                     userAnswer: null,
-                    isCorrect: null
+                    isCorrect: null1111111111111111111111
                 }));
                 
                 const totalQuestions = currentQuizQuestions.length;
@@ -4160,13 +4129,12 @@ document.getElementById('quiz-save-btn').addEventListener('click', async () => {
 // --- DOM Elements for Result Sheet ---
 const resultSheetModal = document.getElementById('result-sheet-modal');
 const showResultsSheetBtn = document.getElementById('show-results-sheet-btn');
-const tabBtnDay = document.getElementById('tab-btn-day');
-const tabBtnSubject = document.getElementById('tab-btn-subject');
-const tabContentDay = document.getElementById('tab-content-day');
-const tabContentSubject = document.getElementById('tab-content-subject');
-// Sub-tab containers
-const subjectSubTabs = document.getElementById('subject-sub-tabs');
-const subjectSubContent = document.getElementById('subject-sub-content');
+const tabBtnMcq = document.getElementById('tab-btn-mcq');
+const tabBtnVocab = document.getElementById('tab-btn-vocab');
+const tabContentMcq = document.getElementById('tab-content-mcq');
+const tabContentVocab = document.getElementById('tab-content-vocab');
+const mcqResultsList = document.getElementById('mcq-results-list');
+const vocabResultsList = document.getElementById('vocab-results-list');
 const savedQuizReviewBtn = document.getElementById('saved-quiz-review-btn');
 let tempSavedReviewData = null; // Holds questions for the review button
 
@@ -4177,132 +4145,77 @@ showResultsSheetBtn.addEventListener('click', () => {
 });
 
 // --- Tab Switching ---
-tabBtnDay.addEventListener('click', () => {
-    tabBtnDay.classList.add('active-tab');
-    tabBtnSubject.classList.remove('active-tab');
-    tabContentDay.classList.remove('hidden');
-    tabContentSubject.classList.add('hidden');
+tabBtnMcq.addEventListener('click', () => {
+    tabBtnMcq.classList.add('active-tab');
+    tabBtnVocab.classList.remove('active-tab');
+    tabContentMcq.classList.remove('hidden');
+    tabContentVocab.classList.add('hidden');
 });
-tabBtnSubject.addEventListener('click', () => {
-    tabBtnSubject.classList.add('active-tab');
-    tabBtnDay.classList.remove('active-tab');
-    tabContentSubject.classList.remove('hidden');
-    tabContentDay.classList.add('hidden');
+tabBtnVocab.addEventListener('click', () => {
+    tabBtnVocab.classList.add('active-tab');
+    tabBtnMcq.classList.remove('active-tab');
+    tabContentVocab.classList.remove('hidden');
+    tabContentMcq.classList.add('hidden');
 });
 
 // --- Fetch and Render Data ---
-        async function loadAndDisplayResults() {
-            if (!currentUser || !userId) {
-                // Use the new, correct variable names
-                tabContentDay.innerHTML = `<p class="text-center text-red-500 py-10">Please log in to see results.</p>`;
-                tabContentSubject.innerHTML = `<p class="text-center text-red-500 py-10">Please log in to see results.</p>`;
-                return;
-            }
+async function loadAndDisplayResults() {
+    if (!currentUser || !userId) {
+        mcqResultsList.innerHTML = `<p class="text-center text-red-500 py-10">Please log in to see results.</p>`;
+        vocabResultsList.innerHTML = `<p class="text-center text-red-500 py-10">Please log in to see results.</p>`;
+        return;
+    }
 
-            // Use cache if available
-            if (savedResultsCache) {
-                console.log("Loading results from cache...");
-                renderResults(savedResultsCache);
-                return;
-            }
+    // Use cache if available
+    if (savedResultsCache) {
+        console.log("Loading results from cache...");
+        renderResults(savedResultsCache);
+        return;
+    }
 
-            // Set loading state using the new, correct variable names
-            tabContentDay.innerHTML = `<p class="text-center text-gray-500 italic py-10">Loading results...</p>`;
-            tabContentSubject.innerHTML = `<p class="text-center text-gray-500 italic py-10">Loading subject data...</p>`;
+    // Set loading state
+    mcqResultsList.innerHTML = `<p class="text-center text-gray-500 italic py-10">Loading MCQ results...</p>`;
+    vocabResultsList.innerHTML = `<p class="text-center text-gray-500 italic py-10">Loading Vocab quiz results...</p>`;
 
-            try {
-                console.log("Fetching results from Firestore...");
-                const resultsCollectionPath = getUserResultsCollectionPath();
-                const q = query(collection(db, resultsCollectionPath), orderBy("saveTimestamp", "desc"));
-                
-                const querySnapshot = await getDocs(q);
-                
-                const allResults = [];
-                querySnapshot.forEach((doc) => {
-                    allResults.push({ id: doc.id, ...doc.data() });
-                });
+    try {
+        console.log("Fetching results from Firestore...");
+        const resultsCollectionPath = getUserResultsCollectionPath();
+        const q = query(collection(db, resultsCollectionPath), orderBy("saveTimestamp", "desc"));
+        
+        const querySnapshot = await getDocs(q);
+        
+        const allResults = [];
+        querySnapshot.forEach((doc) => {
+            allResults.push({ id: doc.id, ...doc.data() });
+        });
 
-                savedResultsCache = allResults; // Store in cache
-                renderResults(allResults);
+        savedResultsCache = allResults; // Store in cache
+        renderResults(allResults);
 
-            } catch (error) {
-                console.error("Error fetching results:", error);
-                // Use the new, correct variable names
-                tabContentDay.innerHTML = `<p class="text-center text-red-500 py-10">Error loading results.</p>`;
-                tabContentSubject.innerHTML = `<p class="text-center text-red-500 py-10">Error loading results.</p>`;
-            }
-        }
+    } catch (error) {
+        console.error("Error fetching results:", error);
+        mcqResultsList.innerHTML = `<p class="text-center text-red-500 py-10">Error loading results.</p>`;
+        vocabResultsList.innerHTML = `<p class="text-center text-red-500 py-10">Error loading results.</p>`;
+    }
+}
 
-// --- Render Helper (UPGRADED for New Tabs) ---
+// --- Render Helper (UPGRADED for Request 5) ---
 function renderResults(allResults) {
-    // --- ১. "By Day" ট্যাব রেন্ডার করুন ---
-    const dayStats = calculateOverallStats(allResults);
-    tabContentDay.innerHTML = createResultsTable(allResults, 'byDay', dayStats);
+    const mcqResults = allResults.filter(r => r.quizType === 'MCQ');
+    const vocabResults = allResults.filter(r => r.quizType === 'Vocab');
 
-    // --- ২. "By Subject" ট্যাবের জন্য ডেটা প্রস্তুত করুন ---
-    let subjectResults = {};
-    let combinedResults = [];
+    // --- ৫. মোট হিসাব করুন ---
+    const mcqStats = calculateOverallStats(mcqResults);
+    const vocabStats = calculateOverallStats(vocabResults);
 
-    allResults.forEach(res => {
-        if (res.topicLink?.includes('center')) {
-            combinedResults.push(res); // সাপ্তাহিক/মাসিক টেস্ট
-        } else if (res.subjectName) {
-            if (!subjectResults[res.subjectName]) {
-                subjectResults[res.subjectName] = [];
-            }
-            subjectResults[res.subjectName].push(res);
-        } else if (res.quizType === 'Vocab') {
-            // পুরনো Vocab ডেটা
-            if (!subjectResults['Vocabulary']) subjectResults['Vocabulary'] = [];
-            subjectResults['Vocabulary'].push(res);
-        } else {
-            // পুরনো MCQ ডেটা, কোনো সাবজেক্ট নেই
-            combinedResults.push(res);
-        }
-    });
+    mcqResultsList.innerHTML = createResultsTable(mcqResults, 'mcq', mcqStats);
+    vocabResultsList.innerHTML = createResultsTable(vocabResults, 'vocab', vocabStats);
 
-    // --- ৩. "By Subject" সাব-ট্যাব রেন্ডার করুন ---
-    let subTabsHtml = '';
-    let subContentHtml = '';
-    let firstTab = true;
-
-    // "Combined Tests" ট্যাব (যদি ডেটা থাকে)
-    if (combinedResults.length > 0) {
-        const combinedStats = calculateOverallStats(combinedResults);
-        subTabsHtml += `<button class="subject-sub-tab-btn active-sub-tab" data-tab="combined">Combined Tests</button>`;
-        subContentHtml += `<div class="subject-sub-tab-content" data-tab="combined">
-            ${createResultsTable(combinedResults, 'bySubject', combinedStats)}
-        </div>`;
-        firstTab = false;
-    }
-
-    // সাবজেক্ট ট্যাবগুলো
-    Object.keys(subjectResults).sort().forEach((subjectName, index) => {
-        const results = subjectResults[subjectName];
-        const stats = calculateOverallStats(results);
-        const isActive = firstTab && index === 0;
-        
-        subTabsHtml += `<button class="subject-sub-tab-btn ${isActive ? 'active-sub-tab' : ''}" data-tab="${escapeHtml(subjectName)}">
-            ${escapeHtml(subjectName)}
-        </button>`;
-        
-        subContentHtml += `<div class="subject-sub-tab-content ${isActive ? '' : 'hidden'}" data-tab="${escapeHtml(subjectName)}">
-            ${createResultsTable(results, 'bySubject', stats)}
-        </div>`;
-    });
-
-    if (subTabsHtml === '') {
-        subTabsHtml = '<p class="text-gray-500 text-sm italic">No subject-specific results found yet.</p>';
-    }
-
-    subjectSubTabs.innerHTML = subTabsHtml;
-    subjectSubContent.innerHTML = subContentHtml;
-
-    // --- ৪. সব লিসেনার যোগ করুন ---
+    // Add listeners to the new buttons
     attachViewResultListeners(allResults);
-    attachTopicLinkListeners();
-    attachChartButtonListeners();
-    attachSubjectSubTabListeners(); // <-- নতুন লিসেনার
+    attachTopicLinkListeners(); // <-- ৩. লিঙ্কগুলোর জন্য লিসেনার যোগ করুন
+	attachChartButtonListeners(); // <-- ৪. চার্ট বাটনের জন্য লিসেনার যোগ করুন
+	
 }
 	
 // --- ৫. মোট হিসাব করার জন্য নতুন ফাংশন ---
@@ -4312,9 +4225,9 @@ function calculateOverallStats(results) {
     let totalTime = 0;
 
     results.forEach(res => {
-        totalObtained += (res.finalScore || 0);
-        totalFull += (res.totalQuestions || 0);
-        totalTime += (res.timeTakenInSeconds || 0);
+        totalObtained += res.finalScore;
+        totalFull += res.totalQuestions;
+        totalTime += res.timeTakenInSeconds;
     });
 
     const overallPercentage = (totalFull > 0) ? (Math.max(0, totalObtained) / totalFull) * 100 : 0;
@@ -4326,9 +4239,10 @@ function calculateOverallStats(results) {
         overallPercentage: overallPercentage.toFixed(1)
     };
 }
+
 // --- Create Table HTML ---
 // --- Create Table HTML (UPGRADED for Requests 2, 4, 5) ---
-function createResultsTable(results, type, stats) {
+function createResultsTable(results, type, stats) { // <-- ৩. 'stats' নামে নতুন প্যারামিটার যোগ করুন
     if (results.length === 0) {
         return `<p class="text-center text-gray-500 italic py-10">No ${type} results found.</p>`;
     }
@@ -4339,18 +4253,11 @@ function createResultsTable(results, type, stats) {
         }) : 'N/A';
         
         // --- ৩. টপিক লিঙ্ক রেন্ডার করুন ---
-        let topicDisplay = '';
-        if (type === 'bySubject' && res.topicContent) {
-            topicDisplay = escapeHtml(res.topicContent); // সাবজেক্ট ট্যাবে Topic কলামের কন্টেন্ট দেখান
-        } else {
-            topicDisplay = escapeHtml(res.topicName); // By Day ট্যাবে জেনারেট করা নাম দেখান
-        }
-
         const topicLinkHtml = `
             <a href="${res.topicLink || '#'}" class="topic-link" 
                data-link="${res.topicLink || '#'}" 
                data-link-type="${res.topicLink?.startsWith('#day') ? 'day' : (res.topicLink ? 'modal' : 'none')}">
-                ${topicDisplay}
+                ${escapeHtml(res.topicName)}
             </a>
         `;
         
@@ -4359,9 +4266,9 @@ function createResultsTable(results, type, stats) {
                 <td class="sl-col">${index + 1}</td>
                 <td class="date-col">${date}</td>
                 <td class="topic-col">${topicLinkHtml}</td>
-                <td class="score-col">${(res.finalScore || 0).toFixed(2)}</td>
-                <td class="score-col">${res.totalQuestions || 0}</td>
-                <td class="time-col">${formatTime(res.timeTakenInSeconds || 0)}</td> <td class="percent-col ${res.percentage >= 50 ? 'text-emerald-600' : 'text-red-600'}">${res.percentage || 0}%</td>
+                <td class="score-col">${res.finalScore.toFixed(2)}</td>
+                <td class="score-col">${res.totalQuestions}</td>
+                <td class="time-col">${formatTime(res.timeTakenInSeconds)}</td> <td class="percent-col ${res.percentage >= 50 ? 'text-emerald-600' : 'text-red-600'}">${res.percentage}%</td>
                 <td class="view-col">
                     <button class="action-button action-button-secondary text-xs view-saved-result-btn" data-result-id="${res.id}">
                         <i class="fas fa-eye mr-1"></i> View
@@ -4380,7 +4287,7 @@ function createResultsTable(results, type, stats) {
                     <th class="topic-col">Exam Topic</th>
                     <th class="score-col">Obtained</th>
                     <th class="score-col">Full</th> <th class="time-col">Time Taken</th> <th class="percent-col">Percentage</th>
-                    <th class="view-col">View</th>
+                    <th class="view-col">Summary</th>
                 </tr>
             </thead>
             <tbody>
@@ -4389,15 +4296,15 @@ function createResultsTable(results, type, stats) {
             <tfoot>
                 <tr>
                     <th colspan="3">Overall Performance</th>
-                    <th class="score-col">${(stats.totalObtained || 0).toFixed(2)}</th>
-                    <th class="score-col">${stats.totalFull || 0}</th>
-                    <th class="time-col">${formatTime(stats.totalTime || 0)}</th>
-                    <th class="percent-col">${stats.overallPercentage || 0}%</th>
+                    <th class="score-col">${stats.totalObtained.toFixed(2)}</th>
+                    <th class="score-col">${stats.totalFull}</th>
+                    <th class="time-col">${formatTime(stats.totalTime)}</th>
+                    <th class="percent-col">${stats.overallPercentage}%</th>
                     <th class="view-col">
                         <button class="action-button progress-chart-btn" data-chart-type="${type}">
                             <i class="fas fa-chart-line mr-1"></i> Your Progress
                         </button>
-                    </th>
+                        </th>
                 </tr>
             </tfoot>
         </table>
@@ -4685,24 +4592,3 @@ function renderProgressChart(labels, data, title) {
     });
 }
 // --- END: NEW PROGRESS CHART LOGIC ---
-
-// --- START: NEW SUBJECT SUB-TAB LOGIC ---
-function attachSubjectSubTabListeners() {
-    subjectSubTabs.addEventListener('click', (e) => {
-        const button = e.target.closest('.subject-sub-tab-btn');
-        if (!button) return;
-
-        // 1. Deactivate all buttons and hide all content
-        subjectSubTabs.querySelectorAll('.subject-sub-tab-btn').forEach(btn => btn.classList.remove('active-sub-tab'));
-        subjectSubContent.querySelectorAll('.subject-sub-tab-content').forEach(content => content.classList.add('hidden'));
-
-        // 2. Activate the clicked button and show its content
-        button.classList.add('active-sub-tab');
-        const tabName = button.dataset.tab;
-        const contentToShow = subjectSubContent.querySelector(`.subject-sub-tab-content[data-tab="${tabName}"]`);
-        if (contentToShow) {
-            contentToShow.classList.remove('hidden');
-        }
-    });
-}
-// --- END: NEW SUBJECT SUB-TAB LOGIC ---
