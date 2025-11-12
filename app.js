@@ -3921,7 +3921,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     options: [...mcq.options],
                     correctAnswer: mcq.correctAnswer,
                     userAnswer: null,
-                    isCorrect: null1111111111111111111111
+                    isCorrect: null
                 }));
                 
                 const totalQuestions = currentQuizQuestions.length;
