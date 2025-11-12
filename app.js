@@ -396,7 +396,7 @@
                         monthNavButtonsContainer.appendChild(button);
 						
                     });
-						monthNavButtonsContainer.insertAdjacentHTML('beforeend', addMonthBtnHTML);
+						
 
                     // --- MODIFIED BLOCK START ---
                     if (currentMonthId && !monthExists) {
@@ -414,7 +414,13 @@
                     }
                     // --- MODIFIED BLOCK END ---
                 }
-
+				
+				// --- START: FIX ---
+                // This line was moved from inside the 'else' block
+                // Now it will run even if the querySnapshot is empty
+                monthNavButtonsContainer.insertAdjacentHTML('beforeend', addMonthBtnHTML);
+                // --- END: FIX ---
+				
                 // Restore scroll position
                 if (shouldRestoreScroll) {
                     console.log("Restoring scroll position to (loadStudyPlans):", scrollY);
