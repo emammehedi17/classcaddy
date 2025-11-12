@@ -4626,4 +4626,4 @@ function renderProgressChart(labels, data, title) {
             }
         }
     });
-
+}
