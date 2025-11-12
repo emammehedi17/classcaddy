@@ -4305,7 +4305,7 @@ function renderResults(allResults) {
     attachSubjectSubTabListeners(); // <-- নতুন লিসেনার
 }
 	
-// --- ৫. মোট হিসাব করার জন্য নতুন ফাংশন ---
+// --- ৫. মোট হিসাব করার জন্য নতুন ফাংশн ---
 function calculateOverallStats(results) {
     let totalObtained = 0;
     let totalFull = 0;
@@ -4328,7 +4328,7 @@ function calculateOverallStats(results) {
 }
 
 // --- Create Table HTML ---
-		// --- Create Table HTML (UPGRADED for Requests 2, 4, 5) ---
+// --- Create Table HTML (UPGRADED for Requests 2, 4, 5) ---
 function createResultsTable(results, type, stats) { // <-- ৩. 'stats' নামে নতুন প্যারামিটার যোগ করুন
     if (results.length === 0) {
         return `<p class="text-center text-gray-500 italic py-10">No ${type} results found.</p>`;
