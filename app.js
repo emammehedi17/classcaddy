@@ -1361,7 +1361,7 @@
                  else if (button.classList.contains('quiz-btn')) {
                      const dayIndex = parseInt(daySection.dataset.dayIndex);
                      const rowIndex = parseInt(row.dataset.rowIndex);
-                     
+                     startQuiz(monthId, weekId, dayIndex, rowIndex);
                  }
                  // --- END: QUIZ BUTTON HANDLER ---
 
