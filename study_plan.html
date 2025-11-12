@@ -145,6 +145,7 @@
             </div> 
 			
 			<div id="result-sheet-modal" class="modal">
+    <div id="result-sheet-modal" class="modal">
       <div class="modal-content" style="max-width: 900px; max-height: 85vh; display: flex; flex-direction: column;">
         <div class="modal-header-sticky">
           <h3 class="text-2xl font-semibold text-emerald-600">My Quiz Results</h3>
@@ -152,24 +153,25 @@
         </div>
     
         <div class="flex border-b border-gray-200 mt-2">
-            <button id="tab-btn-mcq" class="result-tab-btn active-tab">
-                <i class="fas fa-tasks mr-2"></i> MCQ Results
+            <button id="tab-btn-day" class="result-tab-btn active-tab">
+                <i class="fas fa-calendar-day mr-2"></i> By Day
             </button>
-            <button id="tab-btn-vocab" class="result-tab-btn">
-                <i class="fas fa-book-open mr-2"></i> Vocab Quiz Results
+            <button id="tab-btn-subject" class="result-tab-btn">
+                <i class="fas fa-book mr-2"></i> By Subject
             </button>
         </div>
     
         <div class="" style="overflow-y: auto; flex-grow: 1; padding-top: 1rem;">
-            <div id="tab-content-mcq" class="result-tab-content">
-                <div id="mcq-results-list" class="results-table-container">
-                    <p class="text-center text-gray-500 italic py-10">Loading MCQ results...</p>
-                </div>
+            
+            <div id="tab-content-day" class="result-tab-content">
+                <p class="text-center text-gray-500 italic py-10">Loading results...</p>
             </div>
-            <div id="tab-content-vocab" class="result-tab-content hidden">
-                <div id="vocab-results-list" class="results-table-container">
-                    <p class="text-center text-gray-500 italic py-10">Loading Vocab quiz results...</p>
-                </div>
+            
+            <div id="tab-content-subject" class="result-tab-content hidden">
+                <div id="subject-sub-tabs" class="flex border-b border-gray-200 mb-4" style="flex-wrap: wrap;">
+                    </div>
+                <div id="subject-sub-content">
+                    </div>
             </div>
         </div>
     
@@ -575,6 +577,6 @@
       </div>
     </div>
 	
-	<script type="module" src="app.js"></script>
+	<script type="module" src="app.js?v=2"></script>
 </body>
 </html>
