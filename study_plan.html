@@ -349,20 +349,27 @@
       <div class="modal-content" style="max-width: 600px; padding-top: 35px; padding-right: 45px; overflow: hidden;">
         <span class="modal-close" onclick="closeQuizModal()">&times;</span>
         
-        <div id="quiz-start-screen" class="text-center py-10">
-            <h3 id="quiz-title" class="text-2xl font-semibold mb-4 text-indigo-600">Vocabulary Quiz</h3>
-            <p id="quiz-start-message" class="text-gray-600 mb-6">Loading vocabulary...</p>
+        <div id="quiz-start-screen" class="text-center flex flex-col" style="min-height: 40vh; max-height: 70vh;">
             
-            <p class="text-sm font-medium text-red-600 -mt-2 mb-6">
-                <i class="fas fa-exclamation-triangle mr-1"></i> Warning: 0.25 marks will be deducted for each wrong answer.
-            </p>
-			<p id="quiz-total-time-warning" class="text-sm font-medium text-blue-600 -mt-2 mb-6" style="display: none;">
-                <i class="fas fa-clock mr-1"></i> You will be given <span class="font-bold">00:00:00</span> to finish the test.
-            </p>
-            <button id="quiz-start-btn" class="hidden action-button" style="background-color: #4f46e5; padding: 10px 24px; font-size: 1rem;">
-                <i class="fas fa-play mr-2"></i>Start Quiz
-            </button>
+            <div class="flex-grow overflow-y-auto px-6 py-10">
+                <h3 id="quiz-title" class="text-2xl font-semibold mb-4 text-indigo-600">Vocabulary Quiz</h3>
+                <p id="quiz-start-message" class="text-gray-600 mb-6">Loading vocabulary...</p>
+                
+                <p class="text-sm font-medium text-red-600 -mt-2 mb-6">
+                    <i class="fas fa-exclamation-triangle mr-1"></i> Warning: 0.25 marks will be deducted for each wrong answer.
+                </p>
+    			<p id="quiz-total-time-warning" class="text-sm font-medium text-blue-600 -mt-2 mb-6" style="display: none;">
+                    <i class="fas fa-clock mr-1"></i> You will be given <span class="font-bold">00:00:00</span> to finish the test.
+                </p>
+            </div>
+            
+            <div class="flex-shrink-0 pt-4 pb-8 px-6">
+                <button id="quiz-start-btn" class="hidden action-button w-full sm:w-auto" style="background-color: #4f46e5; padding: 10px 24px; font-size: 1rem;">
+                    <i class="fas fa-play mr-2"></i>Start Quiz
+                </button>
+            </div>
         </div>
+
 
         <div id="quiz-main-screen" class="hidden">
             <div class="flex justify-between items-center mb-6">
