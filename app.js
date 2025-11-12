@@ -4213,7 +4213,16 @@ tabBtnSubject.addEventListener('click', () => {
             try {
                 console.log("Fetching results from Firestore...");
                 const resultsCollectionPath = getUserResultsCollectionPath();
-                const q = query(collection(db, resultsCollectionPath), orderBy("saveTimestamp", "desc"));
+                
+                // --- START: NEW QUERY ---
+                // This query only fetches *new* results that have the 'subjectName' field
+                // (where it's either null or a string), ignoring all old, broken data.
+                const q = query(collection(db, resultsCollectionPath),
+                            where("subjectName", ">=", null),
+                            orderBy("subjectName"), // First, order by the field in the inequality
+                            orderBy("saveTimestamp", "desc") // Then, order by timestamp
+                          );
+                // --- END: NEW QUERY ---
                 
                 const querySnapshot = await getDocs(q);
                 
@@ -4227,9 +4236,18 @@ tabBtnSubject.addEventListener('click', () => {
 
             } catch (error) {
                 console.error("Error fetching results:", error);
-                // Use the new, correct variable names
-                tabContentDay.innerHTML = `<p class="text-center text-red-500 py-10">Error loading results.</p>`;
-                tabContentSubject.innerHTML = `<p class="text-center text-red-500 py-10">Error loading results.</p>`;
+                
+                // --- START: NEW ERROR MESSAGE ---
+                // Show a helpful error if the index is missing
+                if (error.code === 'failed-precondition') {
+                    const errorMsg = '<b>Database Index Required.</b><br>Please open the console (F12), click the link in the error message, and create the required Firestore index to view results.';
+                    tabContentDay.innerHTML = `<p class="text-center text-red-500 py-10">${errorMsg}</p>`;
+                    tabContentSubject.innerHTML = `<p class="text-center text-red-500 py-10">${errorMsg}</p>`;
+                } else {
+                    tabContentDay.innerHTML = `<p class="text-center text-red-500 py-10">Error loading results.</p>`;
+                    tabContentSubject.innerHTML = `<p class="text-center text-red-500 py-10">Error loading results.</p>`;
+                }
+                // --- END: NEW ERROR MESSAGE ---
             }
         }
 
