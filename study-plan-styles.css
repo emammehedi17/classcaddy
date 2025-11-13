@@ -1611,7 +1611,7 @@
 .day-section-body {
     max-height: 20000px; /* 10x larger, animation still works */
     overflow: hidden;
-    transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+    
     
     /* বডির নিজস্ব বর্ডার এবং প্যাডিং */
     
