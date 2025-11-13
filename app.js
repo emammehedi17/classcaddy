@@ -540,8 +540,8 @@
              const docRef = doc(db, getUserPlansCollectionPath(), monthId);
              try {
                  // Listen for real-time updates ONLY on the selected month
-                 unsubscribeActiveMonth = onSnapshot(docRef, (docSnap) => {
-                     // Check if this is still the active month before re-rendering
+					unsubscribeActiveMonth = onSnapshot(docRef, (docSnap) => {
+                     // 1. Check if we should ignore this update
                      const activeBtn = monthNavButtonsContainer.querySelector('button.active-month');
                      if (!activeBtn || activeBtn.dataset.monthId !== monthId) {
                          console.log("Snapshot received for non-active month. Ignoring render.");
@@ -549,140 +549,75 @@
                          return;
                      }
 
-                     // --- AUTOSAVE FIX START ---
                      const isCurrentlyEditing = currentMonthPlanDisplay.querySelector('.day-section.editing');
                      if (isCurrentlyEditing) {
                          console.log("Skipping all re-renders because a day is in edit mode.");
                          return; // Stop here. Do nothing.
                      }
-                     // --- AUTOSAVE FIX END ---
 
+                     // 2. Get data and check for structural changes
+                     if (!docSnap.exists()) {
+                         console.error("Document for monthId not found (or deleted):", monthId);
+                         currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">This plan was not found (it may have been deleted).</p>';
+                         return;
+                     }
+                     
+                     const monthData = docSnap.data();
+                     const monthElement = currentMonthPlanDisplay.querySelector(`.card[data-month-id="${monthId}"]`);
+                     let structureHasChanged = false;
 
-                     // --- ANIMATION FIX START (NOW WITH STRUCTURAL CHECK) ---
-                     const hasPendingWrites = docSnap.metadata.hasPendingWrites;
-                     if (hasPendingWrites) {
-                         console.log("Local change detected. Checking for structural changes...");
-                         const monthData = docSnap.data();
-
-                         // --- NEW STRUCTURAL CHECK ---
-                         let structureHasChanged = false;
-                         if (monthData && monthData.weeks) {
-                             const weekSections = currentMonthPlanDisplay.querySelectorAll('.week-section');
-                             
-                             if (weekSections.length !== Object.keys(monthData.weeks).length) {
-                                 structureHasChanged = true;
-                             } else {
-                                 // Check each week for day count changes
-                                 for (const weekSection of weekSections) {
-                                     const weekId = weekSection.dataset.weekId;
-                                     const domDayCount = weekSection.querySelectorAll('.day-section').length;
-                                     const dataDayCount = monthData.weeks[weekId]?.days?.length || 0;
-                                     
-                                     if (domDayCount !== dataDayCount) {
-                                         structureHasChanged = true;
-                                         break; // Found a change, no need to check others
-                                     }
+                     // 3. Check for structural changes (new/deleted days or weeks)
+                     if (monthElement && monthData.weeks) {
+                         const domWeekCount = monthElement.querySelectorAll('.week-section').length;
+                         const dataWeekCount = Object.keys(monthData.weeks).length;
+                         if (domWeekCount !== dataWeekCount) {
+                             structureHasChanged = true;
+                         } else {
+                             for (const weekId in monthData.weeks) {
+                                 const domDayCount = monthElement.querySelectorAll(`.week-section[data-week-id="${weekId}"] .day-section`).length;
+                                 const dataDayCount = monthData.weeks[weekId]?.days?.length || 0;
+                                 if (domDayCount !== dataDayCount) {
+                                     structureHasChanged = true;
+                                     break;
                                  }
-                             }
-                         } else if (monthData) {
-                             // Month data exists but has no weeks, but UI might still show weeks
-                             if (currentMonthPlanDisplay.querySelectorAll('.week-section').length > 0) {
-                                 structureHasChanged = true;
                              }
                          }
-                         // --- END NEW STRUCTURAL CHECK ---
+                     } else if (monthElement) {
+                         // Data is missing, but element exists?
+                         structureHasChanged = true;
+                     }
 
+                     // 4. Decide whether to re-render or do a targeted update
+                     if (structureHasChanged || !monthElement) {
+                         // --- CASE 1: FULL RE-RENDER ---
+                         // (A day/week was added/deleted, or this is the first load)
+                         console.log("Structural change or first load. Performing full re-render.");
+                         
+                         let scrollY = window.scrollY;
+                         let parentContainerRect = currentMonthPlanDisplay.getBoundingClientRect();
+                         let shouldRestoreScroll = parentContainerRect.top < 0;
 
-                         // --- MODIFIED LOGIC ---
-                         if (structureHasChanged) {
-                             console.log("Structural change (day added/deleted) detected. Forcing full re-render.");
-                             // DO NOT return. Fall through to the full re-render logic below.
-                         } else {
-                             // No structural change, just do the smooth progress bar update.
-                             console.log("Non-structural change. Updating progress bars only.");
-                             if (monthData) {
-							 
-								// --- NEW MANUAL TRACKER UPDATE (NO ANIMATION) ---
-                             if (monthData) {
-                                 const monthlyPercent = calculateOverallMonthlyProgress(monthData);
-                                 const { 
-                                     weekly: lastWeekPercent, 
-                                     daily: lastDayPercent, 
-                                     link: continueLink 
-                                 } = findLastProgressTrackers(monthId, monthData);
-                                 
-                                 const circumference = 408;
-                                 // --- Trig constants ---
-                                 const radius = 65;
-                                 const center = 75;
+                         currentMonthPlanDisplay.innerHTML = '';
+                         currentMonthPlanDisplay.appendChild(createMonthElement(monthId, monthData));
 
-                                 // Update Monthly Tracker
-                                 const monthlyCard = currentMonthPlanDisplay.querySelector(`#monthly-tracker-${monthId}`);
-                                 if (monthlyCard) {
-                                     monthlyCard.querySelector('.tracker-score').textContent = monthlyPercent + '%';
-                                     const monthlyOffset = circumference - (circumference * monthlyPercent) / 100;
-                                     monthlyCard.querySelector('.progress').style.strokeDashoffset = monthlyOffset;
-                                     // --- ADDED ---
-                                     const monthlyCap = monthlyCard.querySelector('.end-cap');
-                                     const angleM = (monthlyPercent / 100) * 360;
-                                     const radsM = (angleM - 90) * (Math.PI / 180);
-                                     monthlyCap.style.left = `${center + radius * Math.cos(radsM)}px`;
-                                     monthlyCap.style.top = `${center + radius * Math.sin(radsM)}px`;
-                                     monthlyCap.style.borderColor = monthlyCard.dataset.colorEnd;
-                                     monthlyCap.style.visibility = monthlyPercent === 0 ? 'hidden' : 'visible';
-                                 }
-                                 
-                                 // Update Weekly Tracker
-                                 const weeklyCard = currentMonthPlanDisplay.querySelector(`#weekly-tracker-${monthId}`);
-                                 if (weeklyCard) {
-                                     weeklyCard.querySelector('.tracker-score').textContent = lastWeekPercent + '%';
-                                     const weeklyOffset = circumference - (circumference * lastWeekPercent) / 100;
-                                     weeklyCard.querySelector('.progress').style.strokeDashoffset = weeklyOffset;
-                                     // --- ADDED ---
-                                     const weeklyCap = weeklyCard.querySelector('.end-cap');
-                                     const angleW = (lastWeekPercent / 100) * 360;
-                                     const radsW = (angleW - 90) * (Math.PI / 180);
-                                     weeklyCap.style.left = `${center + radius * Math.cos(radsW)}px`;
-                                     weeklyCap.style.top = `${center + radius * Math.sin(radsW)}px`;
-                                     weeklyCap.style.borderColor = weeklyCard.dataset.colorEnd;
-                                     weeklyCap.style.visibility = lastWeekPercent === 0 ? 'hidden' : 'visible';
-                                 }
-
-                                 // Update Daily Tracker
-                                 const dailyCard = currentMonthPlanDisplay.querySelector(`#daily-tracker-${monthId}`);
-                                 if (dailyCard) {
-                                     dailyCard.querySelector('.tracker-score').textContent = lastDayPercent + '%';
-                                     const dailyOffset = circumference - (circumference * lastDayPercent) / 100;
-                                     dailyCard.querySelector('.progress').style.strokeDashoffset = dailyOffset;
-                                     // --- ADDED ---
-                                     const dailyCap = dailyCard.querySelector('.end-cap');
-                                     const angleD = (lastDayPercent / 100) * 360;
-                                     const radsD = (angleD - 90) * (Math.PI / 180);
-                                     dailyCap.style.left = `${center + radius * Math.cos(radsD)}px`;
-                                     dailyCap.style.top = `${center + radius * Math.sin(radsD)}px`;
-                                     dailyCap.style.borderColor = dailyCard.dataset.colorEnd;
-                                     dailyCap.style.visibility = lastDayPercent === 0 ? 'hidden' : 'visible';
-                                     
-                                     const continueBtn = dailyCard.querySelector('.tracker-continue-btn');
-                                     if (continueLink) {
-                                         if (continueBtn) continueBtn.href = continueLink;
-                                         else dailyCard.querySelector('.inner-text').insertAdjacentHTML('beforeend', `<a href="${continueLink}" class="tracker-continue-btn">Continue</a>`);
-                                     } else {
-                                         if (continueBtn) continueBtn.remove();
-                                     }
-                                 }
+                         if (shouldRestoreScroll) {
+                             window.scrollTo({ top: scrollY, behavior: 'auto' });
+                         } else if (anchorId) {
+                             // Scroll to anchor on first load
+                             const targetElement = document.getElementById(anchorId);
+                             if (targetElement) {
+                                 targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                              }
-                             // --- END NEW MANUAL TRACKER UPDATE ---
-                                 currentMonthPlanDisplay.querySelectorAll('.week-section').forEach(weekSection => {
-                                     const weekId = weekSection.dataset.weekId;
-                                     const weekData = monthData.weeks?.[weekId];
-                                     if (weekId && weekData) {
-                                         updateWeeklyProgressUI(monthId, weekId, weekData);
-                                         weekData.days?.forEach((dayData, dayIndex) => {
-                                             updateDailyProgressUI(monthId, weekId, dayIndex, dayData);
-                                         });
-                                     }
-                                 });
+                             anchorId = null; // Scroll only once
+                         }
+
+                     } else {
+                         // --- CASE 2: TARGETED UPDATE ---
+                         // (Only data changed, e.g., a checkbox or progress)
+                         console.log("Data change detected. Performing targeted UI update.");
+                         updateMonthUI(monthId, monthData);
+                     }
+                 });
                              }
                              return; // Don't do the full, destructive re-render
                          }
@@ -1001,10 +936,12 @@
                     <div class="sticky-progress-wrapper" style="top: ${headerHeight};">
                         <div class="flex justify-between text-xs text-gray-500">
                             <span>Weekly Progress</span>
-                            <span class="progress-percentage font-medium">${initialProgress}%</span>
+                            <span id="week-perc-${monthId}-${weekId}" class="progress-percentage font-medium">${initialProgress}%</span>
                         </div>
                         
-                        <div class="progress-bar-container w-full"> <div class="progress-bar-fill progress-bar-weekly" style="width: ${initialProgress}%;"></div> </div>
+                        <div class="progress-bar-container w-full"> 
+                            <div id="week-bar-${monthId}-${weekId}" class="progress-bar-fill progress-bar-weekly" style="width: ${initialProgress}%;"></div> 
+                        </div>
                     </div>
                     <div class="days-container space-y-6 mt-4"> ${daysHtml} </div>
                      ${isGuestMode ? '' : (totalDays < 7 ? (totalDays > 0 ? `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>` : `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`) : '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>')}
@@ -1045,10 +982,10 @@
                          <div class="day-header-progress day-progress-wrapper" data-day-index="${dayIndex}">
                              <div class="flex justify-between text-xs text-gray-500">
                                  <span>Day Progress</span>
-                                 <span class="progress-percentage font-medium">${initialDayProgress}%</span>
+                                 <span id="day-perc-${monthId}-${weekId}-${dayIndex}" class="progress-percentage font-medium">${initialDayProgress}%</span>
                              </div>
                              <div class="progress-bar-container w-full"> 
-                                 <div class="progress-bar-fill progress-bar-daily" style="width: ${Math.min(initialDayProgress, 100)}%;"></div> 
+                                 <div id="day-bar-${monthId}-${weekId}-${dayIndex}" class="progress-bar-fill progress-bar-daily" style="width: ${Math.min(initialDayProgress, 100)}%;"></div> 
                              </div>
                          </div>
                          
@@ -4961,4 +4898,113 @@ function renderProgressChart(labels, data, title) {
             }
         }
     });
+	
+		/**
+ * NEW: Performs targeted UI updates for the entire month
+ * without a full re-render.
+ */
+function updateMonthUI(monthId, monthData) {
+    if (!monthData) return;
+    
+    const monthElement = document.querySelector(`.card[data-month-id="${monthId}"]`);
+    if (!monthElement) return; // Month isn't on the page
+
+    // 1. Update Monthly Progress Trackers
+    const monthlyPercent = calculateOverallMonthlyProgress(monthData);
+    const { 
+        weekly: lastWeekPercent, 
+        daily: lastDayPercent, 
+        link: continueLink 
+    } = findLastProgressTrackers(monthId, monthData);
+
+    updateTracker(monthElement, `#monthly-tracker-${monthId}`, monthlyPercent);
+    updateTracker(monthElement, `#weekly-tracker-${monthId}`, lastWeekPercent);
+    updateTracker(monthElement, `#daily-tracker-${monthId}`, lastDayPercent, continueLink);
+
+    // 2. Update Weekly Targets & Progress
+    for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
+        const weekData = monthData.weeks?.[weekId];
+        
+        // Update weekly target text
+        const targetTextElement = monthElement.querySelector(`#target-text-${monthId}-${weekId}`);
+        if (targetTextElement) {
+            targetTextElement.textContent = monthData.weeklyTargets?.[weekId] || '';
+        }
+
+        if (weekData) {
+            // Update weekly progress bar
+            const weekPerc = calculateWeeklyProgress(weekData);
+            const weekBar = monthElement.querySelector(`#week-bar-${monthId}-${weekId}`);
+            const weekPercText = monthElement.querySelector(`#week-perc-${monthId}-${weekId}`);
+            if (weekBar && weekPercText) {
+                weekBar.style.width = `${weekPerc}%`;
+                weekBar.style.opacity = weekPerc > 0 ? '1' : '0';
+                weekPercText.textContent = `${weekPerc}%`;
+            }
+
+            // 3. Update Daily Progress
+            weekData.days?.forEach((dayData, dayIndex) => {
+                const dayPerc = calculateDailyProgress(dayData);
+                const dayBar = monthElement.querySelector(`#day-bar-${monthId}-${weekId}-${dayIndex}`);
+                const dayPercText = monthElement.querySelector(`#day-perc-${monthId}-${weekId}-${dayIndex}`);
+                if (dayBar && dayPercText) {
+                    dayBar.style.width = `${Math.min(dayPerc, 100)}%`;
+                    dayBar.style.opacity = dayPerc > 0 ? '1' : '0';
+                    dayPercText.textContent = `${dayPerc}%`;
+                }
+
+                // 4. Update Row Checkboxes & Classes (if not in edit mode)
+                const daySection = monthElement.querySelector(`#day-${monthId}-${weekId}-${dayIndex}`);
+                if (daySection && !daySection.classList.contains('editing')) {
+                    dayData.rows?.forEach((rowData, rowIndex) => {
+                        const row = daySection.querySelector(`tr[data-row-index="${rowIndex}"]`);
+                        if (row) {
+                            const checkbox = row.querySelector('.completion-checkbox');
+                            if (checkbox) checkbox.checked = rowData.completed;
+                            row.classList.toggle('row-completed', rowData.completed);
+                        }
+                    });
+                }
+            });
+        }
+    }
+}
+
+		/**
+		 * NEW: Helper function to update a single progress tracker.
+		 */
+		function updateTracker(container, selector, percentage, continueLink = null) {
+			const tracker = container.querySelector(selector);
+			if (!tracker) return;
+
+			const score = tracker.querySelector('.tracker-score');
+			const progress = tracker.querySelector('.progress');
+			const cap = tracker.querySelector('.end-cap');
+			const circumference = 408;
+			const radius = 65;
+			const center = 75;
+
+			// Update text
+			score.textContent = percentage + '%';
+			
+			// Update bar
+			const offset = circumference - (circumference * percentage) / 100;
+			progress.style.strokeDashoffset = offset;
+
+			// Update cap
+			const angle = (percentage / 100) * 360;
+			const rads = (angle - 90) * (Math.PI / 180);
+			cap.style.left = `${center + radius * Math.cos(rads)}px`;
+			cap.style.top = `${center + radius * Math.sin(rads)}px`;
+			cap.style.visibility = percentage === 0 ? 'hidden' : 'visible';
+
+			// Update "Continue" button
+			const continueBtn = tracker.querySelector('.tracker-continue-btn');
+			if (continueLink) {
+				if (continueBtn) continueBtn.href = continueLink;
+				else tracker.querySelector('.inner-text').insertAdjacentHTML('beforeend', `<a href="${continueLink}" class="tracker-continue-btn">Continue</a>`);
+			} else {
+				if (continueBtn) continueBtn.remove();
+			}
+		}
 }
