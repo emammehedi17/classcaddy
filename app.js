@@ -1282,12 +1282,31 @@
                     } else {
                         e.preventDefault();
                         const dayToToggle = target.closest('.day-section');
+                        if (!dayToToggle) return; // Safety check
+
                         const isExpanding = dayToToggle.classList.contains('is-collapsed');
 
-                        // Accordion Logic: REMOVED
+                        // --- START: NEW ACCORDION LOGIC ---
                         
-                        // Toggle the clicked day
-                        dayToToggle.classList.toggle('is-collapsed');
+                        if (!isExpanding) {
+                            // The user is clicking an already-open day to collapse it.
+                            dayToToggle.classList.add('is-collapsed');
+                        } else {
+                            // The user is clicking a collapsed day to expand it.
+                            
+                            // 1. Find the parent month container
+                            const monthElement = dayToToggle.closest('.card[data-month-id]');
+                            if (!monthElement) return;
+
+                            // 2. Collapse all other open days within this month
+                            monthElement.querySelectorAll('.day-section:not(.is-collapsed)').forEach(openDay => {
+                                openDay.classList.add('is-collapsed');
+                            });
+
+                            // 3. Expand the target day
+                            dayToToggle.classList.remove('is-collapsed');
+                        }
+                        // --- END: NEW ACCORDION LOGIC ---
                     }
                     return; // টগল করার পর আর কিছু করার দরকার নেই
                  }
