@@ -2105,34 +2105,74 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  document.getElementById('story-textarea').value = existingStory; editStoryModal.style.display = "block";
              } catch (error) { console.error("Error fetching/prepping story:", error); showCustomAlert("Could not open story editor. Please save your day plan first."); setSyncStatus("Error", "red"); }
          }
-         saveStoryBtn.addEventListener('click', async () => {
+         
+		 
+		saveStoryBtn.addEventListener('click', () => { // <-- Removed 'async'
              if (!currentUser || !userId || !currentStoryTarget) return;
+             
+             // --- START: FAST (INSTANT) PART ---
              const { monthId, weekId, dayIndex, rowIndex } = currentStoryTarget;
-             if (rowIndex === -1) { showCustomAlert("Error: No associated vocabulary row found."); return; }
+             if (rowIndex === -1) { 
+                 showCustomAlert("Error: No associated vocabulary row found."); 
+                 return; 
+             }
+             
              const newStory = document.getElementById('story-textarea').value.trim();
-             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             
+             // 1. Optimistic Update: Close the modal immediately
+             closeModal('edit-story-modal');
              setSyncStatus("Syncing...", "yellow");
-             try {
-                 const docSnap = await getDoc(docRef); if (!docSnap.exists()) throw new Error("Month document not found.");
-                 let monthData = docSnap.data(); let daysArray = monthData.weeks?.[weekId]?.days || [];
-                 if (daysArray[dayIndex]?.rows?.[rowIndex]) {
-                     daysArray[dayIndex].rows[rowIndex].story = newStory || null;
-                     const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
-                     await updateDoc(docRef, updatePayload);
-console.log("Story saved successfully for row:", rowIndex);
-closeModal('edit-story-modal');
-setSyncStatus("Synced", "green");
+             
+             // 2. Clear the target
+             const targetToSave = currentStoryTarget; // Keep a copy for the async function
+             currentStoryTarget = null; 
+             // --- END: FAST PART ---
 
-// --- Keep day editing mode active ---
-const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
-if (daySection && !daySection.classList.contains('editing')) {
-    toggleDayEditMode(monthId, weekId, daySection, true);
-}
 
-                 } else { throw new Error("Target row for story not found."); }
-             } catch (error) { console.error("Error saving story:", error); showCustomAlert("Error saving story."); setSyncStatus("Error", "red"); }
-             finally { currentStoryTarget = null; }
+             // --- START: SLOW (BACKGROUND) PART ---
+             // Create a new async function to run in the background
+             (async () => {
+                 // Use the 'targetToSave' variable
+                 const docRef = doc(db, getUserPlansCollectionPath(), targetToSave.monthId);
+                 try {
+                     const docSnap = await getDoc(docRef); 
+                     if (!docSnap.exists()) throw new Error("Month document not found.");
+                     
+                     let monthData = docSnap.data(); 
+                     let daysArray = monthData.weeks?.[targetToSave.weekId]?.days || [];
+                     
+                     if (daysArray[targetToSave.dayIndex]?.rows?.[targetToSave.rowIndex]) {
+                         // Update the story in the row
+                         daysArray[targetToSave.dayIndex].rows[targetToSave.rowIndex].story = newStory || null;
+                         
+                         // Prepare the payload
+                         const updatePayload = { [`weeks.${targetToSave.weekId}.days`]: daysArray };
+                         
+                         // Save to Firebase
+                         await updateDoc(docRef, updatePayload);
+                         
+                         console.log("Story saved successfully in background for row:", targetToSave.rowIndex);
+                         setSyncStatus("Synced", "green");
+                         showCustomAlert("Story saved!", "success");
+
+                         // --- Keep day editing mode active ---
+                         const daySection = document.querySelector(`[data-month-id="${targetToSave.monthId}"] [data-week-id="${targetToSave.weekId}"] [data-day-index="${targetToSave.dayIndex}"]`);
+                         if (daySection && !daySection.classList.contains('editing')) {
+                             toggleDayEditMode(targetToSave.monthId, targetToSave.weekId, daySection, true);
+                         }
+
+                     } else { 
+                         throw new Error("Target row for story not found."); 
+                     }
+                 } catch (error) { 
+                     console.error("Error saving story in background:", error); 
+                     showCustomAlert("Error saving story."); 
+                     setSyncStatus("Error", "red"); 
+                 }
+             })(); // <-- Immediately invoke the background function
+             // --- END: SLOW PART ---
          });
+		 
          async function readStory(monthId, weekId, dayIndex, rowIndex) {
             if (!currentUser || !userId) return;
             const storyModalContent = document.getElementById('story-modal-content');
