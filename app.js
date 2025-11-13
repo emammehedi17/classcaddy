@@ -142,6 +142,7 @@
 		// --- START: ADD THESE QUIZ STATE VARIABLES ---
         let currentVocabData = []; // Renamed from currentQuizData
         let currentMcqData = []; // NEW variable for MCQ quizzes
+		let currentOptionPool = null;
         let currentQuizQuestions = [];
         let currentQuizQuestionIndex = 0;
         let currentQuizScore = 0;
@@ -2747,7 +2748,20 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             // "Try Again" বাটনের জন্য প্রশ্নগুলো রি-জেনারেট করুন
             if (currentVocabData) {
                 // এটি একটি Vocab কুইজ, সোর্স থেকে রি-জেনারেট করুন
-                currentQuizQuestions = generateQuizData(currentVocabData);
+                // --- START: FIX ---
+                if (!currentOptionPool) {
+                    // This is a fallback for "Try Again" from a saved result
+                    // where the global pool wasn't saved.
+                    console.warn("No option pool found. Falling back to simple generation for 'Try Again'.");
+                    currentOptionPool = {
+                        allWords: currentVocabData.map(v => v.word),
+                        allBanglaMeanings: currentVocabData.map(v => v.banglaMeaning),
+                        allSynonyms: currentVocabData.map(v => v.synonym).filter(Boolean)
+                    };
+                }
+                // Call with the correct 2 arguments
+                currentQuizQuestions = generateQuizData(currentVocabData, currentOptionPool);
+                // --- END: FIX ---
             } else if (currentMcqData) {
                 // এটি একটি MCQ কুইজ, সোর্স থেকে রি-জেনারেট করুন
                 currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ // <-- ১. এখানে shuffleArray যোগ করুন
@@ -3354,10 +3368,12 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     });
                 }
                 
-                // 5. Generate questions
-                currentQuizQuestions = generateQuizData(questionList, optionPool); // Generate questions
+                // 5. Store data for runQuizGame to use
+                currentOptionPool = optionPool; // <-- SET THE GLOBAL POOL
+                currentQuizQuestions = []; // Clear any old questions
                 
-                const totalQuestions = currentQuizQuestions.length;
+                // Estimate total questions for the timer
+                const totalQuestions = questionList.length * 2 + questionList.filter(v => v.synonym).length;
                 const totalTimeInSeconds = totalQuestions * 36;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
@@ -3767,10 +3783,12 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     });
                 }
 
-                // 5. Generate questions using both lists
-                currentQuizQuestions = generateQuizData(questionList, optionPool); // Generate questions
+                // 5. Store data for runQuizGame to use
+                currentOptionPool = optionPool; // <-- SET THE GLOBAL POOL
+                currentQuizQuestions = []; // Clear any old questions
                 
-                const totalQuestions = currentQuizQuestions.length;
+                // Estimate total questions for the timer
+                const totalQuestions = questionList.length * 2 + questionList.filter(v => v.synonym).length;
                 const totalTimeInSeconds = totalQuestions * 36;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
