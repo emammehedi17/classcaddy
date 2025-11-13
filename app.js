@@ -1060,7 +1060,7 @@
                      
                      <div class="day-section-body">
                          
-                         <div class="flex justify-end items-center gap-2 flex-wrap mb-4">
+                         <div class="flex justify-end items-center gap-2 flex-wrap mb-4 mt-3">
                              ${allMcqButtonsNormalMode}
                              ${isGuestMode ? '' : '<button class="action-button action-button-secondary text-xs edit-day-btn"><i class="fas fa-pencil-alt mr-1"></i> Edit</button>'}
                              </div>
