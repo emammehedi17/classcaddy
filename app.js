@@ -540,7 +540,7 @@
              const docRef = doc(db, getUserPlansCollectionPath(), monthId);
              try {
                  // Listen for real-time updates ONLY on the selected month
-					unsubscribeActiveMonth = onSnapshot(docRef, (docSnap) => {
+                 unsubscribeActiveMonth = onSnapshot(docRef, (docSnap) => {
                      // 1. Check if we should ignore this update
                      const activeBtn = monthNavButtonsContainer.querySelector('button.active-month');
                      if (!activeBtn || activeBtn.dataset.monthId !== monthId) {
@@ -616,51 +616,6 @@
                          // (Only data changed, e.g., a checkbox or progress)
                          console.log("Data change detected. Performing targeted UI update.");
                          updateMonthUI(monthId, monthData);
-                     }
-                 });
-                             }
-                             return; // Don't do the full, destructive re-render
-                         }
-                         // --- END MODIFIED LOGIC ---
-                     }
-                     // --- ANIMATION FIX END ---
-
-
-                     // --- Full re-render for changes from OTHER sources (or local structural changes) ---
-                     console.log("Full re-render from server data.");
-                     let scrollY = window.scrollY;
-                     let parentContainerRect = currentMonthPlanDisplay.getBoundingClientRect();
-                     let shouldRestoreScroll = parentContainerRect.top < 0;
-
-
-                     if (docSnap.exists()) {
-                         currentMonthPlanDisplay.innerHTML = '';
-                         currentMonthPlanDisplay.appendChild(createMonthElement(monthId, docSnap.data()));
-                     } else {
-                         console.error("Document for monthId not found (or deleted):", monthId);
-                         currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">This plan was not found (it may have been deleted).</p>';
-                     }
-
-                     if (shouldRestoreScroll) {
-                        console.log("Restoring scroll position to (displayMonthPlan):", scrollY);
-                        window.scrollTo({ top: scrollY, behavior: 'auto' });
-                     } else if (anchorId) {
-                        // --- NEW ANCHOR LOGIC ---
-                        console.log("Scrolling to anchor:", anchorId);
-                        const targetElement = document.getElementById(anchorId);
-                        if (targetElement) {
-                            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            // Highlight flash
-                            targetElement.style.transition = 'background-color 0.3s ease-out';
-                            targetElement.style.backgroundColor = '#d1fae5'; // emerald-100
-                            setTimeout(() => {
-                                targetElement.style.backgroundColor = '';
-                            }, 2000);
-                        } else {
-                            console.warn("Anchor element not found:", anchorId);
-                        }
-                        anchorId = null; // Scroll only once
-                        // --- END NEW ANCHOR LOGIC ---
                      }
                  });
              } catch (error) {
