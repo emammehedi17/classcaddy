@@ -2650,87 +2650,88 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         /**
-         * UPGRADED: Generates 3 types of questions from pre-processed vocab data.
+         * UPGRADED: Generates 3 types of questions from a specific list,
+         * using a global pool for incorrect options.
+         * @param {Array} questionList - The pre-processed vocab list to generate *questions* from.
+         * @param {Object} optionPool - An object { allWords, allBanglaMeanings, allSynonyms } for *options*.
          */
-        function generateQuizData(parsedVocabList) {
-        let questions = [];
-        
-        // --- ১. ভুল উত্তরের জন্য হেল্পার অ্যারে তৈরি করুন ---
-        const allWords = parsedVocabList.map(v => v.word);
-        const allBanglaMeanings = parsedVocabList.map(v => v.banglaMeaning);
-        const allSynonyms = parsedVocabList.map(v => v.synonym).filter(Boolean); // শুধু বৈধ Synonym নিন
+        function generateQuizData(questionList, optionPool) {
+            let questions = [];
+            
+            // --- 1. Get helper arrays from the provided option pool ---
+            const { allWords, allBanglaMeanings, allSynonyms } = optionPool;
 
-        // --- ২. টাইপ ১: Synonym প্রশ্ন তৈরি করুন (Eng -> Syn) ---
-        // (এই লুপটি প্রতিটি শব্দের জন্য একটি করে Synonym প্রশ্ন তৈরি করবে, যদি Synonym থাকে)
-        for (const item of parsedVocabList) {
-            const { word, synonym } = item;
+            // --- 2. Type 1: Synonym questions (Eng -> Syn) ---
+            for (const item of questionList) {
+                const { word, synonym } = item;
 
-            if (synonym) {
-                // ভুল অপশনগুলো অন্য Synonym বা শব্দ থেকে নিন
-                let wrongOptions = allSynonyms.filter(s => s !== synonym && s !== word);
-                if (wrongOptions.length < 3) {
-                    wrongOptions.push(...allWords.filter(w => w !== word && w !== synonym));
+                if (synonym) {
+                    // Wrong options come from the global pool
+                    let wrongOptions = allSynonyms.filter(s => s !== synonym && s !== word);
+                    if (wrongOptions.length < 3) {
+                        wrongOptions.push(...allWords.filter(w => w !== word && w !== synonym));
+                    }
+                    
+                    let options = shuffleArray([...new Set(wrongOptions)]).slice(0, 3);
+                    options.push(synonym); // Add correct answer
+
+                    questions.push({
+                        question: `What is the synonym of "${word}"?`,
+                        options: shuffleArray(options),
+                        correctAnswer: synonym,
+                        userAnswer: null,
+                        isCorrect: null
+                    });
                 }
-                
-                let options = shuffleArray([...new Set(wrongOptions)]).slice(0, 3);
-                options.push(synonym); // সঠিক উত্তর যোগ করুন
+            }
 
+            // --- 3. Type 2 & 3: Split the *question list* ---
+            let shuffledList = shuffleArray([...questionList]);
+            const n = shuffledList.length;
+            const halfN = Math.ceil(n / 2);
+
+            const engToBanList = shuffledList.slice(0, halfN);
+            const banToEngList = shuffledList.slice(halfN);
+
+            // --- 4. Type 2: Eng -> Ban questions ---
+            for (const item of engToBanList) {
+                const { word, banglaMeaning } = item;
+                
+                // Wrong options come from the global pool
+                let wrongMeanings = allBanglaMeanings.filter(m => m !== banglaMeaning);
+                let options = shuffleArray([...new Set(wrongMeanings)]).slice(0, 3);
+                options.push(banglaMeaning); // Add correct answer
+                
                 questions.push({
-                    question: `What is the synonym of "${word}"?`,
+                    question: `What is the meaning of "${word}"?`,
                     options: shuffleArray(options),
-                    correctAnswer: synonym,
+                    correctAnswer: banglaMeaning,
                     userAnswer: null,
                     isCorrect: null
                 });
             }
+
+            // --- 5. Type 3: Ban -> Eng questions ---
+            for (const item of banToEngList) {
+                const { word, banglaMeaning } = item;
+                
+                // Wrong options come from the global pool
+                let wrongWords = allWords.filter(w => w !== word);
+                let options = shuffleArray([...new Set(wrongWords)]).slice(0, 3);
+                options.push(word); // Add correct answer
+                
+                questions.push({
+                    question: `What is the English word for "${banglaMeaning}"?`,
+                    options: shuffleArray(options),
+                    correctAnswer: word,
+                    userAnswer: null,
+                    isCorrect: null
+                });
+            }
+
+            // --- 6. Final shuffle ---
+            return shuffleArray(questions);
         }
-
-        // --- ৩. টাইপ ২ ও ৩-এর জন্য তালিকাটি ভাগ করুন ---
-        let shuffledList = shuffleArray([...parsedVocabList]); // তালিকার একটি কপি শাফল করুন
-        const n = shuffledList.length;
-        const halfN = Math.ceil(n / 2); // ১০টি শব্দ হলে ৫টি, ১১টি হলে ৬টি
-
-        const engToBanList = shuffledList.slice(0, halfN); // প্রথম অর্ধেক
-        const banToEngList = shuffledList.slice(halfN); // দ্বিতীয় অর্ধেক
-
-        // --- ৪. টাইপ ২: Eng -> Ban প্রশ্ন তৈরি করুন ---
-        for (const item of engToBanList) {
-            const { word, banglaMeaning } = item;
-            
-            let wrongMeanings = allBanglaMeanings.filter(m => m !== banglaMeaning);
-            let options = shuffleArray([...new Set(wrongMeanings)]).slice(0, 3);
-            options.push(banglaMeaning); // সঠিক উত্তর যোগ করুন
-            
-            questions.push({
-                question: `What is the meaning of "${word}"?`,
-                options: shuffleArray(options),
-                correctAnswer: banglaMeaning,
-                userAnswer: null,
-                isCorrect: null
-            });
-        }
-
-        // --- ৫. টাইপ ৩: Ban -> Eng প্রশ্ন তৈরি করুন ---
-        for (const item of banToEngList) {
-            const { word, banglaMeaning } = item;
-            
-            let wrongWords = allWords.filter(w => w !== word);
-            let options = shuffleArray([...new Set(wrongWords)]).slice(0, 3);
-            options.push(word); // সঠিক উত্তর যোগ করুন
-            
-            questions.push({
-                question: `What is the English word for "${banglaMeaning}"?`,
-                options: shuffleArray(options),
-                correctAnswer: word,
-                userAnswer: null,
-                isCorrect: null
-            });
-        }
-
-        // --- ৬. চূড়ান্ত শাফল ---
-        // সব ধরনের প্রশ্ন তৈরি করার পর, সেগুলোকে একসাথে শাফল করুন
-        return shuffleArray(questions);
-    }
 
         
         /**
@@ -3289,13 +3290,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 		
 		// 4. Function to start a week-long quiz
-        // This is the CORRECT version
         async function startWeekQuiz(monthId, weekId) {
             quizTitle.textContent = 'Vocabulary Quiz';
-            // Set the source info for the topic name
             window.currentQuizSourceInfo = { monthId, weekId };
-			
-			window.currentQuizSubjectInfo = { subjectName: "Vocabulary", topicDetail: "Weekly Vocabulary" }; // <-- ADD THIS LINE
+			window.currentQuizSubjectInfo = { subjectName: "Vocabulary", topicDetail: "Weekly Vocabulary" };
             closeModal('quiz-center-modal');
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
@@ -3327,10 +3325,37 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     return;
                 }
 
-                // --- TIMER LOGIC: Generate questions NOW ---
-                currentVocabData = preProcessVocab(allWeekVocab);
+                // --- TIMER LOGIC (UPGRADED): Generate questions with a global pool ---
+                
+                // 1. Get the vocab for THIS week's QUESTIONS
+                const questionList = preProcessVocab(allWeekVocab);
+                currentVocabData = questionList; // Store for "Try Again"
                 currentMcqData = null;
-                currentQuizQuestions = generateQuizData(currentVocabData); // Generate questions
+
+                // 2. Get the global pool (everything *before* this week)
+                quizStartMessage.textContent = "Loading global vocabulary pool...";
+                // We pass null for dayIndex, so it fetches all weeks *before* this one.
+                let optionPool = await getGlobalVocabPool(monthId, weekId, null);
+
+                // 3. Handle fallback
+                if (optionPool.allWords.length < 4) {
+                    console.warn("No previous vocab found. Using current week's vocab as option pool.");
+                    optionPool = {
+                        allWords: questionList.map(v => v.word),
+                        allBanglaMeanings: questionList.map(v => v.banglaMeaning),
+                        allSynonyms: questionList.map(v => v.synonym).filter(Boolean)
+                    };
+                } else {
+                    // 4. Add current week's words to the pool
+                    questionList.forEach(v => {
+                        if(v.word) optionPool.allWords.push(v.word);
+                        if(v.banglaMeaning) optionPool.allBanglaMeanings.push(v.banglaMeaning);
+                        if (v.synonym) optionPool.allSynonyms.push(v.synonym);
+                    });
+                }
+                
+                // 5. Generate questions
+                currentQuizQuestions = generateQuizData(questionList, optionPool); // Generate questions
                 
                 const totalQuestions = currentQuizQuestions.length;
                 const totalTimeInSeconds = totalQuestions * 36;
@@ -3340,7 +3365,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 warningP.style.display = 'block';
                 // --- END TIMER LOGIC ---
 
-                quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week?`;
+                quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week? (Using global options pool)`;
                 quizStartBtn.classList.remove('hidden');
                 
                 const newStartBtn = quizStartBtn.cloneNode(true);
@@ -3620,13 +3645,73 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             }
         }
 		
+		/**
+         * Fetches all vocab from all days *before* the specified date.
+         * @param {string} currentMonthId - The month ID (e.g., "2025-10")
+         * @param {string} currentWeekId - The week ID (e.g., "week2")
+         * @param {number | null} currentDayIndex - The day index (e.g., 0) OR null if it's a week quiz.
+         */
+        async function getGlobalVocabPool(currentMonthId, currentWeekId, currentDayIndex = null) {
+            const allWords = new Set();
+            const allBanglaMeanings = new Set();
+            const allSynonyms = new Set();
+
+            try {
+                const plansCollectionPath = getUserPlansCollectionPath();
+                const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+                const querySnapshot = await getDocs(q);
+
+                for (const docSnap of querySnapshot.docs) {
+                    const monthId = docSnap.id;
+                    if (monthId > currentMonthId) break; // Stop if past the current month
+                    const monthData = docSnap.data();
+
+                    const weekIds = ['week1', 'week2', 'week3', 'week4'];
+                    for (const weekId of weekIds) {
+                        if (monthId === currentMonthId && weekId > currentWeekId) break; // Stop if past the current week
+
+                        // If it's a WEEK quiz, stop when we hit the current week
+                        if (currentDayIndex === null && monthId === currentMonthId && weekId === currentWeekId) break;
+
+                        const weekData = monthData.weeks?.[weekId];
+                        if (!weekData || !weekData.days) continue;
+
+                        for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
+                            // If it's a DAY quiz, stop when we hit the current day
+                            if (currentDayIndex !== null && monthId === currentMonthId && weekId === currentWeekId && dayIndex >= currentDayIndex) break;
+
+                            // This is a previous day. Add its vocab to the pool.
+                            const day = weekData.days[dayIndex];
+                            for (const row of day.rows) {
+                                if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
+                                    const processedVocab = preProcessVocab(row.vocabData);
+                                    processedVocab.forEach(v => {
+                                        if (v.word) allWords.add(v.word);
+                                        if (v.banglaMeaning) allBanglaMeanings.add(v.banglaMeaning);
+                                        if (v.synonym) allSynonyms.add(v.synonym);
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error building global vocab pool:", error);
+                // Return empty pool on error
+            }
+
+            return {
+                allWords: [...allWords],
+                allBanglaMeanings: [...allBanglaMeanings],
+                allSynonyms: [...allSynonyms]
+            };
+        }
 		
 		// 5. "Quiz" বাটনে ক্লিক করলে (Vocabulary-এর জন্য)
         async function startQuiz(monthId, weekId, dayIndex, rowIndex) {
             quizTitle.textContent = 'Vocabulary Quiz';
-            // This global variable will be used to build the topic name when saving
             window.currentQuizSourceInfo = { monthId, weekId, dayIndex, rowIndex };
-            currentMcqTarget = null; // Ensure this is null for vocab quizzes
+            currentMcqTarget = null; 
 
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
@@ -3646,9 +3731,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 const rowData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex];
                 if (!rowData) throw new Error("Row data not found.");
 
-                // Set the subject info for the results page
                 window.currentQuizSubjectInfo = { subjectName: rowData.subject || "Vocabulary", topicDetail: "Row Vocabulary" };
-
                 const vocabData = rowData.vocabData;
 
                 if (!vocabData || vocabData.length < 4) { 
@@ -3656,10 +3739,36 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     return;
                 }
 
-                // --- TIMER LOGIC: Generate questions NOW ---
-                currentVocabData = preProcessVocab(vocabData); // Use the vocab data
-                currentMcqData = null; // Clear MCQ data
-                currentQuizQuestions = generateQuizData(currentVocabData); // Generate questions
+                // --- TIMER LOGIC (UPGRADED): Generate questions with a global pool ---
+            
+                // 1. Get the vocab for THIS day's QUESTIONS
+                const questionList = preProcessVocab(vocabData);
+                currentVocabData = questionList; // Store for "Try Again"
+                currentMcqData = null; 
+
+                // 2. Get the global pool for all INCORRECT options
+                quizStartMessage.textContent = "Loading global vocabulary pool...";
+                let optionPool = await getGlobalVocabPool(monthId, weekId, dayIndex);
+
+                // 3. Handle user's constraint: If the pool is empty, use the current day's list as a fallback
+                if (optionPool.allWords.length < 4) {
+                    console.warn("No previous vocab found. Using current day's vocab as option pool.");
+                    optionPool = {
+                        allWords: questionList.map(v => v.word),
+                        allBanglaMeanings: questionList.map(v => v.banglaMeaning),
+                        allSynonyms: questionList.map(v => v.synonym).filter(Boolean)
+                    };
+                } else {
+                    // 4. Add current day's words to the pool to ensure they are also options
+                    questionList.forEach(v => {
+                        if(v.word) optionPool.allWords.push(v.word);
+                        if(v.banglaMeaning) optionPool.allBanglaMeanings.push(v.banglaMeaning);
+                        if (v.synonym) optionPool.allSynonyms.push(v.synonym);
+                    });
+                }
+
+                // 5. Generate questions using both lists
+                currentQuizQuestions = generateQuizData(questionList, optionPool); // Generate questions
                 
                 const totalQuestions = currentQuizQuestions.length;
                 const totalTimeInSeconds = totalQuestions * 36;
@@ -3669,10 +3778,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 warningP.style.display = 'block';
                 // --- END TIMER LOGIC ---
                 
-                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this row?`;
+                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this row? (Using global options pool)`;
                 quizStartBtn.classList.remove('hidden');
                 
-                // Re-clone the button to remove old listeners
                 const newStartBtn = quizStartBtn.cloneNode(true);
                 quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
                 newStartBtn.addEventListener('click', runQuizGame);
