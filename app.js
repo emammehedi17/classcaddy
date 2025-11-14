@@ -3332,7 +3332,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 warningP.style.display = 'block';
                 // --- END TIMER LOGIC ---
 
-                quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week? (Using global options pool)`;
+                quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week?`;
                 quizStartBtn.classList.remove('hidden');
                 
                 const newStartBtn = quizStartBtn.cloneNode(true);
