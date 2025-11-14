@@ -1977,25 +1977,43 @@ function addVocabPairInputs(container, word = '', meaning = '') {
         // --- Story Modals ---
          async function openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex) {
              if (!currentUser || !userId) return;
-             let daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
-             if (vocabRowIndex === -1) {
-                 const vocabRow = daySection ? daySection.querySelector('tr.vocab-row') : null;
-                 if(vocabRow) { vocabRowIndex = parseInt(vocabRow.dataset.rowIndex); }
-                 else { showCustomAlert("Please add and save a Vocabulary row before adding a story."); return; }
-             }
-             let existingStory = ''; const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-             setSyncStatus("Syncing...", "yellow");
+             
+             // This 'if (vocabRowIndex === -1)' block is removed.
+             
+             let existingStory = ''; 
+             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             setSyncStatus("Loading...", "blue"); // Changed to "Loading"
+             
              try {
-                 const docSnap = await getDoc(docRef); let dayData;
+                 const docSnap = await getDoc(docRef); 
+                 let dayData;
+                 
                  if (docSnap.exists()) {
                      dayData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex];
-                     if (dayData && dayData.rows && dayData.rows[vocabRowIndex]) { existingStory = dayData.rows[vocabRowIndex].story || ''; }
-                     else if (daySection.classList.contains('editing')) { console.log("New row detected. Saving day plan..."); await saveDayPlan(monthId, weekId, daySection); }
-                     else { throw new Error("Target row not found."); }
+                     
+                     // This is the only check we need:
+                     // Does this row exist in the database?
+                     if (dayData && dayData.rows && dayData.rows[vocabRowIndex]) {
+                         // Yes: get the saved story.
+                         existingStory = dayData.rows[vocabRowIndex].story || ''; 
+                     }
+                     // No: The row is new and only in the DOM.
+                     // We do nothing. existingStory remains '', which is correct.
                  }
-                 setSyncStatus("Synced", "green"); currentStoryTarget = { monthId, weekId, dayIndex, rowIndex: vocabRowIndex };
-                 document.getElementById('story-textarea').value = existingStory; editStoryModal.style.display = "block";
-             } catch (error) { console.error("Error fetching/prepping story:", error); showCustomAlert("Could not open story editor. Please save your day plan first."); setSyncStatus("Error", "red"); }
+                 
+                 // The old 'else if' and 'else' blocks that threw errors are removed.
+                 
+                 setSyncStatus("Synced", "green"); 
+                 currentStoryTarget = { monthId, weekId, dayIndex, rowIndex: vocabRowIndex };
+                 document.getElementById('story-textarea').value = existingStory; 
+                 editStoryModal.style.display = "block";
+                 document.getElementById('story-textarea').focus(); // Add focus
+                 
+             } catch (error) { 
+                 console.error("Error fetching/prepping story:", error); 
+                 showCustomAlert("Could not open story editor. A database error occurred."); 
+                 setSyncStatus("Error", "red"); 
+             }
          }
          
 		 
