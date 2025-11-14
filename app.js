@@ -3324,7 +3324,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 currentQuizQuestions = []; // Clear any old questions
                 
                 // Estimate total questions for the timer
-                const totalQuestions = questionList.length * 2 + questionList.filter(v => v.synonym).length;
+                const totalQuestions = questionList.length + questionList.filter(v => v.synonym).length;
                 const totalTimeInSeconds = totalQuestions * 36;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
@@ -3739,7 +3739,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 currentQuizQuestions = []; // Clear any old questions
                 
                 // Estimate total questions for the timer
-                const totalQuestions = questionList.length * 2 + questionList.filter(v => v.synonym).length;
+                const totalQuestions = questionList.length + questionList.filter(v => v.synonym).length;
                 const totalTimeInSeconds = totalQuestions * 36;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
