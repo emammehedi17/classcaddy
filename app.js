@@ -512,14 +512,14 @@
                  btn.classList.toggle('action-button-secondary', btn.dataset.monthId !== monthId);
              });
 
-             if (isAlreadyActive && anchorId) {
-                // Month is already displayed. Just scroll to the anchor.
-                const targetElement = document.getElementById(anchorId);
-                if (targetElement) {
-                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-                return; // Stop here. Do not reload the month.
+            if (isAlreadyActive && !anchorId) {
+                 // Month is already displayed AND we are NOT trying to
+                 // scroll to a new day, so just stop.
+                return; 
              }
+             // If we are here, it means:
+             // 1. We are loading a new month (isAlreadyActive = false)
+             // 2. We are RE-loading the current month to show a new day (isAlreadyActive = true, anchorId = true)
 
              currentMonthPlanDisplay.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading...</p>';
              selectMonthMessage.classList.add('hidden');
