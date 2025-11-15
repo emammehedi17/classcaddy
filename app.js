@@ -33,6 +33,7 @@
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
+            window.myAppDb = db; // <-- ADD THIS LINE
             googleProvider = new GoogleAuthProvider();
             console.log("Firebase initialized successfully.");
         } catch (error) {
