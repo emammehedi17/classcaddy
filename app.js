@@ -1850,7 +1850,7 @@ function addVocabPairInputs(container, word = '', meaning = '') {
             // --- START: MODIFIED ---
             const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
              
-             getDoc(weekDocRef).then(weekDocSnap => {
+            getDoc(weekDocRef).then(weekDocSnap => {
                  if (!weekDocSnap.exists()) throw new Error("Week document not found.");
                  
                  let daysArray = weekDocSnap.data().days || [];
@@ -1864,12 +1864,17 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  daysArray.splice(dayIndex, 1);
                  for (let i = dayIndex; i < daysArray.length; i++) { daysArray[i].dayNumber = i + 1; }
                  
-                 // Update the WEEK document
                  return updateDoc(weekDocRef, { days: daysArray });
                  
              }).then(() => {
                  console.log("Delete command sent to Firestore.");
-                 setSyncStatus("Synced", "green"); // onSnapshot will not fire, so we set this here
+                 
+                 // --- START: FIX ---
+                 // Manually re-run displayMonthPlan to show the change
+                 const weekAnchor = `week-${monthId}-${weekId}`;
+                 displayMonthPlan(monthId, weekAnchor);
+                 // --- END: FIX ---
+                 
              }).catch(error => {
                  console.error("Error deleting day:", error); 
                  showCustomAlert("Error deleting day. Please refresh.", "error"); 
@@ -1918,15 +1923,17 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  const weekDocSnap = await getDoc(weekDocRef);
                  let daysArray = [];
                  let newDayData;
+                 let newDayIndex = 0; // <-- To calculate the anchor link
 
                  if (weekDocSnap.exists()) {
-                     // Week doc exists, get its days
                      daysArray = weekDocSnap.data().days || [];
                      if (daysArray.length >= 7) { 
                          showCustomAlert("You cannot add more than 7 days to a week."); 
-                         setSyncStatus("Synced", "green"); // Reset status
+                         setSyncStatus("Synced", "green"); 
                          return; 
                      }
+                     
+                     newDayIndex = daysArray.length; // The new day will be at this index
                      
                      const lastDayIndex = daysArray.length - 1;
                      if (lastDayIndex >= 0) {
@@ -1936,20 +1943,22 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                          newDayData = { dayNumber: 1, date: '', rows: [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }] };
                      }
                      
-                     // Update the existing week doc
                      await updateDoc(weekDocRef, { days: arrayUnion(newDayData) });
                      
                  } else {
-                     // Week doc doesn't exist, create it with the first day
+                     // newDayIndex is already 0
                      newDayData = { dayNumber: 1, date: '', rows: [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }] };
-                     
-                     // Create the new week doc
                      await setDoc(weekDocRef, { days: [newDayData] });
                  }
-                 // --- END: MODIFIED ---
                  
                  console.log("New day added successfully.");
-                 setSyncStatus("Synced", "green");
+                 
+                 // --- START: FIX ---
+                 // Manually re-run displayMonthPlan to show the new day
+                 // This will also set the status to "Synced"
+                 const newDayAnchor = `day-${monthId}-${weekId}-${newDayIndex}`;
+                 displayMonthPlan(monthId, newDayAnchor);
+                 // --- END: FIX ---
                  
              } catch (error) { 
                  console.error("Error adding new day:", error); 
