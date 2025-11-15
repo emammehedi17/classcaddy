@@ -1052,7 +1052,12 @@
                     questionsCellHtml = `<button class="action-button view-row-mcq-btn" data-row-index="${rowIndex}"><i class="fas fa-eye mr-1"></i> View Qs</button>`;
                     
                     if (rowData.mcqData.length >= 1) { // 1 বা তার বেশি প্রশ্ন থাকলেই কুইজ বাটন দেখাবে
-                        testCellHtml = `<button class="action-button test-row-mcq-btn" data-row-index="${rowIndex}"><i class="fas fa-tasks mr-1"></i> Quiz</button>`;
+                        // --- START: MODIFIED ---
+                        // Added classes and style to match the vocab quiz button
+                        testCellHtml = `<button class="action-button action-button-secondary text-xs test-row-mcq-btn" data-row-index="${rowIndex}" style="border-color: #6366f1; color: #4f46e5;">
+                                            <i class="fas fa-question-circle mr-1"></i> Quiz
+                                        </button>`;
+                        // --- END: MODIFIED ---
                     }
                 }
 
