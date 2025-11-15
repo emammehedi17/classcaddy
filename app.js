@@ -511,86 +511,88 @@
                  btn.classList.toggle('action-button-secondary', btn.dataset.monthId !== monthId);
              });
 
-             // --- NEW LOGIC: If month is active, just scroll ---
              if (isAlreadyActive && anchorId) {
                 // Month is already displayed. Just scroll to the anchor.
-                console.log("Month already active. Scrolling to anchor:", anchorId);
                 const targetElement = document.getElementById(anchorId);
                 if (targetElement) {
                     targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Highlight flash
-                    targetElement.style.transition = 'background-color 0.3s ease-out';
-                    targetElement.style.backgroundColor = '#d1fae5'; // emerald-100
-                    setTimeout(() => {
-                        targetElement.style.backgroundColor = '';
-                    }, 2000);
                 }
                 return; // Stop here. Do not reload the month.
              }
-             // --- END NEW LOGIC ---
 
              currentMonthPlanDisplay.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading...</p>';
              selectMonthMessage.classList.add('hidden');
 
-             // Stop listening to the previously active month
              if (unsubscribeActiveMonth) {
                  unsubscribeActiveMonth();
              }
 
-             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+             // --- START: NEW DATA LOADING LOGIC ---
+             const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
+
              try {
-                 // Listen for real-time updates ONLY on the selected month
-                 unsubscribeActiveMonth = onSnapshot(docRef, (docSnap) => {
+                 // We will listen to the MONTH document for changes
+                 unsubscribeActiveMonth = onSnapshot(monthDocRef, async (monthDocSnap) => {
+                     
                      // 1. Check if we should ignore this update
                      const activeBtn = monthNavButtonsContainer.querySelector('button.active-month');
                      if (!activeBtn || activeBtn.dataset.monthId !== monthId) {
                          console.log("Snapshot received for non-active month. Ignoring render.");
-                         if (unsubscribeActiveMonth) unsubscribeActiveMonth(); // Stop listening
+                         if (unsubscribeActiveMonth) unsubscribeActiveMonth();
                          return;
                      }
 
                      const isCurrentlyEditing = currentMonthPlanDisplay.querySelector('.day-section.editing');
                      if (isCurrentlyEditing) {
                          console.log("Skipping all re-renders because a day is in edit mode.");
-                         return; // Stop here. Do nothing.
+                         return;
                      }
 
-                     // 2. Get data and check for structural changes
-                     if (!docSnap.exists()) {
+                     if (!monthDocSnap.exists()) {
                          console.error("Document for monthId not found (or deleted):", monthId);
-                         currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">This plan was not found (it may have been deleted).</p>';
+                         currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">This plan was not found.</p>';
                          return;
                      }
                      
-                     const monthData = docSnap.data();
+                     // 2. Get the main month data (targets, name, etc.)
+                     const monthData = monthDocSnap.data();
+                     
+                     // 3. NOW, fetch all the week documents from the subcollection
+                     const weeksCollectionRef = collection(db, monthDocRef.path, 'weeks');
+                     const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
+                     
+                     const weeksData = {}; // This will hold { week1: {days:[]}, week2: {days:[]} }
+                     weeksQuerySnapshot.forEach(doc => {
+                         weeksData[doc.id] = doc.data();
+                     });
+                     
+                     console.log("Fetched month data and", weeksQuerySnapshot.size, "week documents.");
+
+                     // 4. Check for structural changes (new/deleted WEEKS)
                      const monthElement = currentMonthPlanDisplay.querySelector(`.card[data-month-id="${monthId}"]`);
                      let structureHasChanged = false;
-
-                     // 3. Check for structural changes (new/deleted days or weeks)
-                     if (monthElement && monthData.weeks) {
+                     
+                     if (monthElement) {
                          const domWeekCount = monthElement.querySelectorAll('.week-section').length;
-                         const dataWeekCount = Object.keys(monthData.weeks).length;
+                         const dataWeekCount = Object.keys(weeksData).length;
                          if (domWeekCount !== dataWeekCount) {
                              structureHasChanged = true;
                          } else {
-                             for (const weekId in monthData.weeks) {
+                            // Check for day count changes inside each week
+                             for (const weekId in weeksData) {
                                  const domDayCount = monthElement.querySelectorAll(`.week-section[data-week-id="${weekId}"] .day-section`).length;
-                                 const dataDayCount = monthData.weeks[weekId]?.days?.length || 0;
+                                 const dataDayCount = weeksData[weekId]?.days?.length || 0;
                                  if (domDayCount !== dataDayCount) {
                                      structureHasChanged = true;
                                      break;
                                  }
                              }
                          }
-                     } else if (monthElement) {
-                         // Data is missing, but element exists?
-                         structureHasChanged = true;
                      }
-
-                     // 4. Decide whether to re-render or do a targeted update
+                     
+                     // 5. Decide whether to re-render or do a targeted update
                      if (structureHasChanged || !monthElement) {
                          // --- CASE 1: FULL RE-RENDER ---
-                         // (A day/week was added/deleted, or this is the first load)
                          console.log("Structural change or first load. Performing full re-render.");
                          
                          let scrollY = window.scrollY;
@@ -598,30 +600,31 @@
                          let shouldRestoreScroll = parentContainerRect.top < 0;
 
                          currentMonthPlanDisplay.innerHTML = '';
-                         currentMonthPlanDisplay.appendChild(createMonthElement(monthId, monthData));
+                         // Pass BOTH data objects to the renderer
+                         currentMonthPlanDisplay.appendChild(createMonthElement(monthId, monthData, weeksData));
 
                          if (shouldRestoreScroll) {
                              window.scrollTo({ top: scrollY, behavior: 'auto' });
                          } else if (anchorId) {
-                             // Scroll to anchor on first load
                              const targetElement = document.getElementById(anchorId);
                              if (targetElement) {
                                  targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                              }
-                             anchorId = null; // Scroll only once
+                             anchorId = null;
                          }
 
                      } else {
                          // --- CASE 2: TARGETED UPDATE ---
-                         // (Only data changed, e.g., a checkbox or progress)
                          console.log("Data change detected. Performing targeted UI update.");
-                         updateMonthUI(monthId, monthData);
+                         // Pass BOTH data objects to the updater
+                         updateMonthUI(monthId, monthData, weeksData);
                      }
                  });
              } catch (error) {
                  console.error("Error fetching specific month plan:", error);
                  currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">Error loading this month\'s plan.</p>';
              }
+             // --- END: NEW DATA LOADING LOGIC ---
          }
 
 
@@ -781,7 +784,7 @@
 		
 		
         // --- UI Creation ---
-        function createMonthElement(monthId, data) {
+        function createMonthElement(monthId, monthData, weeksData) {
             const monthDiv = document.createElement('div');
             monthDiv.className = 'mb-12 p-6 card';
             monthDiv.dataset.monthId = monthId;
@@ -789,18 +792,21 @@
             const targetColors = { week1: 'text-indigo-700', week2: 'text-teal-700', week3: 'text-amber-700', week4: 'text-rose-700' };
             const targetHoverBgColors = { week1: 'hover:bg-indigo-50', week2: 'hover:bg-teal-50', week3: 'hover:bg-amber-50', week4: 'hover:bg-rose-50' };
 
-            const monthlyPercent = calculateOverallMonthlyProgress(data);
+            // --- START: MODIFIED ---
+            // These functions now need the 'weeksData' object
+            const monthlyPercent = calculateOverallMonthlyProgress(weeksData);
             const { 
                 weekly: lastWeekPercent, 
                 daily: lastDayPercent, 
                 link: continueLink 
-            } = findLastProgressTrackers(monthId, data);
+            } = findLastProgressTrackers(monthId, weeksData);
+            // --- END: MODIFIED ---
 
             monthDiv.innerHTML = `
                  <div class="flex justify-between items-start mb-6">
-                     <h2 class="text-2xl font-bold text-emerald-600">${data.monthName || 'Unnamed Month'} <span class="text-lg text-gray-400 font-normal">(${monthId})</span></h2>
+                     <h2 class="text-2xl font-bold text-emerald-600">${monthData.monthName || 'Unnamed Month'} <span class="text-lg text-gray-400 font-normal">(${monthId})</span></h2>
                      ${isGuestMode ? '' : '<button class="icon-button delete-month-btn" title="Delete Month"><i class="fas fa-trash-alt text-red-500"></i></button>'}
-                     </div>
+                 </div>
 
                  <div class="progress-trackers-container mb-10" data-month-id="${monthId}">
                     ${createTrackerHTML(
@@ -837,7 +843,7 @@
 							<a href="#week-${monthId}-week${weekNum}" class="target-card-link ${targetHoverBgColors[`week${weekNum}`] || ''}">
 								<div class="target-card">
 									<h3 class="font-semibold text-lg ${targetColors[`week${weekNum}`] || 'text-gray-700'} mb-2">Week ${weekNum}</h3>
-									<textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" class="target-textarea w-full" placeholder="Enter target..." disabled>${escapeHtml(data.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
+									<textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" class="target-textarea w-full" placeholder="Enter target..." disabled>${escapeHtml(monthData.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
 								</div>
 							</a>
 						`).join('')}
@@ -846,27 +852,25 @@
                  <div class="space-y-8 weekly-plans-container">
                     ${[1, 2, 3, 4].map(weekNum => {
                         const weekId = `week${weekNum}`;
-                        const targetText = data.weeklyTargets?.[weekId] || '';
-                        return createWeekElement(monthId, weekId, data.weeks?.[weekId], `week-${monthId}-${weekId}`, targetText);
+                        const targetText = monthData.weeklyTargets?.[weekId] || '';
+                        // --- START: MODIFIED ---
+                        // Pass the specific week's data from 'weeksData'
+                        return createWeekElement(monthId, weekId, weeksData[weekId], `week-${monthId}-${weekId}`, targetText);
+                        // --- END: MODIFIED ---
                     }).join('')}
                 </div>`;
 
-             // --- START: GUEST MODE FIX ---
-             // Only add listeners for buttons that actually exist.
-             // In Guest Mode, these buttons are not rendered, so we must skip this.
              if (!isGuestMode) {
                  monthDiv.querySelector('.edit-targets-btn').addEventListener('click', (e) => handleEditTargets(e.currentTarget, monthId));
-                 monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId, data.monthName || monthId));
+                 monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId, monthData.monthName || monthId));
              }
-             // --- END: GUEST MODE FIX ---
              
              attachWeekEventListeners(monthDiv, monthId);
              
-             // --- MODIFIED: Auto-resize textareas on load ---
              const targetGroup = monthDiv.querySelector('.monthly-targets');
              setTimeout(() => {
-                syncTextareaHeights(targetGroup); // Call the new function
-             }, 0); // Defer to next "tick"
+                syncTextareaHeights(targetGroup);
+             }, 0); 
 
              animateTrackers(monthDiv);
              
@@ -874,12 +878,17 @@
         }
 
         function createWeekElement(monthId, weekId, weekData, sectionId, targetText) {
-            const daysHtml = weekData?.days?.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('') || '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
+            // --- START: MODIFIED ---
+            // weekData is now the doc { days: [...] } or undefined if it doesn't exist
+            const daysHtml = weekData?.days?.length > 0
+                ? weekData.days.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('')
+                : '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
             const totalDays = weekData?.days?.length || 0;
+            // --- END: MODIFIED ---
+            
             const initialProgress = calculateWeeklyProgress(weekData);
             const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px';
             
-            // --- Create HTML for the target text ---
             const targetHtml = `<p class="week-target-text" id="target-text-${monthId}-${weekId}">${escapeHtml(targetText)}</p>`;
 
             return `
@@ -900,7 +909,7 @@
                     </div>
                     <div class="days-container space-y-6 mt-4"> ${daysHtml} </div>
                      ${isGuestMode ? '' : (totalDays < 7 ? (totalDays > 0 ? `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>` : `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`) : '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>')}
-                     </div>`;
+                </div>`;
         }
 
         function createDayElement(monthId, weekId, dayIndex, dayData) {
@@ -2207,21 +2216,21 @@ function addVocabPairInputs(container, word = '', meaning = '') {
         }
 		
 		
-		function calculateOverallMonthlyProgress(monthData) {
-            if (!monthData || !monthData.weeks) return 0;
+		function calculateOverallMonthlyProgress(weeksData) {
+            if (!weeksData) return 0;
             
             let total = 0;
-            total += calculateWeeklyProgress(monthData.weeks.week1);
-            total += calculateWeeklyProgress(monthData.weeks.week2);
-            total += calculateWeeklyProgress(monthData.weeks.week3);
-            total += calculateWeeklyProgress(monthData.weeks.week4);
+            total += calculateWeeklyProgress(weeksData.week1);
+            total += calculateWeeklyProgress(weeksData.week2);
+            total += calculateWeeklyProgress(weeksData.week3);
+            total += calculateWeeklyProgress(weeksData.week4);
             
             // Return the average of the 4 weeks
             return Math.round(total / 4);
         }
 		
-		function findLastProgressTrackers(monthId, monthData) {
-            if (!monthData || !monthData.weeks) {
+		function findLastProgressTrackers(monthId, weeksData) {
+            if (!weeksData) {
                 return { weekly: 0, daily: 0, link: null };
             }
 
@@ -2232,7 +2241,7 @@ function addVocabPairInputs(container, word = '', meaning = '') {
 
             // Iterate backwards from week 4 to find the latest week with content
             for (const weekId of ['week4', 'week3', 'week2', 'week1']) {
-                const weekData = monthData.weeks[weekId];
+                const weekData = weeksData[weekId];
                 if (weekData && weekData.days && weekData.days.length > 0) {
                     // This is the "last week"
                     lastWeekData = weekData;
@@ -2260,7 +2269,6 @@ function addVocabPairInputs(container, word = '', meaning = '') {
 
             return { weekly: weeklyPercent, daily: dailyPercent, link: continueLink };
         }
-
         
         function createTrackerHTML(id, label, percentage, colorStart, colorEnd, continueLink = null) {
             // 'label' is "Monthly Progress", "Last Week", "Last Day"
@@ -4881,23 +4889,25 @@ function renderProgressChart(labels, data, title) {
         }
     });
 	
-		/**
+	/**
  * NEW: Performs targeted UI updates for the entire month
  * without a full re-render.
  */
-function updateMonthUI(monthId, monthData) {
+function updateMonthUI(monthId, monthData, weeksData) {
     if (!monthData) return;
     
     const monthElement = document.querySelector(`.card[data-month-id="${monthId}"]`);
     if (!monthElement) return; // Month isn't on the page
 
     // 1. Update Monthly Progress Trackers
-    const monthlyPercent = calculateOverallMonthlyProgress(monthData);
+    // --- START: MODIFIED ---
+    const monthlyPercent = calculateOverallMonthlyProgress(weeksData);
     const { 
         weekly: lastWeekPercent, 
         daily: lastDayPercent, 
         link: continueLink 
-    } = findLastProgressTrackers(monthId, monthData);
+    } = findLastProgressTrackers(monthId, weeksData);
+    // --- END: MODIFIED ---
 
     updateTracker(monthElement, `#monthly-tracker-${monthId}`, monthlyPercent);
     updateTracker(monthElement, `#weekly-tracker-${monthId}`, lastWeekPercent);
@@ -4905,7 +4915,9 @@ function updateMonthUI(monthId, monthData) {
 
     // 2. Update Weekly Targets & Progress
     for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
-        const weekData = monthData.weeks?.[weekId];
+        // --- START: MODIFIED ---
+        const weekData = weeksData[weekId]; // Get week data from the new object
+        // --- END: MODIFIED ---
         
         // Update weekly target text
         const targetTextElement = monthElement.querySelector(`#target-text-${monthId}-${weekId}`);
