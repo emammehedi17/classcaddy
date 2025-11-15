@@ -1040,8 +1040,12 @@
              let testCellHtml = '';
 
              if (isEditing) {
-                // Edit Mode: Show "Add Qs" button
-                questionsCellHtml = `<button class="action-button add-row-mcq-btn" data-row-index="${rowIndex}"><i class="fas fa-plus mr-1"></i> Add Qs</button>`;
+                // Edit Mode: Check if questions already exist
+                const hasMcqs = rowData.mcqData && rowData.mcqData.length > 0;
+                const btnText = hasMcqs ? 'Edit Qs' : 'Add Qs';
+                const btnIcon = hasMcqs ? 'fa-pencil-alt' : 'fa-plus';
+                
+                questionsCellHtml = `<button class="action-button add-row-mcq-btn" data-row-index="${rowIndex}"><i class="fas ${btnIcon} mr-1"></i> ${btnText}</button>`;
              } else {
                 // Normal Mode: Show "View Qs" and "Quiz" buttons if data exists
                 if (rowData.mcqData && rowData.mcqData.length > 0) {
