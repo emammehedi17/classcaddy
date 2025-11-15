@@ -130,7 +130,8 @@
         let unsubscribeActiveMonth = null; // For the currently displayed month
         let currentStoryTarget = null;
         let currentConfirmAction = null;
-        let currentVocabCodeTarget = null; // <-- ADD THIS LINE
+        let currentVocabCodeTarget = null;
+		let isCheckboxClickGlobal = null;
 		let currentMcqTarget = null;
 		let autosaveTimer = null;
 		
@@ -1253,7 +1254,11 @@
                             
                             // DOM থেকে ডেটা পড়ুন (চেকবক্সের নতুন অবস্থা সহ)
                             const dayIndex = parseInt(daySection.dataset.dayIndex);
-                            const parseResult = parseAndPrepareSaveData(daySection, daysArray, weekId, true); // true = isCheckboxClick
+                            // --- START: MODIFIED ---
+                            // Set the global var so saveDataToFirebase knows the weekId
+                            isCheckboxClickGlobal = { weekId: weekId };
+                            const parseResult = await parseAndPrepareSaveData(daySection, weekId, true); // true = isCheckboxClick
+                            // --- END: MODIFIED ---
                             
                             if (parseResult === null) {
                                 setSyncStatus("Error", "red");
@@ -1420,8 +1425,13 @@
                  actionsHeader.classList.remove('hidden');
                  completionPercHeader.classList.remove('hidden');
 
-                 const planDoc = await getDoc(doc(db, getUserPlansCollectionPath(), monthId));
-                 const dayData = planDoc.exists() ? planDoc.data().weeks[weekId]?.days[dayIndex] : null;
+                 // --- START: MODIFIED ---
+                 // Fetch the specific WEEK document
+                 const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                 const weekDocSnap = await getDoc(weekDocRef);
+                 const dayData = weekDocSnap.exists() ? weekDocSnap.data().days[dayIndex] : null;
+                 // --- END: MODIFIED ---
+                 
                  if (!dayData) { console.error("Could not find day data to edit."); setSyncStatus("Error", "red"); return; }
 
                  tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
@@ -1431,94 +1441,67 @@
                  setSyncStatus("Editing...", "blue");
 
                  // --- AUTOSAVE LOGIC (START) ---
-                 // Define the autosave handler
                  const autosaveHandler = (e) => {
-                     // Check if the event is from a valid input
                      if (e.target.classList.contains('editable-input') || e.target.classList.contains('vocab-input')) {
-                         if (autosaveTimer) clearTimeout(autosaveTimer); // Clear existing timer
-                         // setSyncStatus("Unsaved changes", "yellow"); // <-- REMOVED this line
-                         
-                         // Set a new timer
+                         if (autosaveTimer) clearTimeout(autosaveTimer);
                          autosaveTimer = setTimeout(() => {
                              console.log("Autosaving changes...");
-                             saveDayPlan(monthId, weekId, daySection, true); // <-- ADDED 'true'
-                         }, 2500); // Wait 2.5 seconds after last input
+                             saveDayPlan(monthId, weekId, daySection, true); 
+                         }, 2500); 
                      }
                  };
-                 // Attach the listener to the whole day section using event delegation
                  daySection.addEventListener('input', autosaveHandler);
-                 // Store the handler on the element so we can remove it later
                  daySection.autosaveHandler = autosaveHandler;
                  // --- AUTOSAVE LOGIC (END) ---
 
              } else {
                  // --- SAVING AND EXITING EDIT MODE (OPTIMISTIC) ---
                  
-                 // ১. অটোসেভ বন্ধ করুন
+                 // 1. Stop autosave
                  if (autosaveTimer) clearTimeout(autosaveTimer);
                  if (daySection.autosaveHandler) {
                      daySection.removeEventListener('input', daySection.autosaveHandler);
                      daySection.autosaveHandler = null;
                  }
                  
-                 // --- START: OPTIMISTIC UI LOGIC ---
-                 
-                 // ২. তৎক্ষণাৎ "Syncing..." দেখান
+                 // 2. Show Syncing
                  setSyncStatus("Syncing...", "yellow");
 
-                 // ৩. ডেটাবেস থেকে বর্তমান ডেটা পড়ুন (গল্প, MCQ ইত্যাদি সংরক্ষণের জন্য)
-                 // এটিই এখন ব্যবহারকারীর একমাত্র অপেক্ষার ধাপ
-                 const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-                 let daysArray;
-                 try {
-                     const docSnap = await getDoc(docRef);
-                     if (!docSnap.exists()) throw new Error("Month document not found.");
-                     daysArray = docSnap.data().weeks?.[weekId]?.days || [];
-                 } catch (error) {
-                     console.error("Error fetching data before save:", error);
-                     showCustomAlert("Error fetching plan data. Cannot save.");
-                     setSyncStatus("Error", "red");
-                     return; // সেভ বাতিল করুন
-                 }
+                 // 3. Get the path to the MONTH document
+                 const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
 
-                 // ৪. DOM থেকে ডেটা পড়ুন এবং সেভের জন্য প্রস্তুত করুন (খুব দ্রুত)
-                 const parseResult = parseAndPrepareSaveData(daySection, daysArray, weekId);
+                 // 4. Parse DOM and prepare data (NOW ASYNC)
+                 const parseResult = await parseAndPrepareSaveData(daySection, weekId);
                  
                  if (parseResult === null) {
-                     // পার্সিং ব্যর্থ হলে সেভ বাতিল করুন
                      setSyncStatus("Error", "red");
                      return; 
                  }
                  
                  const { updatedRows, updatePayload } = parseResult;
 
-                 // ৫. তৎক্ষণাৎ UI আপডেট করুন (অপেক্ষা না করে)
+                 // 5. Update UI instantly
                  daySection.classList.remove('editing');
-                 daySection.classList.remove('is-collapsed'); // সেকশনটি খোলা রাখুন
+				 daySection.classList.add('saving');
+                 daySection.classList.remove('is-collapsed'); 
                  editButton.classList.remove('hidden'); 
                  editModeControls.classList.add('hidden');
                  deleteDayButton.classList.add('hidden');
                  actionsHeader.classList.add('hidden');
                  completionPercHeader.classList.add('hidden');
 
-                 // তৎক্ষণাৎ টেবিল রি-রেন্ডার করুন
                  tableBody.innerHTML = updatedRows.map((rowData, rowIndex) =>
                     createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)
                  ).join('');
                  
-                 // তৎক্ষণাৎ ডেইলি প্রোগ্রেস বার আপডেট করুন
                  const dayDataForProgress = { rows: updatedRows };
                  updateDailyProgressUI(monthId, weekId, dayIndex, dayDataForProgress);
 				 
-				 // --- START: NEW FIX ---
-                 // সেভ করার পর, স্ক্রল করে এই সেকশনটিকে ভিউতে রাখুন
                  daySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                 // --- END: NEW FIX ---
                  
-                 // ৬. আসল সেভ রিকোয়েস্টটি ব্যাকগ্রাউন্ডে পাঠান (await ছাড়া)
-                 saveDataToFirebase(docRef, updatePayload, false);
-
-                 // --- END: OPTIMISTIC UI LOGIC ---
+                 // 6. Save in background
+                 saveDataToFirebase(monthDocRef, updatePayload, false);
+				 daySection.classList.remove('saving');
              }
         }
 
@@ -1529,10 +1512,21 @@
         /**
          * ধাপ ১ (নতুন): DOM থেকে ডেটা পড়ে এবং সেভের জন্য প্রস্তুত করে (Synchronous)
          */
-        function parseAndPrepareSaveData(daySection, daysArray, weekId, isCheckboxClick = false) {
+        async function parseAndPrepareSaveData(daySection, weekId, isCheckboxClick = false) {
             try {
                 const dayIndex = parseInt(daySection.dataset.dayIndex);
-                const currentDayData = daysArray[dayIndex];
+                
+                // --- START: MODIFIED ---
+                // Fetch the fresh data directly from the WEEK document
+                const monthId = daySection.closest('.card[data-month-id]').dataset.monthId;
+                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                const weekDocSnap = await getDoc(weekDocRef);
+                if (!weekDocSnap.exists()) throw new Error("Week document not found for parsing.");
+                
+                const freshDaysArray = weekDocSnap.data().days || [];
+                const currentDayData = freshDaysArray[dayIndex];
+                // --- END: MODIFIED ---
+                
                 if (!currentDayData) {
                     throw new Error(`Day data for index ${dayIndex} not found.`);
                 }
@@ -1547,7 +1541,7 @@
                     let subject, topic, comment, completed, completionPercentage, vocabData = null, story, mcqData = null;
 
                     if (daySection.classList.contains('editing') && !isCheckboxClick) {
-                         // --- এটি এডিট মোড থেকে সেভ করা হচ্ছে ---
+                         // --- In Edit Mode ---
                          subject = (row.querySelector('.subject-input')?.value || '').trim();
                          comment = (row.querySelector('.comment-input')?.value || '').trim();
                          completed = existingRowData.completed || false;
@@ -1555,11 +1549,7 @@
                          completionPercentage = parsePercentage(percInput);
                          
                          story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
-                         
-                         // --- START: BUG FIX ---
-                         // mcqData-কে existingRowData থেকে পড়ুন
                          mcqData = existingRowData.mcqData || null; 
-                         // --- END: BUG FIX ---
 
                          if (row.classList.contains('vocab-row')) {
                              subject = 'Vocabulary';
@@ -1575,7 +1565,7 @@
                              vocabData = null;
                          }
                     } else { 
-                         // --- এটি একটি চেকবক্স ক্লিক বা অন্য কোনো সাধারণ মোড সেভ ---
+                         // --- Checkbox Click Mode ---
                          completed = row.querySelector('.completion-checkbox')?.checked || false;
                          subject = existingRowData.subject; 
                          topic = existingRowData.topic; 
@@ -1583,35 +1573,72 @@
                          completionPercentage = existingRowData.completionPercentage; 
                          vocabData = existingRowData.vocabData; 
                          story = existingRowData.story;
-                         mcqData = existingRowData.mcqData; // <-- এখানেও mcqData সংরক্ষণ করুন
+                         mcqData = existingRowData.mcqData; 
                      }
                      
                      updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null, mcqData: mcqData || null });
                 });
                 
-                daysArray[dayIndex].rows = updatedRows;
-                const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
+                // --- START: MODIFIED ---
+                // Update the correct day in the fresh array
+                freshDaysArray[dayIndex].rows = updatedRows;
+                // The payload is now just the 'days' array. The key will be added by the caller.
+                const updatePayload = { days: freshDaysArray };
+                // --- END: MODIFIED ---
                 
-                // সফলভাবে ডেটা প্রস্তুত হয়েছে
                 return { updatedRows, updatePayload };
 
             } catch (error) {
                 console.error("Error parsing day plan from DOM:", error);
                 showCustomAlert("Error reading data from fields. Cannot save.");
-                return null; // পার্সিং ব্যর্থ হয়েছে
+                return null; // Parsing failed
             }
         }
 
         /**
          * ধাপ ২ (নতুন): ডেটাবেসে সেভ করে (Asynchronous)
          */
-        async function saveDataToFirebase(docRef, updatePayload, isAutosave = false) {
+        async function saveDataToFirebase(monthDocRef, updatePayload, isAutosave = false) {
             try {
                 if (!isAutosave) {
                     setSyncStatus("Syncing...", "yellow");
                 }
                 
-                await updateDoc(docRef, updatePayload);
+                // --- START: MODIFIED ---
+                // 'monthDocRef' is the ref to '.../2025-11'
+                // 'updatePayload' is now { days: [...] }
+                // We need to know which WEEK this save is for.
+                
+                // This is a bit of a hack: The 'updatePayload' doesn't know its own weekId.
+                // We'll find the weekId from the *only* editing daySection on the page.
+                const editingDay = document.querySelector('.day-section.editing, .day-section.saving'); 
+                // (We'll add the 'saving' class in toggleDayEditMode)
+                
+                let weekId;
+                if(isAutosave && editingDay) {
+                    weekId = editingDay.closest('.week-section').dataset.weekId;
+                } else if (isCheckboxClickGlobal) { // We'll set this global variable
+                    weekId = isCheckboxClickGlobal.weekId;
+                    isCheckboxClickGlobal = null; // Clear it
+                } else {
+                    // This is a manual save, find the 'saving' section
+                    const savingDay = document.querySelector('.day-section.saving');
+                    if (savingDay) {
+                        weekId = savingDay.closest('.week-section').dataset.weekId;
+                        savingDay.classList.remove('saving'); // Clean up
+                    }
+                }
+
+                if (!weekId) {
+                    throw new Error("Could not determine weekId for save operation.");
+                }
+
+                // Create the correct reference to the WEEK document
+                const weekDocRef = doc(db, monthDocRef.path, 'weeks', weekId);
+                
+                // The payload is already { days: [...] }
+                await updateDoc(weekDocRef, updatePayload);
+                // --- END: MODIFIED ---
                 
                 console.log("Save successful.");
                 if (!isAutosave) {
@@ -1781,79 +1808,68 @@ function addVocabPairInputs(container, word = '', meaning = '') {
              const dayNum = daySection.querySelector('h4').textContent;
              showConfirmationModal(`Delete ${dayNum}`, `Are you sure you want to delete all entries for ${dayNum}? This action cannot be undone.`, () => deleteDay(monthId, weekId, daySection, dayIndex));
          }
+		 
          function deleteDay(monthId, weekId, daySection, dayIndex) {
             if (!currentUser || !userId) return;
-            console.log(`Attempting to delete day index ${dayIndex} from week ${weekId}, month ${monthId}`);
             
-            const weekSection = daySection.closest('.week-section'); // Get parent week
-            
-            // --- FIX START ---
-            // Remove the day from the UI immediately.
+            const weekSection = daySection.closest('.week-section'); 
             daySection.remove();
             
-            // Manually count remaining days in the DOM
+            // ... (UI logic for buttons remains the same) ...
             const remainingDays = weekSection.querySelectorAll('.day-section').length;
-
-            // Find the button container (which is the element *after* .days-container)
             const buttonContainer = weekSection.querySelector('.days-container').nextElementSibling;
-            
             let newButtonHtml = '';
             if (remainingDays < 7) {
                 if (remainingDays > 0) {
-                    // Show "Add New Day"
                     newButtonHtml = `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>`;
                 } else {
-                    // Show "Add First Day"
                     newButtonHtml = `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`;
-                    
-                    // Also add back the "No days" message
                     const daysContainer = weekSection.querySelector('.days-container');
                     if (daysContainer) {
                         daysContainer.innerHTML = '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
                     }
                 }
             } else {
-                // Show "Max days"
                 newButtonHtml = '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>';
             }
-            
-            // Replace the old button container (which has the wrong button)
             if (buttonContainer) {
                 buttonContainer.outerHTML = newButtonHtml;
             }
-            // --- FIX END ---
+            // --- END: UI Logic ---
             
             setSyncStatus("Syncing...", "yellow");
-            const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+            
+            // --- START: MODIFIED ---
+            const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
              
-             // Run the database update in the background
-             getDoc(docRef).then(docSnap => {
-                 if (!docSnap.exists()) throw new Error("Month document not found.");
-                 let monthData = docSnap.data();
-                 let daysArray = monthData.weeks?.[weekId]?.days || [];
+             getDoc(weekDocRef).then(weekDocSnap => {
+                 if (!weekDocSnap.exists()) throw new Error("Week document not found.");
+                 
+                 let daysArray = weekDocSnap.data().days || [];
                  
                  if (!daysArray[dayIndex]) {
-                    console.warn("Day not found in Firestore, but delete was requested. UI is now in sync.");
+                    console.warn("Day not found in Firestore, UI is now in sync.");
                     setSyncStatus("Synced", "green");
                     return; 
                  }
                  
-                 // Perform the deletion and re-numbering
                  daysArray.splice(dayIndex, 1);
                  for (let i = dayIndex; i < daysArray.length; i++) { daysArray[i].dayNumber = i + 1; }
                  
-                 const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
+                 // Update the WEEK document
+                 return updateDoc(weekDocRef, { days: daysArray });
                  
-                 // Do NOT await this. Let the onSnapshot listener handle the final "green" sync status.
-                 updateDoc(docRef, updatePayload);
-                 
+             }).then(() => {
                  console.log("Delete command sent to Firestore.");
+                 setSyncStatus("Synced", "green"); // onSnapshot will not fire, so we set this here
              }).catch(error => {
                  console.error("Error deleting day:", error); 
-                 showCustomAlert("Error deleting day. The UI may be out of sync. Please refresh the page.", "error"); 
+                 showCustomAlert("Error deleting day. Please refresh.", "error"); 
                  setSyncStatus("Error", "red");
              });
+             // --- END: MODIFIED ---
          }
+		 
          function confirmDeleteMonth(monthId, monthName) {
              showConfirmationModal(
                  `Delete Month: ${monthName}`, 
@@ -1884,26 +1900,54 @@ function addVocabPairInputs(container, word = '', meaning = '') {
         // Add New Day
         async function addNewDay(monthId, weekId, weekSection) {
             if (!currentUser || !userId) return;
-             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-             try {
-                 const docSnap = await getDoc(docRef);
-                 if (!docSnap.exists()) throw new Error("Month document not found.");
-                 const monthData = docSnap.data();
-                 let daysArray = monthData.weeks?.[weekId]?.days || [];
-                 if (daysArray.length >= 7) { showCustomAlert("You cannot add more than 7 days to a week."); return; }
-                console.log(`Adding new day to ${monthId}, ${weekId} (Current count: ${daysArray.length})`);
-                setSyncStatus("Syncing...", "yellow");
-                 const lastDayIndex = daysArray.length - 1;
+            
+            setSyncStatus("Syncing...", "yellow");
+            
+            // --- START: MODIFIED ---
+            const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+             
+            try {
+                 const weekDocSnap = await getDoc(weekDocRef);
+                 let daysArray = [];
                  let newDayData;
-                  if (lastDayIndex >= 0) {
-                     const lastDayRows = daysArray[lastDayIndex].rows || [];
-                     newDayData = { dayNumber: daysArray.length + 1, date: '', rows: lastDayRows.map(row => ({ subject: row.subject || '', topic: (row.subject?.toLowerCase() === 'vocabulary') ? null : (row.topic || ''), completed: false, comment: '', completionPercentage: row.completionPercentage ?? null, vocabData: (row.subject?.toLowerCase() === 'vocabulary') ? (row.vocabData || null) : null, story: null })) };
-                 } else { newDayData = { dayNumber: 1, date: '', rows: [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }] }; }
-                 const updatePayload = { [`weeks.${weekId}.days`]: arrayUnion(newDayData) };
-                 await updateDoc(docRef, updatePayload);
+
+                 if (weekDocSnap.exists()) {
+                     // Week doc exists, get its days
+                     daysArray = weekDocSnap.data().days || [];
+                     if (daysArray.length >= 7) { 
+                         showCustomAlert("You cannot add more than 7 days to a week."); 
+                         setSyncStatus("Synced", "green"); // Reset status
+                         return; 
+                     }
+                     
+                     const lastDayIndex = daysArray.length - 1;
+                     if (lastDayIndex >= 0) {
+                         const lastDayRows = daysArray[lastDayIndex].rows || [];
+                         newDayData = { dayNumber: daysArray.length + 1, date: '', rows: lastDayRows.map(row => ({ subject: row.subject || '', topic: (row.subject?.toLowerCase() === 'vocabulary') ? null : (row.topic || ''), completed: false, comment: '', completionPercentage: row.completionPercentage ?? null, vocabData: (row.subject?.toLowerCase() === 'vocabulary') ? (row.vocabData || null) : null, story: null })) };
+                     } else {
+                         newDayData = { dayNumber: 1, date: '', rows: [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }] };
+                     }
+                     
+                     // Update the existing week doc
+                     await updateDoc(weekDocRef, { days: arrayUnion(newDayData) });
+                     
+                 } else {
+                     // Week doc doesn't exist, create it with the first day
+                     newDayData = { dayNumber: 1, date: '', rows: [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }] };
+                     
+                     // Create the new week doc
+                     await setDoc(weekDocRef, { days: [newDayData] });
+                 }
+                 // --- END: MODIFIED ---
+                 
                  console.log("New day added successfully.");
                  setSyncStatus("Synced", "green");
-             } catch (error) { console.error("Error adding new day:", error); showCustomAlert("Error adding new day."); setSyncStatus("Error", "red"); }
+                 
+             } catch (error) { 
+                 console.error("Error adding new day:", error); 
+                 showCustomAlert("Error adding new day."); 
+                 setSyncStatus("Error", "red"); 
+             }
         }
 
         // --- Monthly Target Edit ---
@@ -1996,36 +2040,30 @@ function addVocabPairInputs(container, word = '', meaning = '') {
          async function openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex) {
              if (!currentUser || !userId) return;
              
-             // This 'if (vocabRowIndex === -1)' block is removed.
-             
              let existingStory = ''; 
-             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-             setSyncStatus("Loading...", "blue"); // Changed to "Loading"
+             setSyncStatus("Loading...", "blue"); 
              
              try {
-                 const docSnap = await getDoc(docRef); 
+                 // --- START: MODIFIED ---
+                 const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                 const weekDocSnap = await getDoc(weekDocRef);
+                 // --- END: MODIFIED ---
+                 
                  let dayData;
                  
-                 if (docSnap.exists()) {
-                     dayData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex];
+                 if (weekDocSnap.exists()) {
+                     dayData = weekDocSnap.data().days?.[dayIndex];
                      
-                     // This is the only check we need:
-                     // Does this row exist in the database?
                      if (dayData && dayData.rows && dayData.rows[vocabRowIndex]) {
-                         // Yes: get the saved story.
                          existingStory = dayData.rows[vocabRowIndex].story || ''; 
                      }
-                     // No: The row is new and only in the DOM.
-                     // We do nothing. existingStory remains '', which is correct.
                  }
-                 
-                 // The old 'else if' and 'else' blocks that threw errors are removed.
                  
                  setSyncStatus("Synced", "green"); 
                  currentStoryTarget = { monthId, weekId, dayIndex, rowIndex: vocabRowIndex };
                  document.getElementById('story-textarea').value = existingStory; 
                  editStoryModal.style.display = "block";
-                 document.getElementById('story-textarea').focus(); // Add focus
+                 document.getElementById('story-textarea').focus();
                  
              } catch (error) { 
                  console.error("Error fetching/prepping story:", error); 
@@ -2035,10 +2073,9 @@ function addVocabPairInputs(container, word = '', meaning = '') {
          }
          
 		 
-		saveStoryBtn.addEventListener('click', () => { // <-- Removed 'async'
+		saveStoryBtn.addEventListener('click', () => { 
              if (!currentUser || !userId || !currentStoryTarget) return;
              
-             // --- START: FAST (INSTANT) PART ---
              const { monthId, weekId, dayIndex, rowIndex } = currentStoryTarget;
              if (rowIndex === -1) { 
                  showCustomAlert("Error: No associated vocabulary row found."); 
@@ -2047,43 +2084,33 @@ function addVocabPairInputs(container, word = '', meaning = '') {
              
              const newStory = document.getElementById('story-textarea').value.trim();
              
-             // 1. Optimistic Update: Close the modal immediately
              closeModal('edit-story-modal');
              setSyncStatus("Syncing...", "yellow");
              
-             // 2. Clear the target
-             const targetToSave = currentStoryTarget; // Keep a copy for the async function
+             const targetToSave = currentStoryTarget; 
              currentStoryTarget = null; 
-             // --- END: FAST PART ---
 
-
-             // --- START: SLOW (BACKGROUND) PART ---
-             // Create a new async function to run in the background
              (async () => {
-                 // Use the 'targetToSave' variable
-                 const docRef = doc(db, getUserPlansCollectionPath(), targetToSave.monthId);
+                 // --- START: MODIFIED ---
+                 const weekDocRef = doc(db, getUserPlansCollectionPath(), targetToSave.monthId, 'weeks', targetToSave.weekId);
+                 // --- END: MODIFIED ---
+                 
                  try {
-                     const docSnap = await getDoc(docRef); 
-                     if (!docSnap.exists()) throw new Error("Month document not found.");
+                     const weekDocSnap = await getDoc(weekDocRef); 
+                     if (!weekDocSnap.exists()) throw new Error("Week document not found.");
                      
-                     let monthData = docSnap.data(); 
-                     let daysArray = monthData.weeks?.[targetToSave.weekId]?.days || [];
+                     let daysArray = weekDocSnap.data().days || [];
                      
                      if (daysArray[targetToSave.dayIndex]?.rows?.[targetToSave.rowIndex]) {
-                         // Update the story in the row
                          daysArray[targetToSave.dayIndex].rows[targetToSave.rowIndex].story = newStory || null;
                          
-                         // Prepare the payload
-                         const updatePayload = { [`weeks.${targetToSave.weekId}.days`]: daysArray };
-                         
-                         // Save to Firebase
-                         await updateDoc(docRef, updatePayload);
+                         // Update the WEEK document
+                         await updateDoc(weekDocRef, { days: daysArray });
                          
                          console.log("Story saved successfully in background for row:", targetToSave.rowIndex);
                          setSyncStatus("Synced", "green");
                          showCustomAlert("Story saved!", "success");
 
-                         // --- Keep day editing mode active ---
                          const daySection = document.querySelector(`[data-month-id="${targetToSave.monthId}"] [data-week-id="${targetToSave.weekId}"] [data-day-index="${targetToSave.dayIndex}"]`);
                          if (daySection && !daySection.classList.contains('editing')) {
                              toggleDayEditMode(targetToSave.monthId, targetToSave.weekId, daySection, true);
@@ -2097,8 +2124,7 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                      showCustomAlert("Error saving story."); 
                      setSyncStatus("Error", "red"); 
                  }
-             })(); // <-- Immediately invoke the background function
-             // --- END: SLOW PART ---
+             })(); 
          });
 		 
          async function readStory(monthId, weekId, dayIndex, rowIndex) {
