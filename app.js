@@ -2469,18 +2469,20 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
              try {
                  let dataToUse = weekData;
                  if (!dataToUse) {
-                     console.log("Progress UI fetching data...");
-                     const docRef = doc(db, getUserPlansCollectionPath(), monthId); const docSnap = await getDoc(docRef);
-                     if (docSnap.exists()) {
-                         dataToUse = docSnap.data().weeks?.[weekId];
+                     console.log("Progress UI fetching data for week...");
+                     // --- START: MODIFIED ---
+                     // Fetch from the correct subcollection path
+                     const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId); 
+                     const weekDocSnap = await getDoc(weekDocRef);
+                     if (weekDocSnap.exists()) {
+                         dataToUse = weekDocSnap.data(); // This is the weekData { days: [...] }
                      }
+                     // --- END: MODIFIED ---
                  }
 
                  if (dataToUse) {
                     const progress = calculateWeeklyProgress(dataToUse);
                     progressBarFill.style.width = `${progress}%`;
-                    // --- THIS IS THE CHANGE ---
-                    // Hide the bar (and cap) if progress is 0
                     progressBarFill.style.opacity = progress > 0 ? '1' : '0';
                     progressPercentageSpan.textContent = `${progress}%`;
                  }
