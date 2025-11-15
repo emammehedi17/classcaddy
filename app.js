@@ -1869,11 +1869,10 @@ function addVocabPairInputs(container, word = '', meaning = '') {
              }).then(() => {
                  console.log("Delete command sent to Firestore.");
                  
-                 // --- START: FIX ---
-                 // Manually re-run displayMonthPlan to show the change
-                 const weekAnchor = `week-${monthId}-${weekId}`;
-                 displayMonthPlan(monthId, weekAnchor);
-                 // --- END: FIX ---
+                 // --- START: NEW FIX ---
+                 // The UI is already updated. Just set the sync status.
+                 setSyncStatus("Synced", "green");
+                 // --- END: NEW FIX ---
                  
              }).catch(error => {
                  console.error("Error deleting day:", error); 
@@ -1916,14 +1915,13 @@ function addVocabPairInputs(container, word = '', meaning = '') {
             
             setSyncStatus("Syncing...", "yellow");
             
-            // --- START: MODIFIED ---
             const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
              
             try {
                  const weekDocSnap = await getDoc(weekDocRef);
                  let daysArray = [];
                  let newDayData;
-                 let newDayIndex = 0; // <-- To calculate the anchor link
+                 let newDayIndex = 0; // The index for the new day
 
                  if (weekDocSnap.exists()) {
                      daysArray = weekDocSnap.data().days || [];
@@ -1953,12 +1951,55 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  
                  console.log("New day added successfully.");
                  
-                 // --- START: FIX ---
-                 // Manually re-run displayMonthPlan to show the new day
-                 // This will also set the status to "Synced"
-                 const newDayAnchor = `day-${monthId}-${weekId}-${newDayIndex}`;
-                 displayMonthPlan(monthId, newDayAnchor);
-                 // --- END: FIX ---
+                 // --- START: NEW UI FIX ---
+                 // Manually build and insert the new day's HTML
+                 
+                 // 1. Create the new day's HTML
+                 const newDayHtml = createDayElement(monthId, weekId, newDayIndex, newDayData);
+                 
+                 // 2. Find the days container
+                 const daysContainer = weekSection.querySelector('.days-container');
+                 if (!daysContainer) return;
+
+                 // 3. If this is the first day, clear the "No days" message
+                 if (newDayIndex === 0) {
+                     daysContainer.innerHTML = '';
+                 }
+                 
+                 // 4. Insert the new day
+                 daysContainer.insertAdjacentHTML('beforeend', newDayHtml);
+
+                 // 5. Update the "Add Day" button
+                 const totalDays = newDayIndex + 1;
+                 const buttonContainer = weekSection.querySelector('.days-container').nextElementSibling;
+                 let newButtonHtml = '';
+                 if (totalDays < 7) {
+                     newButtonHtml = `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>`;
+                 } else {
+                     newButtonHtml = '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>';
+                 }
+                 if (buttonContainer) {
+                     buttonContainer.outerHTML = newButtonHtml;
+                 }
+
+                 // 6. Expand the new day (using the accordion logic)
+                 const newDayElement = daysContainer.querySelector(`[data-day-index="${newDayIndex}"]`);
+                 if (newDayElement) {
+                     // Find parent month and collapse all others
+                     const monthElement = newDayElement.closest('.card[data-month-id]');
+                     if (monthElement) {
+                        monthElement.querySelectorAll('.day-section:not(.is-collapsed)').forEach(openDay => {
+                            openDay.classList.add('is-collapsed');
+                        });
+                     }
+                     // Expand the new day
+                     newDayElement.classList.remove('is-collapsed');
+                     // Scroll to it smoothly
+                     newDayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                 }
+                 
+                 setSyncStatus("Synced", "green");
+                 // --- END: NEW UI FIX ---
                  
              } catch (error) { 
                  console.error("Error adding new day:", error); 
