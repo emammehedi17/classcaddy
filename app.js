@@ -3537,12 +3537,33 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         
                         // --- START: MODIFIED ---
                         const updatePayload = { days: daysArray };
-                        await updateDoc(weekDocRef, updatePayload);
+await updateDoc(weekDocRef, updatePayload);
                         // --- END: MODIFIED ---
                         
                         console.log("MCQs saved successfully in background for day:", dayIndex);
                         setSyncStatus("Synced", "green");
                         showCustomAlert(`${parsedData.length} MCQs saved successfully!`, "success");
+
+                        // --- START: NEW UI FIX ---
+                        // Manually update the button text without a full reload
+                        try {
+                            const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
+                            if (daySection) {
+                                const button = daySection.querySelector(`button.add-row-mcq-btn[data-row-index="${rowIndex}"]`);
+                                if (button) {
+                                    if (parsedData.length > 0) {
+                                        button.innerHTML = `<i class="fas fa-pencil-alt mr-1"></i> Edit Qs`;
+                                    } else {
+                                        // This handles the case where you deleted all MCQs
+                                        button.innerHTML = `<i class="fas fa-plus mr-1"></i> Add Qs`;
+                                    }
+                                }
+                            }
+                        } catch (uiError) {
+                            console.error("Error updating button UI:", uiError);
+                        }
+                        // --- END: NEW UI FIX ---
+
                     } else {
                         throw new Error("Target day for MCQs not found.");
                     }
