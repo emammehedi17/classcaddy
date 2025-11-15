@@ -694,11 +694,11 @@
 
             const modal = document.getElementById('all-vocab-modal');
             const contentDiv = document.getElementById('vocab-list-content');
-            const totalVocabCountSpan = document.getElementById('total-vocab-count'); // <-- 1. GET THE SPAN
+            const totalVocabCountSpan = document.getElementById('total-vocab-count');
             
             modal.style.display = "block";
             contentDiv.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading all vocabularies...</p>';
-            if (totalVocabCountSpan) totalVocabCountSpan.textContent = "..."; // <-- 2. SET TO LOADING
+            if (totalVocabCountSpan) totalVocabCountSpan.textContent = "...";
             setSyncStatus("Loading...", "blue");
 
             try {
@@ -711,17 +711,25 @@
 
                 if (querySnapshot.empty) {
                     contentDiv.innerHTML = '<p class="text-center text-gray-500 italic py-10">No study plans found.</p>';
-                    if (totalVocabCountSpan) totalVocabCountSpan.textContent = "0"; // <-- 3. SET TO 0
+                    if (totalVocabCountSpan) totalVocabCountSpan.textContent = "0";
                     setSyncStatus("Synced", "green");
                     return;
                 }
 
                 for (const docSnap of querySnapshot.docs) {
+                    const monthId = docSnap.id;
                     const monthData = docSnap.data();
-                    const monthName = monthData.monthName || docSnap.id;
+                    const monthName = monthData.monthName || monthId;
+                    
+                    // --- START: MODIFIED ---
+                    // Fetch the weeks subcollection for this month
+                    const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
+                    const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
+                    // --- END: MODIFIED ---
 
-                    for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
-                        const weekData = monthData.weeks?.[weekId];
+                    for (const weekDocSnap of weeksQuerySnapshot.docs) {
+                        const weekId = weekDocSnap.id;
+                        const weekData = weekDocSnap.data();
                         if (!weekData || !weekData.days) continue;
 
                         let weekVocabs = [];
@@ -768,13 +776,13 @@
                     contentDiv.innerHTML = allVocabsHtml;
                 }
                 
-                if (totalVocabCountSpan) totalVocabCountSpan.textContent = totalVocabCount; // <-- 4. SET THE FINAL COUNT
+                if (totalVocabCountSpan) totalVocabCountSpan.textContent = totalVocabCount;
                 setSyncStatus("Synced", "green");
 
             } catch (error) {
                 console.error("Error fetching all vocabularies:", error);
                 contentDiv.innerHTML = '<p class="text-center text-red-500 py-10">Could not load vocabularies. Please try again.</p>';
-                if (totalVocabCountSpan) totalVocabCountSpan.textContent = "Error"; // <-- 5. SET ON ERROR
+                if (totalVocabCountSpan) totalVocabCountSpan.textContent = "Error";
                 setSyncStatus("Error", "red");
             }
         }
@@ -2130,51 +2138,44 @@ function addVocabPairInputs(container, word = '', meaning = '') {
          async function readStory(monthId, weekId, dayIndex, rowIndex) {
             if (!currentUser || !userId) return;
             const storyModalContent = document.getElementById('story-modal-content');
-            storyModalContent.innerHTML = '<p class="text-gray-500 italic">Loading story...</p>'; // Clear previous content and show loading
-            storyModal.style.display = "block"; // Show modal immediately
+            storyModalContent.innerHTML = '<p class="text-gray-500 italic">Loading story...</p>';
+            storyModal.style.display = "block";
 
              try {
-                 const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-                 const docSnap = await getDoc(docRef);
-                 if (docSnap.exists()) {
-                     const dayData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex];
+                 // --- START: MODIFIED ---
+                 const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                 const weekDocSnap = await getDoc(weekDocRef);
+                 // --- END: MODIFIED ---
+                 
+                 if (weekDocSnap.exists()) {
+                     const dayData = weekDocSnap.data().days?.[dayIndex];
                      const rowData = dayData?.rows?.[rowIndex];
                      const story = rowData?.story;
-                     const vocabData = rowData?.vocabData; // Get the vocab data for this row
+                     const vocabData = rowData?.vocabData;
 
                      if (story) {
-                         let highlightedStory = escapeHtml(story); // Start with escaped story text
-
+                         let highlightedStory = escapeHtml(story);
                          if (vocabData && vocabData.length > 0) {
-                             // Create a sorted list of vocab words (longer words first to avoid partial matches)
                              const wordsToHighlight = vocabData
                                  .map(v => v.word?.trim())
-                                 .filter(Boolean) // Remove empty words
-                                 .sort((a, b) => b.length - a.length); // Sort longest first
+                                 .filter(Boolean) 
+                                 .sort((a, b) => b.length - a.length); 
 
                              wordsToHighlight.forEach(word => {
-                                 // Use RegExp for case-insensitive, whole word matching
-                                 // \b ensures word boundaries (prevents matching 'cat' inside 'category')
-                                 // 'gi' flags: global (all occurrences) and case-insensitive
                                  const regex = new RegExp(`\\b(${escapeRegExp(word)})\\b`, 'gi');
-
-                                 // Replace found words with highlighted span, preserving original casing
                                  highlightedStory = highlightedStory.replace(regex, (match) => {
-                                     // Check if already inside a span (avoid nested highlighting)
-                                     // This is a basic check; complex HTML might need a more robust parser
                                      const surroundingChars = highlightedStory.substring(
                                          Math.max(0, highlightedStory.indexOf(match) - 25),
                                          highlightedStory.indexOf(match) + match.length + 10
                                      );
                                      if (surroundingChars.includes('<span class="highlighted-vocab">')) {
-                                         return match; // Already highlighted (or part of one), skip
+                                         return match; 
                                      }
                                      return `<span class="highlighted-vocab">${match}</span>`;
                                  });
                              });
                          }
-                         // Use innerHTML to render the spans
-                         storyModalContent.innerHTML = highlightedStory.replace(/\n/g, '<br>'); // Replace newlines with <br> for display
+                         storyModalContent.innerHTML = highlightedStory.replace(/\n/g, '<br>');
 
                      } else {
                          storyModalContent.textContent = "No story found for this entry.";
@@ -3331,11 +3332,14 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             document.getElementById('quiz-total-time-warning').style.display = 'none';
 
             try {
-                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists()) throw new Error("Month document not found.");
+                // --- START: MODIFIED ---
+                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                const weekDocSnap = await getDoc(weekDocRef);
+                if (!weekDocSnap.exists()) throw new Error("Week document not found.");
 
-                const weekData = docSnap.data().weeks?.[weekId];
+                const weekData = weekDocSnap.data();
+                // --- END: MODIFIED ---
+                
                 if (!weekData || !weekData.days) throw new Error("Week data not found.");
                 
                 let allWeekVocab = [];
@@ -3351,19 +3355,13 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     return;
                 }
 
-                // --- TIMER LOGIC (UPGRADED): Generate questions with a global pool ---
-                
-                // 1. Get the vocab for THIS week's QUESTIONS
                 const questionList = preProcessVocab(allWeekVocab);
-                currentVocabData = questionList; // Store for "Try Again"
+                currentVocabData = questionList; 
                 currentMcqData = null;
 
-                // 2. Get the global pool (everything *before* this week)
                 quizStartMessage.textContent = "Loading global vocabulary pool...";
-                // We pass null for dayIndex, so it fetches all weeks *before* this one.
                 let optionPool = await getGlobalVocabPool(monthId, weekId, null);
 
-                // 3. Handle fallback
                 if (optionPool.allWords.length < 4) {
                     console.warn("No previous vocab found. Using current week's vocab as option pool.");
                     optionPool = {
@@ -3372,7 +3370,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         allSynonyms: questionList.map(v => v.synonym).filter(Boolean)
                     };
                 } else {
-                    // 4. Add current week's words to the pool
                     questionList.forEach(v => {
                         if(v.word) optionPool.allWords.push(v.word);
                         if(v.banglaMeaning) optionPool.allBanglaMeanings.push(v.banglaMeaning);
@@ -3380,18 +3377,15 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     });
                 }
                 
-                // 5. Store data for runQuizGame to use
-                currentOptionPool = optionPool; // <-- SET THE GLOBAL POOL
-                currentQuizQuestions = []; // Clear any old questions
+                currentOptionPool = optionPool; 
+                currentQuizQuestions = []; 
                 
-                // Estimate total questions for the timer
                 const totalQuestions = questionList.length + questionList.filter(v => v.synonym).length;
                 const totalTimeInSeconds = totalQuestions * 36;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
                 warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
-                // --- END TIMER LOGIC ---
 
                 quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week?`;
                 quizStartBtn.classList.remove('hidden');
@@ -3434,26 +3428,26 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         async function openAddMcqModal(monthId, weekId, dayIndex, rowIndex) {
             currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
             
-            // ডেটাবেস থেকে বিদ্যমান MCQ ডেটা আনুন (যদি থাকে)
             setSyncStatus("Loading...", "blue");
             try {
-                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-                const docSnap = await getDoc(docRef);
+                // --- START: MODIFIED ---
+                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                const weekDocSnap = await getDoc(weekDocRef);
+                // --- END: MODIFIED ---
+                
                 let rawText = '';
-                if (docSnap.exists()) {
-                    // --- MODIFIED: Get mcqData from ROW object ---
-                    const mcqData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex]?.mcqData;
+                if (weekDocSnap.exists()) {
+                    const mcqData = weekDocSnap.data().days?.[dayIndex]?.rows?.[rowIndex]?.mcqData;
                     
                     if (mcqData) {
-                        // যদি ডেটা থাকে, তাহলে টেক্সট এরিয়াতে দেখানোর জন্য ফরম্যাট করি
                         rawText = mcqData.map((mcq, index) => {
                             const options = mcq.options.map((opt, i) => `${['ক', 'খ', 'গ', 'ঘ'][i]}. ${opt}`).join('\n');
-                            const correctPrefix = ['ক', 'খ', 'গ', 'ঘ'][mcq.options.indexOf(mcq.correctAnswer)];
+                            const correctPrefix = ['ক', 'খ', 'ג', 'ঘ'][mcq.options.indexOf(mcq.correctAnswer)];
                             return `${['০১', '০২', '০৩', '০৪', '০৫', '০৬', '০৭', '০৮', '০৯'][index] || (index + 1)}. ${mcq.question}\n${options}\nসঠিক উত্তর: ${correctPrefix}. ${mcq.correctAnswer}\n`;
                         }).join('\n');
                     }
                 }
-                mcqPasteTextarea.value = rawText; // এখানে সেভ করা MCQ গুলো দেখাবে
+                mcqPasteTextarea.value = rawText; 
                 setSyncStatus("Synced", "green");
             } catch (error) {
                 console.error("Error fetching MCQ data for modal:", error);
@@ -3464,45 +3458,35 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         // 2. Modal এর "Parse & Save MCQs" বাটনে ক্লিক করলে এই ফাংশনটি কল হবে
-        saveMcqBtn.addEventListener('click', () => { // <-- 'async' removed
+        saveMcqBtn.addEventListener('click', () => { 
             if (!currentMcqTarget) return;
 
-            // --- START: FAST (INSTANT) PART ---
             const { monthId, weekId, dayIndex, rowIndex } = currentMcqTarget;
             const rawText = mcqPasteTextarea.value;
             const parsedData = parseMcqText(rawText);
-            
-            // 1. Validation check (this is fast)
-            if (rawText.trim() !== '' && parsedData.length === 0) {
-                showCustomAlert("No valid MCQs found. Please check the format.", "error");
-                return; // Stay in the modal
-            }
 
-            // 2. Optimistic Update: Close the modal immediately
             closeModal('add-mcq-modal');
             setSyncStatus("Syncing...", "yellow");
             
-            // --- END: FAST PART ---
-
-
-            // --- START: SLOW (BACKGROUND) PART ---
-            // Create a new async function to run in the background
             (async () => {
                 try {
-                    const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-                    const docSnap = await getDoc(docRef);
+                    // --- START: MODIFIED ---
+                    const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                    const weekDocSnap = await getDoc(weekDocRef);
+                    // --- END: MODIFIED ---
 
-                    if (!docSnap.exists()) throw new Error("Month document not found.");
+                    if (!weekDocSnap.exists()) throw new Error("Week document not found.");
 
-                    let monthData = docSnap.data();
-                    let daysArray = monthData.weeks?.[weekId]?.days || [];
+                    let daysArray = weekDocSnap.data().days || [];
                     
                     if (daysArray[dayIndex] && daysArray[dayIndex].rows[rowIndex]) {
                         
                         daysArray[dayIndex].rows[rowIndex].mcqData = parsedData.length > 0 ? parsedData : null;
                         
-                        const updatePayload = { [`weeks.${weekId}.days`]: daysArray };
-                        await updateDoc(docRef, updatePayload);
+                        // --- START: MODIFIED ---
+                        const updatePayload = { days: daysArray };
+                        await updateDoc(weekDocRef, updatePayload);
+                        // --- END: MODIFIED ---
                         
                         console.log("MCQs saved successfully in background for day:", dayIndex);
                         setSyncStatus("Synced", "green");
@@ -3515,10 +3499,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     showCustomAlert("Error saving MCQs. Please try again.", "error");
                     setSyncStatus("Error", "red");
                 } finally {
-                    currentMcqTarget = null; // Clear target after operation is complete
+                    currentMcqTarget = null;
                 }
-            })(); // <-- Immediately invoke the background function
-            // --- END: SLOW PART ---
+            })(); 
         });
 
         // 3. ✨ The Magic Parser Function (Regex) - (UPGRADED for ALL Formats)
@@ -3620,20 +3603,21 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             viewMcqModal.style.display = 'block';
 
             try {
-                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists()) throw new Error("Month document not found.");
+                // --- START: MODIFIED ---
+                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                const weekDocSnap = await getDoc(weekDocRef);
+                if (!weekDocSnap.exists()) throw new Error("Week document not found.");
 
-                const dayData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex];
+                const dayData = weekDocSnap.data().days?.[dayIndex];
+                // --- END: MODIFIED ---
+                
                 if (!dayData) throw new Error("Day data not found.");
 
                 let mcqData = [];
 
                 if (rowIndex !== null) {
-                    // Req 1: Load MCQs for a specific row
                     mcqData = dayData.rows?.[rowIndex]?.mcqData || [];
                 } else {
-                    // Req 2: Load ALL MCQs for the day
                     mcqData = dayData.rows?.reduce((acc, row) => {
                         if (row.mcqData) {
                             acc.push(...row.mcqData);
@@ -3641,8 +3625,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         return acc;
                     }, []) || [];
                 }
-
-                
 
                 if (!mcqData || mcqData.length < 1) {
                     viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">No MCQs found for this entry.</p>';
@@ -3691,24 +3673,30 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
                 for (const docSnap of querySnapshot.docs) {
                     const monthId = docSnap.id;
-                    if (monthId > currentMonthId) break; // Stop if past the current month
-                    const monthData = docSnap.data();
+                    if (monthId > currentMonthId) break; 
+                    
+                    // --- START: MODIFIED ---
+                    const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
+                    const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
+                    // --- END: MODIFIED ---
 
-                    const weekIds = ['week1', 'week2', 'week3', 'week4'];
+                    const weekIds = ['week1', 'week2', 'week3', 'week4'].sort(); // Ensure correct order
+
                     for (const weekId of weekIds) {
-                        if (monthId === currentMonthId && weekId > currentWeekId) break; // Stop if past the current week
+                        if (monthId === currentMonthId && weekId > currentWeekId) break; 
 
-                        // If it's a WEEK quiz, stop when we hit the current week
                         if (currentDayIndex === null && monthId === currentMonthId && weekId === currentWeekId) break;
 
-                        const weekData = monthData.weeks?.[weekId];
+                        // Get the week doc from our query snapshot
+                        const weekDoc = weeksQuerySnapshot.docs.find(d => d.id === weekId);
+                        if (!weekDoc) continue;
+                        
+                        const weekData = weekDoc.data();
                         if (!weekData || !weekData.days) continue;
 
                         for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
-                            // If it's a DAY quiz, stop when we hit the current day
                             if (currentDayIndex !== null && monthId === currentMonthId && weekId === currentWeekId && dayIndex >= currentDayIndex) break;
 
-                            // This is a previous day. Add its vocab to the pool.
                             const day = weekData.days[dayIndex];
                             for (const row of day.rows) {
                                 if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
@@ -3725,7 +3713,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
             } catch (error) {
                 console.error("Error building global vocab pool:", error);
-                // Return empty pool on error
             }
 
             return {
@@ -3752,11 +3739,14 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             document.getElementById('quiz-total-time-warning').style.display = 'none';
 
             try {
-                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists()) throw new Error("Month document not found.");
+                // --- START: MODIFIED ---
+                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                const weekDocSnap = await getDoc(weekDocRef);
+                if (!weekDocSnap.exists()) throw new Error("Week document not found.");
 
-                const rowData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex]?.rows?.[rowIndex];
+                const rowData = weekDocSnap.data().days?.[dayIndex]?.rows?.[rowIndex];
+                // --- END: MODIFIED ---
+                
                 if (!rowData) throw new Error("Row data not found.");
 
                 window.currentQuizSubjectInfo = { subjectName: rowData.subject || "Vocabulary", topicDetail: "Row Vocabulary" };
@@ -3766,19 +3756,14 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     quizStartMessage.textContent = "You need at least 4 vocabulary words in this row to start a quiz.";
                     return;
                 }
-
-                // --- TIMER LOGIC (UPGRADED): Generate questions with a global pool ---
             
-                // 1. Get the vocab for THIS day's QUESTIONS
                 const questionList = preProcessVocab(vocabData);
-                currentVocabData = questionList; // Store for "Try Again"
+                currentVocabData = questionList; 
                 currentMcqData = null; 
 
-                // 2. Get the global pool for all INCORRECT options
                 quizStartMessage.textContent = "Loading global vocabulary pool...";
                 let optionPool = await getGlobalVocabPool(monthId, weekId, dayIndex);
 
-                // 3. Handle user's constraint: If the pool is empty, use the current day's list as a fallback
                 if (optionPool.allWords.length < 4) {
                     console.warn("No previous vocab found. Using current day's vocab as option pool.");
                     optionPool = {
@@ -3787,7 +3772,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         allSynonyms: questionList.map(v => v.synonym).filter(Boolean)
                     };
                 } else {
-                    // 4. Add current day's words to the pool to ensure they are also options
                     questionList.forEach(v => {
                         if(v.word) optionPool.allWords.push(v.word);
                         if(v.banglaMeaning) optionPool.allBanglaMeanings.push(v.banglaMeaning);
@@ -3795,18 +3779,15 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     });
                 }
 
-                // 5. Store data for runQuizGame to use
-                currentOptionPool = optionPool; // <-- SET THE GLOBAL POOL
-                currentQuizQuestions = []; // Clear any old questions
+                currentOptionPool = optionPool;
+                currentQuizQuestions = []; 
                 
-                // Estimate total questions for the timer
                 const totalQuestions = questionList.length + questionList.filter(v => v.synonym).length;
                 const totalTimeInSeconds = totalQuestions * 36;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
                 warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
-                // --- END TIMER LOGIC ---
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
                 quizStartBtn.classList.remove('hidden');
@@ -3819,7 +3800,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             } catch (error) {
                 console.error("Error loading vocab quiz data:", error);
                 quizStartMessage.textContent = "Could not load quiz data. Please try again.";
-                window.currentQuizSubjectInfo = { subjectName: 'Vocabulary', topicDetail: 'Error loading topic' }; // Fallback
+                window.currentQuizSubjectInfo = { subjectName: 'Vocabulary', topicDetail: 'Error loading topic' }; 
             }
         }
 		
@@ -3830,27 +3811,34 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizTitle.textContent = 'MCQ Quiz';
 			currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
             quizModal.style.display = "block";
-            // ... (কোড)
+            quizMainScreen.classList.add('hidden');
+            quizResultsScreen.classList.add('hidden');
+            quizStartScreen.classList.remove('hidden');
+            quizStartMessage.textContent = "Loading quiz data...";
+            quizStartBtn.classList.add('hidden');
+            document.getElementById('quiz-total-time-warning').style.display = 'none';
+            
             try {
-                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists()) throw new Error("Month document not found.");
+                // --- START: MODIFIED ---
+                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                const weekDocSnap = await getDoc(weekDocRef);
+                if (!weekDocSnap.exists()) throw new Error("Week document not found.");
 
-                const dayData = docSnap.data().weeks?.[weekId]?.days?.[dayIndex];
+                const dayData = weekDocSnap.data().days?.[dayIndex];
+                // --- END: MODIFIED ---
+                
                 if (!dayData) throw new Error("Day data not found.");
-				// --- START: ADD THIS BLOCK ---
-                const rowData = dayData?.rows?.[rowIndex]; // Get the row
+                
+                const rowData = dayData?.rows?.[rowIndex]; 
                 const subjectName = rowData?.subject || 'MCQ';
                 const topicDetail = rowData?.topic || 'N/A';
                 window.currentQuizSubjectInfo = { subjectName, topicDetail };
-                // --- END: ADD THIS BLOCK ---
+                
                 let mcqData = [];
 
                 if (rowIndex !== null) {
-                    // Req 1: Load MCQs for a specific row
                     mcqData = dayData.rows?.[rowIndex]?.mcqData || [];
                 } else {
-                    // Req 3: Load ALL MCQs for the day
                     mcqData = dayData.rows?.reduce((acc, row) => {
                         if (row.mcqData) {
                             acc.push(...row.mcqData);
@@ -3864,10 +3852,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     return;
                 }
 
-                // --- TIMER LOGIC: Generate questions NOW ---
                 currentMcqData = mcqData;
                 currentVocabData = null;
-                currentQuizQuestions = currentMcqData.map(mcq => ({ // Generate questions
+                currentQuizQuestions = currentMcqData.map(mcq => ({
                     question: mcq.question,
                     options: [...mcq.options],
                     correctAnswer: mcq.correctAnswer,
@@ -3881,7 +3868,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 const warningP = document.getElementById('quiz-total-time-warning');
                 warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
-                // --- END TIMER LOGIC ---
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${mcqData.length} MCQs?`;
                 quizStartBtn.classList.remove('hidden');
@@ -3894,7 +3880,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             } catch (error) {
                 console.error("Error loading MCQ quiz data:", error);
                 quizStartMessage.textContent = "Could not load quiz data. Please try again.";
-                window.currentQuizSubjectInfo = { subjectName: 'MCQ', topicDetail: 'Error loading topic' }; // <-- ADD FALLBACK
+                window.currentQuizSubjectInfo = { subjectName: 'MCQ', topicDetail: 'Error loading topic' };
             }
         }
 
@@ -3935,7 +3921,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 if (querySnapshot.empty) {
                     masterMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">No study plans found.</p>';
                     totalMcqCountSpan.textContent = "0";
-                    setSyncStatus("Synced", "green"); // Added this
+                    setSyncStatus("Synced", "green"); 
                     return;
                 }
 
@@ -3945,19 +3931,28 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     const monthName = monthData.monthName || monthId;
 
                     let monthHasMcqs = false;
-                    let monthWeekContainerHtml = ''; // Holds the week blocks for this month
+                    let monthWeekContainerHtml = '';
+                    
+                    // --- START: MODIFIED ---
+                    const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
+                    const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
+                    // --- END: MODIFIED ---
 
                     for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
-                        const weekData = monthData.weeks?.[weekId];
+                        // --- START: MODIFIED ---
+                        const weekDoc = weeksQuerySnapshot.docs.find(d => d.id === weekId);
+                        if (!weekDoc) continue;
+                        const weekData = weekDoc.data();
+                        // --- END: MODIFIED ---
+                        
                         if (!weekData || !weekData.days) continue;
 
                         let weekHasMcqs = false;
-                        let weekDayContainerHtml = ''; // Holds the day blocks for this week
+                        let weekDayContainerHtml = ''; 
 
                         for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
                             const day = weekData.days[dayIndex];
                             
-                            // --- REQ 6: Aggregate MCQs from all rows in this day ---
                             const dayMcqs = day.rows?.reduce((acc, row) => {
                                 if (row.mcqData) acc.push(...row.mcqData);
                                 return acc;
@@ -3969,7 +3964,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                                 totalMcqCount += dayMcqs.length;
                                 
                                 let dayMcqItemsHtml = '';
-                                dayMcqs.forEach((mcq, index) => { // Use aggregated dayMcqs
+                                dayMcqs.forEach((mcq, index) => { 
                                     dayMcqItemsHtml += `
                                         <div class="mcq-item">
                                             <p class="mcq-question">${index + 1}. ${escapeHtml(mcq.question)}</p>
@@ -3992,7 +3987,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                                     </div>
                                 `;
                             }
-                            // --- END LOGIC FIX ---
                         }
                         if (weekHasMcqs) {
                             monthWeekContainerHtml += `
@@ -4053,9 +4047,19 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     let monthMcqs = [];
                     let monthHtml = `<h3>${monthName}</h3>`;
                     let monthHasMcqs = false;
+                    
+                    // --- START: MODIFIED ---
+                    const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
+                    const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
+                    // --- END: MODIFIED ---
 
                     for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
-                        const weekData = monthData.weeks?.[weekId];
+                        // --- START: MODIFIED ---
+                        const weekDoc = weeksQuerySnapshot.docs.find(d => d.id === weekId);
+                        if (!weekDoc) continue;
+                        const weekData = weekDoc.data();
+                        // --- END: MODIFIED ---
+                        
                         if (!weekData || !weekData.days) continue;
 
                         let weekMcqs = [];
@@ -4065,7 +4069,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
                             const day = weekData.days[dayIndex];
                             
-                            // --- REQ 6: Aggregate MCQs from all rows in this day ---
                             const dayMcqs = day.rows?.reduce((acc, row) => {
                                 if (row.mcqData) acc.push(...row.mcqData);
                                 return acc;
@@ -4077,17 +4080,14 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                                 weekHasMcqs = true;
                                 weekMcqs.push(...dayMcqs);
                                 
-                                // Add Day Button
                                 weekHtml += `<button class="mcq-center-btn day-btn" data-quiz-type="day" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}">
                                     Day ${day.dayNumber} (${dayMcqs.length} MCQs)
                                 </button>`;
                             }
-                            // --- END LOGIC FIX ---
                         }
 
                         if (weekHasMcqs) {
                             monthMcqs.push(...weekMcqs);
-                            // Add Week Total Button
                             weekHtml = `
                                 <h4>${weekId.replace('week', 'Week ')}</h4>
                                 <button class="mcq-center-btn week-btn" data-quiz-type="week" data-month-id="${monthId}" data-week-id="${weekId}">
@@ -4100,7 +4100,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     }
 
                     if (monthHasMcqs) {
-                        // Add Month Total Button
                         monthHtml = `
                             <h3>${monthName}</h3>
                             <button class="mcq-center-btn month-btn" data-quiz-type="month" data-month-id="${monthId}">
@@ -4149,60 +4148,66 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             document.getElementById('quiz-total-time-warning').style.display = 'none';
 
             try {
-                const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists()) throw new Error("Month document not found.");
-
-                const monthData = docSnap.data();
+                // --- START: MODIFIED ---
+                const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const weeksCollectionRef = collection(db, monthDocRef.path, 'weeks');
+                // --- END: MODIFIED ---
+                
                 let aggregatedMcqs = [];
                 let quizTitle = '';
 
-					if (quizType === 'day') {
-                    const day = monthData.weeks?.[weekId]?.days?.[dayIndex];
+                if (quizType === 'day') {
+                    const weekDocRef = doc(weeksCollectionRef, weekId);
+                    const weekDocSnap = await getDoc(weekDocRef);
+                    if (!weekDocSnap.exists()) throw new Error("Week document not found.");
+                    
+                    const day = weekDocSnap.data().days?.[dayIndex];
                     if (!day) throw new Error("Day data not found.");
-                    // REQ 6: Aggregate from rows
+                    
                     day.rows?.forEach(row => {
                         if (row.mcqData) aggregatedMcqs.push(...row.mcqData);
                     });
                     quizTitle = `Day ${day.dayNumber} - ${weekId.replace('week', 'Week ')}`;
+                    
                 } else if (quizType === 'week') {
-                    const week = monthData.weeks?.[weekId];
-                    if (!week) throw new Error("Week data not found.");
-                    // REQ 6: Aggregate from rows
-                    for (const day of week.days) {
-                        day.rows?.forEach(row => {
-                            if (row.mcqData) aggregatedMcqs.push(...row.mcqData);
-                        });
+                    const weekDocRef = doc(weeksCollectionRef, weekId);
+                    const weekDocSnap = await getDoc(weekDocRef);
+                    if (!weekDocSnap.exists()) throw new Error("Week document not found.");
+                    
+                    const weekData = weekDocSnap.data();
+                    if (weekData && weekData.days) {
+                        for (const day of weekData.days) {
+                            day.rows?.forEach(row => {
+                                if (row.mcqData) aggregatedMcqs.push(...row.mcqData);
+                            });
+                        }
                     }
-                    quizTitle = `${weekId.replace('week', 'Week ')} - ${monthData.monthName}`;
+                    quizTitle = `${weekId.replace('week', 'Week ')} - ${monthId}`;
+                    
                 } else if (quizType === 'month') {
-                    for (const wId of ['week1', 'week2', 'week3', 'week4']) {
-                        const week = monthData.weeks?.[wId];
-                        if (week && week.days) {
-                            // REQ 6: Aggregate from rows
-                            for (const day of week.days) {
+                    const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
+                    for (const weekDocSnap of weeksQuerySnapshot.docs) {
+                        const weekData = weekDocSnap.data();
+                        if (weekData && weekData.days) {
+                            for (const day of weekData.days) {
                                 day.rows?.forEach(row => {
                                     if (row.mcqData) aggregatedMcqs.push(...row.mcqData);
                                 });
                             }
                         }
                     }
-                    quizTitle = `${monthData.monthName} - All MCQs`;
+                    quizTitle = `${monthId} - All MCQs`;
                 }
 				
-				// --- START: ADD THIS LINE ---
-                // We set the subject as "Aggregated" because it combines multiple rows/days
                 window.currentQuizSubjectInfo = { subjectName: "Aggregated", topicDetail: quizTitle };
-                // --- END: ADD THIS LINE ---
                 if (aggregatedMcqs.length === 0) {
                     quizStartMessage.textContent = "No MCQs found for this selection.";
                     return;
                 }
                 
-                // --- TIMER LOGIC: Generate questions NOW ---
                 currentMcqData = aggregatedMcqs; 
                 currentVocabData = null;
-                currentQuizQuestions = currentMcqData.map(mcq => ({ // Generate questions
+                currentQuizQuestions = currentMcqData.map(mcq => ({ 
                     question: mcq.question,
                     options: [...mcq.options],
                     correctAnswer: mcq.correctAnswer,
@@ -4216,7 +4221,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 const warningP = document.getElementById('quiz-total-time-warning');
                 warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
-                // --- END TIMER LOGIC ---
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${aggregatedMcqs.length} MCQs from: ${quizTitle}?`;
                 quizStartBtn.classList.remove('hidden');
@@ -4229,7 +4233,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             } catch (error) {
                 console.error("Error loading aggregated MCQ quiz data:", error);
                 quizStartMessage.textContent = "Could not load quiz data. Please try again.";
-                window.currentQuizSubjectInfo = { subjectName: 'Aggregated', topicDetail: 'Error loading topic' }; // <-- ADD FALLBACK
+                window.currentQuizSubjectInfo = { subjectName: 'Aggregated', topicDetail: 'Error loading topic' }; 
             }
         }
 
