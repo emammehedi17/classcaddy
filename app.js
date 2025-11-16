@@ -3390,18 +3390,26 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             try {
                 const plansCollectionPath = getUserPlansCollectionPath();
                 const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
-                const querySnapshot = await getDocs(q);
+                const querySnapshot = await getDocs(q); // Gets all MONTHS
                 
                 let quizButtonsHtml = '';
                 let quizzesFound = 0;
 
-                for (const docSnap of querySnapshot.docs) {
+                for (const docSnap of querySnapshot.docs) { // Loop 1: Months
                     const monthId = docSnap.id;
                     const monthData = docSnap.data();
                     const monthName = monthData.monthName || monthId;
 
-                    for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
-                        const weekData = monthData.weeks?.[weekId];
+                    // --- START: MODIFIED ---
+                    // Fetch the weeks subcollection for this month
+                    const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
+                    const weeksQuerySnapshot = await getDocs(weeksCollectionRef); // Gets all WEEKS
+                    // --- END: MODIFIED ---
+
+                    for (const weekDocSnap of weeksQuerySnapshot.docs) { // Loop 2: Actual weeks
+                        const weekId = weekDocSnap.id;
+                        const weekData = weekDocSnap.data(); // This is { days: [...] }
+
                         if (!weekData || !weekData.days) continue;
 
                         // Aggregate all vocab from this week
