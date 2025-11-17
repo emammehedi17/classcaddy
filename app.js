@@ -1750,24 +1750,24 @@ async function runMigrationForMonth(monthDocRef, oldWeeksMap) {
                     setSyncStatus("Syncing...", "yellow");
                 }
                 
-                // --- START: MODIFIED ---
-                // 'monthDocRef' is the ref to '.../2025-11'
-                // 'updatePayload' is now { days: [...] }
-                // We need to know which WEEK this save is for.
-                
-                // This is a bit of a hack: The 'updatePayload' doesn't know its own weekId.
-                // We'll find the weekId from the *only* editing daySection on the page.
+                // --- START: MODIFIED LOGIC ---
                 const editingDay = document.querySelector('.day-section.editing, .day-section.saving'); 
-                // (We'll add the 'saving' class in toggleDayEditMode)
                 
                 let weekId;
-                if(isAutosave && editingDay) {
+                let dayIndexForTimestamp = null;
+                let wasCheckboxClick = false;
+
+                if (isAutosave && editingDay) {
+                    // This is an autosave from typing
                     weekId = editingDay.closest('.week-section').dataset.weekId;
-                } else if (isCheckboxClickGlobal) { // We'll set this global variable
+                } else if (isCheckboxClickGlobal) { 
+                    // This is a checkbox click
                     weekId = isCheckboxClickGlobal.weekId;
-                    isCheckboxClickGlobal = null; // Clear it
+                    dayIndexForTimestamp = isCheckboxClickGlobal.dayIndex;
+                    wasCheckboxClick = true;
+                    isCheckboxClickGlobal = null; // Clear it now that we've used it
                 } else {
-                    // This is a manual save, find the 'saving' section
+                    // This is a manual "Save" button click
                     const savingDay = document.querySelector('.day-section.saving');
                     if (savingDay) {
                         weekId = savingDay.closest('.week-section').dataset.weekId;
@@ -1782,22 +1782,20 @@ async function runMigrationForMonth(monthDocRef, oldWeeksMap) {
                 // Create the correct reference to the WEEK document
                 const weekDocRef = doc(db, monthDocRef.path, 'weeks', weekId);
                 
-                // The payload is already { days: [...] }
+                // Save the { days: [...] } payload to the WEEK doc
                 await updateDoc(weekDocRef, updatePayload);
-                // --- END: MODIFIED ---
-
+                
                 // --- START: NEW TIMESTAMP LOGIC ---
-                // If this was a checkbox click, update the month doc
-                if (isCheckboxClickGlobal && isCheckboxClickGlobal.dayIndex !== undefined) {
-                    const dayIndex = isCheckboxClickGlobal.dayIndex;
+                // If this was a checkbox click, update the MONTH doc
+                if (wasCheckboxClick) {
                     const monthUpdatePayload = { 
                         lastCompletedDay: { 
                             timestamp: Timestamp.now(), 
                             weekId: weekId, 
-                            dayIndex: dayIndex 
+                            dayIndex: dayIndexForTimestamp 
                         } 
                     };
-                    await updateDoc(monthDocRef, monthUpdatePayload);
+                    await updateDoc(monthDocRef, monthUpdatePayload); // Saves to the month doc
                     console.log("Updated lastCompletedDay timestamp on month doc.");
                 }
                 // --- END: NEW TIMESTAMP LOGIC ---
