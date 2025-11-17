@@ -104,17 +104,20 @@
                     <i class="fas fa-binoculars mr-2"></i> Study With Mehedi (Guest)
                 </button>
             </div>
-             <div id="user-info" class="hidden flex flex-col sm:flex-row justify-between items-center text-sm">
-                 <div class="flex items-center gap-3 mb-3 sm:mb-0 text-gray-600">
+            <div id="user-info" class="hidden flex flex-col sm:flex-row justify-between items-center text-sm">
+                <div class="flex items-center gap-3 mb-3 sm:mb-0 text-gray-600">
                      <i class="fas fa-check-circle text-emerald-500"></i>
-                     <span class="font-semibold">Sync Status:</span>
                      <span id="sync-status-text" class="text-emerald-500 font-medium">Synced</span>
                  </div>
-                <div class="text-center sm:text-right">
-                    <p id="user-display" class="font-medium text-gray-800"></p>
-                    <p id="user-email-display" class="text-gray-500 text-xs"></p>
-                     <span id="user-id-display" class="ml-4 text-xs text-gray-400 break-all" title="Your unique User ID"></span>
-                    <button id="logout-btn" class="mt-1 text-red-500 hover:text-red-700 text-xs font-semibold">Log Out</button>
+                 
+                <div class="flex items-center gap-3">
+                    <div class="text-center sm:text-right">
+                        <p id="user-display" class="font-medium text-gray-800"></p>
+                        <p id="user-email-display" class="text-gray-500 text-xs"></p>
+                        <span id="user-id-display" class="ml-4 text-xs text-gray-400 break-all" title="Your unique User ID"></span>
+                        <button id="logout-btn" class="mt-1 text-red-500 hover:text-red-700 text-xs font-semibold">Log Out</button>
+                    </div>
+                    <img id="user-photo-display" class="h-10 w-10 rounded-full border-2 border-emerald-500 object-cover hidden" src="" alt="Profile">
                 </div>
             </div>
         </div>
@@ -627,6 +630,6 @@
       </div>
     </div>
 	
-	<script type="module" src="app.js"></script>
+	<script type="module" src="app.js" defer></script>
 </body>
 </html>
