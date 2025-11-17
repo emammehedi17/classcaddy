@@ -2023,11 +2023,69 @@ function addVocabPairInputs(container, word = '', meaning = '') {
              if (!currentUser || !userId) return;
              console.log("Attempting to delete month:", monthId);
              setSyncStatus("Syncing...", "yellow");
+             
+             // --- START: NEW LOGIC ---
+             let monthToLoad = null;
+             const buttonToDelete = monthNavButtonsContainer.querySelector(`button[data-month-id="${monthId}"]`);
+             
+             if (buttonToDelete) {
+                 // Find the previous button that is a month button (not the "Add Month" button)
+                 let prevButton = buttonToDelete.previousElementSibling;
+                 while(prevButton && !prevButton.dataset.monthId) {
+                     prevButton = prevButton.previousElementSibling;
+                 }
+                 
+                 // Find the next button that is a month button
+                 let nextButton = buttonToDelete.nextElementSibling;
+                 while(nextButton && !nextButton.dataset.monthId) {
+                     nextButton = nextButton.nextElementSibling;
+                 }
+
+                 if (prevButton && prevButton.dataset.monthId) {
+                     // Prefer loading the previous month
+                     monthToLoad = prevButton.dataset.monthId;
+                 } else if (nextButton && nextButton.dataset.monthId) {
+                     // Otherwise, load the next month
+                     monthToLoad = nextButton.dataset.monthId;
+                 }
+                 // If no neighbor, monthToLoad remains null
+             }
+             
+             // Unsubscribe if we are deleting the active month
              const activeBtn = monthNavButtonsContainer.querySelector('button.active-month');
-             if (activeBtn && activeBtn.dataset.monthId === monthId && unsubscribeActiveMonth) { unsubscribeActiveMonth(); unsubscribeActiveMonth = null; }
+             if (activeBtn && activeBtn.dataset.monthId === monthId && unsubscribeActiveMonth) { 
+                 unsubscribeActiveMonth(); 
+                 unsubscribeActiveMonth = null; 
+             }
+             // --- END: NEW LOGIC ---
+
              const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-             try { await deleteDoc(docRef); console.log("Month deleted successfully."); setSyncStatus("Synced", "green"); }
-             catch (error) { console.error("Error deleting month:", error); showCustomAlert("Error deleting month. Please try again."); setSyncStatus("Error", "red"); }
+             try { 
+                 await deleteDoc(docRef); 
+                 console.log("Month deleted successfully."); 
+                 setSyncStatus("Synced", "green"); 
+                 
+                 // --- START: NEW LOADING LOGIC ---
+                 if (monthToLoad) {
+                     // Explicitly load the neighbor month.
+                     // The database listener will update the buttons,
+                     // but this ensures the correct month is displayed.
+                     displayMonthPlan(monthToLoad); 
+                 } else {
+                     // It was the only month. Clear the display.
+                     // The database listener will show the "No plans" message.
+                     currentMonthPlanDisplay.innerHTML = '';
+                     selectMonthMessage.classList.add('hidden');
+                     noPlansMessage.style.display = 'block';
+                 }
+                 // --- END: NEW LOADING LOGIC ---
+                 
+             }
+             catch (error) { 
+                 console.error("Error deleting month:", error); 
+                 showCustomAlert("Error deleting month. Please try again."); 
+                 setSyncStatus("Error", "red"); 
+             }
          }
          function showConfirmationModal(title, message, onConfirm) {
              confirmModalTitle.textContent = title; confirmModalMessage.textContent = message; currentConfirmAction = onConfirm;
