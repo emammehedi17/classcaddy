@@ -748,7 +748,7 @@ async function runMigrationForMonth(monthDocRef, oldWeeksMap) {
              // --- END: New Logic ---
         });
 
-        // 2. This listener SAVES the new month from the modal
+        // 2. This listener SAVES the new month from the modal (NOW OPTIMISTIC)
         saveNewMonthBtn.addEventListener('click', async () => {
             if (!currentUser || !userId) return;
 
@@ -768,38 +768,47 @@ async function runMigrationForMonth(monthDocRef, oldWeeksMap) {
             const monthId = `${year}-${(monthIndex + 1).toString().padStart(2, '0')}`; // e.g., "2025-12"
 
             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+            
+            // 4. We MUST check for duplicates before proceeding
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                  showCustomAlert(`Month ID ${monthId} (${monthName}) already exists.`, "error");
                  return; 
             }
 
-            // 4. Create the new data object (now compatible with subcollections)
+            // 5. Create the new data object
             const newPlanData = {
                monthName: monthName,
                createdAt: Timestamp.now(),
                weeklyTargets: { week1: '', week2: '', week3: '', week4: '' }
-               // We no longer create the 'weeks' map
             };
 
-            // 5. Save to Firebase
-            setSyncStatus("Syncing...", "yellow");
-            try { 
-                await setDoc(docRef, newPlanData); 
-                console.log("New month added:", monthId);
-                
-                // --- START: NEW BEHAVIOR ---
-                showCustomAlert("Month Created Successfully!", "success"); // 1. Show success alert
-                closeModal('add-month-modal'); // 2. Close the popup
-                displayMonthPlan(monthId); // 3. Instantly load the new month
-                // setSyncStatus("Synced", "green"); // displayMonthPlan will handle this
-                // --- END: NEW BEHAVIOR ---
-            }
-            catch (error) { 
-                console.error("Error adding new month:", error); 
-                showCustomAlert("Error adding month.");
-                setSyncStatus("Error", "red");
-            }
+            // --- START: NEW OPTIMISTIC FLOW ---
+            
+            // 6. Perform instant UI actions
+            showCustomAlert("Month Created Successfully!", "success");
+            closeModal('add-month-modal');
+            
+            // 7. Instantly load the new (empty) month.
+            // This will show "Loading..." and set up the listener.
+            displayMonthPlan(monthId); 
+
+            // 8. Run the database write in the background (no 'await')
+            setDoc(docRef, newPlanData)
+                .then(() => {
+                    console.log("Background save of new month successful:", monthId);
+                    // The onSnapshot listener in displayMonthPlan will automatically
+                    // detect this change and render the new month.
+                })
+                .catch((error) => {
+                    // The save FAILED. The user already saw "success", so we must now show a hard error.
+                    console.error("Error adding new month in background:", error); 
+                    showCustomAlert("CRITICAL ERROR: Could not save new month. Please refresh.", "error");
+                    setSyncStatus("Error", "red");
+                    // Overwrite the loading screen with an error
+                    currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">Error creating month. Please refresh.</p>';
+                });
+            // --- END: NEW OPTIMISTIC FLOW ---
         });
 		
 		showAllVocabBtn.addEventListener('click', displayAllVocabs);
