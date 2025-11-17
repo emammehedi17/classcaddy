@@ -1861,7 +1861,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     setSyncStatus("Syncing...", "yellow");
                 }
                 
-                // --- START: MODIFIED LOGIC ---
                 const editingDay = document.querySelector('.day-section.editing, .day-section.saving'); 
                 
                 let weekId;
@@ -1890,14 +1889,16 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     throw new Error("Could not determine weekId for save operation.");
                 }
 
-                // Create the correct reference to the WEEK document
+                // --- START: MODIFIED - PARALLEL SAVE ---
+                
+                // 1. Create a list of promises to run
+                const savePromises = [];
+
+                // 2. Promise 1: Save the (large) 'days' array to the WEEK document
                 const weekDocRef = doc(db, monthDocRef.path, 'weeks', weekId);
+                savePromises.push( updateDoc(weekDocRef, updatePayload) );
                 
-                // Save the { days: [...] } payload to the WEEK doc
-                await updateDoc(weekDocRef, updatePayload);
-                
-                // --- START: NEW TIMESTAMP LOGIC ---
-                // If this was a checkbox click, update the MONTH doc
+                // 3. Promise 2: If it was a checkbox click, save the (small) timestamp to the MONTH document
                 if (wasCheckboxClick) {
                     const monthUpdatePayload = { 
                         lastCompletedDay: { 
@@ -1906,10 +1907,17 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             dayIndex: dayIndexForTimestamp 
                         } 
                     };
-                    await updateDoc(monthDocRef, monthUpdatePayload); // Saves to the month doc
+                    // This save will trigger the onSnapshot listener for the month
+                    savePromises.push( updateDoc(monthDocRef, monthUpdatePayload) );
+                }
+
+                // 4. Run all saves at the same time
+                await Promise.all(savePromises);
+                
+                if (wasCheckboxClick) {
                     console.log("Updated lastCompletedDay timestamp on month doc.");
                 }
-                // --- END: NEW TIMESTAMP LOGIC ---
+                // --- END: MODIFIED - PARALLEL SAVE ---
                 
                 console.log("Save successful.");
                 if (!isAutosave) {
