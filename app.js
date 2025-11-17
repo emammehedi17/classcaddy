@@ -1398,7 +1398,7 @@ async function runMigrationForMonth(monthDocRef, oldWeeksMap) {
                             }
                             
                             // DOM থেকে ডেটা পড়ুন (চেকবক্সের নতুন অবস্থা সহ)
-                            const dayIndex = parseInt(daySection.dataset.dayIndex);
+                            
                             // --- START: MODIFIED ---
                             // Set the global var so saveDataToFirebase knows the weekId AND dayIndex
                             const dayIndex = parseInt(daySection.dataset.dayIndex); // <-- Add this
