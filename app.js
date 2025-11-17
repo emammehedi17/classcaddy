@@ -51,6 +51,7 @@
         const userDisplay = document.getElementById('user-display');
         const userEmailDisplay = document.getElementById('user-email-display');
         const userIdDisplay = document.getElementById('user-id-display');
+		const userPhotoDisplay = document.getElementById('user-photo-display');
         const googleLoginBtn = document.getElementById('google-login-btn');
 		const guestLoginBtn = document.getElementById('guest-login-btn');
         const logoutBtn = document.getElementById('logout-btn'); // Main logout button
@@ -278,6 +279,12 @@
                 userDisplay.textContent = user.displayName || 'User';
                 userEmailDisplay.textContent = user.email || (user.isAnonymous ? 'Guest (Read-Only)' : ''); // <-- MODIFIED
                 userIdDisplay.textContent = `ID: ${userId}`;
+				if (user.photoURL) {
+                    userPhotoDisplay.src = user.photoURL;
+                    userPhotoDisplay.classList.remove('hidden');
+                } else {
+                    userPhotoDisplay.classList.add('hidden');
+                }
                 userIdDisplay.title = 'Your unique User ID';
 
                 // --- MODIFIED: HIDE/SHOW LOGOUT BUTTON ---
@@ -314,7 +321,9 @@
                 loginPrompt.style.display = 'block';
                 userInfo.classList.add('hidden');
                 logoutBtn.classList.add('hidden');
-
+				
+				userPhotoDisplay.classList.add('hidden');
+				userPhotoDisplay.src = "";
                  const loggedOutHTML = `<a href="index.html#signup" class="px-5 py-2 font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors signup-button text-sm">Sign Up</a>`;
                  authContainerDesktop.innerHTML = loggedOutHTML;
                  authContainerMobile.innerHTML = loggedOutHTML.replace('px-5 py-2', 'block w-full text-center py-2');
@@ -373,6 +382,7 @@
                 uid: MEHEDI_UID,
                 displayName: "Guest (Viewing Mehedi's Plan)",
                 email: "read-only@guest.com",
+				photoURL: "images/profile.jpg",
                 isAnonymous: true // Use this to check for guest mode
             };
             // Manually call updateAuthUI with this guest user
