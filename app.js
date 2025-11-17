@@ -945,7 +945,7 @@ async function runMigrationForMonth(monthDocRef, oldWeeksMap) {
                 weekly: lastWeekPercent, 
                 daily: lastDayPercent, 
                 link: continueLink 
-            } = findLastProgressTrackers(monthId, weeksData);
+            } = findLastProgressTrackers(monthId, monthData, weeksData);
             // --- END: MODIFIED ---
 
             monthDiv.innerHTML = `
@@ -1400,8 +1400,9 @@ async function runMigrationForMonth(monthDocRef, oldWeeksMap) {
                             // DOM থেকে ডেটা পড়ুন (চেকবক্সের নতুন অবস্থা সহ)
                             const dayIndex = parseInt(daySection.dataset.dayIndex);
                             // --- START: MODIFIED ---
-                            // Set the global var so saveDataToFirebase knows the weekId
-                            isCheckboxClickGlobal = { weekId: weekId };
+                            // Set the global var so saveDataToFirebase knows the weekId AND dayIndex
+                            const dayIndex = parseInt(daySection.dataset.dayIndex); // <-- Add this
+                            isCheckboxClickGlobal = { weekId: weekId, dayIndex: dayIndex }; // <-- Add dayIndex
                             const parseResult = await parseAndPrepareSaveData(daySection, weekId, true); // true = isCheckboxClick
                             // --- END: MODIFIED ---
                             
@@ -1784,6 +1785,22 @@ async function runMigrationForMonth(monthDocRef, oldWeeksMap) {
                 // The payload is already { days: [...] }
                 await updateDoc(weekDocRef, updatePayload);
                 // --- END: MODIFIED ---
+
+                // --- START: NEW TIMESTAMP LOGIC ---
+                // If this was a checkbox click, update the month doc
+                if (isCheckboxClickGlobal && isCheckboxClickGlobal.dayIndex !== undefined) {
+                    const dayIndex = isCheckboxClickGlobal.dayIndex;
+                    const monthUpdatePayload = { 
+                        lastCompletedDay: { 
+                            timestamp: Timestamp.now(), 
+                            weekId: weekId, 
+                            dayIndex: dayIndex 
+                        } 
+                    };
+                    await updateDoc(monthDocRef, monthUpdatePayload);
+                    console.log("Updated lastCompletedDay timestamp on month doc.");
+                }
+                // --- END: NEW TIMESTAMP LOGIC ---
                 
                 console.log("Save successful.");
                 if (!isAutosave) {
@@ -2501,42 +2518,53 @@ function addVocabPairInputs(container, word = '', meaning = '') {
             return Math.round(total / 4);
         }
 		
-		function findLastProgressTrackers(monthId, weeksData) {
+		function findLastProgressTrackers(monthId, monthData, weeksData) {
             if (!weeksData) {
                 return { weekly: 0, daily: 0, link: null };
             }
 
+            // --- START: NEW LOGIC ---
+            // Try to find the *last completed* day first
+            if (monthData && monthData.lastCompletedDay) {
+                const { weekId, dayIndex } = monthData.lastCompletedDay;
+                const weekData = weeksData[weekId];
+                const dayData = weekData?.days?.[dayIndex];
+
+                if (dayData) {
+                    // Found it!
+                    console.log("Tracker found last *completed* day:", weekId, dayIndex);
+                    const weeklyPercent = calculateWeeklyProgress(weekData);
+                    const dailyPercent = calculateDailyProgress(dayData);
+                    const continueLink = `#day-${monthId}-${weekId}-${dayIndex}`;
+                    return { weekly: weeklyPercent, daily: dailyPercent, link: continueLink };
+                }
+            }
+            // --- END: NEW LOGIC ---
+
+            // --- FALLBACK: Original logic (find last *existing* day) ---
+            console.log("Tracker falling back to last *existing* day.");
             let lastWeekData = null;
             let lastDayData = null;
             let lastWeekId = null;
             let lastDayIndex = -1;
 
-            // Iterate backwards from week 4 to find the latest week with content
             for (const weekId of ['week4', 'week3', 'week2', 'week1']) {
                 const weekData = weeksData[weekId];
                 if (weekData && weekData.days && weekData.days.length > 0) {
-                    // This is the "last week"
                     lastWeekData = weekData;
                     lastWeekId = weekId;
-                    
-                    // This is the "last day" in that week
                     lastDayIndex = weekData.days.length - 1;
                     lastDayData = weekData.days[lastDayIndex];
-                    
-                    break; // Stop searching, we found the latest week
+                    break; 
                 }
             }
 
             if (!lastWeekData) {
-                // No days found in any week
                 return { weekly: 0, daily: 0, link: null };
             }
 
-            // We found the last week and day, now calculate their progress
             const weeklyPercent = calculateWeeklyProgress(lastWeekData);
             const dailyPercent = calculateDailyProgress(lastDayData);
-            
-            // Create the anchor link for the "Continue" button
             const continueLink = `#day-${monthId}-${lastWeekId}-${lastDayIndex}`;
 
             return { weekly: weeklyPercent, daily: dailyPercent, link: continueLink };
@@ -3740,7 +3768,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         
                         // --- START: MODIFIED ---
                         const updatePayload = { days: daysArray };
-await updateDoc(weekDocRef, updatePayload);
+						await updateDoc(weekDocRef, updatePayload);
                         // --- END: MODIFIED ---
                         
                         console.log("MCQs saved successfully in background for day:", dayIndex);
@@ -5212,7 +5240,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
         weekly: lastWeekPercent, 
         daily: lastDayPercent, 
         link: continueLink 
-    } = findLastProgressTrackers(monthId, weeksData);
+    } = findLastProgressTrackers(monthId, monthData, weeksData);
     // --- END: MODIFIED ---
 
     updateTracker(monthElement, `#monthly-tracker-${monthId}`, monthlyPercent);
