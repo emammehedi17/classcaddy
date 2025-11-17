@@ -85,6 +85,10 @@
         const confirmModalMessage = document.getElementById('confirm-modal-message');
         const confirmModalConfirmBtn = document.getElementById('confirm-modal-confirm');
         const confirmModalCancelBtn = document.getElementById('confirm-modal-cancel');
+		const addMonthModal = document.getElementById('add-month-modal');
+        const newMonthSelect = document.getElementById('new-month-select');
+        const newMonthYear = document.getElementById('new-month-year');
+        const saveNewMonthBtn = document.getElementById('save-new-month-btn');
 		// --- START: ADD THESE QUIZ ELEMENTS ---
         const quizModal = document.getElementById('quiz-modal');
 		const banglaRegex = /[\u0980-\u09FF]/; // Bengali Unicode Range
@@ -698,9 +702,8 @@ async function runMigrationForMonth(monthDocRef, oldWeeksMap) {
          }
 
 
-       // Add a new month
-        // Add a new month
-        document.addEventListener('click', async (e) => {
+       // 1. This listener OPENS the modal and sets the default date
+        document.addEventListener('click', (e) => {
             // Check if the clicked element or its parent is the inline add button
             if (!e.target.matches('#add-month-btn-inline') && !e.target.closest('#add-month-btn-inline')) {
                 return; // Not our button, do nothing
@@ -708,49 +711,92 @@ async function runMigrationForMonth(monthDocRef, oldWeeksMap) {
             
              e.preventDefault(); // Prevent page jump
              if (!currentUser || !userId) return;
-             const currentYear = new Date().getFullYear();
-             const currentMonthIndex = new Date().getMonth();
-             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-             // Default to *current* month
-             const suggestedMonthName = `${monthNames[currentMonthIndex]} ${currentYear}`;
-             const monthNameInput = prompt("Enter month name (e.g., 'October 2025'):", suggestedMonthName);
-             if (!monthNameInput || monthNameInput.trim() === '') return;
-             const monthName = monthNameInput.trim();
+             // --- START: New Logic ---
+             
+             // 1. Find the last month in the list
+             const monthButtons = monthNavButtonsContainer.querySelectorAll('button[data-month-id]');
+             let nextYear, nextMonthIndex;
 
-             let monthId = '';
-             let monthYear = currentYear;
-             let monthIndex = currentMonthIndex;
+             if (monthButtons.length > 0) {
+                 const lastMonthButton = monthButtons[monthButtons.length - 1];
+                 const lastMonthId = lastMonthButton.dataset.monthId; // e.g., "2025-11"
+                 const parts = lastMonthId.split('-');
+                 const lastYear = parseInt(parts[0]);
+                 const lastMonth = parseInt(parts[1]) - 1; // 0-indexed (e.g., 10 for November)
 
-             try {
-                const parts = monthName.split(' ');
-                const year = parseInt(parts[1]);
-                const index = monthNames.findIndex(m => m.toLowerCase() === parts[0].toLowerCase());
-                if (year && index !== -1 && year > 1900 && year < 3000) {
-                    monthId = `${year}-${(index + 1).toString().padStart(2, '0')}`;
-                    monthYear = year;
-                    monthIndex = index;
-                } else { throw new Error("Invalid format"); }
-             } catch (e) {
-                 monthId = `${monthYear}-${(monthIndex + 1).toString().padStart(2, '0')}`;
-                 console.warn("Could not parse month name, using generated ID:", monthId);
+                 // 2. Calculate the next month
+                 const nextMonthDate = new Date(lastYear, lastMonth);
+                 nextMonthDate.setMonth(nextMonthDate.getMonth() + 1); // This handles year rollover
+                 
+                 nextYear = nextMonthDate.getFullYear();
+                 nextMonthIndex = nextMonthDate.getMonth(); // 0-indexed
+             } else {
+                 // No months exist. Default to the *current* month.
+                 const today = new Date();
+                 nextYear = today.getFullYear();
+                 nextMonthIndex = today.getMonth();
              }
 
-             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-             const docSnap = await getDoc(docRef);
-             if (docSnap.exists()) { showCustomAlert(`Month ID ${monthId} (${monthName}) already exists.`); return; }
+             // 3. Populate the modal
+             newMonthSelect.value = nextMonthIndex;
+             newMonthYear.value = nextYear;
 
-             const newPlanData = {
-                monthName: monthName,
-                createdAt: Timestamp.now(), // Used for sorting
-                weeklyTargets: { week1: '', week2: '', week3: '', week4: '' },
-                weeks: {
-                    week1: { days: [] }, week2: { days: [] }, week3: { days: [] }, week4: { days: [] }
-                }
-             };
+             // 4. Show the modal
+             addMonthModal.style.display = 'block';
+             newMonthYear.focus(); // Focus the year input
+             // --- END: New Logic ---
+        });
 
-            try { await setDoc(docRef, newPlanData); console.log("New month added:", monthId); }
-            catch (error) { console.error("Error adding new month:", error); showCustomAlert("Error adding month."); }
+        // 2. This listener SAVES the new month from the modal
+        saveNewMonthBtn.addEventListener('click', async () => {
+            if (!currentUser || !userId) return;
+
+            // 1. Get values from modal
+            const monthIndex = parseInt(newMonthSelect.value); // 0-11
+            const year = parseInt(newMonthYear.value);
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            // 2. Validate
+            if (isNaN(year) || year < 2020 || year > 2100) {
+                showCustomAlert("Please enter a valid year (e.g., 2025).", "error");
+                return;
+            }
+
+            // 3. Create names and ID
+            const monthName = `${monthNames[monthIndex]} ${year}`;
+            const monthId = `${year}-${(monthIndex + 1).toString().padStart(2, '0')}`; // e.g., "2025-12"
+
+            const docRef = doc(db, getUserPlansCollectionPath(), monthId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                 showCustomAlert(`Month ID ${monthId} (${monthName}) already exists.`, "error");
+                 return; 
+            }
+
+            // 4. Create the new data object (now compatible with subcollections)
+            const newPlanData = {
+               monthName: monthName,
+               createdAt: Timestamp.now(),
+               weeklyTargets: { week1: '', week2: '', week3: '', week4: '' }
+               // We no longer create the 'weeks' map
+            };
+
+            // 5. Save to Firebase
+            setSyncStatus("Syncing...", "yellow");
+            try { 
+                await setDoc(docRef, newPlanData); 
+                console.log("New month added:", monthId);
+                setSyncStatus("Synced", "green");
+                closeModal('add-month-modal');
+                // The 'loadStudyPlans' onSnapshot listener will automatically
+                // see the new month and add the button.
+            }
+            catch (error) { 
+                console.error("Error adding new month:", error); 
+                showCustomAlert("Error adding month.");
+                setSyncStatus("Error", "red");
+            }
         });
 		
 		showAllVocabBtn.addEventListener('click', displayAllVocabs);
