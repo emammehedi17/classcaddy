@@ -557,7 +557,118 @@ async function runMigrationForMonth(monthDocRef, oldWeeksMap) {
         return false;
     }
 }
-		
+		/**
+ * NEW: Performs targeted UI updates for the entire month
+ * without a full re-render.
+ */
+function updateMonthUI(monthId, monthData, weeksData) {
+    if (!monthData) return;
+    
+    const monthElement = document.querySelector(`.card[data-month-id="${monthId}"]`);
+    if (!monthElement) return; // Month isn't on the page
+
+    // 1. Update Monthly Progress Trackers
+    // --- START: MODIFIED ---
+    const monthlyPercent = calculateOverallMonthlyProgress(weeksData);
+    const { 
+        weekly: lastWeekPercent, 
+        daily: lastDayPercent, 
+        link: continueLink 
+    } = findLastProgressTrackers(monthId, monthData, weeksData);
+    // --- END: MODIFIED ---
+
+    updateTracker(monthElement, `#monthly-tracker-${monthId}`, monthlyPercent);
+    updateTracker(monthElement, `#weekly-tracker-${monthId}`, lastWeekPercent);
+    updateTracker(monthElement, `#daily-tracker-${monthId}`, lastDayPercent, continueLink);
+
+    // 2. Update Weekly Targets & Progress
+    for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
+        // --- START: MODIFIED ---
+        const weekData = weeksData[weekId]; // Get week data from the new object
+        // --- END: MODIFIED ---
+        
+        // Update weekly target text
+        const targetTextElement = monthElement.querySelector(`#target-text-${monthId}-${weekId}`);
+        if (targetTextElement) {
+            targetTextElement.textContent = monthData.weeklyTargets?.[weekId] || '';
+        }
+
+        if (weekData) {
+            // Update weekly progress bar
+            const weekPerc = calculateWeeklyProgress(weekData);
+            const weekBar = monthElement.querySelector(`#week-bar-${monthId}-${weekId}`);
+            const weekPercText = monthElement.querySelector(`#week-perc-${monthId}-${weekId}`);
+            if (weekBar && weekPercText) {
+                weekBar.style.width = `${weekPerc}%`;
+                weekBar.style.opacity = weekPerc > 0 ? '1' : '0';
+                weekPercText.textContent = `${weekPerc}%`;
+            }
+
+            // 3. Update Daily Progress
+            weekData.days?.forEach((dayData, dayIndex) => {
+                const dayPerc = calculateDailyProgress(dayData);
+                const dayBar = monthElement.querySelector(`#day-bar-${monthId}-${weekId}-${dayIndex}`);
+                const dayPercText = monthElement.querySelector(`#day-perc-${monthId}-${weekId}-${dayIndex}`);
+                if (dayBar && dayPercText) {
+                    dayBar.style.width = `${Math.min(dayPerc, 100)}%`;
+                    dayBar.style.opacity = dayPerc > 0 ? '1' : '0';
+                    dayPercText.textContent = `${dayPerc}%`;
+                }
+
+                // 4. Update Row Checkboxes & Classes (if not in edit mode)
+                const daySection = monthElement.querySelector(`#day-${monthId}-${weekId}-${dayIndex}`);
+                if (daySection && !daySection.classList.contains('editing')) {
+                    dayData.rows?.forEach((rowData, rowIndex) => {
+                        const row = daySection.querySelector(`tr[data-row-index="${rowIndex}"]`);
+                        if (row) {
+                            const checkbox = row.querySelector('.completion-checkbox');
+                            if (checkbox) checkbox.checked = rowData.completed;
+                            row.classList.toggle('row-completed', rowData.completed);
+                        }
+                    });
+                }
+            });
+        }
+    }
+}
+
+		/**
+		 * NEW: Helper function to update a single progress tracker.
+		 */
+		function updateTracker(container, selector, percentage, continueLink = null) {
+			const tracker = container.querySelector(selector);
+			if (!tracker) return;
+
+			const score = tracker.querySelector('.tracker-score');
+			const progress = tracker.querySelector('.progress');
+			const cap = tracker.querySelector('.end-cap');
+			const circumference = 408;
+			const radius = 65;
+			const center = 75;
+
+			// Update text
+			score.textContent = percentage + '%';
+			
+			// Update bar
+			const offset = circumference - (circumference * percentage) / 100;
+			progress.style.strokeDashoffset = offset;
+
+			// Update cap
+			const angle = (percentage / 100) * 360;
+			const rads = (angle - 90) * (Math.PI / 180);
+			cap.style.left = `${center + radius * Math.cos(rads)}px`;
+			cap.style.top = `${center + radius * Math.sin(rads)}px`;
+			cap.style.visibility = percentage === 0 ? 'hidden' : 'visible';
+
+			// Update "Continue" button
+			const continueBtn = tracker.querySelector('.tracker-continue-btn');
+			if (continueLink) {
+				if (continueBtn) continueBtn.href = continueLink;
+				else tracker.querySelector('.inner-text').insertAdjacentHTML('beforeend', `<a href="${continueLink}" class="tracker-continue-btn">Continue</a>`);
+			} else {
+				if (continueBtn) continueBtn.remove();
+			}
+		}
          // Display a specific month's plan
         async function displayMonthPlan(monthId, anchorId = null) {
             if (!currentUser || !userId) return;
@@ -5221,118 +5332,7 @@ function renderProgressChart(labels, data, title) {
         }
     });
 	
-	/**
- * NEW: Performs targeted UI updates for the entire month
- * without a full re-render.
- */
-function updateMonthUI(monthId, monthData, weeksData) {
-    if (!monthData) return;
-    
-    const monthElement = document.querySelector(`.card[data-month-id="${monthId}"]`);
-    if (!monthElement) return; // Month isn't on the page
-
-    // 1. Update Monthly Progress Trackers
-    // --- START: MODIFIED ---
-    const monthlyPercent = calculateOverallMonthlyProgress(weeksData);
-    const { 
-        weekly: lastWeekPercent, 
-        daily: lastDayPercent, 
-        link: continueLink 
-    } = findLastProgressTrackers(monthId, monthData, weeksData);
-    // --- END: MODIFIED ---
-
-    updateTracker(monthElement, `#monthly-tracker-${monthId}`, monthlyPercent);
-    updateTracker(monthElement, `#weekly-tracker-${monthId}`, lastWeekPercent);
-    updateTracker(monthElement, `#daily-tracker-${monthId}`, lastDayPercent, continueLink);
-
-    // 2. Update Weekly Targets & Progress
-    for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
-        // --- START: MODIFIED ---
-        const weekData = weeksData[weekId]; // Get week data from the new object
-        // --- END: MODIFIED ---
-        
-        // Update weekly target text
-        const targetTextElement = monthElement.querySelector(`#target-text-${monthId}-${weekId}`);
-        if (targetTextElement) {
-            targetTextElement.textContent = monthData.weeklyTargets?.[weekId] || '';
-        }
-
-        if (weekData) {
-            // Update weekly progress bar
-            const weekPerc = calculateWeeklyProgress(weekData);
-            const weekBar = monthElement.querySelector(`#week-bar-${monthId}-${weekId}`);
-            const weekPercText = monthElement.querySelector(`#week-perc-${monthId}-${weekId}`);
-            if (weekBar && weekPercText) {
-                weekBar.style.width = `${weekPerc}%`;
-                weekBar.style.opacity = weekPerc > 0 ? '1' : '0';
-                weekPercText.textContent = `${weekPerc}%`;
-            }
-
-            // 3. Update Daily Progress
-            weekData.days?.forEach((dayData, dayIndex) => {
-                const dayPerc = calculateDailyProgress(dayData);
-                const dayBar = monthElement.querySelector(`#day-bar-${monthId}-${weekId}-${dayIndex}`);
-                const dayPercText = monthElement.querySelector(`#day-perc-${monthId}-${weekId}-${dayIndex}`);
-                if (dayBar && dayPercText) {
-                    dayBar.style.width = `${Math.min(dayPerc, 100)}%`;
-                    dayBar.style.opacity = dayPerc > 0 ? '1' : '0';
-                    dayPercText.textContent = `${dayPerc}%`;
-                }
-
-                // 4. Update Row Checkboxes & Classes (if not in edit mode)
-                const daySection = monthElement.querySelector(`#day-${monthId}-${weekId}-${dayIndex}`);
-                if (daySection && !daySection.classList.contains('editing')) {
-                    dayData.rows?.forEach((rowData, rowIndex) => {
-                        const row = daySection.querySelector(`tr[data-row-index="${rowIndex}"]`);
-                        if (row) {
-                            const checkbox = row.querySelector('.completion-checkbox');
-                            if (checkbox) checkbox.checked = rowData.completed;
-                            row.classList.toggle('row-completed', rowData.completed);
-                        }
-                    });
-                }
-            });
-        }
-    }
-}
-
-		/**
-		 * NEW: Helper function to update a single progress tracker.
-		 */
-		function updateTracker(container, selector, percentage, continueLink = null) {
-			const tracker = container.querySelector(selector);
-			if (!tracker) return;
-
-			const score = tracker.querySelector('.tracker-score');
-			const progress = tracker.querySelector('.progress');
-			const cap = tracker.querySelector('.end-cap');
-			const circumference = 408;
-			const radius = 65;
-			const center = 75;
-
-			// Update text
-			score.textContent = percentage + '%';
-			
-			// Update bar
-			const offset = circumference - (circumference * percentage) / 100;
-			progress.style.strokeDashoffset = offset;
-
-			// Update cap
-			const angle = (percentage / 100) * 360;
-			const rads = (angle - 90) * (Math.PI / 180);
-			cap.style.left = `${center + radius * Math.cos(rads)}px`;
-			cap.style.top = `${center + radius * Math.sin(rads)}px`;
-			cap.style.visibility = percentage === 0 ? 'hidden' : 'visible';
-
-			// Update "Continue" button
-			const continueBtn = tracker.querySelector('.tracker-continue-btn');
-			if (continueLink) {
-				if (continueBtn) continueBtn.href = continueLink;
-				else tracker.querySelector('.inner-text').insertAdjacentHTML('beforeend', `<a href="${continueLink}" class="tracker-continue-btn">Continue</a>`);
-			} else {
-				if (continueBtn) continueBtn.remove();
-			}
-		}
+	
 		
 }
 
