@@ -787,10 +787,13 @@ async function runMigrationForMonth(monthDocRef, oldWeeksMap) {
             try { 
                 await setDoc(docRef, newPlanData); 
                 console.log("New month added:", monthId);
-                setSyncStatus("Synced", "green");
-                closeModal('add-month-modal');
-                // The 'loadStudyPlans' onSnapshot listener will automatically
-                // see the new month and add the button.
+                
+                // --- START: NEW BEHAVIOR ---
+                showCustomAlert("Month Created Successfully!", "success"); // 1. Show success alert
+                closeModal('add-month-modal'); // 2. Close the popup
+                displayMonthPlan(monthId); // 3. Instantly load the new month
+                // setSyncStatus("Synced", "green"); // displayMonthPlan will handle this
+                // --- END: NEW BEHAVIOR ---
             }
             catch (error) { 
                 console.error("Error adding new month:", error); 
