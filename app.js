@@ -1049,21 +1049,24 @@ function updateMonthUI(monthId, monthData, weeksData) {
             const targetColors = { week1: 'text-indigo-700', week2: 'text-teal-700', week3: 'text-amber-700', week4: 'text-rose-700' };
             const targetHoverBgColors = { week1: 'hover:bg-indigo-50', week2: 'hover:bg-teal-50', week3: 'hover:bg-amber-50', week4: 'hover:bg-rose-50' };
 
-            // --- START: MODIFIED ---
-            // These functions now need the 'weeksData' object
             const monthlyPercent = calculateOverallMonthlyProgress(weeksData);
             const { 
                 weekly: lastWeekPercent, 
                 daily: lastDayPercent, 
                 link: continueLink 
             } = findLastProgressTrackers(monthId, monthData, weeksData);
-            // --- END: MODIFIED ---
 
             monthDiv.innerHTML = `
                  <div class="flex justify-between items-start mb-6">
                      <h2 class="text-2xl font-bold text-emerald-600">${monthData.monthName || 'Unnamed Month'} <span class="text-lg text-gray-400 font-normal">(${monthId})</span></h2>
-                     ${isGuestMode ? '' : '<button class="icon-button delete-month-btn" title="Delete Month"><i class="fas fa-trash-alt text-red-500"></i></button>'}
-                 </div>
+                     
+                     <div class="flex items-center gap-2">
+                        <button class="action-button action-button-secondary text-xs view-month-summary-btn" style="height: 32px;">
+                            <i class="fas fa-table mr-1"></i> Month Summary
+                        </button>
+                        ${isGuestMode ? '' : '<button class="icon-button delete-month-btn" title="Delete Month"><i class="fas fa-trash-alt text-red-500"></i></button>'}
+                     </div>
+                     </div>
 
                  <div class="progress-trackers-container mb-10" data-month-id="${monthId}">
                     ${createTrackerHTML(
@@ -1110,12 +1113,15 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     ${[1, 2, 3, 4].map(weekNum => {
                         const weekId = `week${weekNum}`;
                         const targetText = monthData.weeklyTargets?.[weekId] || '';
-                        // --- START: MODIFIED ---
-                        // Pass the specific week's data from 'weeksData'
                         return createWeekElement(monthId, weekId, weeksData[weekId], `week-${monthId}-${weekId}`, targetText);
-                        // --- END: MODIFIED ---
                     }).join('')}
                 </div>`;
+
+             // --- START: ADD LISTENER FOR NEW BUTTON ---
+             monthDiv.querySelector('.view-month-summary-btn').addEventListener('click', () => {
+                 openMonthSummaryModal(monthId);
+             });
+             // --- END: ADD LISTENER FOR NEW BUTTON ---
 
              if (!isGuestMode) {
                  monthDiv.querySelector('.edit-targets-btn').addEventListener('click', (e) => handleEditTargets(e.currentTarget, monthId));
@@ -1511,7 +1517,110 @@ function updateMonthUI(monthId, monthData, weeksData) {
             }
         }
         // --- END: WEEK SUMMARY FEATURE ---
+		
+		// --- START: MONTH SUMMARY FEATURE ---
+        const monthSummaryModal = document.getElementById('month-summary-modal');
+        const monthSummaryContent = document.getElementById('month-summary-content');
 
+        async function openMonthSummaryModal(monthId) {
+            monthSummaryModal.style.display = "block";
+            monthSummaryContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading monthly summary...</p>';
+            
+            try {
+                // 1. Fetch fresh data for ALL weeks
+                const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
+                const weeksCollectionRef = collection(db, monthDocRef.path, 'weeks');
+                const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
+                
+                if (weeksQuerySnapshot.empty) {
+                    monthSummaryContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">No data found for this month.</p>';
+                    return;
+                }
+
+                // 2. Organize data and find unique subjects
+                const weeksData = {};
+                const subjectsSet = new Set();
+
+                weeksQuerySnapshot.forEach(doc => {
+                    const wId = doc.id;
+                    const wData = doc.data();
+                    weeksData[wId] = wData;
+                    
+                    wData.days?.forEach(day => {
+                        day.rows?.forEach(row => {
+                            if (row.subject && row.subject.toLowerCase() !== 'vocabulary') {
+                                subjectsSet.add(row.subject);
+                            }
+                        });
+                    });
+                });
+
+                const subjects = Array.from(subjectsSet).sort();
+
+                if (subjects.length === 0) {
+                    monthSummaryContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">No academic subjects found for this month.</p>';
+                    return;
+                }
+
+                // 3. Build the Table HTML
+                let tableHtml = `
+                    <div class="results-table-container">
+                    <table class="w-full text-sm text-left text-gray-600 study-table border-collapse">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0 z-10">
+                            <tr>
+                                <th class="px-4 py-3 border text-center bg-gray-100" style="min-width: 100px;">Week / Day</th>
+                                ${subjects.map(sub => `<th class="px-4 py-3 border text-center bg-gray-100" style="min-width: 150px;">${escapeHtml(sub)}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                // 4. Loop through Weeks (1-4) and then Days
+                ['week1', 'week2', 'week3', 'week4'].forEach(weekId => {
+                    const weekData = weeksData[weekId];
+                    if (!weekData || !weekData.days || weekData.days.length === 0) return;
+
+                    // Add a Week Header Row
+                    tableHtml += `
+                        <tr class="bg-emerald-50">
+                            <td colspan="${subjects.length + 1}" class="px-4 py-2 font-bold text-emerald-700 text-center border">
+                                ${weekId.replace('week', 'Week ')}
+                            </td>
+                        </tr>
+                    `;
+
+                    weekData.days.forEach(day => {
+                        tableHtml += `<tr class="hover:bg-gray-50">`;
+                        
+                        // Day Column
+                        tableHtml += `<td class="px-4 py-3 border font-medium text-gray-900 whitespace-nowrap text-center">Day ${day.dayNumber}</td>`;
+                        
+                        // Subject Columns
+                        subjects.forEach(subject => {
+                            const topics = day.rows
+                                ?.filter(r => r.subject === subject && r.topic)
+                                .map(r => r.topic) || [];
+                                
+                            let cellContent = '<span class="text-gray-300">-</span>';
+                            if (topics.length > 0) {
+                                cellContent = topics.map(t => escapeHtml(t)).join('<br><hr class="my-1 border-gray-200">');
+                            }
+                            
+                            tableHtml += `<td class="px-4 py-3 border align-top">${cellContent}</td>`;
+                        });
+                        tableHtml += `</tr>`;
+                    });
+                });
+
+                tableHtml += `</tbody></table></div>`;
+                monthSummaryContent.innerHTML = tableHtml;
+
+            } catch (error) {
+                console.error("Error generating month summary:", error);
+                monthSummaryContent.innerHTML = '<p class="text-center text-red-500 py-10">Could not load summary.</p>';
+            }
+        }
+        // --- END: MONTH SUMMARY FEATURE ---
        
 		function attachWeekEventListeners(monthElement, monthId) {
              const weeklyPlansContainer = monthElement.querySelector('.weekly-plans-container');

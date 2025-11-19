@@ -641,6 +641,17 @@
       </div>
     </div>
 	
+	<div id="month-summary-modal" class="modal">
+      <div class="modal-content" style="max-width: 95%; width: 1100px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header-sticky">
+          <h3 class="text-2xl font-semibold text-emerald-600">Monthly Summary</h3>
+          <span class="modal-close" onclick="closeModal('month-summary-modal')">&times;</span>
+        </div>
+        <div id="month-summary-content" style="overflow-y: auto; flex-grow: 1; padding-top: 1rem;">
+            </div>
+      </div>
+    </div>	
+	
 	<script type="module" src="app.js" defer></script>
 </body>
 </html>
