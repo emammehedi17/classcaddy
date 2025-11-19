@@ -1696,17 +1696,20 @@
 }
 
 .summary-read-more-btn {
-    font-size: 0.7rem;
+    font-size: 0.75rem; /* Slightly larger text */
     color: #059669; /* emerald-600 */
-    background: none;
-    border: none;
+    background: rgba(255, 255, 255, 0.9); /* Background to make it readable over text */
+    border: 1px solid #d1fae5;
+    border-radius: 4px;
     cursor: pointer;
-    padding: 0;
+    padding: 2px 6px;
     margin-top: 4px;
     font-weight: 600;
-    display: none; /* Hidden by default */
+    display: inline-block; /* CHANGED from none */
+    transition: all 0.2s;
 }
 
 .summary-read-more-btn:hover {
-    text-decoration: underline;
+    background-color: #ecfdf5;
+    text-decoration: none;
 }
