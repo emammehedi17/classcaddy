@@ -5540,47 +5540,48 @@ function renderProgressChart(labels, data, title) {
             }
         }
     });
-	
-	// --- Helper for Summary Tables ---
-        function createSummaryCellHtml(topicsArray) {
-            if (!topicsArray || topicsArray.length === 0) {
-                return '<span class="text-gray-300">-</span>';
-            }
+}
 
-            // Create the full content string
-            const fullContent = topicsArray.map(t => escapeHtml(t)).join('<br><hr class="my-1 border-gray-200">');
-            
-            // Heuristic check: Does this look like it needs more than 3 lines?
-            const isLong = topicsArray.length > 2 || fullContent.length > 150;
+// --- Helper for Summary Tables ---
+function createSummaryCellHtml(topicsArray) {
+    if (!topicsArray || topicsArray.length === 0) {
+        return '<span class="text-gray-300">-</span>';
+    }
 
-            if (isLong) {
-                return `
-                    <div class="summary-cell-wrapper">
-                        <div class="summary-cell-content">${fullContent}</div>
-                        <button class="summary-read-more-btn" onclick="toggleSummaryRow(this)">...more</button>
-                    </div>
-                `;
-            } else {
-                return `<div class="summary-cell-content" style="-webkit-line-clamp: unset; max-height: none;">${fullContent}</div>`;
-            }
-        }
+    // Create the full content string
+    const fullContent = topicsArray.map(t => escapeHtml(t)).join('<br><hr class="my-1 border-gray-200">');
+    
+    // Heuristic check: Does this look like it needs more than 3 lines?
+    const isLong = topicsArray.length > 2 || fullContent.length > 150;
 
-        // Global function for the onclick event
-        window.toggleSummaryRow = function(btn) {
-            // Find the parent TR
-            const row = btn.closest('tr');
-            if (row) {
-                // Toggle the class on the ROW so all cells in this row expand together
-                row.classList.toggle('expanded');
-                
-                // Update button text logic
-                const isExpanded = row.classList.contains('expanded');
-                // Find all buttons in this row to update their text
-                row.querySelectorAll('.summary-read-more-btn').forEach(b => {
-                    b.textContent = isExpanded ? 'less' : '...more';
-                });
-            }
-        };
+    if (isLong) {
+        return `
+            <div class="summary-cell-wrapper">
+                <div class="summary-cell-content">${fullContent}</div>
+                <button class="summary-read-more-btn" onclick="toggleSummaryRow(this)">...more</button>
+            </div>
+        `;
+    } else {
+        return `<div class="summary-cell-content" style="-webkit-line-clamp: unset; max-height: none;">${fullContent}</div>`;
+    }
+}
+
+// Global function for the onclick event
+window.toggleSummaryRow = function(btn) {
+    // Find the parent TR
+    const row = btn.closest('tr');
+    if (row) {
+        // Toggle the class on the ROW so all cells in this row expand together
+        row.classList.toggle('expanded');
+        
+        // Update button text logic
+        const isExpanded = row.classList.contains('expanded');
+        // Find all buttons in this row to update their text
+        row.querySelectorAll('.summary-read-more-btn').forEach(b => {
+            b.textContent = isExpanded ? 'less' : '...more';
+        });
+    }
+};
 }
 
 
