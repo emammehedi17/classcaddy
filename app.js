@@ -5548,7 +5548,8 @@ function createSummaryCellHtml(topicsArray) {
     const fullContent = topicsArray.map(t => escapeHtml(t)).join('<br><hr class="my-1 border-gray-200">');
     
     // Heuristic check: Does this look like it needs more than 3 lines?
-    const isLong = topicsArray.length > 2 || fullContent.length > 150;
+    // Lowered length threshold from 150 to 100 to ensure buttons appear for borderline cases
+    const isLong = topicsArray.length > 2 || fullContent.length > 100;
 
     if (isLong) {
         return `
@@ -5558,7 +5559,14 @@ function createSummaryCellHtml(topicsArray) {
             </div>
         `;
     } else {
-        return `<div class="summary-cell-content" style="-webkit-line-clamp: unset; max-height: none;">${fullContent}</div>`;
+        // UNIFORMITY FIX: Removed inline styles (max-height: none). 
+        // Now this cell will respect the CSS clamp (3 lines), keeping the row height uniform.
+        // We still wrap it for DOM consistency.
+        return `
+            <div class="summary-cell-wrapper">
+                <div class="summary-cell-content">${fullContent}</div>
+            </div>
+        `;
     }
 }
 
