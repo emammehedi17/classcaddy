@@ -630,6 +630,17 @@
       </div>
     </div>
 	
+	<div id="week-summary-modal" class="modal">
+      <div class="modal-content" style="max-width: 900px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header-sticky">
+          <h3 class="text-2xl font-semibold text-emerald-600">Weekly Summary</h3>
+          <span class="modal-close" onclick="closeModal('week-summary-modal')">&times;</span>
+        </div>
+        <div id="week-summary-content" style="overflow-y: auto; flex-grow: 1; padding-top: 1rem;">
+            </div>
+      </div>
+    </div>
+	
 	<script type="module" src="app.js" defer></script>
 </body>
 </html>
