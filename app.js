@@ -1506,6 +1506,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                 tableHtml += `</tbody></table></div>`;
                 weekSummaryContent.innerHTML = tableHtml;
+				updateSummaryButtons();
 
             } catch (error) {
                 console.error("Error generating week summary:", error);
@@ -1609,6 +1610,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                 tableHtml += `</tbody></table></div>`;
                 monthSummaryContent.innerHTML = tableHtml;
+				updateSummaryButtons();
 
             } catch (error) {
                 console.error("Error generating month summary:", error);
@@ -5544,30 +5546,36 @@ function createSummaryCellHtml(topicsArray) {
         return '<span class="text-gray-300">-</span>';
     }
 
-    // Create the full content string
+    // Join content with dividers
     const fullContent = topicsArray.map(t => escapeHtml(t)).join('<br><hr class="my-1 border-gray-200">');
     
-    // Heuristic check: Does this look like it needs more than 3 lines?
-    // Lowered length threshold from 150 to 100 to ensure buttons appear for borderline cases
-    const isLong = topicsArray.length > 2 || fullContent.length > 100;
+    // Always return the structure with a hidden button. 
+    // We will verify overflow in the UI using updateSummaryButtons().
+    return `
+        <div class="summary-cell-wrapper">
+            <div class="summary-cell-content">${fullContent}</div>
+            <button class="summary-read-more-btn" style="display: none;" onclick="toggleSummaryRow(this)">...more</button>
+        </div>
+    `;
+}
 
-    if (isLong) {
-        return `
-            <div class="summary-cell-wrapper">
-                <div class="summary-cell-content">${fullContent}</div>
-                <button class="summary-read-more-btn" onclick="toggleSummaryRow(this)">...more</button>
-            </div>
-        `;
-    } else {
-        // UNIFORMITY FIX: Removed inline styles (max-height: none). 
-        // Now this cell will respect the CSS clamp (3 lines), keeping the row height uniform.
-        // We still wrap it for DOM consistency.
-        return `
-            <div class="summary-cell-wrapper">
-                <div class="summary-cell-content">${fullContent}</div>
-            </div>
-        `;
-    }
+function updateSummaryButtons() {
+    // Use requestAnimationFrame to ensure the DOM has updated layout
+    requestAnimationFrame(() => {
+        document.querySelectorAll('.summary-cell-wrapper').forEach(wrapper => {
+            const content = wrapper.querySelector('.summary-cell-content');
+            const btn = wrapper.querySelector('.summary-read-more-btn');
+            
+            if (content && btn) {
+                // Check if content height exceeds visible height (plus 1px buffer)
+                if (content.scrollHeight > content.clientHeight + 1) {
+                    btn.style.display = 'inline-block';
+                } else {
+                    btn.style.display = 'none';
+                }
+            }
+        });
+    });
 }
 
 // Global function for the onclick event
