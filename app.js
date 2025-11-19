@@ -1438,6 +1438,14 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
         async function openWeekSummaryModal(monthId, weekId) {
             weekSummaryModal.style.display = "block";
+			// --- START: ADD THIS BLOCK ---
+            // Store the IDs on the print button so we can access them later
+            const printBtn = document.getElementById('print-week-summary-btn');
+            if (printBtn) {
+                printBtn.dataset.monthId = monthId; // e.g., "2025-11"
+                printBtn.dataset.weekId = weekId;   // e.g., "week1"
+            }
+            // --- END: ADD THIS BLOCK ---
             weekSummaryContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading summary...</p>';
             
             try {
@@ -1521,6 +1529,13 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
         async function openMonthSummaryModal(monthId) {
             monthSummaryModal.style.display = "block";
+			// --- START: ADD THIS BLOCK ---
+            // Store the ID on the print button
+            const printBtn = document.getElementById('print-month-summary-btn');
+            if (printBtn) {
+                printBtn.dataset.monthId = monthId; // e.g., "2025-11"
+            }
+            // --- END: ADD THIS BLOCK ---
             monthSummaryContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading monthly summary...</p>';
             
             try {
@@ -5598,7 +5613,7 @@ window.toggleSummaryRow = function(btn) {
 
 // --- START: PRINT FUNCTIONALITY ---
 
-        function printSummaryContent(contentId, title) {
+        function printSummaryContent(contentId, title, detailsHTML) {
             const contentDiv = document.getElementById(contentId);
             
             if (!contentDiv || contentDiv.innerHTML.trim() === '') {
@@ -5616,24 +5631,42 @@ window.toggleSummaryRow = function(btn) {
                     @page {
                         size: A4 landscape;
                         margin: 1cm;
+                        margin-bottom: 1.5cm; /* Space for footer */
                     }
                     body {
                         font-family: 'Inter', 'Kalpurush', sans-serif;
                         padding: 20px;
                         color: #1f2937;
-                        -webkit-print-color-adjust: exact; /* Ensure colors print */
+                        -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
                     }
-                    h1 {
+                    .print-header-container {
                         text-align: center;
-                        color: #059669;
                         margin-bottom: 20px;
+                        border-bottom: 2px solid #10b981;
+                        padding-bottom: 10px;
+                    }
+                    h1 {
+                        color: #059669;
+                        margin: 0 0 10px 0;
                         font-size: 24px;
+                    }
+                    .meta-info {
+                        display: flex;
+                        justify-content: center;
+                        gap: 30px;
+                        font-size: 14px;
+                        color: #374151;
+                        font-weight: 600;
+                    }
+                    .meta-item span {
+                        font-weight: 400;
+                        color: #111827;
                     }
                     table {
                         width: 100%;
                         border-collapse: collapse;
-                        font-size: 12px; /* Smaller font for A4 fit */
+                        font-size: 12px;
                     }
                     th, td {
                         border: 1px solid #e5e7eb;
@@ -5648,20 +5681,39 @@ window.toggleSummaryRow = function(btn) {
                         text-transform: uppercase;
                         font-size: 11px;
                     }
+                    
                     /* Highlight rows logic */
                     .bg-emerald-50 { background-color: #ecfdf5 !important; }
                     .bg-gray-50 { background-color: #f9fafb !important; }
                     
                     /* Clean up cell content for print */
-                    .summary-read-more-btn { display: none !important; } /* Hide "More" buttons */
+                    .summary-read-more-btn { display: none !important; }
                     .summary-cell-content {
                         max-height: none !important;
                         -webkit-line-clamp: unset !important;
                         display: block !important;
                         overflow: visible !important;
                     }
-                    .summary-cell-wrapper {
-                        display: block;
+                    .summary-cell-wrapper { display: block; }
+
+                    /* FOOTER STYLES */
+                    .print-footer {
+                        position: fixed;
+                        bottom: 0;
+                        left: 0;
+                        right: 0;
+                        height: 30px;
+                        text-align: center;
+                        font-size: 11px;
+                        color: #6b7280;
+                        border-top: 1px solid #e5e7eb;
+                        padding-top: 8px;
+                        background-color: white;
+                    }
+                    .print-footer a {
+                        color: #059669;
+                        text-decoration: none;
+                        font-weight: 600;
                     }
                 </style>
             `;
@@ -5669,27 +5721,88 @@ window.toggleSummaryRow = function(btn) {
             printWindow.document.write('<html><head><title>' + title + '</title>');
             printWindow.document.write(styles);
             printWindow.document.write('</head><body>');
-            printWindow.document.write('<h1>' + title + '</h1>');
+            
+            // Custom Header with Details
+            printWindow.document.write(`
+                <div class="print-header-container">
+                    <h1>${title}</h1>
+                    <div class="meta-info">
+                        ${detailsHTML}
+                    </div>
+                </div>
+            `);
+
             printWindow.document.write(contentDiv.innerHTML);
+
+            // Custom Footer
+            printWindow.document.write(`
+                <div class="print-footer">
+                    Visit us at: <a href="https://classcaddy.netlify.app/">https://classcaddy.netlify.app/</a>
+                </div>
+            `);
+
             printWindow.document.write('</body></html>');
             
             printWindow.document.close();
             printWindow.focus();
 
-            // Wait for content to render then print
             setTimeout(() => {
                 printWindow.print();
                 printWindow.close();
             }, 500);
         }
 
-        // Event Listeners for Print Buttons
-        document.getElementById('print-week-summary-btn')?.addEventListener('click', () => {
-            printSummaryContent('week-summary-content', 'Weekly Study Summary');
+        // Helper to get month Name
+        function getMonthNameFromIndex(index) {
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            return months[index] || "Unknown";
+        }
+
+        // Event Listener: Week Summary Print
+        document.getElementById('print-week-summary-btn')?.addEventListener('click', (e) => {
+            const btn = e.currentTarget;
+            const monthId = btn.dataset.monthId; // "2025-11"
+            const weekId = btn.dataset.weekId;   // "week1"
+            
+            let detailsHTML = '';
+            if (monthId && weekId) {
+                const parts = monthId.split('-');
+                const year = parts[0];
+                const monthIndex = parseInt(parts[1]) - 1;
+                const monthName = getMonthNameFromIndex(monthIndex);
+                
+                // Convert "week1" to "01"
+                const weekNum = weekId.replace('week', '').padStart(2, '0');
+
+                detailsHTML = `
+                    <div class="meta-item">Year: <span>${year}</span></div>
+                    <div class="meta-item">Month: <span>${monthName}</span></div>
+                    <div class="meta-item">Week: <span>${weekNum}</span></div>
+                `;
+            }
+
+            printSummaryContent('week-summary-content', 'Weekly Study Summary', detailsHTML);
         });
 
-        document.getElementById('print-month-summary-btn')?.addEventListener('click', () => {
-            printSummaryContent('month-summary-content', 'Monthly Study Summary');
+        // Event Listener: Month Summary Print
+        document.getElementById('print-month-summary-btn')?.addEventListener('click', (e) => {
+            const btn = e.currentTarget;
+            const monthId = btn.dataset.monthId; // "2025-11"
+            
+            let detailsHTML = '';
+            if (monthId) {
+                const parts = monthId.split('-');
+                const year = parts[0];
+                const monthIndex = parseInt(parts[1]) - 1;
+                const monthName = getMonthNameFromIndex(monthIndex);
+
+                detailsHTML = `
+                    <div class="meta-item">Year: <span>${year}</span></div>
+                    <div class="meta-item">Month: <span>${monthName}</span></div>
+                `;
+            }
+
+            printSummaryContent('month-summary-content', 'Monthly Study Summary', detailsHTML);
         });
 
         // --- END: PRINT FUNCTIONALITY ---
