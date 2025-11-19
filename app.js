@@ -5541,91 +5541,7 @@ function renderProgressChart(labels, data, title) {
         }
     });
 	
-	// --- START: WEEK SUMMARY FEATURE ---
-        const weekSummaryModal = document.getElementById('week-summary-modal');
-        const weekSummaryContent = document.getElementById('week-summary-content');
-
-        async function openWeekSummaryModal(monthId, weekId) {
-            weekSummaryModal.style.display = "block";
-            weekSummaryContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading summary...</p>';
-            
-            try {
-                // 1. Fetch fresh data for the week
-                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
-                const weekDocSnap = await getDoc(weekDocRef);
-
-                if (!weekDocSnap.exists() || !weekDocSnap.data().days || weekDocSnap.data().days.length === 0) {
-                    weekSummaryContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">No data found for this week.</p>';
-                    return;
-                }
-
-                const daysData = weekDocSnap.data().days;
-                
-                // 2. Identify all unique subjects (excluding Vocabulary)
-                const subjectsSet = new Set();
-                daysData.forEach(day => {
-                    day.rows?.forEach(row => {
-                        if (row.subject && row.subject.toLowerCase() !== 'vocabulary') {
-                            subjectsSet.add(row.subject);
-                        }
-                    });
-                });
-                
-                // Convert to array and sort alphabetically
-                const subjects = Array.from(subjectsSet).sort();
-
-                if (subjects.length === 0) {
-                    weekSummaryContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">No academic subjects found for this week (only Vocabulary or empty rows).</p>';
-                    return;
-                }
-
-                // 3. Build the Table HTML
-                let tableHtml = `
-                    <div class="results-table-container">
-                    <table class="w-full text-sm text-left text-gray-600 study-table">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 border">Day</th>
-                                ${subjects.map(sub => `<th class="px-4 py-3 border text-center">${escapeHtml(sub)}</th>`).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                // 4. Populate Rows (Day by Day)
-                daysData.forEach(day => {
-                    tableHtml += `<tr>`;
-                    // Day Column
-                    tableHtml += `<td class="px-4 py-3 border font-medium text-gray-900 whitespace-nowrap">Day ${day.dayNumber}</td>`;
-                    
-                    // Subject Columns
-                    subjects.forEach(subject => {
-                        const topics = day.rows
-                            ?.filter(r => r.subject === subject && r.topic)
-                            .map(r => r.topic) || [];
-                            
-                        // --- START: MODIFIED ---
-                        // Use the new helper function to generate the cell content
-                        const cellContent = createSummaryCellHtml(topics);
-                        // Add the 'summary-cell' class to the TD
-                        tableHtml += `<td class="px-4 py-3 border align-top summary-cell">${cellContent}</td>`;
-                        // --- END: MODIFIED ---
-                    });
-
-                    tableHtml += `</tr>`;
-                });
-
-                tableHtml += `</tbody></table></div>`;
-                weekSummaryContent.innerHTML = tableHtml;
-
-            } catch (error) {
-                console.error("Error generating week summary:", error);
-                weekSummaryContent.innerHTML = '<p class="text-center text-red-500 py-10">Could not load summary.</p>';
-            }
-        }
-        // --- END: WEEK SUMMARY FEATURE ---
-		
-		// --- Helper for Summary Tables ---
+	// --- Helper for Summary Tables ---
         function createSummaryCellHtml(topicsArray) {
             if (!topicsArray || topicsArray.length === 0) {
                 return '<span class="text-gray-300">-</span>';
@@ -5635,7 +5551,6 @@ function renderProgressChart(labels, data, title) {
             const fullContent = topicsArray.map(t => escapeHtml(t)).join('<br><hr class="my-1 border-gray-200">');
             
             // Heuristic check: Does this look like it needs more than 3 lines?
-            // We check if there are more than 2 line breaks OR if the string is very long.
             const isLong = topicsArray.length > 2 || fullContent.length > 150;
 
             if (isLong) {
