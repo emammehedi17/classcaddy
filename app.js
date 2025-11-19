@@ -5582,7 +5582,6 @@ window.toggleSummaryRow = function(btn) {
         });
     }
 };
-}
 
 
 		
