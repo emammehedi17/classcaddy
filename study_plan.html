@@ -632,25 +632,35 @@
 	
 	<div id="week-summary-modal" class="modal">
       <div class="modal-content" style="max-width: 900px; max-height: 85vh; display: flex; flex-direction: column;">
-        <div class="modal-header-sticky">
+        <div class="modal-header-sticky flex justify-between items-center border-b pb-3 mb-4">
           <h3 class="text-2xl font-semibold text-emerald-600">Weekly Summary</h3>
-          <span class="modal-close" onclick="closeModal('week-summary-modal')">&times;</span>
+          <div class="flex items-center gap-3">
+              <button id="print-week-summary-btn" class="action-button action-button-secondary text-sm">
+                  <i class="fas fa-print mr-1.5"></i> Print
+              </button>
+              <span class="modal-close static text-3xl leading-none cursor-pointer hover:text-gray-800 text-gray-400">&times;</span>
+          </div>
         </div>
-        <div id="week-summary-content" style="overflow-y: auto; flex-grow: 1; padding-top: 1rem;">
+        <div id="week-summary-content" style="overflow-y: auto; flex-grow: 1; padding-top: 0.5rem;">
             </div>
       </div>
     </div>
 	
 	<div id="month-summary-modal" class="modal">
       <div class="modal-content" style="max-width: 95%; width: 1100px; max-height: 85vh; display: flex; flex-direction: column;">
-        <div class="modal-header-sticky">
+        <div class="modal-header-sticky flex justify-between items-center border-b pb-3 mb-4">
           <h3 class="text-2xl font-semibold text-emerald-600">Monthly Summary</h3>
-          <span class="modal-close" onclick="closeModal('month-summary-modal')">&times;</span>
+          <div class="flex items-center gap-3">
+              <button id="print-month-summary-btn" class="action-button action-button-secondary text-sm">
+                  <i class="fas fa-print mr-1.5"></i> Print
+              </button>
+              <span class="modal-close static text-3xl leading-none cursor-pointer hover:text-gray-800 text-gray-400">&times;</span>
+          </div>
         </div>
-        <div id="month-summary-content" style="overflow-y: auto; flex-grow: 1; padding-top: 1rem;">
+        <div id="month-summary-content" style="overflow-y: auto; flex-grow: 1; padding-top: 0.5rem;">
             </div>
       </div>
-    </div>	
+    </div>
 	
 	<script type="module" src="app.js" defer></script>
 </body>

@@ -5596,4 +5596,100 @@ window.toggleSummaryRow = function(btn) {
 };
 
 
-		
+// --- START: PRINT FUNCTIONALITY ---
+
+        function printSummaryContent(contentId, title) {
+            const contentDiv = document.getElementById(contentId);
+            
+            if (!contentDiv || contentDiv.innerHTML.trim() === '') {
+                showCustomAlert("No content to print.", "error");
+                return;
+            }
+
+            // Create a temporary print window
+            const printWindow = window.open('', '', 'height=800,width=1000');
+            
+            const styles = `
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
+                    
+                    @page {
+                        size: A4 landscape;
+                        margin: 1cm;
+                    }
+                    body {
+                        font-family: 'Inter', 'Kalpurush', sans-serif;
+                        padding: 20px;
+                        color: #1f2937;
+                        -webkit-print-color-adjust: exact; /* Ensure colors print */
+                        print-color-adjust: exact;
+                    }
+                    h1 {
+                        text-align: center;
+                        color: #059669;
+                        margin-bottom: 20px;
+                        font-size: 24px;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 12px; /* Smaller font for A4 fit */
+                    }
+                    th, td {
+                        border: 1px solid #e5e7eb;
+                        padding: 8px 10px;
+                        text-align: left;
+                        vertical-align: top;
+                    }
+                    thead th {
+                        background-color: #f3f4f6 !important;
+                        color: #1f2937;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        font-size: 11px;
+                    }
+                    /* Highlight rows logic */
+                    .bg-emerald-50 { background-color: #ecfdf5 !important; }
+                    .bg-gray-50 { background-color: #f9fafb !important; }
+                    
+                    /* Clean up cell content for print */
+                    .summary-read-more-btn { display: none !important; } /* Hide "More" buttons */
+                    .summary-cell-content {
+                        max-height: none !important;
+                        -webkit-line-clamp: unset !important;
+                        display: block !important;
+                        overflow: visible !important;
+                    }
+                    .summary-cell-wrapper {
+                        display: block;
+                    }
+                </style>
+            `;
+
+            printWindow.document.write('<html><head><title>' + title + '</title>');
+            printWindow.document.write(styles);
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h1>' + title + '</h1>');
+            printWindow.document.write(contentDiv.innerHTML);
+            printWindow.document.write('</body></html>');
+            
+            printWindow.document.close();
+            printWindow.focus();
+
+            // Wait for content to render then print
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        }
+
+        // Event Listeners for Print Buttons
+        document.getElementById('print-week-summary-btn')?.addEventListener('click', () => {
+            printSummaryContent('week-summary-content', 'Weekly Study Summary');
+        });
+
+        document.getElementById('print-month-summary-btn')?.addEventListener('click', () => {
+            printSummaryContent('month-summary-content', 'Monthly Study Summary');
+        });
+
+        // --- END: PRINT FUNCTIONALITY ---

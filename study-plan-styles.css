@@ -1713,3 +1713,9 @@
     background-color: #ecfdf5;
     text-decoration: none;
 }
+
+/* Fix for the new Flexbox Header with Print Button */
+.modal-header-sticky .modal-close {
+    position: static !important; /* Override previous absolute positioning */
+    margin-left: 10px;
+}
