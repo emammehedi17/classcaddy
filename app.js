@@ -5611,7 +5611,7 @@ window.toggleSummaryRow = function(btn) {
 };
 
 
-// --- START: PRINT FUNCTIONALITY ---
+// --- START: PRINT FUNCTIONALITY (MOBILE COMPATIBLE - IFRAME METHOD) ---
 
         function printSummaryContent(contentId, title, detailsHTML) {
             const contentDiv = document.getElementById(contentId);
@@ -5621,9 +5621,18 @@ window.toggleSummaryRow = function(btn) {
                 return;
             }
 
-            // Create a temporary print window
-            const printWindow = window.open('', '', 'height=800,width=1000');
-            
+            // 1. Create a hidden Iframe
+            const iframe = document.createElement('iframe');
+            iframe.style.position = 'fixed';
+            iframe.style.right = '0';
+            iframe.style.bottom = '0';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.border = '0';
+            // Append to body to make it part of the current document context
+            document.body.appendChild(iframe);
+
+            // 2. Define Styles (Same as before)
             const styles = `
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
@@ -5631,7 +5640,7 @@ window.toggleSummaryRow = function(btn) {
                     @page {
                         size: A4 landscape;
                         margin: 1cm;
-                        margin-bottom: 1.5cm; /* Space for footer */
+                        margin-bottom: 1.5cm;
                     }
                     body {
                         font-family: 'Inter', 'Kalpurush', sans-serif;
@@ -5639,6 +5648,7 @@ window.toggleSummaryRow = function(btn) {
                         color: #1f2937;
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
+                        background-color: white; /* Ensure white background for PDF */
                     }
                     .print-header-container {
                         text-align: center;
@@ -5718,38 +5728,53 @@ window.toggleSummaryRow = function(btn) {
                 </style>
             `;
 
-            printWindow.document.write('<html><head><title>' + title + '</title>');
-            printWindow.document.write(styles);
-            printWindow.document.write('</head><body>');
-            
-            // Custom Header with Details
-            printWindow.document.write(`
-                <div class="print-header-container">
-                    <h1>${title}</h1>
-                    <div class="meta-info">
-                        ${detailsHTML}
+            // 3. Build the Full HTML String
+            const fullHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${title}</title>
+                    ${styles}
+                </head>
+                <body>
+                    <div class="print-header-container">
+                        <h1>${title}</h1>
+                        <div class="meta-info">
+                            ${detailsHTML}
+                        </div>
                     </div>
-                </div>
-            `);
 
-            printWindow.document.write(contentDiv.innerHTML);
+                    ${contentDiv.innerHTML}
 
-            // Custom Footer
-            printWindow.document.write(`
-                <div class="print-footer">
-                    Visit us at: <a href="https://classcaddy.netlify.app/">https://classcaddy.netlify.app/</a>
-                </div>
-            `);
+                    <div class="print-footer">
+                        Visit us at: <a href="https://classcaddy.netlify.app/">https://classcaddy.netlify.app/</a>
+                    </div>
+                </body>
+                </html>
+            `;
 
-            printWindow.document.write('</body></html>');
-            
-            printWindow.document.close();
-            printWindow.focus();
+            // 4. Write to the Iframe
+            const frameDoc = iframe.contentWindow ? iframe.contentWindow.document : iframe.contentDocument;
+            frameDoc.open();
+            frameDoc.write(fullHtml);
+            frameDoc.close();
 
+            // 5. Execute Print with a delay (important for mobile to render styles)
             setTimeout(() => {
-                printWindow.print();
-                printWindow.close();
-            }, 500);
+                try {
+                    iframe.contentWindow.focus(); // Focus is required on some browsers
+                    iframe.contentWindow.print();
+                } catch (e) {
+                    console.error("Print execution failed:", e);
+                    showCustomAlert("Printing is not supported on this device.", "error");
+                } finally {
+                    // Remove the iframe after a sufficient delay (allowing print dialog to finish)
+                    // 1 minute delay is safe; user will be done by then, or it doesn't matter
+                    setTimeout(() => {
+                        document.body.removeChild(iframe);
+                    }, 60000); 
+                }
+            }, 1000); // 1 second delay to ensure rendering
         }
 
         // Helper to get month Name
@@ -5761,8 +5786,8 @@ window.toggleSummaryRow = function(btn) {
         // Event Listener: Week Summary Print
         document.getElementById('print-week-summary-btn')?.addEventListener('click', (e) => {
             const btn = e.currentTarget;
-            const monthId = btn.dataset.monthId; // "2025-11"
-            const weekId = btn.dataset.weekId;   // "week1"
+            const monthId = btn.dataset.monthId; 
+            const weekId = btn.dataset.weekId;   
             
             let detailsHTML = '';
             if (monthId && weekId) {
@@ -5771,7 +5796,6 @@ window.toggleSummaryRow = function(btn) {
                 const monthIndex = parseInt(parts[1]) - 1;
                 const monthName = getMonthNameFromIndex(monthIndex);
                 
-                // Convert "week1" to "01"
                 const weekNum = weekId.replace('week', '').padStart(2, '0');
 
                 detailsHTML = `
@@ -5787,7 +5811,7 @@ window.toggleSummaryRow = function(btn) {
         // Event Listener: Month Summary Print
         document.getElementById('print-month-summary-btn')?.addEventListener('click', (e) => {
             const btn = e.currentTarget;
-            const monthId = btn.dataset.monthId; // "2025-11"
+            const monthId = btn.dataset.monthId; 
             
             let detailsHTML = '';
             if (monthId) {
