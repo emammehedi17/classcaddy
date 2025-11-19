@@ -1597,10 +1597,14 @@ function updateMonthUI(monthId, monthData, weeksData) {
                                 ?.filter(r => r.subject === subject && r.topic)
                                 .map(r => r.topic) || [];
                                 
-                            // --- USE THE HELPER FUNCTION ---
+                            // --- START: MODIFIED ---
+                            // Use the new helper function
                             const cellContent = createSummaryCellHtml(topics);
                             tableHtml += `<td class="px-4 py-3 border align-top summary-cell">${cellContent}</td>`;
+                            // --- END: MODIFIED ---
                         });
+                        tableHtml += `</tr>`;
+                    });
                 });
 
                 tableHtml += `</tbody></table></div>`;
@@ -5574,3 +5578,6 @@ window.toggleSummaryRow = function(btn) {
         });
     }
 };
+
+
+		
