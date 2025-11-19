@@ -1485,7 +1485,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                 // 4. Populate Rows (Day by Day)
                 daysData.forEach(day => {
-                    tableHtml += `<tr class="hover:bg-gray-50">`;
+                    tableHtml += `<tr class="hover:bg-gray-50 summary-row">`; // <-- ADDED 'summary-row'
                     // Day Column
                     tableHtml += `<td class="px-4 py-3 border font-medium text-gray-900 whitespace-nowrap text-center">Day ${day.dayNumber}</td>`;
                     
@@ -1590,7 +1590,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     `;
 
                     weekData.days.forEach(day => {
-                        tableHtml += `<tr class="hover:bg-gray-50">`;
+                        tableHtml += `<tr class="hover:bg-gray-50 summary-row">`; // <-- ADDED 'summary-row'
                         
                         // Day Column
                         tableHtml += `<td class="px-4 py-3 border font-medium text-gray-900 whitespace-nowrap text-center">Day ${day.dayNumber}</td>`;
@@ -1601,12 +1601,11 @@ function updateMonthUI(monthId, monthData, weeksData) {
                                 ?.filter(r => r.subject === subject && r.topic)
                                 .map(r => r.topic) || [];
                                 
-                            let cellContent = '<span class="text-gray-300">-</span>';
-                            if (topics.length > 0) {
-                                cellContent = topics.map(t => escapeHtml(t)).join('<br><hr class="my-1 border-gray-200">');
-                            }
-                            
-                            tableHtml += `<td class="px-4 py-3 border align-top">${cellContent}</td>`;
+                            // --- START: MODIFIED ---
+                            // Use the new helper function
+                            const cellContent = createSummaryCellHtml(topics);
+                            tableHtml += `<td class="px-4 py-3 border align-top summary-cell">${cellContent}</td>`;
+                            // --- END: MODIFIED ---
                         });
                         tableHtml += `</tr>`;
                     });
@@ -5601,18 +5600,16 @@ function renderProgressChart(labels, data, title) {
                     
                     // Subject Columns
                     subjects.forEach(subject => {
-                        // Find all topics for this subject on this day
                         const topics = day.rows
                             ?.filter(r => r.subject === subject && r.topic)
                             .map(r => r.topic) || [];
                             
-                        let cellContent = '-';
-                        if (topics.length > 0) {
-                            // Join multiple topics with line breaks
-                            cellContent = topics.map(t => escapeHtml(t)).join('<br><hr class="my-1 border-gray-200">');
-                        }
-                        
-                        tableHtml += `<td class="px-4 py-3 border align-top">${cellContent}</td>`;
+                        // --- START: MODIFIED ---
+                        // Use the new helper function to generate the cell content
+                        const cellContent = createSummaryCellHtml(topics);
+                        // Add the 'summary-cell' class to the TD
+                        tableHtml += `<td class="px-4 py-3 border align-top summary-cell">${cellContent}</td>`;
+                        // --- END: MODIFIED ---
                     });
 
                     tableHtml += `</tr>`;
@@ -5628,6 +5625,48 @@ function renderProgressChart(labels, data, title) {
         }
         // --- END: WEEK SUMMARY FEATURE ---
 		
+		
+		// --- Helper for Summary Tables ---
+        function createSummaryCellHtml(topicsArray) {
+            if (!topicsArray || topicsArray.length === 0) {
+                return '<span class="text-gray-300">-</span>';
+            }
+
+            // Create the full content string
+            const fullContent = topicsArray.map(t => escapeHtml(t)).join('<br><hr class="my-1 border-gray-200">');
+            
+            // Heuristic check: Does this look like it needs more than 3 lines?
+            // We check if there are more than 2 line breaks OR if the string is very long.
+            const isLong = topicsArray.length > 2 || fullContent.length > 150;
+
+            if (isLong) {
+                return `
+                    <div class="summary-cell-wrapper">
+                        <div class="summary-cell-content">${fullContent}</div>
+                        <button class="summary-read-more-btn" onclick="toggleSummaryRow(this)">...more</button>
+                    </div>
+                `;
+            } else {
+                return `<div class="summary-cell-content" style="-webkit-line-clamp: unset; max-height: none;">${fullContent}</div>`;
+            }
+        }
+
+        // Global function for the onclick event
+        window.toggleSummaryRow = function(btn) {
+            // Find the parent TR
+            const row = btn.closest('tr');
+            if (row) {
+                // Toggle the class on the ROW so all cells in this row expand together
+                row.classList.toggle('expanded');
+                
+                // Update button text logic (optional, if you want it to say "less")
+                const isExpanded = row.classList.contains('expanded');
+                // Find all buttons in this row to update their text
+                row.querySelectorAll('.summary-read-more-btn').forEach(b => {
+                    b.textContent = isExpanded ? 'less' : '...more';
+                });
+            }
+        };
 }
 
 

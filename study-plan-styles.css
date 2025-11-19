@@ -1677,3 +1677,38 @@
 }
 
 /* --- END: QUIZ START SCREEN MOBILE FIX --- */
+
+/* --- START: Summary Table Expansion Styles --- */
+.summary-cell-content {
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Show max 3 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+    max-height: 4.2em; /* 3 lines * 1.4 line-height */
+    transition: max-height 0.3s ease;
+}
+
+.summary-row.expanded .summary-cell-content {
+    -webkit-line-clamp: unset; /* Remove limit */
+    max-height: none; /* Allow full height */
+    overflow: visible;
+}
+
+.summary-read-more-btn {
+    font-size: 0.7rem;
+    color: #059669; /* emerald-600 */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 4px;
+    font-weight: 600;
+    display: none; /* Hidden by default */
+}
+
+.summary-read-more-btn:hover {
+    text-decoration: underline;
+}
+
+/* --- END: Summary Table Expansion Styles --- */
