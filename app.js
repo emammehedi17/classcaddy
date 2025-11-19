@@ -5625,7 +5625,6 @@ function renderProgressChart(labels, data, title) {
         }
         // --- END: WEEK SUMMARY FEATURE ---
 		
-		
 		// --- Helper for Summary Tables ---
         function createSummaryCellHtml(topicsArray) {
             if (!topicsArray || topicsArray.length === 0) {
@@ -5659,7 +5658,7 @@ function renderProgressChart(labels, data, title) {
                 // Toggle the class on the ROW so all cells in this row expand together
                 row.classList.toggle('expanded');
                 
-                // Update button text logic (optional, if you want it to say "less")
+                // Update button text logic
                 const isExpanded = row.classList.contains('expanded');
                 // Find all buttons in this row to update their text
                 row.querySelectorAll('.summary-read-more-btn').forEach(b => {
