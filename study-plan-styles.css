@@ -795,17 +795,14 @@
 		/* --- STYLES FOR ALL-VOCAB MODAL --- */
         
         /* New fixed header for the modal */
-        .modal-header-sticky {
-            position: relative;
-            padding-bottom: 1.25rem; /* mb-5 */
-            border-bottom: 1px solid #e5e7eb; /* gray-200 */
-            flex-shrink: 0; /* Prevents header from shrinking */
-        }
-        /* Reposition the close button */
-        .all-vocab-modal-content .modal-close {
-            top: -5px; /* Adjust as needed */
-            right: 0;
-        }
+		.modal-header-sticky {
+			/* position: relative; removed to fix close button position */
+			padding-bottom: 1.25rem; /* mb-5 */
+			border-bottom: 1px solid #e5e7eb; /* gray-200 */
+			flex-shrink: 0; /* Prevents header from shrinking */
+		}
+
+/* .all-vocab-modal-content .modal-close override removed to ensure consistency */
 
         /* The scrolling part */
         #vocab-list-content {
