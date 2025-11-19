@@ -1496,13 +1496,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             ?.filter(r => r.subject === subject && r.topic)
                             .map(r => r.topic) || [];
                             
-                        let cellContent = '<span class="text-gray-400">-</span>';
-                        if (topics.length > 0) {
-                            // Join multiple topics with line breaks
-                            cellContent = topics.map(t => escapeHtml(t)).join('<br><hr class="my-1 border-gray-200">');
-                        }
-                        
-                        tableHtml += `<td class="px-4 py-3 border align-top">${cellContent}</td>`;
+                        // --- USE THE HELPER FUNCTION ---
+                        const cellContent = createSummaryCellHtml(topics);
+                        tableHtml += `<td class="px-4 py-3 border align-top summary-cell">${cellContent}</td>`;
                     });
 
                     tableHtml += `</tr>`;
@@ -1601,14 +1597,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
                                 ?.filter(r => r.subject === subject && r.topic)
                                 .map(r => r.topic) || [];
                                 
-                            // --- START: MODIFIED ---
-                            // Use the new helper function
+                            // --- USE THE HELPER FUNCTION ---
                             const cellContent = createSummaryCellHtml(topics);
                             tableHtml += `<td class="px-4 py-3 border align-top summary-cell">${cellContent}</td>`;
-                            // --- END: MODIFIED ---
                         });
-                        tableHtml += `</tr>`;
-                    });
                 });
 
                 tableHtml += `</tbody></table></div>`;
@@ -5582,6 +5574,3 @@ window.toggleSummaryRow = function(btn) {
         });
     }
 };
-
-
-		
