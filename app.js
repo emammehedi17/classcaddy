@@ -5678,165 +5678,154 @@ window.toggleSummaryRow = function(btn) {
             return html;
         }
 		
-		// --- START: PRINT FUNCTIONALITY (PAGINATED SUMMARY & COLORFUL) ---
+		// --- START: PRINT FUNCTIONALITY (PROMISIFIED & FIXED) ---
 
         function printSummaryContent(contentId, title, headerHTML, extraContentHTML = '') {
-            // 1. Generate Paginated Main Table HTML
-            const mainTableHTML = getPaginatedMainTableHtml(contentId);
+            return new Promise((resolve, reject) => {
+                // 1. Generate Paginated Main Table HTML
+                const mainTableHTML = getPaginatedMainTableHtml(contentId);
 
-            if (!mainTableHTML) {
-                showCustomAlert("No content to print.", "error");
-                return;
-            }
-
-            // 2. Create a hidden Iframe
-            const iframe = document.createElement('iframe');
-            iframe.style.position = 'fixed';
-            iframe.style.right = '0';
-            iframe.style.bottom = '0';
-            iframe.style.width = '0';
-            iframe.style.height = '0';
-            iframe.style.border = '0';
-            document.body.appendChild(iframe);
-
-            // 3. Define Styles
-            const styles = `
-                <style>
-                    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
-                    
-                    @page {
-                        size: A4 landscape;
-                        margin: 1cm;
-                        margin-bottom: 2cm; 
-                    }
-                    body {
-                        font-family: 'Inter', 'Kalpurush', sans-serif;
-                        padding: 20px;
-                        padding-bottom: 30px; 
-                        color: #1f2937;
-                        -webkit-print-color-adjust: exact;
-                        print-color-adjust: exact;
-                        background-color: white;
-                    }
-                    
-                    /* HEADER & INFO */
-                    .print-header-container { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #10b981; padding-bottom: 15px; }
-                    h1 { color: #059669; margin: 0 0 10px 0; font-size: 24px; }
-                    .meta-info { display: flex; justify-content: center; gap: 30px; font-size: 14px; color: #374151; font-weight: 600; }
-                    .user-info-row { display: flex; justify-content: center; gap: 20px; margin-top: 8px; font-size: 12px; color: #4b5563; font-weight: 500; }
-                    .user-info-row span { font-weight: 600; color: #1f2937; }
-                    
-                    /* --- COLORFUL SUMMARY TABLE STYLES --- */
-                    table.summary-print-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px; }
-                    
-                    /* Header (Dark Blue/Black like Vocab) */
-                    .summary-print-table thead th { 
-                        background-color: #1f2937 !important; 
-                        color: white !important; 
-                        font-weight: bold; 
-                        text-transform: uppercase; 
-                        font-size: 11px; 
-                        padding: 8px 10px;
-                        border: 1px solid #374151;
-                        text-align: center;
-                    }
-                    
-                    /* Cells */
-                    .summary-print-table td { 
-                        border: 1px solid #d1d5db; 
-                        padding: 8px 10px; 
-                        text-align: left; 
-                        vertical-align: top; 
-                    }
-                    
-                    /* Week/Section Header Rows (Green) */
-                    .summary-print-table tr td[colspan] {
-                        background-color: #047857 !important; /* Dark Green */
-                        color: white !important;
-                        font-weight: bold;
-                        text-align: center;
-                    }
-
-                    /* Zebra Striping for Data Rows */
-                    .summary-print-table tbody tr:nth-child(even) { background-color: #f9fafb; }
-                    
-                    /* Column Specifics */
-                    .summary-print-table td:first-child { font-weight: 600; text-align: center; color: #1f2937; } /* Day Column */
-                    .summary-print-table td:last-child { font-weight: 700; text-align: center; color: #4b5563; } /* Vocab Count */
-
-                    /* Clean up cell content */
-                    .summary-read-more-btn { display: none !important; }
-                    .summary-cell-content { max-height: none !important; -webkit-line-clamp: unset !important; display: block !important; overflow: visible !important; }
-                    .summary-cell-wrapper { display: block; }
-
-                    /* VOCAB SECTION STYLES */
-                    .vocab-section-title { color: #059669; text-align: center; margin-top: 30px; margin-bottom: 10px; font-size: 18px; font-weight: bold; page-break-before: always; }
-                    .vocab-print-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 0; }
-                    .vocab-print-table th, .vocab-print-table td { border: 1px solid #d1d5db; padding: 5px 8px; text-align: left; vertical-align: middle; }
-                    .vocab-main-header th { background-color: #1f2937 !important; color: white !important; text-align: center; font-weight: bold; }
-                    .vocab-week-header td { background-color: #047857 !important; color: white !important; font-weight: bold; text-align: center; font-size: 13px; padding: 8px; }
-                    .vocab-day-header td { background-color: #10b981 !important; color: white !important; font-weight: bold; text-align: center; }
-                    .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
-                    .vocab-col-divider { border-right: 2px solid #9ca3af !important; }
-
-                    /* FOOTER */
-                    .print-footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 8px 0; text-align: center; font-size: 12px; color: #6b7280; border-top: 2px solid #10b981; background-color: white; z-index: 1000; }
-                    .print-footer a { color: #059669; text-decoration: none; font-weight: 600; }
-                    
-                    /* Print Optimization */
-                    tr { page-break-inside: avoid; page-break-after: auto; }
-                    thead { display: table-header-group; }
-                    tfoot { display: table-footer-group; }
-                </style>
-            `;
-
-            // 4. Build HTML
-            let htmlContent = `
-                <!DOCTYPE html>
-                <html>
-                <head><title>${title}</title>${styles}</head>
-                <body>
-                    <div class="print-header-container">
-                        <h1>${title}</h1>
-                        ${headerHTML}
-                    </div>
-                    ${mainTableHTML}
-            `;
-
-            if (extraContentHTML) {
-                htmlContent += `
-                    <div class="vocab-section">
-                        <h2 class="vocab-section-title">Vocabulary List</h2>
-                        ${extraContentHTML}
-                    </div>
-                `;
-            }
-
-            htmlContent += `
-                    <div style="height: 50px;"></div>
-                    <div class="print-footer">
-                        Visit us at: <a href="https://classcaddy.netlify.app/">https://classcaddy.netlify.app/</a>
-                    </div>
-                </body></html>
-            `;
-
-            // 5. Write & Print
-            const frameDoc = iframe.contentWindow ? iframe.contentWindow.document : iframe.contentDocument;
-            frameDoc.open();
-            frameDoc.write(htmlContent);
-            frameDoc.close();
-
-            setTimeout(() => {
-                try {
-                    iframe.contentWindow.focus();
-                    iframe.contentWindow.print();
-                } catch (e) {
-                    console.error("Print failed:", e);
-                    showCustomAlert("Printing failed.", "error");
-                } finally {
-                    setTimeout(() => document.body.removeChild(iframe), 60000);
+                if (!mainTableHTML) {
+                    showCustomAlert("No content to print.", "error");
+                    resolve(); // Resolve immediately to reset button
+                    return;
                 }
-            }, 1000);
+
+                // 2. Create a hidden Iframe
+                // Remove any existing print iframes to prevent duplicates
+                const existingIframe = document.querySelector('iframe[name="print-frame"]');
+                if (existingIframe) document.body.removeChild(existingIframe);
+
+                const iframe = document.createElement('iframe');
+                iframe.name = "print-frame"; // Name it to find it easily
+                iframe.style.position = 'fixed';
+                iframe.style.right = '0';
+                iframe.style.bottom = '0';
+                iframe.style.width = '0';
+                iframe.style.height = '0';
+                iframe.style.border = '0';
+                document.body.appendChild(iframe);
+
+                // 3. Define Styles
+                const styles = `
+                    <style>
+                        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
+                        
+                        @page {
+                            size: A4 landscape;
+                            margin: 1cm;
+                            margin-bottom: 2cm; 
+                        }
+                        body {
+                            font-family: 'Inter', 'Kalpurush', sans-serif;
+                            padding: 20px;
+                            padding-bottom: 30px; 
+                            color: #1f2937;
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact;
+                            background-color: white;
+                        }
+                        
+                        /* HEADER & INFO */
+                        .print-header-container { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #10b981; padding-bottom: 15px; }
+                        h1 { color: #059669; margin: 0 0 10px 0; font-size: 24px; }
+                        .meta-info { display: flex; justify-content: center; gap: 30px; font-size: 14px; color: #374151; font-weight: 600; }
+                        .user-info-row { display: flex; justify-content: center; gap: 20px; margin-top: 8px; font-size: 12px; color: #4b5563; font-weight: 500; }
+                        .user-info-row span { font-weight: 600; color: #1f2937; }
+                        
+                        /* TABLE STYLES */
+                        table.summary-print-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px; }
+                        .summary-print-table thead th { background-color: #1f2937 !important; color: white !important; font-weight: bold; text-transform: uppercase; font-size: 11px; padding: 8px 10px; border: 1px solid #374151; text-align: center; }
+                        .summary-print-table td { border: 1px solid #d1d5db; padding: 8px 10px; text-align: left; vertical-align: top; }
+                        .summary-print-table tr td[colspan] { background-color: #047857 !important; color: white !important; font-weight: bold; text-align: center; }
+                        .summary-print-table tbody tr:nth-child(even) { background-color: #f9fafb; }
+                        .summary-print-table td:first-child { font-weight: 600; text-align: center; color: #1f2937; }
+                        .summary-print-table td:last-child { font-weight: 700; text-align: center; color: #4b5563; }
+
+                        /* Clean up */
+                        .summary-read-more-btn { display: none !important; }
+                        .summary-cell-content { max-height: none !important; -webkit-line-clamp: unset !important; display: block !important; overflow: visible !important; }
+                        .summary-cell-wrapper { display: block; }
+
+                        /* VOCAB STYLES */
+                        .vocab-section-title { color: #059669; text-align: center; margin-top: 30px; margin-bottom: 10px; font-size: 18px; font-weight: bold; page-break-before: always; }
+                        .vocab-print-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 0; }
+                        .vocab-print-table th, .vocab-print-table td { border: 1px solid #d1d5db; padding: 5px 8px; text-align: left; vertical-align: middle; }
+                        .vocab-main-header th { background-color: #1f2937 !important; color: white !important; text-align: center; font-weight: bold; }
+                        .vocab-week-header td { background-color: #047857 !important; color: white !important; font-weight: bold; text-align: center; font-size: 13px; padding: 8px; }
+                        .vocab-day-header td { background-color: #10b981 !important; color: white !important; font-weight: bold; text-align: center; }
+                        .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
+                        .vocab-col-divider { border-right: 2px solid #9ca3af !important; }
+
+                        /* FOOTER */
+                        .print-footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 8px 0; text-align: center; font-size: 12px; color: #6b7280; border-top: 2px solid #10b981; background-color: white; z-index: 1000; }
+                        .print-footer a { color: #059669; text-decoration: none; font-weight: 600; }
+                        
+                        tr { page-break-inside: avoid; page-break-after: auto; }
+                        thead { display: table-header-group; }
+                        tfoot { display: table-footer-group; }
+                    </style>
+                `;
+
+                // 4. Build HTML
+                let htmlContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head><title>${title}</title>${styles}</head>
+                    <body>
+                        <div class="print-header-container">
+                            <h1>${title}</h1>
+                            ${headerHTML}
+                        </div>
+                        ${mainTableHTML}
+                `;
+
+                if (extraContentHTML) {
+                    htmlContent += `
+                        <div class="vocab-section">
+                            <h2 class="vocab-section-title">Vocabulary List</h2>
+                            ${extraContentHTML}
+                        </div>
+                    `;
+                }
+
+                htmlContent += `
+                        <div style="height: 50px;"></div>
+                        <div class="print-footer">
+                            Visit us at: <a href="https://classcaddy.netlify.app/">https://classcaddy.netlify.app/</a>
+                        </div>
+                    </body></html>
+                `;
+
+                // 5. Write content
+                const frameDoc = iframe.contentWindow ? iframe.contentWindow.document : iframe.contentDocument;
+                frameDoc.open();
+                frameDoc.write(htmlContent);
+                frameDoc.close();
+
+                // 6. Execute Print (with error handling for mobile)
+                // We wait a bit for styles to render, then print, then resolve
+                setTimeout(() => {
+                    try {
+                        if (!iframe.contentWindow) {
+                            throw new Error("Iframe window lost");
+                        }
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                        resolve(); // Button resets now
+                    } catch (e) {
+                        console.error("Print execution failed:", e);
+                        resolve(); // Reset button even if print fails
+                    } finally {
+                        // Remove iframe after a short delay to ensure print command is sent
+                        setTimeout(() => {
+                            if (document.body.contains(iframe)) {
+                                document.body.removeChild(iframe);
+                            }
+                        }, 3000); 
+                    }
+                }, 500);
+            });
         }
 
         // Event Listener: Week Summary Print
