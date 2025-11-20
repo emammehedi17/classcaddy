@@ -5620,7 +5620,7 @@ window.toggleSummaryRow = function(btn) {
 };
 
 
-// --- START: PRINT FUNCTIONALITY (UPDATED) ---
+// --- START: PRINT FUNCTIONALITY (UPDATED FOR FOOTER FIX) ---
 
         function printSummaryContent(contentId, title, detailsHTML, extraContentHTML = '') {
             const contentDiv = document.getElementById(contentId);
@@ -5648,7 +5648,8 @@ window.toggleSummaryRow = function(btn) {
                     @page {
                         size: A4 landscape;
                         margin: 1cm;
-                        margin-bottom: 1.5cm;
+                        /* INCREASED MARGIN: Ensures content breaks before hitting the footer */
+                        margin-bottom: 2cm; 
                     }
                     body {
                         font-family: 'Inter', 'Kalpurush', sans-serif;
@@ -5678,22 +5679,33 @@ window.toggleSummaryRow = function(btn) {
                     .summary-cell-content { max-height: none !important; -webkit-line-clamp: unset !important; display: block !important; overflow: visible !important; }
                     .summary-cell-wrapper { display: block; }
 
-                    /* --- NEW: VOCAB TABLE STYLES --- */
+                    /* VOCAB TABLE STYLES */
                     .vocab-section-title { color: #059669; text-align: center; margin-top: 30px; margin-bottom: 10px; font-size: 18px; font-weight: bold; page-break-before: always; }
                     .vocab-print-table { width: 100%; border-collapse: collapse; font-size: 11px; }
                     .vocab-print-table th, .vocab-print-table td { border: 1px solid #d1d5db; padding: 5px 8px; text-align: left; vertical-align: middle; }
                     
-                    /* Colorful Headers */
                     .vocab-main-header th { background-color: #1f2937 !important; color: white !important; text-align: center; font-weight: bold; }
                     .vocab-week-header td { background-color: #047857 !important; color: white !important; font-weight: bold; text-align: center; font-size: 13px; padding: 8px; }
                     .vocab-day-header td { background-color: #10b981 !important; color: white !important; font-weight: bold; text-align: center; }
                     
-                    /* Striped Rows */
                     .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
-                    .vocab-col-divider { border-right: 2px solid #9ca3af !important; } /* Thick line between two sets */
+                    .vocab-col-divider { border-right: 2px solid #9ca3af !important; }
 
-                    /* Footer */
-                    .print-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 30px; text-align: center; font-size: 11px; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 8px; background-color: white; }
+                    /* FOOTER */
+                    .print-footer { 
+                        position: fixed; 
+                        bottom: 0; 
+                        left: 0; 
+                        right: 0; 
+                        height: 30px; 
+                        text-align: center; 
+                        font-size: 11px; 
+                        color: #6b7280; 
+                        border-top: 1px solid #e5e7eb; 
+                        padding-top: 8px; 
+                        background-color: white; 
+                        z-index: 1000;
+                    }
                     .print-footer a { color: #059669; text-decoration: none; font-weight: 600; }
                 </style>
             `;
@@ -5711,7 +5723,6 @@ window.toggleSummaryRow = function(btn) {
                     ${contentDiv.innerHTML}
             `;
 
-            // Inject Vocabulary Table if provided
             if (extraContentHTML) {
                 htmlContent += `
                     <div class="vocab-section">
