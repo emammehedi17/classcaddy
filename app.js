@@ -6041,3 +6041,152 @@ window.toggleSummaryRow = function(btn) {
         });
 
         // --- END: PRINT FUNCTIONALITY ---
+		
+		
+	// --- START: POMODORO TIMER LOGIC ---
+        
+        const pomoWidget = document.getElementById('pomodoro-widget');
+        const pomoIcon = document.getElementById('pomodoro-icon');
+        const pomoTimerDisplay = document.getElementById('pomo-timer-display');
+        const pomoStartBtn = document.getElementById('pomo-start-btn');
+        const pomoResetBtn = document.getElementById('pomo-reset-btn');
+        const pomoBtnFocus = document.getElementById('pomo-btn-focus');
+        const pomoBtnBreak = document.getElementById('pomo-btn-break');
+        const pomoProgressBar = document.getElementById('pomo-progress-bar');
+        const pomoIconTime = document.getElementById('pomo-icon-time');
+
+        let pomoInterval = null;
+        let pomoTimeLeft = 25 * 60; // Seconds
+        let pomoTotalTime = 25 * 60;
+        let pomoIsRunning = false;
+        let pomoMode = 'focus'; // 'focus' or 'break'
+
+        // Initialize
+        function initPomodoro() {
+            updatePomoDisplay();
+            
+            // Buttons
+            pomoStartBtn.addEventListener('click', togglePomoTimer);
+            pomoResetBtn.addEventListener('click', resetPomoTimer);
+            pomoBtnFocus.addEventListener('click', () => switchPomoMode('focus'));
+            pomoBtnBreak.addEventListener('click', () => switchPomoMode('break'));
+            
+            // Minimize / Maximize
+            document.getElementById('pomo-minimize-btn').addEventListener('click', () => {
+                pomoWidget.classList.add('hidden');
+                pomoIcon.classList.remove('hidden');
+            });
+            pomoIcon.addEventListener('click', () => {
+                pomoIcon.classList.add('hidden');
+                pomoWidget.classList.remove('hidden');
+            });
+        }
+
+        function togglePomoTimer() {
+            if (pomoIsRunning) {
+                pausePomoTimer();
+            } else {
+                startPomoTimer();
+            }
+        }
+
+        function startPomoTimer() {
+            pomoIsRunning = true;
+            pomoStartBtn.innerHTML = `<i class="fas fa-pause mr-1"></i> Pause`;
+            pomoStartBtn.classList.replace('bg-emerald-500', 'bg-amber-500'); // Change color to amber
+            
+            pomoInterval = setInterval(() => {
+                if (pomoTimeLeft > 0) {
+                    pomoTimeLeft--;
+                    updatePomoDisplay();
+                } else {
+                    pomoComplete();
+                }
+            }, 1000);
+        }
+
+        function pausePomoTimer() {
+            pomoIsRunning = false;
+            clearInterval(pomoInterval);
+            pomoStartBtn.innerHTML = `<i class="fas fa-play mr-1"></i> Resume`;
+            pomoStartBtn.classList.replace('bg-amber-500', 'bg-emerald-500');
+        }
+
+        function resetPomoTimer() {
+            pausePomoTimer();
+            pomoStartBtn.innerHTML = `<i class="fas fa-play mr-1"></i> Start`;
+            pomoTimeLeft = (pomoMode === 'focus') ? 25 * 60 : 5 * 60;
+            pomoTotalTime = pomoTimeLeft;
+            updatePomoDisplay();
+        }
+
+        function switchPomoMode(mode) {
+            pomoMode = mode;
+            // Update Tabs
+            if (mode === 'focus') {
+                pomoBtnFocus.classList.add('active');
+                pomoBtnBreak.classList.remove('active');
+                pomoTimeLeft = 25 * 60;
+            } else {
+                pomoBtnBreak.classList.add('active');
+                pomoBtnFocus.classList.remove('active');
+                pomoTimeLeft = 5 * 60;
+            }
+            pomoTotalTime = pomoTimeLeft;
+            pausePomoTimer(); // Auto-pause on switch
+            pomoStartBtn.innerHTML = `<i class="fas fa-play mr-1"></i> Start`;
+            updatePomoDisplay();
+        }
+
+        function updatePomoDisplay() {
+            const minutes = Math.floor(pomoTimeLeft / 60);
+            const seconds = pomoTimeLeft % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Update Widget Text
+            pomoTimerDisplay.textContent = timeString;
+            
+            // Update Progress Bar
+            const progressPercent = ((pomoTotalTime - pomoTimeLeft) / pomoTotalTime) * 100;
+            pomoProgressBar.style.width = `${progressPercent}%`;
+            
+            // Update Browser Tab Title (Optional UX improvement)
+            if (pomoIsRunning) {
+                document.title = `(${timeString}) Class Caddy`;
+            } else {
+                document.title = 'Class Caddy - My Study Plan';
+            }
+
+            // Update Minimized Icon Badge
+            if (pomoIsRunning) {
+                pomoIconTime.classList.remove('hidden');
+                pomoIconTime.textContent = timeString;
+            } else {
+                pomoIconTime.classList.add('hidden');
+            }
+        }
+
+        function pomoComplete() {
+            pausePomoTimer();
+            
+            // Play Beep Sound
+            // Using a standard reliable beep sound from Google's CDN or a simple generated one
+            const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+            audio.play().catch(e => console.log("Audio play failed (user didn't interact yet):", e));
+            
+            showCustomAlert(pomoMode === 'focus' ? "Focus session complete! Take a break." : "Break over! Back to work.", "success");
+            
+            // Auto-switch modes for convenience
+            if (pomoMode === 'focus') {
+                switchPomoMode('break');
+            } else {
+                switchPomoMode('focus');
+            }
+        }
+
+        // Initialize on load
+        if (document.getElementById('pomodoro-widget')) {
+            initPomodoro();
+        }
+
+        // --- END: POMODORO TIMER LOGIC ---
