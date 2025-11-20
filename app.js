@@ -5620,9 +5620,9 @@ window.toggleSummaryRow = function(btn) {
 };
 
 
-// --- START: PRINT FUNCTIONALITY (MOBILE COMPATIBLE - IFRAME METHOD) ---
+// --- START: PRINT FUNCTIONALITY (UPDATED) ---
 
-        function printSummaryContent(contentId, title, detailsHTML) {
+        function printSummaryContent(contentId, title, detailsHTML, extraContentHTML = '') {
             const contentDiv = document.getElementById(contentId);
             
             if (!contentDiv || contentDiv.innerHTML.trim() === '') {
@@ -5638,10 +5638,9 @@ window.toggleSummaryRow = function(btn) {
             iframe.style.width = '0';
             iframe.style.height = '0';
             iframe.style.border = '0';
-            // Append to body to make it part of the current document context
             document.body.appendChild(iframe);
 
-            // 2. Define Styles (Same as before)
+            // 2. Define Styles
             const styles = `
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
@@ -5657,7 +5656,7 @@ window.toggleSummaryRow = function(btn) {
                         color: #1f2937;
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
-                        background-color: white; /* Ensure white background for PDF */
+                        background-color: white;
                     }
                     .print-header-container {
                         text-align: center;
@@ -5665,131 +5664,196 @@ window.toggleSummaryRow = function(btn) {
                         border-bottom: 2px solid #10b981;
                         padding-bottom: 10px;
                     }
-                    h1 {
-                        color: #059669;
-                        margin: 0 0 10px 0;
-                        font-size: 24px;
-                    }
-                    .meta-info {
-                        display: flex;
-                        justify-content: center;
-                        gap: 30px;
-                        font-size: 14px;
-                        color: #374151;
-                        font-weight: 600;
-                    }
-                    .meta-item span {
-                        font-weight: 400;
-                        color: #111827;
-                    }
-                    table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        font-size: 12px;
-                    }
-                    th, td {
-                        border: 1px solid #e5e7eb;
-                        padding: 8px 10px;
-                        text-align: left;
-                        vertical-align: top;
-                    }
-                    thead th {
-                        background-color: #f3f4f6 !important;
-                        color: #1f2937;
-                        font-weight: 700;
-                        text-transform: uppercase;
-                        font-size: 11px;
-                    }
+                    h1 { color: #059669; margin: 0 0 10px 0; font-size: 24px; }
+                    .meta-info { display: flex; justify-content: center; gap: 30px; font-size: 14px; color: #374151; font-weight: 600; }
+                    .meta-item span { font-weight: 400; color: #111827; }
                     
-                    /* Highlight rows logic */
-                    .bg-emerald-50 { background-color: #ecfdf5 !important; }
-                    .bg-gray-50 { background-color: #f9fafb !important; }
+                    /* General Table Styles */
+                    table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px; }
+                    th, td { border: 1px solid #e5e7eb; padding: 8px 10px; text-align: left; vertical-align: top; }
+                    thead th { background-color: #f3f4f6 !important; color: #1f2937; font-weight: 700; text-transform: uppercase; font-size: 11px; }
                     
-                    /* Clean up cell content for print */
+                    /* Summary Table Specifics */
                     .summary-read-more-btn { display: none !important; }
-                    .summary-cell-content {
-                        max-height: none !important;
-                        -webkit-line-clamp: unset !important;
-                        display: block !important;
-                        overflow: visible !important;
-                    }
+                    .summary-cell-content { max-height: none !important; -webkit-line-clamp: unset !important; display: block !important; overflow: visible !important; }
                     .summary-cell-wrapper { display: block; }
 
-                    /* FOOTER STYLES */
-                    .print-footer {
-                        position: fixed;
-                        bottom: 0;
-                        left: 0;
-                        right: 0;
-                        height: 30px;
-                        text-align: center;
-                        font-size: 11px;
-                        color: #6b7280;
-                        border-top: 1px solid #e5e7eb;
-                        padding-top: 8px;
-                        background-color: white;
-                    }
-                    .print-footer a {
-                        color: #059669;
-                        text-decoration: none;
-                        font-weight: 600;
-                    }
+                    /* --- NEW: VOCAB TABLE STYLES --- */
+                    .vocab-section-title { color: #059669; text-align: center; margin-top: 30px; margin-bottom: 10px; font-size: 18px; font-weight: bold; page-break-before: always; }
+                    .vocab-print-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+                    .vocab-print-table th, .vocab-print-table td { border: 1px solid #d1d5db; padding: 5px 8px; text-align: left; vertical-align: middle; }
+                    
+                    /* Colorful Headers */
+                    .vocab-main-header th { background-color: #1f2937 !important; color: white !important; text-align: center; font-weight: bold; }
+                    .vocab-week-header td { background-color: #047857 !important; color: white !important; font-weight: bold; text-align: center; font-size: 13px; padding: 8px; }
+                    .vocab-day-header td { background-color: #10b981 !important; color: white !important; font-weight: bold; text-align: center; }
+                    
+                    /* Striped Rows */
+                    .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
+                    .vocab-col-divider { border-right: 2px solid #9ca3af !important; } /* Thick line between two sets */
+
+                    /* Footer */
+                    .print-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 30px; text-align: center; font-size: 11px; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 8px; background-color: white; }
+                    .print-footer a { color: #059669; text-decoration: none; font-weight: 600; }
                 </style>
             `;
 
-            // 3. Build the Full HTML String
-            const fullHtml = `
+            // 3. Build HTML
+            let htmlContent = `
                 <!DOCTYPE html>
                 <html>
-                <head>
-                    <title>${title}</title>
-                    ${styles}
-                </head>
+                <head><title>${title}</title>${styles}</head>
                 <body>
                     <div class="print-header-container">
                         <h1>${title}</h1>
-                        <div class="meta-info">
-                            ${detailsHTML}
-                        </div>
+                        <div class="meta-info">${detailsHTML}</div>
                     </div>
-
                     ${contentDiv.innerHTML}
+            `;
 
+            // Inject Vocabulary Table if provided
+            if (extraContentHTML) {
+                htmlContent += `
+                    <div class="vocab-section">
+                        <h2 class="vocab-section-title">Vocabulary List</h2>
+                        ${extraContentHTML}
+                    </div>
+                `;
+            }
+
+            htmlContent += `
                     <div class="print-footer">
                         Visit us at: <a href="https://classcaddy.netlify.app/">https://classcaddy.netlify.app/</a>
                     </div>
-                </body>
-                </html>
+                </body></html>
             `;
 
-            // 4. Write to the Iframe
+            // 4. Write & Print
             const frameDoc = iframe.contentWindow ? iframe.contentWindow.document : iframe.contentDocument;
             frameDoc.open();
-            frameDoc.write(fullHtml);
+            frameDoc.write(htmlContent);
             frameDoc.close();
 
-            // 5. Execute Print with a delay (important for mobile to render styles)
             setTimeout(() => {
                 try {
-                    iframe.contentWindow.focus(); // Focus is required on some browsers
+                    iframe.contentWindow.focus();
                     iframe.contentWindow.print();
                 } catch (e) {
-                    console.error("Print execution failed:", e);
-                    showCustomAlert("Printing is not supported on this device.", "error");
+                    console.error("Print failed:", e);
+                    showCustomAlert("Printing failed.", "error");
                 } finally {
-                    // Remove the iframe after a sufficient delay (allowing print dialog to finish)
-                    // 1 minute delay is safe; user will be done by then, or it doesn't matter
-                    setTimeout(() => {
-                        document.body.removeChild(iframe);
-                    }, 60000); 
+                    setTimeout(() => document.body.removeChild(iframe), 60000);
                 }
-            }, 1000); // 1 second delay to ensure rendering
+            }, 1000);
         }
 
         // Helper to get month Name
         function getMonthNameFromIndex(index) {
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             return months[index] || "Unknown";
+        }
+		
+		// Helper to generate the Colorful Vocab Table for printing
+        async function fetchAndBuildVocabHtml(monthId, weekId = null) {
+            let html = `<table class="vocab-print-table">
+                        <thead>
+                            <tr class="vocab-main-header">
+                                <th style="width: 15%;">Word</th>
+                                <th style="width: 20%;">Meaning</th>
+                                <th style="width: 15%;" class="vocab-col-divider">Synonym</th>
+                                <th style="width: 15%;">Word</th>
+                                <th style="width: 20%;">Meaning</th>
+                                <th style="width: 15%;">Synonym</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+            try {
+                // Determine which weeks to process
+                let weeksToProcess = [];
+                
+                if (weekId) {
+                    // Single week
+                    const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                    const weekDoc = await getDoc(weekDocRef);
+                    if (weekDoc.exists()) {
+                        weeksToProcess.push({ id: weekId, data: weekDoc.data() });
+                    }
+                } else {
+                    // All weeks in month
+                    const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
+                    const weeksCollectionRef = collection(db, monthDocRef.path, 'weeks');
+                    const weeksSnapshot = await getDocs(weeksCollectionRef);
+                    
+                    // Sort weeks (week1, week2...)
+                    weeksSnapshot.forEach(doc => weeksToProcess.push({ id: doc.id, data: doc.data() }));
+                    weeksToProcess.sort((a, b) => a.id.localeCompare(b.id));
+                }
+
+                let hasVocab = false;
+
+                for (const week of weeksToProcess) {
+                    const weekData = week.data;
+                    if (!weekData.days) continue;
+
+                    let weekHasVocab = false;
+                    let weekHtml = '';
+
+                    // If printing Month summary, add Week Header
+                    if (!weekId) {
+                        weekHtml += `<tr class="vocab-week-header"><td colspan="6">${week.id.replace('week', 'Week ')}</td></tr>`;
+                    }
+
+                    for (const day of weekData.days) {
+                        // Extract Vocab
+                        let dayVocab = [];
+                        day.rows?.forEach(row => {
+                            if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
+                                // Use existing preProcessVocab to split meaning/synonym
+                                const processed = preProcessVocab(row.vocabData);
+                                dayVocab.push(...processed);
+                            }
+                        });
+
+                        if (dayVocab.length > 0) {
+                            hasVocab = true;
+                            weekHasVocab = true;
+                            
+                            // Add Day Header
+                            weekHtml += `<tr class="vocab-day-header"><td colspan="6">Day ${day.dayNumber}</td></tr>`;
+
+                            // Chunk into pairs for 2-column layout
+                            for (let i = 0; i < dayVocab.length; i += 2) {
+                                const v1 = dayVocab[i];
+                                const v2 = dayVocab[i+1];
+
+                                weekHtml += `<tr class="vocab-data-row">
+                                    <td>${escapeHtml(v1.word)}</td>
+                                    <td>${escapeHtml(v1.banglaMeaning)}</td>
+                                    <td class="vocab-col-divider">${escapeHtml(v1.synonym || '-')}</td>
+                                    
+                                    <td>${v2 ? escapeHtml(v2.word) : ''}</td>
+                                    <td>${v2 ? escapeHtml(v2.banglaMeaning) : ''}</td>
+                                    <td>${v2 ? escapeHtml(v2.synonym || '-') : ''}</td>
+                                </tr>`;
+                            }
+                        }
+                    }
+
+                    if (weekHasVocab) {
+                        html += weekHtml;
+                    }
+                }
+
+                html += `</tbody></table>`;
+                
+                if (!hasVocab) return '<p style="text-align:center; font-style:italic;">No vocabulary found for this period.</p>';
+                return html;
+
+            } catch (e) {
+                console.error("Error building vocab table:", e);
+                return '<p style="color:red;">Error loading vocabulary.</p>';
+            }
         }
 
         // Event Listener: Week Summary Print
