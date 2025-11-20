@@ -5620,7 +5620,7 @@ window.toggleSummaryRow = function(btn) {
 };
 
 
-// --- START: PRINT FUNCTIONALITY (WITH USER INFO) ---
+		// --- START: PRINT FUNCTIONALITY (FIXED USER INFO) ---
 
         function printSummaryContent(contentId, title, headerHTML, extraContentHTML = '') {
             const contentDiv = document.getElementById(contentId);
@@ -5669,7 +5669,7 @@ window.toggleSummaryRow = function(btn) {
                     }
                     h1 { color: #059669; margin: 0 0 10px 0; font-size: 24px; }
                     
-                    /* Flex container for metadata rows */
+                    /* Date Info Row */
                     .meta-info { 
                         display: flex; 
                         justify-content: center; 
@@ -5680,11 +5680,19 @@ window.toggleSummaryRow = function(btn) {
                     }
                     .meta-item span { font-weight: 400; color: #111827; }
                     
-                    /* User Info Specifics */
-                    .user-meta-row {
+                    /* User Info Row - Explicit Styling */
+                    .user-info-row {
+                        display: flex;
+                        justify-content: center;
+                        gap: 20px;
                         margin-top: 8px;
-                        font-size: 13px;
-                        color: #6b7280;
+                        font-size: 12px;
+                        color: #4b5563; /* Darker gray for visibility */
+                        font-weight: 500;
+                    }
+                    .user-info-row span {
+                        font-weight: 600;
+                        color: #1f2937;
                     }
                     
                     /* TABLE STYLES */
@@ -5731,8 +5739,6 @@ window.toggleSummaryRow = function(btn) {
             `;
 
             // 3. Build HTML
-            // Note: We removed the wrapper <div class="meta-info"> around ${headerHTML} 
-            // so we can pass multiple rows (Date Row + User Row).
             let htmlContent = `
                 <!DOCTYPE html>
                 <html>
@@ -5811,17 +5817,23 @@ window.toggleSummaryRow = function(btn) {
                     `;
                 }
 
-                // 2. Build User Information Row (Added Below)
-                if (currentUser) {
-                    const userName = currentUser.displayName || 'Guest';
-                    const userEmail = currentUser.email || '';
+                // 2. Build User Information Row
+                // FIX: Check auth.currentUser directly to ensure we get the user
+                const activeUser = currentUser || auth.currentUser;
+                
+                if (activeUser) {
+                    const userName = activeUser.displayName || 'Guest';
+                    const userEmail = activeUser.email || '';
                     
                     headerHTML += `
-                        <div class="meta-info user-meta-row">
-                            <div class="meta-item">Name: <span>${escapeHtml(userName)}</span></div>
-                            ${userEmail ? `<div class="meta-item">Email: <span>${escapeHtml(userEmail)}</span></div>` : ''}
+                        <div class="user-info-row">
+                            <div>Name: <span>${escapeHtml(userName)}</span></div>
+                            ${userEmail ? `<div>Email: <span>${escapeHtml(userEmail)}</span></div>` : ''}
                         </div>
                     `;
+                } else {
+                    // Debugging fallback
+                    console.warn("User info not found during print generation.");
                 }
 
                 const vocabHtml = await fetchAndBuildVocabHtml(monthId, weekId);
@@ -5836,7 +5848,60 @@ window.toggleSummaryRow = function(btn) {
             }
         });
 
-        
+        // Event Listener: Month Summary Print
+        document.getElementById('print-month-summary-btn')?.addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            const monthId = btn.dataset.monthId;
+            
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1.5"></i> Preparing...`;
+            btn.disabled = true;
+
+            try {
+                let headerHTML = '';
+
+                // 1. Build Date Information Row
+                if (monthId) {
+                    const parts = monthId.split('-');
+                    const year = parts[0];
+                    const monthIndex = parseInt(parts[1]) - 1;
+                    const monthName = getMonthNameFromIndex(monthIndex);
+
+                    headerHTML += `
+                        <div class="meta-info">
+                            <div class="meta-item">Year: <span>${year}</span></div>
+                            <div class="meta-item">Month: <span>${monthName}</span></div>
+                        </div>
+                    `;
+                }
+
+                // 2. Build User Information Row
+                // FIX: Check auth.currentUser directly to ensure we get the user
+                const activeUser = currentUser || auth.currentUser;
+
+                if (activeUser) {
+                    const userName = activeUser.displayName || 'Guest';
+                    const userEmail = activeUser.email || '';
+                    
+                    headerHTML += `
+                        <div class="user-info-row">
+                            <div>Name: <span>${escapeHtml(userName)}</span></div>
+                            ${userEmail ? `<div>Email: <span>${escapeHtml(userEmail)}</span></div>` : ''}
+                        </div>
+                    `;
+                }
+
+                const vocabHtml = await fetchAndBuildVocabHtml(monthId, null);
+                printSummaryContent('month-summary-content', 'Monthly Study Summary', headerHTML, vocabHtml);
+                
+            } catch (error) {
+                console.error(error);
+                showCustomAlert("Failed to prepare print document.", "error");
+            } finally {
+                btn.innerHTML = originalIcon;
+                btn.disabled = false;
+            }
+        });
 
         // --- END: PRINT FUNCTIONALITY ---
 
