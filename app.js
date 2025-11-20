@@ -5678,7 +5678,7 @@ window.toggleSummaryRow = function(btn) {
             return html;
         }
 		
-		// --- START: PRINT FUNCTIONALITY (PROMISIFIED & FIXED) ---
+	// --- START: PRINT FUNCTIONALITY (FIXED: PREVENT DOUBLE EXECUTION) ---
 
         function printSummaryContent(contentId, title, headerHTML, extraContentHTML = '') {
             return new Promise((resolve, reject) => {
@@ -5687,7 +5687,7 @@ window.toggleSummaryRow = function(btn) {
 
                 if (!mainTableHTML) {
                     showCustomAlert("No content to print.", "error");
-                    resolve(); // Resolve immediately to reset button
+                    resolve(); 
                     return;
                 }
 
@@ -5697,7 +5697,7 @@ window.toggleSummaryRow = function(btn) {
                 if (existingIframe) document.body.removeChild(existingIframe);
 
                 const iframe = document.createElement('iframe');
-                iframe.name = "print-frame"; // Name it to find it easily
+                iframe.name = "print-frame";
                 iframe.style.position = 'fixed';
                 iframe.style.right = '0';
                 iframe.style.bottom = '0';
@@ -5803,8 +5803,7 @@ window.toggleSummaryRow = function(btn) {
                 frameDoc.write(htmlContent);
                 frameDoc.close();
 
-                // 6. Execute Print (with error handling for mobile)
-                // We wait a bit for styles to render, then print, then resolve
+                // 6. Execute Print
                 setTimeout(() => {
                     try {
                         if (!iframe.contentWindow) {
@@ -5812,12 +5811,13 @@ window.toggleSummaryRow = function(btn) {
                         }
                         iframe.contentWindow.focus();
                         iframe.contentWindow.print();
-                        resolve(); // Button resets now
                     } catch (e) {
                         console.error("Print execution failed:", e);
-                        resolve(); // Reset button even if print fails
                     } finally {
-                        // Remove iframe after a short delay to ensure print command is sent
+                        // Resolve immediately so UI unlocks even if print dialog is open/blocking
+                        resolve(); 
+                        
+                        // Remove iframe later
                         setTimeout(() => {
                             if (document.body.contains(iframe)) {
                                 document.body.removeChild(iframe);
@@ -5828,20 +5828,144 @@ window.toggleSummaryRow = function(btn) {
             });
         }
 
+        // Helper to generate the Colorful Vocab Table for printing (PAGINATED)
+        async function fetchAndBuildVocabHtml(monthId, weekId = null) {
+            const MAX_ROWS = 25;
+            let rowCount = 0;
+
+            const startNewTable = () => {
+                rowCount = 1; 
+                return `
+                    <table class="vocab-print-table">
+                        <thead>
+                            <tr class="vocab-main-header">
+                                <th style="width: 15%;">Word</th>
+                                <th style="width: 20%;">Meaning</th>
+                                <th style="width: 15%;" class="vocab-col-divider">Synonym</th>
+                                <th style="width: 15%;">Word</th>
+                                <th style="width: 20%;">Meaning</th>
+                                <th style="width: 15%;">Synonym</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+            };
+
+            const checkAndBreakPage = () => {
+                if (rowCount >= MAX_ROWS) {
+                    const breakHtml = `</tbody></table><div style="page-break-before: always;"></div>${startNewTable()}`;
+                    return breakHtml;
+                }
+                return '';
+            };
+
+            let html = startNewTable(); 
+
+            try {
+                let weeksToProcess = [];
+                
+                if (weekId) {
+                    const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                    const weekDoc = await getDoc(weekDocRef);
+                    if (weekDoc.exists()) {
+                        weeksToProcess.push({ id: weekId, data: weekDoc.data() });
+                    }
+                } else {
+                    const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
+                    const weeksCollectionRef = collection(db, monthDocRef.path, 'weeks');
+                    const weeksSnapshot = await getDocs(weeksCollectionRef);
+                    weeksSnapshot.forEach(doc => weeksToProcess.push({ id: doc.id, data: doc.data() }));
+                    weeksToProcess.sort((a, b) => a.id.localeCompare(b.id));
+                }
+
+                let hasVocab = false;
+
+                for (const week of weeksToProcess) {
+                    const weekData = week.data;
+                    if (!weekData.days) continue;
+
+                    let weekHasVocab = false;
+                    let weekBufferHtml = ''; 
+
+                    if (!weekId) {
+                        weekBufferHtml += `<tr class="vocab-week-header"><td colspan="6">${week.id.replace('week', 'Week ')}</td></tr>`;
+                    }
+
+                    for (const day of weekData.days) {
+                        let dayVocab = [];
+                        day.rows?.forEach(row => {
+                            if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
+                                const processed = preProcessVocab(row.vocabData);
+                                dayVocab.push(...processed);
+                            }
+                        });
+
+                        if (dayVocab.length > 0) {
+                            hasVocab = true;
+                            weekHasVocab = true;
+
+                            if (weekBufferHtml) {
+                                html += checkAndBreakPage();
+                                html += weekBufferHtml;
+                                rowCount++; 
+                                weekBufferHtml = ''; 
+                            }
+
+                            html += checkAndBreakPage();
+                            html += `<tr class="vocab-day-header"><td colspan="6">Day ${day.dayNumber}</td></tr>`;
+                            rowCount++;
+
+                            for (let i = 0; i < dayVocab.length; i += 2) {
+                                const v1 = dayVocab[i];
+                                const v2 = dayVocab[i+1];
+
+                                html += checkAndBreakPage();
+                                html += `<tr class="vocab-data-row">
+                                    <td>${escapeHtml(v1.word)}</td>
+                                    <td>${escapeHtml(v1.banglaMeaning)}</td>
+                                    <td class="vocab-col-divider">${escapeHtml(v1.synonym || '-')}</td>
+                                    
+                                    <td>${v2 ? escapeHtml(v2.word) : ''}</td>
+                                    <td>${v2 ? escapeHtml(v2.banglaMeaning) : ''}</td>
+                                    <td>${v2 ? escapeHtml(v2.synonym || '-') : ''}</td>
+                                </tr>`;
+                                rowCount++;
+                            }
+                        }
+                    }
+                }
+
+                html += `</tbody></table>`;
+                if (!hasVocab) return ''; 
+                return html;
+
+            } catch (e) {
+                console.error("Error building vocab table:", e);
+                return '<p style="color:red; text-align:center;">Error loading vocabulary data.</p>';
+            }
+        }
+
         // Event Listener: Week Summary Print
+        // FIX: Added check for 'data-processing' to prevent double execution
         document.getElementById('print-week-summary-btn')?.addEventListener('click', async (e) => {
             const btn = e.currentTarget;
+            
+            if (btn.dataset.processing === "true") return; // Stop if already running
+            btn.dataset.processing = "true";
+            
             const monthId = btn.dataset.monthId;
             const weekId = btn.dataset.weekId;
             
             const originalIcon = btn.innerHTML;
+            // Make sure we aren't saving the spinner as the original text
+            if (!originalIcon.includes('fa-print')) {
+                 btn.innerHTML = `<i class="fas fa-print mr-1.5"></i> Print`; // Reset if bad state
+            }
+            
             btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1.5"></i> Preparing...`;
             btn.disabled = true;
             
             try {
                 let headerHTML = '';
-                
-                // 1. Build Date Information Row
                 if (monthId && weekId) {
                     const parts = monthId.split('-');
                     const year = parts[0];
@@ -5858,50 +5982,56 @@ window.toggleSummaryRow = function(btn) {
                     `;
                 }
 
-                // 2. Build User Information Row
-                // FIX: Check auth.currentUser directly to ensure we get the user
                 const activeUser = currentUser || auth.currentUser;
-                
                 if (activeUser) {
                     const userName = activeUser.displayName || 'Guest';
                     const userEmail = activeUser.email || '';
-                    
                     headerHTML += `
                         <div class="user-info-row">
                             <div>Name: <span>${escapeHtml(userName)}</span></div>
                             ${userEmail ? `<div>Email: <span>${escapeHtml(userEmail)}</span></div>` : ''}
                         </div>
                     `;
-                } else {
-                    // Debugging fallback
-                    console.warn("User info not found during print generation.");
                 }
 
                 const vocabHtml = await fetchAndBuildVocabHtml(monthId, weekId);
-                printSummaryContent('week-summary-content', 'Weekly Study Summary', headerHTML, vocabHtml);
+                await printSummaryContent('week-summary-content', 'Weekly Study Summary', headerHTML, vocabHtml);
                 
             } catch (error) {
                 console.error(error);
                 showCustomAlert("Failed to prepare print document.", "error");
             } finally {
-                btn.innerHTML = originalIcon;
+                // Always revert button state
+                if (originalIcon.includes('fa-print')) {
+                    btn.innerHTML = originalIcon;
+                } else {
+                    btn.innerHTML = `<i class="fas fa-print mr-1.5"></i> Print`;
+                }
                 btn.disabled = false;
+                btn.dataset.processing = "false";
             }
         });
 
         // Event Listener: Month Summary Print
+        // FIX: Added check for 'data-processing' to prevent double execution
         document.getElementById('print-month-summary-btn')?.addEventListener('click', async (e) => {
             const btn = e.currentTarget;
+            
+            if (btn.dataset.processing === "true") return; // Stop if already running
+            btn.dataset.processing = "true";
+            
             const monthId = btn.dataset.monthId;
             
             const originalIcon = btn.innerHTML;
+            if (!originalIcon.includes('fa-print')) {
+                 btn.innerHTML = `<i class="fas fa-print mr-1.5"></i> Print`; 
+            }
+            
             btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1.5"></i> Preparing...`;
             btn.disabled = true;
 
             try {
                 let headerHTML = '';
-
-                // 1. Build Date Information Row
                 if (monthId) {
                     const parts = monthId.split('-');
                     const year = parts[0];
@@ -5916,14 +6046,10 @@ window.toggleSummaryRow = function(btn) {
                     `;
                 }
 
-                // 2. Build User Information Row
-                // FIX: Check auth.currentUser directly to ensure we get the user
                 const activeUser = currentUser || auth.currentUser;
-
                 if (activeUser) {
                     const userName = activeUser.displayName || 'Guest';
                     const userEmail = activeUser.email || '';
-                    
                     headerHTML += `
                         <div class="user-info-row">
                             <div>Name: <span>${escapeHtml(userName)}</span></div>
@@ -5933,14 +6059,19 @@ window.toggleSummaryRow = function(btn) {
                 }
 
                 const vocabHtml = await fetchAndBuildVocabHtml(monthId, null);
-                printSummaryContent('month-summary-content', 'Monthly Study Summary', headerHTML, vocabHtml);
+                await printSummaryContent('month-summary-content', 'Monthly Study Summary', headerHTML, vocabHtml);
                 
             } catch (error) {
                 console.error(error);
                 showCustomAlert("Failed to prepare print document.", "error");
             } finally {
-                btn.innerHTML = originalIcon;
+                if (originalIcon.includes('fa-print')) {
+                    btn.innerHTML = originalIcon;
+                } else {
+                    btn.innerHTML = `<i class="fas fa-print mr-1.5"></i> Print`;
+                }
                 btn.disabled = false;
+                btn.dataset.processing = "false";
             }
         });
 
