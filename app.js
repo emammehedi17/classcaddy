@@ -6043,7 +6043,7 @@ window.toggleSummaryRow = function(btn) {
         // --- END: PRINT FUNCTIONALITY ---
 		
 		
-	// --- START: POMODORO TIMER LOGIC ---
+	// --- START: POMODORO TIMER LOGIC (ROBUST BACKGROUND TIMING) ---
         
         const pomoWidget = document.getElementById('pomodoro-widget');
         const pomoIcon = document.getElementById('pomodoro-icon');
@@ -6056,8 +6056,9 @@ window.toggleSummaryRow = function(btn) {
         const pomoIconTime = document.getElementById('pomo-icon-time');
 
         let pomoInterval = null;
-        let pomoTimeLeft = 25 * 60; // Seconds
-        let pomoTotalTime = 25 * 60;
+        let pomoTimeLeft = 25 * 60; // Current remaining seconds
+        let pomoTotalTime = 25 * 60; // The duration of the current mode (for progress bar)
+        let pomoEndTime = null; // Timestamp when the timer will finish
         let pomoIsRunning = false;
         let pomoMode = 'focus'; // 'focus' or 'break'
 
@@ -6095,14 +6096,27 @@ window.toggleSummaryRow = function(btn) {
             pomoStartBtn.innerHTML = `<i class="fas fa-pause mr-1"></i> Pause`;
             pomoStartBtn.classList.replace('bg-emerald-500', 'bg-amber-500'); // Change color to amber
             
+            // CRITICAL FIX: Calculate the exact End Time based on system clock
+            // This ensures accuracy even if browser throttles the interval
+            const now = Date.now();
+            pomoEndTime = now + (pomoTimeLeft * 1000);
+            
             pomoInterval = setInterval(() => {
-                if (pomoTimeLeft > 0) {
-                    pomoTimeLeft--;
+                const currentTime = Date.now();
+                const distance = pomoEndTime - currentTime;
+                
+                // Calculate remaining seconds from the time difference
+                const secondsRemaining = Math.ceil(distance / 1000);
+
+                if (secondsRemaining >= 0) {
+                    pomoTimeLeft = secondsRemaining;
                     updatePomoDisplay();
                 } else {
+                    pomoTimeLeft = 0;
+                    updatePomoDisplay();
                     pomoComplete();
                 }
-            }, 1000);
+            }, 200); // Check more frequently (200ms) to ensure UI feels snappy
         }
 
         function pausePomoTimer() {
@@ -6110,6 +6124,7 @@ window.toggleSummaryRow = function(btn) {
             clearInterval(pomoInterval);
             pomoStartBtn.innerHTML = `<i class="fas fa-play mr-1"></i> Resume`;
             pomoStartBtn.classList.replace('bg-amber-500', 'bg-emerald-500');
+            // We don't need to save endTime because 'pomoTimeLeft' holds the correct paused value
         }
 
         function resetPomoTimer() {
@@ -6118,6 +6133,7 @@ window.toggleSummaryRow = function(btn) {
             pomoTimeLeft = (pomoMode === 'focus') ? 25 * 60 : 5 * 60;
             pomoTotalTime = pomoTimeLeft;
             updatePomoDisplay();
+            document.title = 'Class Caddy - My Study Plan'; // Reset Title
         }
 
         function switchPomoMode(mode) {
@@ -6139,22 +6155,23 @@ window.toggleSummaryRow = function(btn) {
         }
 
         function updatePomoDisplay() {
-            const minutes = Math.floor(pomoTimeLeft / 60);
-            const seconds = pomoTimeLeft % 60;
+            // Prevent negative numbers
+            const time = Math.max(0, pomoTimeLeft);
+            
+            const minutes = Math.floor(time / 60);
+            const seconds = time % 60;
             const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             
             // Update Widget Text
             pomoTimerDisplay.textContent = timeString;
             
             // Update Progress Bar
-            const progressPercent = ((pomoTotalTime - pomoTimeLeft) / pomoTotalTime) * 100;
+            const progressPercent = ((pomoTotalTime - time) / pomoTotalTime) * 100;
             pomoProgressBar.style.width = `${progressPercent}%`;
             
-            // Update Browser Tab Title (Optional UX improvement)
+            // Update Browser Tab Title
             if (pomoIsRunning) {
                 document.title = `(${timeString}) Class Caddy`;
-            } else {
-                document.title = 'Class Caddy - My Study Plan';
             }
 
             // Update Minimized Icon Badge
@@ -6168,11 +6185,11 @@ window.toggleSummaryRow = function(btn) {
 
         function pomoComplete() {
             pausePomoTimer();
+            document.title = 'Class Caddy - My Study Plan'; // Reset Title
             
             // Play Beep Sound
-            // Using a standard reliable beep sound from Google's CDN or a simple generated one
             const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-            audio.play().catch(e => console.log("Audio play failed (user didn't interact yet):", e));
+            audio.play().catch(e => console.log("Audio play failed:", e));
             
             showCustomAlert(pomoMode === 'focus' ? "Focus session complete! Take a break." : "Break over! Back to work.", "success");
             
