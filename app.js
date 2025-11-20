@@ -5620,9 +5620,9 @@ window.toggleSummaryRow = function(btn) {
 };
 
 
-// --- START: PRINT FUNCTIONALITY (BALANCED HEADER/FOOTER) ---
+// --- START: PRINT FUNCTIONALITY (WITH USER INFO) ---
 
-        function printSummaryContent(contentId, title, detailsHTML, extraContentHTML = '') {
+        function printSummaryContent(contentId, title, headerHTML, extraContentHTML = '') {
             const contentDiv = document.getElementById(contentId);
             
             if (!contentDiv || contentDiv.innerHTML.trim() === '') {
@@ -5648,7 +5648,6 @@ window.toggleSummaryRow = function(btn) {
                     @page {
                         size: A4 landscape;
                         margin: 1cm;
-                        /* Reduced from 3cm to 2cm to look normal, but keeps space for footer */
                         margin-bottom: 2cm; 
                     }
                     body {
@@ -5665,12 +5664,28 @@ window.toggleSummaryRow = function(btn) {
                     .print-header-container {
                         text-align: center;
                         margin-bottom: 20px;
-                        border-bottom: 2px solid #10b981; /* Green Line */
-                        padding-bottom: 15px; /* Balanced Padding */
+                        border-bottom: 2px solid #10b981;
+                        padding-bottom: 15px;
                     }
                     h1 { color: #059669; margin: 0 0 10px 0; font-size: 24px; }
-                    .meta-info { display: flex; justify-content: center; gap: 30px; font-size: 14px; color: #374151; font-weight: 600; }
+                    
+                    /* Flex container for metadata rows */
+                    .meta-info { 
+                        display: flex; 
+                        justify-content: center; 
+                        gap: 30px; 
+                        font-size: 14px; 
+                        color: #374151; 
+                        font-weight: 600; 
+                    }
                     .meta-item span { font-weight: 400; color: #111827; }
+                    
+                    /* User Info Specifics */
+                    .user-meta-row {
+                        margin-top: 8px;
+                        font-size: 13px;
+                        color: #6b7280;
+                    }
                     
                     /* TABLE STYLES */
                     table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px; }
@@ -5681,7 +5696,6 @@ window.toggleSummaryRow = function(btn) {
                     thead { display: table-header-group; }
                     tfoot { display: table-footer-group; }
                     
-                    /* Summary Table Specifics */
                     .summary-read-more-btn { display: none !important; }
                     .summary-cell-content { max-height: none !important; -webkit-line-clamp: unset !important; display: block !important; overflow: visible !important; }
                     .summary-cell-wrapper { display: block; }
@@ -5697,19 +5711,17 @@ window.toggleSummaryRow = function(btn) {
                     .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
                     .vocab-col-divider { border-right: 2px solid #9ca3af !important; }
 
-                    /* FOOTER STYLES (MATCHING HEADER) */
+                    /* FOOTER STYLES */
                     .print-footer { 
                         position: fixed; 
                         bottom: 0; 
                         left: 0; 
                         right: 0; 
-                        /* Increased padding to match header visual weight */
                         padding-top: 15px; 
                         padding-bottom: 15px;
                         text-align: center; 
                         font-size: 12px; 
                         color: #6b7280; 
-                        /* Same border style as header */
                         border-top: 2px solid #10b981; 
                         background-color: white; 
                         z-index: 1000;
@@ -5719,6 +5731,8 @@ window.toggleSummaryRow = function(btn) {
             `;
 
             // 3. Build HTML
+            // Note: We removed the wrapper <div class="meta-info"> around ${headerHTML} 
+            // so we can pass multiple rows (Date Row + User Row).
             let htmlContent = `
                 <!DOCTYPE html>
                 <html>
@@ -5726,7 +5740,7 @@ window.toggleSummaryRow = function(btn) {
                 <body>
                     <div class="print-header-container">
                         <h1>${title}</h1>
-                        <div class="meta-info">${detailsHTML}</div>
+                        ${headerHTML}
                     </div>
                     ${contentDiv.innerHTML}
             `;
@@ -5742,7 +5756,6 @@ window.toggleSummaryRow = function(btn) {
 
             htmlContent += `
                     <div style="height: 50px;"></div>
-                    
                     <div class="print-footer">
                         Visit us at: <a href="https://classcaddy.netlify.app/">https://classcaddy.netlify.app/</a>
                     </div>
@@ -5767,6 +5780,65 @@ window.toggleSummaryRow = function(btn) {
                 }
             }, 1000);
         }
+
+        // Event Listener: Week Summary Print
+        document.getElementById('print-week-summary-btn')?.addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            const monthId = btn.dataset.monthId;
+            const weekId = btn.dataset.weekId;
+            
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1.5"></i> Preparing...`;
+            btn.disabled = true;
+            
+            try {
+                let headerHTML = '';
+                
+                // 1. Build Date Information Row
+                if (monthId && weekId) {
+                    const parts = monthId.split('-');
+                    const year = parts[0];
+                    const monthIndex = parseInt(parts[1]) - 1;
+                    const monthName = getMonthNameFromIndex(monthIndex);
+                    const weekNum = weekId.replace('week', '').padStart(2, '0');
+
+                    headerHTML += `
+                        <div class="meta-info">
+                            <div class="meta-item">Year: <span>${year}</span></div>
+                            <div class="meta-item">Month: <span>${monthName}</span></div>
+                            <div class="meta-item">Week: <span>${weekNum}</span></div>
+                        </div>
+                    `;
+                }
+
+                // 2. Build User Information Row (Added Below)
+                if (currentUser) {
+                    const userName = currentUser.displayName || 'Guest';
+                    const userEmail = currentUser.email || '';
+                    
+                    headerHTML += `
+                        <div class="meta-info user-meta-row">
+                            <div class="meta-item">Name: <span>${escapeHtml(userName)}</span></div>
+                            ${userEmail ? `<div class="meta-item">Email: <span>${escapeHtml(userEmail)}</span></div>` : ''}
+                        </div>
+                    `;
+                }
+
+                const vocabHtml = await fetchAndBuildVocabHtml(monthId, weekId);
+                printSummaryContent('week-summary-content', 'Weekly Study Summary', headerHTML, vocabHtml);
+                
+            } catch (error) {
+                console.error(error);
+                showCustomAlert("Failed to prepare print document.", "error");
+            } finally {
+                btn.innerHTML = originalIcon;
+                btn.disabled = false;
+            }
+        });
+
+        
+
+        // --- END: PRINT FUNCTIONALITY ---
 
         // Helper to get month Name
         function getMonthNameFromIndex(index) {
