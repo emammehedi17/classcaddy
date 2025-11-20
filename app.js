@@ -5619,18 +5619,77 @@ window.toggleSummaryRow = function(btn) {
     }
 };
 
+		
+		// Helper to rebuild the Main Summary Table with Pagination & Color
+        function getPaginatedMainTableHtml(sourceElementId) {
+            const sourceDiv = document.getElementById(sourceElementId);
+            const originalTable = sourceDiv ? sourceDiv.querySelector('table') : null;
+            
+            if (!originalTable) {
+                return sourceDiv ? sourceDiv.innerHTML : ''; // Fallback if no table found
+            }
 
-		// --- START: PRINT FUNCTIONALITY (COMPACT FOOTER) ---
+            const MAX_ROWS_PER_PAGE = 11;
+            const theadHtml = originalTable.querySelector('thead').innerHTML;
+            const rows = Array.from(originalTable.querySelectorAll('tbody tr'));
+            
+            let html = '';
+            let rowCount = 0;
+            let isFirstTable = true;
+
+            // Function to start a new table
+            const startTable = () => {
+                // If it's not the first table, add a page break
+                const breakHtml = isFirstTable ? '' : '<div style="page-break-before: always;"></div>';
+                isFirstTable = false;
+                rowCount = 1; // Reset count (1 for header)
+                
+                return `${breakHtml}
+                    <table class="summary-print-table">
+                        <thead>${theadHtml}</thead>
+                        <tbody>`;
+            };
+
+            html += startTable();
+
+            rows.forEach(row => {
+                // If adding this row exceeds the limit, break and start new
+                if (rowCount >= MAX_ROWS_PER_PAGE) {
+                    html += `</tbody></table>${startTable()}`;
+                }
+
+                // Clone the row to manipulate or read it
+                // We need to preserve content but strip old classes for new styling
+                let newRowHtml = row.outerHTML;
+                
+                // Check if it is a Week Header row (has explicit colspan/bg styles)
+                if (row.querySelector('td[colspan]')) {
+                    // Keep it as a section header
+                     html += newRowHtml.replace('class="', 'class="summary-section-header ');
+                } else {
+                    // Normal data row
+                    html += newRowHtml.replace('class="', 'class="summary-data-row ');
+                }
+                
+                rowCount++;
+            });
+
+            html += '</tbody></table>';
+            return html;
+        }
+		
+		// --- START: PRINT FUNCTIONALITY (PAGINATED SUMMARY & COLORFUL) ---
 
         function printSummaryContent(contentId, title, headerHTML, extraContentHTML = '') {
-            const contentDiv = document.getElementById(contentId);
-            
-            if (!contentDiv || contentDiv.innerHTML.trim() === '') {
+            // 1. Generate Paginated Main Table HTML
+            const mainTableHTML = getPaginatedMainTableHtml(contentId);
+
+            if (!mainTableHTML) {
                 showCustomAlert("No content to print.", "error");
                 return;
             }
 
-            // 1. Create a hidden Iframe
+            // 2. Create a hidden Iframe
             const iframe = document.createElement('iframe');
             iframe.style.position = 'fixed';
             iframe.style.right = '0';
@@ -5640,7 +5699,7 @@ window.toggleSummaryRow = function(btn) {
             iframe.style.border = '0';
             document.body.appendChild(iframe);
 
-            // 2. Define Styles
+            // 3. Define Styles
             const styles = `
                 <style>
                     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
@@ -5660,86 +5719,78 @@ window.toggleSummaryRow = function(btn) {
                         background-color: white;
                     }
                     
-                    /* HEADER STYLES */
-                    .print-header-container {
-                        text-align: center;
-                        margin-bottom: 20px;
-                        border-bottom: 2px solid #10b981;
-                        padding-bottom: 15px;
-                    }
+                    /* HEADER & INFO */
+                    .print-header-container { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #10b981; padding-bottom: 15px; }
                     h1 { color: #059669; margin: 0 0 10px 0; font-size: 24px; }
+                    .meta-info { display: flex; justify-content: center; gap: 30px; font-size: 14px; color: #374151; font-weight: 600; }
+                    .user-info-row { display: flex; justify-content: center; gap: 20px; margin-top: 8px; font-size: 12px; color: #4b5563; font-weight: 500; }
+                    .user-info-row span { font-weight: 600; color: #1f2937; }
                     
-                    /* Date Info Row */
-                    .meta-info { 
-                        display: flex; 
-                        justify-content: center; 
-                        gap: 30px; 
-                        font-size: 14px; 
-                        color: #374151; 
-                        font-weight: 600; 
-                    }
-                    .meta-item span { font-weight: 400; color: #111827; }
+                    /* --- COLORFUL SUMMARY TABLE STYLES --- */
+                    table.summary-print-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px; }
                     
-                    /* User Info Row */
-                    .user-info-row {
-                        display: flex;
-                        justify-content: center;
-                        gap: 20px;
-                        margin-top: 8px;
-                        font-size: 12px;
-                        color: #4b5563;
-                        font-weight: 500;
-                    }
-                    .user-info-row span {
-                        font-weight: 600;
-                        color: #1f2937;
+                    /* Header (Dark Blue/Black like Vocab) */
+                    .summary-print-table thead th { 
+                        background-color: #1f2937 !important; 
+                        color: white !important; 
+                        font-weight: bold; 
+                        text-transform: uppercase; 
+                        font-size: 11px; 
+                        padding: 8px 10px;
+                        border: 1px solid #374151;
+                        text-align: center;
                     }
                     
-                    /* TABLE STYLES */
-                    table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px; }
-                    th, td { border: 1px solid #e5e7eb; padding: 8px 10px; text-align: left; vertical-align: top; }
-                    thead th { background-color: #f3f4f6 !important; color: #1f2937; font-weight: 700; text-transform: uppercase; font-size: 11px; }
+                    /* Cells */
+                    .summary-print-table td { 
+                        border: 1px solid #d1d5db; 
+                        padding: 8px 10px; 
+                        text-align: left; 
+                        vertical-align: top; 
+                    }
                     
-                    tr { page-break-inside: avoid; page-break-after: auto; }
-                    thead { display: table-header-group; }
-                    tfoot { display: table-footer-group; }
+                    /* Week/Section Header Rows (Green) */
+                    .summary-print-table tr td[colspan] {
+                        background-color: #047857 !important; /* Dark Green */
+                        color: white !important;
+                        font-weight: bold;
+                        text-align: center;
+                    }
+
+                    /* Zebra Striping for Data Rows */
+                    .summary-print-table tbody tr:nth-child(even) { background-color: #f9fafb; }
                     
+                    /* Column Specifics */
+                    .summary-print-table td:first-child { font-weight: 600; text-align: center; color: #1f2937; } /* Day Column */
+                    .summary-print-table td:last-child { font-weight: 700; text-align: center; color: #4b5563; } /* Vocab Count */
+
+                    /* Clean up cell content */
                     .summary-read-more-btn { display: none !important; }
                     .summary-cell-content { max-height: none !important; -webkit-line-clamp: unset !important; display: block !important; overflow: visible !important; }
                     .summary-cell-wrapper { display: block; }
 
-                    /* VOCAB STYLES */
+                    /* VOCAB SECTION STYLES */
                     .vocab-section-title { color: #059669; text-align: center; margin-top: 30px; margin-bottom: 10px; font-size: 18px; font-weight: bold; page-break-before: always; }
-                    .vocab-print-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+                    .vocab-print-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 0; }
                     .vocab-print-table th, .vocab-print-table td { border: 1px solid #d1d5db; padding: 5px 8px; text-align: left; vertical-align: middle; }
-                    
                     .vocab-main-header th { background-color: #1f2937 !important; color: white !important; text-align: center; font-weight: bold; }
                     .vocab-week-header td { background-color: #047857 !important; color: white !important; font-weight: bold; text-align: center; font-size: 13px; padding: 8px; }
                     .vocab-day-header td { background-color: #10b981 !important; color: white !important; font-weight: bold; text-align: center; }
                     .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
                     .vocab-col-divider { border-right: 2px solid #9ca3af !important; }
 
-                    /* FOOTER STYLES (REDUCED HEIGHT) */
-                    .print-footer { 
-                        position: fixed; 
-                        bottom: 0; 
-                        left: 0; 
-                        right: 0; 
-                        /* Reduced padding to make it slimmer */
-                        padding-top: 8px; 
-                        padding-bottom: 8px;
-                        text-align: center; 
-                        font-size: 12px; 
-                        color: #6b7280; 
-                        border-top: 2px solid #10b981; 
-                        background-color: white; 
-                        z-index: 1000;
-                    }
+                    /* FOOTER */
+                    .print-footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 8px 0; text-align: center; font-size: 12px; color: #6b7280; border-top: 2px solid #10b981; background-color: white; z-index: 1000; }
                     .print-footer a { color: #059669; text-decoration: none; font-weight: 600; }
+                    
+                    /* Print Optimization */
+                    tr { page-break-inside: avoid; page-break-after: auto; }
+                    thead { display: table-header-group; }
+                    tfoot { display: table-footer-group; }
                 </style>
             `;
 
-            // 3. Build HTML
+            // 4. Build HTML
             let htmlContent = `
                 <!DOCTYPE html>
                 <html>
@@ -5749,7 +5800,7 @@ window.toggleSummaryRow = function(btn) {
                         <h1>${title}</h1>
                         ${headerHTML}
                     </div>
-                    ${contentDiv.innerHTML}
+                    ${mainTableHTML}
             `;
 
             if (extraContentHTML) {
@@ -5769,7 +5820,7 @@ window.toggleSummaryRow = function(btn) {
                 </body></html>
             `;
 
-            // 4. Write & Print
+            // 5. Write & Print
             const frameDoc = iframe.contentWindow ? iframe.contentWindow.document : iframe.contentDocument;
             frameDoc.open();
             frameDoc.write(htmlContent);
