@@ -668,12 +668,17 @@
                 <button id="pomo-btn-focus" class="pomo-tab active">Focus</button>
                 <button id="pomo-btn-break" class="pomo-tab">Break</button>
             </div>
-            <button id="pomo-minimize-btn" class="text-gray-400 hover:text-gray-600">
-                <i class="fas fa-chevron-down"></i>
-            </button>
+            <div class="flex gap-2">
+                <button id="pomo-settings-toggle" class="text-gray-400 hover:text-emerald-600 transition-colors" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button id="pomo-minimize-btn" class="text-gray-400 hover:text-gray-600 transition-colors" title="Minimize">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
         </div>
         
-        <div class="pomo-body">
+        <div id="pomo-timer-view" class="pomo-body">
             <div id="pomo-timer-display" class="text-4xl font-bold text-gray-800 text-center my-4 font-mono">25:00</div>
             
             <div class="flex justify-center gap-3">
@@ -685,6 +690,22 @@
                 </button>
             </div>
         </div>
+
+        <div id="pomo-settings-view" class="pomo-body hidden pt-4">
+            <div class="space-y-3 mb-4">
+                <div class="flex justify-between items-center">
+                    <label class="text-xs font-bold text-gray-600 uppercase">Focus (min)</label>
+                    <input type="number" id="pomo-input-focus" class="w-16 p-1 text-center border border-gray-300 rounded text-sm" value="25" min="1" max="60">
+                </div>
+                <div class="flex justify-between items-center">
+                    <label class="text-xs font-bold text-gray-600 uppercase">Break (min)</label>
+                    <input type="number" id="pomo-input-break" class="w-16 p-1 text-center border border-gray-300 rounded text-sm" value="5" min="1" max="30">
+                </div>
+            </div>
+            <button id="pomo-save-settings-btn" class="action-button w-full justify-center bg-emerald-600 text-xs">
+                <i class="fas fa-check mr-1"></i> Save & Reset
+            </button>
+        </div>
         
         <div class="absolute bottom-0 left-0 h-1 bg-gray-100 w-full">
             <div id="pomo-progress-bar" class="h-full bg-emerald-500 transition-all duration-1000" style="width: 0%"></div>
@@ -695,6 +716,8 @@
         <span id="pomo-icon-time" class="text-[10px] font-bold absolute -top-2 -right-2 bg-red-500 text-white px-1.5 rounded-full hidden">00:00</span>
         <i class="fas fa-stopwatch text-xl"></i>
     </div>
+
+    
 	
 	<script type="module" src="app.js" defer></script>
 </body>
