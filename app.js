@@ -5620,7 +5620,7 @@ window.toggleSummaryRow = function(btn) {
 };
 
 
-// --- START: PRINT FUNCTIONALITY (UPDATED FOR FOOTER FIX) ---
+// --- START: PRINT FUNCTIONALITY (FIXED FOOTER OVERLAP) ---
 
         function printSummaryContent(contentId, title, detailsHTML, extraContentHTML = '') {
             const contentDiv = document.getElementById(contentId);
@@ -5648,12 +5648,14 @@ window.toggleSummaryRow = function(btn) {
                     @page {
                         size: A4 landscape;
                         margin: 1cm;
-                        /* INCREASED MARGIN: Ensures content breaks before hitting the footer */
-                        margin-bottom: 2cm; 
+                        /* CRITICAL FIX: Large bottom margin to clear the footer */
+                        margin-bottom: 3cm; 
                     }
                     body {
                         font-family: 'Inter', 'Kalpurush', sans-serif;
                         padding: 20px;
+                        /* Add padding to body content as a safety buffer */
+                        padding-bottom: 50px;
                         color: #1f2937;
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
@@ -5674,6 +5676,11 @@ window.toggleSummaryRow = function(btn) {
                     th, td { border: 1px solid #e5e7eb; padding: 8px 10px; text-align: left; vertical-align: top; }
                     thead th { background-color: #f3f4f6 !important; color: #1f2937; font-weight: 700; text-transform: uppercase; font-size: 11px; }
                     
+                    /* PREVENT ROWS FROM BREAKING BADLY */
+                    tr { page-break-inside: avoid; page-break-after: auto; }
+                    thead { display: table-header-group; }
+                    tfoot { display: table-footer-group; }
+                    
                     /* Summary Table Specifics */
                     .summary-read-more-btn { display: none !important; }
                     .summary-cell-content { max-height: none !important; -webkit-line-clamp: unset !important; display: block !important; overflow: visible !important; }
@@ -5691,7 +5698,7 @@ window.toggleSummaryRow = function(btn) {
                     .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
                     .vocab-col-divider { border-right: 2px solid #9ca3af !important; }
 
-                    /* FOOTER */
+                    /* FOOTER FIXED AT BOTTOM */
                     .print-footer { 
                         position: fixed; 
                         bottom: 0; 
@@ -5732,7 +5739,9 @@ window.toggleSummaryRow = function(btn) {
                 `;
             }
 
+            // Add an invisible spacer at the end to push content up from the very bottom
             htmlContent += `
+                    <div style="height: 50px; width: 100%;"></div>
                     <div class="print-footer">
                         Visit us at: <a href="https://classcaddy.netlify.app/">https://classcaddy.netlify.app/</a>
                     </div>
