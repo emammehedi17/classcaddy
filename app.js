@@ -5945,79 +5945,108 @@ window.toggleSummaryRow = function(btn) {
         }
 		
 		
-		// Helper to get month Name
+		// --- FIX: Re-added missing helper function ---
         function getMonthNameFromIndex(index) {
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             return months[index] || "Unknown";
         }
-		
-        // Event Listener: Week Summary Print
-        // FIX: Added check for 'data-processing' to prevent double execution
-        document.getElementById('print-week-summary-btn')?.addEventListener('click', async (e) => {
-            const btn = e.currentTarget;
+
+        // Helper to generate the Colorful Vocab Table (CONTINUOUS - NO BREAKS)
+        async function fetchAndBuildVocabHtml(monthId, weekId = null) {
+            // We removed the manual row counting logic. 
+            // The CSS 'thead { display: table-header-group; }' will handle repeating headers automatically.
             
-            if (btn.dataset.processing === "true") return; // Stop if already running
-            btn.dataset.processing = "true";
-            
-            const monthId = btn.dataset.monthId;
-            const weekId = btn.dataset.weekId;
-            
-            const originalIcon = btn.innerHTML;
-            // Make sure we aren't saving the spinner as the original text
-            if (!originalIcon.includes('fa-print')) {
-                 btn.innerHTML = `<i class="fas fa-print mr-1.5"></i> Print`; // Reset if bad state
-            }
-            
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1.5"></i> Preparing...`;
-            btn.disabled = true;
-            
+            let html = `
+                <table class="vocab-print-table">
+                    <thead>
+                        <tr class="vocab-main-header">
+                            <th style="width: 15%;">Word</th>
+                            <th style="width: 20%;">Meaning</th>
+                            <th style="width: 15%;" class="vocab-col-divider">Synonym</th>
+                            <th style="width: 15%;">Word</th>
+                            <th style="width: 20%;">Meaning</th>
+                            <th style="width: 15%;">Synonym</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
             try {
-                let headerHTML = '';
-                if (monthId && weekId) {
-                    const parts = monthId.split('-');
-                    const year = parts[0];
-                    const monthIndex = parseInt(parts[1]) - 1;
-                    const monthName = getMonthNameFromIndex(monthIndex);
-                    const weekNum = weekId.replace('week', '').padStart(2, '0');
-
-                    headerHTML += `
-                        <div class="meta-info">
-                            <div class="meta-item">Year: <span>${year}</span></div>
-                            <div class="meta-item">Month: <span>${monthName}</span></div>
-                            <div class="meta-item">Week: <span>${weekNum}</span></div>
-                        </div>
-                    `;
-                }
-
-                const activeUser = currentUser || auth.currentUser;
-                if (activeUser) {
-                    const userName = activeUser.displayName || 'Guest';
-                    const userEmail = activeUser.email || '';
-                    headerHTML += `
-                        <div class="user-info-row">
-                            <div>Name: <span>${escapeHtml(userName)}</span></div>
-                            ${userEmail ? `<div>Email: <span>${escapeHtml(userEmail)}</span></div>` : ''}
-                        </div>
-                    `;
-                }
-
-                const vocabHtml = await fetchAndBuildVocabHtml(monthId, weekId);
-                await printSummaryContent('week-summary-content', 'Weekly Study Summary', headerHTML, vocabHtml);
+                let weeksToProcess = [];
                 
-            } catch (error) {
-                console.error(error);
-                showCustomAlert("Failed to prepare print document.", "error");
-            } finally {
-                // Always revert button state
-                if (originalIcon.includes('fa-print')) {
-                    btn.innerHTML = originalIcon;
+                if (weekId) {
+                    const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                    const weekDoc = await getDoc(weekDocRef);
+                    if (weekDoc.exists()) {
+                        weeksToProcess.push({ id: weekId, data: weekDoc.data() });
+                    }
                 } else {
-                    btn.innerHTML = `<i class="fas fa-print mr-1.5"></i> Print`;
+                    const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
+                    const weeksCollectionRef = collection(db, monthDocRef.path, 'weeks');
+                    const weeksSnapshot = await getDocs(weeksCollectionRef);
+                    weeksSnapshot.forEach(doc => weeksToProcess.push({ id: doc.id, data: doc.data() }));
+                    weeksToProcess.sort((a, b) => a.id.localeCompare(b.id));
                 }
-                btn.disabled = false;
-                btn.dataset.processing = "false";
+
+                let hasVocab = false;
+
+                for (const week of weeksToProcess) {
+                    const weekData = week.data;
+                    if (!weekData.days) continue;
+
+                    let weekHasVocab = false;
+                    let weekBufferHtml = ''; 
+
+                    if (!weekId) {
+                        weekBufferHtml += `<tr class="vocab-week-header"><td colspan="6">${week.id.replace('week', 'Week ')}</td></tr>`;
+                    }
+
+                    for (const day of weekData.days) {
+                        let dayVocab = [];
+                        day.rows?.forEach(row => {
+                            if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
+                                const processed = preProcessVocab(row.vocabData);
+                                dayVocab.push(...processed);
+                            }
+                        });
+
+                        if (dayVocab.length > 0) {
+                            hasVocab = true;
+                            weekHasVocab = true;
+
+                            if (weekBufferHtml) {
+                                html += weekBufferHtml;
+                                weekBufferHtml = ''; 
+                            }
+
+                            html += `<tr class="vocab-day-header"><td colspan="6">Day ${day.dayNumber}</td></tr>`;
+
+                            for (let i = 0; i < dayVocab.length; i += 2) {
+                                const v1 = dayVocab[i];
+                                const v2 = dayVocab[i+1];
+
+                                html += `<tr class="vocab-data-row">
+                                    <td>${escapeHtml(v1.word)}</td>
+                                    <td>${escapeHtml(v1.banglaMeaning)}</td>
+                                    <td class="vocab-col-divider">${escapeHtml(v1.synonym || '-')}</td>
+                                    
+                                    <td>${v2 ? escapeHtml(v2.word) : ''}</td>
+                                    <td>${v2 ? escapeHtml(v2.banglaMeaning) : ''}</td>
+                                    <td>${v2 ? escapeHtml(v2.synonym || '-') : ''}</td>
+                                </tr>`;
+                            }
+                        }
+                    }
+                }
+
+                html += `</tbody></table>`;
+                if (!hasVocab) return ''; 
+                return html;
+
+            } catch (e) {
+                console.error("Error building vocab table:", e);
+                return '<p style="color:red; text-align:center;">Error loading vocabulary data.</p>';
             }
-        });
+        }
 
         // Event Listener: Month Summary Print
         // FIX: Added check for 'data-processing' to prevent double execution
