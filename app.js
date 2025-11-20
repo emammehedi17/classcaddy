@@ -5774,9 +5774,16 @@ window.toggleSummaryRow = function(btn) {
             return months[index] || "Unknown";
         }
 		
-		// Helper to generate the Colorful Vocab Table for printing
+		// Helper to generate the Colorful Vocab Table for printing (PAGINATED)
         async function fetchAndBuildVocabHtml(monthId, weekId = null) {
-            let html = `<table class="vocab-print-table">
+            const MAX_ROWS = 25;
+            let rowCount = 0;
+
+            // Helper to start a new table block
+            const startNewTable = () => {
+                rowCount = 1; // Reset count (1 for the main header)
+                return `
+                    <table class="vocab-print-table">
                         <thead>
                             <tr class="vocab-main-header">
                                 <th style="width: 15%;">Word</th>
@@ -5788,25 +5795,34 @@ window.toggleSummaryRow = function(btn) {
                             </tr>
                         </thead>
                         <tbody>`;
+            };
+
+            // Helper to handle page breaks
+            const checkAndBreakPage = () => {
+                if (rowCount >= MAX_ROWS) {
+                    // Close current table, add break, start new table
+                    const breakHtml = `</tbody></table><div style="page-break-before: always;"></div>${startNewTable()}`;
+                    return breakHtml;
+                }
+                return '';
+            };
+
+            let html = startNewTable(); // Initialize first table
 
             try {
                 // Determine which weeks to process
                 let weeksToProcess = [];
                 
                 if (weekId) {
-                    // Single week
                     const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
                     const weekDoc = await getDoc(weekDocRef);
                     if (weekDoc.exists()) {
                         weeksToProcess.push({ id: weekId, data: weekDoc.data() });
                     }
                 } else {
-                    // All weeks in month
                     const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
                     const weeksCollectionRef = collection(db, monthDocRef.path, 'weeks');
                     const weeksSnapshot = await getDocs(weeksCollectionRef);
-                    
-                    // Sort weeks (week1, week2...)
                     weeksSnapshot.forEach(doc => weeksToProcess.push({ id: doc.id, data: doc.data() }));
                     weeksToProcess.sort((a, b) => a.id.localeCompare(b.id));
                 }
@@ -5818,19 +5834,18 @@ window.toggleSummaryRow = function(btn) {
                     if (!weekData.days) continue;
 
                     let weekHasVocab = false;
-                    let weekHtml = '';
+                    let weekBufferHtml = ''; // Store week content temporarily to check vocab existence
 
-                    // If printing Month summary, add Week Header
+                    // 1. Add Week Header (Only if printing Month summary)
                     if (!weekId) {
-                        weekHtml += `<tr class="vocab-week-header"><td colspan="6">${week.id.replace('week', 'Week ')}</td></tr>`;
+                        // We only append this to the main HTML later if we find vocab
+                        weekBufferHtml += `<tr class="vocab-week-header"><td colspan="6">${week.id.replace('week', 'Week ')}</td></tr>`;
                     }
 
                     for (const day of weekData.days) {
-                        // Extract Vocab
                         let dayVocab = [];
                         day.rows?.forEach(row => {
                             if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
-                                // Use existing preProcessVocab to split meaning/synonym
                                 const processed = preProcessVocab(row.vocabData);
                                 dayVocab.push(...processed);
                             }
@@ -5839,16 +5854,27 @@ window.toggleSummaryRow = function(btn) {
                         if (dayVocab.length > 0) {
                             hasVocab = true;
                             weekHasVocab = true;
-                            
-                            // Add Day Header
-                            weekHtml += `<tr class="vocab-day-header"><td colspan="6">Day ${day.dayNumber}</td></tr>`;
 
-                            // Chunk into pairs for 2-column layout
+                            // Check/Break for Week Header (if pending)
+                            if (weekBufferHtml) {
+                                html += checkAndBreakPage();
+                                html += weekBufferHtml;
+                                rowCount++; // Count the week header
+                                weekBufferHtml = ''; // Clear buffer
+                            }
+
+                            // 2. Add Day Header
+                            html += checkAndBreakPage();
+                            html += `<tr class="vocab-day-header"><td colspan="6">Day ${day.dayNumber}</td></tr>`;
+                            rowCount++;
+
+                            // 3. Add Data Rows (Pairs)
                             for (let i = 0; i < dayVocab.length; i += 2) {
                                 const v1 = dayVocab[i];
                                 const v2 = dayVocab[i+1];
 
-                                weekHtml += `<tr class="vocab-data-row">
+                                html += checkAndBreakPage();
+                                html += `<tr class="vocab-data-row">
                                     <td>${escapeHtml(v1.word)}</td>
                                     <td>${escapeHtml(v1.banglaMeaning)}</td>
                                     <td class="vocab-col-divider">${escapeHtml(v1.synonym || '-')}</td>
@@ -5857,23 +5883,20 @@ window.toggleSummaryRow = function(btn) {
                                     <td>${v2 ? escapeHtml(v2.banglaMeaning) : ''}</td>
                                     <td>${v2 ? escapeHtml(v2.synonym || '-') : ''}</td>
                                 </tr>`;
+                                rowCount++;
                             }
                         }
-                    }
-
-                    if (weekHasVocab) {
-                        html += weekHtml;
                     }
                 }
 
                 html += `</tbody></table>`;
                 
-                if (!hasVocab) return '<p style="text-align:center; font-style:italic;">No vocabulary found for this period.</p>';
+                if (!hasVocab) return ''; // Return empty if no vocab at all
                 return html;
 
             } catch (e) {
                 console.error("Error building vocab table:", e);
-                return '<p style="color:red;">Error loading vocabulary.</p>';
+                return '<p style="color:red; text-align:center;">Error loading vocabulary data.</p>';
             }
         }
 
