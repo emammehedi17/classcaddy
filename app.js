@@ -6249,41 +6249,6 @@ window.toggleSummaryRow = function(btn) {
             }
         });
 
-        // Event Listener: Month Summary Print
-        document.getElementById('print-month-summary-btn')?.addEventListener('click', async (e) => {
-            const btn = e.currentTarget;
-            const monthId = btn.dataset.monthId;
-            
-            // Visual Feedback
-            const originalIcon = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1.5"></i> Preparing...`;
-            btn.disabled = true;
-
-            try {
-                let detailsHTML = '';
-                if (monthId) {
-                    const parts = monthId.split('-');
-                    const year = parts[0];
-                    const monthIndex = parseInt(parts[1]) - 1;
-                    const monthName = getMonthNameFromIndex(monthIndex);
-
-                    detailsHTML = `
-                        <div class="meta-item">Year: <span>${year}</span></div>
-                        <div class="meta-item">Month: <span>${monthName}</span></div>
-                    `;
-                }
-
-                // Generate Vocab HTML
-                const vocabHtml = await fetchAndBuildVocabHtml(monthId, null);
-
-                printSummaryContent('month-summary-content', 'Monthly Study Summary', detailsHTML, vocabHtml);
-            } catch (error) {
-                console.error(error);
-                showCustomAlert("Failed to prepare print document.", "error");
-            } finally {
-                btn.innerHTML = originalIcon;
-                btn.disabled = false;
-            }
-        });
+        
 
         // --- END: PRINT FUNCTIONALITY ---
