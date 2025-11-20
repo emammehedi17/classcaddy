@@ -5943,7 +5943,14 @@ window.toggleSummaryRow = function(btn) {
                 return '<p style="color:red; text-align:center;">Error loading vocabulary data.</p>';
             }
         }
-
+		
+		
+		// Helper to get month Name
+        function getMonthNameFromIndex(index) {
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            return months[index] || "Unknown";
+        }
+		
         // Event Listener: Week Summary Print
         // FIX: Added check for 'data-processing' to prevent double execution
         document.getElementById('print-week-summary-btn')?.addEventListener('click', async (e) => {
