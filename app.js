@@ -1439,7 +1439,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
         async function openWeekSummaryModal(monthId, weekId) {
             weekSummaryModal.style.display = "block";
             
-            // Store the IDs on the print button so we can access them later
             const printBtn = document.getElementById('print-week-summary-btn');
             if (printBtn) {
                 printBtn.dataset.monthId = monthId; 
@@ -1449,7 +1448,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
             weekSummaryContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading summary...</p>';
             
             try {
-                // 1. Fetch fresh data for the week
                 const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
                 const weekDocSnap = await getDoc(weekDocRef);
 
@@ -1460,22 +1458,19 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                 const daysData = weekDocSnap.data().days;
                 
-                // 2. Identify all unique subjects (excluding Vocabulary)
                 const subjectsSet = new Set();
                 daysData.forEach(day => {
                     day.rows?.forEach(row => {
+                        // We still collect ALL subjects to generate headers, 
+                        // even if some rows aren't checked yet.
                         if (row.subject && row.subject.toLowerCase() !== 'vocabulary') {
                             subjectsSet.add(row.subject);
                         }
                     });
                 });
                 
-                // Convert to array and sort alphabetically
                 const subjects = Array.from(subjectsSet).sort();
 
-                // --- MODIFIED: Removed the check that stopped execution if subjects.length === 0 ---
-
-                // 3. Build the Table HTML
                 let tableHtml = `
                     <div class="results-table-container">
                     <table class="w-full text-sm text-left text-gray-600 study-table">
@@ -1488,31 +1483,29 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         <tbody>
                 `;
 
-                // 4. Populate Rows (Day by Day)
                 daysData.forEach(day => {
                     tableHtml += `<tr class="hover:bg-gray-50 summary-row">`;
-                    // Day Column
                     tableHtml += `<td class="px-4 py-3 border font-medium text-gray-900 whitespace-nowrap text-center">Day ${day.dayNumber}</td>`;
                     
-                    // Subject Columns
                     subjects.forEach(subject => {
+                        // --- MODIFIED FILTER LOGIC ---
+                        // Only show topics if the row is CHECKED (completed)
                         const topics = day.rows
-                            ?.filter(r => r.subject === subject && r.topic)
+                            ?.filter(r => r.subject === subject && r.topic && r.completed) 
                             .map(r => r.topic) || [];
                             
                         const cellContent = createSummaryCellHtml(topics);
                         tableHtml += `<td class="px-4 py-3 border align-top summary-cell">${cellContent}</td>`;
                     });
 
-                    // --- START: ADD VOCABULARY COUNT CELL ---
                     let vocabCount = 0;
                     day.rows?.forEach(row => {
+                        // EXCEPTION: Vocab count includes ALL rows (checked or unchecked)
                         if (row.subject && row.subject.toLowerCase() === 'vocabulary' && row.vocabData) {
                             vocabCount += row.vocabData.length;
                         }
                     });
                     tableHtml += `<td class="px-4 py-3 border align-middle text-center font-bold text-gray-700">${vocabCount}</td>`;
-                    // --- END: ADD VOCABULARY COUNT CELL ---
 
                     tableHtml += `</tr>`;
                 });
@@ -1535,7 +1528,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
         async function openMonthSummaryModal(monthId) {
             monthSummaryModal.style.display = "block";
             
-            // Store the ID on the print button
             const printBtn = document.getElementById('print-month-summary-btn');
             if (printBtn) {
                 printBtn.dataset.monthId = monthId; 
@@ -1544,7 +1536,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
             monthSummaryContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading monthly summary...</p>';
             
             try {
-                // 1. Fetch fresh data for ALL weeks
                 const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
                 const weeksCollectionRef = collection(db, monthDocRef.path, 'weeks');
                 const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
@@ -1554,7 +1545,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     return;
                 }
 
-                // 2. Organize data and find unique subjects
                 const weeksData = {};
                 const subjectsSet = new Set();
 
@@ -1574,9 +1564,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                 const subjects = Array.from(subjectsSet).sort();
 
-                // --- MODIFIED: Removed the check that stopped execution if subjects.length === 0 ---
-
-                // 3. Build the Table HTML
                 let tableHtml = `
                     <div class="results-table-container">
                     <table class="w-full text-sm text-left text-gray-600 study-table border-collapse">
@@ -1589,13 +1576,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         <tbody>
                 `;
 
-                // 4. Loop through Weeks (1-4) and then Days
                 ['week1', 'week2', 'week3', 'week4'].forEach(weekId => {
                     const weekData = weeksData[weekId];
                     if (!weekData || !weekData.days || weekData.days.length === 0) return;
 
-                    // Add a Week Header Row
-                    // Note: Colspan increased by 1 to account for the new Vocab column
                     tableHtml += `
                         <tr class="bg-emerald-50">
                             <td colspan="${subjects.length + 2}" class="px-4 py-2 font-bold text-emerald-700 text-center border">
@@ -1607,30 +1591,29 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     weekData.days.forEach(day => {
                         tableHtml += `<tr class="hover:bg-gray-50 summary-row">`;
                         
-                        // Day Column
                         tableHtml += `<td class="px-4 py-3 border font-medium text-gray-900 whitespace-nowrap text-center">Day ${day.dayNumber}</td>`;
                         
-                        // Subject Columns
                         subjects.forEach(subject => {
+                            // --- MODIFIED FILTER LOGIC ---
+                            // Only show topics if the row is CHECKED (completed)
                             const topics = day.rows
-                                ?.filter(r => r.subject === subject && r.topic)
+                                ?.filter(r => r.subject === subject && r.topic && r.completed)
                                 .map(r => r.topic) || [];
                                 
                             const cellContent = createSummaryCellHtml(topics);
                             tableHtml += `<td class="px-4 py-3 border align-top summary-cell">${cellContent}</td>`;
                         });
 
-                        // --- START: ADD VOCABULARY COUNT CELL ---
                         let vocabCount = 0;
                         day.rows?.forEach(row => {
+                            // EXCEPTION: Vocab count includes ALL rows
                             if (row.subject && row.subject.toLowerCase() === 'vocabulary' && row.vocabData) {
                                 vocabCount += row.vocabData.length;
                             }
                         });
                         tableHtml += `<td class="px-4 py-3 border align-middle text-center font-bold text-gray-700">${vocabCount}</td>`;
-                        // --- END: ADD VOCABULARY COUNT CELL ---
                 });
-                }); // End week loop
+                }); 
 
                 tableHtml += `</tbody></table></div>`;
                 monthSummaryContent.innerHTML = tableHtml;
