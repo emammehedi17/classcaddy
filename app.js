@@ -5620,7 +5620,7 @@ window.toggleSummaryRow = function(btn) {
 };
 
 
-		// --- START: PRINT FUNCTIONALITY (FIXED USER INFO) ---
+		// --- START: PRINT FUNCTIONALITY (COMPACT FOOTER) ---
 
         function printSummaryContent(contentId, title, headerHTML, extraContentHTML = '') {
             const contentDiv = document.getElementById(contentId);
@@ -5680,14 +5680,14 @@ window.toggleSummaryRow = function(btn) {
                     }
                     .meta-item span { font-weight: 400; color: #111827; }
                     
-                    /* User Info Row - Explicit Styling */
+                    /* User Info Row */
                     .user-info-row {
                         display: flex;
                         justify-content: center;
                         gap: 20px;
                         margin-top: 8px;
                         font-size: 12px;
-                        color: #4b5563; /* Darker gray for visibility */
+                        color: #4b5563;
                         font-weight: 500;
                     }
                     .user-info-row span {
@@ -5719,14 +5719,15 @@ window.toggleSummaryRow = function(btn) {
                     .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
                     .vocab-col-divider { border-right: 2px solid #9ca3af !important; }
 
-                    /* FOOTER STYLES */
+                    /* FOOTER STYLES (REDUCED HEIGHT) */
                     .print-footer { 
                         position: fixed; 
                         bottom: 0; 
                         left: 0; 
                         right: 0; 
-                        padding-top: 15px; 
-                        padding-bottom: 15px;
+                        /* Reduced padding to make it slimmer */
+                        padding-top: 8px; 
+                        padding-bottom: 8px;
                         text-align: center; 
                         font-size: 12px; 
                         color: #6b7280; 
