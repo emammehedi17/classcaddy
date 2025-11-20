@@ -5620,7 +5620,7 @@ window.toggleSummaryRow = function(btn) {
 };
 
 
-// --- START: PRINT FUNCTIONALITY (FIXED FOOTER OVERLAP) ---
+// --- START: PRINT FUNCTIONALITY (BALANCED HEADER/FOOTER) ---
 
         function printSummaryContent(contentId, title, detailsHTML, extraContentHTML = '') {
             const contentDiv = document.getElementById(contentId);
@@ -5648,35 +5648,35 @@ window.toggleSummaryRow = function(btn) {
                     @page {
                         size: A4 landscape;
                         margin: 1cm;
-                        /* CRITICAL FIX: Large bottom margin to clear the footer */
-                        margin-bottom: 3cm; 
+                        /* Reduced from 3cm to 2cm to look normal, but keeps space for footer */
+                        margin-bottom: 2cm; 
                     }
                     body {
                         font-family: 'Inter', 'Kalpurush', sans-serif;
                         padding: 20px;
-                        /* Add padding to body content as a safety buffer */
-                        padding-bottom: 50px;
+                        padding-bottom: 30px; 
                         color: #1f2937;
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
                         background-color: white;
                     }
+                    
+                    /* HEADER STYLES */
                     .print-header-container {
                         text-align: center;
                         margin-bottom: 20px;
-                        border-bottom: 2px solid #10b981;
-                        padding-bottom: 10px;
+                        border-bottom: 2px solid #10b981; /* Green Line */
+                        padding-bottom: 15px; /* Balanced Padding */
                     }
                     h1 { color: #059669; margin: 0 0 10px 0; font-size: 24px; }
                     .meta-info { display: flex; justify-content: center; gap: 30px; font-size: 14px; color: #374151; font-weight: 600; }
                     .meta-item span { font-weight: 400; color: #111827; }
                     
-                    /* General Table Styles */
+                    /* TABLE STYLES */
                     table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px; }
                     th, td { border: 1px solid #e5e7eb; padding: 8px 10px; text-align: left; vertical-align: top; }
                     thead th { background-color: #f3f4f6 !important; color: #1f2937; font-weight: 700; text-transform: uppercase; font-size: 11px; }
                     
-                    /* PREVENT ROWS FROM BREAKING BADLY */
                     tr { page-break-inside: avoid; page-break-after: auto; }
                     thead { display: table-header-group; }
                     tfoot { display: table-footer-group; }
@@ -5686,7 +5686,7 @@ window.toggleSummaryRow = function(btn) {
                     .summary-cell-content { max-height: none !important; -webkit-line-clamp: unset !important; display: block !important; overflow: visible !important; }
                     .summary-cell-wrapper { display: block; }
 
-                    /* VOCAB TABLE STYLES */
+                    /* VOCAB STYLES */
                     .vocab-section-title { color: #059669; text-align: center; margin-top: 30px; margin-bottom: 10px; font-size: 18px; font-weight: bold; page-break-before: always; }
                     .vocab-print-table { width: 100%; border-collapse: collapse; font-size: 11px; }
                     .vocab-print-table th, .vocab-print-table td { border: 1px solid #d1d5db; padding: 5px 8px; text-align: left; vertical-align: middle; }
@@ -5694,22 +5694,23 @@ window.toggleSummaryRow = function(btn) {
                     .vocab-main-header th { background-color: #1f2937 !important; color: white !important; text-align: center; font-weight: bold; }
                     .vocab-week-header td { background-color: #047857 !important; color: white !important; font-weight: bold; text-align: center; font-size: 13px; padding: 8px; }
                     .vocab-day-header td { background-color: #10b981 !important; color: white !important; font-weight: bold; text-align: center; }
-                    
                     .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
                     .vocab-col-divider { border-right: 2px solid #9ca3af !important; }
 
-                    /* FOOTER FIXED AT BOTTOM */
+                    /* FOOTER STYLES (MATCHING HEADER) */
                     .print-footer { 
                         position: fixed; 
                         bottom: 0; 
                         left: 0; 
                         right: 0; 
-                        height: 30px; 
+                        /* Increased padding to match header visual weight */
+                        padding-top: 15px; 
+                        padding-bottom: 15px;
                         text-align: center; 
-                        font-size: 11px; 
+                        font-size: 12px; 
                         color: #6b7280; 
-                        border-top: 1px solid #e5e7eb; 
-                        padding-top: 8px; 
+                        /* Same border style as header */
+                        border-top: 2px solid #10b981; 
                         background-color: white; 
                         z-index: 1000;
                     }
@@ -5739,9 +5740,9 @@ window.toggleSummaryRow = function(btn) {
                 `;
             }
 
-            // Add an invisible spacer at the end to push content up from the very bottom
             htmlContent += `
-                    <div style="height: 50px; width: 100%;"></div>
+                    <div style="height: 50px;"></div>
+                    
                     <div class="print-footer">
                         Visit us at: <a href="https://classcaddy.netlify.app/">https://classcaddy.netlify.app/</a>
                     </div>
