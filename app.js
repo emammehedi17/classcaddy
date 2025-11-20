@@ -5669,7 +5669,7 @@ window.toggleSummaryRow = function(btn) {
             return html;
         }
 		
-        // --- START: PRINT FUNCTIONALITY (FOOTER ONLY ON LAST PAGE) ---
+        // --- START: PRINT FUNCTIONALITY (MOBILE ORIENTATION FIX) ---
 
         function printSummaryContent(contentId, title, headerHTML, extraContentHTML = '') {
             return new Promise((resolve, reject) => {
@@ -5682,10 +5682,15 @@ window.toggleSummaryRow = function(btn) {
                     return;
                 }
 
-                // 2. Create a hidden Iframe
+                // 2. CLEANUP: Remove ANY existing print iframe from previous attempts
+                // This ensures we don't have duplicate frames, but we ONLY remove it 
+                // when the user clicks print *again*, not while they are viewing the dialog.
                 const existingIframe = document.querySelector('iframe[name="print-frame"]');
-                if (existingIframe) document.body.removeChild(existingIframe);
+                if (existingIframe) {
+                    document.body.removeChild(existingIframe);
+                }
 
+                // 3. Create a hidden Iframe
                 const iframe = document.createElement('iframe');
                 iframe.name = "print-frame";
                 iframe.style.position = 'fixed';
@@ -5694,9 +5699,10 @@ window.toggleSummaryRow = function(btn) {
                 iframe.style.width = '0';
                 iframe.style.height = '0';
                 iframe.style.border = '0';
+                // Important: We keep it in the DOM so mobile can re-render on orientation change
                 document.body.appendChild(iframe);
 
-                // 3. Define Styles
+                // 4. Define Styles
                 const styles = `
                     <style>
                         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
@@ -5704,7 +5710,6 @@ window.toggleSummaryRow = function(btn) {
                         @page {
                             size: A4 landscape;
                             margin: 1cm;
-                            /* Reset margin-bottom since we don't need space for a fixed footer anymore */
                             margin-bottom: 1cm; 
                         }
                         body {
@@ -5716,7 +5721,7 @@ window.toggleSummaryRow = function(btn) {
                             background-color: white;
                             display: flex;
                             flex-direction: column;
-                            min-height: 95vh; /* Ensure full height logic if needed */
+                            min-height: 95vh; 
                         }
                         
                         /* HEADER & INFO */
@@ -5750,18 +5755,17 @@ window.toggleSummaryRow = function(btn) {
                         .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
                         .vocab-col-divider { border-right: 2px solid #9ca3af !important; }
 
-                        /* FOOTER (CHANGED TO STATIC FLOW) */
+                        /* FOOTER */
                         .print-footer { 
-                            /* No fixed position here */
-                            margin-top: auto; /* Push to bottom if flex container allows */
-                            padding-top: 30px; /* Space above footer */
+                            margin-top: auto; /* Push to bottom */
+                            padding-top: 30px; 
                             padding-bottom: 20px; 
                             text-align: center; 
                             font-size: 12px; 
                             color: #6b7280; 
                             border-top: 2px solid #10b981; 
                             background-color: white; 
-                            page-break-inside: avoid; /* Don't cut the footer in half */
+                            page-break-inside: avoid; 
                         }
                         .print-footer a { color: #059669; text-decoration: none; font-weight: 600; }
                         
@@ -5771,7 +5775,7 @@ window.toggleSummaryRow = function(btn) {
                     </style>
                 `;
 
-                // 4. Build HTML
+                // 5. Build HTML
                 let htmlContent = `
                     <!DOCTYPE html>
                     <html>
@@ -5800,13 +5804,14 @@ window.toggleSummaryRow = function(btn) {
                     </body></html>
                 `;
 
-                // 5. Write content
+                // 6. Write content
                 const frameDoc = iframe.contentWindow ? iframe.contentWindow.document : iframe.contentDocument;
                 frameDoc.open();
                 frameDoc.write(htmlContent);
                 frameDoc.close();
 
-                // 6. Execute Print
+                // 7. Execute Print
+                // Wait 1 second for mobile to fully render the layout before triggering print
                 setTimeout(() => {
                     try {
                         if (!iframe.contentWindow) {
@@ -5818,13 +5823,11 @@ window.toggleSummaryRow = function(btn) {
                         console.error("Print execution failed:", e);
                     } finally {
                         resolve(); 
-                        setTimeout(() => {
-                            if (document.body.contains(iframe)) {
-                                document.body.removeChild(iframe);
-                            }
-                        }, 3000); 
+                        // CRITICAL FIX: We DO NOT remove the iframe here.
+                        // We leave it in the DOM so if the user changes orientation, 
+                        // the browser still has the source content to re-render.
                     }
-                }, 500);
+                }, 1000);
             });
         }
 
