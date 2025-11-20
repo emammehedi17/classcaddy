@@ -6043,7 +6043,7 @@ window.toggleSummaryRow = function(btn) {
         // --- END: PRINT FUNCTIONALITY ---
 		
 		
-	// --- START: POMODORO TIMER LOGIC (ROBUST BACKGROUND TIMING) ---
+	// --- START: POMODORO TIMER LOGIC (EDITABLE & ROBUST) ---
         
         const pomoWidget = document.getElementById('pomodoro-widget');
         const pomoIcon = document.getElementById('pomodoro-icon');
@@ -6054,16 +6054,32 @@ window.toggleSummaryRow = function(btn) {
         const pomoBtnBreak = document.getElementById('pomo-btn-break');
         const pomoProgressBar = document.getElementById('pomo-progress-bar');
         const pomoIconTime = document.getElementById('pomo-icon-time');
+        
+        // Settings Elements
+        const pomoSettingsToggle = document.getElementById('pomo-settings-toggle');
+        const pomoTimerView = document.getElementById('pomo-timer-view');
+        const pomoSettingsView = document.getElementById('pomo-settings-view');
+        const pomoInputFocus = document.getElementById('pomo-input-focus');
+        const pomoInputBreak = document.getElementById('pomo-input-break');
+        const pomoSaveSettingsBtn = document.getElementById('pomo-save-settings-btn');
 
         let pomoInterval = null;
-        let pomoTimeLeft = 25 * 60; // Current remaining seconds
-        let pomoTotalTime = 25 * 60; // The duration of the current mode (for progress bar)
-        let pomoEndTime = null; // Timestamp when the timer will finish
+        // Load defaults from LocalStorage or use 25/5
+        let customFocusMinutes = parseInt(localStorage.getItem('cc_pomo_focus')) || 25;
+        let customBreakMinutes = parseInt(localStorage.getItem('cc_pomo_break')) || 5;
+        
+        let pomoTimeLeft = customFocusMinutes * 60; 
+        let pomoTotalTime = customFocusMinutes * 60; 
+        let pomoEndTime = null; 
         let pomoIsRunning = false;
         let pomoMode = 'focus'; // 'focus' or 'break'
 
         // Initialize
         function initPomodoro() {
+            // Set inputs to saved values
+            pomoInputFocus.value = customFocusMinutes;
+            pomoInputBreak.value = customBreakMinutes;
+            
             updatePomoDisplay();
             
             // Buttons
@@ -6071,6 +6087,46 @@ window.toggleSummaryRow = function(btn) {
             pomoResetBtn.addEventListener('click', resetPomoTimer);
             pomoBtnFocus.addEventListener('click', () => switchPomoMode('focus'));
             pomoBtnBreak.addEventListener('click', () => switchPomoMode('break'));
+            
+            // Settings Logic
+            pomoSettingsToggle.addEventListener('click', () => {
+                const isSettingsOpen = !pomoSettingsView.classList.contains('hidden');
+                if (isSettingsOpen) {
+                    // Close settings (Cancel)
+                    pomoSettingsView.classList.add('hidden');
+                    pomoTimerView.classList.remove('hidden');
+                    // Revert inputs to current saved values
+                    pomoInputFocus.value = customFocusMinutes;
+                    pomoInputBreak.value = customBreakMinutes;
+                } else {
+                    // Open settings
+                    pomoTimerView.classList.add('hidden');
+                    pomoSettingsView.classList.remove('hidden');
+                }
+            });
+
+            pomoSaveSettingsBtn.addEventListener('click', () => {
+                // 1. Get and Validate inputs
+                let fVal = parseInt(pomoInputFocus.value);
+                let bVal = parseInt(pomoInputBreak.value);
+                
+                if (isNaN(fVal) || fVal < 1) fVal = 25;
+                if (isNaN(bVal) || bVal < 1) bVal = 5;
+                
+                // 2. Save to variables and LocalStorage
+                customFocusMinutes = fVal;
+                customBreakMinutes = bVal;
+                localStorage.setItem('cc_pomo_focus', customFocusMinutes);
+                localStorage.setItem('cc_pomo_break', customBreakMinutes);
+                
+                // 3. Reset Timer with new values
+                resetPomoTimer();
+                
+                // 4. Switch view back
+                pomoSettingsView.classList.add('hidden');
+                pomoTimerView.classList.remove('hidden');
+                showCustomAlert(`Timer updated: ${fVal}m Focus / ${bVal}m Break`, "success");
+            });
             
             // Minimize / Maximize
             document.getElementById('pomo-minimize-btn').addEventListener('click', () => {
@@ -6094,18 +6150,15 @@ window.toggleSummaryRow = function(btn) {
         function startPomoTimer() {
             pomoIsRunning = true;
             pomoStartBtn.innerHTML = `<i class="fas fa-pause mr-1"></i> Pause`;
-            pomoStartBtn.classList.replace('bg-emerald-500', 'bg-amber-500'); // Change color to amber
+            pomoStartBtn.classList.replace('bg-emerald-500', 'bg-amber-500'); 
             
-            // CRITICAL FIX: Calculate the exact End Time based on system clock
-            // This ensures accuracy even if browser throttles the interval
+            // Calculate exact End Time
             const now = Date.now();
             pomoEndTime = now + (pomoTimeLeft * 1000);
             
             pomoInterval = setInterval(() => {
                 const currentTime = Date.now();
                 const distance = pomoEndTime - currentTime;
-                
-                // Calculate remaining seconds from the time difference
                 const secondsRemaining = Math.ceil(distance / 1000);
 
                 if (secondsRemaining >= 0) {
@@ -6116,7 +6169,7 @@ window.toggleSummaryRow = function(btn) {
                     updatePomoDisplay();
                     pomoComplete();
                 }
-            }, 200); // Check more frequently (200ms) to ensure UI feels snappy
+            }, 200);
         }
 
         function pausePomoTimer() {
@@ -6124,57 +6177,52 @@ window.toggleSummaryRow = function(btn) {
             clearInterval(pomoInterval);
             pomoStartBtn.innerHTML = `<i class="fas fa-play mr-1"></i> Resume`;
             pomoStartBtn.classList.replace('bg-amber-500', 'bg-emerald-500');
-            // We don't need to save endTime because 'pomoTimeLeft' holds the correct paused value
         }
 
         function resetPomoTimer() {
             pausePomoTimer();
             pomoStartBtn.innerHTML = `<i class="fas fa-play mr-1"></i> Start`;
-            pomoTimeLeft = (pomoMode === 'focus') ? 25 * 60 : 5 * 60;
+            
+            // Use custom variables instead of hardcoded values
+            pomoTimeLeft = (pomoMode === 'focus') ? customFocusMinutes * 60 : customBreakMinutes * 60;
             pomoTotalTime = pomoTimeLeft;
+            
             updatePomoDisplay();
-            document.title = 'Class Caddy - My Study Plan'; // Reset Title
+            document.title = 'Class Caddy - My Study Plan'; 
         }
 
         function switchPomoMode(mode) {
             pomoMode = mode;
-            // Update Tabs
             if (mode === 'focus') {
                 pomoBtnFocus.classList.add('active');
                 pomoBtnBreak.classList.remove('active');
-                pomoTimeLeft = 25 * 60;
+                pomoTimeLeft = customFocusMinutes * 60; // Use custom
             } else {
                 pomoBtnBreak.classList.add('active');
                 pomoBtnFocus.classList.remove('active');
-                pomoTimeLeft = 5 * 60;
+                pomoTimeLeft = customBreakMinutes * 60; // Use custom
             }
             pomoTotalTime = pomoTimeLeft;
-            pausePomoTimer(); // Auto-pause on switch
+            pausePomoTimer(); 
             pomoStartBtn.innerHTML = `<i class="fas fa-play mr-1"></i> Start`;
             updatePomoDisplay();
         }
 
         function updatePomoDisplay() {
-            // Prevent negative numbers
             const time = Math.max(0, pomoTimeLeft);
-            
             const minutes = Math.floor(time / 60);
             const seconds = time % 60;
             const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             
-            // Update Widget Text
             pomoTimerDisplay.textContent = timeString;
             
-            // Update Progress Bar
             const progressPercent = ((pomoTotalTime - time) / pomoTotalTime) * 100;
             pomoProgressBar.style.width = `${progressPercent}%`;
             
-            // Update Browser Tab Title
             if (pomoIsRunning) {
                 document.title = `(${timeString}) Class Caddy`;
             }
 
-            // Update Minimized Icon Badge
             if (pomoIsRunning) {
                 pomoIconTime.classList.remove('hidden');
                 pomoIconTime.textContent = timeString;
@@ -6185,15 +6233,13 @@ window.toggleSummaryRow = function(btn) {
 
         function pomoComplete() {
             pausePomoTimer();
-            document.title = 'Class Caddy - My Study Plan'; // Reset Title
+            document.title = 'Class Caddy - My Study Plan'; 
             
-            // Play Beep Sound
             const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
             audio.play().catch(e => console.log("Audio play failed:", e));
             
             showCustomAlert(pomoMode === 'focus' ? "Focus session complete! Take a break." : "Break over! Back to work.", "success");
             
-            // Auto-switch modes for convenience
             if (pomoMode === 'focus') {
                 switchPomoMode('break');
             } else {
@@ -6201,7 +6247,6 @@ window.toggleSummaryRow = function(btn) {
             }
         }
 
-        // Initialize on load
         if (document.getElementById('pomodoro-widget')) {
             initPomodoro();
         }
