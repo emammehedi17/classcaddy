@@ -5669,7 +5669,7 @@ window.toggleSummaryRow = function(btn) {
             return html;
         }
 		
-        // --- START: PRINT FUNCTIONALITY ---
+        // --- START: PRINT FUNCTIONALITY (FOOTER ONLY ON LAST PAGE) ---
 
         function printSummaryContent(contentId, title, headerHTML, extraContentHTML = '') {
             return new Promise((resolve, reject) => {
@@ -5704,16 +5704,19 @@ window.toggleSummaryRow = function(btn) {
                         @page {
                             size: A4 landscape;
                             margin: 1cm;
-                            margin-bottom: 2cm; 
+                            /* Reset margin-bottom since we don't need space for a fixed footer anymore */
+                            margin-bottom: 1cm; 
                         }
                         body {
                             font-family: 'Inter', 'Kalpurush', sans-serif;
                             padding: 20px;
-                            padding-bottom: 30px; 
                             color: #1f2937;
                             -webkit-print-color-adjust: exact;
                             print-color-adjust: exact;
                             background-color: white;
+                            display: flex;
+                            flex-direction: column;
+                            min-height: 95vh; /* Ensure full height logic if needed */
                         }
                         
                         /* HEADER & INFO */
@@ -5747,8 +5750,19 @@ window.toggleSummaryRow = function(btn) {
                         .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
                         .vocab-col-divider { border-right: 2px solid #9ca3af !important; }
 
-                        /* FOOTER */
-                        .print-footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 8px 0; text-align: center; font-size: 12px; color: #6b7280; border-top: 2px solid #10b981; background-color: white; z-index: 1000; }
+                        /* FOOTER (CHANGED TO STATIC FLOW) */
+                        .print-footer { 
+                            /* No fixed position here */
+                            margin-top: auto; /* Push to bottom if flex container allows */
+                            padding-top: 30px; /* Space above footer */
+                            padding-bottom: 20px; 
+                            text-align: center; 
+                            font-size: 12px; 
+                            color: #6b7280; 
+                            border-top: 2px solid #10b981; 
+                            background-color: white; 
+                            page-break-inside: avoid; /* Don't cut the footer in half */
+                        }
                         .print-footer a { color: #059669; text-decoration: none; font-weight: 600; }
                         
                         tr { page-break-inside: avoid; page-break-after: auto; }
@@ -5780,7 +5794,6 @@ window.toggleSummaryRow = function(btn) {
                 }
 
                 htmlContent += `
-                        <div style="height: 50px;"></div>
                         <div class="print-footer">
                             Visit us at: <a href="https://classcaddy.netlify.app/">https://classcaddy.netlify.app/</a>
                         </div>
@@ -5804,10 +5817,7 @@ window.toggleSummaryRow = function(btn) {
                     } catch (e) {
                         console.error("Print execution failed:", e);
                     } finally {
-                        // Resolve immediately
                         resolve(); 
-                        
-                        // Remove iframe later
                         setTimeout(() => {
                             if (document.body.contains(iframe)) {
                                 document.body.removeChild(iframe);
