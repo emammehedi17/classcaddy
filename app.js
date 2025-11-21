@@ -6043,7 +6043,7 @@ window.toggleSummaryRow = function(btn) {
         // --- END: PRINT FUNCTIONALITY ---
 		
 		
-	// --- START: POMODORO TIMER LOGIC (CLOUD SYNCED & PERSISTENT) ---
+	// --- START: POMODORO TIMER LOGIC (LOCKED TABS & BASE64 SOUND) ---
         
         const pomoWidget = document.getElementById('pomodoro-widget');
         const pomoIcon = document.getElementById('pomodoro-icon');
@@ -6063,13 +6063,16 @@ window.toggleSummaryRow = function(btn) {
         const pomoInputBreak = document.getElementById('pomo-input-break');
         const pomoSaveSettingsBtn = document.getElementById('pomo-save-settings-btn');
 
-        // State Variables (Visual only, real truth is in Firebase)
+        // Pleasant Digital Alarm Sound (Base64 encoded to ensure it plays)
+        const pomoAlarm = new Audio("data:audio/mp3;base64,//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
+        
+        // State Variables
         let pomoLocalInterval = null;
         let pomoState = {
-            status: 'idle', // 'idle', 'running', 'paused'
-            mode: 'focus',  // 'focus', 'break'
-            endTime: null,  // Timestamp (milliseconds)
-            remaining: 25 * 60, // Seconds left (snapshot)
+            status: 'idle', 
+            mode: 'focus',  
+            endTime: null,  
+            remaining: 25 * 60, 
             totalDuration: 25 * 60,
             config: { focus: 25, break: 5 }
         };
@@ -6080,8 +6083,26 @@ window.toggleSummaryRow = function(btn) {
             // UI Listeners
             pomoStartBtn.addEventListener('click', handlePomoToggle);
             pomoResetBtn.addEventListener('click', handlePomoReset);
-            pomoBtnFocus.addEventListener('click', () => handlePomoSwitchMode('focus'));
-            pomoBtnBreak.addEventListener('click', () => handlePomoSwitchMode('break'));
+            
+            // --- NEW: CONDITIONAL TAB SWITCHING ---
+            pomoBtnFocus.addEventListener('click', () => {
+                if (pomoState.mode === 'focus') return; // Already active
+                if (isTimerActive()) {
+                    showCustomAlert("Timer is active. Reset it to switch modes.", "error");
+                    return;
+                }
+                handlePomoSwitchMode('focus');
+            });
+
+            pomoBtnBreak.addEventListener('click', () => {
+                if (pomoState.mode === 'break') return; // Already active
+                if (isTimerActive()) {
+                    showCustomAlert("Timer is active. Reset it to switch modes.", "error");
+                    return;
+                }
+                handlePomoSwitchMode('break');
+            });
+            // --------------------------------------
             
             // Settings Listeners
             pomoSettingsToggle.addEventListener('click', () => {
@@ -6089,7 +6110,6 @@ window.toggleSummaryRow = function(btn) {
                 if (isSettingsOpen) {
                     pomoSettingsView.classList.add('hidden');
                     pomoTimerView.classList.remove('hidden');
-                    // Revert UI inputs to current state
                     pomoInputFocus.value = pomoState.config.focus;
                     pomoInputBreak.value = pomoState.config.break;
                 } else {
@@ -6102,13 +6122,21 @@ window.toggleSummaryRow = function(btn) {
                 const fVal = parseInt(pomoInputFocus.value) || 25;
                 const bVal = parseInt(pomoInputBreak.value) || 5;
                 
-                // Update Config in DB
-                await updatePomoDoc({
-                    config: { focus: fVal, break: bVal },
-                    // If idle, auto-update the remaining time to match new setting
-                    ...(pomoState.status === 'idle' && pomoState.mode === 'focus' ? { remaining: fVal * 60, totalDuration: fVal * 60 } : {}),
-                    ...(pomoState.status === 'idle' && pomoState.mode === 'break' ? { remaining: bVal * 60, totalDuration: bVal * 60 } : {})
-                });
+                // If timer is running/paused, we only update config, not current time
+                const updates = { config: { focus: fVal, break: bVal } };
+
+                // Only auto-update the remaining time if the timer is FRESH (not started yet)
+                if (!isTimerActive()) {
+                    if (pomoState.mode === 'focus') {
+                        updates.remaining = fVal * 60;
+                        updates.totalDuration = fVal * 60;
+                    } else {
+                        updates.remaining = bVal * 60;
+                        updates.totalDuration = bVal * 60;
+                    }
+                }
+
+                await updatePomoDoc(updates);
                 
                 pomoSettingsView.classList.add('hidden');
                 pomoTimerView.classList.remove('hidden');
@@ -6125,7 +6153,7 @@ window.toggleSummaryRow = function(btn) {
                 pomoWidget.classList.remove('hidden');
             });
 
-            // 2. Listen for Auth Changes specifically for Pomodoro
+            // 2. Listen for Auth Changes
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     startPomoSync(user.uid);
@@ -6135,7 +6163,13 @@ window.toggleSummaryRow = function(btn) {
             });
         }
 
-        // 3. Sync Logic (The Brain)
+        // Helper: Check if timer has started or is paused mid-way
+        function isTimerActive() {
+            // It is active if it's RUNNING, or if it's PAUSED but some time has elapsed
+            return pomoState.status === 'running' || (pomoState.status === 'paused' && pomoState.remaining < pomoState.totalDuration);
+        }
+
+        // 3. Sync Logic
         function startPomoSync(uid) {
             if (pomoUnsubscribe) pomoUnsubscribe();
             
@@ -6143,11 +6177,9 @@ window.toggleSummaryRow = function(btn) {
             
             pomoUnsubscribe = onSnapshot(docRef, (docSnap) => {
                 if (docSnap.exists()) {
-                    // Load state from server
                     const data = docSnap.data();
                     pomoState = { ...pomoState, ...data };
                     
-                    // Update inputs if config changed on another device
                     if (data.config) {
                         pomoInputFocus.value = data.config.focus;
                         pomoInputBreak.value = data.config.break;
@@ -6155,7 +6187,6 @@ window.toggleSummaryRow = function(btn) {
 
                     renderPomoUI();
                 } else {
-                    // Create default doc if missing
                     updatePomoDoc({
                         status: 'idle',
                         mode: 'focus',
@@ -6171,7 +6202,6 @@ window.toggleSummaryRow = function(btn) {
         function stopPomoSync() {
             if (pomoUnsubscribe) pomoUnsubscribe();
             clearInterval(pomoLocalInterval);
-            // Reset display to default
             pomoTimerDisplay.textContent = "25:00";
             pomoProgressBar.style.width = "0%";
         }
@@ -6185,8 +6215,16 @@ window.toggleSummaryRow = function(btn) {
 
         // 5. Action Handlers
         async function handlePomoToggle() {
+            // Trick: Play silent sound on user interaction to unlock Audio Context for later
+            pomoAlarm.volume = 0.1; // Set low volume just in case
+            pomoAlarm.play().then(() => {
+                pomoAlarm.pause();
+                pomoAlarm.currentTime = 0;
+                pomoAlarm.volume = 1.0; // Restore volume
+            }).catch(e => {});
+
             if (pomoState.status === 'running') {
-                // PAUSE: Calculate remaining time based on current progress and save
+                // PAUSE
                 const now = Date.now();
                 const timeLeft = Math.max(0, Math.ceil((pomoState.endTime - now) / 1000));
                 
@@ -6196,7 +6234,7 @@ window.toggleSummaryRow = function(btn) {
                     endTime: null
                 });
             } else {
-                // START: Calculate target End Time based on remaining seconds
+                // START
                 const now = Date.now();
                 const targetEndTime = now + (pomoState.remaining * 1000);
                 
@@ -6218,9 +6256,10 @@ window.toggleSummaryRow = function(btn) {
         }
 
         async function handlePomoSwitchMode(newMode) {
+            // This is only called if validation passes (timer is idle/reset)
             const newTime = (newMode === 'focus' ? pomoState.config.focus : pomoState.config.break) * 60;
             await updatePomoDoc({
-                status: 'idle', // Always pause on switch
+                status: 'idle',
                 mode: newMode,
                 remaining: newTime,
                 totalDuration: newTime,
@@ -6230,7 +6269,7 @@ window.toggleSummaryRow = function(btn) {
 
         // 6. UI Renderer & Local Tick
         function renderPomoUI() {
-            // Update Tabs
+            // Update Tabs UI
             if (pomoState.mode === 'focus') {
                 pomoBtnFocus.classList.add('active');
                 pomoBtnBreak.classList.remove('active');
@@ -6239,33 +6278,28 @@ window.toggleSummaryRow = function(btn) {
                 pomoBtnFocus.classList.remove('active');
             }
 
-            // Clear old interval to prevent stacking
             if (pomoLocalInterval) clearInterval(pomoLocalInterval);
 
             if (pomoState.status === 'running') {
-                // Change Button to Pause
                 pomoStartBtn.innerHTML = `<i class="fas fa-pause mr-1"></i> Pause`;
                 pomoStartBtn.classList.replace('bg-emerald-500', 'bg-amber-500');
 
-                // Start Local Ticker to update UI smoothly between server snapshots
                 pomoLocalInterval = setInterval(() => {
                     const now = Date.now();
                     const distance = pomoState.endTime - now;
                     const secondsLeft = Math.ceil(distance / 1000);
 
                     if (secondsLeft <= 0) {
-                        handleTimerComplete(); // Timer finished
+                        handleTimerComplete(); 
                     } else {
                         updateDisplayElements(secondsLeft, pomoState.totalDuration);
                     }
-                }, 200); // fast update for smooth feel
+                }, 200); 
 
             } else {
-                // Idle or Paused
                 pomoStartBtn.innerHTML = `<i class="fas fa-play mr-1"></i> ${pomoState.status === 'paused' ? 'Resume' : 'Start'}`;
                 pomoStartBtn.classList.replace('bg-amber-500', 'bg-emerald-500');
                 
-                // Just show the static 'remaining' value from DB
                 updateDisplayElements(pomoState.remaining, pomoState.totalDuration);
                 
                 document.title = 'Class Caddy - My Study Plan';
@@ -6293,22 +6327,17 @@ window.toggleSummaryRow = function(btn) {
         function handleTimerComplete() {
             clearInterval(pomoLocalInterval);
             
-            // Play Sound
-            const audio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-            audio.play().catch(e => console.log("Audio play failed:", e));
+            // --- SOUND FIX ---
+            pomoAlarm.play().catch(e => console.log("Audio play failed:", e));
             
-            // Show Alert
             const msg = pomoState.mode === 'focus' ? "Focus complete! Take a break." : "Break over! Back to work.";
             showCustomAlert(msg, "success");
 
-            // Logic: Switch mode automatically and stop
-            // We only want ONE device to trigger the DB update to avoid race conditions,
-            // but since `endTime` is past, the first device to catch it wins. 
-            // Firestore handles concurrency well.
-            
+            // Auto-switch Logic (Resetting timer for next phase)
             const nextMode = pomoState.mode === 'focus' ? 'break' : 'focus';
             const nextDuration = (nextMode === 'focus' ? pomoState.config.focus : pomoState.config.break) * 60;
 
+            // We update DB so all devices see it ended
             updatePomoDoc({
                 status: 'idle',
                 mode: nextMode,
@@ -6318,7 +6347,6 @@ window.toggleSummaryRow = function(btn) {
             });
         }
 
-        // Start everything if widget exists
         if (document.getElementById('pomodoro-widget')) {
             initPomodoro();
         }
