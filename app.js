@@ -1975,12 +1975,12 @@ function updateMonthUI(monthId, monthData, weeksData) {
         /**
          * ধাপ ১ (নতুন): DOM থেকে ডেটা পড়ে এবং সেভের জন্য প্রস্তুত করে (Synchronous)
          */
+        // Step 1: Parse DOM and prepare data (UPDATED: Reads Temp MCQs)
         async function parseAndPrepareSaveData(daySection, weekId, isCheckboxClick = false) {
             try {
                 const dayIndex = parseInt(daySection.dataset.dayIndex);
                 
-                // --- START: MODIFIED ---
-                // Fetch the fresh data directly from the WEEK document
+                // Fetch fresh data
                 const monthId = daySection.closest('.card[data-month-id]').dataset.monthId;
                 const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
                 const weekDocSnap = await getDoc(weekDocRef);
@@ -1988,7 +1988,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 
                 const freshDaysArray = weekDocSnap.data().days || [];
                 const currentDayData = freshDaysArray[dayIndex];
-                // --- END: MODIFIED ---
                 
                 if (!currentDayData) {
                     throw new Error(`Day data for index ${dayIndex} not found.`);
@@ -1999,12 +1998,15 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                 rowElements.forEach((row) => {
                     let existingRowIndex = parseInt(row.dataset.rowIndex);
-                    const existingRowData = !isNaN(existingRowIndex) && currentDayData.rows?.[existingRowIndex] ? currentDayData.rows[existingRowIndex] : {};
+                    // Handle new rows (index might be -1 or new)
+                    const existingRowData = (!isNaN(existingRowIndex) && existingRowIndex !== -1 && currentDayData.rows?.[existingRowIndex]) 
+                        ? currentDayData.rows[existingRowIndex] 
+                        : {};
 
                     let subject, topic, comment, completed, completionPercentage, vocabData = null, story, mcqData = null;
 
                     if (daySection.classList.contains('editing') && !isCheckboxClick) {
-                         // --- In Edit Mode ---
+                         // --- EDIT MODE ---
                          subject = (row.querySelector('.subject-input')?.value || '').trim();
                          comment = (row.querySelector('.comment-input')?.value || '').trim();
                          completed = existingRowData.completed || false;
@@ -2012,7 +2014,17 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          completionPercentage = parsePercentage(percInput);
                          
                          story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
-                         mcqData = existingRowData.mcqData || null; 
+                         
+                         // --- FIX: Check for Temporary MCQ Data on the button ---
+                         const mcqBtn = row.querySelector('.add-row-mcq-btn');
+                         if (mcqBtn && mcqBtn.dataset.tempMcq) {
+                             // CASE A: User just added/edited MCQs in this session
+                             mcqData = JSON.parse(mcqBtn.dataset.tempMcq);
+                         } else {
+                             // CASE B: No change, keep existing DB data
+                             mcqData = existingRowData.mcqData || null;
+                         }
+                         // ------------------------------------------------------
 
                          if (row.classList.contains('vocab-row')) {
                              subject = 'Vocabulary';
@@ -2028,7 +2040,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                              vocabData = null;
                          }
                     } else { 
-                         // --- Checkbox Click Mode ---
+                         // --- CHECKBOX MODE ---
                          completed = row.querySelector('.completion-checkbox')?.checked || false;
                          subject = existingRowData.subject; 
                          topic = existingRowData.topic; 
@@ -2042,19 +2054,15 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null, mcqData: mcqData || null });
                 });
                 
-                // --- START: MODIFIED ---
-                // Update the correct day in the fresh array
                 freshDaysArray[dayIndex].rows = updatedRows;
-                // The payload is now just the 'days' array. The key will be added by the caller.
                 const updatePayload = { days: freshDaysArray };
-                // --- END: MODIFIED ---
                 
                 return { updatedRows, updatePayload };
 
             } catch (error) {
                 console.error("Error parsing day plan from DOM:", error);
                 showCustomAlert("Error reading data from fields. Cannot save.");
-                return null; // Parsing failed
+                return null;
             }
         }
 
@@ -4030,16 +4038,37 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         const viewMcqModal = document.getElementById('view-mcq-modal');
         const viewMcqContent = document.getElementById('view-mcq-content');
 
-        // 1. "Add/Edit MCQ" বাটনে ক্লিক করলে এই ফাংশনটি কল হবে
+        // 1. "Add/Edit MCQ" Button Handler (UPDATED: Checks Local Temp Data First)
         async function openAddMcqModal(monthId, weekId, dayIndex, rowIndex) {
             currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
+            mcqPasteTextarea.value = ''; // Clear first
             
+            // Find the button in the DOM to see if we have temporary unsaved data
+            const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
+            const row = daySection ? daySection.querySelector(`tr[data-row-index="${rowIndex}"]`) : null;
+            const button = row ? row.querySelector('.add-row-mcq-btn') : null;
+
+            // A. Check for LOCAL temporary data (Unsaved)
+            if (button && button.dataset.tempMcq) {
+                console.log("Loading MCQs from local temp storage...");
+                const localData = JSON.parse(button.dataset.tempMcq);
+                const rawText = localData.map((mcq, index) => {
+                    const options = mcq.options.map((opt, i) => `${['ক', 'খ', 'গ', 'ঘ'][i]}. ${opt}`).join('\n');
+                    const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+                    const correctPrefix = correctIndex !== -1 ? ['ক', 'খ', 'গ', 'ঘ'][correctIndex] : '??';
+                    return `${index + 1}. ${mcq.question}\n${options}\nসঠিক উত্তর: ${correctPrefix}. ${mcq.correctAnswer}\n`;
+                }).join('\n');
+                
+                mcqPasteTextarea.value = rawText;
+                addMcqModal.style.display = 'block';
+                return; // Stop here, no need to check DB
+            }
+
+            // B. Check DATABASE (Saved)
             setSyncStatus("Loading...", "blue");
             try {
-                // --- START: MODIFIED ---
                 const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
                 const weekDocSnap = await getDoc(weekDocRef);
-                // --- END: MODIFIED ---
                 
                 let rawText = '';
                 if (weekDocSnap.exists()) {
@@ -4048,8 +4077,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     if (mcqData) {
                         rawText = mcqData.map((mcq, index) => {
                             const options = mcq.options.map((opt, i) => `${['ক', 'খ', 'গ', 'ঘ'][i]}. ${opt}`).join('\n');
-                            const correctPrefix = ['ক', 'খ', 'ג', 'ঘ'][mcq.options.indexOf(mcq.correctAnswer)];
-                            return `${['০১', '০২', '০৩', '০৪', '০৫', '০৬', '০৭', '০৮', '০৯'][index] || (index + 1)}. ${mcq.question}\n${options}\nসঠিক উত্তর: ${correctPrefix}. ${mcq.correctAnswer}\n`;
+                            const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+                            const correctPrefix = correctIndex !== -1 ? ['ক', 'খ', 'গ', 'ঘ'][correctIndex] : '??';
+                            return `${index + 1}. ${mcq.question}\n${options}\nসঠিক উত্তর: ${correctPrefix}. ${mcq.correctAnswer}\n`;
                         }).join('\n');
                     }
                 }
@@ -4063,7 +4093,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             addMcqModal.style.display = 'block';
         }
 
-        // 2. Modal এর "Parse & Save MCQs" বাটনে ক্লিক করলে এই ফাংশনটি কল হবে
+        // 2. Modal "Parse & Save" Handler (UPDATED: Saves to DOM Only)
         saveMcqBtn.addEventListener('click', () => { 
             if (!currentMcqTarget) return;
 
@@ -4072,63 +4102,37 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const parsedData = parseMcqText(rawText);
 
             closeModal('add-mcq-modal');
-            setSyncStatus("Syncing...", "yellow");
             
-            (async () => {
-                try {
-                    // --- START: MODIFIED ---
-                    const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
-                    const weekDocSnap = await getDoc(weekDocRef);
-                    // --- END: MODIFIED ---
+            // Find the button in the UI
+            const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
+            const row = daySection ? daySection.querySelector(`tr[data-row-index="${rowIndex}"]`) : null;
+            const button = row ? row.querySelector('.add-row-mcq-btn') : null;
 
-                    if (!weekDocSnap.exists()) throw new Error("Week document not found.");
-
-                    let daysArray = weekDocSnap.data().days || [];
-                    
-                    if (daysArray[dayIndex] && daysArray[dayIndex].rows[rowIndex]) {
-                        
-                        daysArray[dayIndex].rows[rowIndex].mcqData = parsedData.length > 0 ? parsedData : null;
-                        
-                        // --- START: MODIFIED ---
-                        const updatePayload = { days: daysArray };
-						await updateDoc(weekDocRef, updatePayload);
-                        // --- END: MODIFIED ---
-                        
-                        console.log("MCQs saved successfully in background for day:", dayIndex);
-                        setSyncStatus("Synced", "green");
-                        showCustomAlert(`${parsedData.length} MCQs saved successfully!`, "success");
-
-                        // --- START: NEW UI FIX ---
-                        // Manually update the button text without a full reload
-                        try {
-                            const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
-                            if (daySection) {
-                                const button = daySection.querySelector(`button.add-row-mcq-btn[data-row-index="${rowIndex}"]`);
-                                if (button) {
-                                    if (parsedData.length > 0) {
-                                        button.innerHTML = `<i class="fas fa-pencil-alt mr-1"></i> Edit Qs`;
-                                    } else {
-                                        // This handles the case where you deleted all MCQs
-                                        button.innerHTML = `<i class="fas fa-plus mr-1"></i> Add Qs`;
-                                    }
-                                }
-                            }
-                        } catch (uiError) {
-                            console.error("Error updating button UI:", uiError);
-                        }
-                        // --- END: NEW UI FIX ---
-
-                    } else {
-                        throw new Error("Target day for MCQs not found.");
-                    }
-                } catch (error) {
-                    console.error("Error parsing or saving MCQs in background:", error);
-                    showCustomAlert("Error saving MCQs. Please try again.", "error");
-                    setSyncStatus("Error", "red");
-                } finally {
-                    currentMcqTarget = null;
+            if (button) {
+                if (parsedData.length > 0) {
+                    // 1. Save data to the DOM element temporarily
+                    button.dataset.tempMcq = JSON.stringify(parsedData);
+                    // 2. Update UI visually
+                    button.innerHTML = `<i class="fas fa-pencil-alt mr-1"></i> Edit Qs (${parsedData.length})`;
+                    button.classList.add('bg-emerald-100', 'text-emerald-700'); // Visual cue
+                    showCustomAlert(`${parsedData.length} MCQs attached to row! (Click 'Save Day' to confirm)`, "success");
+                } else {
+                    // Data cleared
+                    delete button.dataset.tempMcq;
+                    button.innerHTML = `<i class="fas fa-plus mr-1"></i> Add Qs`;
+                    button.classList.remove('bg-emerald-100', 'text-emerald-700');
                 }
-            })(); 
+                
+                // Trigger the autosave logic for the day if it exists
+                if (daySection.autosaveHandler) {
+                    // We fire a manual input event to wake up the autosave timer
+                    daySection.dispatchEvent(new Event('input'));
+                }
+            } else {
+                showCustomAlert("Error: Could not find row to update.", "error");
+            }
+
+            currentMcqTarget = null;
         });
 
         // 3. ✨ The Magic Parser Function (Regex) - (FIXED FOR OCR ERRORS)
