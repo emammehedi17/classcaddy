@@ -4131,16 +4131,14 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             })(); 
         });
 
-        // 3. ✨ The Magic Parser Function (Regex) - (UPGRADED for ALL Formats)
+        // 3. ✨ The Magic Parser Function (Regex) - (FIXED FOR OCR ERRORS)
         function parseMcqText(text) {
             let cleanText = text.replace(/\n*([০-৯0-9]+\.)/g, '\n$1');
             const mcqData = [];
             
-            // --- START: NEW SIMPLER Regex ---
-            // This Regex now captures everything after "Correct answer:" into ONE group
+            // This Regex captures everything after "Correct answer:" into ONE group
             const mcqRegex = 
 /(?:[০-৯0-9]+)\.\s*([\s\S]+?)\n(?:(?:ক\.)|(?:a\.))\s*([\s\S]+?)\n(?:(?:খ\.)|(?:b\.))\s*([\s\S]+?)\n(?:(?:গ\.)|(?:c\.))\s*([\s\S]+?)\n(?:(?:ঘ\.)|(?:d\.))\s*([\s\S]+?)\n(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([\s\S]+?)(?=\n[০-৯0-9]+\.|\n*$)/gi;
-            // --- END: NEW SIMPLER Regex ---
             
             let match;
             while ((match = mcqRegex.exec(cleanText)) !== null) {
@@ -4153,64 +4151,58 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         match[5].trim()  // opt d/ঘ
                     ];
                     
-                    // --- START: NEW ROBUST LOGIC ---
-                    // match[6] contains EVERYTHING after the colon.
-                    // e.g., "b", "b. The ...", "The ..."
                     const answerString = match[6].trim();
                     const answerStringLower = answerString.toLowerCase();
                     let correctAnswer = null;
 
-                    // Test 1: Check for short prefix (e.g., "b" or "খ")
+                    // Test 1: Check for short prefix
                     if (answerStringLower === 'a' || answerStringLower === 'ক') {
                         correctAnswer = options[0];
                     } else if (answerStringLower === 'b' || answerStringLower === 'খ') {
                         correctAnswer = options[1];
-                    } else if (answerStringLower === 'c' || answerStringLower === 'গ') {
+                    } else if (answerStringLower === 'c' || answerStringLower === 'গ' || answerStringLower === 'ג') { // Added ג
                         correctAnswer = options[2];
                     } else if (answerStringLower === 'd' || answerStringLower === 'ঘ') {
                         correctAnswer = options[3];
                     }
 
-                    // Test 2: If no match, check for prefix with text (e.g., "b. The...")
+                    // Test 2: Check for prefix with text (e.g., "b. The...", "ג. ট্রোজান...")
                     if (correctAnswer === null) {
                         if (answerStringLower.startsWith('a.') || answerStringLower.startsWith('ক.')) {
                             correctAnswer = options[0];
                         } else if (answerStringLower.startsWith('b.') || answerStringLower.startsWith('খ.')) {
                             correctAnswer = options[1];
-                        } else if (answerStringLower.startsWith('c.') || answerStringLower.startsWith('গ.')) {
+                        } else if (answerStringLower.startsWith('c.') || answerStringLower.startsWith('গ.') || answerStringLower.startsWith('ג.')) { // Added ג.
                             correctAnswer = options[2];
                         } else if (answerStringLower.startsWith('d.') || answerStringLower.startsWith('ঘ.')) {
                             correctAnswer = options[3];
                         }
                     }
 
-                    // Test 3: If still no match, check if the full string matches an option
+                    // Test 3: Check if the full string matches an option
                     if (correctAnswer === null) {
-                        // Check for an exact (case-sensitive) match
                         let found = false;
                         for (const opt of options) {
+                            // Check exact match
                             if (opt === answerString) {
                                 correctAnswer = opt;
                                 found = true;
                                 break;
                             }
-                        }
-                        // If no exact match, check for a case-insensitive match
-                        if (!found) {
-                             for (const opt of options) {
-                                if (opt.toLowerCase() === answerStringLower) {
-                                    correctAnswer = opt;
-                                    break;
-                                }
+                            // Check fuzzy match (ignore the 'ג.' prefix in the answerString if comparing to option text)
+                            // This handles cases where answer is "ג. OptionText" and option is "OptionText"
+                            if (answerString.includes(opt) || opt.includes(answerString)) {
+                                correctAnswer = opt;
+                                found = true;
+                                break;
                             }
                         }
                     }
                     
                     if (!correctAnswer) {
                         console.warn("Could not determine correct answer for:", question, "--- Got:", answerString);
-                        continue; // Skip this question
+                        continue; 
                     }
-                    // --- END: NEW ROBUST LOGIC ---
 
                     mcqData.push({
                         question: question,
