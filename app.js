@@ -6522,3 +6522,64 @@ repairBtn.innerText = "🛠️ FIX WEEK 3";
 repairBtn.style.cssText = "position: fixed; bottom: 20px; left: 20px; z-index: 99999; background: #f97316; color: white; padding: 12px 20px; font-weight: bold; border-radius: 8px; cursor: pointer; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3);";
 repairBtn.onclick = window.repairWeek3;
 document.body.appendChild(repairBtn);
+
+// --- DEEP RESCUE SCRIPT (Paste at bottom of app.js) ---
+
+window.deepRescue = async function() {
+    if (typeof db === 'undefined' || typeof auth === 'undefined') {
+        alert("Wait for page to load..."); return;
+    }
+    const user = auth.currentUser;
+    if (!user) { alert("Please log in."); return; }
+
+    const monthId = "2025-11"; // Your Month
+    const weekId = "week3";    // Your Missing Week
+    const userId = user.uid;
+    const appId = "study-plan17"; 
+
+    console.log(`Checking Old Storage for ${monthId} / ${weekId}...`);
+
+    // 1. Look at the Month Document (Where data lived before the update)
+    const monthDocRef = doc(db, `artifacts/${appId}/users/${userId}/studyPlans/${monthId}`);
+
+    try {
+        const monthSnap = await getDoc(monthDocRef);
+        
+        if (monthSnap.exists()) {
+            const data = monthSnap.data();
+            
+            // Check if the 'weeks' map still exists with data
+            if (data.weeks && data.weeks[weekId] && data.weeks[weekId].days && data.weeks[weekId].days.length > 1) {
+                
+                const oldDays = data.weeks[weekId].days;
+                const count = oldDays.length;
+                
+                if (confirm(`FOUND IT! I found ${count} days of old data in the backup. Overwrite the empty days with this?`)) {
+                    
+                    // 2. Overwrite the empty subcollection with this old data
+                    const weekSubDocRef = doc(db, `artifacts/${appId}/users/${userId}/studyPlans/${monthId}/weeks/${weekId}`);
+                    
+                    await updateDoc(weekSubDocRef, { days: oldDays });
+                    
+                    alert("Data Restored! Refresh the page now.");
+                    location.reload();
+                }
+                
+            } else {
+                alert("Sadly, the old data is not in the backup storage. It seems it was deleted during the glitch.\n\nYou will need to re-enter the data into the empty days.");
+            }
+        } else {
+            alert("Month document not found.");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Error checking backup: " + e.message);
+    }
+};
+
+// Create Purple Button
+const deepBtn = document.createElement('button');
+deepBtn.innerText = "💜 DEEP RESCUE";
+deepBtn.style.cssText = "position: fixed; bottom: 20px; left: 150px; z-index: 99999; background: #7e22ce; color: white; padding: 12px 20px; font-weight: bold; border-radius: 8px; cursor: pointer; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3);";
+deepBtn.onclick = window.deepRescue;
+document.body.appendChild(deepBtn);
