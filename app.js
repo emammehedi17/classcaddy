@@ -512,51 +512,7 @@
             });
         }
 		
-		/**
- * NEW: This function automatically migrates a month from the
- * old "map" structure to the new "subcollection" structure.
- */
-async function runMigrationForMonth(monthDocRef, oldWeeksMap) {
-    try {
-        console.log(`MIGRATION: Starting auto-migration for ${monthDocRef.id}...`);
-        
-        // We must import these functions here
-        const { writeBatch, doc, deleteField } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-        
-        const batch = writeBatch(db);
 
-        // 1. Copy all week data to the new subcollection
-        for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
-            const weekData = oldWeeksMap[weekId];
-            // Check if the weekData exists and has days
-            if (weekData && (weekData.days || weekData.rows)) { // Check for old 'rows' bug too
-                const newWeekDocRef = doc(db, monthDocRef.path, 'weeks', weekId);
-                
-                // Ensure data format is correct
-                let daysArray = weekData.days || weekData.rows || []; 
-                if (!Array.isArray(daysArray)) daysArray = []; // Safety check
-                
-                batch.set(newWeekDocRef, { days: daysArray });
-                console.log(`MIGRATION: Adding ${weekId} to subcollection.`);
-            }
-        }
-
-        // 2. Delete the old, oversized 'weeks' map from the parent document
-        batch.update(monthDocRef, { weeks: deleteField() });
-        console.log(`MIGRATION: Deleting old 'weeks' map.`);
-
-        // 3. Commit all changes at once
-        await batch.commit();
-        
-        console.log(`MIGRATION: Auto-migration successful for: ${monthDocRef.id}`);
-        return true;
-    
-    } catch (e) {
-        console.error(`MIGRATION FAILED for ${monthDocRef.id}:`, e);
-        showCustomAlert(`Data migration failed for this month. Please contact support.`, "error");
-        return false;
-    }
-}
 		/**
  * NEW: Performs targeted UI updates for the entire month
  * without a full re-render.
@@ -729,28 +685,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      // 2. Get the main month data (targets, name, etc.)
                      const monthData = monthDocSnap.data();
 
-                     // --- START: AUTO-MIGRATION SCRIPT ---
-                     if (monthData.weeks) {
-                         // This document is in the OLD format!
-                         // We must migrate it before we can display it.
-                         console.warn(`MIGRATION: Old 'weeks' map found for ${monthId}. Running migration...`);
-                         setSyncStatus("Upgrading data...", "blue");
-                         
-                         const migrationSuccess = await runMigrationForMonth(monthDocSnap.ref, monthData.weeks);
-                         
-                         if (migrationSuccess) {
-                             // The migration is done. The 'onSnapshot' listener will
-                             // automatically fire again with the new, correct data.
-                             // We just need to stop this *current* function from running.
-                             console.log("MIGRATION: Complete. Awaiting data refresh...");
-                             setSyncStatus("Upgrade complete!", "green");
-                         } else {
-                             // The migration failed.
-                             currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">A critical error occurred during data migration. Please refresh and try again.</p>';
-                         }
-                         return; // Stop this function. The listener will re-run.
-                     }
-                     // --- END: AUTO-MIGRATION SCRIPT ---
+                     
                      
                      // 3. NOW, fetch all the week documents from the subcollection
                      const weeksCollectionRef = collection(db, monthDocRef.path, 'weeks');
