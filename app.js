@@ -6347,6 +6347,10 @@ window.exportData = async function() {
         downloadAnchorNode.remove();
         
         showCustomAlert("Backup downloaded successfully!", "success");
+		// --- NEW: Save the timestamp ---
+        localStorage.setItem('cc_last_backup_date', Date.now());
+        document.getElementById('backup-reminder-toast')?.remove(); // Remove reminder if it exists
+        // -------------------------------
 
     } catch (error) {
         console.error("Export failed:", error);
@@ -6368,3 +6372,95 @@ exportButton.onclick = window.exportData;
 if (!window.matchMedia('print').matches) {
     document.body.appendChild(exportButton);
 }
+
+// --- SMART BACKUP REMINDER SYSTEM ---
+
+function checkBackupStatus() {
+    if (!currentUser || !userId) return;
+
+    const LAST_BACKUP = localStorage.getItem('cc_last_backup_date');
+    const BACKUP_INTERVAL_DAYS = 3; // Ask for backup every 3 days
+    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+    let shouldRemind = false;
+
+    if (!LAST_BACKUP) {
+        // Never backed up on this device
+        shouldRemind = true;
+    } else {
+        const daysSince = (Date.now() - parseInt(LAST_BACKUP)) / MS_PER_DAY;
+        if (daysSince > BACKUP_INTERVAL_DAYS) {
+            shouldRemind = true;
+        }
+    }
+
+    if (shouldRemind) {
+        showBackupReminder();
+    }
+}
+
+function showBackupReminder() {
+    // Avoid duplicate toasts
+    if (document.getElementById('backup-reminder-toast')) return;
+
+    const toast = document.createElement('div');
+    toast.id = 'backup-reminder-toast';
+    toast.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="background: #fff; padding: 8px; border-radius: 50%;">
+                <i class="fas fa-exclamation-triangle text-amber-500 text-xl"></i>
+            </div>
+            <div>
+                <h4 style="margin: 0; font-weight: 700; font-size: 14px;">Backup Reminder</h4>
+                <p style="margin: 0; font-size: 12px; opacity: 0.9;">You haven't backed up in a while!</p>
+            </div>
+        </div>
+        <div style="margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end;">
+            <button id="remind-later-btn" style="background: transparent; border: 1px solid rgba(255,255,255,0.5); color: white; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer;">Later</button>
+            <button id="remind-backup-btn" style="background: white; color: #d97706; border: none; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer;">Backup Now</button>
+        </div>
+    `;
+    
+    toast.style.cssText = `
+        position: fixed; 
+        bottom: 80px; /* Above the manual buttons */
+        left: 20px; 
+        background: linear-gradient(135deg, #f59e0b, #d97706); 
+        color: white; 
+        padding: 15px; 
+        border-radius: 12px; 
+        box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.5); 
+        z-index: 1000; 
+        font-family: 'Inter', sans-serif;
+        width: 280px;
+        animation: slideInLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    `;
+
+    document.body.appendChild(toast);
+
+    // Add Listeners
+    document.getElementById('remind-backup-btn').onclick = () => {
+        window.exportData();
+        // The toast will be removed by exportData on success
+    };
+
+    document.getElementById('remind-later-btn').onclick = () => {
+        toast.style.animation = 'slideOutLeft 0.5s forwards';
+        setTimeout(() => toast.remove(), 500);
+        // Remind again in 24 hours (fake 'snooze')
+        localStorage.setItem('cc_last_backup_date', Date.now() - (2 * 24 * 60 * 60 * 1000)); 
+    };
+}
+
+// Add Keyframe animations for the toast
+const styleSheet = document.createElement("style");
+styleSheet.innerText = `
+    @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideOutLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
+`;
+document.head.appendChild(styleSheet);
+
+// 3. Trigger the check when the user logs in or loads the page
+// We hook into the existing Auth Listener by checking periodically
+setInterval(checkBackupStatus, 60000); // Check every 1 minute
+setTimeout(checkBackupStatus, 3000);   // Also check 3 seconds after load
