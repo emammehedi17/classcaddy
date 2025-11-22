@@ -1657,6 +1657,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                         // --- START: NEW ACCORDION LOGIC ---
                         
+                        // --- START: NEW ACCORDION LOGIC (WITH SCROLL FIX) ---
+                        
                         if (!isExpanding) {
                             // The user is clicking an already-open day to collapse it.
                             dayToToggle.classList.add('is-collapsed');
@@ -1674,7 +1676,14 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                             // 3. Expand the target day
                             dayToToggle.classList.remove('is-collapsed');
+
+                            // 4. FIX: Scroll the newly opened day to the center
+                            // We use a small timeout to let the DOM update (collapse the old one) first.
+                            setTimeout(() => {
+                                dayToToggle.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 200);
                         }
+                        
                         // --- END: NEW ACCORDION LOGIC ---
                     }
                     return; // টগল করার পর আর কিছু করার দরকার নেই
