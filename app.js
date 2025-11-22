@@ -6464,3 +6464,95 @@ document.head.appendChild(styleSheet);
 // We hook into the existing Auth Listener by checking periodically
 setInterval(checkBackupStatus, 60000); // Check every 1 minute
 setTimeout(checkBackupStatus, 3000);   // Also check 3 seconds after load
+
+
+// --- DATA RESTORE FEATURE (IMPORT JSON) ---
+
+// 1. Create hidden file input
+const importInput = document.createElement('input');
+importInput.type = 'file';
+importInput.accept = '.json';
+importInput.style.display = 'none';
+document.body.appendChild(importInput);
+
+// 2. Function to handle file selection and restore
+importInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!confirm("WARNING: This will OVERWRITE existing data with the data from this backup file.\n\nAre you sure you want to proceed?")) {
+        importInput.value = ''; // Reset input
+        return;
+    }
+
+    const restoreBtn = document.getElementById('restore-btn');
+    const originalText = restoreBtn.innerHTML;
+    restoreBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Restoring...`;
+    restoreBtn.disabled = true;
+    
+    const reader = new FileReader();
+    
+    reader.onload = async (event) => {
+        try {
+            const backupData = JSON.parse(event.target.result);
+            const userId = auth.currentUser.uid;
+            const appId = "study-plan17";
+            const rootPath = `artifacts/${appId}/users/${userId}/studyPlans`;
+
+            let totalMonths = 0;
+            let totalWeeks = 0;
+
+            // Iterate through each Month in the backup
+            for (const monthId in backupData) {
+                const fullMonthData = backupData[monthId];
+                
+                // Separate the 'weeks' data from the 'month' metadata
+                // This is CRITICAL to maintain the new database structure
+                const weeksData = fullMonthData.weeks || {};
+                delete fullMonthData.weeks; // Remove weeks from the main doc object
+
+                // 1. Restore the Month Document (Metadata only)
+                const monthDocRef = doc(db, rootPath, monthId);
+                await setDoc(monthDocRef, fullMonthData);
+                totalMonths++;
+
+                // 2. Restore the Weeks (Subcollection)
+                for (const weekId in weeksData) {
+                    const weekDocRef = doc(db, rootPath, monthId, 'weeks', weekId);
+                    await setDoc(weekDocRef, weeksData[weekId]);
+                    totalWeeks++;
+                }
+            }
+
+            console.log(`Restore Complete: ${totalMonths} months and ${totalWeeks} weeks recovered.`);
+            alert(`Success! Restored ${totalMonths} months of data.\n\nPlease refresh the page.`);
+            location.reload();
+
+        } catch (error) {
+            console.error("Restore failed:", error);
+            alert("Error restoring data. The file might be corrupt or invalid.");
+        } finally {
+            restoreBtn.innerHTML = originalText;
+            restoreBtn.disabled = false;
+            importInput.value = ''; // Reset for next time
+        }
+    };
+
+    reader.readAsText(file);
+});
+
+// 3. Create the Green Restore Button
+const restoreButton = document.createElement('button');
+restoreButton.id = 'restore-btn';
+restoreButton.innerHTML = `<i class="fas fa-upload"></i> Restore Data`;
+restoreButton.style.cssText = "position: fixed; bottom: 20px; left: 150px; z-index: 999; background: #10b981; color: white; padding: 10px 16px; font-weight: bold; border-radius: 30px; cursor: pointer; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); font-size: 13px;";
+
+restoreButton.onclick = () => {
+    if (!auth.currentUser) { alert("Please log in to restore data."); return; }
+    importInput.click(); // Trigger the hidden file input
+};
+
+// Only add if not printing
+if (!window.matchMedia('print').matches) {
+    document.body.appendChild(restoreButton);
+}
