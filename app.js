@@ -6411,6 +6411,7 @@ backupDownloadBtn.addEventListener('click', async () => {
 async function executeCloudBackup(isAuto = false) {
     if (!auth.currentUser) return;
 
+    // UI Updates (Only if manual click)
     const btn = document.getElementById('backup-cloud-btn');
     let originalText = "";
     
@@ -6419,7 +6420,7 @@ async function executeCloudBackup(isAuto = false) {
         btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Managing...`;
         btn.disabled = true;
     } else if (isAuto) {
-        console.log("Triggering 24-hour Auto Backup...");
+        console.log("Triggering Cloud-Sync Auto Backup...");
         showCustomAlert("Auto-Archiving Daily Backup...", "success");
     }
 
@@ -6494,15 +6495,14 @@ async function executeCloudBackup(isAuto = false) {
             });
         }
 
-        // --- IMPORTANT: Update the timestamp on SUCCESS ---
-        localStorage.setItem('cc_last_cloud_backup_timestamp', Date.now());
+        // REMOVED: localStorage.setItem(...) -> We don't need this anymore.
+        // The timestamp inside the document we just created is now the source of truth.
 
         showCustomAlert(successMessage, "success");
         
         // Refresh list if modal is open
         if (document.getElementById('backup-restore-modal').style.display === 'block') {
-            // Triggering click on restore tab to reload list
-            if(tabRestore) tabRestore.click(); 
+            document.getElementById('tab-btn-restore').click();
         }
 
     } catch (error) {
@@ -6520,26 +6520,67 @@ async function executeCloudBackup(isAuto = false) {
 backupCloudBtn.addEventListener('click', () => executeCloudBackup(false));
 
 
-// --- 5. SMART SCHEDULER (24-HOUR CYCLE) ---
+// --- 5. SMART SCHEDULER (UNIVERSAL 24-HOUR CYCLE) ---
 
-function initSmartCloudBackup() {
-    const checkAndRun = () => {
+async function initSmartCloudBackup() {
+    const checkAndRun = async () => {
         if (!auth.currentUser) return;
 
-        const lastRun = localStorage.getItem('cc_last_cloud_backup_timestamp');
-        const now = Date.now();
-        const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; 
+        const userId = auth.currentUser.uid;
+        const appId = "study-plan17";
+        const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
 
-        if (!lastRun || (now - parseInt(lastRun)) > TWENTY_FOUR_HOURS) {
-            executeCloudBackup(true); 
+        try {
+            // Query the NEWEST backup (Ordered by timestamp DESCending)
+            const q = query(cloudBackupsRef, orderBy("timestamp", "desc")); 
+            const snapshot = await getDocs(q);
+
+            let shouldBackup = false;
+
+            if (snapshot.empty) {
+                // Case 1: No backups exist at all. Run immediately.
+                console.log("No cloud backups found. Initializing first auto-backup.");
+                shouldBackup = true;
+            } else {
+                // Case 2: Backups exist. Check the time of the newest one.
+                const lastDoc = snapshot.docs[0]; // The first one is the newest due to 'desc'
+                const lastBackupDate = lastDoc.data().timestamp.toDate(); // Convert Firestore Timestamp to JS Date
+                const lastBackupTime = lastBackupDate.getTime();
+                const now = Date.now();
+                
+                const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 86,400,000 ms
+
+                if ((now - lastBackupTime) > TWENTY_FOUR_HOURS) {
+                    console.log(`Last backup was ${lastBackupDate.toLocaleString()}. >24h ago. Triggering backup.`);
+                    shouldBackup = true;
+                } else {
+                    // Debug log (optional)
+                    // console.log(`Backup fresh. Last run: ${lastBackupDate.toLocaleString()}`);
+                }
+            }
+
+            if (shouldBackup) {
+                executeCloudBackup(true); // Run Auto Backup
+            }
+
+        } catch (error) {
+            console.error("Error checking backup status:", error);
         }
     };
 
+    // 1. Check 5 seconds after load (Covers "User just logged in on new device")
     setTimeout(checkAndRun, 5000);
-    setInterval(checkAndRun, 10 * 60 * 1000);
+
+    // 2. Check every 20 minutes (Covers "User keeps tab open all day")
+    setInterval(checkAndRun, 20 * 60 * 1000);
 }
 
-initSmartCloudBackup();
+// Hook into Auth State so it starts when user logs in
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        initSmartCloudBackup();
+    }
+});
 
 // --- 6. LOAD CLOUD BACKUPS (THE MISSING FUNCTION) ---
 async function loadCloudBackups() {
