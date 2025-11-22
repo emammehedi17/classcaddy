@@ -6420,38 +6420,36 @@ backupCloudBtn.addEventListener('click', async () => {
         const appId = "study-plan17";
         const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
 
+        // Define default message
+        let successMessage = "Backup saved to cloud successfully!";
+
         // --- STEP 1: ENFORCE LIMIT (Max 5) ---
-        // Fetch existing backups ordered by oldest first
         const q = query(cloudBackupsRef, orderBy("timestamp", "asc"));
         const snapshot = await getDocs(q);
 
-        // If we have 5 or more, we need to make room for the 6th (the new one)
+        // Only delete if we actually have 5 or more
         if (snapshot.size >= 5) {
-            console.log(`Found ${snapshot.size} backups. Deleting oldest to maintain limit of 5...`);
+            console.log(`Found ${snapshot.size} backups. Deleting oldest...`);
             
-            // Calculate how many to delete (e.g., if there are 7, delete 3 so we end up with 4 + 1 new = 5)
-            const numToDelete = snapshot.size - 4; 
-            
+            // Change message to inform user
+            successMessage = "Backup saved! (Oldest backup removed to maintain limit)";
+
+            const numToDelete = snapshot.size - 4; // Keep 4, add 1 new = 5
             const batch = writeBatch(db);
-            let deleteCount = 0;
 
             for (let i = 0; i < numToDelete; i++) {
                 const oldDoc = snapshot.docs[i];
                 
-                // Check for chunks and delete them first
                 if (oldDoc.data().isChunked) {
                     const partsRef = collection(db, oldDoc.ref.path, 'parts');
                     const partsSnap = await getDocs(partsRef);
                     partsSnap.forEach(part => batch.delete(part.ref));
                 }
                 
-                // Delete the main document
                 batch.delete(oldDoc.ref);
-                deleteCount++;
             }
             
             await batch.commit();
-            console.log(`Deleted ${deleteCount} old backup(s).`);
         }
 
         // --- STEP 2: GENERATE & SAVE NEW BACKUP ---
@@ -6459,12 +6457,10 @@ backupCloudBtn.addEventListener('click', async () => {
         
         const backupData = await generateBackupObject();
         const jsonString = JSON.stringify(backupData);
-        
-        // Safe limit: 200,000 chars
         const CHUNK_SIZE = 200000; 
         
         if (jsonString.length > CHUNK_SIZE) {
-            // Large File (Split it)
+            // Large File (Chunked)
             const chunks = [];
             for (let i = 0; i < jsonString.length; i += CHUNK_SIZE) {
                 chunks.push(jsonString.substring(i, i + CHUNK_SIZE));
@@ -6487,7 +6483,7 @@ backupCloudBtn.addEventListener('click', async () => {
             await batch.commit();
 
         } else {
-            // Small File (Normal Save)
+            // Small File (Normal)
             await addDoc(cloudBackupsRef, {
                 timestamp: Timestamp.now(),
                 note: "Auto-Managed Cloud Backup",
@@ -6496,7 +6492,8 @@ backupCloudBtn.addEventListener('click', async () => {
             });
         }
 
-        showCustomAlert("Backup saved! (Oldest backup removed)", "success");
+        // Use the dynamic message here
+        showCustomAlert(successMessage, "success");
         
         // 3. Switch to Restore tab
         tabRestore.click();
