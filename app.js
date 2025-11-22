@@ -6411,7 +6411,6 @@ backupDownloadBtn.addEventListener('click', async () => {
 async function executeCloudBackup(isAuto = false) {
     if (!auth.currentUser) return;
 
-    // UI Updates (Only if manual click)
     const btn = document.getElementById('backup-cloud-btn');
     let originalText = "";
     
@@ -6421,7 +6420,6 @@ async function executeCloudBackup(isAuto = false) {
         btn.disabled = true;
     } else if (isAuto) {
         console.log("Triggering 24-hour Auto Backup...");
-        // Optional: You can remove this alert if you want it to be completely silent
         showCustomAlert("Auto-Archiving Daily Backup...", "success");
     }
 
@@ -6503,7 +6501,8 @@ async function executeCloudBackup(isAuto = false) {
         
         // Refresh list if modal is open
         if (document.getElementById('backup-restore-modal').style.display === 'block') {
-            document.getElementById('tab-btn-restore').click();
+            // Triggering click on restore tab to reload list
+            if(tabRestore) tabRestore.click(); 
         }
 
     } catch (error) {
@@ -6529,32 +6528,72 @@ function initSmartCloudBackup() {
 
         const lastRun = localStorage.getItem('cc_last_cloud_backup_timestamp');
         const now = Date.now();
-        const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 86,400,000 ms
+        const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; 
 
-        // If never run, OR if 24 hours have passed since last run
         if (!lastRun || (now - parseInt(lastRun)) > TWENTY_FOUR_HOURS) {
-            executeCloudBackup(true); // Run Auto Backup
-        } else {
-            // Optional logging for debugging
-            // const hoursLeft = ((TWENTY_FOUR_HOURS - (now - parseInt(lastRun))) / (60*60*1000)).toFixed(1);
-            // console.log(`Auto-Backup not due yet. Next run in approx ${hoursLeft} hours.`);
+            executeCloudBackup(true); 
         }
     };
 
-    // 1. Check shortly after load (covers "User just opened browser after 2 days")
-    // We wait 5 seconds to ensure Firebase Auth is fully settled and data is loaded
     setTimeout(checkAndRun, 5000);
-
-    // 2. Check every 10 minutes (covers "User keeps tab open all day")
     setInterval(checkAndRun, 10 * 60 * 1000);
 }
 
-// Start the scheduler
 initSmartCloudBackup();
 
+// --- 6. LOAD CLOUD BACKUPS (THE MISSING FUNCTION) ---
+async function loadCloudBackups() {
+    if (!auth.currentUser) return;
+    
+    cloudBackupList.innerHTML = '<p class="text-center text-gray-400 text-xs py-4"><i class="fas fa-spinner fa-spin mr-1"></i> Loading...</p>';
+    
+    try {
+        const userId = auth.currentUser.uid;
+        const appId = "study-plan17";
+        const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
+        
+        // Order by newest first
+        const q = query(cloudBackupsRef, orderBy("timestamp", "desc"));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+            cloudBackupList.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">No cloud backups found.</p>';
+            return;
+        }
+        
+        let html = '';
+        querySnapshot.forEach(doc => {
+            const backup = doc.data();
+            const date = backup.timestamp ? backup.timestamp.toDate() : new Date();
+            const dateStr = date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+            const timeStr = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+            
+            // Note handling
+            const note = backup.note || "Manual Cloud Backup";
+            
+            html += `
+            <div class="cloud-backup-card">
+                <div>
+                    <span class="backup-info-title"><i class="fas fa-clock text-gray-400 mr-1"></i> ${dateStr}</span>
+                    <span class="backup-info-date">${timeStr} - ${note}</span>
+                </div>
+                <div class="flex items-center">
+                    <button class="restore-cloud-btn" onclick="restoreFromCloud('${doc.id}')">
+                        Restore
+                    </button>
+                </div>
+            </div>`;
+        });
+        
+        cloudBackupList.innerHTML = html;
 
+    } catch (error) {
+        console.error("Error loading cloud backups:", error);
+        cloudBackupList.innerHTML = '<p class="text-center text-red-400 text-xs py-4">Error loading backups.</p>';
+    }
+}
 
-// 6. ACTION: Restore From Cloud (The "Restore" button on card)
+// 7. ACTION: Restore From Cloud (The "Restore" button on card)
 window.restoreFromCloud = async function(docId) {
     if (!confirm("WARNING: Restoring this backup will OVERWRITE your current study plan.\n\nAre you sure you want to proceed?")) {
         return;
@@ -6580,12 +6619,8 @@ window.restoreFromCloud = async function(docId) {
         if (docData.isChunked) {
             console.log(`Detected chunked backup (${docData.chunkCount} parts). Reassembling...`);
             
-            // Fetch all parts from subcollection, ordered by index
+            // Fetch all parts from subcollection
             const partsRef = collection(db, docRef.path, 'parts');
-            // Note: We import 'orderBy' at top, ensure it's used here
-            // If you didn't import orderBy globally, use the string keys 0, 1, 2... 
-            // Since we named docs "0", "1", we can just fetch all and sort in JS.
-            
             const partsSnap = await getDocs(partsRef);
             
             // Sort by index to ensure correct order
@@ -6613,8 +6648,6 @@ window.restoreFromCloud = async function(docId) {
         showCustomAlert("Failed to restore. Data might be corrupt.", "error");
     }
 };
-
-
 
 // 8. ACTION: Restore From File (Existing Logic)
 performRestoreFileBtn.addEventListener('click', () => {
