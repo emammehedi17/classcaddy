@@ -6407,7 +6407,7 @@ backupDownloadBtn.addEventListener('click', async () => {
     }
 });
 
-// 4. ACTION: Backup & Save to Cloud
+// 4. ACTION: Backup & Save to Cloud (WITH CHUNKING SUPPORT)
 backupCloudBtn.addEventListener('click', async () => {
     if (!auth.currentUser) return;
 
@@ -6420,20 +6420,59 @@ backupCloudBtn.addEventListener('click', async () => {
         const backupData = await generateBackupObject();
         const jsonString = JSON.stringify(backupData);
         
-        // 2. Save to 'cloudBackups' collection
         const userId = auth.currentUser.uid;
         const appId = "study-plan17";
         const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
         
-        await addDoc(cloudBackupsRef, {
-            timestamp: Timestamp.now(),
-            note: "Manual Cloud Backup",
-            data: jsonString // We store the stringified JSON
-        });
+        // 2. Check Size & Decide Strategy
+        // Safe limit: 200,000 chars (approx 600KB-800KB depending on language) to stay well under 1MB limit
+        const CHUNK_SIZE = 200000; 
+        
+        if (jsonString.length > CHUNK_SIZE) {
+            // --- STRATEGY A: LARGE FILE (SPLIT IT) ---
+            console.log(`Backup too large (${jsonString.length} chars). Splitting...`);
+            
+            const chunks = [];
+            for (let i = 0; i < jsonString.length; i += CHUNK_SIZE) {
+                chunks.push(jsonString.substring(i, i + CHUNK_SIZE));
+            }
+
+            // A1. Create the Header Document (No data, just info)
+            const backupDocRef = await addDoc(cloudBackupsRef, {
+                timestamp: Timestamp.now(),
+                note: `Manual Cloud Backup (Large: ${chunks.length} parts)`,
+                isChunked: true,
+                chunkCount: chunks.length,
+                totalSize: jsonString.length
+            });
+
+            // A2. Save chunks to a subcollection
+            const batch = writeBatch(db);
+            chunks.forEach((chunk, index) => {
+                // Create a doc inside 'parts' subcollection: backups/{id}/parts/{0}
+                const chunkRef = doc(db, backupDocRef.path, 'parts', index.toString());
+                batch.set(chunkRef, { 
+                    data: chunk, 
+                    index: index 
+                });
+            });
+            
+            await batch.commit();
+            console.log("Chunked backup saved successfully.");
+
+        } else {
+            // --- STRATEGY B: SMALL FILE (NORMAL SAVE) ---
+            await addDoc(cloudBackupsRef, {
+                timestamp: Timestamp.now(),
+                note: "Manual Cloud Backup",
+                isChunked: false,
+                data: jsonString
+            });
+        }
 
         showCustomAlert("Backup saved to cloud successfully!", "success");
         
-        // 3. Switch to Restore tab to show the new backup immediately
+        // 3. Switch to Restore tab
         tabRestore.click();
 
     } catch (error) {
@@ -6503,8 +6542,7 @@ window.restoreFromCloud = async function(docId) {
         return;
     }
     
-    // Show global loading or alert
-    showCustomAlert("Fetching backup...", "success"); // Using success color for info
+    showCustomAlert("Fetching backup...", "success");
     
     try {
         const userId = auth.currentUser.uid;
@@ -6517,8 +6555,37 @@ window.restoreFromCloud = async function(docId) {
             return;
         }
         
-        const backupDataString = docSnap.data().data;
-        const backupData = JSON.parse(backupDataString);
+        const docData = docSnap.data();
+        let finalJsonString = "";
+
+        // --- CHECK FOR CHUNKS ---
+        if (docData.isChunked) {
+            console.log(`Detected chunked backup (${docData.chunkCount} parts). Reassembling...`);
+            
+            // Fetch all parts from subcollection, ordered by index
+            const partsRef = collection(db, docRef.path, 'parts');
+            // Note: We import 'orderBy' at top, ensure it's used here
+            // If you didn't import orderBy globally, use the string keys 0, 1, 2... 
+            // Since we named docs "0", "1", we can just fetch all and sort in JS.
+            
+            const partsSnap = await getDocs(partsRef);
+            
+            // Sort by index to ensure correct order
+            const parts = [];
+            partsSnap.forEach(partDoc => {
+                parts.push(partDoc.data());
+            });
+            parts.sort((a, b) => a.index - b.index);
+            
+            // Join them
+            finalJsonString = parts.map(p => p.data).join('');
+            
+        } else {
+            // Normal simple backup
+            finalJsonString = docData.data;
+        }
+        
+        const backupData = JSON.parse(finalJsonString);
         
         // Use the shared executor logic
         await executeRestore(backupData);
@@ -6536,7 +6603,25 @@ window.deleteCloudBackup = async function(docId) {
     try {
         const userId = auth.currentUser.uid;
         const appId = "study-plan17";
-        await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/cloudBackups`, docId));
+        const docRef = doc(db, `artifacts/${appId}/users/${userId}/cloudBackups`, docId);
+        
+        // 1. Check if it has sub-parts to delete first
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists() && docSnap.data().isChunked) {
+            console.log("Deleting backup chunks...");
+            const partsRef = collection(db, docRef.path, 'parts');
+            const partsSnap = await getDocs(partsRef);
+            
+            // Delete all parts (Batching 500 at a time is best practice, but simple loop is okay for backups <500MB)
+            const batch = writeBatch(db);
+            partsSnap.forEach(partDoc => {
+                batch.delete(partDoc.ref);
+            });
+            await batch.commit();
+        }
+
+        // 2. Delete the main document
+        await deleteDoc(docRef);
         
         // Refresh list
         loadCloudBackups();
