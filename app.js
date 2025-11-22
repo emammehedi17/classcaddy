@@ -6407,58 +6407,63 @@ backupDownloadBtn.addEventListener('click', async () => {
     }
 });
 
-// 4. ACTION: Backup & Save to Cloud (MAX 5 FILES + CHUNKING)
-backupCloudBtn.addEventListener('click', async () => {
+// 4. SHARED FUNCTION: Perform Cloud Backup
+async function executeCloudBackup(isAuto = false) {
     if (!auth.currentUser) return;
 
-    const originalText = backupCloudBtn.innerHTML;
-    backupCloudBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Managing...`;
-    backupCloudBtn.disabled = true;
+    // UI Updates (Only if manual click)
+    const btn = document.getElementById('backup-cloud-btn');
+    let originalText = "";
+    
+    if (!isAuto && btn) {
+        originalText = btn.innerHTML;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Managing...`;
+        btn.disabled = true;
+    } else if (isAuto) {
+        console.log("Triggering 24-hour Auto Backup...");
+        // Optional: You can remove this alert if you want it to be completely silent
+        showCustomAlert("Auto-Archiving Daily Backup...", "success");
+    }
 
     try {
         const userId = auth.currentUser.uid;
         const appId = "study-plan17";
         const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
 
-        // Define default message
-        let successMessage = "Backup saved to cloud successfully!";
-
         // --- STEP 1: ENFORCE LIMIT (Max 5) ---
         const q = query(cloudBackupsRef, orderBy("timestamp", "asc"));
         const snapshot = await getDocs(q);
 
-        // Only delete if we actually have 5 or more
-        if (snapshot.size >= 5) {
-            console.log(`Found ${snapshot.size} backups. Deleting oldest...`);
-            
-            // Change message to inform user
-            successMessage = "Backup saved! (Oldest backup removed to maintain limit)";
+        let successMessage = isAuto ? "Daily Auto-Backup Complete!" : "Backup saved to cloud successfully!";
 
-            const numToDelete = snapshot.size - 4; // Keep 4, add 1 new = 5
+        if (snapshot.size >= 5) {
+            const numToDelete = snapshot.size - 4; 
             const batch = writeBatch(db);
 
             for (let i = 0; i < numToDelete; i++) {
                 const oldDoc = snapshot.docs[i];
-                
                 if (oldDoc.data().isChunked) {
                     const partsRef = collection(db, oldDoc.ref.path, 'parts');
                     const partsSnap = await getDocs(partsRef);
                     partsSnap.forEach(part => batch.delete(part.ref));
                 }
-                
                 batch.delete(oldDoc.ref);
             }
-            
             await batch.commit();
+            
+            if (isAuto) successMessage = "Daily Auto-Backup Complete! (Oldest removed)";
+            else successMessage = "Backup saved! (Oldest backup removed to maintain limit)";
         }
 
-        // --- STEP 2: GENERATE & SAVE NEW BACKUP ---
-        backupCloudBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Uploading...`;
+        // --- STEP 2: GENERATE & SAVE ---
+        if (!isAuto && btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Uploading...`;
         
         const backupData = await generateBackupObject();
         const jsonString = JSON.stringify(backupData);
         const CHUNK_SIZE = 200000; 
         
+        const noteText = isAuto ? "Auto-Backup (24h Cycle)" : "Manual Cloud Backup";
+
         if (jsonString.length > CHUNK_SIZE) {
             // Large File (Chunked)
             const chunks = [];
@@ -6468,7 +6473,7 @@ backupCloudBtn.addEventListener('click', async () => {
 
             const backupDocRef = await addDoc(cloudBackupsRef, {
                 timestamp: Timestamp.now(),
-                note: `Auto-Managed Cloud Backup`,
+                note: noteText,
                 isChunked: true,
                 chunkCount: chunks.length,
                 totalSize: jsonString.length
@@ -6479,82 +6484,75 @@ backupCloudBtn.addEventListener('click', async () => {
                 const chunkRef = doc(db, backupDocRef.path, 'parts', index.toString());
                 batch.set(chunkRef, { data: chunk, index: index });
             });
-            
             await batch.commit();
 
         } else {
-            // Small File (Normal)
+            // Small File
             await addDoc(cloudBackupsRef, {
                 timestamp: Timestamp.now(),
-                note: "Auto-Managed Cloud Backup",
+                note: noteText,
                 isChunked: false,
                 data: jsonString
             });
         }
 
-        // Use the dynamic message here
+        // --- IMPORTANT: Update the timestamp on SUCCESS ---
+        localStorage.setItem('cc_last_cloud_backup_timestamp', Date.now());
+
         showCustomAlert(successMessage, "success");
         
-        // 3. Switch to Restore tab
-        tabRestore.click();
+        // Refresh list if modal is open
+        if (document.getElementById('backup-restore-modal').style.display === 'block') {
+            document.getElementById('tab-btn-restore').click();
+        }
 
     } catch (error) {
         console.error("Cloud backup failed:", error);
-        showCustomAlert("Cloud backup failed. Check console.", "error");
+        if (!isAuto) showCustomAlert("Cloud backup failed.", "error");
     } finally {
-        backupCloudBtn.innerHTML = originalText;
-        backupCloudBtn.disabled = false;
-    }
-});
-
-// 5. ACTION: Load Cloud Backups List
-async function loadCloudBackups() {
-    if (!auth.currentUser) return;
-    
-    cloudBackupList.innerHTML = '<p class="text-center text-gray-400 text-xs py-4"><i class="fas fa-spinner fa-spin mr-1"></i> Loading...</p>';
-    
-    try {
-        const userId = auth.currentUser.uid;
-        const appId = "study-plan17";
-        const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
-        
-        // Order by newest first
-        const q = query(cloudBackupsRef, orderBy("timestamp", "desc"));
-        const querySnapshot = await getDocs(q);
-        
-        if (querySnapshot.empty) {
-            cloudBackupList.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">No cloud backups found.</p>';
-            return;
+        if (!isAuto && btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         }
-        
-        let html = '';
-        querySnapshot.forEach(doc => {
-            const backup = doc.data();
-            const date = backup.timestamp ? backup.timestamp.toDate() : new Date();
-            const dateStr = date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-            const timeStr = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-            
-            html += `
-            <div class="cloud-backup-card">
-                <div>
-                    <span class="backup-info-title"><i class="fas fa-clock text-gray-400 mr-1"></i> ${dateStr}</span>
-                    <span class="backup-info-date">${timeStr}</span>
-                </div>
-                <div class="flex items-center">
-                    <button class="restore-cloud-btn" onclick="restoreFromCloud('${doc.id}')">
-                        Restore
-                    </button>
-                </div>
-            </div>`;
-        });
-        
-        cloudBackupList.innerHTML = html;
-
-    } catch (error) {
-        console.error("Error loading cloud backups:", error);
-        cloudBackupList.innerHTML = '<p class="text-center text-red-400 text-xs py-4">Error loading backups.</p>';
     }
 }
+
+// Listener for Manual Click
+backupCloudBtn.addEventListener('click', () => executeCloudBackup(false));
+
+
+// --- 5. SMART SCHEDULER (24-HOUR CYCLE) ---
+
+function initSmartCloudBackup() {
+    const checkAndRun = () => {
+        if (!auth.currentUser) return;
+
+        const lastRun = localStorage.getItem('cc_last_cloud_backup_timestamp');
+        const now = Date.now();
+        const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 86,400,000 ms
+
+        // If never run, OR if 24 hours have passed since last run
+        if (!lastRun || (now - parseInt(lastRun)) > TWENTY_FOUR_HOURS) {
+            executeCloudBackup(true); // Run Auto Backup
+        } else {
+            // Optional logging for debugging
+            // const hoursLeft = ((TWENTY_FOUR_HOURS - (now - parseInt(lastRun))) / (60*60*1000)).toFixed(1);
+            // console.log(`Auto-Backup not due yet. Next run in approx ${hoursLeft} hours.`);
+        }
+    };
+
+    // 1. Check shortly after load (covers "User just opened browser after 2 days")
+    // We wait 5 seconds to ensure Firebase Auth is fully settled and data is loaded
+    setTimeout(checkAndRun, 5000);
+
+    // 2. Check every 10 minutes (covers "User keeps tab open all day")
+    setInterval(checkAndRun, 10 * 60 * 1000);
+}
+
+// Start the scheduler
+initSmartCloudBackup();
+
+
 
 // 6. ACTION: Restore From Cloud (The "Restore" button on card)
 window.restoreFromCloud = async function(docId) {
