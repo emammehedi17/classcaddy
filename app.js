@@ -6345,8 +6345,8 @@ tabRestore.addEventListener('click', () => {
 
 refreshCloudListBtn.addEventListener('click', loadCloudBackups);
 
-// --- HELPER: Generate Backup Data Object ---
-async function generateBackupObject() {
+// --- HELPER: Generate Backup Data Object (With Progress Tracking) ---
+async function generateBackupObject(onProgress = () => {}) {
     const userId = auth.currentUser.uid;
     const appId = "study-plan17";
     const plansCollectionPath = `artifacts/${appId}/users/${userId}/studyPlans`;
@@ -6354,7 +6354,15 @@ async function generateBackupObject() {
     const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
     const querySnapshot = await getDocs(q);
     
+    const totalMonths = querySnapshot.size;
     const backupData = {};
+    
+    if (totalMonths === 0) {
+        onProgress(100);
+        return backupData;
+    }
+
+    let processedCount = 0;
 
     for (const docSnap of querySnapshot.docs) {
         const monthId = docSnap.id;
@@ -6372,6 +6380,11 @@ async function generateBackupObject() {
             ...monthData,
             weeks: weeksData 
         };
+
+        // Update Progress
+        processedCount++;
+        const percent = Math.round((processedCount / totalMonths) * 100);
+        onProgress(percent);
     }
     return backupData;
 }
@@ -6381,24 +6394,14 @@ backupDownloadBtn.addEventListener('click', async () => {
     if (!auth.currentUser) return;
 
     const originalText = backupDownloadBtn.innerHTML;
-    backupDownloadBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Generating...`;
+    backupDownloadBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> 0%`; // Show text progress in button
     backupDownloadBtn.disabled = true;
 
     try {
-        const backupData = await generateBackupObject();
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "class_caddy_backup_" + new Date().toISOString().slice(0, 10) + ".json");
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-        
-        localStorage.setItem('cc_last_backup_date', Date.now());
-        updateLastBackupText();
-        showCustomAlert("Backup downloaded successfully!", "success");
-
-    } catch (error) {
+        // Pass a simple callback to update button text
+        const backupData = await generateBackupObject((pct) => {
+            backupDownloadBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> ${pct}%`;
+        }); catch (error) {
         console.error("Export failed:", error);
         showCustomAlert("Export failed. Check console.", "error");
     } finally {
@@ -6407,21 +6410,39 @@ backupDownloadBtn.addEventListener('click', async () => {
     }
 });
 
-// 4. SHARED FUNCTION: Perform Cloud Backup
+// 4. SHARED FUNCTION: Perform Cloud Backup (With Progress Bar)
 async function executeCloudBackup(isAuto = false) {
     if (!auth.currentUser) return;
 
-    // UI Updates (Only if manual click)
     const btn = document.getElementById('backup-cloud-btn');
+    
+    // UI Elements for Progress
+    const progressUI = document.getElementById('backup-progress-ui');
+    const progressBar = document.getElementById('backup-progress-bar');
+    const stepText = document.getElementById('backup-step-text');
+    const percentText = document.getElementById('backup-percent-text');
+
     let originalText = "";
     
+    // Helper to update the bar
+    const updateProgress = (percent, message) => {
+        if (progressBar) progressBar.style.width = `${percent}%`;
+        if (percentText) percentText.textContent = `${percent}%`;
+        if (stepText && message) stepText.textContent = message;
+    };
+
     if (!isAuto && btn) {
         originalText = btn.innerHTML;
-        btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Managing...`;
+        btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Processing...`;
         btn.disabled = true;
+        
+        // Show Progress Bar
+        if (progressUI) {
+            progressUI.classList.remove('hidden');
+            updateProgress(0, "Starting...");
+        }
     } else if (isAuto) {
         console.log("Triggering Cloud-Sync Auto Backup...");
-        showCustomAlert("Auto-Archiving Daily Backup...", "success");
     }
 
     try {
@@ -6429,13 +6450,16 @@ async function executeCloudBackup(isAuto = false) {
         const appId = "study-plan17";
         const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
 
-        // --- STEP 1: ENFORCE LIMIT (Max 5) ---
+        // --- STEP 1: ENFORCE LIMIT (Quick check) ---
+        if (!isAuto) updateProgress(5, "Checking storage...");
+        
         const q = query(cloudBackupsRef, orderBy("timestamp", "asc"));
         const snapshot = await getDocs(q);
 
         let successMessage = isAuto ? "Daily Auto-Backup Complete!" : "Backup saved to cloud successfully!";
 
         if (snapshot.size >= 5) {
+            if (!isAuto) updateProgress(10, "Cleaning old backups...");
             const numToDelete = snapshot.size - 4; 
             const batch = writeBatch(db);
 
@@ -6454,14 +6478,23 @@ async function executeCloudBackup(isAuto = false) {
             else successMessage = "Backup saved! (Oldest backup removed to maintain limit)";
         }
 
-        // --- STEP 2: GENERATE & SAVE ---
-        if (!isAuto && btn) btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Uploading...`;
+        // --- STEP 2: GENERATE DATA (Reading takes the most time) ---
+        // We map the generation progress (0-100) to the bar's (10-80) range
         
-        const backupData = await generateBackupObject();
+        const backupData = await generateBackupObject((genPercent) => {
+            if (!isAuto) {
+                // Scale 0-100 to 15-80
+                const visualPercent = 15 + Math.round(genPercent * 0.65);
+                updateProgress(visualPercent, `Gathering Data (${genPercent}%)`);
+            }
+        });
+
         const jsonString = JSON.stringify(backupData);
         const CHUNK_SIZE = 200000; 
-        
         const noteText = isAuto ? "Auto-Backup (24h Cycle)" : "Manual Cloud Backup";
+
+        // --- STEP 3: UPLOAD (Writing is fast, but we track it) ---
+        if (!isAuto) updateProgress(85, "Uploading...");
 
         if (jsonString.length > CHUNK_SIZE) {
             // Large File (Chunked)
@@ -6469,6 +6502,8 @@ async function executeCloudBackup(isAuto = false) {
             for (let i = 0; i < jsonString.length; i += CHUNK_SIZE) {
                 chunks.push(jsonString.substring(i, i + CHUNK_SIZE));
             }
+
+            if (!isAuto) updateProgress(90, `Uploading ${chunks.length} parts...`);
 
             const backupDocRef = await addDoc(cloudBackupsRef, {
                 timestamp: Timestamp.now(),
@@ -6487,6 +6522,7 @@ async function executeCloudBackup(isAuto = false) {
 
         } else {
             // Small File
+            if (!isAuto) updateProgress(90, "Uploading...");
             await addDoc(cloudBackupsRef, {
                 timestamp: Timestamp.now(),
                 note: noteText,
@@ -6495,21 +6531,31 @@ async function executeCloudBackup(isAuto = false) {
             });
         }
 
-        // REMOVED: localStorage.setItem(...) -> We don't need this anymore.
-        // The timestamp inside the document we just created is now the source of truth.
-
-        showCustomAlert(successMessage, "success");
+        // Finish
+        if (!isAuto) updateProgress(100, "Complete!");
         
-        // Refresh list if modal is open
-        if (document.getElementById('backup-restore-modal').style.display === 'block') {
-            document.getElementById('tab-btn-restore').click();
-        }
+        // Tiny delay so user sees 100% before closing
+        setTimeout(() => {
+            localStorage.setItem('cc_last_cloud_backup_timestamp', Date.now());
+            showCustomAlert(successMessage, "success");
+            
+            if (document.getElementById('backup-restore-modal').style.display === 'block') {
+                document.getElementById('tab-btn-restore').click();
+            }
+            
+            // Reset UI
+            if (progressUI) progressUI.classList.add('hidden');
+            if (!isAuto && btn) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }, 600);
 
     } catch (error) {
         console.error("Cloud backup failed:", error);
-        if (!isAuto) showCustomAlert("Cloud backup failed.", "error");
-    } finally {
-        if (!isAuto && btn) {
+        if (!isAuto) {
+            updateProgress(0, "Failed");
+            showCustomAlert("Cloud backup failed.", "error");
             btn.innerHTML = originalText;
             btn.disabled = false;
         }
