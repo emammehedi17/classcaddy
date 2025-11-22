@@ -735,32 +735,50 @@
             <div id="content-backup" class="tab-content-br">
                 <div class="text-center py-4">
                     <div class="bg-emerald-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-download text-2xl text-emerald-600"></i>
+                        <i class="fas fa-save text-2xl text-emerald-600"></i>
                     </div>
-                    <h4 class="font-semibold text-gray-800 mb-2">Download Backup</h4>
-                    <p class="text-sm text-gray-600 mb-6">Save a complete copy of your study plan, vocabulary, and quiz results to your device.</p>
+                    <h4 class="font-semibold text-gray-800 mb-2">Create Backup</h4>
+                    <p class="text-sm text-gray-600 mb-6">Save your study plan locally or to the cloud.</p>
                     
-                    <button id="perform-backup-btn" class="action-button w-full justify-center py-3 text-base">
-                        <i class="fas fa-file-export mr-2"></i> Download JSON File
-                    </button>
-                    <p id="last-backup-text" class="text-xs text-gray-400 mt-3">Last backup: Never</p>
+                    <div class="space-y-3">
+                        <button id="backup-cloud-btn" class="action-button w-full justify-center py-3 text-sm bg-indigo-600 hover:bg-indigo-700">
+                            <i class="fas fa-cloud-upload-alt mr-2"></i> Backup & Save to Cloud
+                        </button>
+                        
+                        <div class="relative flex py-1 items-center">
+                            <div class="flex-grow border-t border-gray-200"></div>
+                            <span class="flex-shrink-0 mx-4 text-gray-400 text-xs uppercase">Or</span>
+                            <div class="flex-grow border-t border-gray-200"></div>
+                        </div>
+
+                        <button id="backup-download-btn" class="action-button w-full justify-center py-3 text-sm action-button-secondary">
+                            <i class="fas fa-file-download mr-2"></i> Download JSON File
+                        </button>
+                    </div>
+                    <p id="last-backup-text" class="text-xs text-gray-400 mt-4">Last backup: Never</p>
                 </div>
             </div>
 
             <div id="content-restore" class="tab-content-br hidden">
-                <div class="text-center py-4">
-                    <div class="bg-amber-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-upload text-2xl text-amber-600"></i>
-                    </div>
-                    <h4 class="font-semibold text-gray-800 mb-2">Restore from File</h4>
-                    <p class="text-sm text-gray-600 mb-4">Upload a previously saved JSON file to recover your data.</p>
-                    <p class="text-xs text-red-500 bg-red-50 p-2 rounded mb-6 border border-red-100">
-                        <i class="fas fa-exclamation-triangle mr-1"></i> Warning: This will OVERWRITE all current data with the data from the file.
-                    </p>
+                <div class="py-2">
+                    <h4 class="font-semibold text-gray-800 mb-3 text-sm flex justify-between items-center">
+                        Cloud Backups
+                        <button id="refresh-cloud-backups-btn" class="text-xs text-indigo-600 hover:underline"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </h4>
                     
+                    <div id="cloud-backup-list" class="space-y-2 mb-6 max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
+                        <p class="text-center text-gray-400 text-xs py-4">Loading backups...</p>
+                    </div>
+
+                    <div class="relative flex py-2 items-center mb-4">
+                        <div class="flex-grow border-t border-gray-200"></div>
+                        <span class="flex-shrink-0 mx-4 text-gray-400 text-xs uppercase">Or Upload File</span>
+                        <div class="flex-grow border-t border-gray-200"></div>
+                    </div>
+
                     <input type="file" id="restore-file-input" accept=".json" class="hidden">
-                    <button id="perform-restore-btn" class="action-button w-full justify-center py-3 text-base" style="background-color: #d97706;">
-                        <i class="fas fa-file-import mr-2"></i> Select File & Restore
+                    <button id="perform-restore-file-btn" class="action-button w-full justify-center py-2 text-sm" style="background-color: #d97706;">
+                        <i class="fas fa-file-import mr-2"></i> Select .JSON File
                     </button>
                 </div>
             </div>
