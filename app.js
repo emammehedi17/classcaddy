@@ -6395,13 +6395,23 @@ backupDownloadBtn.addEventListener('click', async () => {
 
     const originalText = backupDownloadBtn.innerHTML;
     backupDownloadBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> 0%`; // Show text progress in button
-    backupDownloadBtn.disabled = true;
+    backupDownloadBtn.disabled = true;;
 
     try {
-        // Pass a simple callback to update button text
-        const backupData = await generateBackupObject((pct) => {
-            backupDownloadBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> ${pct}%`;
-        }); catch (error) {
+        const backupData = await generateBackupObject();
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "class_caddy_backup_" + new Date().toISOString().slice(0, 10) + ".json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+        
+        localStorage.setItem('cc_last_backup_date', Date.now());
+        updateLastBackupText();
+        showCustomAlert("Backup downloaded successfully!", "success");
+
+    } catch (error) {
         console.error("Export failed:", error);
         showCustomAlert("Export failed. Check console.", "error");
     } finally {
