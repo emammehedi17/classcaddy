@@ -6356,3 +6356,85 @@ window.toggleSummaryRow = function(btn) {
             initPomodoro();
         }
         // --- END: POMODORO TIMER LOGIC ---
+		
+		
+	// --- DATA RESCUE TOOL ---
+// Run this to find and restore missing weeks
+window.rescueData = async function() {
+    if (!currentUser || !userId) {
+        alert("Please log in first.");
+        return;
+    }
+    
+    // Ask user for the Month ID (e.g., "2025-11")
+    const monthId = prompt("Enter the Month ID where data is missing (e.g., 2025-11):");
+    if (!monthId) return;
+
+    console.log("Attempting rescue for:", monthId);
+    const monthDocRef = doc(db, `artifacts/${appId}/users/${userId}/studyPlans`, monthId);
+
+    try {
+        const docSnap = await getDoc(monthDocRef);
+        if (!docSnap.exists()) {
+            alert("Month not found!");
+            return;
+        }
+
+        const data = docSnap.data();
+        
+        // CHECK 1: Look for old "weeks" map
+        if (data.weeks) {
+            console.log("Found OLD data format! Migrating now...");
+            const batch = writeBatch(db);
+            let count = 0;
+
+            for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
+                if (data.weeks[weekId]) {
+                    const newWeekRef = doc(db, monthDocRef.path, 'weeks', weekId);
+                    // Don't overwrite if new data already exists, merge it
+                    batch.set(newWeekRef, { days: data.weeks[weekId].days || [] }, { merge: true });
+                    console.log(`Recovering ${weekId}...`);
+                    count++;
+                }
+            }
+            
+            if (count > 0) {
+                // We do NOT delete the old data yet, just in case.
+                await batch.commit();
+                alert(`Rescue Successful! Recovered ${count} weeks. Please refresh the page.`);
+                location.reload();
+            } else {
+                alert("Old data structure found, but it was empty.");
+            }
+        } else {
+            // CHECK 2: Data might be there but UI isn't rendering. 
+            // Let's check the subcollections manually.
+            console.log("Old structure not found. Checking subcollections...");
+            const subColRef = collection(db, monthDocRef.path, 'weeks');
+            const subSnaps = await getDocs(subColRef);
+            
+            let msg = "Database Status:\n";
+            subSnaps.forEach(doc => {
+                const d = doc.data();
+                msg += `${doc.id}: Found ${d.days ? d.days.length : 0} days.\n`;
+            });
+            
+            if (subSnaps.empty) {
+                msg += "No weeks found in subcollection.";
+            }
+            
+            alert(msg);
+        }
+
+    } catch (e) {
+        console.error(e);
+        alert("Rescue failed. Check console for details.");
+    }
+};
+
+// Add a temporary button to the top of the screen
+const rescueBtn = document.createElement('button');
+rescueBtn.innerText = "🚑 RESCUE MISSING DATA";
+rescueBtn.style.cssText = "position: fixed; bottom: 10px; left: 10px; z-index: 9999; background: red; color: white; padding: 10px; font-weight: bold; border-radius: 5px; cursor: pointer;";
+rescueBtn.onclick = window.rescueData;
+document.body.appendChild(rescueBtn);
