@@ -6356,3 +6356,80 @@ window.toggleSummaryRow = function(btn) {
             initPomodoro();
         }
         // --- END: POMODORO TIMER LOGIC ---
+		
+		// --- DATA BACKUP FEATURE ---
+
+// Function to download all study plan data as a JSON file
+window.exportData = async function() {
+    if (!auth.currentUser) { alert("Please log in to export data."); return; }
+    
+    const confirmExport = confirm("Do you want to download a backup of your entire Study Plan?");
+    if (!confirmExport) return;
+
+    const exportBtn = document.getElementById('export-btn');
+    const originalText = exportBtn.innerHTML;
+    exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Exporting...`;
+    exportBtn.disabled = true;
+
+    try {
+        const userId = auth.currentUser.uid;
+        const appId = "study-plan17";
+        const plansCollectionPath = `artifacts/${appId}/users/${userId}/studyPlans`;
+        
+        // 1. Fetch all months
+        const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+        const querySnapshot = await getDocs(q);
+        
+        const backupData = {};
+
+        for (const docSnap of querySnapshot.docs) {
+            const monthId = docSnap.id;
+            const monthData = docSnap.data();
+            
+            // 2. Fetch weeks for this month
+            const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
+            const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
+            
+            const weeksData = {};
+            weeksQuerySnapshot.forEach(weekDoc => {
+                weeksData[weekDoc.id] = weekDoc.data();
+            });
+
+            // Combine structure
+            backupData[monthId] = {
+                ...monthData,
+                weeks: weeksData // Nest the weeks data back inside for the backup file
+            };
+        }
+
+        // 3. Convert to JSON and Download
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "class_caddy_backup_" + new Date().toISOString().slice(0, 10) + ".json");
+        document.body.appendChild(downloadAnchorNode); // Required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+        
+        showCustomAlert("Backup downloaded successfully!", "success");
+
+    } catch (error) {
+        console.error("Export failed:", error);
+        showCustomAlert("Export failed. Check console.", "error");
+    } finally {
+        exportBtn.innerHTML = originalText;
+        exportBtn.disabled = false;
+    }
+};
+
+// Create the Blue Backup Button (Fixed Position)
+const exportButton = document.createElement('button');
+exportButton.id = 'export-btn';
+exportButton.innerHTML = `<i class="fas fa-download"></i> Backup Data`;
+exportButton.style.cssText = "position: fixed; bottom: 20px; left: 20px; z-index: 999; background: #2563eb; color: white; padding: 10px 16px; font-weight: bold; border-radius: 30px; cursor: pointer; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); font-size: 13px;";
+exportButton.onclick = window.exportData;
+
+// Only add if not printing
+if (!window.matchMedia('print').matches) {
+    document.body.appendChild(exportButton);
+}
