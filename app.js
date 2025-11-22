@@ -6438,3 +6438,87 @@ rescueBtn.innerText = "🚑 RESCUE MISSING DATA";
 rescueBtn.style.cssText = "position: fixed; bottom: 10px; left: 10px; z-index: 9999; background: red; color: white; padding: 10px; font-weight: bold; border-radius: 5px; cursor: pointer;";
 rescueBtn.onclick = window.rescueData;
 document.body.appendChild(rescueBtn);
+
+// --- REPAIR SCRIPT (Paste at the bottom of app.js) ---
+
+// Make the repair function global so the button can find it, 
+// but define it inside the module so it can see 'db' and 'userId'
+window.repairWeek3 = async function() {
+    // Check if variables from app.js are available
+    if (typeof db === 'undefined' || typeof auth === 'undefined') {
+        alert("Error: Database not initialized. Wait a moment or refresh.");
+        return;
+    }
+
+    // Use auth.currentUser directly to be safe
+    const user = auth.currentUser; 
+    if (!user) { 
+        alert("Please log in to repair data."); 
+        return; 
+    }
+    
+    const monthId = "2025-11"; // <--- CHANGE THIS IF NEEDED
+    const weekId = "week3";
+    const userId = user.uid;
+    const appId = "study-plan17"; // Hardcoded based on your config
+
+    if (!confirm(`This will add 6 missing days to ${monthId} - ${weekId}. Continue?`)) return;
+
+    // Construct path manually to ensure we hit the right spot
+    const docPath = `artifacts/${appId}/users/${userId}/studyPlans/${monthId}/weeks/${weekId}`;
+    console.log("Repairing document at:", docPath);
+    
+    // We need to import these manually in case they aren't in scope
+    // (But since this is inside app.js, the top imports should work)
+    const { doc, getDoc, updateDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
+
+    const docRef = doc(db, docPath);
+    
+    try {
+        const docSnap = await getDoc(docRef);
+        
+        // Get existing days (preserves your existing Day 1)
+        let days = docSnap.exists() ? docSnap.data().days : [];
+        console.log("Existing days found:", days.length);
+        
+        // Identify what day numbers we already have
+        const existingNums = days.map(d => d.dayNumber);
+        let nextNum = 1;
+        
+        // Add up to 7 days total
+        let addedCount = 0;
+        while (days.length < 7) {
+            while (existingNums.includes(nextNum)) nextNum++; // Skip existing numbers
+            
+            days.push({
+                dayNumber: nextNum,
+                // Empty row structure
+                rows: [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null }]
+            });
+            existingNums.push(nextNum);
+            addedCount++;
+        }
+        
+        // Sort days by dayNumber (1, 2, 3...)
+        days.sort((a, b) => a.dayNumber - b.dayNumber);
+
+        if (addedCount > 0) {
+            await updateDoc(docRef, { days: days });
+            alert(`Success! Added ${addedCount} missing days. Please Refresh the page.`);
+            location.reload();
+        } else {
+            alert("Week 3 already has 7 days. No changes needed.");
+        }
+
+    } catch (e) {
+        console.error(e);
+        alert("Repair failed: " + e.message);
+    }
+};
+
+// Create the Orange Button
+const repairBtn = document.createElement('button');
+repairBtn.innerText = "🛠️ FIX WEEK 3";
+repairBtn.style.cssText = "position: fixed; bottom: 20px; left: 20px; z-index: 99999; background: #f97316; color: white; padding: 12px 20px; font-weight: bold; border-radius: 8px; cursor: pointer; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3);";
+repairBtn.onclick = window.repairWeek3;
+document.body.appendChild(repairBtn);
