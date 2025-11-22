@@ -6407,70 +6407,96 @@ backupDownloadBtn.addEventListener('click', async () => {
     }
 });
 
-// 4. ACTION: Backup & Save to Cloud (WITH CHUNKING SUPPORT)
+// 4. ACTION: Backup & Save to Cloud (MAX 5 FILES + CHUNKING)
 backupCloudBtn.addEventListener('click', async () => {
     if (!auth.currentUser) return;
 
     const originalText = backupCloudBtn.innerHTML;
-    backupCloudBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Uploading...`;
+    backupCloudBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Managing...`;
     backupCloudBtn.disabled = true;
 
     try {
-        // 1. Generate Data
-        const backupData = await generateBackupObject();
-        const jsonString = JSON.stringify(backupData);
-        
         const userId = auth.currentUser.uid;
         const appId = "study-plan17";
         const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
+
+        // --- STEP 1: ENFORCE LIMIT (Max 5) ---
+        // Fetch existing backups ordered by oldest first
+        const q = query(cloudBackupsRef, orderBy("timestamp", "asc"));
+        const snapshot = await getDocs(q);
+
+        // If we have 5 or more, we need to make room for the 6th (the new one)
+        if (snapshot.size >= 5) {
+            console.log(`Found ${snapshot.size} backups. Deleting oldest to maintain limit of 5...`);
+            
+            // Calculate how many to delete (e.g., if there are 7, delete 3 so we end up with 4 + 1 new = 5)
+            const numToDelete = snapshot.size - 4; 
+            
+            const batch = writeBatch(db);
+            let deleteCount = 0;
+
+            for (let i = 0; i < numToDelete; i++) {
+                const oldDoc = snapshot.docs[i];
+                
+                // Check for chunks and delete them first
+                if (oldDoc.data().isChunked) {
+                    const partsRef = collection(db, oldDoc.ref.path, 'parts');
+                    const partsSnap = await getDocs(partsRef);
+                    partsSnap.forEach(part => batch.delete(part.ref));
+                }
+                
+                // Delete the main document
+                batch.delete(oldDoc.ref);
+                deleteCount++;
+            }
+            
+            await batch.commit();
+            console.log(`Deleted ${deleteCount} old backup(s).`);
+        }
+
+        // --- STEP 2: GENERATE & SAVE NEW BACKUP ---
+        backupCloudBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Uploading...`;
         
-        // 2. Check Size & Decide Strategy
-        // Safe limit: 200,000 chars (approx 600KB-800KB depending on language) to stay well under 1MB limit
+        const backupData = await generateBackupObject();
+        const jsonString = JSON.stringify(backupData);
+        
+        // Safe limit: 200,000 chars
         const CHUNK_SIZE = 200000; 
         
         if (jsonString.length > CHUNK_SIZE) {
-            // --- STRATEGY A: LARGE FILE (SPLIT IT) ---
-            console.log(`Backup too large (${jsonString.length} chars). Splitting...`);
-            
+            // Large File (Split it)
             const chunks = [];
             for (let i = 0; i < jsonString.length; i += CHUNK_SIZE) {
                 chunks.push(jsonString.substring(i, i + CHUNK_SIZE));
             }
 
-            // A1. Create the Header Document (No data, just info)
             const backupDocRef = await addDoc(cloudBackupsRef, {
                 timestamp: Timestamp.now(),
-                note: `Manual Cloud Backup (Large: ${chunks.length} parts)`,
+                note: `Auto-Managed Cloud Backup`,
                 isChunked: true,
                 chunkCount: chunks.length,
                 totalSize: jsonString.length
             });
 
-            // A2. Save chunks to a subcollection
             const batch = writeBatch(db);
             chunks.forEach((chunk, index) => {
-                // Create a doc inside 'parts' subcollection: backups/{id}/parts/{0}
                 const chunkRef = doc(db, backupDocRef.path, 'parts', index.toString());
-                batch.set(chunkRef, { 
-                    data: chunk, 
-                    index: index 
-                });
+                batch.set(chunkRef, { data: chunk, index: index });
             });
             
             await batch.commit();
-            console.log("Chunked backup saved successfully.");
 
         } else {
-            // --- STRATEGY B: SMALL FILE (NORMAL SAVE) ---
+            // Small File (Normal Save)
             await addDoc(cloudBackupsRef, {
                 timestamp: Timestamp.now(),
-                note: "Manual Cloud Backup",
+                note: "Auto-Managed Cloud Backup",
                 isChunked: false,
                 data: jsonString
             });
         }
 
-        showCustomAlert("Backup saved to cloud successfully!", "success");
+        showCustomAlert("Backup saved! (Oldest backup removed)", "success");
         
         // 3. Switch to Restore tab
         tabRestore.click();
@@ -6518,9 +6544,6 @@ async function loadCloudBackups() {
                     <span class="backup-info-date">${timeStr}</span>
                 </div>
                 <div class="flex items-center">
-                    <button class="delete-cloud-btn" onclick="deleteCloudBackup('${doc.id}')" title="Delete Backup">
-                        <i class="fas fa-trash"></i>
-                    </button>
                     <button class="restore-cloud-btn" onclick="restoreFromCloud('${doc.id}')">
                         Restore
                     </button>
@@ -6596,41 +6619,7 @@ window.restoreFromCloud = async function(docId) {
     }
 };
 
-// 7. ACTION: Delete Cloud Backup
-window.deleteCloudBackup = async function(docId) {
-    if (!confirm("Delete this backup file?")) return;
-    
-    try {
-        const userId = auth.currentUser.uid;
-        const appId = "study-plan17";
-        const docRef = doc(db, `artifacts/${appId}/users/${userId}/cloudBackups`, docId);
-        
-        // 1. Check if it has sub-parts to delete first
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists() && docSnap.data().isChunked) {
-            console.log("Deleting backup chunks...");
-            const partsRef = collection(db, docRef.path, 'parts');
-            const partsSnap = await getDocs(partsRef);
-            
-            // Delete all parts (Batching 500 at a time is best practice, but simple loop is okay for backups <500MB)
-            const batch = writeBatch(db);
-            partsSnap.forEach(partDoc => {
-                batch.delete(partDoc.ref);
-            });
-            await batch.commit();
-        }
 
-        // 2. Delete the main document
-        await deleteDoc(docRef);
-        
-        // Refresh list
-        loadCloudBackups();
-        
-    } catch (error) {
-        console.error("Delete failed:", error);
-        showCustomAlert("Could not delete backup.", "error");
-    }
-};
 
 // 8. ACTION: Restore From File (Existing Logic)
 performRestoreFileBtn.addEventListener('click', () => {
