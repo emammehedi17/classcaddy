@@ -6292,16 +6292,21 @@ window.toggleSummaryRow = function(btn) {
         }
         // --- END: POMODORO TIMER LOGIC ---
 		
-// --- BACKUP & RESTORE MANAGER ---
+// --- BACKUP & RESTORE MANAGER (CLOUD & LOCAL) ---
 
 const backupModal = document.getElementById('backup-restore-modal');
 const tabBackup = document.getElementById('tab-btn-backup');
 const tabRestore = document.getElementById('tab-btn-restore');
 const contentBackup = document.getElementById('content-backup');
 const contentRestore = document.getElementById('content-restore');
-const performBackupBtn = document.getElementById('perform-backup-btn');
-const performRestoreBtn = document.getElementById('perform-restore-btn');
+
+// Buttons
+const backupDownloadBtn = document.getElementById('backup-download-btn');
+const backupCloudBtn = document.getElementById('backup-cloud-btn');
+const performRestoreFileBtn = document.getElementById('perform-restore-file-btn');
+const refreshCloudListBtn = document.getElementById('refresh-cloud-backups-btn');
 const restoreFileInput = document.getElementById('restore-file-input');
+const cloudBackupList = document.getElementById('cloud-backup-list');
 const lastBackupText = document.getElementById('last-backup-text');
 
 // 1. Open Modal
@@ -6314,7 +6319,7 @@ function updateLastBackupText() {
     const lastDate = localStorage.getItem('cc_last_backup_date');
     if (lastDate) {
         const date = new Date(parseInt(lastDate));
-        lastBackupText.textContent = `Last backup: ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+        lastBackupText.textContent = `Last local backup: ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
     } else {
         lastBackupText.textContent = "Last backup: Never";
     }
@@ -6333,50 +6338,54 @@ tabRestore.addEventListener('click', () => {
     tabBackup.classList.remove('active-tab-br');
     contentRestore.classList.remove('hidden');
     contentBackup.classList.add('hidden');
+    
+    // Load cloud backups when tab opens
+    loadCloudBackups();
 });
 
-// 3. Perform Backup (Export)
-performBackupBtn.addEventListener('click', async () => {
+refreshCloudListBtn.addEventListener('click', loadCloudBackups);
+
+// --- HELPER: Generate Backup Data Object ---
+async function generateBackupObject() {
+    const userId = auth.currentUser.uid;
+    const appId = "study-plan17";
+    const plansCollectionPath = `artifacts/${appId}/users/${userId}/studyPlans`;
+    
+    const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+    const querySnapshot = await getDocs(q);
+    
+    const backupData = {};
+
+    for (const docSnap of querySnapshot.docs) {
+        const monthId = docSnap.id;
+        const monthData = docSnap.data();
+        
+        const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
+        const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
+        
+        const weeksData = {};
+        weeksQuerySnapshot.forEach(weekDoc => {
+            weeksData[weekDoc.id] = weekDoc.data();
+        });
+
+        backupData[monthId] = {
+            ...monthData,
+            weeks: weeksData 
+        };
+    }
+    return backupData;
+}
+
+// 3. ACTION: Download JSON File
+backupDownloadBtn.addEventListener('click', async () => {
     if (!auth.currentUser) return;
 
-    const originalText = performBackupBtn.innerHTML;
-    performBackupBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Generating...`;
-    performBackupBtn.disabled = true;
+    const originalText = backupDownloadBtn.innerHTML;
+    backupDownloadBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Generating...`;
+    backupDownloadBtn.disabled = true;
 
     try {
-        const userId = auth.currentUser.uid;
-        const appId = "study-plan17";
-        const plansCollectionPath = `artifacts/${appId}/users/${userId}/studyPlans`;
-        
-        // Fetch all months
-        const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
-        const querySnapshot = await getDocs(q);
-        
-        const backupData = {};
-
-        for (const docSnap of querySnapshot.docs) {
-            const monthId = docSnap.id;
-            const monthData = docSnap.data();
-            
-            // Fetch weeks subcollection
-            const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
-            const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
-            
-            const weeksData = {};
-            weeksQuerySnapshot.forEach(weekDoc => {
-                weeksData[weekDoc.id] = weekDoc.data();
-            });
-
-            backupData[monthId] = {
-                ...monthData,
-                weeks: weeksData 
-            };
-        }
-        
-        // Also Backup Quiz Results (Optional but recommended)
-        // You can extend this later to include `quizResults` collection
-
-        // Download
+        const backupData = await generateBackupObject();
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);
@@ -6385,7 +6394,6 @@ performBackupBtn.addEventListener('click', async () => {
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
         
-        // Update Timestamp
         localStorage.setItem('cc_last_backup_date', Date.now());
         updateLastBackupText();
         showCustomAlert("Backup downloaded successfully!", "success");
@@ -6394,13 +6402,153 @@ performBackupBtn.addEventListener('click', async () => {
         console.error("Export failed:", error);
         showCustomAlert("Export failed. Check console.", "error");
     } finally {
-        performBackupBtn.innerHTML = originalText;
-        performBackupBtn.disabled = false;
+        backupDownloadBtn.innerHTML = originalText;
+        backupDownloadBtn.disabled = false;
     }
 });
 
-// 4. Perform Restore (Import)
-performRestoreBtn.addEventListener('click', () => {
+// 4. ACTION: Backup & Save to Cloud
+backupCloudBtn.addEventListener('click', async () => {
+    if (!auth.currentUser) return;
+
+    const originalText = backupCloudBtn.innerHTML;
+    backupCloudBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Uploading...`;
+    backupCloudBtn.disabled = true;
+
+    try {
+        // 1. Generate Data
+        const backupData = await generateBackupObject();
+        const jsonString = JSON.stringify(backupData);
+        
+        // 2. Save to 'cloudBackups' collection
+        const userId = auth.currentUser.uid;
+        const appId = "study-plan17";
+        const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
+        
+        await addDoc(cloudBackupsRef, {
+            timestamp: Timestamp.now(),
+            note: "Manual Cloud Backup",
+            data: jsonString // We store the stringified JSON
+        });
+
+        showCustomAlert("Backup saved to cloud successfully!", "success");
+        
+        // 3. Switch to Restore tab to show the new backup immediately
+        tabRestore.click();
+
+    } catch (error) {
+        console.error("Cloud backup failed:", error);
+        showCustomAlert("Cloud backup failed. Check console.", "error");
+    } finally {
+        backupCloudBtn.innerHTML = originalText;
+        backupCloudBtn.disabled = false;
+    }
+});
+
+// 5. ACTION: Load Cloud Backups List
+async function loadCloudBackups() {
+    if (!auth.currentUser) return;
+    
+    cloudBackupList.innerHTML = '<p class="text-center text-gray-400 text-xs py-4"><i class="fas fa-spinner fa-spin mr-1"></i> Loading...</p>';
+    
+    try {
+        const userId = auth.currentUser.uid;
+        const appId = "study-plan17";
+        const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
+        
+        // Order by newest first
+        const q = query(cloudBackupsRef, orderBy("timestamp", "desc"));
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+            cloudBackupList.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">No cloud backups found.</p>';
+            return;
+        }
+        
+        let html = '';
+        querySnapshot.forEach(doc => {
+            const backup = doc.data();
+            const date = backup.timestamp ? backup.timestamp.toDate() : new Date();
+            const dateStr = date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+            const timeStr = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+            
+            html += `
+            <div class="cloud-backup-card">
+                <div>
+                    <span class="backup-info-title"><i class="fas fa-clock text-gray-400 mr-1"></i> ${dateStr}</span>
+                    <span class="backup-info-date">${timeStr}</span>
+                </div>
+                <div class="flex items-center">
+                    <button class="delete-cloud-btn" onclick="deleteCloudBackup('${doc.id}')" title="Delete Backup">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="restore-cloud-btn" onclick="restoreFromCloud('${doc.id}')">
+                        Restore
+                    </button>
+                </div>
+            </div>`;
+        });
+        
+        cloudBackupList.innerHTML = html;
+
+    } catch (error) {
+        console.error("Error loading cloud backups:", error);
+        cloudBackupList.innerHTML = '<p class="text-center text-red-400 text-xs py-4">Error loading backups.</p>';
+    }
+}
+
+// 6. ACTION: Restore From Cloud (The "Restore" button on card)
+window.restoreFromCloud = async function(docId) {
+    if (!confirm("WARNING: Restoring this backup will OVERWRITE your current study plan.\n\nAre you sure you want to proceed?")) {
+        return;
+    }
+    
+    // Show global loading or alert
+    showCustomAlert("Fetching backup...", "success"); // Using success color for info
+    
+    try {
+        const userId = auth.currentUser.uid;
+        const appId = "study-plan17";
+        const docRef = doc(db, `artifacts/${appId}/users/${userId}/cloudBackups`, docId);
+        const docSnap = await getDoc(docRef);
+        
+        if (!docSnap.exists()) {
+            showCustomAlert("Backup file not found.", "error");
+            return;
+        }
+        
+        const backupDataString = docSnap.data().data;
+        const backupData = JSON.parse(backupDataString);
+        
+        // Use the shared executor logic
+        await executeRestore(backupData);
+        
+    } catch (error) {
+        console.error("Restore from cloud failed:", error);
+        showCustomAlert("Failed to restore. Data might be corrupt.", "error");
+    }
+};
+
+// 7. ACTION: Delete Cloud Backup
+window.deleteCloudBackup = async function(docId) {
+    if (!confirm("Delete this backup file?")) return;
+    
+    try {
+        const userId = auth.currentUser.uid;
+        const appId = "study-plan17";
+        await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/cloudBackups`, docId));
+        
+        // Refresh list
+        loadCloudBackups();
+        
+    } catch (error) {
+        console.error("Delete failed:", error);
+        showCustomAlert("Could not delete backup.", "error");
+    }
+};
+
+// 8. ACTION: Restore From File (Existing Logic)
+performRestoreFileBtn.addEventListener('click', () => {
     restoreFileInput.click();
 });
 
@@ -6408,55 +6556,63 @@ restoreFileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!confirm("FINAL WARNING: This will completely OVERWRITE your current study plan data for the months included in this file.\n\nAre you sure?")) {
+    if (!confirm("WARNING: This will OVERWRITE existing data.\n\nAre you sure?")) {
         restoreFileInput.value = '';
         return;
     }
-
-    const originalText = performRestoreBtn.innerHTML;
-    performRestoreBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Restoring...`;
-    performRestoreBtn.disabled = true;
     
     const reader = new FileReader();
     reader.onload = async (event) => {
         try {
-            const backupData = JSON.parse(event.target.result);
-            const userId = auth.currentUser.uid;
-            const appId = "study-plan17";
-            const rootPath = `artifacts/${appId}/users/${userId}/studyPlans`;
-
-            let totalMonths = 0;
-
-            // Process restore
-            for (const monthId in backupData) {
-                const fullMonthData = backupData[monthId];
-                const weeksData = fullMonthData.weeks || {};
-                delete fullMonthData.weeks;
-
-                // Restore Month Doc
-                const monthDocRef = doc(db, rootPath, monthId);
-                await setDoc(monthDocRef, fullMonthData);
-
-                // Restore Weeks
-                for (const weekId in weeksData) {
-                    const weekDocRef = doc(db, rootPath, monthId, 'weeks', weekId);
-                    await setDoc(weekDocRef, weeksData[weekId]);
-                }
-                totalMonths++;
-            }
-
-            showCustomAlert(`Success! Restored ${totalMonths} months. Reloading...`, "success");
-            setTimeout(() => location.reload(), 1500);
-
-        } catch (error) {
-            console.error("Restore failed:", error);
-            showCustomAlert("Error restoring data. Invalid file.", "error");
-            performRestoreBtn.innerHTML = originalText;
-            performRestoreBtn.disabled = false;
+            const jsonData = JSON.parse(event.target.result);
+            await executeRestore(jsonData);
+        } catch (e) {
+            showCustomAlert("Invalid JSON file.", "error");
         } finally {
             restoreFileInput.value = '';
         }
     };
     reader.readAsText(file);
 });
+
+// --- SHARED RESTORE EXECUTOR ---
+async function executeRestore(backupData) {
+    const loadingOverlay = document.createElement('div');
+    loadingOverlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;";
+    loadingOverlay.innerHTML = `<i class="fas fa-spinner fa-spin text-4xl text-emerald-600 mb-4"></i><h3 class="text-xl font-bold text-gray-700">Restoring Data...</h3><p class="text-gray-500">Please wait, do not close the page.</p>`;
+    document.body.appendChild(loadingOverlay);
+
+    try {
+        const userId = auth.currentUser.uid;
+        const appId = "study-plan17";
+        const rootPath = `artifacts/${appId}/users/${userId}/studyPlans`;
+
+        let totalMonths = 0;
+
+        for (const monthId in backupData) {
+            const fullMonthData = backupData[monthId];
+            const weeksData = fullMonthData.weeks || {};
+            delete fullMonthData.weeks;
+
+            // Restore Month Doc
+            const monthDocRef = doc(db, rootPath, monthId);
+            await setDoc(monthDocRef, fullMonthData);
+
+            // Restore Weeks
+            for (const weekId in weeksData) {
+                const weekDocRef = doc(db, rootPath, monthId, 'weeks', weekId);
+                await setDoc(weekDocRef, weeksData[weekId]);
+            }
+            totalMonths++;
+        }
+
+        loadingOverlay.innerHTML = `<i class="fas fa-check-circle text-4xl text-emerald-600 mb-4"></i><h3 class="text-xl font-bold text-gray-700">Success!</h3>`;
+        setTimeout(() => location.reload(), 1000);
+
+    } catch (error) {
+        console.error("Restore execution failed:", error);
+        document.body.removeChild(loadingOverlay);
+        showCustomAlert("Error restoring data.", "error");
+    }
+}
 // --- END BACKUP MANAGER ---
