@@ -6292,26 +6292,63 @@ window.toggleSummaryRow = function(btn) {
         }
         // --- END: POMODORO TIMER LOGIC ---
 		
-		// --- DATA BACKUP FEATURE ---
+// --- BACKUP & RESTORE MANAGER ---
 
-// Function to download all study plan data as a JSON file
-window.exportData = async function() {
-    if (!auth.currentUser) { alert("Please log in to export data."); return; }
-    
-    const confirmExport = confirm("Do you want to download a backup of your entire Study Plan?");
-    if (!confirmExport) return;
+const backupModal = document.getElementById('backup-restore-modal');
+const tabBackup = document.getElementById('tab-btn-backup');
+const tabRestore = document.getElementById('tab-btn-restore');
+const contentBackup = document.getElementById('content-backup');
+const contentRestore = document.getElementById('content-restore');
+const performBackupBtn = document.getElementById('perform-backup-btn');
+const performRestoreBtn = document.getElementById('perform-restore-btn');
+const restoreFileInput = document.getElementById('restore-file-input');
+const lastBackupText = document.getElementById('last-backup-text');
 
-    const exportBtn = document.getElementById('export-btn');
-    const originalText = exportBtn.innerHTML;
-    exportBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Exporting...`;
-    exportBtn.disabled = true;
+// 1. Open Modal
+document.getElementById('open-backup-modal-btn')?.addEventListener('click', () => {
+    backupModal.style.display = 'block';
+    updateLastBackupText();
+});
+
+function updateLastBackupText() {
+    const lastDate = localStorage.getItem('cc_last_backup_date');
+    if (lastDate) {
+        const date = new Date(parseInt(lastDate));
+        lastBackupText.textContent = `Last backup: ${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+    } else {
+        lastBackupText.textContent = "Last backup: Never";
+    }
+}
+
+// 2. Tab Switching
+tabBackup.addEventListener('click', () => {
+    tabBackup.classList.add('active-tab-br');
+    tabRestore.classList.remove('active-tab-br');
+    contentBackup.classList.remove('hidden');
+    contentRestore.classList.add('hidden');
+});
+
+tabRestore.addEventListener('click', () => {
+    tabRestore.classList.add('active-tab-br');
+    tabBackup.classList.remove('active-tab-br');
+    contentRestore.classList.remove('hidden');
+    contentBackup.classList.add('hidden');
+});
+
+// 3. Perform Backup (Export)
+performBackupBtn.addEventListener('click', async () => {
+    if (!auth.currentUser) return;
+
+    const originalText = performBackupBtn.innerHTML;
+    performBackupBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Generating...`;
+    performBackupBtn.disabled = true;
 
     try {
         const userId = auth.currentUser.uid;
         const appId = "study-plan17";
         const plansCollectionPath = `artifacts/${appId}/users/${userId}/studyPlans`;
         
-        // 1. Fetch all months
+        // Fetch all months
         const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
         const querySnapshot = await getDocs(q);
         
@@ -6321,7 +6358,7 @@ window.exportData = async function() {
             const monthId = docSnap.id;
             const monthData = docSnap.data();
             
-            // 2. Fetch weeks for this month
+            // Fetch weeks subcollection
             const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
             const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
             
@@ -6330,168 +6367,57 @@ window.exportData = async function() {
                 weeksData[weekDoc.id] = weekDoc.data();
             });
 
-            // Combine structure
             backupData[monthId] = {
                 ...monthData,
-                weeks: weeksData // Nest the weeks data back inside for the backup file
+                weeks: weeksData 
             };
         }
+        
+        // Also Backup Quiz Results (Optional but recommended)
+        // You can extend this later to include `quizResults` collection
 
-        // 3. Convert to JSON and Download
+        // Download
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.setAttribute("href", dataStr);
         downloadAnchorNode.setAttribute("download", "class_caddy_backup_" + new Date().toISOString().slice(0, 10) + ".json");
-        document.body.appendChild(downloadAnchorNode); // Required for firefox
+        document.body.appendChild(downloadAnchorNode);
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
         
-        showCustomAlert("Backup downloaded successfully!", "success");
-		// --- NEW: Save the timestamp ---
+        // Update Timestamp
         localStorage.setItem('cc_last_backup_date', Date.now());
-        document.getElementById('backup-reminder-toast')?.remove(); // Remove reminder if it exists
-        // -------------------------------
+        updateLastBackupText();
+        showCustomAlert("Backup downloaded successfully!", "success");
 
     } catch (error) {
         console.error("Export failed:", error);
         showCustomAlert("Export failed. Check console.", "error");
     } finally {
-        exportBtn.innerHTML = originalText;
-        exportBtn.disabled = false;
+        performBackupBtn.innerHTML = originalText;
+        performBackupBtn.disabled = false;
     }
-};
+});
 
-// Create the Blue Backup Button (Fixed Position)
-const exportButton = document.createElement('button');
-exportButton.id = 'export-btn';
-exportButton.innerHTML = `<i class="fas fa-download"></i> Backup Data`;
-exportButton.style.cssText = "position: fixed; bottom: 20px; left: 20px; z-index: 999; background: #2563eb; color: white; padding: 10px 16px; font-weight: bold; border-radius: 30px; cursor: pointer; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); font-size: 13px;";
-exportButton.onclick = window.exportData;
+// 4. Perform Restore (Import)
+performRestoreBtn.addEventListener('click', () => {
+    restoreFileInput.click();
+});
 
-// Only add if not printing
-if (!window.matchMedia('print').matches) {
-    document.body.appendChild(exportButton);
-}
-
-// --- SMART BACKUP REMINDER SYSTEM ---
-
-function checkBackupStatus() {
-    if (!currentUser || !userId) return;
-
-    const LAST_BACKUP = localStorage.getItem('cc_last_backup_date');
-    const BACKUP_INTERVAL_DAYS = 3; // Ask for backup every 3 days
-    const MS_PER_DAY = 24 * 60 * 60 * 1000;
-
-    let shouldRemind = false;
-
-    if (!LAST_BACKUP) {
-        // Never backed up on this device
-        shouldRemind = true;
-    } else {
-        const daysSince = (Date.now() - parseInt(LAST_BACKUP)) / MS_PER_DAY;
-        if (daysSince > BACKUP_INTERVAL_DAYS) {
-            shouldRemind = true;
-        }
-    }
-
-    if (shouldRemind) {
-        showBackupReminder();
-    }
-}
-
-function showBackupReminder() {
-    // Avoid duplicate toasts
-    if (document.getElementById('backup-reminder-toast')) return;
-
-    const toast = document.createElement('div');
-    toast.id = 'backup-reminder-toast';
-    toast.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="background: #fff; padding: 8px; border-radius: 50%;">
-                <i class="fas fa-exclamation-triangle text-amber-500 text-xl"></i>
-            </div>
-            <div>
-                <h4 style="margin: 0; font-weight: 700; font-size: 14px;">Backup Reminder</h4>
-                <p style="margin: 0; font-size: 12px; opacity: 0.9;">You haven't backed up in a while!</p>
-            </div>
-        </div>
-        <div style="margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end;">
-            <button id="remind-later-btn" style="background: transparent; border: 1px solid rgba(255,255,255,0.5); color: white; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer;">Later</button>
-            <button id="remind-backup-btn" style="background: white; color: #d97706; border: none; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 11px; cursor: pointer;">Backup Now</button>
-        </div>
-    `;
-    
-    toast.style.cssText = `
-        position: fixed; 
-        bottom: 80px; /* Above the manual buttons */
-        left: 20px; 
-        background: linear-gradient(135deg, #f59e0b, #d97706); 
-        color: white; 
-        padding: 15px; 
-        border-radius: 12px; 
-        box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.5); 
-        z-index: 1000; 
-        font-family: 'Inter', sans-serif;
-        width: 280px;
-        animation: slideInLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    `;
-
-    document.body.appendChild(toast);
-
-    // Add Listeners
-    document.getElementById('remind-backup-btn').onclick = () => {
-        window.exportData();
-        // The toast will be removed by exportData on success
-    };
-
-    document.getElementById('remind-later-btn').onclick = () => {
-        toast.style.animation = 'slideOutLeft 0.5s forwards';
-        setTimeout(() => toast.remove(), 500);
-        // Remind again in 24 hours (fake 'snooze')
-        localStorage.setItem('cc_last_backup_date', Date.now() - (2 * 24 * 60 * 60 * 1000)); 
-    };
-}
-
-// Add Keyframe animations for the toast
-const styleSheet = document.createElement("style");
-styleSheet.innerText = `
-    @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes slideOutLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
-`;
-document.head.appendChild(styleSheet);
-
-// 3. Trigger the check when the user logs in or loads the page
-// We hook into the existing Auth Listener by checking periodically
-setInterval(checkBackupStatus, 60000); // Check every 1 minute
-setTimeout(checkBackupStatus, 3000);   // Also check 3 seconds after load
-
-
-// --- DATA RESTORE FEATURE (IMPORT JSON) ---
-
-// 1. Create hidden file input
-const importInput = document.createElement('input');
-importInput.type = 'file';
-importInput.accept = '.json';
-importInput.style.display = 'none';
-document.body.appendChild(importInput);
-
-// 2. Function to handle file selection and restore
-importInput.addEventListener('change', async (e) => {
+restoreFileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!confirm("WARNING: This will OVERWRITE existing data with the data from this backup file.\n\nAre you sure you want to proceed?")) {
-        importInput.value = ''; // Reset input
+    if (!confirm("FINAL WARNING: This will completely OVERWRITE your current study plan data for the months included in this file.\n\nAre you sure?")) {
+        restoreFileInput.value = '';
         return;
     }
 
-    const restoreBtn = document.getElementById('restore-btn');
-    const originalText = restoreBtn.innerHTML;
-    restoreBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Restoring...`;
-    restoreBtn.disabled = true;
+    const originalText = performRestoreBtn.innerHTML;
+    performRestoreBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Restoring...`;
+    performRestoreBtn.disabled = true;
     
     const reader = new FileReader();
-    
     reader.onload = async (event) => {
         try {
             const backupData = JSON.parse(event.target.result);
@@ -6500,59 +6426,37 @@ importInput.addEventListener('change', async (e) => {
             const rootPath = `artifacts/${appId}/users/${userId}/studyPlans`;
 
             let totalMonths = 0;
-            let totalWeeks = 0;
 
-            // Iterate through each Month in the backup
+            // Process restore
             for (const monthId in backupData) {
                 const fullMonthData = backupData[monthId];
-                
-                // Separate the 'weeks' data from the 'month' metadata
-                // This is CRITICAL to maintain the new database structure
                 const weeksData = fullMonthData.weeks || {};
-                delete fullMonthData.weeks; // Remove weeks from the main doc object
+                delete fullMonthData.weeks;
 
-                // 1. Restore the Month Document (Metadata only)
+                // Restore Month Doc
                 const monthDocRef = doc(db, rootPath, monthId);
                 await setDoc(monthDocRef, fullMonthData);
-                totalMonths++;
 
-                // 2. Restore the Weeks (Subcollection)
+                // Restore Weeks
                 for (const weekId in weeksData) {
                     const weekDocRef = doc(db, rootPath, monthId, 'weeks', weekId);
                     await setDoc(weekDocRef, weeksData[weekId]);
-                    totalWeeks++;
                 }
+                totalMonths++;
             }
 
-            console.log(`Restore Complete: ${totalMonths} months and ${totalWeeks} weeks recovered.`);
-            alert(`Success! Restored ${totalMonths} months of data.\n\nPlease refresh the page.`);
-            location.reload();
+            showCustomAlert(`Success! Restored ${totalMonths} months. Reloading...`, "success");
+            setTimeout(() => location.reload(), 1500);
 
         } catch (error) {
             console.error("Restore failed:", error);
-            alert("Error restoring data. The file might be corrupt or invalid.");
+            showCustomAlert("Error restoring data. Invalid file.", "error");
+            performRestoreBtn.innerHTML = originalText;
+            performRestoreBtn.disabled = false;
         } finally {
-            restoreBtn.innerHTML = originalText;
-            restoreBtn.disabled = false;
-            importInput.value = ''; // Reset for next time
+            restoreFileInput.value = '';
         }
     };
-
     reader.readAsText(file);
 });
-
-// 3. Create the Green Restore Button
-const restoreButton = document.createElement('button');
-restoreButton.id = 'restore-btn';
-restoreButton.innerHTML = `<i class="fas fa-upload"></i> Restore Data`;
-restoreButton.style.cssText = "position: fixed; bottom: 20px; left: 150px; z-index: 999; background: #10b981; color: white; padding: 10px 16px; font-weight: bold; border-radius: 30px; cursor: pointer; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.2); font-size: 13px;";
-
-restoreButton.onclick = () => {
-    if (!auth.currentUser) { alert("Please log in to restore data."); return; }
-    importInput.click(); // Trigger the hidden file input
-};
-
-// Only add if not printing
-if (!window.matchMedia('print').matches) {
-    document.body.appendChild(restoreButton);
-}
+// --- END BACKUP MANAGER ---

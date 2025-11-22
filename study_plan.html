@@ -105,10 +105,15 @@
                 </button>
             </div>
             <div id="user-info" class="hidden flex flex-col sm:flex-row justify-between items-center text-sm">
-                <div class="flex items-center gap-3 mb-3 sm:mb-0 text-gray-600">
-                     <i class="fas fa-check-circle text-emerald-500"></i>
-                     <span id="sync-status-text" class="text-emerald-500 font-medium">Synced</span>
-                 </div>
+                <div class="flex flex-col items-start gap-1 mb-3 sm:mb-0">
+                    <div class="flex items-center gap-3 text-gray-600">
+                        <i class="fas fa-check-circle text-emerald-500"></i>
+                        <span id="sync-status-text" class="text-emerald-500 font-medium">Synced</span>
+                    </div>
+                    <button id="open-backup-modal-btn" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium underline decoration-indigo-300 underline-offset-2 transition-colors">
+                        <i class="fas fa-hdd mr-1"></i> Backup / Restore
+                    </button>
+                </div>
                  
                 <div class="flex items-center gap-3">
                     <div class="text-center sm:text-right">
@@ -717,7 +722,50 @@
         <i class="fas fa-stopwatch text-xl"></i>
     </div>
 
-    
+    <div id="backup-restore-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="modal-close" onclick="closeModal('backup-restore-modal')">&times;</span>
+            <h3 class="text-xl font-semibold mb-4 text-gray-800">Manage Data</h3>
+            
+            <div class="flex border-b border-gray-200 mb-6">
+                <button id="tab-btn-backup" class="flex-1 py-2 text-center font-medium text-emerald-600 border-b-2 border-emerald-500 active-tab-br">Backup</button>
+                <button id="tab-btn-restore" class="flex-1 py-2 text-center font-medium text-gray-500 hover:text-gray-700">Restore</button>
+            </div>
+
+            <div id="content-backup" class="tab-content-br">
+                <div class="text-center py-4">
+                    <div class="bg-emerald-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-download text-2xl text-emerald-600"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-800 mb-2">Download Backup</h4>
+                    <p class="text-sm text-gray-600 mb-6">Save a complete copy of your study plan, vocabulary, and quiz results to your device.</p>
+                    
+                    <button id="perform-backup-btn" class="action-button w-full justify-center py-3 text-base">
+                        <i class="fas fa-file-export mr-2"></i> Download JSON File
+                    </button>
+                    <p id="last-backup-text" class="text-xs text-gray-400 mt-3">Last backup: Never</p>
+                </div>
+            </div>
+
+            <div id="content-restore" class="tab-content-br hidden">
+                <div class="text-center py-4">
+                    <div class="bg-amber-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-upload text-2xl text-amber-600"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-800 mb-2">Restore from File</h4>
+                    <p class="text-sm text-gray-600 mb-4">Upload a previously saved JSON file to recover your data.</p>
+                    <p class="text-xs text-red-500 bg-red-50 p-2 rounded mb-6 border border-red-100">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> Warning: This will OVERWRITE all current data with the data from the file.
+                    </p>
+                    
+                    <input type="file" id="restore-file-input" accept=".json" class="hidden">
+                    <button id="perform-restore-btn" class="action-button w-full justify-center py-3 text-base" style="background-color: #d97706;">
+                        <i class="fas fa-file-import mr-2"></i> Select File & Restore
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 	
 	<script type="module" src="app.js" defer></script>
 </body>

@@ -1784,3 +1784,13 @@
     }
 }
 
+/* --- Backup/Restore Modal Styles --- */
+.active-tab-br {
+    color: #059669 !important; /* emerald-600 */
+    border-bottom-color: #059669 !important;
+}
+#tab-btn-restore.active-tab-br {
+    color: #d97706 !important; /* amber-600 */
+    border-bottom-color: #d97706 !important;
+}
+
