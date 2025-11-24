@@ -2012,3 +2012,104 @@
     cursor: default;           /* Shows arrow cursor instead of text selection cursor */
 }
 /* --- END: PREVENT CHEATING STYLES --- */
+
+/* --- START: SETTINGS & DARK MODE STYLES --- */
+
+/* Floating Settings Button */
+.floating-settings-btn {
+    position: absolute;
+    bottom: 5rem; /* 80px (above fullscreen button) */
+    right: 1.5rem; /* 24px */
+    width: 3rem;
+    height: 3rem;
+    background-color: white;
+    border-radius: 9999px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.2s;
+}
+.floating-settings-btn:hover {
+    color: #4f46e5;
+    background-color: #f9fafb;
+    transform: scale(1.1);
+}
+
+/* Settings Panel (Popup) */
+.settings-panel {
+    position: absolute;
+    bottom: 9rem; /* Above settings button */
+    right: 1.5rem;
+    width: 250px;
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e5e7eb;
+    padding: 1rem;
+    z-index: 30;
+    display: none; /* Hidden by default */
+    animation: slideUpFade 0.2s ease-out;
+}
+.settings-panel.active {
+    display: block;
+}
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark Mode Overrides */
+.study-content-dark {
+    background-color: #111827 !important; /* Gray 900 */
+}
+.study-content-dark .study-card {
+    background-color: #1f2937; /* Gray 800 */
+    border-left-color: #6366f1; /* Indigo 500 */
+    border-top: 1px solid #374151;
+    border-right: 1px solid #374151;
+    border-bottom: 1px solid #374151;
+}
+.study-content-dark .study-question {
+    color: #f3f4f6; /* Gray 100 */
+}
+.study-content-dark .study-opt {
+    background-color: #374151; /* Gray 700 */
+    border-color: #4b5563; /* Gray 600 */
+    color: #d1d5db; /* Gray 300 */
+}
+.study-content-dark .study-opt span {
+    color: #ffffff;
+}
+/* Dark Mode Answer Card */
+.study-content-dark .answer-card-bg {
+    background-color: #064e3b !important; /* Emerald 900 */
+    border-color: #065f46 !important; /* Emerald 800 */
+}
+.study-content-dark .answer-icon-bg {
+    background-color: #065f46 !important; /* Emerald 800 */
+    color: #34d399 !important; /* Emerald 400 */
+}
+.study-content-dark .answer-text {
+    color: #d1fae5 !important; /* Emerald 100 */
+}
+.study-content-dark .answer-label {
+    color: #a7f3d0 !important; /* Emerald 200 */
+}
+
+/* Font Controls */
+.font-control-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #d1d5db;
+    background: #f3f4f6;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #374151;
+}
+.font-control-btn:hover { background: #e5e7eb; }
+/* --- END: SETTINGS & DARK MODE STYLES --- */

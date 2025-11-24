@@ -584,6 +584,34 @@
     <div id="view-mcq-modal" class="modal" style="z-index: 106; overflow: hidden;">
       <div class="modal-content" style="width: 95%; max-width: 1000px; height: 90vh; display: flex; flex-direction: column; padding: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0;">
         
+		
+		<button id="view-mcq-settings-btn" class="floating-settings-btn" title="Settings">
+			<i class="fas fa-cog text-lg"></i>
+		</button>
+
+		<div id="view-mcq-settings-panel" class="settings-panel">
+			<div class="flex justify-between items-center mb-4 border-b pb-2">
+				<span class="font-semibold text-sm text-gray-700">Appearance</span>
+				<button class="text-gray-400 hover:text-red-500" onclick="document.getElementById('view-mcq-settings-panel').classList.remove('active')"><i class="fas fa-times"></i></button>
+			</div>
+			
+			<div class="flex justify-between items-center mb-4">
+				<span class="text-sm text-gray-600"><i class="fas fa-moon mr-2"></i>Dark Mode</span>
+				<label class="relative inline-flex items-center cursor-pointer">
+					<input type="checkbox" id="view-mcq-dark-mode-toggle" class="sr-only peer">
+					<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+				</label>
+			</div>
+
+			<div class="mb-1">
+				<div class="text-sm text-gray-600 mb-2"><i class="fas fa-text-height mr-2"></i>Font Size</div>
+				<div class="flex items-center gap-2">
+					<button class="font-control-btn" id="view-mcq-font-dec">-</button>
+					<input type="number" id="view-mcq-font-input" value="16" class="w-full border border-gray-300 rounded p-1 text-center text-sm" min="10" max="30">
+					<button class="font-control-btn" id="view-mcq-font-inc">+</button>
+				</div>
+			</div>
+		</div>
         <button id="view-mcq-fullscreen-btn" class="absolute bottom-6 right-6 w-12 h-12 bg-white rounded-full shadow-xl border border-gray-200 flex items-center justify-center text-gray-600 hover:text-indigo-600 hover:bg-gray-50 transition-all z-20 focus:outline-none" title="Enter Fullscreen">
             <i class="fas fa-expand text-lg"></i>
         </button>
@@ -633,6 +661,34 @@
 <div id="mcq-study-modal" class="modal" style="z-index: 106; overflow: hidden;">
   <div class="modal-content" style="width: 95%; max-width: 1000px; height: 90vh; display: flex; flex-direction: column; padding: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0;">
         
+		
+		<button id="mcq-settings-btn" class="floating-settings-btn" title="Settings">
+			<i class="fas fa-cog text-lg"></i>
+		</button>
+
+		<div id="mcq-settings-panel" class="settings-panel">
+			<div class="flex justify-between items-center mb-4 border-b pb-2">
+				<span class="font-semibold text-sm text-gray-700">Appearance</span>
+				<button class="text-gray-400 hover:text-red-500" onclick="document.getElementById('mcq-settings-panel').classList.remove('active')"><i class="fas fa-times"></i></button>
+			</div>
+			
+			<div class="flex justify-between items-center mb-4">
+				<span class="text-sm text-gray-600"><i class="fas fa-moon mr-2"></i>Dark Mode</span>
+				<label class="relative inline-flex items-center cursor-pointer">
+					<input type="checkbox" id="mcq-dark-mode-toggle" class="sr-only peer">
+					<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+				</label>
+			</div>
+
+			<div class="mb-1">
+				<div class="text-sm text-gray-600 mb-2"><i class="fas fa-text-height mr-2"></i>Font Size</div>
+				<div class="flex items-center gap-2">
+					<button class="font-control-btn" id="mcq-font-dec">-</button>
+					<input type="number" id="mcq-font-input" value="16" class="w-full border border-gray-300 rounded p-1 text-center text-sm" min="10" max="30">
+					<button class="font-control-btn" id="mcq-font-inc">+</button>
+				</div>
+			</div>
+		</div>
         <button id="mcq-fullscreen-btn" class="absolute bottom-6 right-6 w-12 h-12 bg-white rounded-full shadow-xl border border-gray-200 flex items-center justify-center text-gray-600 hover:text-indigo-600 hover:bg-gray-50 transition-all z-20 focus:outline-none" title="Enter Fullscreen">
             <i class="fas fa-expand text-lg"></i>
         </button>

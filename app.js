@@ -7111,16 +7111,17 @@ function renderStudyView(mcqs) {
                     `).join('')}
                 </div>
 
-                <div class="mt-4 pt-2 border-t border-dashed border-gray-200">
-                    <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm">
-                        <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700">
-                            <i class="fas fa-check text-xs"></i>
-                        </div>
-                        <div class="font-bold text-emerald-900 text-sm">
-                            Correct: <span class="text-emerald-800">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
-                        </div>
-                    </div>
-                </div>
+                // Replace the Answer HTML block in BOTH functions with this:
+				<div class="mt-4 pt-2 border-t border-dashed border-gray-200">
+					<div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm answer-card-bg">
+						<div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg">
+							<i class="fas fa-check text-xs"></i>
+						</div>
+						<div class="font-bold text-emerald-900 text-sm answer-text">
+							Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
+						</div>
+					</div>
+				</div>
 
             </div>
         `;
@@ -7444,3 +7445,85 @@ if (viewMcqFullscreenBtn && viewMcqModalContent) {
     document.addEventListener('msfullscreenchange', updateViewFullscreenIcon);
 }
 
+// --- START: SETTINGS (DARK MODE & FONT SIZE) LOGIC ---
+
+function setupModalSettings(ids) {
+    const settingsBtn = document.getElementById(ids.btn);
+    const panel = document.getElementById(ids.panel);
+    const darkModeToggle = document.getElementById(ids.darkToggle);
+    const fontInc = document.getElementById(ids.fontInc);
+    const fontDec = document.getElementById(ids.fontDec);
+    const fontInput = document.getElementById(ids.fontInput);
+    const contentArea = document.getElementById(ids.content);
+
+    if (!settingsBtn || !panel || !contentArea) return;
+
+    // 1. Toggle Panel
+    settingsBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent closing when clicking button
+        panel.classList.toggle('active');
+    });
+
+    // Close panel when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!panel.contains(e.target) && e.target !== settingsBtn && !settingsBtn.contains(e.target)) {
+            panel.classList.remove('active');
+        }
+    });
+
+    // 2. Dark Mode
+    darkModeToggle.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            contentArea.classList.add('study-content-dark');
+        } else {
+            contentArea.classList.remove('study-content-dark');
+        }
+    });
+
+    // 3. Font Size Helpers
+    const updateFontSize = (size) => {
+        contentArea.style.fontSize = `${size}px`;
+        fontInput.value = size;
+        // Specifically update option text size slightly smaller relative to base
+        const options = contentArea.querySelectorAll('.study-opt');
+        options.forEach(opt => opt.style.fontSize = `${size * 0.95}px`);
+    };
+
+    fontInc.addEventListener('click', () => {
+        let current = parseInt(fontInput.value) || 16;
+        if (current < 30) updateFontSize(current + 1);
+    });
+
+    fontDec.addEventListener('click', () => {
+        let current = parseInt(fontInput.value) || 16;
+        if (current > 10) updateFontSize(current - 1);
+    });
+
+    fontInput.addEventListener('change', () => {
+        let val = parseInt(fontInput.value);
+        if (val >= 10 && val <= 30) updateFontSize(val);
+    });
+}
+
+// Initialize for Study Modal
+setupModalSettings({
+    btn: 'mcq-settings-btn',
+    panel: 'mcq-settings-panel',
+    darkToggle: 'mcq-dark-mode-toggle',
+    fontInc: 'mcq-font-inc',
+    fontDec: 'mcq-font-dec',
+    fontInput: 'mcq-font-input',
+    content: 'mcq-study-content'
+});
+
+// Initialize for View Modal
+setupModalSettings({
+    btn: 'view-mcq-settings-btn',
+    panel: 'view-mcq-settings-panel',
+    darkToggle: 'view-mcq-dark-mode-toggle',
+    fontInc: 'view-mcq-font-inc',
+    fontDec: 'view-mcq-font-dec',
+    fontInput: 'view-mcq-font-input',
+    content: 'view-mcq-content'
+});
+// --- END: SETTINGS LOGIC ---
