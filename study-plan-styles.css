@@ -2752,3 +2752,77 @@ body.dark-mode .settings-panel button:hover i.fa-times {
 }
 
 /* --- END: FIX SETTINGS PANEL DARK MODE --- */
+
+/* --- START: FINAL VOCAB TEXT COLOR FIX --- */
+
+/* Force all text inside the Vocab List table to be Pure White in Dark Mode */
+body.dark-mode #vocab-list-content td {
+    color: #ffffff !important;
+}
+
+/* Ensure the row hover doesn't change it back to gray */
+body.dark-mode #vocab-list-content tbody tr:hover td {
+    color: #ffffff !important;
+}
+
+/* --- END: FINAL VOCAB TEXT COLOR FIX --- */
+
+/* --- START: COMPACT QUIZ RESULT MODAL FIX --- */
+
+/* 1. Layout Container: Ensure header and buttons stay visible */
+#quiz-results-screen {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    max-height: 80vh; /* Keep it well within the screen */
+    overflow: hidden; /* Prevent double scrollbars */
+}
+
+/* 2. Compact Header */
+#quiz-results-screen h2 {
+    font-size: 1.5rem !important; /* Smaller title */
+    margin-bottom: 0.5rem !important;
+    margin-top: 0 !important;
+    flex-shrink: 0;
+}
+
+/* 3. Compact Summary List (The Box in the Middle) */
+.result-summary-list {
+    padding: 0.75rem 1rem !important; /* Reduce padding inside the box */
+    overflow-y: auto; /* Allow internal scrolling if screen is very small */
+    flex-grow: 1;
+    margin-bottom: 0.75rem !important;
+    
+    /* Ensure it shrinks if needed */
+    min-height: 0; 
+}
+
+/* 4. Compact Rows (Reduce gaps between lines) */
+.result-summary-row {
+    padding: 0.25rem 0 !important; /* Very tight vertical padding */
+    font-size: 0.85rem !important; /* Slightly smaller text */
+    gap: 0.5rem !important;
+}
+
+/* 5. Compact Final Score Row */
+.result-summary-row.final-score {
+    font-size: 1rem !important;
+    margin-top: 0.25rem !important;
+}
+
+/* 6. Compact Buttons at the Bottom */
+#quiz-results-screen .flex.justify-center {
+    flex-shrink: 0; /* Don't let buttons shrink */
+    margin-top: 0 !important;
+    padding-bottom: 5px;
+    gap: 0.5rem !important; /* Reduce gap between buttons */
+}
+
+#quiz-results-screen .action-button,
+#quiz-results-screen .action-button-secondary {
+    padding: 6px 12px !important; /* Smaller button padding */
+    font-size: 0.8rem !important; /* Smaller button text */
+    height: auto !important;
+}
+
+/* --- END: COMPACT QUIZ RESULT MODAL FIX --- */
