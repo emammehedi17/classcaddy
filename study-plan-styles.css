@@ -2849,3 +2849,26 @@ body.dark-mode #vocab-list-content tbody tr:hover td {
 
 /* --- END: FORCE FIX QUIZ MODAL OVERLAP --- */
 
+/* --- FIX: Result Modal Text Colors in Dark Mode --- */
+
+/* 1. Fix Labels (Total Answered, Percentage, Time Taken) */
+body.dark-mode .result-summary-row .result-label {
+    color: #e5e7eb !important; /* Light Gray */
+}
+
+/* 2. Fix Values (The numbers, e.g. 0, 0.0%, 00:20) */
+body.dark-mode .result-summary-row .result-count,
+body.dark-mode .result-summary-row .result-score-impact {
+    color: #ffffff !important; /* Pure White */
+}
+
+/* 3. Ensure Correct/Wrong/Not-Answered colors are bright enough */
+body.dark-mode .result-summary-row .text-green-700 {
+    color: #4ade80 !important; /* Bright Green */
+}
+body.dark-mode .result-summary-row .text-red-700 {
+    color: #f87171 !important; /* Bright Red */
+}
+body.dark-mode .result-summary-row .text-gray-600 {
+    color: #9ca3af !important; /* Light Gray for 'Not Answered' */
+}
