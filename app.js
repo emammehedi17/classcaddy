@@ -7211,3 +7211,53 @@ printStudyBtn.addEventListener('click', () => {
         printWindow.print();
     }, 1000);
 });
+
+// --- NEW: MCQ Full Screen Toggle Logic ---
+const mcqFullscreenBtn = document.getElementById('mcq-fullscreen-btn');
+const mcqStudyModalContent = document.querySelector('#mcq-study-modal .modal-content');
+
+if (mcqFullscreenBtn && mcqStudyModalContent) {
+    mcqFullscreenBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            // Enter Fullscreen
+            if (mcqStudyModalContent.requestFullscreen) {
+                mcqStudyModalContent.requestFullscreen();
+            } else if (mcqStudyModalContent.webkitRequestFullscreen) { /* Safari */
+                mcqStudyModalContent.webkitRequestFullscreen();
+            } else if (mcqStudyModalContent.msRequestFullscreen) { /* IE11 */
+                mcqStudyModalContent.msRequestFullscreen();
+            }
+        } else {
+            // Exit Fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { /* Safari */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE11 */
+                document.msExitFullscreen();
+            }
+        }
+    });
+
+    // Listen for fullscreen change events to update the icon
+    const updateFullscreenIcon = () => {
+        const icon = mcqFullscreenBtn.querySelector('i');
+        if (document.fullscreenElement) {
+            // We are in fullscreen: show "Compress" icon
+            icon.classList.remove('fa-expand');
+            icon.classList.add('fa-compress');
+            mcqFullscreenBtn.title = "Exit Fullscreen";
+            mcqFullscreenBtn.classList.add('text-indigo-600'); // Highlight active state
+        } else {
+            // We are normal: show "Expand" icon
+            icon.classList.remove('fa-compress');
+            icon.classList.add('fa-expand');
+            mcqFullscreenBtn.title = "Enter Fullscreen";
+            mcqFullscreenBtn.classList.remove('text-indigo-600');
+        }
+    };
+
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+    document.addEventListener('msfullscreenchange', updateFullscreenIcon);
+}

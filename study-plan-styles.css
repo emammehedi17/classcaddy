@@ -1963,3 +1963,27 @@
     font-size: 0.9rem;
     text-align: right;
 }
+
+/* --- START: FULLSCREEN MODAL OVERRIDES --- */
+.modal-content:fullscreen,
+.modal-content:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    background-color: #f9fafb; /* Ensure background isn't black */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Adjust button position in fullscreen if needed */
+.modal-content:fullscreen #mcq-fullscreen-btn,
+.modal-content:-webkit-full-screen #mcq-fullscreen-btn {
+    bottom: 2rem;
+    right: 2rem;
+    transform: scale(1.1); /* Make it slightly larger */
+}
+/* --- END: FULLSCREEN MODAL OVERRIDES --- */
