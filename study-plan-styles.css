@@ -2216,3 +2216,38 @@
     color: #f3f4f6;
 }
 /* --- END: COMPREHENSIVE DARK MODE STYLES --- */
+
+/* --- START: DARK MODE FIXES --- */
+
+/* 1. Fix Font Size Input Box in Dark Mode */
+.study-content-dark input[type="number"] {
+    background-color: #374151 !important; /* Gray 700 */
+    border-color: #4b5563 !important;     /* Gray 600 */
+    color: #f3f4f6 !important;            /* Gray 100 */
+}
+
+/* 2. Fix Settings Panel Background (Force Dark) */
+.study-content-dark .settings-panel {
+    background-color: #1f2937 !important; /* Gray 800 */
+    border-color: #374151 !important;     /* Dark border */
+    color: #f3f4f6 !important;            /* Light text */
+}
+
+/* 3. Ensure Settings Panel Buttons are visible */
+.study-content-dark .settings-panel button.text-gray-400 {
+    color: #9ca3af !important;
+}
+.study-content-dark .settings-panel button.text-gray-400:hover {
+    color: #ef4444 !important; /* Red on hover */
+}
+
+/* 4. Fix Answer Card Labels in Dark Mode */
+/* This ensures the 'Correct:' label and the answer text contrast well */
+.study-content-dark .answer-text {
+    color: #e5e7eb !important; /* Light Gray */
+}
+.study-content-dark .answer-label {
+    color: #6ee7b7 !important; /* Light Emerald */
+}
+
+/* --- END: DARK MODE FIXES --- */
