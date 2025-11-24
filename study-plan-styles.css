@@ -2710,3 +2710,45 @@ body.dark-mode .pomo-tab.active {
 }
 
 /* --- END: DARK MODE PATCH 2 --- */
+
+/* --- START: FIX SETTINGS PANEL DARK MODE --- */
+
+/* 1. The Panel Background & Border */
+body.dark-mode .settings-panel {
+    background-color: #1f2937 !important; /* Dark Gray */
+    border-color: #374151 !important;     /* Dark Border */
+    color: #e5e7eb !important;            /* Light Text */
+}
+
+/* 2. The Labels inside (Appearance, Font Size) */
+body.dark-mode .settings-panel .text-gray-700,
+body.dark-mode .settings-panel .text-gray-600 {
+    color: #e5e7eb !important;
+}
+
+/* 3. The Buttons (+ / -) */
+body.dark-mode .font-control-btn {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #e5e7eb !important;
+}
+body.dark-mode .font-control-btn:hover {
+    background-color: #4b5563 !important;
+}
+
+/* 4. The Input Box (16) */
+body.dark-mode .settings-panel input[type="number"] {
+    background-color: #111827 !important; /* Darker background for input */
+    border-color: #4b5563 !important;
+    color: #ffffff !important;
+}
+
+/* 5. The Close "X" Icon */
+body.dark-mode .settings-panel button i.fa-times {
+    color: #9ca3af !important;
+}
+body.dark-mode .settings-panel button:hover i.fa-times {
+    color: #ef4444 !important; /* Red on hover */
+}
+
+/* --- END: FIX SETTINGS PANEL DARK MODE --- */
