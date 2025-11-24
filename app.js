@@ -3038,18 +3038,12 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const modal = document.getElementById(modalId);
             if (!modal) return;
 
-            // --- START: NEW FULLSCREEN EXIT LOGIC ---
-            // If closing the MCQ Study Modal while in fullscreen, exit fullscreen first
-            if (modalId === 'mcq-study-modal' && document.fullscreenElement) {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) { 
-                    document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) { 
-                    document.msExitFullscreen();
-                }
+            // --- CHECK BOTH MODALS FOR FULLSCREEN EXIT ---
+            if ((modalId === 'mcq-study-modal' || modalId === 'view-mcq-modal') && document.fullscreenElement) {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                else if (document.msExitFullscreen) document.msExitFullscreen();
             }
-            // --- END: NEW FULLSCREEN EXIT LOGIC ---
             
             modal.style.display = "none"; 
 
@@ -4156,7 +4150,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             return mcqData;
         }
 
-        // 4. "View MCQ" Button Handler (UPDATED DESIGN)
+        // 4. "View MCQ" Button Handler (UPDATED WITH DATA STORAGE)
         async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
             const viewMcqContent = document.getElementById('view-mcq-content');
             const subtitle = document.getElementById('view-mcq-subtitle');
@@ -4165,22 +4159,20 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10"><i class="fas fa-spinner fa-spin text-2xl"></i><br>Loading MCQs...</p>';
             modal.style.display = 'block';
 
-            // Update subtitle based on context
-            if (subtitle) {
-                subtitle.textContent = rowIndex !== null 
-                    ? `Row details for Day ${parseInt(dayIndex) + 1}` 
-                    : `All MCQs for Day ${parseInt(dayIndex) + 1}`;
-            }
+            // Construct a title for the header
+            const titleText = rowIndex !== null 
+                ? `Row details for Day ${parseInt(dayIndex) + 1}` 
+                : `All MCQs for Day ${parseInt(dayIndex) + 1}`;
+            
+            if (subtitle) subtitle.textContent = titleText;
 
             try {
-                // --- START: MODIFIED ---
+                // Fetch Data
                 const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
                 const weekDocSnap = await getDoc(weekDocRef);
                 if (!weekDocSnap.exists()) throw new Error("Week document not found.");
 
                 const dayData = weekDocSnap.data().days?.[dayIndex];
-                // --- END: MODIFIED ---
-                
                 if (!dayData) throw new Error("Day data not found.");
 
                 let mcqData = [];
@@ -4199,13 +4191,19 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
                 if (!mcqData || mcqData.length < 1) {
                     viewMcqContent.innerHTML = '<div class="text-center py-10 text-gray-500">No MCQs found for this selection.</div>';
+                    currentViewMcqData = null; // Clear data
                     return;
                 }
 
-                // --- RENDER USING STUDY CARD DESIGN ---
+                // --- STORE DATA FOR BUTTONS ---
+                currentViewMcqData = {
+                    title: titleText,
+                    mcqs: mcqData
+                };
+
+                // --- RENDER ---
                 let html = '';
                 mcqData.forEach((mcq, index) => {
-                    // Determine label (k/kh vs a/b)
                     const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
                     const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
 
@@ -4237,6 +4235,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             } catch (error) {
                 console.error("Error loading MCQs for viewing:", error);
                 viewMcqContent.innerHTML = '<p class="text-center text-red-500 py-10">Could not load MCQs.</p>';
+                currentViewMcqData = null;
             }
         }
 		
@@ -6842,6 +6841,7 @@ const printStudyBtn = document.getElementById('print-study-mcq-btn');
 
 // State to hold current view data for printing
 let currentStudyViewData = null; 
+let currentViewMcqData = null; // Stores data for the View Modal
 
 // 1. Open the Menu
 document.getElementById('show-master-mcq-btn').addEventListener('click', displayMcqMenu);
@@ -7290,3 +7290,138 @@ if (mcqFullscreenBtn && mcqStudyModalContent) {
     document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
     document.addEventListener('msfullscreenchange', updateFullscreenIcon);
 }
+
+// --- VIEW MCQ MODAL BUTTON LISTENERS ---
+
+// 1. Test Button
+const viewMcqTestBtn = document.getElementById('view-mcq-test-btn');
+if (viewMcqTestBtn) {
+    viewMcqTestBtn.addEventListener('click', () => {
+        if (!currentViewMcqData || !currentViewMcqData.mcqs.length) {
+            showCustomAlert("No MCQs to test.", "error");
+            return;
+        }
+        
+        closeModal('view-mcq-modal'); // Close view modal
+        
+        // Start Quiz with the data we just loaded
+        const mcqData = currentViewMcqData.mcqs;
+        const title = currentViewMcqData.title;
+        
+        // Set Quiz Context
+        currentMcqTarget = { quizType: 'aggregated', description: title };
+        window.currentQuizSubjectInfo = { subjectName: "Quick Test", topicDetail: title };
+        
+        // Init Quiz
+        quizTitle.textContent = 'MCQ Quiz';
+        quizModal.style.display = "block";
+        quizMainScreen.classList.add('hidden');
+        quizResultsScreen.classList.add('hidden');
+        quizStartScreen.classList.remove('hidden');
+        
+        currentMcqData = mcqData;
+        currentVocabData = null;
+        currentQuizQuestions = currentMcqData.map(mcq => ({ 
+            question: mcq.question, options: [...mcq.options], correctAnswer: mcq.correctAnswer, userAnswer: null, isCorrect: null 
+        }));
+        
+        const totalTime = currentQuizQuestions.length * 36;
+        const warningP = document.getElementById('quiz-total-time-warning');
+        warningP.querySelector('span').textContent = formatTime(totalTime);
+        warningP.style.display = 'block';
+        
+        quizStartMessage.textContent = `Ready to test yourself on ${currentQuizQuestions.length} MCQs?`;
+        quizStartBtn.classList.remove('hidden');
+        
+        const newStartBtn = quizStartBtn.cloneNode(true);
+        quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
+        newStartBtn.addEventListener('click', runQuizGame);
+        quizStartBtn = newStartBtn;
+    });
+}
+
+// 2. Print Button
+const viewMcqPrintBtn = document.getElementById('view-mcq-print-btn');
+if (viewMcqPrintBtn) {
+    viewMcqPrintBtn.addEventListener('click', () => {
+        if (!currentViewMcqData || !currentViewMcqData.mcqs.length) return;
+        
+        const printWindow = window.open('', '', 'height=900,width=1200');
+        const styles = `
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
+                @page { size: A4; margin: 1cm; }
+                body { font-family: 'Inter', 'Kalpurush', sans-serif; color: #1f2937; font-size: 11px; line-height: 1.3; }
+                .mcq-print-wrapper { column-count: 2; column-gap: 2rem; column-rule: 1px solid #eee; }
+                .print-header { column-span: all; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #4f46e5; padding-bottom: 10px; }
+                .print-mcq-item { break-inside: avoid; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px; margin-bottom: 8px; background: #fff; }
+                .print-q-text { font-weight: 600; margin-bottom: 6px; }
+                .q-num { color: #059669; margin-right: 4px; }
+                .print-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 10px; color: #4b5563; }
+                .print-ans-key { text-align: right; margin-top: 6px; font-size: 10px; color: #059669; border-top: 1px dashed #f3f4f6; padding-top: 2px; }
+            </style>`;
+
+        printWindow.document.write('<html><head><title>Print View</title>' + styles + '</head><body>');
+        printWindow.document.write(`
+            <div class="print-header">
+                <h1 style="margin:0; font-size:20px;">${currentViewMcqData.title}</h1>
+                <p style="margin:5px 0; font-size:10px; color:#666;">Total Questions: ${currentViewMcqData.mcqs.length}</p>
+            </div>
+            <div class="mcq-print-wrapper">
+        `);
+
+        currentViewMcqData.mcqs.forEach((mcq, idx) => {
+            const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+            const ansLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+            
+            printWindow.document.write(`
+                <div class="print-mcq-item">
+                    <div class="print-q-text"><span class="q-num">${idx + 1}.</span> ${escapeHtml(mcq.question)}</div>
+                    <div class="print-options-grid">
+                        ${mcq.options.map((opt, i) => `<div><b>${getOptionLabel(i, mcq.question)}.</b> ${escapeHtml(opt)}</div>`).join('')}
+                    </div>
+                    <div class="print-ans-key">Correct: <b>${ansLabel}</b></div>
+                </div>
+            `);
+        });
+
+        printWindow.document.write('</div></body></html>');
+        printWindow.document.close();
+        setTimeout(() => { printWindow.focus(); printWindow.print(); }, 1000);
+    });
+}
+
+// 3. Full Screen Button
+const viewMcqFullscreenBtn = document.getElementById('view-mcq-fullscreen-btn');
+const viewMcqModalContent = document.querySelector('#view-mcq-modal .modal-content');
+
+if (viewMcqFullscreenBtn && viewMcqModalContent) {
+    viewMcqFullscreenBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            if (viewMcqModalContent.requestFullscreen) viewMcqModalContent.requestFullscreen();
+            else if (viewMcqModalContent.webkitRequestFullscreen) viewMcqModalContent.webkitRequestFullscreen();
+            else if (viewMcqModalContent.msRequestFullscreen) viewMcqModalContent.msRequestFullscreen();
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            else if (document.msExitFullscreen) document.msExitFullscreen();
+        }
+    });
+
+    const updateViewFullscreenIcon = () => {
+        const icon = viewMcqFullscreenBtn.querySelector('i');
+        if (document.fullscreenElement) {
+            icon.classList.remove('fa-expand'); icon.classList.add('fa-compress');
+            viewMcqFullscreenBtn.title = "Exit Fullscreen";
+            viewMcqFullscreenBtn.classList.add('text-indigo-600');
+        } else {
+            icon.classList.remove('fa-compress'); icon.classList.add('fa-expand');
+            viewMcqFullscreenBtn.title = "Enter Fullscreen";
+            viewMcqFullscreenBtn.classList.remove('text-indigo-600');
+        }
+    };
+    document.addEventListener('fullscreenchange', updateViewFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateViewFullscreenIcon);
+    document.addEventListener('msfullscreenchange', updateViewFullscreenIcon);
+}
+

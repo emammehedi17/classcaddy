@@ -584,12 +584,22 @@
     <div id="view-mcq-modal" class="modal" style="z-index: 106; overflow: hidden;">
       <div class="modal-content" style="width: 95%; max-width: 1000px; height: 90vh; display: flex; flex-direction: column; padding: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0;">
         
+        <button id="view-mcq-fullscreen-btn" class="absolute bottom-6 right-6 w-12 h-12 bg-white rounded-full shadow-xl border border-gray-200 flex items-center justify-center text-gray-600 hover:text-indigo-600 hover:bg-gray-50 transition-all z-20 focus:outline-none" title="Enter Fullscreen">
+            <i class="fas fa-expand text-lg"></i>
+        </button>
+
         <div class="flex justify-between items-center p-4 border-b bg-white rounded-t-lg">
             <div>
                 <h3 class="text-xl font-bold text-indigo-700">View MCQs</h3>
                 <p id="view-mcq-subtitle" class="text-xs text-gray-500">Selected Questions</p>
             </div>
             <div class="flex items-center gap-3">
+                <button id="view-mcq-test-btn" class="action-button text-sm" style="background-color: #4f46e5;">
+                    <i class="fas fa-play mr-1.5"></i> Test
+                </button>
+                <button id="view-mcq-print-btn" class="action-button action-button-secondary text-sm">
+                    <i class="fas fa-print mr-1.5"></i> Print
+                </button>
                 <button class="text-gray-400 hover:text-red-500 transition-colors text-2xl" onclick="closeModal('view-mcq-modal')">
                     <i class="fas fa-times"></i>
                 </button>
