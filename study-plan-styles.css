@@ -1996,3 +1996,13 @@
     transform: scale(1.1); /* Make it slightly larger */
 }
 /* --- END: FULLSCREEN MODAL OVERRIDES --- */
+
+/* --- START: PREVENT CHEATING STYLES --- */
+#quiz-question-text {
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* IE10+/Edge */
+    user-select: none;         /* Standard */
+    cursor: default;           /* Shows arrow cursor instead of text selection cursor */
+}
+/* --- END: PREVENT CHEATING STYLES --- */
