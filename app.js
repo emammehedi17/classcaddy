@@ -4150,21 +4150,15 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             return mcqData;
         }
 
-        // 4. "View MCQ" Button Handler (UPDATED: Shows Label + Answer Text)
+        // 4. "View MCQ" Button Handler (UPDATED: Subject | Topic Header)
 async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
     const viewMcqContent = document.getElementById('view-mcq-content');
     const subtitle = document.getElementById('view-mcq-subtitle');
     const modal = document.getElementById('view-mcq-modal');
-    
+    const modalTitle = modal.querySelector('h3'); // Select the header title
+
     viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10"><i class="fas fa-spinner fa-spin text-2xl"></i><br>Loading MCQs...</p>';
     modal.style.display = 'block';
-
-    // Construct a title for the header
-    const titleText = rowIndex !== null 
-        ? `Row details for Day ${parseInt(dayIndex) + 1}` 
-        : `All MCQs for Day ${parseInt(dayIndex) + 1}`;
-    
-    if (subtitle) subtitle.textContent = titleText;
 
     try {
         // Fetch Data
@@ -4176,10 +4170,18 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
         if (!dayData) throw new Error("Day data not found.");
 
         let mcqData = [];
+        let mainTitleText = `Day-${dayData.dayNumber} MCQs`;
+        let subTitleText = "";
 
         // Get data (Single Row or All Rows)
         if (rowIndex !== null) {
-            mcqData = dayData.rows?.[rowIndex]?.mcqData || [];
+            const row = dayData.rows?.[rowIndex];
+            mcqData = row?.mcqData || [];
+            
+            // --- NEW HEADER LOGIC ---
+            const subject = row?.subject || "No Subject";
+            const topic = row?.topic || "No Topic";
+            subTitleText = `${subject} | ${topic}`;
         } else {
             mcqData = dayData.rows?.reduce((acc, row) => {
                 if (row.mcqData) {
@@ -4187,17 +4189,22 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 }
                 return acc;
             }, []) || [];
+            subTitleText = "All Questions";
         }
+
+        // Apply Text Updates
+        if (modalTitle) modalTitle.textContent = mainTitleText;
+        if (subtitle) subtitle.textContent = subTitleText;
 
         if (!mcqData || mcqData.length < 1) {
             viewMcqContent.innerHTML = '<div class="text-center py-10 text-gray-500">No MCQs found for this selection.</div>';
-            currentViewMcqData = null; // Clear data
+            currentViewMcqData = null; 
             return;
         }
 
         // --- STORE DATA FOR BUTTONS ---
         currentViewMcqData = {
-            title: titleText,
+            title: `${mainTitleText} - ${subTitleText}`, // Combined for Print/Test title
             mcqs: mcqData
         };
 
