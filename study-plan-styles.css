@@ -466,7 +466,7 @@
     /* Flex layout ensures inner content scrolls correctly if needed */
     display: flex;
     flex-direction: column;
-    overflow-y: auto; /* Allows scrolling inside the modal if content is too tall */
+    overflow: visible; /* Allows scrolling inside the modal if content is too tall */
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
