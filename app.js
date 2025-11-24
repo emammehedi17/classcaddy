@@ -7462,7 +7462,7 @@ let globalSettings = {
     fontSize: 16
 };
 
-// 1. Initialize Sync (Call this when user logs in)
+// 1. Initialize Sync
 function initSettingsSync(userId) {
     const settingsRef = doc(db, `artifacts/${appId}/users/${userId}/settings`, 'preferences');
 
@@ -7470,39 +7470,31 @@ function initSettingsSync(userId) {
     onSnapshot(settingsRef, (docSnap) => {
         if (docSnap.exists()) {
             const data = docSnap.data();
-            // Update global state
             if (data.darkMode !== undefined) globalSettings.darkMode = data.darkMode;
             if (data.fontSize !== undefined) globalSettings.fontSize = data.fontSize;
             
-            // Apply to UI
             applySettingsToDom();
-            updateSettingsControls();
         } else {
-            // Create default if doesn't exist
             setDoc(settingsRef, globalSettings, { merge: true });
         }
     });
 }
 
-// 2. Apply Visual Changes to DOM
+// 2. Apply Visual Changes (GLOBAL)
 function applySettingsToDom() {
-    // A. Apply Dark Mode to ALL Modal Wrappers
-    const wrappers = document.querySelectorAll('.modal-content');
-    wrappers.forEach(wrapper => {
-        if (globalSettings.darkMode) {
-            wrapper.classList.add('study-content-dark');
-        } else {
-            wrapper.classList.remove('study-content-dark');
-        }
-    });
+    // A. Apply Global Dark Mode to BODY
+    if (globalSettings.darkMode) {
+        document.body.classList.add('dark-mode');
+    } else {
+        document.body.classList.remove('dark-mode');
+    }
 
-    // B. Apply Font Size to Content Areas
+    // B. Apply Font Size (To specific content areas only)
     const contentIds = ['mcq-study-content', 'view-mcq-content'];
     contentIds.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.style.fontSize = `${globalSettings.fontSize}px`;
-            
             // Update inner elements
             const questions = el.querySelectorAll('.study-question');
             const options = el.querySelectorAll('.study-opt');
@@ -7513,24 +7505,14 @@ function applySettingsToDom() {
             answers.forEach(ans => ans.style.fontSize = `${globalSettings.fontSize * 0.9}px`);
         }
     });
-}
-
-// 3. Update Input Boxes and Toggles (Syncs both modals)
-function updateSettingsControls() {
-    // Update Toggles
-    ['mcq-dark-mode-toggle', 'view-mcq-dark-mode-toggle'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.checked = globalSettings.darkMode;
-    });
-
-    // Update Font Inputs
-    ['mcq-font-input', 'view-mcq-font-input'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = globalSettings.fontSize;
+    
+    // Update Font Inputs in Settings Panels (if they exist)
+    document.querySelectorAll('#mcq-font-input, #view-mcq-font-input').forEach(input => {
+        input.value = globalSettings.fontSize;
     });
 }
 
-// 4. Save to Firebase
+// 3. Save to Firebase
 async function saveUserPreferences() {
     if (!auth.currentUser) return;
     const settingsRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/settings`, 'preferences');
@@ -7541,67 +7523,39 @@ async function saveUserPreferences() {
     }
 }
 
-// 5. Setup Listeners (Call once per modal)
-function attachSettingsListeners(ids) {
-    const settingsBtn = document.getElementById(ids.btn);
-    const panel = document.getElementById(ids.panel);
-    const darkModeToggle = document.getElementById(ids.darkToggle);
+// 4. Global Dark Mode Toggle Listener
+const globalDarkBtn = document.getElementById('global-dark-mode-btn');
+if (globalDarkBtn) {
+    globalDarkBtn.addEventListener('click', () => {
+        globalSettings.darkMode = !globalSettings.darkMode; // Toggle boolean
+        applySettingsToDom(); // Apply instantly
+        saveUserPreferences(); // Save to DB
+    });
+}
+
+// 5. (Optional) Keep Font Size Listeners for the modals
+function attachFontSizeListeners(ids) {
     const fontInc = document.getElementById(ids.fontInc);
     const fontDec = document.getElementById(ids.fontDec);
     const fontInput = document.getElementById(ids.fontInput);
 
-    if (!settingsBtn || !panel) return;
+    if (!fontInc) return;
 
-    // Toggle Panel Visibility
-    settingsBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        panel.classList.toggle('active');
-    });
-
-    // Dark Mode Change
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('change', (e) => {
-            globalSettings.darkMode = e.target.checked;
-            applySettingsToDom(); // Instant local update
-            saveUserPreferences(); // Save to DB
-        });
-    }
-
-    // Font Size Change
     const changeFont = (newSize) => {
         if (newSize >= 10 && newSize <= 30) {
             globalSettings.fontSize = newSize;
-            applySettingsToDom(); // Instant local update
-            updateSettingsControls(); // Update inputs instantly
-            
-            // Debounce save (optional, but simple save is fine here)
+            applySettingsToDom();
             saveUserPreferences();
         }
     };
 
-    if (fontInc) fontInc.addEventListener('click', () => changeFont(globalSettings.fontSize + 1));
-    if (fontDec) fontDec.addEventListener('click', () => changeFont(globalSettings.fontSize - 1));
-    if (fontInput) fontInput.addEventListener('change', (e) => changeFont(parseInt(e.target.value)));
-
-    // Close panel on outside click
-    document.addEventListener('click', (e) => {
-        if (!panel.contains(e.target) && e.target !== settingsBtn && !settingsBtn.contains(e.target)) {
-            panel.classList.remove('active');
-        }
-    });
+    fontInc.addEventListener('click', () => changeFont(globalSettings.fontSize + 1));
+    fontDec.addEventListener('click', () => changeFont(globalSettings.fontSize - 1));
+    fontInput.addEventListener('change', (e) => changeFont(parseInt(e.target.value)));
 }
 
-// Initialize Listeners
-attachSettingsListeners({
-    btn: 'mcq-settings-btn', panel: 'mcq-settings-panel',
-    darkToggle: 'mcq-dark-mode-toggle',
-    fontInc: 'mcq-font-inc', fontDec: 'mcq-font-dec', fontInput: 'mcq-font-input'
-});
-
-attachSettingsListeners({
-    btn: 'view-mcq-settings-btn', panel: 'view-mcq-settings-panel',
-    darkToggle: 'view-mcq-dark-mode-toggle',
-    fontInc: 'view-mcq-font-inc', fontDec: 'view-mcq-font-dec', fontInput: 'view-mcq-font-input'
-});
+// Attach font listeners (we keep these inside the modals as requested earlier)
+attachFontSizeListeners({ fontInc: 'mcq-font-inc', fontDec: 'mcq-font-dec', fontInput: 'mcq-font-input' });
+attachFontSizeListeners({ fontInc: 'view-mcq-font-inc', fontDec: 'view-mcq-font-dec', fontInput: 'view-mcq-font-input' });
 
 // --- END: GLOBAL SETTINGS SYNC ---

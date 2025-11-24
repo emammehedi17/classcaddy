@@ -2269,3 +2269,138 @@
 }
 
 /* --- END: FINAL DARK MODE FIXES --- */
+
+/* --- START: GLOBAL DARK MODE "EVERYTHING" OVERRIDES --- */
+
+/* 1. Base Backgrounds & Text */
+body.dark-mode {
+    background-color: #111827 !important; /* Gray 900 */
+    color: #e5e7eb !important; /* Gray 200 */
+}
+body.dark-mode::before {
+    opacity: 0.1; /* Dim the background pattern */
+}
+
+/* 2. Cards, Modals, Containers */
+body.dark-mode .card,
+body.dark-mode .modal-content,
+body.dark-mode .week-section,
+body.dark-mode .day-section-body,
+body.dark-mode .target-card,
+body.dark-mode header.main-website-ui, 
+body.dark-mode #mobile-menu,
+body.dark-mode .dropdown-menu,
+body.dark-mode .pomodoro-widget {
+    background-color: #1f2937 !important; /* Gray 800 */
+    border-color: #374151 !important; /* Gray 700 */
+    color: #e5e7eb !important;
+}
+
+/* 3. Text Colors (Override Tailwind grays/blacks) */
+body.dark-mode .text-gray-800,
+body.dark-mode .text-gray-900,
+body.dark-mode .text-gray-700,
+body.dark-mode .text-gray-600 {
+    color: #e5e7eb !important;
+}
+body.dark-mode .text-gray-500,
+body.dark-mode .text-gray-400 {
+    color: #9ca3af !important;
+}
+/* Specific adjustments for colored text */
+body.dark-mode .text-emerald-600 { color: #34d399 !important; } /* Brighter Green */
+body.dark-mode .text-indigo-700, body.dark-mode .text-indigo-600 { color: #818cf8 !important; } /* Brighter Indigo */
+
+/* 4. Inputs & Textareas */
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+    background-color: #374151 !important; /* Gray 700 */
+    border-color: #4b5563 !important;
+    color: #ffffff !important;
+}
+body.dark-mode input::placeholder, 
+body.dark-mode textarea::placeholder {
+    color: #9ca3af !important;
+}
+
+/* 5. Tables (Study Plan & Results) */
+body.dark-mode .study-table th,
+body.dark-mode .study-table td,
+body.dark-mode .results-table-container th,
+body.dark-mode .results-table-container td {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #e5e7eb !important;
+}
+body.dark-mode .study-table thead,
+body.dark-mode .study-table tbody tr:hover td {
+    background-color: #374151 !important; /* Gray 700 for headers/hover */
+}
+
+/* 6. Buttons */
+body.dark-mode .action-button-secondary {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #ffffff !important;
+}
+body.dark-mode .action-button-secondary:hover {
+    background-color: #4b5563 !important;
+}
+
+/* 7. Specific Modules (Quiz, Vocab, MCQ) */
+body.dark-mode .quiz-option-btn {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #e5e7eb !important;
+}
+body.dark-mode .study-card {
+    background-color: #111827 !important; /* Darker than modal */
+    border-color: #374151 !important;
+}
+body.dark-mode .study-opt {
+    background-color: #1f2937 !important;
+    border-color: #4b5563 !important;
+}
+body.dark-mode .answer-card-bg {
+    background-color: #064e3b !important; /* Deep Green */
+    border-color: #065f46 !important;
+}
+body.dark-mode .answer-text { color: #d1fae5 !important; }
+body.dark-mode .answer-label { color: #6ee7b7 !important; }
+
+/* 8. Progress Bars & Charts */
+body.dark-mode .progress-bar-container {
+    background-color: #374151 !important;
+}
+/* Fix White Caps on Progress Bars */
+body.dark-mode .progress-bar-fill::after {
+    background-color: #1f2937 !important; /* Match modal bg */
+}
+/* Fix Circular Trackers */
+body.dark-mode .circular {
+    background-color: #111827 !important;
+    border-color: #374151 !important;
+}
+body.dark-mode .circular circle.bg {
+    stroke: #374151 !important;
+}
+body.dark-mode .circular .tracker-score {
+    color: #ffffff !important;
+}
+body.dark-mode .circular .end-cap {
+    background-color: #111827 !important;
+    box-shadow: none !important;
+}
+
+/* 9. Global Toggle Button State */
+body.dark-mode #global-dark-mode-btn {
+    background-color: #fbbf24 !important; /* Yellow Sun */
+    color: #1f2937 !important; /* Dark Text */
+    border-color: #f59e0b !important;
+}
+body.dark-mode #global-dark-mode-btn i::before {
+    content: "\f185"; /* Switch Moon to Sun Icon */
+}
+
+/* --- END: GLOBAL DARK MODE OVERRIDES --- */
