@@ -6926,7 +6926,7 @@ async function buildMasterMcqPrintHtml() {
     return html;
 }
 
-// 2. Print Handler (Updated CSS)
+// 2. Optimized Print Handler (Crash-Proof for Large Data)
 document.getElementById('print-master-mcq-btn')?.addEventListener('click', async (e) => {
     const btn = e.currentTarget;
     const originalText = btn.innerHTML;
@@ -6934,96 +6934,52 @@ document.getElementById('print-master-mcq-btn')?.addEventListener('click', async
     btn.disabled = true;
 
     try {
-        const contentHtml = await buildMasterMcqPrintHtml();
+        const userId = auth.currentUser.uid;
+        const appId = "study-plan17";
+        const plansCollectionPath = `artifacts/${appId}/users/${userId}/studyPlans`;
         
+        // 1. Open the window immediately (Empty)
         const printWindow = window.open('', '', 'height=900,width=1200');
-        
+        if (!printWindow) {
+            showCustomAlert("Pop-up blocked! Please allow pop-ups.", "error");
+            return;
+        }
+
+        // 2. Set up the skeleton HTML & CSS
         const styles = `
             <style>
                 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
                 @page { size: A4; margin: 1cm; }
                 body { font-family: 'Inter', 'Kalpurush', sans-serif; color: #1f2937; font-size: 11px; line-height: 1.3; }
                 
-                /* 2-Column Layout */
                 .mcq-print-wrapper {
                     column-count: 2;
                     column-gap: 2rem;
                     column-rule: 1px solid #eee;
                 }
                 
-                /* Month Header */
                 .print-month-header {
                     column-span: all; 
-                    text-align: center;
-                    font-size: 16px;
-                    font-weight: bold;
-                    color: #059669;
-                    border-bottom: 2px solid #059669;
-                    margin-top: 15px;
-                    margin-bottom: 10px;
-                    padding-bottom: 5px;
+                    text-align: center; font-size: 16px; font-weight: bold; color: #059669;
+                    border-bottom: 2px solid #059669; margin-top: 15px; margin-bottom: 10px; padding-bottom: 5px;
                 }
-                
-                /* Day Header */
-                .print-day-group {
-                    break-inside: avoid;
-                    margin-bottom: 15px;
-                }
+                .print-day-group { break-inside: avoid; margin-bottom: 15px; }
                 .print-day-header {
-                    font-weight: bold;
-                    background: #f3f4f6;
-                    padding: 4px 8px;
-                    border-radius: 4px;
-                    margin-bottom: 5px;
-                    color: #374151;
-                    font-size: 12px;
-                    border-left: 4px solid #4f46e5;
+                    font-weight: bold; background: #f3f4f6; padding: 4px 8px;
+                    border-radius: 4px; margin-bottom: 8px; color: #374151; font-size: 12px; border-left: 4px solid #4f46e5;
                 }
-
-                /* Subject Header (New) */
                 .print-subject-header {
-                    font-size: 11px;
-                    font-weight: 700;
-                    color: #4f46e5; /* Indigo color */
-                    text-transform: uppercase;
-                    margin-top: 8px;
-                    margin-bottom: 4px;
-                    padding-bottom: 2px;
-                    border-bottom: 1px dashed #c7d2fe;
-                    padding-left: 4px;
+                    font-size: 11px; font-weight: 700; color: #4f46e5; text-transform: uppercase;
+                    margin-top: 8px; margin-bottom: 4px; padding-bottom: 2px; border-bottom: 1px dashed #c7d2fe; padding-left: 4px;
                 }
-                
-                /* MCQ Item */
                 .print-mcq-item {
-                    break-inside: avoid;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 6px;
-                    padding: 8px;
-                    margin-bottom: 6px;
-                    background: #fff;
+                    break-inside: avoid; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px; margin-bottom: 6px; background: #fff;
                 }
                 .print-q-text { font-weight: 600; margin-bottom: 6px; }
                 .q-num { color: #059669; margin-right: 4px; }
-                
-                /* Options Grid */
-                .print-options-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 4px;
-                    font-size: 10px;
-                    color: #4b5563;
-                }
+                .print-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 10px; color: #4b5563; }
                 .opt-label { font-weight: bold; color: #6b7280; }
-
-                /* Answer Key */
-                .print-ans-key {
-                    text-align: right;
-                    margin-top: 6px;
-                    font-size: 10px;
-                    color: #059669;
-                    border-top: 1px dashed #f3f4f6;
-                    padding-top: 2px;
-                }
+                .print-ans-key { text-align: right; margin-top: 6px; font-size: 10px; color: #059669; border-top: 1px dashed #f3f4f6; padding-top: 2px; }
             </style>
         `;
 
@@ -7035,22 +6991,116 @@ document.getElementById('print-master-mcq-btn')?.addEventListener('click', async
                 <h1 style="margin:0; color:#1f2937; font-size:20px;">Master MCQ List</h1>
                 <p style="margin:5px 0; color:#6b7280; font-size:10px;">Generated on ${today}</p>
             </div>
+            <div class="mcq-print-wrapper">
         `);
-        
-        printWindow.document.write(contentHtml);
-        printWindow.document.write('</body></html>');
+
+        // 3. Fetch Data Streamingly
+        const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            printWindow.document.write("<p>No MCQs found.</p>");
+        }
+
+        let totalMcqsProcessed = 0;
+
+        // Loop through Months
+        for (const docSnap of querySnapshot.docs) {
+            const monthId = docSnap.id;
+            const monthName = docSnap.data().monthName || monthId;
+            let monthHeaderWritten = false;
+
+            // Fetch Weeks
+            const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
+            const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
+            const sortedWeeks = weeksQuerySnapshot.docs.sort((a, b) => a.id.localeCompare(b.id));
+
+            for (const weekDoc of sortedWeeks) {
+                const weekId = weekDoc.id;
+                const weekData = weekDoc.data();
+                if (!weekData.days) continue;
+
+                for (const day of weekData.days) {
+                    // Prepare Day Buffer
+                    let dayBufferHtml = '';
+                    const mcqsBySubject = {}; 
+                    let hasMcqs = false;
+
+                    day.rows?.forEach(row => {
+                        if (row.mcqData && row.mcqData.length > 0) {
+                            const subject = row.subject || "General";
+                            if (!mcqsBySubject[subject]) mcqsBySubject[subject] = [];
+                            mcqsBySubject[subject].push(...row.mcqData);
+                            hasMcqs = true;
+                        }
+                    });
+
+                    if (hasMcqs) {
+                        // Write Month Header (Only once if data exists)
+                        if (!monthHeaderWritten) {
+                            printWindow.document.write(`<div class="print-month-header">${escapeHtml(monthName)}</div>`);
+                            monthHeaderWritten = true;
+                        }
+
+                        dayBufferHtml += `<div class="print-day-group">`;
+                        dayBufferHtml += `<div class="print-day-header">Week ${weekId.replace('week', '')} - Day ${day.dayNumber}</div>`;
+
+                        for (const [subject, mcqs] of Object.entries(mcqsBySubject)) {
+                            dayBufferHtml += `<div class="print-subject-header">${escapeHtml(subject)}</div>`;
+
+                            for (let idx = 0; idx < mcqs.length; idx++) {
+                                const mcq = mcqs[idx];
+                                const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+                                const ansLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+
+                                dayBufferHtml += `
+                                    <div class="print-mcq-item">
+                                        <div class="print-q-text"><span class="q-num">${idx + 1}.</span> ${escapeHtml(mcq.question)}</div>
+                                        <div class="print-options-grid">
+                                            ${mcq.options.map((opt, i) => `<div><span class="opt-label">${getOptionLabel(i, mcq.question)}.</span> ${escapeHtml(opt)}</div>`).join('')}
+                                        </div>
+                                        <div class="print-ans-key">Correct: <b>${ansLabel}</b></div>
+                                    </div>
+                                `;
+
+                                totalMcqsProcessed++;
+                                
+                                // --- CRITICAL: Anti-Freeze Pause ---
+                                // Every 50 MCQs, pause for 50ms to let browser render UI
+                                if (totalMcqsProcessed % 50 === 0) {
+                                    btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1.5"></i> Rendering (${totalMcqsProcessed})...`;
+                                    await new Promise(r => setTimeout(r, 20)); // Breathe
+                                }
+                            }
+                        }
+                        dayBufferHtml += `</div>`; // End Day Group
+                        
+                        // Write Day Chunk immediately to free memory
+                        printWindow.document.write(dayBufferHtml);
+                    }
+                }
+            }
+        }
+
+        printWindow.document.write('</div></body></html>');
         printWindow.document.close();
 
+        btn.innerHTML = `<i class="fas fa-check mr-1.5"></i> Done`;
+        
+        // Wait for final render before print dialog
         setTimeout(() => {
+            printWindow.focus();
             printWindow.print();
-            printWindow.close();
-        }, 1000);
+            // printWindow.close(); // Optional: Keep open for large files
+        }, 1500);
 
     } catch (error) {
         console.error(error);
         showCustomAlert("Failed to print.", "error");
     } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }, 2000);
     }
 });
