@@ -4152,7 +4152,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
 
 
-// 4. "View MCQ" Button Handler (FIXED: Added Dark Mode Classes back)
+// 4. "View MCQ" Button Handler (UPDATED: font-semibold for Answer)
 async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
     const viewMcqContent = document.getElementById('view-mcq-content');
     const subtitle = document.getElementById('view-mcq-subtitle');
@@ -4229,7 +4229,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                             <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg">
                                 <i class="fas fa-check text-xs"></i>
                             </div>
-                            <div class="font-bold text-emerald-900 text-sm answer-text">
+                            <div class="font-semibold text-emerald-900 text-sm answer-text">
                                 Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
                             </div>
                         </div>
@@ -7086,7 +7086,7 @@ window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
 };
 
 
-// 3. Render the Cards (FIXED: Added Dark Mode Classes back)
+// 3. Render the Cards (UPDATED: font-semibold for Answer)
 function renderStudyView(mcqs) {
     if (mcqs.length === 0) {
         mcqStudyContent.innerHTML = '<div class="text-center py-10 text-gray-500">No MCQs found here.</div>';
@@ -7118,7 +7118,7 @@ function renderStudyView(mcqs) {
                         <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg">
                             <i class="fas fa-check text-xs"></i>
                         </div>
-                        <div class="font-bold text-emerald-900 text-sm answer-text">
+                        <div class="font-semibold text-emerald-900 text-sm answer-text">
                             Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
                         </div>
                     </div>
