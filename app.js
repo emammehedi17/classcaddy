@@ -4150,12 +4150,12 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             return mcqData;
         }
 
-        // 4. "View MCQ" Button Handler (UPDATED: Subject | Topic Header)
+        // 4. "View MCQ" Button Handler (UPDATED: Inline Numbering)
 async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
     const viewMcqContent = document.getElementById('view-mcq-content');
     const subtitle = document.getElementById('view-mcq-subtitle');
     const modal = document.getElementById('view-mcq-modal');
-    const modalTitle = modal.querySelector('h3'); // Select the header title
+    const modalTitle = modal.querySelector('h3');
 
     viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10"><i class="fas fa-spinner fa-spin text-2xl"></i><br>Loading MCQs...</p>';
     modal.style.display = 'block';
@@ -4177,8 +4177,6 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
         if (rowIndex !== null) {
             const row = dayData.rows?.[rowIndex];
             mcqData = row?.mcqData || [];
-            
-            // --- NEW HEADER LOGIC ---
             const subject = row?.subject || "No Subject";
             const topic = row?.topic || "No Topic";
             subTitleText = `${subject} | ${topic}`;
@@ -4192,7 +4190,6 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
             subTitleText = "All Questions";
         }
 
-        // Apply Text Updates
         if (modalTitle) modalTitle.textContent = mainTitleText;
         if (subtitle) subtitle.textContent = subTitleText;
 
@@ -4204,7 +4201,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 
         // --- STORE DATA FOR BUTTONS ---
         currentViewMcqData = {
-            title: `${mainTitleText} - ${subTitleText}`, // Combined for Print/Test title
+            title: `${mainTitleText} - ${subTitleText}`,
             mcqs: mcqData
         };
 
@@ -4216,12 +4213,10 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 
             html += `
                 <div class="study-card">
-                    <div class="flex justify-between mb-2">
-                        <span class="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded">
-                            Question #${index + 1}
-                        </span>
+                    <div class="study-question text-gray-900 font-medium">
+                        <span class="text-indigo-600 font-bold mr-1">${index + 1}.</span>${escapeHtml(mcq.question)}
                     </div>
-                    <div class="study-question text-gray-900 font-medium">${escapeHtml(mcq.question)}</div>
+
                     <div class="study-options">
                         ${mcq.options.map((opt, i) => `
                             <div class="study-opt text-gray-900">
@@ -4245,7 +4240,8 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
         currentViewMcqData = null;
     }
 }
-		
+
+	
 		/**
          * Fetches all vocab from all days *before* the specified date.
          * @param {string} currentMonthId - The month ID (e.g., "2025-10")
@@ -7082,7 +7078,7 @@ window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
     }
 };
 
-// 3. Render the Cards (UPDATED: Shows Label + Answer Text)
+// 3. Render the Cards (UPDATED: Inline Numbering)
 function renderStudyView(mcqs) {
     if (mcqs.length === 0) {
         mcqStudyContent.innerHTML = '<div class="text-center py-10 text-gray-500">No MCQs found here.</div>';
@@ -7097,12 +7093,10 @@ function renderStudyView(mcqs) {
 
         html += `
             <div class="study-card">
-                <div class="flex justify-between mb-2">
-                    <span class="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded">
-                        Question #${idx + 1}
-                    </span>
+                <div class="study-question text-gray-900 font-medium">
+                    <span class="text-indigo-600 font-bold mr-1">${idx + 1}.</span>${escapeHtml(mcq.question)}
                 </div>
-                <div class="study-question text-gray-900 font-medium">${escapeHtml(mcq.question)}</div>
+                
                 <div class="study-options">
                     ${mcq.options.map((opt, i) => `
                         <div class="study-opt text-gray-900">
