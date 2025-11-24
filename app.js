@@ -7055,25 +7055,28 @@ function renderStudyView(mcqs) {
 
     let html = '';
     mcqs.forEach((mcq, idx) => {
+        // Determine the label (k/kh or a/b) for the correct answer
+        const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+        const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+
         html += `
             <div class="study-card">
                 <div class="flex justify-between mb-2">
                     <span class="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded">
-                        ${mcq.meta.month} / ${mcq.meta.week} / Day ${mcq.meta.day}
+                        Question #${idx + 1}
                     </span>
-                    <span class="text-xs font-bold text-gray-400">#${idx + 1}</span>
-                </div>
-                <div class="study-question">${escapeHtml(mcq.question)}</div>
+                    </div>
+                <div class="study-question text-gray-900 font-medium">${escapeHtml(mcq.question)}</div>
                 <div class="study-options">
                     ${mcq.options.map((opt, i) => `
-                        <div class="study-opt">
-                            <span class="font-bold text-gray-400 mr-2">${getOptionLabel(i, mcq.question)}.</span>
+                        <div class="study-opt text-gray-900">
+                            <span class="font-bold text-black mr-2">${getOptionLabel(i, mcq.question)}.</span>
                             ${escapeHtml(opt)}
                         </div>
                     `).join('')}
                 </div>
-                <div class="study-answer">
-                    Correct Answer: ${escapeHtml(mcq.correctAnswer)}
+                <div class="study-answer" style="text-align: left;">
+                    Correct: ${correctLabel}
                 </div>
             </div>
         `;
