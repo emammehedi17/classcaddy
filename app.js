@@ -4654,15 +4654,17 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
             // --- START: FIX FOR OVERLAPPING SCREENS ---
             quizModal.style.display = "block";
             
+            // Force hide Main, Results, and Review screens
             quizMainScreen.classList.add('hidden');
             quizMainScreen.style.display = 'none';
             
             quizResultsScreen.classList.add('hidden');
-            quizResultsScreen.style.display = 'none';
+            quizResultsScreen.style.display = 'none'; // Critical fix
             
             quizReviewScreen.classList.add('hidden');
             quizReviewScreen.style.display = 'none';
 
+            // Show Start Screen
             quizStartScreen.classList.remove('hidden');
             quizStartScreen.style.display = '';
             // --- END: FIX FOR OVERLAPPING SCREENS ---
@@ -7185,9 +7187,7 @@ function renderStudyView(mcqs) {
 }
 
 
-
-
-// 5. NEW: Test Handler for Study View (UPDATED: Exits Fullscreen)
+	// 5. NEW: Test Handler for Study View (UPDATED: Exits Fullscreen)
 document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
     if (!currentStudyViewData || currentStudyViewData.mcqs.length === 0) {
         showCustomAlert("No MCQs available to test.", "error");
@@ -7222,15 +7222,17 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
     // --- START: FIX FOR OVERLAPPING SCREENS ---
     quizModal.style.display = "block";
     
+    // Force hide Main, Results, and Review screens
     quizMainScreen.classList.add('hidden');
     quizMainScreen.style.display = 'none';
     
     quizResultsScreen.classList.add('hidden');
-    quizResultsScreen.style.display = 'none';
+    quizResultsScreen.style.display = 'none'; // Critical fix
     
     quizReviewScreen.classList.add('hidden');
     quizReviewScreen.style.display = 'none';
 
+    // Show Start Screen
     quizStartScreen.classList.remove('hidden');
     quizStartScreen.style.display = '';
     // --- END: FIX FOR OVERLAPPING SCREENS ---
@@ -7405,10 +7407,24 @@ if (viewMcqTestBtn) {
         
         // Init Quiz
         quizTitle.textContent = 'MCQ Quiz';
+        
+        // --- START: FIX FOR OVERLAPPING SCREENS ---
         quizModal.style.display = "block";
+        
+        // Force hide Main, Results, and Review screens
         quizMainScreen.classList.add('hidden');
+        quizMainScreen.style.display = 'none';
+        
         quizResultsScreen.classList.add('hidden');
+        quizResultsScreen.style.display = 'none'; // Critical fix
+        
+        quizReviewScreen.classList.add('hidden');
+        quizReviewScreen.style.display = 'none';
+
+        // Show Start Screen
         quizStartScreen.classList.remove('hidden');
+        quizStartScreen.style.display = '';
+        // --- END: FIX FOR OVERLAPPING SCREENS ---
         
         currentMcqData = mcqData;
         currentVocabData = null;
