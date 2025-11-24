@@ -619,13 +619,17 @@
                 <p id="study-modal-subtitle" class="text-xs text-gray-500">... topics ...</p>
             </div>
             <div class="flex items-center gap-3">
-                <button id="print-study-mcq-btn" class="action-button action-button-secondary text-sm">
-                    <i class="fas fa-print mr-1.5"></i> Print
-                </button>
-                <button class="text-gray-400 hover:text-red-500 transition-colors text-2xl" onclick="closeModal('mcq-study-modal')">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+				<button id="test-study-mcq-btn" class="action-button text-sm" style="background-color: #4f46e5;">
+					<i class="fas fa-play mr-1.5"></i> Test
+				</button>
+				
+				<button id="print-study-mcq-btn" class="action-button action-button-secondary text-sm">
+					<i class="fas fa-print mr-1.5"></i> Print
+				</button>
+				<button class="text-gray-400 hover:text-red-500 transition-colors text-2xl" onclick="closeModal('mcq-study-modal')">
+					<i class="fas fa-times"></i>
+				</button>
+			</div>
         </div>
 
         <div id="mcq-study-content" class="p-6 bg-gray-50 overflow-y-auto custom-scrollbar kalpurush" style="flex-grow: 1;">

@@ -7084,6 +7084,74 @@ function renderStudyView(mcqs) {
     mcqStudyContent.innerHTML = html;
 }
 
+// 5. NEW: Test Handler for Study View
+document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
+    if (!currentStudyViewData || currentStudyViewData.mcqs.length === 0) {
+        showCustomAlert("No MCQs available to test.", "error");
+        return;
+    }
+
+    // 1. Close the study modal
+    closeModal('mcq-study-modal');
+
+    // 2. Prepare data for the quiz function
+    // We reuse the logic from 'startAggregatedMcqQuiz' but pass the data directly
+    const mcqData = currentStudyViewData.mcqs;
+    const title = currentStudyViewData.title;
+
+    // 3. Set Global Quiz State
+    // We spoof the target so the save function knows it was an aggregated test
+    currentMcqTarget = { 
+        quizType: 'aggregated', // Custom type
+        description: title 
+    };
+    
+    // Set Subject Info for the result sheet
+    window.currentQuizSubjectInfo = { 
+        subjectName: "Study Mode", 
+        topicDetail: title 
+    };
+
+    // 4. Initialize Quiz UI
+    quizTitle.textContent = 'MCQ Quiz';
+    quizModal.style.display = "block";
+    quizMainScreen.classList.add('hidden');
+    quizResultsScreen.classList.add('hidden');
+    quizStartScreen.classList.remove('hidden');
+    
+    // 5. Prepare Questions
+    currentMcqData = mcqData;
+    currentVocabData = null;
+    
+    // Map to quiz format (removing metadata if strictly needed, but keeping it is fine)
+    currentQuizQuestions = currentMcqData.map(mcq => ({ 
+        question: mcq.question,
+        options: [...mcq.options],
+        correctAnswer: mcq.correctAnswer,
+        userAnswer: null,
+        isCorrect: null
+    }));
+
+    // 6. Calculate Time
+    const totalQuestions = currentQuizQuestions.length;
+    const totalTimeInSeconds = totalQuestions * 36;
+
+    // 7. Update Start Screen Text
+    const warningP = document.getElementById('quiz-total-time-warning');
+    warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+    warningP.style.display = 'block';
+    
+    quizStartMessage.textContent = `Ready to test yourself on ${totalQuestions} MCQs from: ${title}?`;
+    
+    // 8. Attach Start Button
+    quizStartBtn.classList.remove('hidden');
+    const newStartBtn = quizStartBtn.cloneNode(true);
+    quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
+    newStartBtn.addEventListener('click', runQuizGame);
+    quizStartBtn = newStartBtn;
+});
+
+
 // 4. Print Handler (Uses 'currentStudyViewData')
 printStudyBtn.addEventListener('click', () => {
     if (!currentStudyViewData || currentStudyViewData.mcqs.length === 0) return;
