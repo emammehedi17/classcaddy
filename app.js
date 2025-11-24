@@ -2733,18 +2733,14 @@ function addVocabPairInputs(container, word = '', meaning = '') {
         }
 
         // --- Other Utility functions ---
-			function calculateWeeklyProgress(weekData) {
+		function calculateWeeklyProgress(weekData) {
             if (!weekData || !weekData.days || weekData.days.length === 0) return 0;
             let totalPercentageSum = 0; 
             
             weekData.days.forEach(day => {
                 day.rows?.forEach(row => {
-                    // Check if the "Done" checkbox is checked
                     if (row.completed) {
-                        // If it is, get the percentage value from the row
                         const perc = parsePercentage(row.completionPercentage);
-                        
-                        // If the percentage is a valid number (not null), add it to the sum
                         if (perc !== null && !isNaN(perc)) {
                              totalPercentageSum += perc;
                         }
@@ -2752,8 +2748,9 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                 });
             });
              
-             // Return the raw sum of *completed* rows, rounded.
-            return Math.round(totalPercentageSum);
+             // WEEK CALC: (Sum of Day Percents) / 7
+             // Example: 7 days of 100% = 700 total. 700 / 7 = 100% Weekly Progress.
+            return Math.round(totalPercentageSum / 7);
         }
 		
 		
@@ -2762,21 +2759,17 @@ function addVocabPairInputs(container, word = '', meaning = '') {
             let totalPercentageSum = 0; 
             
             dayData.rows.forEach(row => {
-                // Check if the "Done" checkbox is checked
                 if (row.completed) {
-                    // If it is, get the percentage value from the row
                     const perc = parsePercentage(row.completionPercentage);
-                    
-                    // If the percentage is a valid number (not null), add it to the sum
                     if (perc !== null && !isNaN(perc)) {
                          totalPercentageSum += perc;
                     }
                 }
             });
              
-            // --- UPDATED CALCULATION ---
-            // Multiply the total sum by 7, as requested, and then round it.
-            return Math.round(totalPercentageSum * 7);
+            // DIRECT SUM: 20 + 30 + 50 = 100%
+            // We cap it at 100 just in case
+            return Math.min(100, Math.round(totalPercentageSum));
         }
 		
 		
@@ -3101,26 +3094,22 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             let strVal = String(value).trim(); 
             if (strVal === '') return null;
 
-            if (strVal.includes('/')) {
-                const parts = strVal.split('/'); 
-                const num = parseFloat(parts[0]); 
-                const den = parseFloat(parts[1]);
-                if (!isNaN(num) && !isNaN(den) && den !== 0) { 
-                    // User wants 3/2 -> 1.5. Just do the division and round to 10 decimal places.
-                    return parseFloat((num / den).toFixed(10));
-                }
-            }
+            // Remove % sign if user typed it
+            strVal = strVal.replace('%', '');
             
-            strVal = strVal.replace(',', '.').replace('%', ''); // Allow comma, dot, and % sign
+            // Replace comma with dot for decimals (e.g. 20,5 -> 20.5)
+            strVal = strVal.replace(',', '.'); 
+            
             const floatVal = parseFloat(strVal);
             
             if (!isNaN(floatVal)) { 
-                // User wants to input any number. Do not clamp it.
-                return parseFloat(floatVal.toFixed(10));
+                // DIRECT: Input "20" -> Save "20"
+                return parseFloat(floatVal.toFixed(2));
             } 
             
-            return null; // Invalid input
+            return null; 
          }
+		 
          function setSyncStatus(text, color) {
              if (!syncStatusText) return; syncStatusText.textContent = text;
              syncStatusText.classList.remove('text-emerald-500', 'text-yellow-500', 'text-red-500', 'text-blue-500');
@@ -6815,3 +6804,90 @@ async function executeRestore(backupData) {
     }
 }
 // --- END BACKUP MANAGER ---
+
+// --- DATA FIXER SCRIPT (CONVERT FRACTIONS TO PERCENTAGES) ---
+
+window.fixOldPercentages = async function() {
+    if (!auth.currentUser) { alert("Please log in."); return; }
+    
+    if (!confirm("WARNING: This will multiply all small percentage values (less than 15) by 7 to convert them to the new format.\n\nAre you sure you want to proceed?")) return;
+
+    const btn = document.getElementById('fix-data-btn');
+    btn.innerHTML = "Fixing...";
+    btn.disabled = true;
+
+    const userId = auth.currentUser.uid;
+    const appId = "study-plan17";
+    const plansCollectionPath = `artifacts/${appId}/users/${userId}/studyPlans`;
+
+    let totalFixedRows = 0;
+
+    try {
+        // 1. Get all Months
+        const q = query(collection(db, plansCollectionPath));
+        const querySnapshot = await getDocs(q);
+
+        for (const monthDoc of querySnapshot.docs) {
+            // 2. Get 'weeks' subcollection for each month
+            const weeksRef = collection(db, monthDoc.ref.path, 'weeks');
+            const weeksSnap = await getDocs(weeksRef);
+
+            for (const weekDoc of weeksSnap.docs) {
+                const weekData = weekDoc.data();
+                if (!weekData.days) continue;
+
+                let weekModified = false;
+                
+                // 3. Loop through Days and Rows
+                weekData.days.forEach(day => {
+                    day.rows?.forEach(row => {
+                        // CHECK: Is this row completed AND has a value?
+                        if (row.completed && row.completionPercentage !== null) {
+                            
+                            const val = parseFloat(row.completionPercentage);
+                            
+                            // SAFETY CHECK: Only fix if value is small (Old format: 100/7 = 14.28)
+                            // If value is > 15, it's likely already fixed (e.g., 20, 50, 80)
+                            if (!isNaN(val) && val > 0 && val < 15) {
+                                
+                                // THE FIX: Multiply by 7
+                                const newVal = Math.min(100, Math.round(val * 7));
+                                
+                                console.log(`Fixing: ${val} -> ${newVal}`);
+                                row.completionPercentage = newVal;
+                                weekModified = true;
+                                totalFixedRows++;
+                            }
+                        }
+                    });
+                });
+
+                // 4. Save only if changes were made
+                if (weekModified) {
+                    await updateDoc(weekDoc.ref, { days: weekData.days });
+                }
+            }
+        }
+
+        alert(`Success! Fixed ${totalFixedRows} rows.\n\nThe progress bars might look wrong for a moment. Please REFRESH the page to recalculate them.`);
+        location.reload();
+
+    } catch (e) {
+        console.error("Fix failed:", e);
+        alert("Error running fix script.");
+    } finally {
+        btn.innerHTML = "✅ Done";
+    }
+};
+
+// Add the Fix Button (Temporary)
+const fixBtn = document.createElement('button');
+fixBtn.id = 'fix-data-btn';
+fixBtn.innerText = "🔧 FIX % DATA";
+fixBtn.style.cssText = "position: fixed; bottom: 70px; left: 150px; z-index: 99999; background: #db2777; color: white; padding: 12px 20px; font-weight: bold; border-radius: 8px; cursor: pointer; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3);";
+fixBtn.onclick = window.fixOldPercentages;
+
+// Only show if not printing
+if (!window.matchMedia('print').matches) {
+    document.body.appendChild(fixBtn);
+}
