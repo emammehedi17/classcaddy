@@ -4150,94 +4150,94 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             return mcqData;
         }
 
-        // 4. "View MCQ" Button Handler (UPDATED WITH DATA STORAGE)
-        async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
-            const viewMcqContent = document.getElementById('view-mcq-content');
-            const subtitle = document.getElementById('view-mcq-subtitle');
-            const modal = document.getElementById('view-mcq-modal');
-            
-            viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10"><i class="fas fa-spinner fa-spin text-2xl"></i><br>Loading MCQs...</p>';
-            modal.style.display = 'block';
+        // 4. "View MCQ" Button Handler (UPDATED: Shows Label + Answer Text)
+async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
+    const viewMcqContent = document.getElementById('view-mcq-content');
+    const subtitle = document.getElementById('view-mcq-subtitle');
+    const modal = document.getElementById('view-mcq-modal');
+    
+    viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10"><i class="fas fa-spinner fa-spin text-2xl"></i><br>Loading MCQs...</p>';
+    modal.style.display = 'block';
 
-            // Construct a title for the header
-            const titleText = rowIndex !== null 
-                ? `Row details for Day ${parseInt(dayIndex) + 1}` 
-                : `All MCQs for Day ${parseInt(dayIndex) + 1}`;
-            
-            if (subtitle) subtitle.textContent = titleText;
+    // Construct a title for the header
+    const titleText = rowIndex !== null 
+        ? `Row details for Day ${parseInt(dayIndex) + 1}` 
+        : `All MCQs for Day ${parseInt(dayIndex) + 1}`;
+    
+    if (subtitle) subtitle.textContent = titleText;
 
-            try {
-                // Fetch Data
-                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
-                const weekDocSnap = await getDoc(weekDocRef);
-                if (!weekDocSnap.exists()) throw new Error("Week document not found.");
+    try {
+        // Fetch Data
+        const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+        const weekDocSnap = await getDoc(weekDocRef);
+        if (!weekDocSnap.exists()) throw new Error("Week document not found.");
 
-                const dayData = weekDocSnap.data().days?.[dayIndex];
-                if (!dayData) throw new Error("Day data not found.");
+        const dayData = weekDocSnap.data().days?.[dayIndex];
+        if (!dayData) throw new Error("Day data not found.");
 
-                let mcqData = [];
+        let mcqData = [];
 
-                // Get data (Single Row or All Rows)
-                if (rowIndex !== null) {
-                    mcqData = dayData.rows?.[rowIndex]?.mcqData || [];
-                } else {
-                    mcqData = dayData.rows?.reduce((acc, row) => {
-                        if (row.mcqData) {
-                            acc.push(...row.mcqData);
-                        }
-                        return acc;
-                    }, []) || [];
+        // Get data (Single Row or All Rows)
+        if (rowIndex !== null) {
+            mcqData = dayData.rows?.[rowIndex]?.mcqData || [];
+        } else {
+            mcqData = dayData.rows?.reduce((acc, row) => {
+                if (row.mcqData) {
+                    acc.push(...row.mcqData);
                 }
-
-                if (!mcqData || mcqData.length < 1) {
-                    viewMcqContent.innerHTML = '<div class="text-center py-10 text-gray-500">No MCQs found for this selection.</div>';
-                    currentViewMcqData = null; // Clear data
-                    return;
-                }
-
-                // --- STORE DATA FOR BUTTONS ---
-                currentViewMcqData = {
-                    title: titleText,
-                    mcqs: mcqData
-                };
-
-                // --- RENDER ---
-                let html = '';
-                mcqData.forEach((mcq, index) => {
-                    const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
-                    const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
-
-                    html += `
-                        <div class="study-card">
-                            <div class="flex justify-between mb-2">
-                                <span class="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded">
-                                    Question #${index + 1}
-                                </span>
-                            </div>
-                            <div class="study-question text-gray-900 font-medium">${escapeHtml(mcq.question)}</div>
-                            <div class="study-options">
-                                ${mcq.options.map((opt, i) => `
-                                    <div class="study-opt text-gray-900">
-                                        <span class="font-bold text-black mr-2">${getOptionLabel(i, mcq.question)}.</span>
-                                        ${escapeHtml(opt)}
-                                    </div>
-                                `).join('')}
-                            </div>
-                            <div class="study-answer" style="text-align: left;">
-                                Correct: ${correctLabel}
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                viewMcqContent.innerHTML = html;
-
-            } catch (error) {
-                console.error("Error loading MCQs for viewing:", error);
-                viewMcqContent.innerHTML = '<p class="text-center text-red-500 py-10">Could not load MCQs.</p>';
-                currentViewMcqData = null;
-            }
+                return acc;
+            }, []) || [];
         }
+
+        if (!mcqData || mcqData.length < 1) {
+            viewMcqContent.innerHTML = '<div class="text-center py-10 text-gray-500">No MCQs found for this selection.</div>';
+            currentViewMcqData = null; // Clear data
+            return;
+        }
+
+        // --- STORE DATA FOR BUTTONS ---
+        currentViewMcqData = {
+            title: titleText,
+            mcqs: mcqData
+        };
+
+        // --- RENDER ---
+        let html = '';
+        mcqData.forEach((mcq, index) => {
+            const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+            const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+
+            html += `
+                <div class="study-card">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded">
+                            Question #${index + 1}
+                        </span>
+                    </div>
+                    <div class="study-question text-gray-900 font-medium">${escapeHtml(mcq.question)}</div>
+                    <div class="study-options">
+                        ${mcq.options.map((opt, i) => `
+                            <div class="study-opt text-gray-900">
+                                <span class="font-bold text-black mr-2">${getOptionLabel(i, mcq.question)}.</span>
+                                ${escapeHtml(opt)}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="study-answer" style="text-align: left;">
+                        Correct: <span class="font-semibold">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
+                    </div>
+                </div>
+            `;
+        });
+        
+        viewMcqContent.innerHTML = html;
+
+    } catch (error) {
+        console.error("Error loading MCQs for viewing:", error);
+        viewMcqContent.innerHTML = '<p class="text-center text-red-500 py-10">Could not load MCQs.</p>';
+        currentViewMcqData = null;
+    }
+}
 		
 		/**
          * Fetches all vocab from all days *before* the specified date.
@@ -7075,7 +7075,7 @@ window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
     }
 };
 
-// 3. Render the Cards
+// 3. Render the Cards (UPDATED: Shows Label + Answer Text)
 function renderStudyView(mcqs) {
     if (mcqs.length === 0) {
         mcqStudyContent.innerHTML = '<div class="text-center py-10 text-gray-500">No MCQs found here.</div>';
@@ -7084,7 +7084,7 @@ function renderStudyView(mcqs) {
 
     let html = '';
     mcqs.forEach((mcq, idx) => {
-        // Determine the label (k/kh or a/b) for the correct answer
+        // Determine the label (k/kh or a/b)
         const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
         const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
 
@@ -7094,7 +7094,7 @@ function renderStudyView(mcqs) {
                     <span class="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded">
                         Question #${idx + 1}
                     </span>
-                    </div>
+                </div>
                 <div class="study-question text-gray-900 font-medium">${escapeHtml(mcq.question)}</div>
                 <div class="study-options">
                     ${mcq.options.map((opt, i) => `
@@ -7105,7 +7105,7 @@ function renderStudyView(mcqs) {
                     `).join('')}
                 </div>
                 <div class="study-answer" style="text-align: left;">
-                    Correct: ${correctLabel}
+                    Correct: <span class="font-semibold">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
                 </div>
             </div>
         `;
