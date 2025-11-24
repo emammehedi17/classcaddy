@@ -4445,7 +4445,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		// --- START: NEW MASTER MCQ LIST & QUIZ CENTER LOGIC ---
 
         // 1. DOM Elements
-        const masterMcqModal = document.getElementById('master-mcq-modal');
+        
         const masterMcqContent = document.getElementById('master-mcq-content');
         const totalMcqCountSpan = document.getElementById('total-mcq-count');
         const mcqQuizCenterModal = document.getElementById('mcq-quiz-center-modal');
@@ -4453,7 +4453,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
         
 
-        
+			
 
         // 4. Add listener for the "Test Yourself" button in the Master MCQ List
         document.getElementById('show-mcq-quiz-center-btn').addEventListener('click', openMcqQuizCenter);
