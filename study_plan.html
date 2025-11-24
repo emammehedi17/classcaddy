@@ -592,17 +592,23 @@
       </div>
     </div>
     <div id="master-mcq-modal" class="modal">
-      <div class="modal-content" style="max-width: 600px; max-height: 85vh; display: flex; flex-direction: column;">
-        <div class="modal-header-sticky border-b pb-3 mb-4">
-          <h3 class="text-2xl font-semibold text-emerald-600">MCQ Repository</h3>
-          <p class="text-xs text-gray-500 mt-1">Select a specific topic, day, week, or month to study.</p>
-          <span class="modal-close static text-3xl leading-none cursor-pointer hover:text-gray-800 text-gray-400" onclick="closeModal('master-mcq-modal')">&times;</span>
-        </div>
-        
-        <div id="master-mcq-menu-content" class="custom-scrollbar" style="overflow-y: auto; flex-grow: 1; padding-right: 5px;">
-            </div>
-      </div>
+  <div class="modal-content" style="max-width: 600px; max-height: 85vh; display: flex; flex-direction: column;">
+    <div class="modal-header-sticky border-b pb-3 mb-4">
+      <h3 class="text-2xl font-semibold text-emerald-600">MCQ Repository</h3>
+      <p class="text-xs text-gray-500 mt-1">Select a specific topic, day, week, or month to study.</p>
+      <span class="modal-close static text-3xl leading-none cursor-pointer hover:text-gray-800 text-gray-400" onclick="closeModal('master-mcq-modal')">&times;</span>
     </div>
+    
+    <div id="master-mcq-menu-content" class="custom-scrollbar" style="overflow-y: auto; flex-grow: 1; padding-right: 5px;">
+    </div>
+
+    <div class="modal-footer-sticky border-t pt-3 mt-3 flex justify-between items-center">
+        <button id="show-mcq-quiz-center-btn" class="action-button" style="background-color: #4f46e5;">
+            <i class="fas fa-brain mr-1.5"></i> Test Yourself
+        </button>
+    </div>
+  </div>
+</div>
 
     <div id="mcq-study-modal" class="modal" style="z-index: 106;">
       <div class="modal-content" style="width: 95%; max-width: 1000px; height: 90vh; display: flex; flex-direction: column; padding: 0;">

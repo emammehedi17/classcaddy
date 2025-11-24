@@ -4455,7 +4455,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
 			
 
-        
+        // 4. Add listener for the "Test Yourself" button in the Master MCQ List
+        document.getElementById('show-mcq-quiz-center-btn').addEventListener('click', openMcqQuizCenter);
 
         // 5. Function to build the MCQ Quiz Center (LOGIC FIXED)
         async function openMcqQuizCenter() {
