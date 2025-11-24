@@ -4150,7 +4150,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             return mcqData;
         }
 
-        // 4. "View MCQ" Button Handler (UPDATED: Inline Numbering)
+// 4. "View MCQ" Button Handler (UPDATED: Answer Button Card Style)
 async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
     const viewMcqContent = document.getElementById('view-mcq-content');
     const subtitle = document.getElementById('view-mcq-subtitle');
@@ -4161,7 +4161,6 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
     modal.style.display = 'block';
 
     try {
-        // Fetch Data
         const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
         const weekDocSnap = await getDoc(weekDocRef);
         if (!weekDocSnap.exists()) throw new Error("Week document not found.");
@@ -4173,7 +4172,6 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
         let mainTitleText = `Day-${dayData.dayNumber} MCQs`;
         let subTitleText = "";
 
-        // Get data (Single Row or All Rows)
         if (rowIndex !== null) {
             const row = dayData.rows?.[rowIndex];
             mcqData = row?.mcqData || [];
@@ -4199,13 +4197,11 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
             return;
         }
 
-        // --- STORE DATA FOR BUTTONS ---
         currentViewMcqData = {
             title: `${mainTitleText} - ${subTitleText}`,
             mcqs: mcqData
         };
 
-        // --- RENDER ---
         let html = '';
         mcqData.forEach((mcq, index) => {
             const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
@@ -4225,9 +4221,18 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                             </div>
                         `).join('')}
                     </div>
-                    <div class="study-answer" style="text-align: left;">
-                        Correct: <span class="font-semibold">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
+
+                    <div class="mt-4">
+                        <div class="inline-block w-full bg-emerald-50 border border-emerald-200 rounded-lg p-3 shadow-sm">
+                            <div class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-emerald-600 mt-1"></i>
+                                <span class="text-emerald-800 font-medium">
+                                    Correct: <span class="font-bold text-emerald-900">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
+                                </span>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             `;
         });
@@ -7078,7 +7083,7 @@ window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
     }
 };
 
-// 3. Render the Cards (UPDATED: Inline Numbering)
+// 3. Render the Cards (UPDATED: Answer Button Card Style)
 function renderStudyView(mcqs) {
     if (mcqs.length === 0) {
         mcqStudyContent.innerHTML = '<div class="text-center py-10 text-gray-500">No MCQs found here.</div>';
@@ -7087,7 +7092,6 @@ function renderStudyView(mcqs) {
 
     let html = '';
     mcqs.forEach((mcq, idx) => {
-        // Determine the label (k/kh or a/b)
         const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
         const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
 
@@ -7105,9 +7109,18 @@ function renderStudyView(mcqs) {
                         </div>
                     `).join('')}
                 </div>
-                <div class="study-answer" style="text-align: left;">
-                    Correct: <span class="font-semibold">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
+
+                <div class="mt-4">
+                    <div class="inline-block w-full bg-emerald-50 border border-emerald-200 rounded-lg p-3 shadow-sm">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check-circle text-emerald-600 mt-1"></i>
+                            <span class="text-emerald-800 font-medium">
+                                Correct: <span class="font-bold text-emerald-900">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
+                            </span>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         `;
     });
