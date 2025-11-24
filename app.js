@@ -7525,11 +7525,11 @@ function attachSettingsListeners(ids) {
 
     if (!settingsBtn || !panel) return;
 
-    // Open/Close Panel
-    settingsBtn.onclick = (e) => {
+    // Open/Close Panel (UPDATED: Using addEventListener)
+    settingsBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         panel.classList.toggle('active');
-    };
+    });
 
     // Close when clicking outside
     document.addEventListener('click', (e) => {
@@ -7547,9 +7547,19 @@ function attachSettingsListeners(ids) {
         }
     };
 
-    if (fontInc) fontInc.onclick = (e) => { e.stopPropagation(); changeFont(globalSettings.fontSize + 1); };
-    if (fontDec) fontDec.onclick = (e) => { e.stopPropagation(); changeFont(globalSettings.fontSize - 1); };
-    if (fontInput) fontInput.onchange = (e) => changeFont(parseInt(e.target.value));
+    if (fontInc) fontInc.addEventListener('click', (e) => { 
+        e.stopPropagation(); 
+        changeFont(globalSettings.fontSize + 1); 
+    });
+    
+    if (fontDec) fontDec.addEventListener('click', (e) => { 
+        e.stopPropagation(); 
+        changeFont(globalSettings.fontSize - 1); 
+    });
+    
+    if (fontInput) fontInput.addEventListener('change', (e) => {
+        changeFont(parseInt(e.target.value));
+    });
 }
 
 // Initialize Listeners
