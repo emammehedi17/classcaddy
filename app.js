@@ -3489,6 +3489,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         function showQuizResults() {
 			if (quizTimerInterval) clearInterval(quizTimerInterval);
             const quizEndTime = Date.now(); // <-- কুইজ শেষ হওয়ার সময় সেভ করুন
+			
+			quizStartScreen.classList.add('hidden'); // Force hide Start Screen
             
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.remove('hidden');
