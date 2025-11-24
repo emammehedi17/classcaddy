@@ -2827,19 +2827,29 @@ body.dark-mode #vocab-list-content tbody tr:hover td {
 
 /* --- END: COMPACT QUIZ RESULT MODAL FIX --- */
 
-/* --- START: FIX QUIZ MODAL OVERLAP --- */
+/* --- START: FORCE FIX QUIZ MODAL OVERLAP --- */
 
-/* Priority Fix: Ensure 'hidden' class overrides the flex display */
-.quiz-start-container.hidden {
+/* 1. Use ID selector + !important to absolutely force hiding */
+#quiz-start-screen.hidden {
     display: none !important;
 }
 
-/* Ensure the results screen takes full height if needed */
+/* 2. Ensure Results Screen layout is clean */
 #quiz-results-screen {
-    flex-grow: 1;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    align-items: stretch;
 }
 
-/* --- END: FIX QUIZ MODAL OVERLAP --- */
+/* 3. Ensure Main Screen hides properly too */
+#quiz-main-screen.hidden {
+    display: none !important;
+}
+
+/* --- END: FORCE FIX QUIZ MODAL OVERLAP --- */
+
+/* --- FIX: Force Start Screen to Hide --- */
+#quiz-start-screen.hidden {
+    display: none !important;
+}
