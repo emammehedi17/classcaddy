@@ -4326,12 +4326,24 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
             quizTitle.textContent = 'Vocabulary Quiz';
             window.currentQuizSourceInfo = { monthId, weekId, dayIndex, rowIndex };
             currentMcqTarget = null; 
-			quizStartScreen.style.display = '';
+            
+            // --- START: FIX FOR OVERLAPPING SCREENS ---
             quizModal.style.display = "block";
+            
+            // Force hide Main, Results, and Review screens using inline styles
             quizMainScreen.classList.add('hidden');
+            quizMainScreen.style.display = 'none'; 
+            
             quizResultsScreen.classList.add('hidden');
+            quizResultsScreen.style.display = 'none'; // This line fixes the issue
+            
             quizReviewScreen.classList.add('hidden');
+            quizReviewScreen.style.display = 'none';
+
+            // Show Start Screen
             quizStartScreen.classList.remove('hidden');
+            quizStartScreen.style.display = ''; 
+            // --- END: FIX FOR OVERLAPPING SCREENS ---
             
             quizStartMessage.textContent = "Loading vocabulary...";
             quizStartBtn.classList.add('hidden');
@@ -4405,15 +4417,28 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 		
 		
         // 5. "MCQ Test" বাটনে ক্লিক করলে (UPGRADED)
-        // UPGRADED: Generates questions first to set timer
         async function startMcqQuiz(monthId, weekId, dayIndex, rowIndex) {
             quizTitle.textContent = 'MCQ Quiz';
 			currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
-			quizStartScreen.style.display = '';
+			
+            // --- START: FIX FOR OVERLAPPING SCREENS ---
             quizModal.style.display = "block";
+            
+            // Force hide Main, Results, and Review screens using inline styles
             quizMainScreen.classList.add('hidden');
+            quizMainScreen.style.display = 'none'; 
+            
             quizResultsScreen.classList.add('hidden');
+            quizResultsScreen.style.display = 'none'; // This line fixes the issue
+            
+            quizReviewScreen.classList.add('hidden');
+            quizReviewScreen.style.display = 'none';
+
+            // Show Start Screen
             quizStartScreen.classList.remove('hidden');
+            quizStartScreen.style.display = ''; 
+            // --- END: FIX FOR OVERLAPPING SCREENS ---
+
             quizStartMessage.textContent = "Loading quiz data...";
             quizStartBtn.classList.add('hidden');
             document.getElementById('quiz-total-time-warning').style.display = 'none';
