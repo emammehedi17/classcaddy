@@ -4441,7 +4441,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
             quizMainScreen.style.display = 'none'; 
             
             quizResultsScreen.classList.add('hidden');
-            quizResultsScreen.style.display = 'none'; // This line fixes the issue
+            quizResultsScreen.style.display = 'none';
             
             quizReviewScreen.classList.add('hidden');
             quizReviewScreen.style.display = 'none';
@@ -4646,16 +4646,26 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
         });
 
         // 7. Function to start a quiz (day, week, or month) (LOGIC FIXED)
-        // UPGRADED: Generates questions first to set timer
         async function startAggregatedMcqQuiz(quizType, monthId, weekId = null, dayIndex = null) {
             quizTitle.textContent = 'MCQ Quiz';
 			currentMcqTarget = { quizType, monthId, weekId, dayIndex };
             closeModal('mcq-quiz-center-modal');
-			quizStartScreen.style.display = '';
+			
+            // --- START: FIX FOR OVERLAPPING SCREENS ---
             quizModal.style.display = "block";
+            
             quizMainScreen.classList.add('hidden');
+            quizMainScreen.style.display = 'none';
+            
             quizResultsScreen.classList.add('hidden');
+            quizResultsScreen.style.display = 'none';
+            
+            quizReviewScreen.classList.add('hidden');
+            quizReviewScreen.style.display = 'none';
+
             quizStartScreen.classList.remove('hidden');
+            quizStartScreen.style.display = '';
+            // --- END: FIX FOR OVERLAPPING SCREENS ---
             
             quizStartMessage.textContent = `Loading ${quizType} quiz...`;
             quizStartBtn.classList.add('hidden');
@@ -7208,10 +7218,22 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
 
     // 4. Initialize Quiz UI
     quizTitle.textContent = 'MCQ Quiz';
+    
+    // --- START: FIX FOR OVERLAPPING SCREENS ---
     quizModal.style.display = "block";
+    
     quizMainScreen.classList.add('hidden');
+    quizMainScreen.style.display = 'none';
+    
     quizResultsScreen.classList.add('hidden');
+    quizResultsScreen.style.display = 'none';
+    
+    quizReviewScreen.classList.add('hidden');
+    quizReviewScreen.style.display = 'none';
+
     quizStartScreen.classList.remove('hidden');
+    quizStartScreen.style.display = '';
+    // --- END: FIX FOR OVERLAPPING SCREENS ---
     
     // 5. Prepare Questions
     currentMcqData = mcqData;
