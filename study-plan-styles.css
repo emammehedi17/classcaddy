@@ -2251,3 +2251,21 @@
 }
 
 /* --- END: DARK MODE FIXES --- */
+
+/* --- START: FINAL DARK MODE FIXES --- */
+
+/* 1. Fix White Background Behind Cards */
+/* This overrides the 'bg-gray-50' class on the inner scrollable area */
+.study-content-dark #mcq-study-content,
+.study-content-dark #view-mcq-content {
+    background-color: transparent !important;
+}
+
+/* 2. Fix Unreadable Text in Settings Panel */
+/* Forces the gray text (e.g. "Appearance", "Dark Mode") to become light */
+.study-content-dark .settings-panel .text-gray-700,
+.study-content-dark .settings-panel .text-gray-600 {
+    color: #e5e7eb !important; /* Light Gray */
+}
+
+/* --- END: FINAL DARK MODE FIXES --- */
