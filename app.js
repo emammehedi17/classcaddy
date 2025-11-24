@@ -7113,25 +7113,30 @@ function renderStudyView(mcqs) {
     mcqStudyContent.innerHTML = html;
 }
 
-// 5. NEW: Test Handler for Study View
+// 5. NEW: Test Handler for Study View (UPDATED: Exits Fullscreen)
 document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
     if (!currentStudyViewData || currentStudyViewData.mcqs.length === 0) {
         showCustomAlert("No MCQs available to test.", "error");
         return;
     }
 
-      // 2. Prepare data for the quiz function
+    // --- FIX: Exit Fullscreen if active so Quiz Modal appears on top ---
+    if (document.fullscreenElement) {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
+    }
+
+    // 2. Prepare data for the quiz function
     const mcqData = currentStudyViewData.mcqs;
     const title = currentStudyViewData.title;
 
     // 3. Set Global Quiz State
-    // We spoof the target so the save function knows it was an aggregated test
     currentMcqTarget = { 
-        quizType: 'aggregated', // Custom type
+        quizType: 'aggregated', 
         description: title 
     };
     
-    // Set Subject Info for the result sheet
     window.currentQuizSubjectInfo = { 
         subjectName: "Study Mode", 
         topicDetail: title 
@@ -7148,7 +7153,6 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
     currentMcqData = mcqData;
     currentVocabData = null;
     
-    // Map to quiz format (removing metadata if strictly needed, but keeping it is fine)
     currentQuizQuestions = currentMcqData.map(mcq => ({ 
         question: mcq.question,
         options: [...mcq.options],
@@ -7289,7 +7293,7 @@ if (mcqFullscreenBtn && mcqStudyModalContent) {
 
 // --- VIEW MCQ MODAL BUTTON LISTENERS ---
 
-// 1. Test Button (View MCQ Modal) - FIXED
+// 1. Test Button (View MCQ Modal) - (UPDATED: Exits Fullscreen)
 const viewMcqTestBtn = document.getElementById('view-mcq-test-btn');
 if (viewMcqTestBtn) {
     viewMcqTestBtn.addEventListener('click', () => {
@@ -7298,11 +7302,16 @@ if (viewMcqTestBtn) {
             return;
         }
         
-        // NOTE: closeModal line is removed to keep the background modal open.
+        // --- FIX: Exit Fullscreen if active so Quiz Modal appears on top ---
+        if (document.fullscreenElement) {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            else if (document.msExitFullscreen) document.msExitFullscreen();
+        }
         
         // Start Quiz with the data we just loaded
         const mcqData = currentViewMcqData.mcqs;
-        const title = currentViewMcqData.title; // <--- THIS LINE WAS MISSING
+        const title = currentViewMcqData.title;
         
         // Set Quiz Context
         currentMcqTarget = { quizType: 'aggregated', description: title };
