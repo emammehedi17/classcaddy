@@ -594,9 +594,14 @@
     <div id="master-mcq-modal" class="modal">
       <div class="modal-content" style="max-width: 700px; max-height: 80vh; display: flex; flex-direction: column;">
         
-        <div class="modal-header-sticky">
+        <div class="modal-header-sticky flex justify-between items-center border-b pb-3 mb-4">
           <h3 class="text-2xl font-semibold text-emerald-600">Master MCQ List</h3>
-          <span class="modal-close" onclick="closeModal('master-mcq-modal')">&times;</span>
+          <div class="flex items-center gap-3">
+              <button id="print-master-mcq-btn" class="action-button action-button-secondary text-sm">
+                  <i class="fas fa-print mr-1.5"></i> Print List
+              </button>
+              <span class="modal-close static text-3xl leading-none cursor-pointer hover:text-gray-800 text-gray-400" onclick="closeModal('master-mcq-modal')">&times;</span>
+          </div>
         </div>
         
         <div id="master-mcq-content" class="kalpurush" style="overflow-y: auto; flex-grow: 1; padding-top: 1.25rem;">

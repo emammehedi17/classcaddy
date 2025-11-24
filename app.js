@@ -6805,3 +6805,241 @@ async function executeRestore(backupData) {
 }
 // --- END BACKUP MANAGER ---
 
+// --- MASTER MCQ PRINT FUNCTIONALITY ---
+
+// Helper to determine label type (Bangla vs English)
+function getOptionLabel(index, text) {
+    const banglaRegex = /[\u0980-\u09FF]/;
+    const labelsBangla = ['ক', 'খ', 'গ', 'ঘ'];
+    const labelsEnglish = ['a', 'b', 'c', 'd'];
+    
+    if (banglaRegex.test(text)) {
+        return labelsBangla[index] || (index + 1);
+    }
+    return labelsEnglish[index] || (index + 1);
+}
+
+// 1. Build the HTML for Printing
+async function buildMasterMcqPrintHtml() {
+    if (!auth.currentUser) return null;
+    
+    let html = '<div class="mcq-print-wrapper">';
+    
+    try {
+        const userId = auth.currentUser.uid;
+        const appId = "study-plan17";
+        const plansCollectionPath = `artifacts/${appId}/users/${userId}/studyPlans`;
+        
+        const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) return "<p>No MCQs found.</p>";
+
+        for (const docSnap of querySnapshot.docs) {
+            const monthId = docSnap.id;
+            const monthData = docSnap.data();
+            const monthName = monthData.monthName || monthId;
+
+            // Month Header (Spans across columns)
+            let monthHeaderAdded = false;
+
+            const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
+            const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
+            
+            // Sort weeks manually to be safe
+            const sortedWeeks = weeksQuerySnapshot.docs.sort((a, b) => a.id.localeCompare(b.id));
+
+            for (const weekDoc of sortedWeeks) {
+                const weekId = weekDoc.id;
+                const weekData = weekDoc.data();
+                if (!weekData.days) continue;
+
+                for (const day of weekData.days) {
+                    // Collect MCQs for this day
+                    const dayMcqs = [];
+                    day.rows?.forEach(row => {
+                        if (row.mcqData && row.mcqData.length > 0) {
+                            row.mcqData.forEach(mcq => {
+                                dayMcqs.push({ ...mcq, subject: row.subject });
+                            });
+                        }
+                    });
+
+                    if (dayMcqs.length > 0) {
+                        // Add Headers lazily to save space
+                        if (!monthHeaderAdded) {
+                            html += `<div class="print-month-header">${escapeHtml(monthName)}</div>`;
+                            monthHeaderAdded = true;
+                        }
+
+                        // Day Group Container
+                        html += `<div class="print-day-group">`;
+                        html += `<div class="print-day-header">Week ${weekId.replace('week', '')} - Day ${day.dayNumber}</div>`;
+
+                        dayMcqs.forEach((mcq, idx) => {
+                            const subjectLabel = mcq.subject ? `<span class="print-subject-tag">${escapeHtml(mcq.subject)}</span>` : '';
+                            
+                            // Find correct answer index/label
+                            const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+                            // Use the question text to guess language context for the label
+                            const ansLabel = (correctIndex !== -1) 
+                                ? getOptionLabel(correctIndex, mcq.question) 
+                                : '?';
+
+                            html += `
+                                <div class="print-mcq-item">
+                                    <div class="print-q-text">
+                                        <span class="q-num">${idx + 1}.</span> ${escapeHtml(mcq.question)} ${subjectLabel}
+                                    </div>
+                                    <div class="print-options-grid">
+                                        ${mcq.options.map((opt, i) => {
+                                            const label = getOptionLabel(i, mcq.question);
+                                            return `<div><span class="opt-label">${label}.</span> ${escapeHtml(opt)}</div>`;
+                                        }).join('')}
+                                    </div>
+                                    <div class="print-ans-key">
+                                        Correct: <b>${ansLabel}</b>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        html += `</div>`; // End Day Group
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.error("Error building print HTML", e);
+        return `<p>Error generating print layout.</p>`;
+    }
+
+    html += '</div>'; // End Wrapper
+    return html;
+}
+
+// 2. Print Handler
+document.getElementById('print-master-mcq-btn')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1.5"></i> Preparing...`;
+    btn.disabled = true;
+
+    try {
+        const contentHtml = await buildMasterMcqPrintHtml();
+        
+        // Open Print Window
+        const printWindow = window.open('', '', 'height=900,width=1200');
+        
+        const styles = `
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
+                @page { size: A4; margin: 1cm; }
+                body { font-family: 'Inter', 'Kalpurush', sans-serif; color: #1f2937; font-size: 11px; line-height: 1.3; }
+                
+                /* 2-Column Layout */
+                .mcq-print-wrapper {
+                    column-count: 2;
+                    column-gap: 2rem;
+                    column-rule: 1px solid #eee;
+                }
+                
+                /* Headers */
+                .print-month-header {
+                    column-span: all; /* Spans across both columns */
+                    text-align: center;
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: #059669;
+                    border-bottom: 2px solid #059669;
+                    margin-top: 15px;
+                    margin-bottom: 10px;
+                    padding-bottom: 5px;
+                }
+                .print-day-group {
+                    break-inside: avoid; /* Keep day content together if possible */
+                    margin-bottom: 15px;
+                }
+                .print-day-header {
+                    font-weight: bold;
+                    background: #f3f4f6;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    margin-bottom: 8px;
+                    color: #374151;
+                    font-size: 12px;
+                    border-left: 4px solid #4f46e5;
+                }
+                
+                /* MCQ Item */
+                .print-mcq-item {
+                    break-inside: avoid;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 6px;
+                    padding: 8px;
+                    margin-bottom: 8px;
+                    background: #fff;
+                }
+                .print-q-text { font-weight: 600; margin-bottom: 6px; }
+                .q-num { color: #059669; margin-right: 4px; }
+                
+                .print-subject-tag {
+                    font-size: 9px;
+                    background: #eef2ff;
+                    color: #4338ca;
+                    padding: 1px 5px;
+                    border-radius: 3px;
+                    margin-left: 5px;
+                    font-weight: normal;
+                    text-transform: uppercase;
+                }
+
+                /* Options Grid (2x2 for compactness) */
+                .print-options-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 4px;
+                    font-size: 10px;
+                    color: #4b5563;
+                }
+                .opt-label { font-weight: bold; color: #6b7280; }
+
+                /* Answer Key Alignment */
+                .print-ans-key {
+                    text-align: right;
+                    margin-top: 6px;
+                    font-size: 10px;
+                    color: #059669;
+                    border-top: 1px dashed #f3f4f6;
+                    padding-top: 2px;
+                }
+            </style>
+        `;
+
+        printWindow.document.write('<html><head><title>Master MCQ List</title>' + styles + '</head><body>');
+        
+        // Custom Header
+        const today = new Date().toLocaleDateString();
+        printWindow.document.write(`
+            <div style="text-align:center; margin-bottom:20px; column-span:all;">
+                <h1 style="margin:0; color:#1f2937; font-size:20px;">Master MCQ List</h1>
+                <p style="margin:5px 0; color:#6b7280; font-size:10px;">Generated on ${today}</p>
+            </div>
+        `);
+        
+        printWindow.document.write(contentHtml);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 1000);
+
+    } catch (error) {
+        console.error(error);
+        showCustomAlert("Failed to print.", "error");
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+});
