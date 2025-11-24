@@ -2872,3 +2872,26 @@ body.dark-mode .result-summary-row .text-red-700 {
 body.dark-mode .result-summary-row .text-gray-600 {
     color: #9ca3af !important; /* Light Gray for 'Not Answered' */
 }
+
+/* --- FIX: Header Navigation Pill in Dark Mode --- */
+
+/* 1. The Pill Container Background & Border */
+/* Targets the specific 'bg-gray-100/50' class used in the HTML */
+body.dark-mode header.main-website-ui .bg-gray-100\/50 {
+    background-color: #374151 !important; /* Dark Gray BG */
+    border-color: #4b5563 !important;     /* Subtle Border */
+}
+
+/* 2. Navigation Links Text Color (Inactive Items) */
+body.dark-mode header.main-website-ui nav a.text-gray-600,
+body.dark-mode header.main-website-ui nav button.text-gray-600 {
+    color: #e5e7eb !important; /* Light Text */
+}
+
+/* 3. Navigation Links Hover State */
+/* Overrides the default light gray hover effect */
+body.dark-mode header.main-website-ui nav a.hover\:bg-gray-200:hover,
+body.dark-mode header.main-website-ui nav button.hover\:bg-gray-200:hover {
+    background-color: #4b5563 !important; /* Darker Hover BG */
+    color: #ffffff !important;            /* White Text */
+}
