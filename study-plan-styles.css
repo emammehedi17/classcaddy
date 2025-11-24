@@ -1942,6 +1942,12 @@
     border-radius: 8px;
     border-left: 4px solid #4f46e5;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    
+    /* --- FIX: Center content and limit width --- */
+    width: 100%;
+    max-width: 1000px; /* Prevents cards from getting too wide on big screens */
+    margin-left: auto;
+    margin-right: auto; 
 }
 .study-question {
     font-size: 1.1rem;
