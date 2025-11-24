@@ -6818,6 +6818,9 @@ let currentStudyViewData = null;
 document.getElementById('show-master-mcq-btn').addEventListener('click', displayMcqMenu);
 
 async function displayMcqMenu() {
+    // --- FIX: Define the modal right here ---
+    const masterMcqModal = document.getElementById('master-mcq-modal'); 
+    
     if (!auth.currentUser) { showCustomAlert("Please log in."); return; }
     
     masterMcqModal.style.display = "block";
