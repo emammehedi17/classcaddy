@@ -2849,7 +2849,3 @@ body.dark-mode #vocab-list-content tbody tr:hover td {
 
 /* --- END: FORCE FIX QUIZ MODAL OVERLAP --- */
 
-/* --- FIX: Force Start Screen to Hide --- */
-#quiz-start-screen.hidden {
-    display: none !important;
-}
