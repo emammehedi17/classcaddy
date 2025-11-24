@@ -7289,7 +7289,7 @@ if (mcqFullscreenBtn && mcqStudyModalContent) {
 
 // --- VIEW MCQ MODAL BUTTON LISTENERS ---
 
-// 1. Test Button
+// 1. Test Button (View MCQ Modal) - FIXED
 const viewMcqTestBtn = document.getElementById('view-mcq-test-btn');
 if (viewMcqTestBtn) {
     viewMcqTestBtn.addEventListener('click', () => {
@@ -7298,8 +7298,11 @@ if (viewMcqTestBtn) {
             return;
         }
         
+        // NOTE: closeModal line is removed to keep the background modal open.
+        
         // Start Quiz with the data we just loaded
         const mcqData = currentViewMcqData.mcqs;
+        const title = currentViewMcqData.title; // <--- THIS LINE WAS MISSING
         
         // Set Quiz Context
         currentMcqTarget = { quizType: 'aggregated', description: title };
