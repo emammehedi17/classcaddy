@@ -581,14 +581,24 @@
         </div>
       </div>
     </div>
-    <div id="view-mcq-modal" class="modal">
-      <div class="modal-content" style="max-width: 700px; max-height: 80vh; display: flex; flex-direction: column;">
-        <div class="modal-header-sticky">
-            <h3 class="text-2xl font-semibold text-emerald-600">View MCQs</h3>
-            <span class="modal-close" onclick="closeModal('view-mcq-modal')">&times;</span>
-        </div>
-        <div id="view-mcq-content" class="kalpurush" style="overflow-y: auto; flex-grow: 1; padding-top: 1.25rem;">
+    <div id="view-mcq-modal" class="modal" style="z-index: 106; overflow: hidden;">
+      <div class="modal-content" style="width: 95%; max-width: 1000px; height: 90vh; display: flex; flex-direction: column; padding: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0;">
+        
+        <div class="flex justify-between items-center p-4 border-b bg-white rounded-t-lg">
+            <div>
+                <h3 class="text-xl font-bold text-indigo-700">View MCQs</h3>
+                <p id="view-mcq-subtitle" class="text-xs text-gray-500">Selected Questions</p>
             </div>
+            <div class="flex items-center gap-3">
+                <button class="text-gray-400 hover:text-red-500 transition-colors text-2xl" onclick="closeModal('view-mcq-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="view-mcq-content" class="p-6 bg-gray-50 overflow-y-auto custom-scrollbar kalpurush" style="flex-grow: 1;">
+        </div>
+
       </div>
     </div>
     <div id="master-mcq-modal" class="modal">

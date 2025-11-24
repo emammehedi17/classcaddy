@@ -4156,10 +4156,21 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             return mcqData;
         }
 
-        // 4. "View MCQ" বাটনে ক্লিক করলে
+        // 4. "View MCQ" Button Handler (UPDATED DESIGN)
         async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
-            viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading MCQs...</p>';
-            viewMcqModal.style.display = 'block';
+            const viewMcqContent = document.getElementById('view-mcq-content');
+            const subtitle = document.getElementById('view-mcq-subtitle');
+            const modal = document.getElementById('view-mcq-modal');
+            
+            viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10"><i class="fas fa-spinner fa-spin text-2xl"></i><br>Loading MCQs...</p>';
+            modal.style.display = 'block';
+
+            // Update subtitle based on context
+            if (subtitle) {
+                subtitle.textContent = rowIndex !== null 
+                    ? `Row details for Day ${parseInt(dayIndex) + 1}` 
+                    : `All MCQs for Day ${parseInt(dayIndex) + 1}`;
+            }
 
             try {
                 // --- START: MODIFIED ---
@@ -4174,6 +4185,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
                 let mcqData = [];
 
+                // Get data (Single Row or All Rows)
                 if (rowIndex !== null) {
                     mcqData = dayData.rows?.[rowIndex]?.mcqData || [];
                 } else {
@@ -4186,26 +4198,40 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
 
                 if (!mcqData || mcqData.length < 1) {
-                    viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">No MCQs found for this entry.</p>';
+                    viewMcqContent.innerHTML = '<div class="text-center py-10 text-gray-500">No MCQs found for this selection.</div>';
                     return;
                 }
 
+                // --- RENDER USING STUDY CARD DESIGN ---
                 let html = '';
                 mcqData.forEach((mcq, index) => {
+                    // Determine label (k/kh vs a/b)
+                    const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+                    const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+
                     html += `
-                        <div class="mcq-item">
-                            <p class="mcq-question">${index + 1}. ${escapeHtml(mcq.question)}</p>
-                            <ol class="mcq-options">
+                        <div class="study-card">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded">
+                                    Question #${index + 1}
+                                </span>
+                            </div>
+                            <div class="study-question text-gray-900 font-medium">${escapeHtml(mcq.question)}</div>
+                            <div class="study-options">
                                 ${mcq.options.map((opt, i) => `
-                                    <li class="mcq-option ${opt === mcq.correctAnswer ? 'mcq-correct-answer' : ''}">
-                                        ${['ক', 'খ', 'গ', 'ঘ'][i]}. ${escapeHtml(opt)}
-                                    </li>
+                                    <div class="study-opt text-gray-900">
+                                        <span class="font-bold text-black mr-2">${getOptionLabel(i, mcq.question)}.</span>
+                                        ${escapeHtml(opt)}
+                                    </div>
                                 `).join('')}
-                            </ol>
-                            <p class="mcq-final-answer">সঠিক উত্তর: ${escapeHtml(mcq.correctAnswer)}</p>
+                            </div>
+                            <div class="study-answer" style="text-align: left;">
+                                Correct: ${correctLabel}
+                            </div>
                         </div>
                     `;
                 });
+                
                 viewMcqContent.innerHTML = html;
 
             } catch (error) {

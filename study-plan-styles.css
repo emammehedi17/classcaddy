@@ -1007,43 +1007,7 @@
         /* --- END: QUIZ CENTER STYLES --- */
     
 
-        /* --- START: VIEW MCQ MODAL STYLES --- */
-        #view-mcq-content .mcq-item {
-            padding: 1rem;
-            border: 1px solid #e5e7eb; /* gray-200 */
-            border-radius: 8px;
-            background-color: #f9fafb; /* gray-50 */
-            margin-bottom: 1rem;
-        }
-        #view-mcq-content .mcq-question {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #1f2937; /* gray-800 */
-            margin-bottom: 0.75rem;
-        }
-        #view-mcq-content .mcq-options {
-            list-style-type: none;
-            padding-left: 0;
-            margin-bottom: 0.75rem;
-        }
-        #view-mcq-content .mcq-option {
-            font-size: 0.9rem;
-            color: #4b5563; /* gray-600 */
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        #view-mcq-content .mcq-correct-answer {
-            background-color: #d1fae5; /* emerald-100 */
-            color: #065f46; /* emerald-800 */
-            font-weight: 500;
-        }
-        #view-mcq-content .mcq-final-answer {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: #059669; /* emerald-600 */
-        }
-        /* --- END: VIEW MCQ MODAL STYLES --- */
-		
+        	
 		/* --- START: MCQ QUIZ CENTER STYLES --- */
         #mcq-quiz-center-content h3 { /* Month Header */
             font-size: 1.25rem;
