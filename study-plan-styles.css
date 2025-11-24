@@ -1847,3 +1847,119 @@
     color: #ef4444;
 }
 
+/* --- MCQ MENU BUTTONS --- */
+.mcq-menu-section {
+    margin-bottom: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+}
+.mcq-menu-header {
+    background: #f9fafb;
+    padding: 10px 15px;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.mcq-menu-body {
+    padding: 10px;
+    background: #fff;
+}
+
+/* Hierarchy Buttons */
+.btn-mcq-all {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(to right, #4f46e5, #6366f1);
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: left;
+    transition: transform 0.2s;
+}
+.btn-mcq-all:hover { transform: scale(1.01); shadow: 0 4px 6px rgba(0,0,0,0.1); }
+
+.btn-mcq-month {
+    width: 100%;
+    padding: 8px 12px;
+    background: #ecfdf5; /* emerald-50 */
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+    border-radius: 6px;
+    text-align: left;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.btn-mcq-week {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #eff6ff; /* blue-50 */
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+.btn-mcq-subject {
+    display: inline-block;
+    padding: 4px 10px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #4b5563;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    transition: all 0.2s;
+}
+.btn-mcq-subject:hover {
+    border-color: #6366f1;
+    color: #4f46e5;
+    background: #eef2ff;
+}
+
+/* --- STUDY VIEW DECORATION --- */
+.study-card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #4f46e5;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.study-question {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 12px;
+}
+.study-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.study-opt {
+    padding: 8px 12px;
+    background: #f9fafb;
+    border: 1px solid #f3f4f6;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #4b5563;
+}
+.study-answer {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #e5e7eb;
+    color: #059669;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: right;
+}

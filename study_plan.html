@@ -592,29 +592,38 @@
       </div>
     </div>
     <div id="master-mcq-modal" class="modal">
-      <div class="modal-content" style="max-width: 700px; max-height: 80vh; display: flex; flex-direction: column;">
-        
-        <div class="modal-header-sticky flex justify-between items-center border-b pb-3 mb-4">
-          <h3 class="text-2xl font-semibold text-emerald-600">Master MCQ List</h3>
-          <div class="flex items-center gap-3">
-              <button id="print-master-mcq-btn" class="action-button action-button-secondary text-sm">
-                  <i class="fas fa-print mr-1.5"></i> Print List
-              </button>
-              <span class="modal-close static text-3xl leading-none cursor-pointer hover:text-gray-800 text-gray-400" onclick="closeModal('master-mcq-modal')">&times;</span>
-          </div>
+      <div class="modal-content" style="max-width: 600px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header-sticky border-b pb-3 mb-4">
+          <h3 class="text-2xl font-semibold text-emerald-600">MCQ Repository</h3>
+          <p class="text-xs text-gray-500 mt-1">Select a specific topic, day, week, or month to study.</p>
+          <span class="modal-close static text-3xl leading-none cursor-pointer hover:text-gray-800 text-gray-400" onclick="closeModal('master-mcq-modal')">&times;</span>
         </div>
         
-        <div id="master-mcq-content" class="kalpurush" style="overflow-y: auto; flex-grow: 1; padding-top: 1.25rem;">
+        <div id="master-mcq-menu-content" class="custom-scrollbar" style="overflow-y: auto; flex-grow: 1; padding-right: 5px;">
             </div>
+      </div>
+    </div>
 
-        <div id="mcq-modal-footer" class="modal-footer-sticky" style="display: flex; justify-content: space-between; align-items: center;">
-            <button id="show-mcq-quiz-center-btn" class="action-button" style="background-color: #4f46e5;">
-                <i class="fas fa-brain mr-1.5"></i> Test Yourself
-            </button>
-            <span>
-                Total MCQs: <span id="total-mcq-count" class="font-bold">0</span>
-            </span>
+    <div id="mcq-study-modal" class="modal" style="z-index: 106;">
+      <div class="modal-content" style="width: 95%; max-width: 1000px; height: 90vh; display: flex; flex-direction: column; padding: 0;">
+        
+        <div class="flex justify-between items-center p-4 border-b bg-white rounded-t-lg">
+            <div>
+                <h3 id="study-modal-title" class="text-xl font-bold text-indigo-700">MCQ Study View</h3>
+                <p id="study-modal-subtitle" class="text-xs text-gray-500">... topics ...</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="print-study-mcq-btn" class="action-button action-button-secondary text-sm">
+                    <i class="fas fa-print mr-1.5"></i> Print
+                </button>
+                <button class="text-gray-400 hover:text-red-500 transition-colors text-2xl" onclick="closeModal('mcq-study-modal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
         </div>
+
+        <div id="mcq-study-content" class="p-6 bg-gray-50 overflow-y-auto custom-scrollbar kalpurush" style="flex-grow: 1;">
+            </div>
 
       </div>
     </div>

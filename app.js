@@ -4451,133 +4451,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         const mcqQuizCenterModal = document.getElementById('mcq-quiz-center-modal');
         const mcqQuizCenterContent = document.getElementById('mcq-quiz-center-content');
 
-        // 2. Add listener to the main "MCQ List" header button
-        document.getElementById('show-master-mcq-btn').addEventListener('click', displayMasterMcqList);
+        
 
-        // 3. Function to open and populate the Master MCQ List (UPGRADED STYLE & LOGIC)
-        async function displayMasterMcqList() {
-            if (!currentUser || !userId) {
-                showCustomAlert("Please log in to see your MCQ list.");
-                return;
-            }
-
-            masterMcqModal.style.display = "block";
-            masterMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading all MCQs...</p>';
-            totalMcqCountSpan.textContent = "...";
-            setSyncStatus("Loading...", "blue");
-
-            let allMcqsHtml = '';
-            let totalMcqCount = 0;
-
-            try {
-                const plansCollectionPath = getUserPlansCollectionPath();
-                const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
-                const querySnapshot = await getDocs(q);
-
-                if (querySnapshot.empty) {
-                    masterMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">No study plans found.</p>';
-                    totalMcqCountSpan.textContent = "0";
-                    setSyncStatus("Synced", "green"); 
-                    return;
-                }
-
-                for (const docSnap of querySnapshot.docs) {
-                    const monthId = docSnap.id;
-                    const monthData = docSnap.data();
-                    const monthName = monthData.monthName || monthId;
-
-                    let monthHasMcqs = false;
-                    let monthWeekContainerHtml = '';
-                    
-                    // --- START: MODIFIED ---
-                    const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
-                    const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
-                    // --- END: MODIFIED ---
-
-                    for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
-                        // --- START: MODIFIED ---
-                        const weekDoc = weeksQuerySnapshot.docs.find(d => d.id === weekId);
-                        if (!weekDoc) continue;
-                        const weekData = weekDoc.data();
-                        // --- END: MODIFIED ---
-                        
-                        if (!weekData || !weekData.days) continue;
-
-                        let weekHasMcqs = false;
-                        let weekDayContainerHtml = ''; 
-
-                        for (let dayIndex = 0; dayIndex < weekData.days.length; dayIndex++) {
-                            const day = weekData.days[dayIndex];
-                            
-                            const dayMcqs = day.rows?.reduce((acc, row) => {
-                                if (row.mcqData) acc.push(...row.mcqData);
-                                return acc;
-                            }, []) || [];
-
-                            if (dayMcqs.length > 0) {
-                                monthHasMcqs = true;
-                                weekHasMcqs = true;
-                                totalMcqCount += dayMcqs.length;
-                                
-                                let dayMcqItemsHtml = '';
-                                dayMcqs.forEach((mcq, index) => { 
-                                    dayMcqItemsHtml += `
-                                        <div class="mcq-item">
-                                            <p class="mcq-question">${index + 1}. ${escapeHtml(mcq.question)}</p>
-                                            <ol class="mcq-options">
-                                                ${mcq.options.map((opt, i) => `
-                                                    <li class="mcq-option ${opt === mcq.correctAnswer ? 'mcq-correct-answer' : ''}">
-                                                        ${['ক', 'খ', 'গ', 'ঘ'][i]}. ${escapeHtml(opt)}
-                                                    </li>
-                                                `).join('')}
-                                            </ol>
-                                            <p class="mcq-final-answer">সঠিক উত্তর: ${escapeHtml(mcq.correctAnswer)}</p>
-                                        </div>
-                                    `;
-                                });
-
-                                weekDayContainerHtml += `
-                                    <div class="day-container">
-                                        <h5 class="day-header">Day ${day.dayNumber}</h5>
-                                        ${dayMcqItemsHtml}
-                                    </div>
-                                `;
-                            }
-                        }
-                        if (weekHasMcqs) {
-                            monthWeekContainerHtml += `
-                                <div class="week-container">
-                                    <h4 class="week-header">${weekId.replace('week', 'Week ')}</h4>
-                                    ${weekDayContainerHtml}
-                                </div>
-                            `;
-                        }
-                    }
-                    if (monthHasMcqs) {
-                        allMcqsHtml += `
-                            <div class="month-container">
-                                <h3 class="month-header">${monthName}</h3>
-                                ${monthWeekContainerHtml}
-                            </div>
-                        `;
-                    }
-                }
-
-                if (totalMcqCount === 0) {
-                    masterMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">You have not added any MCQs to your study plans yet.</p>';
-                } else {
-                    masterMcqContent.innerHTML = allMcqsHtml;
-                }
-                totalMcqCountSpan.textContent = totalMcqCount;
-                setSyncStatus("Synced", "green");
-
-            } catch (error) {
-                console.error("Error fetching all MCQs:", error);
-                masterMcqContent.innerHTML = '<p class="text-center text-red-500 py-10">Could not load MCQs. Please try again.</p>';
-                totalMcqCountSpan.textContent = "Error";
-                setSyncStatus("Error", "red");
-            }
-        }
+        
 
         // 4. Add listener for the "Test Yourself" button in the Master MCQ List
         document.getElementById('show-mcq-quiz-center-btn').addEventListener('click', openMcqQuizCenter);
@@ -6926,181 +6802,340 @@ async function buildMasterMcqPrintHtml() {
     return html;
 }
 
-// 2. Optimized Print Handler (Crash-Proof for Large Data)
-document.getElementById('print-master-mcq-btn')?.addEventListener('click', async (e) => {
-    const btn = e.currentTarget;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1.5"></i> Preparing...`;
-    btn.disabled = true;
+
+
+
+// --- NEW MCQ STUDY CENTER LOGIC ---
+
+const masterMcqModal = document.getElementById('master-mcq-modal');
+const masterMcqMenuContent = document.getElementById('master-mcq-menu-content');
+const mcqStudyModal = document.getElementById('mcq-study-modal');
+const mcqStudyContent = document.getElementById('mcq-study-content');
+const printStudyBtn = document.getElementById('print-study-mcq-btn');
+
+// State to hold current view data for printing
+let currentStudyViewData = null; 
+
+// 1. Open the Menu
+document.getElementById('show-master-mcq-btn').addEventListener('click', displayMcqMenu);
+
+async function displayMcqMenu() {
+    if (!auth.currentUser) { showCustomAlert("Please log in."); return; }
+    
+    masterMcqModal.style.display = "block";
+    masterMcqMenuContent.innerHTML = '<p class="text-center text-gray-500 py-10"><i class="fas fa-spinner fa-spin"></i> Loading Repository...</p>';
 
     try {
         const userId = auth.currentUser.uid;
         const appId = "study-plan17";
-        const plansCollectionPath = `artifacts/${appId}/users/${userId}/studyPlans`;
-        
-        // 1. Open the window immediately (Empty)
-        const printWindow = window.open('', '', 'height=900,width=1200');
-        if (!printWindow) {
-            showCustomAlert("Pop-up blocked! Please allow pop-ups.", "error");
-            return;
-        }
-
-        // 2. Set up the skeleton HTML & CSS
-        const styles = `
-            <style>
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
-                @page { size: A4; margin: 1cm; }
-                body { font-family: 'Inter', 'Kalpurush', sans-serif; color: #1f2937; font-size: 11px; line-height: 1.3; }
-                
-                .mcq-print-wrapper {
-                    column-count: 2;
-                    column-gap: 2rem;
-                    column-rule: 1px solid #eee;
-                }
-                
-                .print-month-header {
-                    column-span: all; 
-                    text-align: center; font-size: 16px; font-weight: bold; color: #059669;
-                    border-bottom: 2px solid #059669; margin-top: 15px; margin-bottom: 10px; padding-bottom: 5px;
-                }
-                .print-day-group { break-inside: avoid; margin-bottom: 15px; }
-                .print-day-header {
-                    font-weight: bold; background: #f3f4f6; padding: 4px 8px;
-                    border-radius: 4px; margin-bottom: 8px; color: #374151; font-size: 12px; border-left: 4px solid #4f46e5;
-                }
-                .print-subject-header {
-                    font-size: 11px; font-weight: 700; color: #4f46e5; text-transform: uppercase;
-                    margin-top: 8px; margin-bottom: 4px; padding-bottom: 2px; border-bottom: 1px dashed #c7d2fe; padding-left: 4px;
-                }
-                .print-mcq-item {
-                    break-inside: avoid; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px; margin-bottom: 6px; background: #fff;
-                }
-                .print-q-text { font-weight: 600; margin-bottom: 6px; }
-                .q-num { color: #059669; margin-right: 4px; }
-                .print-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 10px; color: #4b5563; }
-                .opt-label { font-weight: bold; color: #6b7280; }
-                .print-ans-key { text-align: right; margin-top: 6px; font-size: 10px; color: #059669; border-top: 1px dashed #f3f4f6; padding-top: 2px; }
-            </style>
-        `;
-
-        printWindow.document.write('<html><head><title>Master MCQ List</title>' + styles + '</head><body>');
-        
-        const today = new Date().toLocaleDateString();
-        printWindow.document.write(`
-            <div style="text-align:center; margin-bottom:20px; column-span:all;">
-                <h1 style="margin:0; color:#1f2937; font-size:20px;">Master MCQ List</h1>
-                <p style="margin:5px 0; color:#6b7280; font-size:10px;">Generated on ${today}</p>
-            </div>
-            <div class="mcq-print-wrapper">
-        `);
-
-        // 3. Fetch Data Streamingly
-        const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+        const q = query(collection(db, `artifacts/${appId}/users/${userId}/studyPlans`), orderBy(documentId(), "asc"));
         const querySnapshot = await getDocs(q);
 
-        if (querySnapshot.empty) {
-            printWindow.document.write("<p>No MCQs found.</p>");
-        }
+        let html = '';
+        let totalLifetimeMcqs = 0;
 
-        let totalMcqsProcessed = 0;
+        // -- Button: Lifetime All --
+        // We calculate total first, then render this button at the top
+        
+        let monthsHtml = '';
 
-        // Loop through Months
         for (const docSnap of querySnapshot.docs) {
             const monthId = docSnap.id;
-            const monthName = docSnap.data().monthName || monthId;
-            let monthHeaderWritten = false;
-
+            const monthData = docSnap.data();
+            const monthName = monthData.monthName || monthId;
+            
             // Fetch Weeks
-            const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
-            const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
-            const sortedWeeks = weeksQuerySnapshot.docs.sort((a, b) => a.id.localeCompare(b.id));
+            const weeksRef = collection(db, docSnap.ref.path, 'weeks');
+            const weeksSnap = await getDocs(weeksRef);
+            const sortedWeeks = weeksSnap.docs.sort((a, b) => a.id.localeCompare(b.id));
+
+            let monthMcqCount = 0;
+            let weeksHtml = '';
 
             for (const weekDoc of sortedWeeks) {
                 const weekId = weekDoc.id;
                 const weekData = weekDoc.data();
                 if (!weekData.days) continue;
 
-                for (const day of weekData.days) {
-                    // Prepare Day Buffer
-                    let dayBufferHtml = '';
-                    const mcqsBySubject = {}; 
-                    let hasMcqs = false;
+                let weekMcqCount = 0;
+                let daysHtml = '';
+
+                weekData.days.forEach(day => {
+                    // Group MCQs by Subject for this Day
+                    const subjectCounts = {};
+                    let dayTotal = 0;
 
                     day.rows?.forEach(row => {
                         if (row.mcqData && row.mcqData.length > 0) {
-                            const subject = row.subject || "General";
-                            if (!mcqsBySubject[subject]) mcqsBySubject[subject] = [];
-                            mcqsBySubject[subject].push(...row.mcqData);
-                            hasMcqs = true;
+                            const sub = row.subject || 'General';
+                            if (!subjectCounts[sub]) subjectCounts[sub] = 0;
+                            subjectCounts[sub] += row.mcqData.length;
+                            dayTotal += row.mcqData.length;
                         }
                     });
 
-                    if (hasMcqs) {
-                        // Write Month Header (Only once if data exists)
-                        if (!monthHeaderWritten) {
-                            printWindow.document.write(`<div class="print-month-header">${escapeHtml(monthName)}</div>`);
-                            monthHeaderWritten = true;
-                        }
+                    if (dayTotal > 0) {
+                        weekMcqCount += dayTotal;
+                        // Create Subject Buttons
+                        const subjectBtns = Object.entries(subjectCounts).map(([sub, count]) => {
+                            // Click handler: Open Day + Subject
+                            return `<button class="btn-mcq-subject" onclick="openMcqStudy('subject', '${monthId}', '${weekId}', ${day.dayNumber}, '${sub}')">
+                                ${sub} (${count})
+                            </button>`;
+                        }).join('');
 
-                        dayBufferHtml += `<div class="print-day-group">`;
-                        dayBufferHtml += `<div class="print-day-header">Week ${weekId.replace('week', '')} - Day ${day.dayNumber}</div>`;
-
-                        for (const [subject, mcqs] of Object.entries(mcqsBySubject)) {
-                            dayBufferHtml += `<div class="print-subject-header">${escapeHtml(subject)}</div>`;
-
-                            for (let idx = 0; idx < mcqs.length; idx++) {
-                                const mcq = mcqs[idx];
-                                const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
-                                const ansLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
-
-                                dayBufferHtml += `
-                                    <div class="print-mcq-item">
-                                        <div class="print-q-text"><span class="q-num">${idx + 1}.</span> ${escapeHtml(mcq.question)}</div>
-                                        <div class="print-options-grid">
-                                            ${mcq.options.map((opt, i) => `<div><span class="opt-label">${getOptionLabel(i, mcq.question)}.</span> ${escapeHtml(opt)}</div>`).join('')}
-                                        </div>
-                                        <div class="print-ans-key">Correct: <b>${ansLabel}</b></div>
-                                    </div>
-                                `;
-
-                                totalMcqsProcessed++;
-                                
-                                // --- CRITICAL: Anti-Freeze Pause ---
-                                // Every 50 MCQs, pause for 50ms to let browser render UI
-                                if (totalMcqsProcessed % 50 === 0) {
-                                    btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-1.5"></i> Rendering (${totalMcqsProcessed})...`;
-                                    await new Promise(r => setTimeout(r, 20)); // Breathe
-                                }
-                            }
-                        }
-                        dayBufferHtml += `</div>`; // End Day Group
-                        
-                        // Write Day Chunk immediately to free memory
-                        printWindow.document.write(dayBufferHtml);
+                        daysHtml += `
+                            <div class="ml-4 mb-2 border-l-2 border-gray-200 pl-3">
+                                <div class="text-xs font-bold text-gray-400 mb-1">Day ${day.dayNumber}</div>
+                                <div class="flex flex-wrap">${subjectBtns}</div>
+                            </div>
+                        `;
                     }
+                });
+
+                if (weekMcqCount > 0) {
+                    monthMcqCount += weekMcqCount;
+                    weeksHtml += `
+                        <div class="mb-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-semibold text-indigo-600 uppercase tracking-wide">${weekId.replace('week', 'Week ')}</span>
+                                <button class="btn-mcq-week" onclick="openMcqStudy('week', '${monthId}', '${weekId}')">
+                                    Week Total (${weekMcqCount})
+                                </button>
+                            </div>
+                            ${daysHtml}
+                        </div>
+                    `;
                 }
+            }
+
+            if (monthMcqCount > 0) {
+                totalLifetimeMcqs += monthMcqCount;
+                monthsHtml += `
+                    <div class="mcq-menu-section">
+                        <div class="mcq-menu-header">
+                            <span>${monthName}</span>
+                            <button class="btn-mcq-month" style="width:auto; margin:0; padding:4px 10px; font-size:0.8rem;" onclick="openMcqStudy('month', '${monthId}')">
+                                Study Month (${monthMcqCount})
+                            </button>
+                        </div>
+                        <div class="mcq-menu-body">
+                            ${weeksHtml}
+                        </div>
+                    </div>
+                `;
             }
         }
 
-        printWindow.document.write('</div></body></html>');
-        printWindow.document.close();
+        // Add "All" Button at top
+        if (totalLifetimeMcqs > 0) {
+            html += `
+                <button class="btn-mcq-all" onclick="openMcqStudy('all')">
+                    <i class="fas fa-globe-asia mr-2"></i> Study All Lifetime MCQs (${totalLifetimeMcqs})
+                </button>
+            `;
+        } else {
+            html += `<p class="text-center text-gray-500">No MCQs found in your study plan.</p>`;
+        }
 
-        btn.innerHTML = `<i class="fas fa-check mr-1.5"></i> Done`;
-        
-        // Wait for final render before print dialog
-        setTimeout(() => {
-            printWindow.focus();
-            printWindow.print();
-            // printWindow.close(); // Optional: Keep open for large files
-        }, 1500);
+        html += monthsHtml;
+        masterMcqMenuContent.innerHTML = html;
 
-    } catch (error) {
-        console.error(error);
-        showCustomAlert("Failed to print.", "error");
-    } finally {
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }, 2000);
+    } catch (e) {
+        console.error(e);
+        masterMcqMenuContent.innerHTML = '<p class="text-red-500 text-center">Error loading menu.</p>';
     }
+}
+
+// 2. Open Study Modal (Fetcher)
+window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
+    mcqStudyModal.style.display = 'block';
+    mcqStudyContent.innerHTML = '<p class="text-center py-20"><i class="fas fa-spinner fa-spin text-4xl text-indigo-300"></i></p>';
+    
+    // Setup Header
+    const titleEl = document.getElementById('study-modal-title');
+    const subEl = document.getElementById('study-modal-subtitle');
+    const printBtn = document.getElementById('print-study-mcq-btn');
+
+    if (scope === 'all') {
+        titleEl.textContent = "Lifetime MCQ Collection";
+        subEl.textContent = "All Questions";
+        printBtn.style.display = 'none'; // Disable print for ALL
+    } else if (scope === 'month') {
+        titleEl.textContent = `Month: ${monthId}`;
+        subEl.textContent = "All questions for this month";
+        printBtn.style.display = 'inline-flex';
+    } else if (scope === 'week') {
+        titleEl.textContent = `Week: ${weekId} (${monthId})`;
+        subEl.textContent = "All questions for this week";
+        printBtn.style.display = 'inline-flex';
+    } else if (scope === 'subject') {
+        titleEl.textContent = `${subject}`;
+        subEl.textContent = `Day ${dayNum} - ${weekId} - ${monthId}`;
+        printBtn.style.display = 'inline-flex';
+    }
+
+    // Fetch Logic
+    try {
+        const userId = auth.currentUser.uid;
+        const appId = "study-plan17";
+        const plansCollectionPath = `artifacts/${appId}/users/${userId}/studyPlans`;
+        
+        let q;
+        if (scope === 'all') {
+            q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
+        } else {
+            // For month/week/subject, we just start with the month
+            q = query(collection(db, plansCollectionPath), where(documentId(), '==', monthId));
+        }
+
+        const querySnapshot = await getDocs(q);
+        let finalMcqs = [];
+
+        for (const docSnap of querySnapshot.docs) {
+            const mId = docSnap.id;
+            // Optimizing: If we want specific month, loop only that. 
+            // (Query above handles this optimization for month/week/subject scopes)
+
+            const weeksRef = collection(db, docSnap.ref.path, 'weeks');
+            const weeksSnap = await getDocs(weeksRef);
+            const sortedWeeks = weeksSnap.docs.sort((a, b) => a.id.localeCompare(b.id));
+
+            for (const weekDoc of sortedWeeks) {
+                const wId = weekDoc.id;
+                if (scope === 'week' && wId !== weekId) continue;
+                if (scope === 'subject' && wId !== weekId) continue;
+
+                const weekData = weekDoc.data();
+                if (!weekData.days) continue;
+
+                weekData.days.forEach(day => {
+                    if (scope === 'subject' && day.dayNumber !== dayNum) return;
+
+                    day.rows?.forEach(row => {
+                        if (row.mcqData && row.mcqData.length > 0) {
+                            if (scope === 'subject' && row.subject !== subject) return;
+                            
+                            // Add Metadata to MCQ for display
+                            row.mcqData.forEach(mcq => {
+                                finalMcqs.push({
+                                    ...mcq,
+                                    meta: {
+                                        day: day.dayNumber,
+                                        week: wId,
+                                        month: mId,
+                                        subject: row.subject
+                                    }
+                                });
+                            });
+                        }
+                    });
+                });
+            }
+        }
+
+        // Save for printer
+        currentStudyViewData = { scope, title: titleEl.textContent, mcqs: finalMcqs };
+        
+        renderStudyView(finalMcqs);
+
+    } catch (e) {
+        console.error(e);
+        mcqStudyContent.innerHTML = '<p class="text-red-500">Error loading data.</p>';
+    }
+};
+
+// 3. Render the Cards
+function renderStudyView(mcqs) {
+    if (mcqs.length === 0) {
+        mcqStudyContent.innerHTML = '<div class="text-center py-10 text-gray-500">No MCQs found here.</div>';
+        return;
+    }
+
+    let html = '';
+    mcqs.forEach((mcq, idx) => {
+        html += `
+            <div class="study-card">
+                <div class="flex justify-between mb-2">
+                    <span class="text-xs font-bold text-indigo-500 bg-indigo-50 px-2 py-1 rounded">
+                        ${mcq.meta.month} / ${mcq.meta.week} / Day ${mcq.meta.day}
+                    </span>
+                    <span class="text-xs font-bold text-gray-400">#${idx + 1}</span>
+                </div>
+                <div class="study-question">${escapeHtml(mcq.question)}</div>
+                <div class="study-options">
+                    ${mcq.options.map((opt, i) => `
+                        <div class="study-opt">
+                            <span class="font-bold text-gray-400 mr-2">${getOptionLabel(i, mcq.question)}.</span>
+                            ${escapeHtml(opt)}
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="study-answer">
+                    Correct Answer: ${escapeHtml(mcq.correctAnswer)}
+                </div>
+            </div>
+        `;
+    });
+    mcqStudyContent.innerHTML = html;
+}
+
+// 4. Print Handler (Uses 'currentStudyViewData')
+printStudyBtn.addEventListener('click', () => {
+    if (!currentStudyViewData || currentStudyViewData.mcqs.length === 0) return;
+    
+    // Re-use the logic from the previous robust print function, but adapt data source
+    // We create a temporary virtual structure to feed the print function
+    
+    const printWindow = window.open('', '', 'height=900,width=1200');
+    
+    const styles = `
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
+            @page { size: A4; margin: 1cm; }
+            body { font-family: 'Inter', 'Kalpurush', sans-serif; color: #1f2937; font-size: 11px; line-height: 1.3; }
+            .mcq-print-wrapper { column-count: 2; column-gap: 2rem; column-rule: 1px solid #eee; }
+            .print-header { column-span: all; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #4f46e5; padding-bottom: 10px; }
+            .print-mcq-item { break-inside: avoid; border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px; margin-bottom: 8px; background: #fff; }
+            .print-q-text { font-weight: 600; margin-bottom: 6px; }
+            .q-num { color: #059669; margin-right: 4px; }
+            .print-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 10px; color: #4b5563; }
+            .print-ans-key { text-align: right; margin-top: 6px; font-size: 10px; color: #059669; border-top: 1px dashed #f3f4f6; padding-top: 2px; }
+        </style>
+    `;
+
+    printWindow.document.write('<html><head><title>Study Print</title>' + styles + '</head><body>');
+    printWindow.document.write(`
+        <div class="print-header">
+            <h1 style="margin:0; font-size:20px;">${currentStudyViewData.title}</h1>
+            <p style="margin:5px 0; font-size:10px; color:#666;">Total Questions: ${currentStudyViewData.mcqs.length}</p>
+        </div>
+        <div class="mcq-print-wrapper">
+    `);
+
+    // Render Items
+    currentStudyViewData.mcqs.forEach((mcq, idx) => {
+        const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+        const ansLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+        
+        printWindow.document.write(`
+            <div class="print-mcq-item">
+                <div class="print-q-text">
+                    <span class="q-num">${idx + 1}.</span> ${escapeHtml(mcq.question)}
+                </div>
+                <div class="print-options-grid">
+                    ${mcq.options.map((opt, i) => `<div><b>${getOptionLabel(i, mcq.question)}.</b> ${escapeHtml(opt)}</div>`).join('')}
+                </div>
+                <div class="print-ans-key">Correct: <b>${ansLabel}</b></div>
+            </div>
+        `);
+    });
+
+    printWindow.document.write('</div></body></html>');
+    printWindow.document.close();
+
+    setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+    }, 1000);
 });
