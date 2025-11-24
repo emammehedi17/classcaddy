@@ -3290,61 +3290,51 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          * Resets state and starts the quiz game.
          */
         function runQuizGame() {
+            // --- FIX: Force hide using inline style + class ---
+            quizStartScreen.style.display = 'none'; 
             quizStartScreen.classList.add('hidden');
+            
             quizResultsScreen.classList.add('hidden');
             quizMainScreen.classList.remove('hidden');
 			quizReviewScreen.classList.add('hidden');
 
             // --- START: NEW RE-GENERATION LOGIC ---
-            // "Try Again" বাটনের জন্য প্রশ্নগুলো রি-জেনারেট করুন
             if (currentVocabData) {
-                // এটি একটি Vocab কুইজ, সোর্স থেকে রি-জেনারেট করুন
-                // --- START: FIX ---
                 if (!currentOptionPool) {
-                    // This is a fallback for "Try Again" from a saved result
-                    // where the global pool wasn't saved.
-                    console.warn("No option pool found. Falling back to simple generation for 'Try Again'.");
+                    console.warn("No option pool found. Falling back.");
                     currentOptionPool = {
                         allWords: currentVocabData.map(v => v.word),
                         allBanglaMeanings: currentVocabData.map(v => v.banglaMeaning),
                         allSynonyms: currentVocabData.map(v => v.synonym).filter(Boolean)
                     };
                 }
-                // Call with the correct 2 arguments
                 currentQuizQuestions = generateQuizData(currentVocabData, currentOptionPool);
-                // --- END: FIX ---
             } else if (currentMcqData) {
-                // এটি একটি MCQ কুইজ, সোর্স থেকে রি-জেনারেট করুন
-                currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ // <-- ১. এখানে shuffleArray যোগ করুন
+                currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
                     question: mcq.question,
-                    options: [...mcq.options], // <-- ২. এখান থেকে shuffleArray রিমুভ করুন
+                    options: [...mcq.options], 
                     correctAnswer: mcq.correctAnswer,
-                    userAnswer: null, // উত্তর রিসেট করুন
-                    isCorrect: null // স্ট্যাটাস রিসেট করুন
-                }))); // <-- ৩. এখানে একটি অতিরিক্ত ')' বন্ধনী যোগ করুন
+                    userAnswer: null, 
+                    isCorrect: null 
+                }))); 
             } else {
-                // এটি হওয়া উচিত নয়, তবে ফলব্যাক হিসেবে পুরনো প্রশ্নগুলো শাফল করুন
-                console.warn("No source data found for restart, re-shuffling old questions.");
+                console.warn("No source data found, re-shuffling.");
                 currentQuizQuestions = shuffleArray(currentQuizQuestions);
             }
             // --- END: NEW RE-GENERATION LOGIC ---
 
-            // Reset state
             currentQuizQuestionIndex = 0;
             currentQuizScore = 0;
 
             quizScoreEl.textContent = `Score: 0.00`;
             quizRestartBtn.onclick = runQuizGame;
             
-            // --- START: TIMER LOGIC ---
             const totalQuestions = currentQuizQuestions.length;
             const totalTimeInSeconds = totalQuestions * 36;
-            startTimer(totalTimeInSeconds); // Start the countdown!
-            // --- END: TIMER LOGIC ---
+            startTimer(totalTimeInSeconds); 
             
             loadQuizQuestion();
         }
-
 		function startTimer(totalSeconds) {
             if (quizTimerInterval) clearInterval(quizTimerInterval); // Clear any old timer
             quizStartTime = Date.now(); // <-- এই লাইনটি কুইজ শুরুর সময় সেভ করবে
@@ -3488,14 +3478,16 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
         function showQuizResults() {
 			if (quizTimerInterval) clearInterval(quizTimerInterval);
-            const quizEndTime = Date.now(); // <-- কুইজ শেষ হওয়ার সময় সেভ করুন
-			
-			quizStartScreen.classList.add('hidden'); // Force hide Start Screen
+            const quizEndTime = Date.now(); 
+            
+            // --- FIX: Force hide Start & Main screens ---
+            quizStartScreen.style.display = 'none';
+            quizStartScreen.classList.add('hidden');
             
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.remove('hidden');
             quizReviewScreen.classList.add('hidden');
-
+			
             // --- START: NEW CALCULATIONS ---
             const totalQuestions = currentQuizQuestions.length;
             let correctCount = 0;
@@ -3870,6 +3862,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             window.currentQuizSourceInfo = { monthId, weekId };
 			window.currentQuizSubjectInfo = { subjectName: "Vocabulary", topicDetail: "Weekly Vocabulary" };
             closeModal('quiz-center-modal');
+			quizStartScreen.style.display = '';
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.add('hidden');
@@ -4325,7 +4318,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
             quizTitle.textContent = 'Vocabulary Quiz';
             window.currentQuizSourceInfo = { monthId, weekId, dayIndex, rowIndex };
             currentMcqTarget = null; 
-
+			quizStartScreen.style.display = '';
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.add('hidden');
@@ -4408,6 +4401,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
         async function startMcqQuiz(monthId, weekId, dayIndex, rowIndex) {
             quizTitle.textContent = 'MCQ Quiz';
 			currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
+			quizStartScreen.style.display = '';
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.add('hidden');
@@ -4612,6 +4606,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
             quizTitle.textContent = 'MCQ Quiz';
 			currentMcqTarget = { quizType, monthId, weekId, dayIndex };
             closeModal('mcq-quiz-center-modal');
+			quizStartScreen.style.display = '';
             quizModal.style.display = "block";
             quizMainScreen.classList.add('hidden');
             quizResultsScreen.classList.add('hidden');
