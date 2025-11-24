@@ -2113,3 +2113,106 @@
 }
 .font-control-btn:hover { background: #e5e7eb; }
 /* --- END: SETTINGS & DARK MODE STYLES --- */
+
+/* --- START: COMPREHENSIVE DARK MODE STYLES --- */
+
+/* 1. Modal Content & Background */
+.modal-content.study-content-dark {
+    background-color: #1f2937 !important; /* Gray 800 */
+    color: #f3f4f6 !important; /* Gray 100 */
+    border-color: #374151;
+}
+
+/* 2. Header Styling */
+.study-content-dark .modal-header-sticky,
+.study-content-dark .border-b {
+    background-color: #1f2937 !important; /* Match bg */
+    border-bottom-color: #374151 !important; /* Darker border */
+}
+.study-content-dark h3 {
+    color: #e5e7eb !important; /* Light gray title */
+}
+.study-content-dark p, 
+.study-content-dark .text-gray-500 {
+    color: #9ca3af !important; /* Muted text */
+}
+
+/* 3. Floating Buttons (Settings & Fullscreen) */
+.study-content-dark .floating-settings-btn,
+.study-content-dark #mcq-fullscreen-btn,
+.study-content-dark #view-mcq-fullscreen-btn {
+    background-color: #374151 !important; /* Gray 700 */
+    border-color: #4b5563 !important; /* Gray 600 */
+    color: #e5e7eb !important; /* Light text */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+.study-content-dark .floating-settings-btn:hover,
+.study-content-dark #mcq-fullscreen-btn:hover,
+.study-content-dark #view-mcq-fullscreen-btn:hover {
+    background-color: #4b5563 !important; /* Gray 600 */
+    color: #ffffff !important;
+}
+
+/* 4. Header Buttons (Print, Test, Close) */
+.study-content-dark .action-button-secondary {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #e5e7eb !important;
+}
+.study-content-dark .action-button-secondary:hover {
+    background-color: #4b5563 !important;
+}
+.study-content-dark .modal-close,
+.study-content-dark .text-gray-400 {
+    color: #9ca3af !important;
+}
+.study-content-dark .modal-close:hover {
+    color: #ef4444 !important; /* Red on hover */
+}
+
+/* 5. Study Cards */
+.study-content-dark .study-card {
+    background-color: #111827 !important; /* Gray 900 */
+    border-color: #374151;
+    border-left-color: #6366f1; /* Keep indigo accent */
+}
+.study-content-dark .study-question {
+    color: #f3f4f6 !important;
+}
+.study-content-dark .study-opt {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #d1d5db !important;
+}
+.study-content-dark .study-opt span {
+    color: #ffffff !important;
+}
+
+/* 6. Correct Answer Card (The Green Box) */
+.study-content-dark .answer-card-bg {
+    background-color: #064e3b !important; /* Dark Emerald */
+    border-color: #065f46 !important;
+}
+.study-content-dark .answer-icon-bg {
+    background-color: #065f46 !important; /* Darker Emerald */
+    color: #34d399 !important; /* Bright Green Icon */
+}
+.study-content-dark .answer-text {
+    color: #d1fae5 !important; /* Very light green text */
+}
+.study-content-dark .answer-label {
+    color: #6ee7b7 !important; /* Light green label */
+}
+
+/* 7. Settings Panel Itself */
+.study-content-dark .settings-panel {
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #f3f4f6;
+}
+.study-content-dark .font-control-btn {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #f3f4f6;
+}
+/* --- END: COMPREHENSIVE DARK MODE STYLES --- */

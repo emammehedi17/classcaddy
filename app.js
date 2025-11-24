@@ -7454,13 +7454,19 @@ function setupModalSettings(ids) {
     const fontInc = document.getElementById(ids.fontInc);
     const fontDec = document.getElementById(ids.fontDec);
     const fontInput = document.getElementById(ids.fontInput);
-    const contentArea = document.getElementById(ids.content);
+    
+    // FIX: Select the text content area specifically for font sizing
+    const textContentArea = document.getElementById(ids.content);
+    
+    // FIX: Find the MAIN WRAPPER for Dark Mode (Header + Content + Footer)
+    // We look up from the content area to find the .modal-content parent
+    const modalWrapper = textContentArea ? textContentArea.closest('.modal-content') : null;
 
-    if (!settingsBtn || !panel || !contentArea) return;
+    if (!settingsBtn || !panel || !modalWrapper) return;
 
     // 1. Toggle Panel
     settingsBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent closing when clicking button
+        e.stopPropagation();
         panel.classList.toggle('active');
     });
 
@@ -7471,22 +7477,31 @@ function setupModalSettings(ids) {
         }
     });
 
-    // 2. Dark Mode
+    // 2. Dark Mode (Applied to the entire Modal Wrapper)
     darkModeToggle.addEventListener('change', (e) => {
         if (e.target.checked) {
-            contentArea.classList.add('study-content-dark');
+            modalWrapper.classList.add('study-content-dark');
         } else {
-            contentArea.classList.remove('study-content-dark');
+            modalWrapper.classList.remove('study-content-dark');
         }
     });
 
-    // 3. Font Size Helpers
+    // 3. Font Size Helpers (Applied ONLY to the text area)
     const updateFontSize = (size) => {
-        contentArea.style.fontSize = `${size}px`;
+        if (!textContentArea) return;
+        
+        textContentArea.style.fontSize = `${size}px`;
         fontInput.value = size;
-        // Specifically update option text size slightly smaller relative to base
-        const options = contentArea.querySelectorAll('.study-opt');
-        options.forEach(opt => opt.style.fontSize = `${size * 0.95}px`);
+        
+        // Update specific text elements
+        const questions = textContentArea.querySelectorAll('.study-question');
+        const options = textContentArea.querySelectorAll('.study-opt');
+        const answers = textContentArea.querySelectorAll('.answer-text');
+
+        questions.forEach(q => q.style.fontSize = `${size}px`);
+        // Options usually look better slightly smaller
+        options.forEach(opt => opt.style.fontSize = `${size * 0.95}px`); 
+        answers.forEach(ans => ans.style.fontSize = `${size * 0.9}px`);
     };
 
     fontInc.addEventListener('click', () => {
