@@ -2597,3 +2597,63 @@ body.dark-mode .highlighted-vocab {
 }
 
 /* --- END: FINAL DARK MODE PATCH --- */
+
+/* --- START: FINAL DARK MODE FIXES (HEADERS, ICONS, BACKUP) --- */
+
+/* 1. Fix White Headers in Study/View Modals */
+/* This targets the specific white container at the top of the modal */
+body.dark-mode .modal-content .bg-white {
+    background-color: #1f2937 !important; /* Dark Gray */
+    border-bottom-color: #374151 !important;
+    border-radius: 0 !important; /* Remove corners to blend */
+}
+/* Fix the text color inside those headers */
+body.dark-mode .modal-content .bg-white h3 {
+    color: #e5e7eb !important;
+}
+body.dark-mode .modal-content .bg-white p {
+    color: #9ca3af !important;
+}
+
+/* 2. Fix Floating Icons (Settings & Fullscreen) */
+/* Turns the white circles into dark circles */
+body.dark-mode #mcq-fullscreen-btn,
+body.dark-mode #view-mcq-fullscreen-btn,
+body.dark-mode .floating-settings-btn {
+    background-color: #374151 !important; 
+    color: #e5e7eb !important; 
+    border-color: #4b5563 !important;
+}
+body.dark-mode #mcq-fullscreen-btn:hover,
+body.dark-mode #view-mcq-fullscreen-btn:hover,
+body.dark-mode .floating-settings-btn:hover {
+    background-color: #4b5563 !important; /* Lighter on hover */
+}
+
+/* 3. Fix Weekly Progress Bar Background Strip */
+/* This is the sticky bar that stays at the top when scrolling */
+body.dark-mode .sticky-progress-wrapper {
+    background-color: rgba(31, 41, 55, 0.95) !important; /* Dark Gray */
+    border-bottom-color: #374151 !important;
+}
+
+/* 4. Fix Cloud Backup Cards */
+body.dark-mode .cloud-backup-card {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+}
+/* Fix text inside backup cards */
+body.dark-mode .cloud-backup-card .backup-info-title {
+    color: #e5e7eb !important;
+}
+body.dark-mode .cloud-backup-card .backup-info-date {
+    color: #9ca3af !important;
+}
+/* Fix the "Restore" button inside the card */
+body.dark-mode .restore-cloud-btn {
+    background-color: #1f2937 !important;
+    color: #818cf8 !important; /* Indigo */
+    border-color: #6366f1 !important;
+}
+
+/* --- END: FINAL DARK MODE FIXES --- */
