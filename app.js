@@ -3480,13 +3480,37 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 			if (quizTimerInterval) clearInterval(quizTimerInterval);
             const quizEndTime = Date.now(); 
             
-            // --- FIX: Force hide Start & Main screens ---
-            quizStartScreen.style.display = 'none';
-            quizStartScreen.classList.add('hidden');
-            
-            quizMainScreen.classList.add('hidden');
-            quizResultsScreen.classList.remove('hidden');
-            quizReviewScreen.classList.add('hidden');
+            // --- START: FIX FOR OVERLAPPING SCREENS ---
+            // We re-select elements by ID to ensure we are targeting the live DOM
+            const startScreen = document.getElementById('quiz-start-screen');
+            const mainScreen = document.getElementById('quiz-main-screen');
+            const resultsScreen = document.getElementById('quiz-results-screen');
+            const reviewScreen = document.getElementById('quiz-review-screen');
+
+            // 1. Aggressively hide Start Screen
+            if (startScreen) {
+                startScreen.classList.add('hidden');
+                startScreen.style.setProperty('display', 'none', 'important'); // Force hide
+            }
+
+            // 2. Hide Main Quiz Screen
+            if (mainScreen) {
+                mainScreen.classList.add('hidden');
+                mainScreen.style.display = 'none';
+            }
+
+            // 3. Hide Review Screen
+            if (reviewScreen) {
+                reviewScreen.classList.add('hidden');
+                reviewScreen.style.display = 'none';
+            }
+
+            // 4. Show Results Screen
+            if (resultsScreen) {
+                resultsScreen.classList.remove('hidden');
+                resultsScreen.style.display = ''; // Remove 'none' so CSS flex works
+            }
+            // --- END: FIX FOR OVERLAPPING SCREENS ---
 			
             // --- START: NEW CALCULATIONS ---
             const totalQuestions = currentQuizQuestions.length;
@@ -3508,28 +3532,23 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const correctScore = correctCount * 1;
             const wrongScore = wrongCount * -0.25;
             
-            // [স্কোর ফিক্স]: এই গণনাটি এখন সঠিক
             const finalScore = correctScore + wrongScore;
             
-            // [পার্সেন্টেজ ফিক্স]: উপরের 'finalScore' ঠিক হওয়ায় এটিও ঠিক হয়ে যাবে
             const percentage = (totalQuestions > 0) ? (Math.max(0, finalScore) / totalQuestions) * 100 : 0;
             
-            // [টাইম ফিক্স]: ধাপ ১ ও ২ থেকে পাওয়া ভেরিয়েবল দিয়ে সঠিক সময় গণনা
             const timeTakenInSeconds = Math.round((quizEndTime - quizStartTime) / 1000);
             // --- END: NEW CALCULATIONS ---
             
 			// --- START: CAPTURE RESULT DATA FOR SAVING ---
             const quizType = currentMcqData ? 'MCQ' : 'Vocab';
             
-            // Get the subject and topic info we saved when the quiz started
             const subjectInfo = window.currentQuizSubjectInfo || { subjectName: quizType, topicDetail: 'Quiz' };
             const { subjectName, topicDetail } = subjectInfo;
 
-            // --- Topic Name Logic (UPGRADED for "By Day" tab) ---
-            let baseTopicName = ''; // This will be like "Day 2, W3, 2025-11"
+            let baseTopicName = ''; 
             let topicLink = null; 
 
-            if (currentMcqTarget) { // For MCQ quizzes
+            if (currentMcqTarget) { 
                 const { quizType: mcqAggregatedType, monthId, weekId, dayIndex } = currentMcqTarget;
                 
                 if (mcqAggregatedType === 'day' || (dayIndex !== null && dayIndex !== undefined)) {
@@ -3543,36 +3562,32 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     baseTopicName = `${monthId} (All)`;
                     topicLink = `#mcq-quiz-center`; 
                 } else {
-                    // Fallback for single-row MCQ quiz
                     const dayNum = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`)?.textContent || `Day ${parseInt(dayIndex) + 1}`;
                     baseTopicName = `${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
                     topicLink = `#day-${monthId}-${weekId}-${dayIndex}`;
                 }
-            } else if (window.currentQuizSourceInfo) { // For Vocab quizzes
+            } else if (window.currentQuizSourceInfo) { 
                 const { monthId, weekId, dayIndex, rowIndex } = window.currentQuizSourceInfo;
                 
                 if (dayIndex !== undefined && rowIndex !== undefined) {
                     const dayNum = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`)?.textContent || `Day ${parseInt(dayIndex) + 1}`;
                     baseTopicName = `${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
                     topicLink = `#day-${monthId}-${weekId}-${dayIndex}`;
-                } else if (weekId) { // Aggregated week vocab
+                } else if (weekId) { 
                     baseTopicName = `${weekId.replace('week', 'Week ')}, ${monthId}`;
                     topicLink = `#vocab-quiz-center`;
                 }
             }
             
-            // This is the new "Exam Topic" name for the "By Day" tab
             const finalTopicName = `${subjectName} - ${baseTopicName}`; 
-            // --- End Topic Name Logic ---
             
             currentQuizResultData = {
                 quizType: quizType,
-                topicName: finalTopicName, // <-- e.g., "Basic View - Day 2..."
-                subjectName: subjectName,  // <-- NEW (e.g., "Basic View")
-                topicDetail: topicDetail,  // <-- NEW (e.g., "Chapter 1: Intro" or "Vocabulary")
+                topicName: finalTopicName,
+                subjectName: subjectName,
+                topicDetail: topicDetail,
                 topicLink: topicLink, 
-                saveTimestamp: null, // Will be set on save
-                // Summary Stats
+                saveTimestamp: null, 
                 correctCount: correctCount,
                 wrongCount: wrongCount,
                 notAnsweredCount: notAnsweredCount,
@@ -3583,23 +3598,17 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 totalQuestions: totalQuestions,
                 percentage: parseFloat(percentage.toFixed(1)),
                 timeTakenInSeconds: timeTakenInSeconds,
-                // Full Data for Review
-                questions: currentQuizQuestions // Save the full question set
+                questions: currentQuizQuestions 
             };
             
-            
-            
-            // Enable the save button
             if(saveBtn) {
-                // --- START: GUEST MODE HIDE ---
                 if (isGuestMode) {
-                    saveBtn.style.display = 'none'; // Hide save button for guests
+                    saveBtn.style.display = 'none'; 
                 } else {
-                    saveBtn.style.display = 'inline-flex'; // Show for real users
+                    saveBtn.style.display = 'inline-flex'; 
                     saveBtn.disabled = false;
                     saveBtn.innerHTML = `<i class="fas fa-save mr-2"></i>Save`;
                 }
-                // --- END: GUEST MODE HIDE ---
             }
             // --- END: CAPTURE RESULT DATA FOR SAVING ---
 			
@@ -3620,7 +3629,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             document.getElementById('summary-time-taken').textContent = formatTime(timeTakenInSeconds);
             // --- END: POPULATE SUMMARY TABLE ---
             
-            // Show/Hide the "Review Wrong" button
             if (wrongCount > 0) {
                 quizReviewBtn.style.display = 'inline-flex';
             } else {
