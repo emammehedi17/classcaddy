@@ -6806,8 +6806,6 @@ async function buildMasterMcqPrintHtml() {
 
 
 // --- NEW MCQ STUDY CENTER LOGIC ---
-
-const masterMcqModal = document.getElementById('master-mcq-modal');
 const masterMcqMenuContent = document.getElementById('master-mcq-menu-content');
 const mcqStudyModal = document.getElementById('mcq-study-modal');
 const mcqStudyContent = document.getElementById('mcq-study-content');
