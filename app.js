@@ -6819,7 +6819,7 @@ function getOptionLabel(index, text) {
     return labelsEnglish[index] || (index + 1);
 }
 
-// 1. Build the HTML for Printing
+// 1. Build the HTML for Printing (GROUPED BY SUBJECT)
 async function buildMasterMcqPrintHtml() {
     if (!auth.currentUser) return null;
     
@@ -6840,13 +6840,11 @@ async function buildMasterMcqPrintHtml() {
             const monthData = docSnap.data();
             const monthName = monthData.monthName || monthId;
 
-            // Month Header (Spans across columns)
             let monthHeaderAdded = false;
 
             const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
             const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
             
-            // Sort weeks manually to be safe
             const sortedWeeks = weeksQuerySnapshot.docs.sort((a, b) => a.id.localeCompare(b.id));
 
             for (const weekDoc of sortedWeeks) {
@@ -6855,54 +6853,65 @@ async function buildMasterMcqPrintHtml() {
                 if (!weekData.days) continue;
 
                 for (const day of weekData.days) {
-                    // Collect MCQs for this day
-                    const dayMcqs = [];
+                    
+                    // --- STEP 1: Group MCQs by Subject ---
+                    const mcqsBySubject = {}; 
+                    let hasMcqs = false;
+
                     day.rows?.forEach(row => {
                         if (row.mcqData && row.mcqData.length > 0) {
-                            row.mcqData.forEach(mcq => {
-                                dayMcqs.push({ ...mcq, subject: row.subject });
-                            });
+                            const subject = row.subject || "General";
+                            if (!mcqsBySubject[subject]) {
+                                mcqsBySubject[subject] = [];
+                            }
+                            mcqsBySubject[subject].push(...row.mcqData);
+                            hasMcqs = true;
                         }
                     });
 
-                    if (dayMcqs.length > 0) {
-                        // Add Headers lazily to save space
+                    // --- STEP 2: Render ---
+                    if (hasMcqs) {
                         if (!monthHeaderAdded) {
                             html += `<div class="print-month-header">${escapeHtml(monthName)}</div>`;
                             monthHeaderAdded = true;
                         }
 
-                        // Day Group Container
+                        // Start Day Group
                         html += `<div class="print-day-group">`;
                         html += `<div class="print-day-header">Week ${weekId.replace('week', '')} - Day ${day.dayNumber}</div>`;
 
-                        dayMcqs.forEach((mcq, idx) => {
-                            const subjectLabel = mcq.subject ? `<span class="print-subject-tag">${escapeHtml(mcq.subject)}</span>` : '';
+                        // Loop through Subjects
+                        for (const [subject, mcqs] of Object.entries(mcqsBySubject)) {
                             
-                            // Find correct answer index/label
-                            const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
-                            // Use the question text to guess language context for the label
-                            const ansLabel = (correctIndex !== -1) 
-                                ? getOptionLabel(correctIndex, mcq.question) 
-                                : '?';
+                            // SUBJECT HEADER (Appears once per subject block)
+                            html += `<div class="print-subject-header">${escapeHtml(subject)}</div>`;
 
-                            html += `
-                                <div class="print-mcq-item">
-                                    <div class="print-q-text">
-                                        <span class="q-num">${idx + 1}.</span> ${escapeHtml(mcq.question)} ${subjectLabel}
+                            // Loop through Questions for this Subject
+                            mcqs.forEach((mcq, idx) => {
+                                // Find correct answer label
+                                const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+                                const ansLabel = (correctIndex !== -1) 
+                                    ? getOptionLabel(correctIndex, mcq.question) 
+                                    : '?';
+
+                                html += `
+                                    <div class="print-mcq-item">
+                                        <div class="print-q-text">
+                                            <span class="q-num">${idx + 1}.</span> ${escapeHtml(mcq.question)}
+                                        </div>
+                                        <div class="print-options-grid">
+                                            ${mcq.options.map((opt, i) => {
+                                                const label = getOptionLabel(i, mcq.question);
+                                                return `<div><span class="opt-label">${label}.</span> ${escapeHtml(opt)}</div>`;
+                                            }).join('')}
+                                        </div>
+                                        <div class="print-ans-key">
+                                            Correct: <b>${ansLabel}</b>
+                                        </div>
                                     </div>
-                                    <div class="print-options-grid">
-                                        ${mcq.options.map((opt, i) => {
-                                            const label = getOptionLabel(i, mcq.question);
-                                            return `<div><span class="opt-label">${label}.</span> ${escapeHtml(opt)}</div>`;
-                                        }).join('')}
-                                    </div>
-                                    <div class="print-ans-key">
-                                        Correct: <b>${ansLabel}</b>
-                                    </div>
-                                </div>
-                            `;
-                        });
+                                `;
+                            });
+                        }
                         html += `</div>`; // End Day Group
                     }
                 }
@@ -6917,7 +6926,7 @@ async function buildMasterMcqPrintHtml() {
     return html;
 }
 
-// 2. Print Handler
+// 2. Print Handler (Updated CSS)
 document.getElementById('print-master-mcq-btn')?.addEventListener('click', async (e) => {
     const btn = e.currentTarget;
     const originalText = btn.innerHTML;
@@ -6927,7 +6936,6 @@ document.getElementById('print-master-mcq-btn')?.addEventListener('click', async
     try {
         const contentHtml = await buildMasterMcqPrintHtml();
         
-        // Open Print Window
         const printWindow = window.open('', '', 'height=900,width=1200');
         
         const styles = `
@@ -6943,9 +6951,9 @@ document.getElementById('print-master-mcq-btn')?.addEventListener('click', async
                     column-rule: 1px solid #eee;
                 }
                 
-                /* Headers */
+                /* Month Header */
                 .print-month-header {
-                    column-span: all; /* Spans across both columns */
+                    column-span: all; 
                     text-align: center;
                     font-size: 16px;
                     font-weight: bold;
@@ -6955,8 +6963,10 @@ document.getElementById('print-master-mcq-btn')?.addEventListener('click', async
                     margin-bottom: 10px;
                     padding-bottom: 5px;
                 }
+                
+                /* Day Header */
                 .print-day-group {
-                    break-inside: avoid; /* Keep day content together if possible */
+                    break-inside: avoid;
                     margin-bottom: 15px;
                 }
                 .print-day-header {
@@ -6964,10 +6974,23 @@ document.getElementById('print-master-mcq-btn')?.addEventListener('click', async
                     background: #f3f4f6;
                     padding: 4px 8px;
                     border-radius: 4px;
-                    margin-bottom: 8px;
+                    margin-bottom: 5px;
                     color: #374151;
                     font-size: 12px;
                     border-left: 4px solid #4f46e5;
+                }
+
+                /* Subject Header (New) */
+                .print-subject-header {
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: #4f46e5; /* Indigo color */
+                    text-transform: uppercase;
+                    margin-top: 8px;
+                    margin-bottom: 4px;
+                    padding-bottom: 2px;
+                    border-bottom: 1px dashed #c7d2fe;
+                    padding-left: 4px;
                 }
                 
                 /* MCQ Item */
@@ -6976,24 +6999,13 @@ document.getElementById('print-master-mcq-btn')?.addEventListener('click', async
                     border: 1px solid #e5e7eb;
                     border-radius: 6px;
                     padding: 8px;
-                    margin-bottom: 8px;
+                    margin-bottom: 6px;
                     background: #fff;
                 }
                 .print-q-text { font-weight: 600; margin-bottom: 6px; }
                 .q-num { color: #059669; margin-right: 4px; }
                 
-                .print-subject-tag {
-                    font-size: 9px;
-                    background: #eef2ff;
-                    color: #4338ca;
-                    padding: 1px 5px;
-                    border-radius: 3px;
-                    margin-left: 5px;
-                    font-weight: normal;
-                    text-transform: uppercase;
-                }
-
-                /* Options Grid (2x2 for compactness) */
+                /* Options Grid */
                 .print-options-grid {
                     display: grid;
                     grid-template-columns: 1fr 1fr;
@@ -7003,7 +7015,7 @@ document.getElementById('print-master-mcq-btn')?.addEventListener('click', async
                 }
                 .opt-label { font-weight: bold; color: #6b7280; }
 
-                /* Answer Key Alignment */
+                /* Answer Key */
                 .print-ans-key {
                     text-align: right;
                     margin-top: 6px;
@@ -7017,7 +7029,6 @@ document.getElementById('print-master-mcq-btn')?.addEventListener('click', async
 
         printWindow.document.write('<html><head><title>Master MCQ List</title>' + styles + '</head><body>');
         
-        // Custom Header
         const today = new Date().toLocaleDateString();
         printWindow.document.write(`
             <div style="text-align:center; margin-bottom:20px; column-span:all;">
