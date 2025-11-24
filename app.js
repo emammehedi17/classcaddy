@@ -7120,11 +7120,7 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
         return;
     }
 
-    // 1. Close the study modal
-    closeModal('mcq-study-modal');
-
-    // 2. Prepare data for the quiz function
-    // We reuse the logic from 'startAggregatedMcqQuiz' but pass the data directly
+      // 2. Prepare data for the quiz function
     const mcqData = currentStudyViewData.mcqs;
     const title = currentStudyViewData.title;
 
@@ -7302,11 +7298,8 @@ if (viewMcqTestBtn) {
             return;
         }
         
-        closeModal('view-mcq-modal'); // Close view modal
-        
         // Start Quiz with the data we just loaded
         const mcqData = currentViewMcqData.mcqs;
-        const title = currentViewMcqData.title;
         
         // Set Quiz Context
         currentMcqTarget = { quizType: 'aggregated', description: title };
