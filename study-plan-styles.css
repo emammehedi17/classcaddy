@@ -2657,3 +2657,56 @@ body.dark-mode .restore-cloud-btn {
 }
 
 /* --- END: FINAL DARK MODE FIXES --- */
+
+/* --- START: DARK MODE PATCH 2 (VOCAB LIST, QUIZ BTNS, POMODORO) --- */
+
+/* 1. Fix Master Vocabulary List (Alternating Rows) */
+/* Odd rows were showing white/gray. Now they will be dark gray. */
+body.dark-mode #vocab-list-content tbody tr:nth-child(odd) {
+    background-color: #1f2937 !important; /* Darker Gray */
+    color: #e5e7eb !important;
+}
+body.dark-mode #vocab-list-content tbody tr:nth-child(even) {
+    background-color: #374151 !important; /* Slightly Lighter Dark Gray */
+    color: #e5e7eb !important;
+}
+/* Hover effect for rows */
+body.dark-mode #vocab-list-content tbody tr:hover {
+    background-color: #4b5563 !important; 
+}
+/* Fix the Green Week Header inside the list */
+body.dark-mode #vocab-list-content h4 {
+    background-color: #064e3b !important; /* Deep Green */
+    color: #d1fae5 !important; /* Light Green Text */
+}
+
+/* 2. Fix Weekly Quiz Center Buttons */
+/* The big white buttons for selecting a week */
+body.dark-mode .quiz-week-btn {
+    background-color: #1f2937 !important;
+    border-color: #4b5563 !important;
+    color: #e5e7eb !important;
+}
+body.dark-mode .quiz-week-btn:hover {
+    background-color: #374151 !important; /* Lighter on hover */
+    border-color: #6366f1 !important; /* Indigo border on hover */
+    color: #ffffff !important;
+}
+
+/* 3. Fix Pomodoro Timer Tabs (Focus / Break) */
+/* The gray container holding the tabs */
+body.dark-mode .pomo-header .bg-gray-100 {
+    background-color: #374151 !important; /* Dark Gray Container */
+}
+/* The Inactive Tab */
+body.dark-mode .pomo-tab {
+    color: #9ca3af !important; /* Muted Text */
+}
+/* The Active Tab (White card look) */
+body.dark-mode .pomo-tab.active {
+    background-color: #1f2937 !important; /* Dark Card */
+    color: #10b981 !important; /* Emerald Text */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+}
+
+/* --- END: DARK MODE PATCH 2 --- */
