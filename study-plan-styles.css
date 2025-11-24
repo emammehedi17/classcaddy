@@ -2404,3 +2404,117 @@ body.dark-mode #global-dark-mode-btn i::before {
 }
 
 /* --- END: GLOBAL DARK MODE OVERRIDES --- */
+
+/* --- START: FINAL DARK MODE FIXES (COVERS ALL SCREENSHOTS) --- */
+
+/* 1. Fix Quiz Start & Quiz Result Modals (White Footers & Content) */
+body.dark-mode .quiz-start-footer,
+body.dark-mode .result-summary-list,
+body.dark-mode .quiz-start-content {
+    background-color: #1f2937 !important; /* Gray 800 */
+    color: #e5e7eb !important;
+    border-color: #374151 !important;
+}
+
+/* 2. Fix MCQ Repository List (White lists inside modal) */
+body.dark-mode .mcq-menu-section,
+body.dark-mode .mcq-menu-header,
+body.dark-mode .mcq-menu-body {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #e5e7eb !important;
+}
+/* Fix the buttons inside the Repository */
+body.dark-mode .btn-mcq-month, 
+body.dark-mode .btn-mcq-week {
+    background-color: #374151 !important;
+    color: #e5e7eb !important;
+    border-color: #4b5563 !important;
+}
+/* Fix Subject buttons (small pills) */
+body.dark-mode .btn-mcq-subject {
+    background-color: #111827 !important;
+    color: #9ca3af !important;
+    border-color: #4b5563 !important;
+}
+body.dark-mode .btn-mcq-subject:hover {
+    background-color: #374151 !important;
+    color: #fff !important;
+}
+
+/* 3. Fix Weekly & Daily Progress Bars (The colorful rows) */
+/* This turns the bright pastel day rows into dark gray rows */
+body.dark-mode .week-section {
+    background-color: #1f2937 !important; /* Main Week Box */
+    border-color: #374151 !important;
+}
+body.dark-mode .day-section,
+body.dark-mode .day-section-header,
+body.dark-mode .day-section-body {
+    background-color: #374151 !important; /* Dark Gray for Days */
+    color: #e5e7eb !important;
+    border-color: #4b5563 !important;
+}
+/* Ensure text inside days is readable */
+body.dark-mode .day-header-title h4,
+body.dark-mode .day-progress-wrapper span {
+    color: #e5e7eb !important;
+}
+
+/* 4. Fix "Add Month" Button (White button on Dashboard) */
+body.dark-mode #add-month-btn-inline,
+body.dark-mode #save-new-month-btn,
+body.dark-mode #google-login-btn {
+    background-color: #374151 !important;
+    color: #e5e7eb !important;
+    border-color: #4b5563 !important;
+}
+body.dark-mode #google-login-btn:hover,
+body.dark-mode #add-month-btn-inline:hover {
+    background-color: #4b5563 !important;
+}
+
+/* 5. Fix Inputs & Dropdowns (Month Selector) */
+body.dark-mode select, 
+body.dark-mode input[type="text"],
+body.dark-mode input[type="number"] {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #fff !important;
+}
+
+/* 6. Fix Quiz Review Items */
+body.dark-mode .review-item {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+}
+body.dark-mode .review-option {
+    background-color: #1f2937 !important;
+    color: #d1d5db !important;
+    border-color: #4b5563;
+}
+
+/* 7. Fix Scrollbars (Stark white track) */
+body.dark-mode ::-webkit-scrollbar-track {
+    background: #111827 !important;
+}
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background-color: #4b5563 !important;
+    border: 2px solid #111827 !important;
+}
+
+/* 8. Fix "View MCQs" Modal Header & Footer */
+body.dark-mode .modal-header-sticky, 
+body.dark-mode .modal-footer-sticky {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+}
+
+/* 9. Text Contrast Fixes */
+body.dark-mode .text-gray-500, 
+body.dark-mode .text-gray-600, 
+body.dark-mode .text-gray-700 {
+    color: #9ca3af !important; /* Lighten all dark text */
+}
+
+/* --- END: FINAL DARK MODE FIXES --- */
