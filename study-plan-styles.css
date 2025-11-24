@@ -2518,3 +2518,82 @@ body.dark-mode .text-gray-700 {
 }
 
 /* --- END: FINAL DARK MODE FIXES --- */
+
+
+/* --- START: FINAL DARK MODE PATCH (FIXING REMAINING ISSUES) --- */
+
+/* 1. Fix Study MCQ Modal Background */
+/* Forces the inner container to be transparent so the dark modal bg shows through */
+body.dark-mode #mcq-study-content,
+body.dark-mode #view-mcq-content {
+    background-color: transparent !important;
+}
+
+/* 2. Fix Vocabulary Pills (The white bubbles) */
+body.dark-mode .vocab-word {
+    background-color: #374151 !important; /* Dark Gray */
+    color: #e5e7eb !important; /* Light Text */
+    border: 1px solid #4b5563;
+}
+body.dark-mode .vocab-word:hover {
+    background-color: #4b5563 !important; /* Slightly lighter on hover */
+}
+
+/* 3. Fix Progress Bar Tracks (The white background behind the colorful bar) */
+body.dark-mode .progress-bar-container {
+    background-color: #374151 !important; /* Dark Gray Track */
+}
+/* Fix the text labels like "Weekly Progress" above the bar */
+body.dark-mode .sticky-progress-wrapper .text-gray-500,
+body.dark-mode .day-progress-wrapper .text-gray-500 {
+    color: #9ca3af !important; /* Muted Light Gray */
+}
+
+/* 4. Fix Circular Progress Text ("Last Day", "Last Week", etc.) */
+body.dark-mode .tracker-label-small {
+    background-color: #374151 !important; /* Dark background for the pill */
+    color: #e5e7eb !important; /* Light Text */
+    border: 1px solid #4b5563;
+}
+
+/* 5. Fix Monthly Target Boxes (The textareas) */
+body.dark-mode .target-textarea {
+    background-color: #1f2937 !important; /* Dark Gray */
+    color: #e5e7eb !important;
+    border-color: #374151 !important;
+}
+/* Fix the specific "Weekly Targets" header text */
+body.dark-mode .monthly-targets h3 {
+    color: #e5e7eb !important;
+}
+
+/* 6. FIX QUIZ OPTIONS FEEDBACK (Green/Red) in Dark Mode */
+/* When Correct: Green Background, White Text */
+body.dark-mode .quiz-option-btn.correct {
+    background-color: #059669 !important; /* Emerald Green */
+    border-color: #059669 !important;
+    color: #ffffff !important;
+}
+/* When Incorrect: Red Background, White Text */
+body.dark-mode .quiz-option-btn.incorrect {
+    background-color: #dc2626 !important; /* Red */
+    border-color: #dc2626 !important;
+    color: #ffffff !important;
+}
+/* Normal State (Hover) */
+body.dark-mode .quiz-option-btn:hover:not(:disabled) {
+    background-color: #374151 !important; /* Dark Gray Hover */
+    border-color: #6366f1 !important; /* Indigo Border */
+}
+
+/* 7. Fix "Read Story" Modal Content */
+body.dark-mode #story-modal-content {
+    color: #e5e7eb !important;
+}
+/* Fix Highlighted Words in Story */
+body.dark-mode .highlighted-vocab {
+    background-color: #064e3b !important; /* Dark Green BG */
+    color: #6ee7b7 !important; /* Light Green Text */
+}
+
+/* --- END: FINAL DARK MODE PATCH --- */
