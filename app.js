@@ -4150,7 +4150,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             return mcqData;
         }
 
-// 4. "View MCQ" Button Handler (UPDATED: Stronger Answer Card Style)
+// 4. "View MCQ" Button Handler (UPDATED: Compact Answer Card)
 async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
     const viewMcqContent = document.getElementById('view-mcq-content');
     const subtitle = document.getElementById('view-mcq-subtitle');
@@ -4223,11 +4223,11 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                     </div>
 
                     <div class="mt-4 pt-2 border-t border-dashed border-gray-200">
-                        <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-3 shadow-sm">
+                        <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm">
                             <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700">
-                                <i class="fas fa-check text-sm"></i>
+                                <i class="fas fa-check text-xs"></i>
                             </div>
-                            <div class="font-bold text-emerald-900 text-md">
+                            <div class="font-bold text-emerald-900 text-sm">
                                 Correct: <span class="text-emerald-800">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
                             </div>
                         </div>
@@ -7084,7 +7084,7 @@ window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
 };
 
 
-// 3. Render the Cards (UPDATED: Stronger Answer Card Style)
+// 3. Render the Cards (UPDATED: Compact Answer Card)
 function renderStudyView(mcqs) {
     if (mcqs.length === 0) {
         mcqStudyContent.innerHTML = '<div class="text-center py-10 text-gray-500">No MCQs found here.</div>';
@@ -7112,11 +7112,11 @@ function renderStudyView(mcqs) {
                 </div>
 
                 <div class="mt-4 pt-2 border-t border-dashed border-gray-200">
-                    <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-3 shadow-sm">
+                    <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm">
                         <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700">
-                            <i class="fas fa-check text-sm"></i>
+                            <i class="fas fa-check text-xs"></i>
                         </div>
-                        <div class="font-bold text-emerald-900 text-md">
+                        <div class="font-bold text-emerald-900 text-sm">
                             Correct: <span class="text-emerald-800">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
                         </div>
                     </div>
@@ -7127,7 +7127,6 @@ function renderStudyView(mcqs) {
     });
     mcqStudyContent.innerHTML = html;
 }
-
 // 5. NEW: Test Handler for Study View (UPDATED: Exits Fullscreen)
 document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
     if (!currentStudyViewData || currentStudyViewData.mcqs.length === 0) {
