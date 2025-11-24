@@ -3286,17 +3286,24 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         
-        /**
+		/**
          * Resets state and starts the quiz game.
          */
         function runQuizGame() {
-            // --- FIX: Force hide using inline style + class ---
-            quizStartScreen.style.display = 'none'; 
+            // 1. Hide Start Screen
             quizStartScreen.classList.add('hidden');
+            quizStartScreen.style.display = 'none'; 
             
+            // 2. Hide Results & Review Screens (Safety check)
             quizResultsScreen.classList.add('hidden');
+            quizResultsScreen.style.display = 'none';
+            
+            quizReviewScreen.classList.add('hidden');
+            quizReviewScreen.style.display = 'none';
+
+            // 3. SHOW Main Screen (Critical Fix)
             quizMainScreen.classList.remove('hidden');
-			quizReviewScreen.classList.add('hidden');
+            quizMainScreen.style.display = ''; // <--- This removes 'display: none'
 
             // --- START: NEW RE-GENERATION LOGIC ---
             if (currentVocabData) {
@@ -3334,7 +3341,12 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             startTimer(totalTimeInSeconds); 
             
             loadQuizQuestion();
+            
+            // Fix animation state on restart
+            quizQuestionArea.classList.remove('slide-in-right', 'slide-in-left');
         }
+		
+        
 		function startTimer(totalSeconds) {
             if (quizTimerInterval) clearInterval(quizTimerInterval); // Clear any old timer
             quizStartTime = Date.now(); // <-- এই লাইনটি কুইজ শুরুর সময় সেভ করবে
