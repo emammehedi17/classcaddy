@@ -1175,7 +1175,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                                      <th scope="col" class="px-3 py-2 test-col text-center">Test</th>
                                      <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Comment</th>
                                      <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell text-center">Done</th>
-                                     <th scope="col" class="px-3 py-2 w-[10%] md:w-[5%] center-cell completion-perc-header hidden text-center">%</th>
+                                     <th scope="col" class="px-3 py-2 w-[10%] md:w-[5%] center-cell completion-perc-header hidden text-center">out of 100%</th>
                                      <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell actions-header hidden text-center"></th> 
                                  </tr>
                              </thead>
