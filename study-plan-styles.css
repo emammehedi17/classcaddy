@@ -3044,4 +3044,14 @@ body.dark-mode .circular {
 /* Optional: Make the 'empty' part of the circle track slightly lighter for better contrast */
 body.dark-mode .circular .bg {
     stroke: #374151 !important; /* Matches the border/input color */
+}	
+
+/* --- FIX: Remove Outer Square Box from Trackers --- */
+
+/* Applies to both Light and Dark modes */
+.circular,
+body.dark-mode .circular {
+    background-color: transparent !important; /* Removes the square background color */
+    border: none !important;                  /* Removes the border line */
+    box-shadow: none !important;              /* Removes the drop shadow */
 }
