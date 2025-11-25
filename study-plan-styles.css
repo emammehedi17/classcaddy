@@ -3096,3 +3096,58 @@ body.dark-mode .review-question {
     background-color: #cbd5e1;
     border-radius: 20px;
 }
+
+/* --- FIX: Completed (Checked) Rows in Dark Mode --- */
+
+/* 1. Base Text Color for Completed Rows */
+body.dark-mode .study-table tbody tr.row-completed td {
+    color: #ffffff !important; /* White Text */
+    border-bottom-width: 2px;
+}
+
+/* 2. Day 1: Emerald (Dark Version) */
+body.dark-mode .days-container > .day-section:nth-of-type(7n+1) .study-table tbody tr.row-completed td {
+    background-color: #064e3b !important; /* Deep Emerald */
+    border-color: #059669 !important;     /* Bright Emerald Border */
+}
+
+/* 3. Day 2: Sky Blue (Dark Version) */
+body.dark-mode .days-container > .day-section:nth-of-type(7n+2) .study-table tbody tr.row-completed td {
+    background-color: #0c4a6e !important; /* Deep Sky */
+    border-color: #0284c7 !important;     /* Bright Sky Border */
+}
+
+/* 4. Day 3: Amber (Dark Version) */
+body.dark-mode .days-container > .day-section:nth-of-type(7n+3) .study-table tbody tr.row-completed td {
+    background-color: #451a03 !important; /* Deep Amber/Brown */
+    border-color: #d97706 !important;     /* Bright Amber Border */
+}
+
+/* 5. Day 4: Red (Dark Version) */
+body.dark-mode .days-container > .day-section:nth-of-type(7n+4) .study-table tbody tr.row-completed td {
+    background-color: #450a0a !important; /* Deep Red */
+    border-color: #dc2626 !important;     /* Bright Red Border */
+}
+
+/* 6. Day 5: Purple (Dark Version) */
+body.dark-mode .days-container > .day-section:nth-of-type(7n+5) .study-table tbody tr.row-completed td {
+    background-color: #3b0764 !important; /* Deep Purple */
+    border-color: #9333ea !important;     /* Bright Purple Border */
+}
+
+/* 7. Day 6: Indigo (Dark Version) */
+body.dark-mode .days-container > .day-section:nth-of-type(7n+6) .study-table tbody tr.row-completed td {
+    background-color: #312e81 !important; /* Deep Indigo */
+    border-color: #4f46e5 !important;     /* Bright Indigo Border */
+}
+
+/* 8. Day 7: Cyan (Dark Version) */
+body.dark-mode .days-container > .day-section:nth-of-type(7n+7) .study-table tbody tr.row-completed td {
+    background-color: #164e63 !important; /* Deep Cyan */
+    border-color: #0891b2 !important;     /* Bright Cyan Border */
+}
+
+/* 9. Hover Effect */
+body.dark-mode .study-table tbody tr.row-completed:hover td {
+    filter: brightness(1.2); /* Make it slightly brighter on hover */
+}
