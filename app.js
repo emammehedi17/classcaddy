@@ -4120,13 +4120,20 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             addMcqModal.style.display = 'block';
         }
 
-        // 2. Modal "Parse & Save" Handler (UPDATED: Saves to DOM Only)
+        // 2. Modal "Parse & Save" Handler (UPDATED: With Validation)
         saveMcqBtn.addEventListener('click', () => { 
             if (!currentMcqTarget) return;
 
             const { monthId, weekId, dayIndex, rowIndex } = currentMcqTarget;
             const rawText = mcqPasteTextarea.value;
             const parsedData = parseMcqText(rawText);
+
+            // --- FIX: VALIDATION CHECK ---
+            if (parsedData.length === 0) {
+                showCustomAlert("No MCQs found! Please check the format and try again.", "error");
+                return; // Stop here, do NOT close the modal
+            }
+            // -----------------------------
 
             closeModal('add-mcq-modal');
             
@@ -4141,10 +4148,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     button.dataset.tempMcq = JSON.stringify(parsedData);
                     // 2. Update UI visually
                     button.innerHTML = `<i class="fas fa-pencil-alt mr-1"></i> Edit Qs (${parsedData.length})`;
-                    button.classList.add('bg-emerald-100', 'text-emerald-700'); // Visual cue
+                    button.classList.add('bg-emerald-100', 'text-emerald-700'); 
                     showCustomAlert(`${parsedData.length} MCQs attached to row! (Click 'Save Day' to confirm)`, "success");
                 } else {
-                    // Data cleared
+                    // This block is now unreachable due to the check above, but kept for safety
                     delete button.dataset.tempMcq;
                     button.innerHTML = `<i class="fas fa-plus mr-1"></i> Add Qs`;
                     button.classList.remove('bg-emerald-100', 'text-emerald-700');
@@ -4152,7 +4159,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 
                 // Trigger the autosave logic for the day if it exists
                 if (daySection.autosaveHandler) {
-                    // We fire a manual input event to wake up the autosave timer
                     daySection.dispatchEvent(new Event('input'));
                 }
             } else {
@@ -4161,15 +4167,17 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
             currentMcqTarget = null;
         });
-
-        // 3. ✨ The Magic Parser Function (Regex) - (FIXED FOR OCR ERRORS)
+		
+		
+        // 3. ✨ The Magic Parser Function (Regex) - (FIXED FOR WHITESPACE)
         function parseMcqText(text) {
+            // Ensure newlines before numbers
             let cleanText = text.replace(/\n*([০-৯0-9]+\.)/g, '\n$1');
             const mcqData = [];
             
-            // This Regex captures everything after "Correct answer:" into ONE group
+            // Updated Regex: Added \s* to allow spaces before options (e.g. " a." or "  ক.")
             const mcqRegex = 
-/(?:[০-৯0-9]+)\.\s*([\s\S]+?)\n(?:(?:ক\.)|(?:a\.))\s*([\s\S]+?)\n(?:(?:খ\.)|(?:b\.))\s*([\s\S]+?)\n(?:(?:গ\.)|(?:c\.))\s*([\s\S]+?)\n(?:(?:ঘ\.)|(?:d\.))\s*([\s\S]+?)\n(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([\s\S]+?)(?=\n[০-৯0-9]+\.|\n*$)/gi;
+/(?:[০-৯0-9]+)\.\s*([\s\S]+?)\n\s*(?:(?:ক\.)|(?:a\.))\s*([\s\S]+?)\n\s*(?:(?:খ\.)|(?:b\.))\s*([\s\S]+?)\n\s*(?:(?:গ\.)|(?:c\.))\s*([\s\S]+?)\n\s*(?:(?:ঘ\.)|(?:d\.))\s*([\s\S]+?)\n\s*(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([\s\S]+?)(?=\n\s*[০-৯0-9]+\.|\n*$)/gi;
             
             let match;
             while ((match = mcqRegex.exec(cleanText)) !== null) {
@@ -4186,67 +4194,39 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     const answerStringLower = answerString.toLowerCase();
                     let correctAnswer = null;
 
-                    // Test 1: Check for short prefix
-                    if (answerStringLower === 'a' || answerStringLower === 'ক') {
-                        correctAnswer = options[0];
-                    } else if (answerStringLower === 'b' || answerStringLower === 'খ') {
-                        correctAnswer = options[1];
-                    } else if (answerStringLower === 'c' || answerStringLower === 'গ' || answerStringLower === 'ג') { // Added ג
-                        correctAnswer = options[2];
-                    } else if (answerStringLower === 'd' || answerStringLower === 'ঘ') {
-                        correctAnswer = options[3];
+                    // Logic to find correct answer index
+                    if (answerStringLower === 'a' || answerStringLower === 'ক') correctAnswer = options[0];
+                    else if (answerStringLower === 'b' || answerStringLower === 'খ') correctAnswer = options[1];
+                    else if (answerStringLower === 'c' || answerStringLower === 'গ' || answerStringLower === 'ג') correctAnswer = options[2];
+                    else if (answerStringLower === 'd' || answerStringLower === 'ঘ') correctAnswer = options[3];
+
+                    if (correctAnswer === null) {
+                        if (answerStringLower.startsWith('a.') || answerStringLower.startsWith('ক.')) correctAnswer = options[0];
+                        else if (answerStringLower.startsWith('b.') || answerStringLower.startsWith('খ.')) correctAnswer = options[1];
+                        else if (answerStringLower.startsWith('c.') || answerStringLower.startsWith('গ.') || answerStringLower.startsWith('ג.')) correctAnswer = options[2];
+                        else if (answerStringLower.startsWith('d.') || answerStringLower.startsWith('ঘ.')) correctAnswer = options[3];
                     }
 
-                    // Test 2: Check for prefix with text (e.g., "b. The...", "ג. ট্রোজান...")
                     if (correctAnswer === null) {
-                        if (answerStringLower.startsWith('a.') || answerStringLower.startsWith('ক.')) {
-                            correctAnswer = options[0];
-                        } else if (answerStringLower.startsWith('b.') || answerStringLower.startsWith('খ.')) {
-                            correctAnswer = options[1];
-                        } else if (answerStringLower.startsWith('c.') || answerStringLower.startsWith('গ.') || answerStringLower.startsWith('ג.')) { // Added ג.
-                            correctAnswer = options[2];
-                        } else if (answerStringLower.startsWith('d.') || answerStringLower.startsWith('ঘ.')) {
-                            correctAnswer = options[3];
-                        }
-                    }
-
-                    // Test 3: Check if the full string matches an option
-                    if (correctAnswer === null) {
-                        let found = false;
                         for (const opt of options) {
-                            // Check exact match
-                            if (opt === answerString) {
+                            if (opt === answerString || answerString.includes(opt) || opt.includes(answerString)) {
                                 correctAnswer = opt;
-                                found = true;
-                                break;
-                            }
-                            // Check fuzzy match (ignore the 'ג.' prefix in the answerString if comparing to option text)
-                            // This handles cases where answer is "ג. OptionText" and option is "OptionText"
-                            if (answerString.includes(opt) || opt.includes(answerString)) {
-                                correctAnswer = opt;
-                                found = true;
                                 break;
                             }
                         }
                     }
                     
-                    if (!correctAnswer) {
-                        console.warn("Could not determine correct answer for:", question, "--- Got:", answerString);
-                        continue; 
+                    if (correctAnswer) {
+                        mcqData.push({ question, options, correctAnswer });
                     }
-
-                    mcqData.push({
-                        question: question,
-                        options: options,
-                        correctAnswer: correctAnswer
-                    });
                 } catch (e) {
-                    console.error("Failed to parse one MCQ block:", e, match);
+                    console.error("Failed to parse one MCQ block:", e);
                 }
             }
             return mcqData;
         }
-
+		
+		
 
 
 // 4. "View MCQ" Button Handler (UPDATED: font-semibold for Answer)
