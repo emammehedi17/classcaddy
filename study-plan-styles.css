@@ -3055,3 +3055,20 @@ body.dark-mode .circular {
     border: none !important;                  /* Removes the border line */
     box-shadow: none !important;              /* Removes the drop shadow */
 }
+
+/* --- FIX: Review Wrong/Correct Colors in Dark Mode --- */
+
+/* 1. Correct Answer (Green) */
+body.dark-mode .review-option.correct {
+    background-color: #064e3b !important; /* Deep Emerald Green */
+    border-color: #059669 !important;     /* Bright Green Border */
+    color: #ffffff !important;            /* White Text */
+}
+
+/* 2. Incorrect Answer (Red) */
+body.dark-mode .review-option.incorrect {
+    background-color: #7f1d1d !important; /* Deep Red */
+    border-color: #ef4444 !important;     /* Bright Red Border */
+    color: #fee2e2 !important;            /* Light Pink/Red Text */
+    text-decoration: line-through;        /* Keep strikethrough */
+}
