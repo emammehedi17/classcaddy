@@ -3604,17 +3604,17 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             let baseTopicName = ''; 
             let topicLink = null; 
 
-            // --- BUG FIX: SAFE DOM QUERYING ---
-            // We wrap DOM queries in try-catch or use optional chaining to prevent crashes
+            // --- BUG FIX: SAFE TOPIC NAME GENERATION ---
             try {
                 if (currentMcqTarget) { 
                     const { quizType: mcqAggregatedType, monthId, weekId, dayIndex } = currentMcqTarget;
                     
-                    if (mcqAggregatedType === 'day' || (dayIndex !== null && dayIndex !== undefined)) {
-                        // Try to find element, fallback to safe string if missing
+                    if (mcqAggregatedType === 'day' || (dayIndex !== null && dayIndex !== undefined && weekId)) {
                         const dayEl = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`);
                         const dayNum = dayEl ? dayEl.textContent : `Day ${parseInt(dayIndex) + 1}`;
-                        baseTopicName = `${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
+                        // Added safe check for weekId
+                        const wStr = weekId ? weekId.replace('week', 'W') : 'W?';
+                        baseTopicName = `${dayNum}, ${wStr}, ${monthId}`;
                         topicLink = `#day-${monthId}-${weekId}-${dayIndex}`; 
                     } else if (mcqAggregatedType === 'week') {
                         baseTopicName = `${weekId.replace('week', 'Week ')}, ${monthId}`;
@@ -3623,11 +3623,18 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         baseTopicName = `${monthId} (All)`;
                         topicLink = `#mcq-quiz-center`; 
                     } else {
-                        // Fallback
-                        const dayEl = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`);
-                        const dayNum = dayEl ? dayEl.textContent : `Day ${parseInt(dayIndex) + 1}`;
-                        baseTopicName = `${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
-                        topicLink = `#day-${monthId}-${weekId}-${dayIndex}`;
+                        // Fallback for Study Mode / Aggregated (where weekId might be undefined)
+                        if (currentMcqTarget.description) {
+                            baseTopicName = currentMcqTarget.description;
+                        } else if (weekId) {
+                            // It has a weekId, try to format it
+                            const dayEl = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`);
+                            const dayNum = dayEl ? dayEl.textContent : `Day ${parseInt(dayIndex) + 1}`;
+                            baseTopicName = `${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
+                            topicLink = `#day-${monthId}-${weekId}-${dayIndex}`;
+                        } else {
+                            baseTopicName = "Custom Quiz";
+                        }
                     }
                 } else if (window.currentQuizSourceInfo) { 
                     const { monthId, weekId, dayIndex, rowIndex } = window.currentQuizSourceInfo;
@@ -3635,7 +3642,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     if (dayIndex !== undefined && rowIndex !== undefined) {
                         const dayEl = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`);
                         const dayNum = dayEl ? dayEl.textContent : `Day ${parseInt(dayIndex) + 1}`;
-                        baseTopicName = `${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
+                        const wStr = weekId ? weekId.replace('week', 'W') : 'W?';
+                        baseTopicName = `${dayNum}, ${wStr}, ${monthId}`;
                         topicLink = `#day-${monthId}-${weekId}-${dayIndex}`;
                     } else if (weekId) { 
                         baseTopicName = `${weekId.replace('week', 'Week ')}, ${monthId}`;
@@ -3649,9 +3657,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             const finalTopicName = `${subjectName} - ${baseTopicName}`; 
             
-            // --- BUG FIX: DEEP COPY QUESTIONS ---
-            // We use JSON.parse(JSON.stringify(...)) to create a disconnect snapshot of the questions.
-            // This fixes the "Review Wrong" button showing empty/wrong data later.
+            // Create Deep Copy for Review
             const questionsSnapshot = JSON.parse(JSON.stringify(currentQuizQuestions));
 
             currentQuizResultData = {
@@ -3671,32 +3677,27 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 totalQuestions: totalQuestions,
                 percentage: parseFloat(percentage.toFixed(1)),
                 timeTakenInSeconds: timeTakenInSeconds,
-                questions: questionsSnapshot // <--- USING SNAPSHOT
+                questions: questionsSnapshot 
             };
             
-            // Enable Save Button
             if(saveBtn) {
                 if (isGuestMode) {
                     saveBtn.style.display = 'none'; 
                 } else {
                     saveBtn.style.display = 'inline-flex'; 
-                    saveBtn.disabled = false; // Enable it
+                    saveBtn.disabled = false; 
                     saveBtn.innerHTML = `<i class="fas fa-save mr-2"></i>Save`;
                 }
             }
 			
             // --- UPDATE UI TEXT ---
             document.getElementById('summary-answered-count').textContent = answeredCount;
-            
             document.getElementById('summary-correct-count').textContent = correctCount;
             document.getElementById('summary-correct-score').textContent = `+${correctScore.toFixed(2)}`;
-            
             document.getElementById('summary-wrong-count').textContent = wrongCount;
             document.getElementById('summary-wrong-score').textContent = wrongScore.toFixed(2);
-            
             document.getElementById('summary-not-answered-count').textContent = notAnsweredCount;
             document.getElementById('summary-not-answered-score').textContent = `0.00`;
-            
             document.getElementById('summary-final-score').textContent = finalScore.toFixed(2);
             document.getElementById('summary-percentage').textContent = `${percentage.toFixed(1)}%`;
             document.getElementById('summary-time-taken').textContent = formatTime(timeTakenInSeconds);
@@ -3707,6 +3708,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 quizReviewBtn.style.display = 'none';
             }
         }
+		
 		
         // --- START: ADD NEW QUIZ NAV LISTENERS ---
         quizNextBtn.addEventListener('click', () => {
@@ -3754,9 +3756,21 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         });
         
         // 3. The function to build and show the review screen
+        // 3. The function to build and show the review screen
         function showReviewScreen() {
-            quizResultsScreen.classList.add('hidden');
-            quizReviewScreen.classList.remove('hidden');
+            // --- FIX: FORCE SHOW REVIEW SCREEN ---
+            const resultsScreen = document.getElementById('quiz-results-screen');
+            const reviewScreen = document.getElementById('quiz-review-screen');
+            
+            // 1. Hide Results
+            resultsScreen.classList.add('hidden');
+            resultsScreen.style.display = 'none'; // Force hide
+            
+            // 2. Show Review
+            reviewScreen.classList.remove('hidden');
+            reviewScreen.style.display = ''; // Remove inline 'display: none'
+            // -------------------------------------
+
             quizReviewContent.innerHTML = ''; // Clear old content
             
             const wrongAnswers = currentQuizQuestions.filter(q => q.isCorrect === false);
@@ -3775,9 +3789,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         ${q.options.map(option => {
                             let className = 'review-option';
                             if (option === q.correctAnswer) {
-                                className += ' correct'; // This is the correct one
+                                className += ' correct'; 
                             } else if (option === q.userAnswer) {
-                                className += ' incorrect'; // This is the one the user (wrongly) chose
+                                className += ' incorrect'; 
                             }
                             return `<div class="${className}">${escapeHtml(option)}</div>`;
                         }).join('')}
@@ -3788,7 +3802,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             quizReviewContent.innerHTML = html;
         }
-        
+		
         // --- END: NEW REVIEW SCREEN LOGIC ---
 		
 		// --- START: ADD THIS NEW FUNCTION ---
