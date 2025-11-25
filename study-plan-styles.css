@@ -3031,3 +3031,17 @@ body.dark-mode .action-button-danger:hover {
 .tracker-score {
     font-size: 24px !important;   /* Reduced from 28px */
 }
+
+/* --- FIX: Circular Tracker Background in Dark Mode --- */
+
+/* Change background from #111827 (Very Dark) to #1f2937 (Dark Gray - same as the card) */
+body.dark-mode .circular {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important; /* Keep the border consistent */
+    box-shadow: none !important;      /* Remove shadow to flatten the look */
+}
+
+/* Optional: Make the 'empty' part of the circle track slightly lighter for better contrast */
+body.dark-mode .circular .bg {
+    stroke: #374151 !important; /* Matches the border/input color */
+}
