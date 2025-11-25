@@ -2,7 +2,8 @@
         // Import necessary functions from Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, signInWithCustomToken, signInAnonymously, getRedirectResult, signInWithRedirect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, setDoc, doc, getDoc, collection, query, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, limit, setLogLevel, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, setDoc, doc, getDoc, collection, query, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+		
         // --- Firebase Configuration ---
         setLogLevel('debug'); // Keep debug logging enabled for now
 
@@ -7726,57 +7727,3 @@ attachSettingsListeners({ btn: 'mcq-settings-btn', panel: 'mcq-settings-panel', 
 attachSettingsListeners({ btn: 'view-mcq-settings-btn', panel: 'view-mcq-settings-panel', fontInc: 'view-mcq-font-inc', fontDec: 'view-mcq-font-dec', fontInput: 'view-mcq-font-input' });
 
 // --- END: GLOBAL SETTINGS SYNC & MODAL CONTROLS ---
-
-
-// --- TEMPORARY BUTTON: Fix Last Quiz Result Subject ---
-// PASTE AT BOTTOM OF app.js
-
-const fixResultBtn = document.createElement('button');
-fixResultBtn.innerHTML = '<i class="fas fa-wrench mr-2"></i> Fix Last Result';
-fixResultBtn.style.cssText = "position: fixed; bottom: 140px; left: 20px; z-index: 9999; padding: 12px 20px; background: #f97316; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-family: sans-serif;";
-document.body.appendChild(fixResultBtn);
-
-fixResultBtn.addEventListener('click', async () => {
-    if (!auth.currentUser) { alert("Please log in."); return; }
-
-    fixResultBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
-    
-    try {
-        const userId = auth.currentUser.uid;
-        const appId = "study-plan17"; // Ensure this matches your config
-        const resultsRef = collection(db, `artifacts/${appId}/users/${userId}/quizResults`);
-        
-        // Get the MOST RECENT result (The one at the top of your list)
-        const q = query(resultsRef, orderBy("saveTimestamp", "desc"), limit(1));
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-            alert("No results found to fix.");
-            fixResultBtn.innerHTML = "No Data";
-            return;
-        }
-
-        const docSnap = querySnapshot.docs[0];
-        const data = docSnap.data();
-
-        // Confirmation Prompt
-        const confirmMsg = `Found Result:\n\nTopic: ${data.topicName}\nCurrent Subject: ${data.subjectName}\n\nDo you want to change the Subject to "English Handbook"?\n(This will move it to the correct tab)`;
-        
-        if (confirm(confirmMsg)) {
-            // UPDATE THE DOCUMENT
-            await updateDoc(docSnap.ref, { 
-                subjectName: "English Handbook" 
-            });
-            
-            alert("Success! The result has been updated.\n\nReloading page to refresh lists...");
-            location.reload();
-        } else {
-            fixResultBtn.innerHTML = '<i class="fas fa-wrench mr-2"></i> Fix Last Result';
-        }
-
-    } catch (error) {
-        console.error(error);
-        alert("Error: " + error.message);
-        fixResultBtn.innerHTML = "Error";
-    }
-});
