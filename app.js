@@ -356,11 +356,12 @@
                 userPhotoDisplay.classList.add('hidden');
                 userPhotoDisplay.src = "";
 
-                // --- START: CHANGED "SIGN UP" TO "SIGN IN" BUTTON ---
-                const loggedOutHTML = `<button id="header-signin-btn" class="px-5 py-2 font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors text-sm">Sign in</button>`;
+                // --- START: GOOGLE STYLE SIGN IN BUTTON ---
+                // Changed classes: bg-[#1a73e8] (Google Blue), rounded (instead of rounded-full), font-medium
+                const loggedOutHTML = `<button id="header-signin-btn" class="px-6 py-2 font-medium bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded transition-colors text-sm shadow-sm">Sign in</button>`;
                 
                 authContainerDesktop.innerHTML = loggedOutHTML;
-                authContainerMobile.innerHTML = loggedOutHTML.replace('px-5 py-2', 'block w-full text-center py-2').replace('id="header-signin-btn"', 'id="mobile-signin-btn"');
+                authContainerMobile.innerHTML = loggedOutHTML.replace('px-6 py-2', 'block w-full text-center py-2').replace('id="header-signin-btn"', 'id="mobile-signin-btn"');
 
                 // Define the login trigger
                 const triggerHeaderLogin = async () => {
@@ -375,7 +376,7 @@
                 // Attach listeners to the new buttons
                 document.getElementById('header-signin-btn')?.addEventListener('click', triggerHeaderLogin);
                 document.getElementById('mobile-signin-btn')?.addEventListener('click', triggerHeaderLogin);
-                // --- END: CHANGED "SIGN UP" TO "SIGN IN" BUTTON ---
+                // --- END: GOOGLE STYLE SIGN IN BUTTON ---
 
                 studyPlanContent.classList.add('hidden');
                 monthNavButtonsContainer.innerHTML = '';
