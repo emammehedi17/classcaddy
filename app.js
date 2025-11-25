@@ -3549,39 +3549,30 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 			if (quizTimerInterval) clearInterval(quizTimerInterval);
             const quizEndTime = Date.now(); 
             
-            // --- START: FIX FOR OVERLAPPING SCREENS ---
-            // We re-select elements by ID to ensure we are targeting the live DOM
+            // --- FIX FOR OVERLAPPING SCREENS ---
             const startScreen = document.getElementById('quiz-start-screen');
             const mainScreen = document.getElementById('quiz-main-screen');
             const resultsScreen = document.getElementById('quiz-results-screen');
             const reviewScreen = document.getElementById('quiz-review-screen');
 
-            // 1. Aggressively hide Start Screen
             if (startScreen) {
                 startScreen.classList.add('hidden');
-                startScreen.style.setProperty('display', 'none', 'important'); // Force hide
+                startScreen.style.setProperty('display', 'none', 'important'); 
             }
-
-            // 2. Hide Main Quiz Screen
             if (mainScreen) {
                 mainScreen.classList.add('hidden');
                 mainScreen.style.display = 'none';
             }
-
-            // 3. Hide Review Screen
             if (reviewScreen) {
                 reviewScreen.classList.add('hidden');
                 reviewScreen.style.display = 'none';
             }
-
-            // 4. Show Results Screen
             if (resultsScreen) {
                 resultsScreen.classList.remove('hidden');
-                resultsScreen.style.display = ''; // Remove 'none' so CSS flex works
+                resultsScreen.style.display = ''; 
             }
-            // --- END: FIX FOR OVERLAPPING SCREENS ---
 			
-            // --- START: NEW CALCULATIONS ---
+            // --- STATS CALCULATIONS ---
             const totalQuestions = currentQuizQuestions.length;
             let correctCount = 0;
             let wrongCount = 0;
@@ -3600,15 +3591,11 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const answeredCount = correctCount + wrongCount;
             const correctScore = correctCount * 1;
             const wrongScore = wrongCount * -0.25;
-            
             const finalScore = correctScore + wrongScore;
-            
             const percentage = (totalQuestions > 0) ? (Math.max(0, finalScore) / totalQuestions) * 100 : 0;
-            
             const timeTakenInSeconds = Math.round((quizEndTime - quizStartTime) / 1000);
-            // --- END: NEW CALCULATIONS ---
             
-			// --- START: CAPTURE RESULT DATA FOR SAVING ---
+			// --- CAPTURE RESULT DATA ---
             const quizType = currentMcqData ? 'MCQ' : 'Vocab';
             
             const subjectInfo = window.currentQuizSubjectInfo || { subjectName: quizType, topicDetail: 'Quiz' };
@@ -3617,39 +3604,56 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             let baseTopicName = ''; 
             let topicLink = null; 
 
-            if (currentMcqTarget) { 
-                const { quizType: mcqAggregatedType, monthId, weekId, dayIndex } = currentMcqTarget;
-                
-                if (mcqAggregatedType === 'day' || (dayIndex !== null && dayIndex !== undefined)) {
-                    const dayNum = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`)?.textContent || `Day ${parseInt(dayIndex) + 1}`;
-                    baseTopicName = `${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
-                    topicLink = `#day-${monthId}-${weekId}-${dayIndex}`; 
-                } else if (mcqAggregatedType === 'week') {
-                    baseTopicName = `${weekId.replace('week', 'Week ')}, ${monthId}`;
-                    topicLink = `#mcq-quiz-center`; 
-                } else if (mcqAggregatedType === 'month') {
-                    baseTopicName = `${monthId} (All)`;
-                    topicLink = `#mcq-quiz-center`; 
-                } else {
-                    const dayNum = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`)?.textContent || `Day ${parseInt(dayIndex) + 1}`;
-                    baseTopicName = `${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
-                    topicLink = `#day-${monthId}-${weekId}-${dayIndex}`;
+            // --- BUG FIX: SAFE DOM QUERYING ---
+            // We wrap DOM queries in try-catch or use optional chaining to prevent crashes
+            try {
+                if (currentMcqTarget) { 
+                    const { quizType: mcqAggregatedType, monthId, weekId, dayIndex } = currentMcqTarget;
+                    
+                    if (mcqAggregatedType === 'day' || (dayIndex !== null && dayIndex !== undefined)) {
+                        // Try to find element, fallback to safe string if missing
+                        const dayEl = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`);
+                        const dayNum = dayEl ? dayEl.textContent : `Day ${parseInt(dayIndex) + 1}`;
+                        baseTopicName = `${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
+                        topicLink = `#day-${monthId}-${weekId}-${dayIndex}`; 
+                    } else if (mcqAggregatedType === 'week') {
+                        baseTopicName = `${weekId.replace('week', 'Week ')}, ${monthId}`;
+                        topicLink = `#mcq-quiz-center`; 
+                    } else if (mcqAggregatedType === 'month') {
+                        baseTopicName = `${monthId} (All)`;
+                        topicLink = `#mcq-quiz-center`; 
+                    } else {
+                        // Fallback
+                        const dayEl = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`);
+                        const dayNum = dayEl ? dayEl.textContent : `Day ${parseInt(dayIndex) + 1}`;
+                        baseTopicName = `${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
+                        topicLink = `#day-${monthId}-${weekId}-${dayIndex}`;
+                    }
+                } else if (window.currentQuizSourceInfo) { 
+                    const { monthId, weekId, dayIndex, rowIndex } = window.currentQuizSourceInfo;
+                    
+                    if (dayIndex !== undefined && rowIndex !== undefined) {
+                        const dayEl = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`);
+                        const dayNum = dayEl ? dayEl.textContent : `Day ${parseInt(dayIndex) + 1}`;
+                        baseTopicName = `${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
+                        topicLink = `#day-${monthId}-${weekId}-${dayIndex}`;
+                    } else if (weekId) { 
+                        baseTopicName = `${weekId.replace('week', 'Week ')}, ${monthId}`;
+                        topicLink = `#vocab-quiz-center`;
+                    }
                 }
-            } else if (window.currentQuizSourceInfo) { 
-                const { monthId, weekId, dayIndex, rowIndex } = window.currentQuizSourceInfo;
-                
-                if (dayIndex !== undefined && rowIndex !== undefined) {
-                    const dayNum = document.querySelector(`#day-${monthId}-${weekId}-${dayIndex} h4`)?.textContent || `Day ${parseInt(dayIndex) + 1}`;
-                    baseTopicName = `${dayNum}, ${weekId.replace('week', 'W')}, ${monthId}`;
-                    topicLink = `#day-${monthId}-${weekId}-${dayIndex}`;
-                } else if (weekId) { 
-                    baseTopicName = `${weekId.replace('week', 'Week ')}, ${monthId}`;
-                    topicLink = `#vocab-quiz-center`;
-                }
+            } catch (e) {
+                console.warn("Error generating topic name, using fallback.", e);
+                baseTopicName = "Unknown Topic";
             }
             
             const finalTopicName = `${subjectName} - ${baseTopicName}`; 
             
+            // --- BUG FIX: DEEP COPY QUESTIONS ---
+            // We use JSON.parse(JSON.stringify(...)) to create a disconnect snapshot of the questions.
+            // This fixes the "Review Wrong" button showing empty/wrong data later.
+            const questionsSnapshot = JSON.parse(JSON.stringify(currentQuizQuestions));
+
             currentQuizResultData = {
                 quizType: quizType,
                 topicName: finalTopicName,
@@ -3667,21 +3671,21 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 totalQuestions: totalQuestions,
                 percentage: parseFloat(percentage.toFixed(1)),
                 timeTakenInSeconds: timeTakenInSeconds,
-                questions: currentQuizQuestions 
+                questions: questionsSnapshot // <--- USING SNAPSHOT
             };
             
+            // Enable Save Button
             if(saveBtn) {
                 if (isGuestMode) {
                     saveBtn.style.display = 'none'; 
                 } else {
                     saveBtn.style.display = 'inline-flex'; 
-                    saveBtn.disabled = false;
+                    saveBtn.disabled = false; // Enable it
                     saveBtn.innerHTML = `<i class="fas fa-save mr-2"></i>Save`;
                 }
             }
-            // --- END: CAPTURE RESULT DATA FOR SAVING ---
 			
-            // --- START: POPULATE SUMMARY TABLE ---
+            // --- UPDATE UI TEXT ---
             document.getElementById('summary-answered-count').textContent = answeredCount;
             
             document.getElementById('summary-correct-count').textContent = correctCount;
@@ -3696,7 +3700,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             document.getElementById('summary-final-score').textContent = finalScore.toFixed(2);
             document.getElementById('summary-percentage').textContent = `${percentage.toFixed(1)}%`;
             document.getElementById('summary-time-taken').textContent = formatTime(timeTakenInSeconds);
-            // --- END: POPULATE SUMMARY TABLE ---
             
             if (wrongCount > 0) {
                 quizReviewBtn.style.display = 'inline-flex';
@@ -3704,7 +3707,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 quizReviewBtn.style.display = 'none';
             }
         }
-		
 		
         // --- START: ADD NEW QUIZ NAV LISTENERS ---
         quizNextBtn.addEventListener('click', () => {
