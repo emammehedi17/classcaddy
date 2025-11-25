@@ -356,12 +356,22 @@
                 userPhotoDisplay.classList.add('hidden');
                 userPhotoDisplay.src = "";
 
-                // --- START: GOOGLE STYLE SIGN IN BUTTON ---
-                // Changed classes: bg-[#1a73e8] (Google Blue), rounded (instead of rounded-full), font-medium
-                const loggedOutHTML = `<button id="header-signin-btn" class="px-6 py-2 font-medium bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded transition-colors text-sm shadow-sm">Sign in</button>`;
+                // --- START: GOOGLE BRANDED SIGN IN BUTTON ---
+                const googleLogo = "data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=";
+
+                const loggedOutHTML = `
+                    <button id="header-signin-btn" class="flex items-center gap-3 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-full transition-colors text-sm font-medium shadow-sm">
+                        <img src="${googleLogo}" alt="G" class="w-5 h-5">
+                        <span>Sign in</span>
+                    </button>`;
                 
+                // For mobile, we adjust formatting to center it
+                const mobileLoggedOutHTML = loggedOutHTML
+                    .replace('id="header-signin-btn"', 'id="mobile-signin-btn"')
+                    .replace('flex items-center', 'flex items-center justify-center w-full');
+
                 authContainerDesktop.innerHTML = loggedOutHTML;
-                authContainerMobile.innerHTML = loggedOutHTML.replace('px-6 py-2', 'block w-full text-center py-2').replace('id="header-signin-btn"', 'id="mobile-signin-btn"');
+                authContainerMobile.innerHTML = mobileLoggedOutHTML;
 
                 // Define the login trigger
                 const triggerHeaderLogin = async () => {
@@ -376,8 +386,7 @@
                 // Attach listeners to the new buttons
                 document.getElementById('header-signin-btn')?.addEventListener('click', triggerHeaderLogin);
                 document.getElementById('mobile-signin-btn')?.addEventListener('click', triggerHeaderLogin);
-                // --- END: GOOGLE STYLE SIGN IN BUTTON ---
-
+                // --- END: GOOGLE BRANDED SIGN IN BUTTON ---
                 studyPlanContent.classList.add('hidden');
                 monthNavButtonsContainer.innerHTML = '';
                 currentMonthPlanDisplay.innerHTML = '';
