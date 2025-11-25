@@ -6913,7 +6913,6 @@ let currentViewMcqData = null; // Stores data for the View Modal
 document.getElementById('show-master-mcq-btn').addEventListener('click', displayMcqMenu);
 
 async function displayMcqMenu() {
-    // --- FIX: Define the modal right here ---
     const masterMcqModal = document.getElementById('master-mcq-modal'); 
     
     if (!auth.currentUser) { showCustomAlert("Please log in."); return; }
@@ -6929,10 +6928,6 @@ async function displayMcqMenu() {
 
         let html = '';
         let totalLifetimeMcqs = 0;
-
-        // -- Button: Lifetime All --
-        // We calculate total first, then render this button at the top
-        
         let monthsHtml = '';
 
         for (const docSnap of querySnapshot.docs) {
@@ -6957,7 +6952,6 @@ async function displayMcqMenu() {
                 let daysHtml = '';
 
                 weekData.days.forEach(day => {
-                    // Group MCQs by Subject for this Day
                     const subjectCounts = {};
                     let dayTotal = 0;
 
@@ -6972,11 +6966,10 @@ async function displayMcqMenu() {
 
                     if (dayTotal > 0) {
                         weekMcqCount += dayTotal;
-                        // Create Subject Buttons
                         const subjectBtns = Object.entries(subjectCounts).map(([sub, count]) => {
-                            // Click handler: Open Day + Subject
-                            return `<button class="btn-mcq-subject" onclick="openMcqStudy('subject', '${monthId}', '${weekId}', ${day.dayNumber}, '${sub}')">
-                                ${sub} (${count})
+                            // FIX: Use data attributes instead of onclick
+                            return `<button class="btn-mcq-subject" data-action="open-study" data-scope="subject" data-month-id="${monthId}" data-week-id="${weekId}" data-day-num="${day.dayNumber}" data-subject="${escapeHtml(sub)}">
+                                ${escapeHtml(sub)} (${count})
                             </button>`;
                         }).join('');
 
@@ -6995,7 +6988,7 @@ async function displayMcqMenu() {
                         <div class="mb-4">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-sm font-semibold text-indigo-600 uppercase tracking-wide">${weekId.replace('week', 'Week ')}</span>
-                                <button class="btn-mcq-week" onclick="openMcqStudy('week', '${monthId}', '${weekId}')">
+                                <button class="btn-mcq-week" data-action="open-study" data-scope="week" data-month-id="${monthId}" data-week-id="${weekId}">
                                     Week Total (${weekMcqCount})
                                 </button>
                             </div>
@@ -7011,7 +7004,7 @@ async function displayMcqMenu() {
                     <div class="mcq-menu-section">
                         <div class="mcq-menu-header">
                             <span>${monthName}</span>
-                            <button class="btn-mcq-month" style="width:auto; margin:0; padding:4px 10px; font-size:0.8rem;" onclick="openMcqStudy('month', '${monthId}')">
+                            <button class="btn-mcq-month" style="width:auto; margin:0; padding:4px 10px; font-size:0.8rem;" data-action="open-study" data-scope="month" data-month-id="${monthId}">
                                 Study Month (${monthMcqCount})
                             </button>
                         </div>
@@ -7023,10 +7016,9 @@ async function displayMcqMenu() {
             }
         }
 
-        // Add "All" Button at top
         if (totalLifetimeMcqs > 0) {
             html += `
-                <button class="btn-mcq-all" onclick="openMcqStudy('all')">
+                <button class="btn-mcq-all" data-action="open-study" data-scope="all">
                     <i class="fas fa-globe-asia mr-2"></i> Study All Lifetime MCQs (${totalLifetimeMcqs})
                 </button>
             `;
@@ -7043,6 +7035,23 @@ async function displayMcqMenu() {
     }
 }
 
+// --- NEW: Event Delegation for MCQ Repository ---
+if (masterMcqMenuContent) {
+    masterMcqMenuContent.addEventListener('click', (e) => {
+        // Find the closest button with data-action="open-study"
+        const btn = e.target.closest('[data-action="open-study"]');
+        if (!btn) return;
+
+        const ds = btn.dataset;
+        
+        // Convert dayNum to integer if it exists
+        const dayNum = ds.dayNum ? parseInt(ds.dayNum) : null;
+        
+        // Call the study opener
+        openMcqStudy(ds.scope, ds.monthId, ds.weekId, dayNum, ds.subject);
+    });
+}
+// 2. Open Study Modal (Fetcher)
 // 2. Open Study Modal (Fetcher)
 window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
     mcqStudyModal.style.display = 'block';
@@ -7090,9 +7099,6 @@ window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
 
         for (const docSnap of querySnapshot.docs) {
             const mId = docSnap.id;
-            // Optimizing: If we want specific month, loop only that. 
-            // (Query above handles this optimization for month/week/subject scopes)
-
             const weeksRef = collection(db, docSnap.ref.path, 'weeks');
             const weeksSnap = await getDocs(weeksRef);
             const sortedWeeks = weeksSnap.docs.sort((a, b) => a.id.localeCompare(b.id));
@@ -7110,7 +7116,9 @@ window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
 
                     day.rows?.forEach(row => {
                         if (row.mcqData && row.mcqData.length > 0) {
-                            if (scope === 'subject' && row.subject !== subject) return;
+                            // FIX: Handle 'General' default if subject is empty
+                            const rowSubject = row.subject || 'General';
+                            if (scope === 'subject' && rowSubject !== subject) return;
                             
                             // Add Metadata to MCQ for display
                             row.mcqData.forEach(mcq => {
@@ -7120,7 +7128,7 @@ window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
                                         day: day.dayNumber,
                                         week: wId,
                                         month: mId,
-                                        subject: row.subject
+                                        subject: rowSubject
                                     }
                                 });
                             });
@@ -7130,9 +7138,7 @@ window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
             }
         }
 
-        // Save for printer
         currentStudyViewData = { scope, title: titleEl.textContent, mcqs: finalMcqs };
-        
         renderStudyView(finalMcqs);
 
     } catch (e) {
@@ -7140,7 +7146,6 @@ window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
         mcqStudyContent.innerHTML = '<p class="text-red-500">Error loading data.</p>';
     }
 };
-
 
 // 3. Render the Cards (UPDATED: font-semibold for Answer)
 function renderStudyView(mcqs) {
