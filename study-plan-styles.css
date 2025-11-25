@@ -2969,3 +2969,32 @@ body.dark-mode .add-first-day-btn:hover {
     color: #34d399 !important;            /* Brighter Green Text */
     border-color: #6b7280 !important;     /* Lighter Border */
 }
+
+/* --- FIX: Make Floating Icons Smaller --- */
+
+/* 1. Dark Mode Button Size */
+#global-dark-mode-btn {
+    width: 44px !important;   /* Reduced from 56px */
+    height: 44px !important;  /* Reduced from 56px */
+    bottom: 75px !important;  /* Adjust position to sit closer to the button below */
+}
+#global-dark-mode-btn i {
+    font-size: 1.1rem !important; /* Smaller Icon */
+}
+
+/* 2. Pomodoro Icon Size */
+.pomodoro-icon {
+    width: 44px !important;   /* Reduced from 56px */
+    height: 44px !important;  /* Reduced from 56px */
+}
+.pomodoro-icon i {
+    font-size: 1.1rem !important; /* Smaller Icon */
+}
+
+/* 3. Adjust the tiny timer badge on the Pomodoro icon */
+#pomo-icon-time {
+    font-size: 9px !important;
+    right: -5px !important;
+    top: -5px !important;
+    padding: 2px 4px !important;
+}
