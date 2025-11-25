@@ -2925,3 +2925,27 @@ body.dark-mode .day-section.editing textarea::placeholder {
 body.dark-mode .day-section.editing td {
     border-color: #374151 !important;
 }
+
+/* --- FIX: 'Add Qs' / 'Edit Qs' Buttons in Dark Mode --- */
+
+/* 1. Default 'Add Qs' Button (Empty State) */
+body.dark-mode .study-table .add-row-mcq-btn {
+    background-color: #374151 !important; /* Dark Gray */
+    color: #e5e7eb !important;            /* Light Text */
+    border-color: #4b5563 !important;     /* Dark Border */
+}
+body.dark-mode .study-table .add-row-mcq-btn:hover {
+    background-color: #4b5563 !important; /* Lighter Gray on Hover */
+    color: #ffffff !important;
+}
+
+/* 2. 'Edit Qs' Button (Has Data State) */
+/* Overrides the .bg-emerald-100 and .text-emerald-700 classes added by JS */
+body.dark-mode .study-table .add-row-mcq-btn.bg-emerald-100 {
+    background-color: #064e3b !important; /* Deep Dark Green */
+    color: #6ee7b7 !important;            /* Light Green Text */
+    border-color: #059669 !important;     /* Green Border */
+}
+body.dark-mode .study-table .add-row-mcq-btn.bg-emerald-100:hover {
+    background-color: #065f46 !important; /* Slightly lighter Green */
+}
