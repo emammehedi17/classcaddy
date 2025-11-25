@@ -311,20 +311,29 @@
                 }
                 logoutBtn.classList.remove('hidden');
 
+                // --- START: REMOVE LOGOUT BUTTON FROM HEADER ---
                 let loggedInHTML = '';
                 if (isGuestMode) {
-                    loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700">Guest Mode</p><p class="text-gray-500 text-xs">Viewing Mehedi's Plan</p></div><button id="logout-btn-header" class="ml-3 action-button action-button-secondary text-xs px-3 py-1">Exit</button>`;
+                    // Removed the 'Exit' button from here
+                    loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700">Guest Mode</p><p class="text-gray-500 text-xs">Viewing Mehedi's Plan</p></div>`;
                 } else {
-                    loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700">${user.displayName || 'User'}</p><p class="text-gray-500 text-xs">${user.email || (user.isAnonymous ? 'Anonymous' : '')}</p></div><button id="logout-btn-header" class="ml-3 action-button action-button-danger text-xs px-3 py-1">Log Out</button>`;
+                    // Removed the 'Log Out' button from here
+                    loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700">${user.displayName || 'User'}</p><p class="text-gray-500 text-xs">${user.email || (user.isAnonymous ? 'Anonymous' : '')}</p></div>`;
                 }
+                
                 authContainerDesktop.innerHTML = loggedInHTML;
-                authContainerMobile.innerHTML = loggedInHTML.replace('ml-3', 'w-full mt-2').replace('logout-btn-header', 'logout-btn-mobile');
+                
+                // Note: If you still want the button on MOBILE menu only, we can add it back here manually. 
+                // For now, this removes it from both Desktop Header and Mobile Menu to be consistent.
+                authContainerMobile.innerHTML = loggedInHTML; 
+                // --- END: REMOVE LOGOUT BUTTON FROM HEADER ---
 
+                // We can safely leave these listeners; the ?. check prevents errors if the buttons don't exist
                 document.getElementById('logout-btn-header')?.addEventListener('click', handleLogout);
                 document.getElementById('logout-btn-mobile')?.addEventListener('click', handleLogout);
 
                 studyPlanContent.classList.remove('hidden');
-                loadStudyPlans(); 
+                loadStudyPlans();
             } else {
                 // --- START: GUEST MODE LOGIC (LOGOUT) ---
                 isGuestMode = false;
