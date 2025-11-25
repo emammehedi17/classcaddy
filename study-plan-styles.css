@@ -2949,3 +2949,23 @@ body.dark-mode .study-table .add-row-mcq-btn.bg-emerald-100 {
 body.dark-mode .study-table .add-row-mcq-btn.bg-emerald-100:hover {
     background-color: #065f46 !important; /* Slightly lighter Green */
 }
+
+/* --- FIX: 'Add New Day' Button in Dark Mode --- */
+
+/* 1. Default State */
+/* Changes background to Dark Gray and keeps the text green */
+body.dark-mode .add-day-btn,
+body.dark-mode .add-first-day-btn {
+    background-color: #374151 !important; /* Dark Gray */
+    color: #10b981 !important;            /* Emerald Text */
+    border-color: #4b5563 !important;     /* Darker Gray Border */
+}
+
+/* 2. Hover State */
+/* Slightly lighter gray background on hover */
+body.dark-mode .add-day-btn:hover,
+body.dark-mode .add-first-day-btn:hover {
+    background-color: #4b5563 !important; /* Light Gray Hover */
+    color: #34d399 !important;            /* Brighter Green Text */
+    border-color: #6b7280 !important;     /* Lighter Border */
+}
