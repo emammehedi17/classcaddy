@@ -2998,3 +2998,36 @@ body.dark-mode .add-first-day-btn:hover {
     top: -5px !important;
     padding: 2px 4px !important;
 }
+
+/* --- FIX: Log Out (Danger) Button in Dark Mode --- */
+
+/* 1. Default State */
+/* Dark Gray background with Light Red text/border */
+body.dark-mode .action-button-danger {
+    background-color: #374151 !important; /* Dark Gray */
+    color: #f87171 !important;            /* Light Red Text */
+    border-color: #7f1d1d !important;     /* Dark Red Border */
+}
+
+/* 2. Hover State */
+/* Turns slightly red on hover */
+body.dark-mode .action-button-danger:hover {
+    background-color: #450a0a !important; /* Very Dark Red Background */
+    color: #ffffff !important;            /* White Text */
+    border-color: #ef4444 !important;     /* Brighter Red Border */
+}
+
+/* --- FIX: Circular Tracker Label Overlap --- */
+
+.tracker-label-small {
+    font-size: 10px !important;   /* Reduced from 13px to 10px */
+    padding: 1px 6px !important;  /* Reduced padding */
+    margin-bottom: 2px !important; /* Tighter spacing */
+    max-width: 85%;               /* Prevent it from touching the edges */
+    white-space: nowrap;          /* Keep text on one line */
+}
+
+/* Optional: Adjust the big score number slightly to fit better */
+.tracker-score {
+    font-size: 24px !important;   /* Reduced from 28px */
+}
