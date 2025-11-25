@@ -260,6 +260,11 @@
 		
         // --- Authentication ---
         function updateAuthUI(user) {
+             // --- START: TARGET HEADER LOGO ---
+             const headerLogo = document.querySelector('img[alt="DU Logo"]');
+             const headerLink = headerLogo ? headerLogo.closest('a') : null;
+             // --- END: TARGET HEADER LOGO ---
+
              if (user) {
 				 
 				initSettingsSync(user.uid);
@@ -274,30 +279,38 @@
                 currentUser = user;
                 userId = user.uid; // This will be MEHEDI_UID in guest mode
                 console.log("User logged in:", userId);
-                console.log("Is Guest Mode:", isGuestMode); // <-- Good for debugging
+                console.log("Is Guest Mode:", isGuestMode); 
 
                 loginPrompt.style.display = 'none';
                 userInfo.classList.remove('hidden');
                 userDisplay.textContent = user.displayName || 'User';
-                userEmailDisplay.textContent = user.email || (user.isAnonymous ? 'Guest (Read-Only)' : ''); // <-- MODIFIED
+                userEmailDisplay.textContent = user.email || (user.isAnonymous ? 'Guest (Read-Only)' : ''); 
                 userIdDisplay.textContent = `ID: ${userId}`;
+				
+                // Update the card profile pic (existing code)
 				if (user.photoURL) {
                     userPhotoDisplay.src = user.photoURL;
                     userPhotoDisplay.classList.remove('hidden');
+                    
+                    // --- START: UPDATE HEADER LOGO TO USER PHOTO ---
+                    if (headerLogo) {
+                        headerLogo.src = user.photoURL; // Change logo to user photo
+                        if (headerLink) headerLink.removeAttribute('href'); // Disable DU link
+                    }
+                    // --- END: UPDATE HEADER LOGO TO USER PHOTO ---
                 } else {
                     userPhotoDisplay.classList.add('hidden');
                 }
                 userIdDisplay.title = 'Your unique User ID';
 
-                // --- MODIFIED: HIDE/SHOW LOGOUT BUTTON ---
+                // ... (Rest of your existing Login logic for buttons/headers) ...
                 if (isGuestMode) {
-                    logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt mr-1"></i> Exit Guest Mode'; // Change button text
+                    logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt mr-1"></i> Exit Guest Mode'; 
                 } else {
-                    logoutBtn.innerHTML = 'Log Out'; // Default text
+                    logoutBtn.innerHTML = 'Log Out'; 
                 }
                 logoutBtn.classList.remove('hidden');
 
-                // --- MODIFIED: GUEST MODE HEADER ---
                 let loggedInHTML = '';
                 if (isGuestMode) {
                     loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700">Guest Mode</p><p class="text-gray-500 text-xs">Viewing Mehedi's Plan</p></div><button id="logout-btn-header" class="ml-3 action-button action-button-secondary text-xs px-3 py-1">Exit</button>`;
@@ -311,7 +324,7 @@
                 document.getElementById('logout-btn-mobile')?.addEventListener('click', handleLogout);
 
                 studyPlanContent.classList.remove('hidden');
-                loadStudyPlans(); // Load plans (will load Mehedi's data)
+                loadStudyPlans(); 
             } else {
                 // --- START: GUEST MODE LOGIC (LOGOUT) ---
                 isGuestMode = false;
@@ -319,6 +332,13 @@
                 currentUser = null;
                 userId = null;
                 console.log("User logged out");
+
+                // --- START: RESET HEADER LOGO TO DU ---
+                if (headerLogo) {
+                    headerLogo.src = "images/du_logo.png"; // Revert to DU Logo
+                    if (headerLink) headerLink.href = "https://du.ac.bd/"; // Restore DU Link
+                }
+                // --- END: RESET HEADER LOGO TO DU ---
 
                 loginPrompt.style.display = 'block';
                 userInfo.classList.add('hidden');
@@ -342,7 +362,7 @@
                 unsubscribeActiveMonth = null;
             }
         }
-
+		
         onAuthStateChanged(auth, async (user) => {
              console.log("Auth state changed. User:", user);
              if (user) {
