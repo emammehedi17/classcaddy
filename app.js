@@ -7649,3 +7649,86 @@ attachSettingsListeners({ btn: 'view-mcq-settings-btn', panel: 'view-mcq-setting
 // --- END: GLOBAL SETTINGS SYNC & MODAL CONTROLS ---
 
 
+// --- TEMPORARY BUTTON: Copy Week 4 Day 2 Percentages to Days 3-7 (2025-11) ---
+// PASTE THIS AT THE BOTTOM OF app.js
+
+const tempCopyBtn2 = document.createElement('button');
+tempCopyBtn2.innerHTML = '<i class="fas fa-bolt mr-2"></i> Copy Day 2 -> Days 3-7';
+tempCopyBtn2.style.cssText = "position: fixed; bottom: 80px; left: 20px; z-index: 9999; padding: 12px 20px; background: #d97706; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-family: sans-serif;";
+document.body.appendChild(tempCopyBtn2);
+
+tempCopyBtn2.addEventListener('click', async () => {
+    // 1. Security Check
+    if (!auth.currentUser) {
+        alert("Please log in first.");
+        return;
+    }
+
+    const monthId = '2025-11';
+    const weekId = 'week4';
+    
+    if (!confirm(`Are you sure you want to copy PERCENTAGES from Day 2 to Days 3-7 for:\n\nMonth: ${monthId}\nWeek: ${weekId}?`)) return;
+
+    const originalText = tempCopyBtn2.innerHTML;
+    tempCopyBtn2.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+    tempCopyBtn2.disabled = true;
+
+    try {
+        // 2. Define Path
+        const userId = auth.currentUser.uid;
+        const planPath = `artifacts/${typeof appId !== 'undefined' ? appId : 'study-plan17'}/users/${userId}/studyPlans`;
+        
+        const weekDocRef = doc(db, planPath, monthId, 'weeks', weekId);
+        const weekDocSnap = await getDoc(weekDocRef);
+
+        if (!weekDocSnap.exists()) {
+            alert(`Document not found: ${monthId}/${weekId}`);
+            tempCopyBtn2.innerHTML = "Error";
+            return;
+        }
+
+        const data = weekDocSnap.data();
+        const days = data.days || [];
+
+        // 3. Get Source (Day 2 -> Index 1)
+        const sourceDay = days[1]; 
+        if (!sourceDay) {
+            alert("Day 2 (Index 1) does not exist in this week.");
+            tempCopyBtn2.innerHTML = originalText;
+            tempCopyBtn2.disabled = false;
+            return;
+        }
+
+        // 4. Loop through Target Days (Index 2 to 6) -> Days 3 to 7
+        let updatedCount = 0;
+        
+        for (let i = 2; i < days.length; i++) {
+            const targetDay = days[i];
+            
+            // Loop through rows of the target day
+            if (targetDay.rows) {
+                targetDay.rows.forEach((targetRow, rowIndex) => {
+                    // Find the corresponding row in Source Day (Day 2)
+                    const sourceRow = sourceDay.rows[rowIndex];
+                    
+                    if (sourceRow) {
+                        // COPY ACTION:
+                        targetRow.completionPercentage = sourceRow.completionPercentage;
+                        updatedCount++;
+                    }
+                });
+            }
+        }
+
+        // 5. Save back to Firebase
+        await updateDoc(weekDocRef, { days: days });
+
+        alert(`Successfully updated ${updatedCount} rows in Days 3-${days.length}! Page will reload.`);
+        location.reload();
+
+    } catch (error) {
+        console.error("Copy failed:", error);
+        alert("Error: " + error.message);
+        tempCopyBtn2.innerHTML = "Failed";
+    }
+});
