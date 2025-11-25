@@ -4229,7 +4229,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
 
 
-// 4. "View MCQ" Button Handler (UPDATED: font-semibold for Answer)
+// 4. "View MCQ" Button Handler (UPDATED: Captures Subject)
 async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
     const viewMcqContent = document.getElementById('view-mcq-content');
     const subtitle = document.getElementById('view-mcq-subtitle');
@@ -4250,14 +4250,18 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
         let mcqData = [];
         let mainTitleText = `Day-${dayData.dayNumber} MCQs`;
         let subTitleText = "";
+        let subjectName = "Quick Test"; // Default
 
         if (rowIndex !== null) {
+            // Single Row Mode
             const row = dayData.rows?.[rowIndex];
             mcqData = row?.mcqData || [];
             const subject = row?.subject || "No Subject";
             const topic = row?.topic || "No Topic";
             subTitleText = `${subject} | ${topic}`;
+            subjectName = subject; // Capture the real subject
         } else {
+            // All Day Mode
             mcqData = dayData.rows?.reduce((acc, row) => {
                 if (row.mcqData) {
                     acc.push(...row.mcqData);
@@ -4265,6 +4269,14 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 return acc;
             }, []) || [];
             subTitleText = "All Questions";
+            
+            // Optional: If all rows have the same subject, use it. Otherwise 'Aggregated'
+            const subjects = new Set(dayData.rows?.filter(r => r.mcqData && r.mcqData.length > 0).map(r => r.subject));
+            if (subjects.size === 1) {
+                subjectName = [...subjects][0];
+            } else {
+                subjectName = "Aggregated";
+            }
         }
 
         if (modalTitle) modalTitle.textContent = mainTitleText;
@@ -4278,7 +4290,8 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 
         currentViewMcqData = {
             title: `${mainTitleText} - ${subTitleText}`,
-            mcqs: mcqData
+            mcqs: mcqData,
+            subject: subjectName // Store it for the test button
         };
 
         let html = '';
@@ -4324,6 +4337,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
         currentViewMcqData = null;
     }
 }
+
 
 	
 		/**
@@ -7446,7 +7460,7 @@ if (mcqFullscreenBtn && mcqStudyModalContent) {
 
 // --- VIEW MCQ MODAL BUTTON LISTENERS ---
 
-// 1. Test Button (View MCQ Modal) - (UPDATED: Exits Fullscreen)
+// 1. Test Button (View MCQ Modal) - (UPDATED: Uses Correct Subject)
 const viewMcqTestBtn = document.getElementById('view-mcq-test-btn');
 if (viewMcqTestBtn) {
     viewMcqTestBtn.addEventListener('click', () => {
@@ -7455,7 +7469,7 @@ if (viewMcqTestBtn) {
             return;
         }
         
-        // --- FIX: Exit Fullscreen if active so Quiz Modal appears on top ---
+        // Fix: Exit Fullscreen if active so Quiz Modal appears on top
         if (document.fullscreenElement) {
             if (document.exitFullscreen) document.exitFullscreen();
             else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
@@ -7468,28 +7482,28 @@ if (viewMcqTestBtn) {
         
         // Set Quiz Context
         currentMcqTarget = { quizType: 'aggregated', description: title };
-        window.currentQuizSubjectInfo = { subjectName: "Quick Test", topicDetail: title };
         
-        // Init Quiz
+        // --- FIX: Use the actual subject we captured ---
+        window.currentQuizSubjectInfo = { 
+            subjectName: currentViewMcqData.subject || "Quick Test", 
+            topicDetail: title 
+        };
+        
+        // Init Quiz (Standard Force Hide Logic)
         quizTitle.textContent = 'MCQ Quiz';
-        
-        // --- START: FIX FOR OVERLAPPING SCREENS ---
         quizModal.style.display = "block";
         
-        // Force hide Main, Results, and Review screens
         quizMainScreen.classList.add('hidden');
         quizMainScreen.style.display = 'none';
         
         quizResultsScreen.classList.add('hidden');
-        quizResultsScreen.style.display = 'none'; // Critical fix
+        quizResultsScreen.style.display = 'none';
         
         quizReviewScreen.classList.add('hidden');
         quizReviewScreen.style.display = 'none';
 
-        // Show Start Screen
         quizStartScreen.classList.remove('hidden');
         quizStartScreen.style.display = '';
-        // --- END: FIX FOR OVERLAPPING SCREENS ---
         
         currentMcqData = mcqData;
         currentVocabData = null;
@@ -7511,6 +7525,7 @@ if (viewMcqTestBtn) {
         quizStartBtn = newStartBtn;
     });
 }
+
 
 // 2. Print Button
 const viewMcqPrintBtn = document.getElementById('view-mcq-print-btn');
