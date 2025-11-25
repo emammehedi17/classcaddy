@@ -352,12 +352,30 @@
                 loginPrompt.style.display = 'block';
                 userInfo.classList.add('hidden');
                 logoutBtn.classList.add('hidden');
-				
-				userPhotoDisplay.classList.add('hidden');
-				userPhotoDisplay.src = "";
-                 const loggedOutHTML = `<a href="index.html#signup" class="px-5 py-2 font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors signup-button text-sm">Sign Up</a>`;
-                 authContainerDesktop.innerHTML = loggedOutHTML;
-                 authContainerMobile.innerHTML = loggedOutHTML.replace('px-5 py-2', 'block w-full text-center py-2');
+                
+                userPhotoDisplay.classList.add('hidden');
+                userPhotoDisplay.src = "";
+
+                // --- START: CHANGED "SIGN UP" TO "SIGN IN" BUTTON ---
+                const loggedOutHTML = `<button id="header-signin-btn" class="px-5 py-2 font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors text-sm">Sign in</button>`;
+                
+                authContainerDesktop.innerHTML = loggedOutHTML;
+                authContainerMobile.innerHTML = loggedOutHTML.replace('px-5 py-2', 'block w-full text-center py-2').replace('id="header-signin-btn"', 'id="mobile-signin-btn"');
+
+                // Define the login trigger
+                const triggerHeaderLogin = async () => {
+                    try {
+                        await signInWithPopup(auth, googleProvider);
+                    } catch (error) {
+                        console.error("Header Sign-In Error:", error);
+                        showCustomAlert(`Sign-in error: ${error.code}`, "error");
+                    }
+                };
+
+                // Attach listeners to the new buttons
+                document.getElementById('header-signin-btn')?.addEventListener('click', triggerHeaderLogin);
+                document.getElementById('mobile-signin-btn')?.addEventListener('click', triggerHeaderLogin);
+                // --- END: CHANGED "SIGN UP" TO "SIGN IN" BUTTON ---
 
                 studyPlanContent.classList.add('hidden');
                 monthNavButtonsContainer.innerHTML = '';
