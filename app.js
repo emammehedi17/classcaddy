@@ -3750,9 +3750,16 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         
         // 2. Button on Review Page: "Back to Results"
         quizBackToResultsBtn.addEventListener('click', () => {
-            // Just show/hide the correct screens
-            quizReviewScreen.classList.add('hidden');
-            quizResultsScreen.classList.remove('hidden');
+            const resultsScreen = document.getElementById('quiz-results-screen');
+            const reviewScreen = document.getElementById('quiz-review-screen');
+
+            // 1. Hide Review Screen (Forcefully)
+            reviewScreen.classList.add('hidden');
+            reviewScreen.style.display = 'none';
+
+            // 2. Show Results Screen (Clear the inline 'display: none')
+            resultsScreen.classList.remove('hidden');
+            resultsScreen.style.display = ''; 
         });
         
         // 3. The function to build and show the review screen
