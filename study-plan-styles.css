@@ -3072,3 +3072,8 @@ body.dark-mode .review-option.incorrect {
     color: #fee2e2 !important;            /* Light Pink/Red Text */
     text-decoration: line-through;        /* Keep strikethrough */
 }
+
+/* --- FIX: Review Question Text Color in Dark Mode --- */
+body.dark-mode .review-question {
+    color: #ffffff !important; /* Pure White */
+}
