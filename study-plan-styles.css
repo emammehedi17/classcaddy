@@ -2895,3 +2895,33 @@ body.dark-mode header.main-website-ui nav button.hover\:bg-gray-200:hover {
     background-color: #4b5563 !important; /* Darker Hover BG */
     color: #ffffff !important;            /* White Text */
 }
+
+/* --- FIX: Day Editing Mode in Dark Mode --- */
+
+/* 1. Override the light green background */
+/* We set it to Dark Gray (#1f2937) to match the card style */
+body.dark-mode .day-section.editing,
+body.dark-mode .day-section.editing .day-section-body {
+    background-color: #1f2937 !important; 
+    border-color: #059669 !important; /* Keep the green border to show it's active */
+}
+
+/* 2. Fix Inputs & Textareas in Edit Mode */
+/* Ensures the typing area is dark with white text */
+body.dark-mode .day-section.editing .editable-input,
+body.dark-mode .day-section.editing .vocab-input {
+    background-color: #374151 !important; 
+    border-color: #4b5563 !important;
+    color: #ffffff !important;
+}
+
+/* 3. Fix Placeholders (the "Topic...", "Comment..." text) */
+body.dark-mode .day-section.editing input::placeholder,
+body.dark-mode .day-section.editing textarea::placeholder {
+    color: #9ca3af !important;
+}
+
+/* 4. Fix Table Borders in Edit Mode */
+body.dark-mode .day-section.editing td {
+    border-color: #374151 !important;
+}
