@@ -7727,3 +7727,52 @@ attachSettingsListeners({ btn: 'mcq-settings-btn', panel: 'mcq-settings-panel', 
 attachSettingsListeners({ btn: 'view-mcq-settings-btn', panel: 'view-mcq-settings-panel', fontInc: 'view-mcq-font-inc', fontDec: 'view-mcq-font-dec', fontInput: 'view-mcq-font-input' });
 
 // --- END: GLOBAL SETTINGS SYNC & MODAL CONTROLS ---
+
+// --- BCS EXAM COUNTDOWN TIMER ---
+// PASTE AT THE BOTTOM OF app.js
+
+(function createCountdownWidget() {
+    // 1. Create the HTML Element
+    const countdownBtn = document.createElement('div');
+    countdownBtn.id = 'bcs-countdown-btn';
+    countdownBtn.className = 'floating-countdown-pill';
+    countdownBtn.innerHTML = `
+        <div class="countdown-icon"><i class="fas fa-hourglass-half"></i></div>
+        <div class="countdown-text">
+            <span class="countdown-label">BCS Prelim</span>
+            <span id="bcs-timer-display" class="font-mono">00:00:00:00</span>
+        </div>
+    `;
+    document.body.appendChild(countdownBtn);
+
+    // 2. Countdown Logic
+    const targetDate = new Date('January 30, 2026 00:00:00').getTime();
+    const timerDisplay = document.getElementById('bcs-timer-display');
+
+    function updateTimer() {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+
+        if (distance < 0) {
+            timerDisplay.textContent = "EXAM STARTED";
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Format: dd:hh:mm:ss
+        const d = days.toString().padStart(2, '0');
+        const h = hours.toString().padStart(2, '0');
+        const m = minutes.toString().padStart(2, '0');
+        const s = seconds.toString().padStart(2, '0');
+
+        timerDisplay.textContent = `${d}:${h}:${m}:${s}`;
+    }
+
+    // 3. Start the Timer
+    setInterval(updateTimer, 1000);
+    updateTimer(); // Run once immediately
+})();

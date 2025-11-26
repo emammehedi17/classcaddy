@@ -3151,3 +3151,83 @@ body.dark-mode .days-container > .day-section:nth-of-type(7n+7) .study-table tbo
 body.dark-mode .study-table tbody tr.row-completed:hover td {
     filter: brightness(1.2); /* Make it slightly brighter on hover */
 }
+
+
+/* --- BCS Countdown Floating Widget --- */
+
+.floating-countdown-pill {
+    position: fixed;
+    bottom: 130px; /* Positioned above the Dark Mode button (75px + gap) */
+    right: 20px;
+    z-index: 998;
+    
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    padding: 6px 12px 6px 6px; /* Adjusted padding for pill shape */
+    border-radius: 9999px;     /* Full rounded corners */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    
+    font-family: 'Inter', sans-serif;
+    transition: transform 0.2s ease;
+    cursor: default;
+}
+
+.floating-countdown-pill:hover {
+    transform: scale(1.02);
+}
+
+/* The Circular Icon part */
+.countdown-icon {
+    width: 32px;
+    height: 32px;
+    background-color: #f59e0b; /* Amber-500 */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+/* Text Container */
+.countdown-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+/* "BCS Prelim" Label */
+.countdown-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #6b7280; /* Gray-500 */
+    letter-spacing: 0.025em;
+}
+
+/* The Timer Numbers (dd:hh:mm:ss) */
+#bcs-timer-display {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1f2937; /* Gray-800 */
+    font-variant-numeric: tabular-nums; /* Keeps numbers monospaced so they don't jitter */
+}
+
+/* --- Dark Mode Support --- */
+body.dark-mode .floating-countdown-pill {
+    background-color: #1f2937 !important; /* Dark Gray */
+    border-color: #374151 !important;
+}
+
+body.dark-mode .countdown-label {
+    color: #9ca3af !important; /* Light Gray */
+}
+
+body.dark-mode #bcs-timer-display {
+    color: #f3f4f6 !important; /* White */
+}
