@@ -3153,12 +3153,13 @@ body.dark-mode .study-table tbody tr.row-completed:hover td {
 }
 
 
-/* --- BCS Countdown Floating Widget --- */
+/* --- BCS Countdown Floating Widget (Left Side) --- */
 
 .floating-countdown-pill {
     position: fixed;
-    bottom: 130px; /* Positioned above the Dark Mode button (75px + gap) */
-    right: 20px;
+    bottom: 20px;  /* Aligns with the Pomodoro icon's vertical level */
+    left: 20px;    /* Moves it to the LEFT side of the page */
+    right: auto;   /* Ensures it doesn't stick to the right */
     z-index: 998;
     
     display: flex;
@@ -3167,8 +3168,8 @@ body.dark-mode .study-table tbody tr.row-completed:hover td {
     
     background-color: white;
     border: 1px solid #e5e7eb;
-    padding: 6px 12px 6px 6px; /* Adjusted padding for pill shape */
-    border-radius: 9999px;     /* Full rounded corners */
+    padding: 6px 12px 6px 6px; 
+    border-radius: 9999px;     
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     
     font-family: 'Inter', sans-serif;
