@@ -7776,3 +7776,44 @@ attachSettingsListeners({ btn: 'view-mcq-settings-btn', panel: 'view-mcq-setting
     setInterval(updateTimer, 1000);
     updateTimer(); // Run once immediately
 })();
+
+// --- AUTOMATIC BODY SCROLL LOCK ---
+// Prevents background scrolling when any modal is open
+
+const scrollLockObserver = new MutationObserver(() => {
+    let isAnyModalOpen = false;
+    
+    // Check every modal to see if any are visible
+    document.querySelectorAll('.modal').forEach(modal => {
+        const style = window.getComputedStyle(modal);
+        if (style.display !== 'none') {
+            isAnyModalOpen = true;
+        }
+    });
+    
+    // If any modal is open, freeze the body. Otherwise, unfreeze.
+    document.body.style.overflow = isAnyModalOpen ? 'hidden' : '';
+});
+
+// Start watching all modals for style/class changes
+document.addEventListener('DOMContentLoaded', () => {
+    const modals = document.querySelectorAll('.modal');
+    if (modals.length > 0) {
+        modals.forEach(modal => {
+            scrollLockObserver.observe(modal, { 
+                attributes: true, 
+                attributeFilter: ['style', 'class'] 
+            });
+        });
+    }
+});
+
+// Fallback: If DOM is already loaded (e.g. hot reload), attach immediately
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    document.querySelectorAll('.modal').forEach(modal => {
+        scrollLockObserver.observe(modal, { 
+            attributes: true, 
+            attributeFilter: ['style', 'class'] 
+        });
+    });
+}
