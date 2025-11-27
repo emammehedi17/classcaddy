@@ -3232,3 +3232,10 @@ body.dark-mode .countdown-label {
 body.dark-mode #bcs-timer-display {
     color: #f3f4f6 !important; /* White */
 }
+
+/* --- FIX: Scrollable Story Modal --- */
+#story-modal .modal-content {
+    max-height: 80vh !important; /* Limits height to 80% of screen */
+    overflow-y: auto !important; /* Adds scrollbar if content exceeds height */
+    display: block !important;   /* Ensures standard block layout */
+}
