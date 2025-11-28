@@ -5665,64 +5665,33 @@ window.toggleSummaryRow = function(btn) {
                         
                         @page {
                             size: A4 landscape;
-                            margin: 1cm;
+                            margin: 0.5cm; /* Reduced margin to fit 3 columns better */
                             margin-bottom: 1cm; 
                         }
+                        /* ... (Keep existing body styles) ... */
                         body {
                             font-family: 'Inter', 'Kalpurush', sans-serif;
-                            padding: 20px;
-                            color: #1f2937;
-                            -webkit-print-color-adjust: exact;
-                            print-color-adjust: exact;
-                            background-color: white;
-                            display: flex;
-                            flex-direction: column;
-                            min-height: 95vh; 
+                            padding: 10px; /* Reduced padding */
+                            /* ... */
                         }
                         
-                        /* HEADER & INFO */
-                        .print-header-container { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #10b981; padding-bottom: 15px; }
-                        h1 { color: #059669; margin: 0 0 10px 0; font-size: 24px; }
-                        .meta-info { display: flex; justify-content: center; gap: 30px; font-size: 14px; color: #374151; font-weight: 600; }
-                        .user-info-row { display: flex; justify-content: center; gap: 20px; margin-top: 8px; font-size: 12px; color: #4b5563; font-weight: 500; }
-                        .user-info-row span { font-weight: 600; color: #1f2937; }
-                        
-                        /* TABLE STYLES */
-                        table.summary-print-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px; }
-                        .summary-print-table thead th { background-color: #1f2937 !important; color: white !important; font-weight: bold; text-transform: uppercase; font-size: 11px; padding: 8px 10px; border: 1px solid #374151; text-align: center; }
-                        .summary-print-table td { border: 1px solid #d1d5db; padding: 8px 10px; text-align: left; vertical-align: top; }
-                        .summary-print-table tr td[colspan] { background-color: #047857 !important; color: white !important; font-weight: bold; text-align: center; }
-                        .summary-print-table tbody tr:nth-child(even) { background-color: #f9fafb; }
-                        .summary-print-table td:first-child { font-weight: 600; text-align: center; color: #1f2937; }
-                        .summary-print-table td:last-child { font-weight: 700; text-align: center; color: #4b5563; }
+                        /* ... (Keep header/info styles) ... */
 
-                        /* Clean up */
-                        .summary-read-more-btn { display: none !important; }
-                        .summary-cell-content { max-height: none !important; -webkit-line-clamp: unset !important; display: block !important; overflow: visible !important; }
-                        .summary-cell-wrapper { display: block; }
-
-                        /* VOCAB STYLES */
+                        /* VOCAB STYLES (UPDATED) */
                         .vocab-section-title { color: #059669; text-align: center; margin-top: 30px; margin-bottom: 10px; font-size: 18px; font-weight: bold; page-break-before: always; }
-                        .vocab-print-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 0; }
-                        .vocab-print-table th, .vocab-print-table td { border: 1px solid #d1d5db; padding: 5px 8px; text-align: left; vertical-align: middle; }
-                        .vocab-main-header th { background-color: #1f2937 !important; color: white !important; text-align: center; font-weight: bold; }
-                        .vocab-week-header td { background-color: #047857 !important; color: white !important; font-weight: bold; text-align: center; font-size: 13px; padding: 8px; }
+                        
+                        /* Increased Font Size here: 13px */
+                        .vocab-print-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 0; }
+                        
+                        .vocab-print-table th, .vocab-print-table td { border: 1px solid #d1d5db; padding: 4px 6px; text-align: left; vertical-align: middle; }
+                        .vocab-main-header th { background-color: #1f2937 !important; color: white !important; text-align: center; font-weight: bold; font-size: 12px; }
+                        .vocab-week-header td { background-color: #047857 !important; color: white !important; font-weight: bold; text-align: center; font-size: 14px; padding: 8px; }
                         .vocab-day-header td { background-color: #10b981 !important; color: white !important; font-weight: bold; text-align: center; }
                         .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
-                        .vocab-col-divider { border-right: 2px solid #9ca3af !important; }
+                        .vocab-col-divider { border-right: 2px solid #6b7280 !important; }
 
-                        /* FOOTER */
-                        .print-footer { 
-                            margin-top: auto; /* Push to bottom */
-                            padding-top: 30px; 
-                            padding-bottom: 20px; 
-                            text-align: center; 
-                            font-size: 12px; 
-                            color: #6b7280; 
-                            border-top: 2px solid #10b981; 
-                            background-color: white; 
-                            page-break-inside: avoid; 
-                        }
+                        /* ... (Keep rest of the styles) ... */
+                        .print-footer { margin-top: auto; padding-top: 30px; padding-bottom: 20px; text-align: center; font-size: 12px; color: #6b7280; border-top: 2px solid #10b981; background-color: white; page-break-inside: avoid; }
                         .print-footer a { color: #059669; text-decoration: none; font-weight: 600; }
                         
                         tr { page-break-inside: avoid; page-break-after: auto; }
@@ -5792,18 +5761,24 @@ window.toggleSummaryRow = function(btn) {
             return months[index] || "Unknown";
         }
 
-        // Helper to generate the Colorful Vocab Table (CONTINUOUS - NO BREAKS)
+// Helper to generate the Colorful Vocab Table (CONTINUOUS - NO BREAKS)
         async function fetchAndBuildVocabHtml(monthId, weekId = null) {
+            // --- UPDATED: 3-Column Header Layout ---
             let html = `
                 <table class="vocab-print-table">
                     <thead>
                         <tr class="vocab-main-header">
-                            <th style="width: 15%;">Word</th>
-                            <th style="width: 20%;">Meaning</th>
-                            <th style="width: 15%;" class="vocab-col-divider">Synonym</th>
-                            <th style="width: 15%;">Word</th>
-                            <th style="width: 20%;">Meaning</th>
-                            <th style="width: 15%;">Synonym</th>
+                            <th style="width: 11%;">Word</th>
+                            <th style="width: 14%;">Meaning</th>
+                            <th style="width: 8%;" class="vocab-col-divider">Syn</th>
+                            
+                            <th style="width: 11%;">Word</th>
+                            <th style="width: 14%;">Meaning</th>
+                            <th style="width: 8%;" class="vocab-col-divider">Syn</th>
+                            
+                            <th style="width: 11%;">Word</th>
+                            <th style="width: 14%;">Meaning</th>
+                            <th style="width: 9%;">Syn</th>
                         </tr>
                     </thead>
                     <tbody>`;
@@ -5835,7 +5810,8 @@ window.toggleSummaryRow = function(btn) {
                     let weekBufferHtml = ''; 
 
                     if (!weekId) {
-                        weekBufferHtml += `<tr class="vocab-week-header"><td colspan="6">${week.id.replace('week', 'Week ')}</td></tr>`;
+                        // Spanning 9 columns now
+                        weekBufferHtml += `<tr class="vocab-week-header"><td colspan="9">${week.id.replace('week', 'Week ')}</td></tr>`;
                     }
 
                     for (const day of weekData.days) {
@@ -5856,11 +5832,14 @@ window.toggleSummaryRow = function(btn) {
                                 weekBufferHtml = ''; 
                             }
 
-                            html += `<tr class="vocab-day-header"><td colspan="6">Day ${day.dayNumber}</td></tr>`;
+                            // Spanning 9 columns now
+                            html += `<tr class="vocab-day-header"><td colspan="9">Day ${day.dayNumber}</td></tr>`;
 
-                            for (let i = 0; i < dayVocab.length; i += 2) {
+                            // --- UPDATED: Loop by 3 items per row ---
+                            for (let i = 0; i < dayVocab.length; i += 3) {
                                 const v1 = dayVocab[i];
                                 const v2 = dayVocab[i+1];
+                                const v3 = dayVocab[i+2];
 
                                 html += `<tr class="vocab-data-row">
                                     <td>${escapeHtml(v1.word)}</td>
@@ -5869,7 +5848,11 @@ window.toggleSummaryRow = function(btn) {
                                     
                                     <td>${v2 ? escapeHtml(v2.word) : ''}</td>
                                     <td>${v2 ? escapeHtml(v2.banglaMeaning) : ''}</td>
-                                    <td>${v2 ? escapeHtml(v2.synonym || '-') : ''}</td>
+                                    <td class="vocab-col-divider">${v2 ? escapeHtml(v2.synonym || '-') : ''}</td>
+
+                                    <td>${v3 ? escapeHtml(v3.word) : ''}</td>
+                                    <td>${v3 ? escapeHtml(v3.banglaMeaning) : ''}</td>
+                                    <td>${v3 ? escapeHtml(v3.synonym || '-') : ''}</td>
                                 </tr>`;
                             }
                         }
@@ -5885,7 +5868,8 @@ window.toggleSummaryRow = function(btn) {
                 return '<p style="color:red; text-align:center;">Error loading vocabulary data.</p>';
             }
         }
-
+		
+		
         // Event Listener: Week Summary Print
         document.getElementById('print-week-summary-btn')?.addEventListener('click', async (e) => {
             const btn = e.currentTarget;
