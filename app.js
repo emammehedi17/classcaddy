@@ -5638,9 +5638,7 @@ window.toggleSummaryRow = function(btn) {
                     return;
                 }
 
-                // 2. CLEANUP: Remove ANY existing print iframe from previous attempts
-                // This ensures we don't have duplicate frames, but we ONLY remove it 
-                // when the user clicks print *again*, not while they are viewing the dialog.
+                // 2. CLEANUP: Remove ANY existing print iframe
                 const existingIframe = document.querySelector('iframe[name="print-frame"]');
                 if (existingIframe) {
                     document.body.removeChild(existingIframe);
@@ -5655,33 +5653,55 @@ window.toggleSummaryRow = function(btn) {
                 iframe.style.width = '0';
                 iframe.style.height = '0';
                 iframe.style.border = '0';
-                // Important: We keep it in the DOM so mobile can re-render on orientation change
                 document.body.appendChild(iframe);
 
-                // 4. Define Styles
+                // 4. Define Styles (FULL CSS RESTORED)
                 const styles = `
                     <style>
                         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
                         
                         @page {
                             size: A4 landscape;
-                            margin: 0.5cm; /* Reduced margin to fit 3 columns better */
+                            margin: 0.5cm; 
                             margin-bottom: 1cm; 
                         }
-                        /* ... (Keep existing body styles) ... */
                         body {
                             font-family: 'Inter', 'Kalpurush', sans-serif;
-                            padding: 10px; /* Reduced padding */
-                            /* ... */
+                            padding: 20px;
+                            color: #1f2937;
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact;
+                            background-color: white;
+                            display: flex;
+                            flex-direction: column;
+                            min-height: 95vh; 
                         }
                         
-                        /* ... (Keep header/info styles) ... */
+                        /* HEADER & INFO */
+                        .print-header-container { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #10b981; padding-bottom: 15px; }
+                        h1 { color: #059669; margin: 0 0 10px 0; font-size: 24px; }
+                        .meta-info { display: flex; justify-content: center; gap: 30px; font-size: 14px; color: #374151; font-weight: 600; }
+                        .user-info-row { display: flex; justify-content: center; gap: 20px; margin-top: 8px; font-size: 12px; color: #4b5563; font-weight: 500; }
+                        .user-info-row span { font-weight: 600; color: #1f2937; }
+                        
+                        /* MAIN SUMMARY TABLE STYLES (Restored) */
+                        table.summary-print-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px; }
+                        .summary-print-table thead th { background-color: #1f2937 !important; color: white !important; font-weight: bold; text-transform: uppercase; font-size: 11px; padding: 8px 10px; border: 1px solid #374151; text-align: center; }
+                        .summary-print-table td { border: 1px solid #d1d5db; padding: 8px 10px; text-align: left; vertical-align: top; }
+                        .summary-print-table tr td[colspan] { background-color: #047857 !important; color: white !important; font-weight: bold; text-align: center; }
+                        .summary-print-table tbody tr:nth-child(even) { background-color: #f9fafb; }
+                        .summary-print-table td:first-child { font-weight: 600; text-align: center; color: #1f2937; }
+                        .summary-print-table td:last-child { font-weight: 700; text-align: center; color: #4b5563; }
 
-                        /* VOCAB STYLES (UPDATED) */
+                        /* Read More Button Cleanup */
+                        .summary-read-more-btn { display: none !important; }
+                        .summary-cell-content { max-height: none !important; -webkit-line-clamp: unset !important; display: block !important; overflow: visible !important; }
+                        .summary-cell-wrapper { display: block; }
+
+                        /* VOCAB STYLES (3-Column Layout) */
                         .vocab-section-title { color: #059669; text-align: center; margin-top: 30px; margin-bottom: 10px; font-size: 18px; font-weight: bold; page-break-before: always; }
                         
-                        /* Increased Font Size here: 13px */
-                        .vocab-print-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 0; }
+                        .vocab-print-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 0; } /* Increased Font */
                         
                         .vocab-print-table th, .vocab-print-table td { border: 1px solid #d1d5db; padding: 4px 6px; text-align: left; vertical-align: middle; }
                         .vocab-main-header th { background-color: #1f2937 !important; color: white !important; text-align: center; font-weight: bold; font-size: 12px; }
@@ -5690,8 +5710,18 @@ window.toggleSummaryRow = function(btn) {
                         .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
                         .vocab-col-divider { border-right: 2px solid #6b7280 !important; }
 
-                        /* ... (Keep rest of the styles) ... */
-                        .print-footer { margin-top: auto; padding-top: 30px; padding-bottom: 20px; text-align: center; font-size: 12px; color: #6b7280; border-top: 2px solid #10b981; background-color: white; page-break-inside: avoid; }
+                        /* FOOTER */
+                        .print-footer { 
+                            margin-top: auto; 
+                            padding-top: 30px; 
+                            padding-bottom: 20px; 
+                            text-align: center; 
+                            font-size: 12px; 
+                            color: #6b7280; 
+                            border-top: 2px solid #10b981; 
+                            background-color: white; 
+                            page-break-inside: avoid; 
+                        }
                         .print-footer a { color: #059669; text-decoration: none; font-weight: 600; }
                         
                         tr { page-break-inside: avoid; page-break-after: auto; }
@@ -5736,7 +5766,6 @@ window.toggleSummaryRow = function(btn) {
                 frameDoc.close();
 
                 // 7. Execute Print
-                // Wait 1 second for mobile to fully render the layout before triggering print
                 setTimeout(() => {
                     try {
                         if (!iframe.contentWindow) {
@@ -5748,14 +5777,12 @@ window.toggleSummaryRow = function(btn) {
                         console.error("Print execution failed:", e);
                     } finally {
                         resolve(); 
-                        // CRITICAL FIX: We DO NOT remove the iframe here.
-                        // We leave it in the DOM so if the user changes orientation, 
-                        // the browser still has the source content to re-render.
                     }
                 }, 1000);
             });
         }
-
+		
+		
         function getMonthNameFromIndex(index) {
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             return months[index] || "Unknown";
