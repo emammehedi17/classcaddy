@@ -5825,6 +5825,7 @@ window.toggleSummaryRow = function(btn) {
         }
 
 // Helper to generate the Colorful Vocab Table with Summary (WORDS ONLY)
+        // Helper to generate the Colorful Vocab Table with Summary (CORRECTED COUNT)
         async function fetchAndBuildVocabHtml(monthId, weekId = null) {
             let html = `
                 <table class="vocab-print-table">
@@ -5891,19 +5892,20 @@ window.toggleSummaryRow = function(btn) {
                         let dayVocab = [];
                         
                         day.rows?.forEach(row => {
-                            if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
+                            // --- FIX: Check if vocabData exists, ignore Subject Name ---
+                            if (row.vocabData && row.vocabData.length > 0) {
                                 const processed = preProcessVocab(row.vocabData);
                                 dayVocab.push(...processed);
                                 
-                                // --- COUNTING LOGIC (UPDATED: WORDS ONLY) ---
+                                // --- COUNTING LOGIC (WORDS ONLY) ---
                                 processed.forEach(v => {
-                                    // Only count the Word entry itself
+                                    // Count if the Word exists (matches the Table Logic)
                                     if (v.word && v.word.trim()) {
                                         totalVocabCount++;
                                         weekCounts[week.id]++;
                                     }
                                 });
-                                // --------------------------------------------
+                                // -----------------------------------
                             }
                         });
 
@@ -5946,6 +5948,7 @@ window.toggleSummaryRow = function(btn) {
                 // --- 4. APPEND SUMMARY SECTION ---
                 if (hasVocab) {
                     let weekSummaryHtml = Object.keys(weekCounts).sort().map(wId => {
+                        // Only show weeks that have content
                         if (weekCounts[wId] > 0) {
                             const wLabel = wId.replace('week', 'Week-');
                             return `<div class="summary-line week-total">${wLabel}: ${weekCounts[wId]}</div>`;
@@ -5972,7 +5975,6 @@ window.toggleSummaryRow = function(btn) {
                 return '<p style="color:red; text-align:center;">Error loading vocabulary data.</p>';
             }
         }
-		
 		
         // Event Listener: Week Summary Print
         document.getElementById('print-week-summary-btn')?.addEventListener('click', async (e) => {
