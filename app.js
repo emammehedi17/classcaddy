@@ -5655,7 +5655,7 @@ window.toggleSummaryRow = function(btn) {
                 iframe.style.border = '0';
                 document.body.appendChild(iframe);
 
-                // 4. Define Styles (FULL CSS RESTORED)
+                // 4. Define Styles (UPDATED FONT SIZES)
                 const styles = `
                     <style>
                         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
@@ -5684,7 +5684,7 @@ window.toggleSummaryRow = function(btn) {
                         .user-info-row { display: flex; justify-content: center; gap: 20px; margin-top: 8px; font-size: 12px; color: #4b5563; font-weight: 500; }
                         .user-info-row span { font-weight: 600; color: #1f2937; }
                         
-                        /* MAIN SUMMARY TABLE STYLES (Restored) */
+                        /* MAIN SUMMARY TABLE STYLES */
                         table.summary-print-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 20px; }
                         .summary-print-table thead th { background-color: #1f2937 !important; color: white !important; font-weight: bold; text-transform: uppercase; font-size: 11px; padding: 8px 10px; border: 1px solid #374151; text-align: center; }
                         .summary-print-table td { border: 1px solid #d1d5db; padding: 8px 10px; text-align: left; vertical-align: top; }
@@ -5698,14 +5698,17 @@ window.toggleSummaryRow = function(btn) {
                         .summary-cell-content { max-height: none !important; -webkit-line-clamp: unset !important; display: block !important; overflow: visible !important; }
                         .summary-cell-wrapper { display: block; }
 
-                        /* VOCAB STYLES (3-Column Layout) */
+                        /* VOCAB STYLES (UPDATED) */
                         .vocab-section-title { color: #059669; text-align: center; margin-top: 30px; margin-bottom: 10px; font-size: 18px; font-weight: bold; page-break-before: always; }
                         
-                        .vocab-print-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 0; } /* Increased Font */
+                        /* Increased Font Size to 15px */
+                        .vocab-print-table { width: 100%; border-collapse: collapse; font-size: 15px; margin-bottom: 0; } 
                         
-                        .vocab-print-table th, .vocab-print-table td { border: 1px solid #d1d5db; padding: 4px 6px; text-align: left; vertical-align: middle; }
-                        .vocab-main-header th { background-color: #1f2937 !important; color: white !important; text-align: center; font-weight: bold; font-size: 12px; }
-                        .vocab-week-header td { background-color: #047857 !important; color: white !important; font-weight: bold; text-align: center; font-size: 14px; padding: 8px; }
+                        /* Increased Padding for readability */
+                        .vocab-print-table th, .vocab-print-table td { border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; vertical-align: middle; }
+                        
+                        .vocab-main-header th { background-color: #1f2937 !important; color: white !important; text-align: center; font-weight: bold; font-size: 13px; }
+                        .vocab-week-header td { background-color: #047857 !important; color: white !important; font-weight: bold; text-align: center; font-size: 16px; padding: 8px; }
                         .vocab-day-header td { background-color: #10b981 !important; color: white !important; font-weight: bold; text-align: center; }
                         .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
                         .vocab-col-divider { border-right: 2px solid #6b7280 !important; }
@@ -5781,6 +5784,7 @@ window.toggleSummaryRow = function(btn) {
                 }, 1000);
             });
         }
+		
 		
 		
         function getMonthNameFromIndex(index) {
