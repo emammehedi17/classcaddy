@@ -5824,8 +5824,7 @@ window.toggleSummaryRow = function(btn) {
             return months[index] || "Unknown";
         }
 
-// Helper to generate the Colorful Vocab Table (CONTINUOUS - NO BREAKS)
-        // Helper to generate the Colorful Vocab Table with Summary
+// Helper to generate the Colorful Vocab Table with Summary (WORDS ONLY)
         async function fetchAndBuildVocabHtml(monthId, weekId = null) {
             let html = `
                 <table class="vocab-print-table">
@@ -5870,8 +5869,8 @@ window.toggleSummaryRow = function(btn) {
                 }
 
                 // --- 3. INITIALIZE COUNTERS ---
-                let totalVocabCount = 0; // Grand Total (Words + Synonyms)
-                const weekCounts = {};   // Track count per week
+                let totalVocabCount = 0; 
+                const weekCounts = {};   
 
                 let hasVocab = false;
 
@@ -5882,7 +5881,6 @@ window.toggleSummaryRow = function(btn) {
                     let weekHasVocab = false;
                     let weekBufferHtml = ''; 
                     
-                    // Initialize count for this week
                     if (!weekCounts[week.id]) weekCounts[week.id] = 0;
 
                     if (!weekId) {
@@ -5897,20 +5895,15 @@ window.toggleSummaryRow = function(btn) {
                                 const processed = preProcessVocab(row.vocabData);
                                 dayVocab.push(...processed);
                                 
-                                // --- COUNTING LOGIC ---
+                                // --- COUNTING LOGIC (UPDATED: WORDS ONLY) ---
                                 processed.forEach(v => {
-                                    // 1. Count the Word
+                                    // Only count the Word entry itself
                                     if (v.word && v.word.trim()) {
                                         totalVocabCount++;
                                         weekCounts[week.id]++;
                                     }
-                                    // 2. Count the Synonym (if it exists)
-                                    if (v.synonym && v.synonym.trim() && v.synonym.trim() !== '-') {
-                                        totalVocabCount++;
-                                        weekCounts[week.id]++;
-                                    }
                                 });
-                                // ----------------------
+                                // --------------------------------------------
                             }
                         });
 
@@ -5953,7 +5946,6 @@ window.toggleSummaryRow = function(btn) {
                 // --- 4. APPEND SUMMARY SECTION ---
                 if (hasVocab) {
                     let weekSummaryHtml = Object.keys(weekCounts).sort().map(wId => {
-                        // Only show weeks that actually have counts
                         if (weekCounts[wId] > 0) {
                             const wLabel = wId.replace('week', 'Week-');
                             return `<div class="summary-line week-total">${wLabel}: ${weekCounts[wId]}</div>`;
@@ -5980,6 +5972,7 @@ window.toggleSummaryRow = function(btn) {
                 return '<p style="color:red; text-align:center;">Error loading vocabulary data.</p>';
             }
         }
+		
 		
         // Event Listener: Week Summary Print
         document.getElementById('print-week-summary-btn')?.addEventListener('click', async (e) => {
