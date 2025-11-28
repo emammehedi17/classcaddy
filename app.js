@@ -3956,17 +3956,30 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             }
         }
 		
-		// 4. Function to start a week-long quiz
+		// 4. Function to start a week-long quiz (FIXED OVERLAP)
         async function startWeekQuiz(monthId, weekId) {
             quizTitle.textContent = 'Vocabulary Quiz';
             window.currentQuizSourceInfo = { monthId, weekId };
 			window.currentQuizSubjectInfo = { subjectName: "Vocabulary", topicDetail: "Weekly Vocabulary" };
             closeModal('quiz-center-modal');
-			quizStartScreen.style.display = '';
+			
+            // --- START: FIX FOR OVERLAPPING SCREENS ---
             quizModal.style.display = "block";
+            
+            // Force hide Main, Results, and Review screens
             quizMainScreen.classList.add('hidden');
+            quizMainScreen.style.display = 'none';
+            
             quizResultsScreen.classList.add('hidden');
+            quizResultsScreen.style.display = 'none'; // This prevents the result window from showing
+            
+            quizReviewScreen.classList.add('hidden');
+            quizReviewScreen.style.display = 'none';
+
+            // Show Start Screen
             quizStartScreen.classList.remove('hidden');
+            quizStartScreen.style.display = '';
+            // --- END: FIX FOR OVERLAPPING SCREENS ---
             
             quizStartMessage.textContent = "Loading week's vocabulary...";
             quizStartBtn.classList.add('hidden');
@@ -4041,7 +4054,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 quizStartMessage.textContent = "Could not load week quiz data. Please try again.";
             }
         }
-
+		
+		
         // 3. Add a global click listener for the new week buttons
         quizCenterContent.addEventListener('click', (e) => {
             const button = e.target.closest('.quiz-week-btn');
