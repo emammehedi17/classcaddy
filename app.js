@@ -5655,7 +5655,7 @@ window.toggleSummaryRow = function(btn) {
                 iframe.style.border = '0';
                 document.body.appendChild(iframe);
 
-                // 4. Define Styles (FONT SIZES INCREASED)
+                // 4. Define Styles (INCLUDES NEW SUMMARY CSS)
                 const styles = `
                     <style>
                         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
@@ -5698,21 +5698,52 @@ window.toggleSummaryRow = function(btn) {
                         .summary-cell-content { max-height: none !important; -webkit-line-clamp: unset !important; display: block !important; overflow: visible !important; }
                         .summary-cell-wrapper { display: block; }
 
-                        /* VOCAB STYLES (UPDATED) */
+                        /* VOCAB STYLES */
                         .vocab-section-title { color: #059669; text-align: center; margin-top: 30px; margin-bottom: 10px; font-size: 18px; font-weight: bold; page-break-before: always; }
                         
-                        /* Font Size Increased to 16px */
                         .vocab-print-table { width: 100%; border-collapse: collapse; font-size: 16px; margin-bottom: 0; } 
-                        
-                        /* Padding Kept Same (6px 8px) */
                         .vocab-print-table th, .vocab-print-table td { border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; vertical-align: middle; }
                         
-                        /* Headers also bumped up slightly */
                         .vocab-main-header th { background-color: #1f2937 !important; color: white !important; text-align: center; font-weight: bold; font-size: 14px; }
                         .vocab-week-header td { background-color: #047857 !important; color: white !important; font-weight: bold; text-align: center; font-size: 18px; padding: 8px; }
                         .vocab-day-header td { background-color: #10b981 !important; color: white !important; font-weight: bold; text-align: center; }
                         .vocab-data-row:nth-child(even) { background-color: #f9fafb; }
                         .vocab-col-divider { border-right: 2px solid #6b7280 !important; }
+
+                        /* --- NEW SUMMARY STYLES --- */
+                        .vocab-summary-container { 
+                            margin-top: 25px; 
+                            padding: 15px; 
+                            background-color: #f9fafb; 
+                            border: 1px solid #e5e7eb; 
+                            border-radius: 8px; 
+                            page-break-inside: avoid; 
+                            width: fit-content;
+                            min-width: 250px;
+                        }
+                        .summary-title { 
+                            font-size: 16px; 
+                            font-weight: 700; 
+                            color: #059669; 
+                            border-bottom: 2px solid #10b981; 
+                            padding-bottom: 5px; 
+                            margin-bottom: 10px; 
+                        }
+                        .summary-line { 
+                            font-size: 14px; 
+                            color: #374151; 
+                            margin-bottom: 4px; 
+                            font-weight: 600;
+                        }
+                        .month-total {
+                            font-size: 15px;
+                            color: #1f2937;
+                            margin-bottom: 8px;
+                        }
+                        .week-breakdown {
+                            padding-left: 10px;
+                            border-left: 3px solid #d1fae5;
+                        }
 
                         /* FOOTER */
                         .print-footer { 
@@ -5787,14 +5818,15 @@ window.toggleSummaryRow = function(btn) {
         }
 		
 		
+		
         function getMonthNameFromIndex(index) {
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             return months[index] || "Unknown";
         }
 
 // Helper to generate the Colorful Vocab Table (CONTINUOUS - NO BREAKS)
+        // Helper to generate the Colorful Vocab Table with Summary
         async function fetchAndBuildVocabHtml(monthId, weekId = null) {
-            // --- UPDATED: 3-Column Header Layout ---
             let html = `
                 <table class="vocab-print-table">
                     <thead>
@@ -5815,6 +5847,12 @@ window.toggleSummaryRow = function(btn) {
                     <tbody>`;
 
             try {
+                // --- 1. CALCULATE MONTH NAME ---
+                const parts = monthId.split('-');
+                const monthIndex = parseInt(parts[1]) - 1;
+                const monthName = getMonthNameFromIndex(monthIndex);
+
+                // --- 2. DATA FETCHING ---
                 let weeksToProcess = [];
                 
                 if (weekId) {
@@ -5831,6 +5869,10 @@ window.toggleSummaryRow = function(btn) {
                     weeksToProcess.sort((a, b) => a.id.localeCompare(b.id));
                 }
 
+                // --- 3. INITIALIZE COUNTERS ---
+                let totalVocabCount = 0; // Grand Total (Words + Synonyms)
+                const weekCounts = {};   // Track count per week
+
                 let hasVocab = false;
 
                 for (const week of weeksToProcess) {
@@ -5839,18 +5881,36 @@ window.toggleSummaryRow = function(btn) {
 
                     let weekHasVocab = false;
                     let weekBufferHtml = ''; 
+                    
+                    // Initialize count for this week
+                    if (!weekCounts[week.id]) weekCounts[week.id] = 0;
 
                     if (!weekId) {
-                        // Spanning 9 columns now
                         weekBufferHtml += `<tr class="vocab-week-header"><td colspan="9">${week.id.replace('week', 'Week ')}</td></tr>`;
                     }
 
                     for (const day of weekData.days) {
                         let dayVocab = [];
+                        
                         day.rows?.forEach(row => {
                             if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
                                 const processed = preProcessVocab(row.vocabData);
                                 dayVocab.push(...processed);
+                                
+                                // --- COUNTING LOGIC ---
+                                processed.forEach(v => {
+                                    // 1. Count the Word
+                                    if (v.word && v.word.trim()) {
+                                        totalVocabCount++;
+                                        weekCounts[week.id]++;
+                                    }
+                                    // 2. Count the Synonym (if it exists)
+                                    if (v.synonym && v.synonym.trim() && v.synonym.trim() !== '-') {
+                                        totalVocabCount++;
+                                        weekCounts[week.id]++;
+                                    }
+                                });
+                                // ----------------------
                             }
                         });
 
@@ -5863,10 +5923,8 @@ window.toggleSummaryRow = function(btn) {
                                 weekBufferHtml = ''; 
                             }
 
-                            // Spanning 9 columns now
                             html += `<tr class="vocab-day-header"><td colspan="9">Day ${day.dayNumber}</td></tr>`;
 
-                            // --- UPDATED: Loop by 3 items per row ---
                             for (let i = 0; i < dayVocab.length; i += 3) {
                                 const v1 = dayVocab[i];
                                 const v2 = dayVocab[i+1];
@@ -5891,6 +5949,29 @@ window.toggleSummaryRow = function(btn) {
                 }
 
                 html += `</tbody></table>`;
+
+                // --- 4. APPEND SUMMARY SECTION ---
+                if (hasVocab) {
+                    let weekSummaryHtml = Object.keys(weekCounts).sort().map(wId => {
+                        // Only show weeks that actually have counts
+                        if (weekCounts[wId] > 0) {
+                            const wLabel = wId.replace('week', 'Week-');
+                            return `<div class="summary-line week-total">${wLabel}: ${weekCounts[wId]}</div>`;
+                        }
+                        return '';
+                    }).join('');
+
+                    html += `
+                        <div class="vocab-summary-container">
+                            <div class="summary-title">Total Vocabularies: ${totalVocabCount}</div>
+                            <div class="summary-line month-total">Month: ${monthName} - ${totalVocabCount}</div>
+                            <div class="week-breakdown">
+                                ${weekSummaryHtml}
+                            </div>
+                        </div>
+                    `;
+                }
+
                 if (!hasVocab) return ''; 
                 return html;
 
@@ -5899,7 +5980,6 @@ window.toggleSummaryRow = function(btn) {
                 return '<p style="color:red; text-align:center;">Error loading vocabulary data.</p>';
             }
         }
-		
 		
         // Event Listener: Week Summary Print
         document.getElementById('print-week-summary-btn')?.addEventListener('click', async (e) => {
