@@ -4204,23 +4204,26 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         });
 		
 		
-        // 3. ✨ The Magic Parser Function (Regex) - (FIXED FOR DECIMALS)
+        // 3. ✨ The Magic Parser Function (Regex) - (FIXED FOR GARBAGE LINES & DECIMALS)
         function parseMcqText(text) {
             // 1. Clean up newlines before numbers to ensure consistency
             let cleanText = text.replace(/\n*([০-৯0-9]+\.)/g, '\n$1');
             const mcqData = [];
             
             // 2. UPDATED REGEX EXPLANATION:
-            // \.(?!\d)  <-- This is the key fix. It means "A dot, but NOT followed by a digit".
-            // This allows "109. " (Question) but ignores "77.8" (Decimal).
+            // Group 1 (Num): ([০-৯0-9]+)
+            // Dot Check: \.(?!\d) -> Dot not followed by digit (avoids 77.8)
+            // Group 2 (Q Text): ((?:(?!\n\s*[০-৯0-9]+\.(?!\d))[\s\S])+?) 
+            //    -> Matches text BUT stops if it sees a "New Line + Number + Dot" pattern.
+            //    -> This prevents merging two questions if the first one is malformed/garbage.
             
             const mcqRegex = 
-/(?:^|\n)\s*([০-৯0-9]+)\.(?!\d)\s*([\s\S]+?)\n\s*(?:(?:ক\.)|(?:a\.))\s*([\s\S]+?)\n\s*(?:(?:খ\.)|(?:b\.))\s*([\s\S]+?)\n\s*(?:(?:গ\.)|(?:c\.))\s*([\s\S]+?)\n\s*(?:(?:ঘ\.)|(?:d\.))\s*([\s\S]+?)\n\s*(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([\s\S]+?)(?=\n\s*[০-৯0-9]+\.(?!\d)|\n*$)/gi;
+/(?:^|\n)\s*([০-৯0-9]+)\.(?!\d)((?:(?!\n\s*[০-৯0-9]+\.(?!\d))[\s\S])+?)\n\s*(?:(?:ক\.)|(?:a\.))\s*([\s\S]+?)\n\s*(?:(?:খ\.)|(?:b\.))\s*([\s\S]+?)\n\s*(?:(?:গ\.)|(?:c\.))\s*([\s\S]+?)\n\s*(?:(?:ঘ\.)|(?:d\.))\s*([\s\S]+?)\n\s*(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([\s\S]+?)(?=\n\s*[০-৯0-9]+\.(?!\d)|\n*$)/gi;
             
             let match;
             while ((match = mcqRegex.exec(cleanText)) !== null) {
                 try {
-                    const question = match[2].trim(); // Index 2 because Index 1 is the Question Number
+                    const question = match[2].trim(); 
                     const options = [
                         match[3].trim(), // opt a/ক
                         match[4].trim(), // opt b/খ
