@@ -4204,28 +4204,31 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         });
 		
 		
-        // 3. ✨ The Magic Parser Function (Regex) - (FIXED FOR WHITESPACE)
+        // 3. ✨ The Magic Parser Function (Regex) - (FIXED FOR DECIMALS)
         function parseMcqText(text) {
-            // Ensure newlines before numbers
+            // 1. Clean up newlines before numbers to ensure consistency
             let cleanText = text.replace(/\n*([০-৯0-9]+\.)/g, '\n$1');
             const mcqData = [];
             
-            // Updated Regex: Added \s* to allow spaces before options (e.g. " a." or "  ক.")
+            // 2. UPDATED REGEX EXPLANATION:
+            // \.(?!\d)  <-- This is the key fix. It means "A dot, but NOT followed by a digit".
+            // This allows "109. " (Question) but ignores "77.8" (Decimal).
+            
             const mcqRegex = 
-/(?:[০-৯0-9]+)\.\s*([\s\S]+?)\n\s*(?:(?:ক\.)|(?:a\.))\s*([\s\S]+?)\n\s*(?:(?:খ\.)|(?:b\.))\s*([\s\S]+?)\n\s*(?:(?:গ\.)|(?:c\.))\s*([\s\S]+?)\n\s*(?:(?:ঘ\.)|(?:d\.))\s*([\s\S]+?)\n\s*(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([\s\S]+?)(?=\n\s*[০-৯0-9]+\.|\n*$)/gi;
+/(?:^|\n)\s*([০-৯0-9]+)\.(?!\d)\s*([\s\S]+?)\n\s*(?:(?:ক\.)|(?:a\.))\s*([\s\S]+?)\n\s*(?:(?:খ\.)|(?:b\.))\s*([\s\S]+?)\n\s*(?:(?:গ\.)|(?:c\.))\s*([\s\S]+?)\n\s*(?:(?:ঘ\.)|(?:d\.))\s*([\s\S]+?)\n\s*(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([\s\S]+?)(?=\n\s*[০-৯0-9]+\.(?!\d)|\n*$)/gi;
             
             let match;
             while ((match = mcqRegex.exec(cleanText)) !== null) {
                 try {
-                    const question = match[1].trim();
+                    const question = match[2].trim(); // Index 2 because Index 1 is the Question Number
                     const options = [
-                        match[2].trim(), // opt a/ক
-                        match[3].trim(), // opt b/খ
-                        match[4].trim(), // opt c/গ
-                        match[5].trim()  // opt d/ঘ
+                        match[3].trim(), // opt a/ক
+                        match[4].trim(), // opt b/খ
+                        match[5].trim(), // opt c/গ
+                        match[6].trim()  // opt d/ঘ
                     ];
                     
-                    const answerString = match[6].trim();
+                    const answerString = match[7].trim();
                     const answerStringLower = answerString.toLowerCase();
                     let correctAnswer = null;
 
@@ -4235,6 +4238,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     else if (answerStringLower === 'c' || answerStringLower === 'গ' || answerStringLower === 'ג') correctAnswer = options[2];
                     else if (answerStringLower === 'd' || answerStringLower === 'ঘ') correctAnswer = options[3];
 
+                    // Check for prefixes like "b. Answer..."
                     if (correctAnswer === null) {
                         if (answerStringLower.startsWith('a.') || answerStringLower.startsWith('ক.')) correctAnswer = options[0];
                         else if (answerStringLower.startsWith('b.') || answerStringLower.startsWith('খ.')) correctAnswer = options[1];
@@ -4242,6 +4246,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         else if (answerStringLower.startsWith('d.') || answerStringLower.startsWith('ঘ.')) correctAnswer = options[3];
                     }
 
+                    // Check for full text match
                     if (correctAnswer === null) {
                         for (const opt of options) {
                             if (opt === answerString || answerString.includes(opt) || opt.includes(answerString)) {
@@ -4252,7 +4257,11 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     }
                     
                     if (correctAnswer) {
-                        mcqData.push({ question, options, correctAnswer });
+                        mcqData.push({ 
+                            question: question, 
+                            options: options, 
+                            correctAnswer: correctAnswer 
+                        });
                     }
                 } catch (e) {
                     console.error("Failed to parse one MCQ block:", e);
@@ -4260,6 +4269,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             }
             return mcqData;
         }
+		
 		
 		
 
