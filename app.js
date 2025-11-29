@@ -3343,7 +3343,28 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         
+		// --- HELPER: Conditional Option Shuffling ---
+        function getProcessedOptions(originalOptions) {
+            // Words that prevent shuffling if present in ANY option
+            const restrictedPhrases = ["Both", "All of the above", "উভয়", "উভয়ই", "উপরের সব", "উপরের সবগুলো"];
+            
+            // Check if ANY option contains a restricted phrase
+            const shouldShuffle = !originalOptions.some(opt => 
+                restrictedPhrases.some(phrase => opt.toLowerCase().includes(phrase.toLowerCase()))
+            );
+            
+            // Create a copy of options
+            const newOptions = [...originalOptions];
+            
+            // Shuffle only if safe, otherwise keep original order
+            return shouldShuffle ? shuffleArray(newOptions) : newOptions;
+        }
+		
+		
 		/**
+         * Resets state and starts the quiz game.
+         */
+        /**
          * Resets state and starts the quiz game.
          */
         function runQuizGame() {
@@ -3360,7 +3381,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
             // 3. SHOW Main Screen (Critical Fix)
             quizMainScreen.classList.remove('hidden');
-            quizMainScreen.style.display = ''; // <--- This removes 'display: none'
+            quizMainScreen.style.display = ''; 
 
             // --- START: NEW RE-GENERATION LOGIC ---
             if (currentVocabData) {
@@ -3374,9 +3395,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
                 currentQuizQuestions = generateQuizData(currentVocabData, currentOptionPool);
             } else if (currentMcqData) {
+                // --- MODIFIED: Use getProcessedOptions for conditional shuffling ---
                 currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
                     question: mcq.question,
-                    options: [...mcq.options], 
+                    options: getProcessedOptions(mcq.options), // <--- UPDATED THIS LINE
                     correctAnswer: mcq.correctAnswer,
                     userAnswer: null, 
                     isCorrect: null 
@@ -3402,7 +3424,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             // Fix animation state on restart
             quizQuestionArea.classList.remove('slide-in-right', 'slide-in-left');
         }
-		
         
 		function startTimer(totalSeconds) {
             if (quizTimerInterval) clearInterval(quizTimerInterval); // Clear any old timer
