@@ -3783,23 +3783,14 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             resultsScreen.style.display = ''; 
         });
         
-        // 3. The function to build and show the review screen
-        // 3. The function to build and show the review screen
         function showReviewScreen() {
-            // --- FIX: FORCE SHOW REVIEW SCREEN ---
+            // ... (keep the force hide/show logic at the top) ...
             const resultsScreen = document.getElementById('quiz-results-screen');
             const reviewScreen = document.getElementById('quiz-review-screen');
-            
-            // 1. Hide Results
-            resultsScreen.classList.add('hidden');
-            resultsScreen.style.display = 'none'; // Force hide
-            
-            // 2. Show Review
-            reviewScreen.classList.remove('hidden');
-            reviewScreen.style.display = ''; // Remove inline 'display: none'
-            // -------------------------------------
+            resultsScreen.classList.add('hidden'); resultsScreen.style.display = 'none';
+            reviewScreen.classList.remove('hidden'); reviewScreen.style.display = '';
 
-            quizReviewContent.innerHTML = ''; // Clear old content
+            quizReviewContent.innerHTML = '';
             
             const wrongAnswers = currentQuizQuestions.filter(q => q.isCorrect === false);
             
@@ -3810,22 +3801,39 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             let html = '';
             wrongAnswers.forEach(q => {
-                html += `
-                <div class="review-item">
-                    <p class="review-question">${escapeHtml(q.question)}</p>
+                let feedbackHtml = '';
+                
+                if (q.correctAnswer) {
+                    // Standard Logic
+                    feedbackHtml = `
                     <div class="review-options">
                         ${q.options.map(option => {
                             let className = 'review-option';
-                            if (option === q.correctAnswer) {
-                                className += ' correct'; 
-                            } else if (option === q.userAnswer) {
-                                className += ' incorrect'; 
-                            }
+                            if (option === q.correctAnswer) className += ' correct';
+                            else if (option === q.userAnswer) className += ' incorrect';
+                            return `<div class="${className}">${escapeHtml(option)}</div>`;
+                        }).join('')}
+                    </div>`;
+                } else {
+                    // Cancelled/No Answer Logic
+                    feedbackHtml = `
+                    <div class="review-options">
+                        ${q.options.map(option => {
+                            let className = 'review-option';
+                            if (option === q.userAnswer) className += ' incorrect'; // Mark user choice wrong
                             return `<div class="${className}">${escapeHtml(option)}</div>`;
                         }).join('')}
                     </div>
-                </div>
-                `;
+                    <div class="mt-2 text-sm text-amber-600 font-semibold p-2 bg-amber-50 rounded border border-amber-200">
+                        <i class="fas fa-info-circle mr-1"></i> Note: ${escapeHtml(q.explanation || 'No correct answer defined')}
+                    </div>`;
+                }
+
+                html += `
+                <div class="review-item">
+                    <p class="review-question">${escapeHtml(q.question)}</p>
+                    ${feedbackHtml}
+                </div>`;
             });
             
             quizReviewContent.innerHTML = html;
@@ -4204,18 +4212,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         });
 		
 		
-        // 3. ✨ The Magic Parser Function (Regex) - (FIXED FOR GARBAGE LINES & DECIMALS)
+       // 3. ✨ The Magic Parser Function (UPDATED: Accepts Questions without Answer)
         function parseMcqText(text) {
-            // 1. Clean up newlines before numbers to ensure consistency
             let cleanText = text.replace(/\n*([০-৯0-9]+\.)/g, '\n$1');
             const mcqData = [];
-            
-            // 2. UPDATED REGEX EXPLANATION:
-            // Group 1 (Num): ([০-৯0-9]+)
-            // Dot Check: \.(?!\d) -> Dot not followed by digit (avoids 77.8)
-            // Group 2 (Q Text): ((?:(?!\n\s*[০-৯0-9]+\.(?!\d))[\s\S])+?) 
-            //    -> Matches text BUT stops if it sees a "New Line + Number + Dot" pattern.
-            //    -> This prevents merging two questions if the first one is malformed/garbage.
             
             const mcqRegex = 
 /(?:^|\n)\s*([০-৯0-9]+)\.(?!\d)((?:(?!\n\s*[০-৯0-9]+\.(?!\d))[\s\S])+?)\n\s*(?:(?:ক\.)|(?:a\.))\s*([\s\S]+?)\n\s*(?:(?:খ\.)|(?:b\.))\s*([\s\S]+?)\n\s*(?:(?:গ\.)|(?:c\.))\s*([\s\S]+?)\n\s*(?:(?:ঘ\.)|(?:d\.))\s*([\s\S]+?)\n\s*(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([\s\S]+?)(?=\n\s*[০-৯0-9]+\.(?!\d)|\n*$)/gi;
@@ -4225,23 +4225,19 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 try {
                     const question = match[2].trim(); 
                     const options = [
-                        match[3].trim(), // opt a/ক
-                        match[4].trim(), // opt b/খ
-                        match[5].trim(), // opt c/গ
-                        match[6].trim()  // opt d/ঘ
+                        match[3].trim(), match[4].trim(), match[5].trim(), match[6].trim()
                     ];
                     
                     const answerString = match[7].trim();
                     const answerStringLower = answerString.toLowerCase();
                     let correctAnswer = null;
 
-                    // Logic to find correct answer index
+                    // 1. Try to find the correct option (Existing Logic)
                     if (answerStringLower === 'a' || answerStringLower === 'ক') correctAnswer = options[0];
                     else if (answerStringLower === 'b' || answerStringLower === 'খ') correctAnswer = options[1];
                     else if (answerStringLower === 'c' || answerStringLower === 'গ' || answerStringLower === 'ג') correctAnswer = options[2];
                     else if (answerStringLower === 'd' || answerStringLower === 'ঘ') correctAnswer = options[3];
 
-                    // Check for prefixes like "b. Answer..."
                     if (correctAnswer === null) {
                         if (answerStringLower.startsWith('a.') || answerStringLower.startsWith('ক.')) correctAnswer = options[0];
                         else if (answerStringLower.startsWith('b.') || answerStringLower.startsWith('খ.')) correctAnswer = options[1];
@@ -4249,7 +4245,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         else if (answerStringLower.startsWith('d.') || answerStringLower.startsWith('ঘ.')) correctAnswer = options[3];
                     }
 
-                    // Check for full text match
                     if (correctAnswer === null) {
                         for (const opt of options) {
                             if (opt === answerString || answerString.includes(opt) || opt.includes(answerString)) {
@@ -4259,20 +4254,20 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         }
                     }
                     
-                    if (correctAnswer) {
-                        mcqData.push({ 
-                            question: question, 
-                            options: options, 
-                            correctAnswer: correctAnswer 
-                        });
-                    }
+                    // --- NEW LOGIC: Accept even if correctAnswer is null ---
+                    mcqData.push({ 
+                        question: question, 
+                        options: options, 
+                        correctAnswer: correctAnswer, // Might be null
+                        explanation: answerString     // Store the raw text (e.g. "Cancelled")
+                    });
+                    
                 } catch (e) {
                     console.error("Failed to parse one MCQ block:", e);
                 }
             }
             return mcqData;
         }
-		
 		
 		
 
@@ -4344,8 +4339,34 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 
         let html = '';
         mcqData.forEach((mcq, index) => {
-            const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
-            const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+            // Check if there is a valid correct answer
+            let answerHtml = '';
+            
+            if (mcq.correctAnswer) {
+                // Standard Green Box
+                const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+                const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+                answerHtml = `
+                    <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm answer-card-bg">
+                        <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg">
+                            <i class="fas fa-check text-xs"></i>
+                        </div>
+                        <div class="font-semibold text-emerald-900 text-sm answer-text">
+                            Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
+                        </div>
+                    </div>`;
+            } else {
+                // Orange "Cancelled/Note" Box
+                answerHtml = `
+                    <div class="inline-flex items-center w-full sm:w-auto bg-amber-100 border border-amber-300 rounded-lg px-4 py-2 shadow-sm">
+                        <div class="flex-shrink-0 bg-amber-200 rounded-full p-1 mr-3 text-amber-700">
+                            <i class="fas fa-exclamation text-xs"></i>
+                        </div>
+                        <div class="font-semibold text-amber-900 text-sm">
+                            Note: <span class="text-amber-800">${escapeHtml(mcq.explanation || "No Answer Defined")}</span>
+                        </div>
+                    </div>`;
+            }
 
             html += `
                 <div class="study-card">
@@ -4363,20 +4384,11 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                     </div>
 
                     <div class="mt-4 pt-2 border-t border-dashed border-gray-200">
-                        <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm answer-card-bg">
-                            <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg">
-                                <i class="fas fa-check text-xs"></i>
-                            </div>
-                            <div class="font-semibold text-emerald-900 text-sm answer-text">
-                                Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
-                            </div>
-                        </div>
+                        ${answerHtml}
                     </div>
-
                 </div>
             `;
         });
-        
         viewMcqContent.innerHTML = html;
 
     } catch (error) {
@@ -4617,6 +4629,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                     question: mcq.question,
                     options: [...mcq.options],
                     correctAnswer: mcq.correctAnswer,
+					explanation: mcq.explanation || null,
                     userAnswer: null,
                     isCorrect: null
                 }));
@@ -4859,6 +4872,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                     question: mcq.question,
                     options: [...mcq.options],
                     correctAnswer: mcq.correctAnswer,
+					explanation: mcq.explanation || null,
                     userAnswer: null,
                     isCorrect: null
                 }));
@@ -7462,6 +7476,7 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
         question: mcq.question,
         options: [...mcq.options],
         correctAnswer: mcq.correctAnswer,
+		explanation: mcq.explanation || null,
         userAnswer: null,
         isCorrect: null
     }));
@@ -7646,7 +7661,7 @@ if (viewMcqTestBtn) {
         currentMcqData = mcqData;
         currentVocabData = null;
         currentQuizQuestions = currentMcqData.map(mcq => ({ 
-            question: mcq.question, options: [...mcq.options], correctAnswer: mcq.correctAnswer, userAnswer: null, isCorrect: null 
+            question: mcq.question, options: [...mcq.options], correctAnswer: mcq.correctAnswer, explanation: mcq.explanation || null, userAnswer: null, isCorrect: null 
         }));
         
         const totalTime = currentQuizQuestions.length * 36;
