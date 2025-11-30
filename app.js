@@ -4108,19 +4108,23 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         const viewMcqModal = document.getElementById('view-mcq-modal');
         const viewMcqContent = document.getElementById('view-mcq-content');
 
-        // 1. "Add/Edit MCQ" Button Handler (UPDATED: Checks Local Temp Data First)
+       // 1. "Add/Edit MCQ" Button Handler (UPDATED: Handles Delete Button Visibility)
         async function openAddMcqModal(monthId, weekId, dayIndex, rowIndex) {
             currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
-            mcqPasteTextarea.value = ''; // Clear first
+            mcqPasteTextarea.value = ''; 
             
-            // Find the button in the DOM to see if we have temporary unsaved data
+            const deleteBtn = document.getElementById('delete-all-mcqs-btn');
+            deleteBtn.classList.add('hidden'); // Hide by default
+
+            // Find the button in the DOM to check for data
             const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
             const row = daySection ? daySection.querySelector(`tr[data-row-index="${rowIndex}"]`) : null;
             const button = row ? row.querySelector('.add-row-mcq-btn') : null;
 
-            // A. Check for LOCAL temporary data (Unsaved)
+            let hasData = false;
+
+            // A. Check for LOCAL temporary data
             if (button && button.dataset.tempMcq) {
-                console.log("Loading MCQs from local temp storage...");
                 const localData = JSON.parse(button.dataset.tempMcq);
                 const rawText = localData.map((mcq, index) => {
                     const options = mcq.options.map((opt, i) => `${['ক', 'খ', 'গ', 'ঘ'][i]}. ${opt}`).join('\n');
@@ -4130,39 +4134,46 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }).join('\n');
                 
                 mcqPasteTextarea.value = rawText;
-                addMcqModal.style.display = 'block';
-                return; // Stop here, no need to check DB
+                hasData = true;
+            }
+            // B. Check DATABASE if no local data
+            else {
+                setSyncStatus("Loading...", "blue");
+                try {
+                    const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                    const weekDocSnap = await getDoc(weekDocRef);
+                    
+                    if (weekDocSnap.exists()) {
+                        const mcqData = weekDocSnap.data().days?.[dayIndex]?.rows?.[rowIndex]?.mcqData;
+                        
+                        if (mcqData && mcqData.length > 0) {
+                            const rawText = mcqData.map((mcq, index) => {
+                                const options = mcq.options.map((opt, i) => `${['ক', 'খ', 'গ', 'ঘ'][i]}. ${opt}`).join('\n');
+                                const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+                                const correctPrefix = correctIndex !== -1 ? ['ক', 'খ', 'গ', 'ঘ'][correctIndex] : '??';
+                                return `${index + 1}. ${mcq.question}\n${options}\nসঠিক উত্তর: ${correctPrefix}. ${mcq.correctAnswer}\n`;
+                            }).join('\n');
+                            
+                            mcqPasteTextarea.value = rawText;
+                            hasData = true;
+                        }
+                    }
+                    setSyncStatus("Synced", "green");
+                } catch (error) {
+                    console.error("Error fetching MCQ data:", error);
+                    setSyncStatus("Error", "red");
+                }
             }
 
-            // B. Check DATABASE (Saved)
-            setSyncStatus("Loading...", "blue");
-            try {
-                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
-                const weekDocSnap = await getDoc(weekDocRef);
-                
-                let rawText = '';
-                if (weekDocSnap.exists()) {
-                    const mcqData = weekDocSnap.data().days?.[dayIndex]?.rows?.[rowIndex]?.mcqData;
-                    
-                    if (mcqData) {
-                        rawText = mcqData.map((mcq, index) => {
-                            const options = mcq.options.map((opt, i) => `${['ক', 'খ', 'গ', 'ঘ'][i]}. ${opt}`).join('\n');
-                            const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
-                            const correctPrefix = correctIndex !== -1 ? ['ক', 'খ', 'গ', 'ঘ'][correctIndex] : '??';
-                            return `${index + 1}. ${mcq.question}\n${options}\nসঠিক উত্তর: ${correctPrefix}. ${mcq.correctAnswer}\n`;
-                        }).join('\n');
-                    }
-                }
-                mcqPasteTextarea.value = rawText; 
-                setSyncStatus("Synced", "green");
-            } catch (error) {
-                console.error("Error fetching MCQ data for modal:", error);
-                setSyncStatus("Error", "red");
+            // Show Delete button if data exists
+            if (hasData) {
+                deleteBtn.classList.remove('hidden');
             }
 
             addMcqModal.style.display = 'block';
         }
-
+		
+		
         // 2. Modal "Parse & Save" Handler (UPDATED: With Validation)
         saveMcqBtn.addEventListener('click', () => { 
             if (!currentMcqTarget) return;
@@ -4210,6 +4221,47 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
             currentMcqTarget = null;
         });
+		
+		
+	// 2a. "Delete All MCQs" Button Handler
+        document.getElementById('delete-all-mcqs-btn')?.addEventListener('click', () => {
+            if (!currentMcqTarget) return;
+            
+            if (!confirm("Are you sure you want to delete all MCQs for this row?")) {
+                return;
+            }
+
+            const { monthId, weekId, dayIndex, rowIndex } = currentMcqTarget;
+            
+            // Clear textarea
+            mcqPasteTextarea.value = '';
+            
+            closeModal('add-mcq-modal');
+
+            // Find the UI button
+            const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
+            const row = daySection ? daySection.querySelector(`tr[data-row-index="${rowIndex}"]`) : null;
+            const button = row ? row.querySelector('.add-row-mcq-btn') : null;
+
+            if (button) {
+                // 1. Send empty array to indicate deletion
+                button.dataset.tempMcq = '[]'; 
+                
+                // 2. Reset UI
+                button.innerHTML = `<i class="fas fa-plus mr-1"></i> Add Qs`;
+                button.classList.remove('bg-emerald-100', 'text-emerald-700');
+                
+                showCustomAlert("All MCQs removed. Click 'Save Day' to confirm.", "success");
+
+                // 3. Trigger Autosave
+                if (daySection.autosaveHandler) {
+                    daySection.dispatchEvent(new Event('input'));
+                }
+            }
+
+            currentMcqTarget = null;
+        });
+		
 		
 		
        // 3. ✨ The Magic Parser Function (UPDATED: Accepts Questions without Answer)
