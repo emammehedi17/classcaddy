@@ -7970,3 +7970,59 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
         });
     });
 }
+
+// --- MCQ COPY FUNCTIONALITY ---
+
+// Helper to format MCQs for clipboard
+function formatMcqsForClipboard(mcqs) {
+    return mcqs.map((mcq, index) => {
+        // 1. Format Options (a. OptionText...)
+        const optionsText = mcq.options.map((opt, i) => {
+            const label = getOptionLabel(i, mcq.question); 
+            return `${label}. ${opt}`;
+        }).join('\n');
+
+        // 2. Format Correct Answer
+        let answerLine = "";
+        if (mcq.correctAnswer) {
+            const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+            const label = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+            // Output format: "Correct answer: b. OptionText"
+            answerLine = `Correct answer: ${label}. ${mcq.correctAnswer}`;
+        } else {
+            // Output format for cancelled/explained questions
+            answerLine = `Correct answer: ${mcq.explanation || 'Cancelled'}`;
+        }
+
+        // 3. Combine
+        return `${index + 1}. ${mcq.question}\n${optionsText}\n${answerLine}`;
+    }).join('\n\n');
+}
+
+// Handler for Copy Buttons
+async function handleMcqCopy(data) {
+    if (!data || !data.mcqs || data.mcqs.length === 0) {
+        showCustomAlert("No MCQs available to copy.", "error");
+        return;
+    }
+
+    const textToCopy = formatMcqsForClipboard(data.mcqs);
+
+    try {
+        await navigator.clipboard.writeText(textToCopy);
+        showCustomAlert(`${data.mcqs.length} MCQs copied to clipboard!`, "success");
+    } catch (err) {
+        console.error('Failed to copy: ', err);
+        showCustomAlert("Failed to copy to clipboard.", "error");
+    }
+}
+
+// Listener for "View Mode" Copy Button
+document.getElementById('copy-view-mcq-btn')?.addEventListener('click', () => {
+    handleMcqCopy(currentViewMcqData);
+});
+
+// Listener for "Study Mode" Copy Button
+document.getElementById('copy-study-mcq-btn')?.addEventListener('click', () => {
+    handleMcqCopy(currentStudyViewData);
+});
