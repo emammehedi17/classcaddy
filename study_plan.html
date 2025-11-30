@@ -575,9 +575,14 @@
 সঠিক উত্তর: খ. অপশন ২
 ০২. পরবর্তী প্রশ্ন..."></textarea>
         
-        <div class="mt-4 flex justify-end gap-3">
-             <button onclick="closeModal('add-mcq-modal')" class="action-button action-button-secondary">Cancel</button>
-             <button id="save-mcq-btn" class="action-button">Parse & Save MCQs</button>
+        <div class="mt-4 flex justify-between items-center">
+             <button id="delete-all-mcqs-btn" class="action-button action-button-danger hidden text-sm">
+                 <i class="fas fa-trash-alt mr-1"></i> Delete All
+             </button>
+
+             <div class="flex gap-3 ml-auto"> <button onclick="closeModal('add-mcq-modal')" class="action-button action-button-secondary">Cancel</button>
+                 <button id="save-mcq-btn" class="action-button">Parse & Save MCQs</button>
+             </div>
         </div>
       </div>
     </div>
