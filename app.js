@@ -3343,10 +3343,19 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         
-		// --- HELPER: Conditional Option Shuffling ---
+		// --- HELPER: Conditional Option Shuffling (UPDATED) ---
         function getProcessedOptions(originalOptions) {
             // Words that prevent shuffling if present in ANY option
-            const restrictedPhrases = ["Both", "All of the above", "উভয়", "উভয়ই", "উপরের সব", "উপরের সবগুলো"];
+            const restrictedPhrases = [
+                // English
+                "Both", "All of the above", "None of the above", "a & b", "b and c", "c and d", "none", "all", "All",
+                // Bengali - Both/All
+                "উভয়", "উভয়ই", "দুটিই", "উপরের সব", "উপরের সবগুলো", "সবগুলো",
+                // Bengali - None
+                "কোনোটিই নয়", "কোনোটিই না", "কোনোটি নয়", "কোনোটি না",
+                // Bengali - Combinations (e.g., "K and Kh")
+                "ক ও খ", "খ ও গ", "ক ও গ", "ক ও গ"
+            ];
             
             // Check if ANY option contains a restricted phrase
             const shouldShuffle = !originalOptions.some(opt => 
@@ -3359,7 +3368,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             // Shuffle only if safe, otherwise keep original order
             return shouldShuffle ? shuffleArray(newOptions) : newOptions;
         }
-		
 		
 		/**
          * Resets state and starts the quiz game.
