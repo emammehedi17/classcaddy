@@ -3364,26 +3364,23 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		/**
          * Resets state and starts the quiz game.
          */
-        /**
-         * Resets state and starts the quiz game.
-         */
         function runQuizGame() {
             // 1. Hide Start Screen
             quizStartScreen.classList.add('hidden');
             quizStartScreen.style.display = 'none'; 
             
-            // 2. Hide Results & Review Screens (Safety check)
+            // 2. Hide Results & Review Screens
             quizResultsScreen.classList.add('hidden');
             quizResultsScreen.style.display = 'none';
             
             quizReviewScreen.classList.add('hidden');
             quizReviewScreen.style.display = 'none';
 
-            // 3. SHOW Main Screen (Critical Fix)
+            // 3. SHOW Main Screen
             quizMainScreen.classList.remove('hidden');
             quizMainScreen.style.display = ''; 
 
-            // --- START: NEW RE-GENERATION LOGIC ---
+            // --- RE-GENERATION LOGIC ---
             if (currentVocabData) {
                 if (!currentOptionPool) {
                     console.warn("No option pool found. Falling back.");
@@ -3395,11 +3392,11 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
                 currentQuizQuestions = generateQuizData(currentVocabData, currentOptionPool);
             } else if (currentMcqData) {
-                // --- MODIFIED: Use getProcessedOptions for conditional shuffling ---
                 currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
                     question: mcq.question,
-                    options: getProcessedOptions(mcq.options), // <--- UPDATED THIS LINE
+                    options: getProcessedOptions(mcq.options), 
                     correctAnswer: mcq.correctAnswer,
+                    explanation: mcq.explanation || null,
                     userAnswer: null, 
                     isCorrect: null 
                 }))); 
@@ -3407,7 +3404,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 console.warn("No source data found, re-shuffling.");
                 currentQuizQuestions = shuffleArray(currentQuizQuestions);
             }
-            // --- END: NEW RE-GENERATION LOGIC ---
 
             currentQuizQuestionIndex = 0;
             currentQuizScore = 0;
@@ -3416,15 +3412,21 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizRestartBtn.onclick = runQuizGame;
             
             const totalQuestions = currentQuizQuestions.length;
-            const totalTimeInSeconds = totalQuestions * 36;
+            
+            // --- NEW TIMING LOGIC ---
+            // If MCQ Data exists, use 20 seconds. Otherwise (Vocab), use 15 seconds.
+            const secondsPerQuestion = currentMcqData ? 20 : 15;
+            const totalTimeInSeconds = totalQuestions * secondsPerQuestion;
+            // ------------------------
+
             startTimer(totalTimeInSeconds); 
             
             loadQuizQuestion();
             
-            // Fix animation state on restart
             quizQuestionArea.classList.remove('slide-in-right', 'slide-in-left');
         }
-        
+		
+		
 		function startTimer(totalSeconds) {
             if (quizTimerInterval) clearInterval(quizTimerInterval); // Clear any old timer
             quizStartTime = Date.now(); // <-- এই লাইনটি কুইজ শুরুর সময় সেভ করবে
@@ -4064,7 +4066,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 currentQuizQuestions = []; 
                 
                 const totalQuestions = questionList.length + questionList.filter(v => v.synonym).length;
-                const totalTimeInSeconds = totalQuestions * 36;
+                const totalTimeInSeconds = totalQuestions * 15;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
                 warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
@@ -4592,7 +4594,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 currentQuizQuestions = []; 
                 
                 const totalQuestions = questionList.length + questionList.filter(v => v.synonym).length;
-                const totalTimeInSeconds = totalQuestions * 36;
+                const totalTimeInSeconds = totalQuestions * 15;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
                 warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
@@ -4687,7 +4689,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 }));
                 
                 const totalQuestions = currentQuizQuestions.length;
-                const totalTimeInSeconds = totalQuestions * 36;
+                const totalTimeInSeconds = totalQuestions * 20;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
                 warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
@@ -4930,7 +4932,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 }));
                 
                 const totalQuestions = currentQuizQuestions.length;
-                const totalTimeInSeconds = totalQuestions * 36;
+                const totalTimeInSeconds = totalQuestions * 20;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
                 warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
@@ -7535,7 +7537,7 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
 
     // 6. Calculate Time
     const totalQuestions = currentQuizQuestions.length;
-    const totalTimeInSeconds = totalQuestions * 36;
+    const totalTimeInSeconds = totalQuestions * 20;
 
     // 7. Update Start Screen Text
     const warningP = document.getElementById('quiz-total-time-warning');
