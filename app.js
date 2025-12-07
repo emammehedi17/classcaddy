@@ -6715,9 +6715,12 @@ async function executeCloudBackup(isAuto = false) {
 
         let successMessage = isAuto ? "Daily Auto-Backup Complete!" : "Backup saved to cloud successfully!";
 
-        if (snapshot.size >= 5) {
+        if (snapshot.size >= 10) { 
             if (!isAuto) updateProgress(10, "Cleaning old backups...");
-            const numToDelete = snapshot.size - 4; 
+            
+            // We want to keep 9 old ones + 1 new one = 10 total.
+            // So we delete (Total - 9).
+            const numToDelete = snapshot.size - 9; 
             const batch = writeBatch(db);
 
             for (let i = 0; i < numToDelete; i++) {
@@ -6841,24 +6844,20 @@ async function initSmartCloudBackup() {
             let shouldBackup = false;
 
             if (snapshot.empty) {
-                // Case 1: No backups exist at all. Run immediately.
                 console.log("No cloud backups found. Initializing first auto-backup.");
                 shouldBackup = true;
             } else {
-                // Case 2: Backups exist. Check the time of the newest one.
-                const lastDoc = snapshot.docs[0]; // The first one is the newest due to 'desc'
-                const lastBackupDate = lastDoc.data().timestamp.toDate(); // Convert Firestore Timestamp to JS Date
+                const lastDoc = snapshot.docs[0]; 
+                const lastBackupDate = lastDoc.data().timestamp.toDate();
                 const lastBackupTime = lastBackupDate.getTime();
                 const now = Date.now();
                 
-                const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000; // 86,400,000 ms
+                // --- CHANGED TO 6 HOURS ---
+                const SIX_HOURS = 6 * 60 * 60 * 1000; 
 
-                if ((now - lastBackupTime) > TWENTY_FOUR_HOURS) {
-                    console.log(`Last backup was ${lastBackupDate.toLocaleString()}. >24h ago. Triggering backup.`);
+                if ((now - lastBackupTime) > SIX_HOURS) {
+                    console.log(`Last backup was ${lastBackupDate.toLocaleString()}. >6h ago. Triggering backup.`);
                     shouldBackup = true;
-                } else {
-                    // Debug log (optional)
-                    // console.log(`Backup fresh. Last run: ${lastBackupDate.toLocaleString()}`);
                 }
             }
 
@@ -6871,12 +6870,13 @@ async function initSmartCloudBackup() {
         }
     };
 
-    // 1. Check 5 seconds after load (Covers "User just logged in on new device")
+    // 1. Check 5 seconds after load
     setTimeout(checkAndRun, 5000);
 
-    // 2. Check every 20 minutes (Covers "User keeps tab open all day")
+    // 2. Check every 20 minutes
     setInterval(checkAndRun, 20 * 60 * 1000);
 }
+
 
 // Hook into Auth State so it starts when user logs in
 onAuthStateChanged(auth, (user) => {
