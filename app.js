@@ -3405,6 +3405,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     options: getProcessedOptions(mcq.options), 
                     correctAnswer: mcq.correctAnswer,
                     explanation: mcq.explanation || null,
+					note: mcq.note || null,
                     userAnswer: null, 
                     isCorrect: null 
                 }))); 
@@ -3474,6 +3475,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          */
         function loadQuizQuestion() {
             quizOptionsContainer.innerHTML = '';
+            // --- NEW: Remove old note if exists ---
+            const oldNote = document.getElementById('quiz-instant-note');
+            if(oldNote) oldNote.remove();
+            // --------------------------------------
             
             const q = currentQuizQuestions[currentQuizQuestionIndex];
             
@@ -3572,6 +3577,17 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 // Answer is wrong: Stay on the page and enable "Next"
                 quizNextBtn.disabled = false;
                 quizSkipBtn.hidden = true;
+				// --- NEW: SHOW INSTANT NOTE ---
+                if (q.note) {
+                    const noteDiv = document.createElement('div');
+                    noteDiv.id = 'quiz-instant-note';
+                    noteDiv.className = 'mt-4 p-3 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm animate-fade-in';
+                    noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(q.note)}`;
+                    
+                    // Insert after the options container
+                    quizOptionsContainer.parentNode.insertBefore(noteDiv, quizOptionsContainer.nextSibling);
+                }
+                // ------------------------------
             }
             // --- END: NEW AUTO-ADVANCE LOGIC ---
         }
@@ -3839,10 +3855,18 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     </div>`;
                 }
 
+                // --- NEW: ADD NOTE TO REVIEW ---
+                let reviewNoteHtml = '';
+                if (q.note) {
+                    reviewNoteHtml = `<div class="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded"><i class="fas fa-info-circle mr-1"></i> ${escapeHtml(q.note)}</div>`;
+                }
+                // -------------------------------
+
                 html += `
                 <div class="review-item">
                     <p class="review-question">${escapeHtml(q.question)}</p>
                     ${feedbackHtml}
+                    ${reviewNoteHtml}
                 </div>`;
             });
             
@@ -4274,7 +4298,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
 		
 		
-       // 3. ✨ The Magic Parser Function (UPDATED: Accepts Questions without Answer)
+       // 3. ✨ The Magic Parser Function (UPDATED: Extracts Notes/Explanations)
         function parseMcqText(text) {
             let cleanText = text.replace(/\n*([০-৯0-9]+\.)/g, '\n$1');
             const mcqData = [];
@@ -4286,15 +4310,28 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             while ((match = mcqRegex.exec(cleanText)) !== null) {
                 try {
                     const question = match[2].trim(); 
-                    const options = [
-                        match[3].trim(), match[4].trim(), match[5].trim(), match[6].trim()
-                    ];
+                    const options = [ match[3].trim(), match[4].trim(), match[5].trim(), match[6].trim() ];
                     
-                    const answerString = match[7].trim();
-                    const answerStringLower = answerString.toLowerCase();
+                    let rawAnswerLine = match[7].trim();
+                    let noteText = null;
+
+                    // --- NOTE PARSING LOGIC ---
+                    // Regex to find "Note:", "NB:", "Explanation:", "ব্যাখ্যা:", etc. (Case insensitive)
+                    const noteSplitRegex = /\n\s*(?:Note|NB|N\.B\.|Explanation|Ex|Exp|ব্যাখ্যা|দ্রষ্টব্য)\s*:\s*/i;
+                    const splitMatch = rawAnswerLine.split(noteSplitRegex);
+
+                    if (splitMatch.length > 1) {
+                        // Part 0 is the answer, Part 1 (and rest) is the note
+                        rawAnswerLine = splitMatch[0].trim();
+                        // Re-join the rest in case the note itself had a similar pattern (rare)
+                        noteText = splitMatch.slice(1).join(' ').trim(); 
+                    }
+                    // --------------------------
+
+                    const answerStringLower = rawAnswerLine.toLowerCase();
                     let correctAnswer = null;
 
-                    // 1. Try to find the correct option (Existing Logic)
+                    // Standard Answer Detection
                     if (answerStringLower === 'a' || answerStringLower === 'ক') correctAnswer = options[0];
                     else if (answerStringLower === 'b' || answerStringLower === 'খ') correctAnswer = options[1];
                     else if (answerStringLower === 'c' || answerStringLower === 'গ' || answerStringLower === 'ג') correctAnswer = options[2];
@@ -4309,19 +4346,19 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
                     if (correctAnswer === null) {
                         for (const opt of options) {
-                            if (opt === answerString || answerString.includes(opt) || opt.includes(answerString)) {
+                            if (opt === rawAnswerLine || rawAnswerLine.includes(opt) || opt.includes(rawAnswerLine)) {
                                 correctAnswer = opt;
                                 break;
                             }
                         }
                     }
                     
-                    // --- NEW LOGIC: Accept even if correctAnswer is null ---
                     mcqData.push({ 
                         question: question, 
                         options: options, 
-                        correctAnswer: correctAnswer, // Might be null
-                        explanation: answerString     // Store the raw text (e.g. "Cancelled")
+                        correctAnswer: correctAnswer, 
+                        explanation: (correctAnswer ? null : rawAnswerLine), // If no match, treat text as error/note
+                        note: noteText // <-- NEW FIELD
                     });
                     
                 } catch (e) {
@@ -4330,6 +4367,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             }
             return mcqData;
         }
+		
 		
 		
 
@@ -4405,52 +4443,50 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
             let answerHtml = '';
             
             if (mcq.correctAnswer) {
-                // Standard Green Box
-                const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
-                const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
-                answerHtml = `
+                 const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+                 const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+                 answerHtml = `
                     <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm answer-card-bg">
-                        <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg">
-                            <i class="fas fa-check text-xs"></i>
-                        </div>
-                        <div class="font-semibold text-emerald-900 text-sm answer-text">
-                            Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
-                        </div>
+                        <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg"><i class="fas fa-check text-xs"></i></div>
+                        <div class="font-semibold text-emerald-900 text-sm answer-text">Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span></div>
                     </div>`;
             } else {
-                // Orange "Cancelled/Note" Box
-                answerHtml = `
+                 answerHtml = `
                     <div class="inline-flex items-center w-full sm:w-auto bg-amber-100 border border-amber-300 rounded-lg px-4 py-2 shadow-sm">
-                        <div class="flex-shrink-0 bg-amber-200 rounded-full p-1 mr-3 text-amber-700">
-                            <i class="fas fa-exclamation text-xs"></i>
-                        </div>
-                        <div class="font-semibold text-amber-900 text-sm">
-                            Note: <span class="text-amber-800">${escapeHtml(mcq.explanation || "No Answer Defined")}</span>
-                        </div>
+                        <div class="flex-shrink-0 bg-amber-200 rounded-full p-1 mr-3 text-amber-700"><i class="fas fa-exclamation text-xs"></i></div>
+                        <div class="font-semibold text-amber-900 text-sm">Note: <span class="text-amber-800">${escapeHtml(mcq.explanation || "No Answer Defined")}</span></div>
                     </div>`;
             }
+
+            // --- NEW: DISPLAY NOTE BELOW ANSWER ---
+            let noteHtml = '';
+            if (mcq.note) {
+                noteHtml = `
+                    <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+                        <span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(mcq.note)}
+                    </div>
+                `;
+            }
+            // --------------------------------------
 
             html += `
                 <div class="study-card">
                     <div class="study-question text-gray-900 font-medium">
                         <span class="text-indigo-600 font-bold mr-1">${index + 1}.</span>${escapeHtml(mcq.question)}
                     </div>
-
                     <div class="study-options">
                         ${mcq.options.map((opt, i) => `
-                            <div class="study-opt text-gray-900">
-                                <span class="font-bold text-black mr-2">${getOptionLabel(i, mcq.question)}.</span>
-                                ${escapeHtml(opt)}
-                            </div>
+                            <div class="study-opt text-gray-900"><span class="font-bold text-black mr-2">${getOptionLabel(i, mcq.question)}.</span>${escapeHtml(opt)}</div>
                         `).join('')}
                     </div>
-
                     <div class="mt-4 pt-2 border-t border-dashed border-gray-200">
                         ${answerHtml}
+                        ${noteHtml} 
                     </div>
                 </div>
             `;
         });
+		
         viewMcqContent.innerHTML = html;
 
     } catch (error) {
@@ -4692,6 +4728,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                     options: [...mcq.options],
                     correctAnswer: mcq.correctAnswer,
 					explanation: mcq.explanation || null,
+					note: mcq.note || null,
                     userAnswer: null,
                     isCorrect: null
                 }));
@@ -4935,6 +4972,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                     options: [...mcq.options],
                     correctAnswer: mcq.correctAnswer,
 					explanation: mcq.explanation || null,
+					note: mcq.note || null,
                     userAnswer: null,
                     isCorrect: null
                 }));
@@ -7539,6 +7577,7 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
         options: [...mcq.options],
         correctAnswer: mcq.correctAnswer,
 		explanation: mcq.explanation || null,
+		note: mcq.note || null,
         userAnswer: null,
         isCorrect: null
     }));
@@ -7723,7 +7762,7 @@ if (viewMcqTestBtn) {
         currentMcqData = mcqData;
         currentVocabData = null;
         currentQuizQuestions = currentMcqData.map(mcq => ({ 
-            question: mcq.question, options: [...mcq.options], correctAnswer: mcq.correctAnswer, explanation: mcq.explanation || null, userAnswer: null, isCorrect: null 
+            question: mcq.question, options: [...mcq.options], correctAnswer: mcq.correctAnswer, explanation: mcq.explanation || null, note: mcq.note || null, userAnswer: null, isCorrect: null 
         }));
         
         const totalTime = currentQuizQuestions.length * 36;
