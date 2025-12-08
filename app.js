@@ -4298,7 +4298,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
 		
 		
-       // 3. ✨ The Magic Parser Function (UPDATED: Extracts Notes/Explanations)
+       // 3. ✨ The Magic Parser Function (UPDATED: Detects Bracket Notes)
         function parseMcqText(text) {
             let cleanText = text.replace(/\n*([০-৯0-9]+\.)/g, '\n$1');
             const mcqData = [];
@@ -4315,18 +4315,31 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     let rawAnswerLine = match[7].trim();
                     let noteText = null;
 
-                    // --- NOTE PARSING LOGIC ---
-                    // Regex to find "Note:", "NB:", "Explanation:", "ব্যাখ্যা:", etc. (Case insensitive)
-                    const noteSplitRegex = /\n\s*(?:Note|NB|N\.B\.|Explanation|Ex|Exp|ব্যাখ্যা|দ্রষ্টব্য)\s*:\s*/i;
+                    // --- NOTE PARSING LOGIC (UPDATED) ---
+                    
+                    // 1. Check for Explicit Keywords (Note:, NB:, Explanation:, etc.)
+                    // We split by newline or spaces to catch "c Note:..." or multi-line notes
+                    const noteSplitRegex = /(?:[\n\s]+)(?:Note|NB|N\.B\.|Explanation|Ex|Exp|ব্যাখ্যা|দ্রষ্টব্য)\s*[:\-]?\s*/i;
                     const splitMatch = rawAnswerLine.split(noteSplitRegex);
 
                     if (splitMatch.length > 1) {
-                        // Part 0 is the answer, Part 1 (and rest) is the note
+                        // Case A: Found a keyword
                         rawAnswerLine = splitMatch[0].trim();
-                        // Re-join the rest in case the note itself had a similar pattern (rare)
-                        noteText = splitMatch.slice(1).join(' ').trim(); 
+                        noteText = splitMatch.slice(1).join(' ').trim();
+                    } else {
+                        // Case B: No keyword found, check for Implicit Brackets (...)
+                        // Looks for: "Answer (Note text)" pattern at the end of the string
+                        const bracketRegex = /^(.*?)\s*\((.+)\)$/s; // 's' flag allows dot to match newlines if needed
+                        const bracketMatch = rawAnswerLine.match(bracketRegex);
+                        
+                        if (bracketMatch) {
+                            // bracketMatch[1] = Answer (e.g., "c")
+                            // bracketMatch[2] = Note content (e.g., "বইয়ের উত্তরে...")
+                            rawAnswerLine = bracketMatch[1].trim();
+                            noteText = bracketMatch[2].trim();
+                        }
                     }
-                    // --------------------------
+                    // ------------------------------------
 
                     const answerStringLower = rawAnswerLine.toLowerCase();
                     let correctAnswer = null;
@@ -4357,8 +4370,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         question: question, 
                         options: options, 
                         correctAnswer: correctAnswer, 
-                        explanation: (correctAnswer ? null : rawAnswerLine), // If no match, treat text as error/note
-                        note: noteText // <-- NEW FIELD
+                        explanation: (correctAnswer ? null : rawAnswerLine),
+                        note: noteText 
                     });
                     
                 } catch (e) {
@@ -4367,6 +4380,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             }
             return mcqData;
         }
+		
 		
 		
 		
