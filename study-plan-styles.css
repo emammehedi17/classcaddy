@@ -3239,3 +3239,29 @@ body.dark-mode #bcs-timer-display {
     overflow-y: auto !important; /* Adds scrollbar if content exceeds height */
     display: block !important;   /* Ensures standard block layout */
 }
+
+/* --- FIX: MCQ Explanation Box Dark Mode --- */
+
+/* 1. Target the Container (Background & Border) */
+/* Applies to: Study Modal, Quiz Screen, and Review Screen */
+body.dark-mode .study-card .bg-blue-50,
+body.dark-mode #quiz-options-container .bg-blue-50,
+body.dark-mode .review-item .bg-blue-50 {
+    background-color: #1e1e24 !important; /* Very Dark Blue/Gray */
+    border-color: #3b82f6 !important;     /* Bright Blue Border */
+    color: #e0f2fe !important;            /* Light Blue Text */
+}
+
+/* 2. Target the Text inside (Overrides blue-800 text color) */
+body.dark-mode .study-card .text-blue-800,
+body.dark-mode #quiz-options-container .text-blue-800,
+body.dark-mode .review-item .text-blue-600 {
+    color: #bae6fd !important; /* Sky Blue (Readable on dark) */
+}
+
+/* 3. Target the Icon inside */
+body.dark-mode .study-card .bg-blue-50 .fa-info-circle,
+body.dark-mode #quiz-options-container .bg-blue-50 .fa-info-circle,
+body.dark-mode .review-item .bg-blue-50 .fa-info-circle {
+    color: #3b82f6 !important; /* Bright Blue Icon */
+}
