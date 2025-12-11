@@ -4142,7 +4142,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         const viewMcqModal = document.getElementById('view-mcq-modal');
         const viewMcqContent = document.getElementById('view-mcq-content');
 
-       // 1. "Add/Edit MCQ" Button Handler (UPDATED: Handles Delete Button Visibility)
+       // 1. "Add/Edit MCQ" Button Handler (UPDATED: Shows Notes in Edit Mode)
         async function openAddMcqModal(monthId, weekId, dayIndex, rowIndex) {
             currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
             mcqPasteTextarea.value = ''; 
@@ -4161,10 +4161,24 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             if (button && button.dataset.tempMcq) {
                 const localData = JSON.parse(button.dataset.tempMcq);
                 const rawText = localData.map((mcq, index) => {
-                    const options = mcq.options.map((opt, i) => `${['ক', 'খ', 'গ', 'ঘ'][i]}. ${opt}`).join('\n');
-                    const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
-                    const correctPrefix = correctIndex !== -1 ? ['ক', 'খ', 'গ', 'ঘ'][correctIndex] : '??';
-                    return `${index + 1}. ${mcq.question}\n${options}\nসঠিক উত্তর: ${correctPrefix}. ${mcq.correctAnswer}\n`;
+                    const options = mcq.options.map((opt, i) => `${['a', 'b', 'c', 'd'][i]}. ${opt}`).join('\n');
+                    
+                    let answerLine = "";
+                    if (mcq.correctAnswer) {
+                        const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+                        const correctPrefix = correctIndex !== -1 ? ['a', 'b', 'c', 'd'][correctIndex] : '??';
+                        answerLine = `Correct answer: ${correctPrefix}. ${mcq.correctAnswer}`;
+                    } else {
+                        answerLine = `Correct answer: ${mcq.explanation || 'Cancelled'}`;
+                    }
+
+                    // --- FIX: Append Note if exists ---
+                    if (mcq.note) {
+                        answerLine += `\nNote: ${mcq.note}`;
+                    }
+                    // ---------------------------------
+
+                    return `${index + 1}. ${mcq.question}\n${options}\n${answerLine}\n`;
                 }).join('\n');
                 
                 mcqPasteTextarea.value = rawText;
@@ -4182,10 +4196,24 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         
                         if (mcqData && mcqData.length > 0) {
                             const rawText = mcqData.map((mcq, index) => {
-                                const options = mcq.options.map((opt, i) => `${['ক', 'খ', 'গ', 'ঘ'][i]}. ${opt}`).join('\n');
-                                const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
-                                const correctPrefix = correctIndex !== -1 ? ['ক', 'খ', 'গ', 'ঘ'][correctIndex] : '??';
-                                return `${index + 1}. ${mcq.question}\n${options}\nসঠিক উত্তর: ${correctPrefix}. ${mcq.correctAnswer}\n`;
+                                const options = mcq.options.map((opt, i) => `${['a', 'b', 'c', 'd'][i]}. ${opt}`).join('\n');
+                                
+                                let answerLine = "";
+                                if (mcq.correctAnswer) {
+                                    const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+                                    const correctPrefix = correctIndex !== -1 ? ['a', 'b', 'c', 'd'][correctIndex] : '??';
+                                    answerLine = `Correct answer: ${correctPrefix}. ${mcq.correctAnswer}`;
+                                } else {
+                                    answerLine = `Correct answer: ${mcq.explanation || 'Cancelled'}`;
+                                }
+
+                                // --- FIX: Append Note if exists ---
+                                if (mcq.note) {
+                                    answerLine += `\nNote: ${mcq.note}`;
+                                }
+                                // ---------------------------------
+
+                                return `${index + 1}. ${mcq.question}\n${options}\n${answerLine}\n`;
                             }).join('\n');
                             
                             mcqPasteTextarea.value = rawText;
@@ -4199,14 +4227,12 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
             }
 
-            // Show Delete button if data exists
             if (hasData) {
                 deleteBtn.classList.remove('hidden');
             }
 
             addMcqModal.style.display = 'block';
         }
-		
 		
         // 2. Modal "Parse & Save" Handler (UPDATED: With Validation)
         saveMcqBtn.addEventListener('click', () => { 
@@ -8086,12 +8112,10 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     });
 }
 
-// --- MCQ COPY FUNCTIONALITY ---
-
-// Helper to format MCQs for clipboard
+// Helper to format MCQs for clipboard (UPDATED: Includes Notes)
 function formatMcqsForClipboard(mcqs) {
     return mcqs.map((mcq, index) => {
-        // 1. Format Options (a. OptionText...)
+        // 1. Format Options
         const optionsText = mcq.options.map((opt, i) => {
             const label = getOptionLabel(i, mcq.question); 
             return `${label}. ${opt}`;
@@ -8102,17 +8126,21 @@ function formatMcqsForClipboard(mcqs) {
         if (mcq.correctAnswer) {
             const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
             const label = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
-            // Output format: "Correct answer: b. OptionText"
             answerLine = `Correct answer: ${label}. ${mcq.correctAnswer}`;
         } else {
-            // Output format for cancelled/explained questions
             answerLine = `Correct answer: ${mcq.explanation || 'Cancelled'}`;
         }
 
-        // 3. Combine
+        // 3. Format Note (NEW)
+        if (mcq.note) {
+            answerLine += `\nNote: ${mcq.note}`;
+        }
+
+        // 4. Combine
         return `${index + 1}. ${mcq.question}\n${optionsText}\n${answerLine}`;
     }).join('\n\n');
 }
+
 
 // Handler for Copy Buttons
 async function handleMcqCopy(data) {
