@@ -1984,30 +1984,33 @@ function updateMonthUI(monthId, monthData, weeksData) {
              }
         }
 
-        // Save Day Plan
-        /**
-         * ধাপ ১ (নতুন): DOM থেকে ডেটা পড়ে এবং সেভের জন্য প্রস্তুত করে (Synchronous)
+/**
+         * Step 1 (Optimized): Parse DOM and prepare save data using LOCAL CACHE (Instant)
          */
-        /**
-         * ধাপ ১ (নতুন): DOM থেকে ডেটা পড়ে এবং সেভের জন্য প্রস্তুত করে (Synchronous)
-         */
-        // Step 1: Parse DOM and prepare data (UPDATED: Reads Temp MCQs)
         async function parseAndPrepareSaveData(daySection, weekId, isCheckboxClick = false) {
             try {
                 const dayIndex = parseInt(daySection.dataset.dayIndex);
                 
-                // Fetch fresh data
-                const monthId = daySection.closest('.card[data-month-id]').dataset.monthId;
-                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
-                const weekDocSnap = await getDoc(weekDocRef);
-                if (!weekDocSnap.exists()) throw new Error("Week document not found for parsing.");
+                // --- OPTIMIZATION: Read from Cache instead of Network ---
+                // We use the cache we populated in displayMonthPlan
+                let freshDaysArray = [];
                 
-                const freshDaysArray = weekDocSnap.data().days || [];
+                if (activeWeeksDataCache && activeWeeksDataCache[weekId] && activeWeeksDataCache[weekId].days) {
+                    // Use a deep copy to avoid mutating cache directly before we are ready
+                    freshDaysArray = JSON.parse(JSON.stringify(activeWeeksDataCache[weekId].days));
+                } else {
+                    // Fallback: If cache is missing (rare), throw error to be safe
+                    console.error("Cache miss during save. Cannot proceed instant save.");
+                    showCustomAlert("Error: Data not loaded. Please refresh.");
+                    return null;
+                }
+                
                 const currentDayData = freshDaysArray[dayIndex];
                 
                 if (!currentDayData) {
-                    throw new Error(`Day data for index ${dayIndex} not found.`);
+                    throw new Error(`Day data for index ${dayIndex} not found in cache.`);
                 }
+                // -------------------------------------------------------
                 
                 const updatedRows = [];
                 const rowElements = daySection.querySelectorAll('tbody tr');
@@ -2031,16 +2034,13 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          
                          story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
                          
-                         // --- FIX: Check for Temporary MCQ Data on the button ---
+                         // Check for Temporary MCQ Data on the button
                          const mcqBtn = row.querySelector('.add-row-mcq-btn');
                          if (mcqBtn && mcqBtn.dataset.tempMcq) {
-                             // CASE A: User just added/edited MCQs in this session
                              mcqData = JSON.parse(mcqBtn.dataset.tempMcq);
                          } else {
-                             // CASE B: No change, keep existing DB data
                              mcqData = existingRowData.mcqData || null;
                          }
-                         // ------------------------------------------------------
 
                          if (row.classList.contains('vocab-row')) {
                              subject = 'Vocabulary';
@@ -2077,7 +2077,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
             } catch (error) {
                 console.error("Error parsing day plan from DOM:", error);
-                showCustomAlert("Error reading data from fields. Cannot save.");
+                showCustomAlert("Error reading data. Cannot save.");
                 return null;
             }
         }
