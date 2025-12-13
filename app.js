@@ -66,6 +66,7 @@
 
         const authContainerDesktop = document.getElementById('auth-container-desktop');
         const authContainerMobile = document.getElementById('auth-container-mobile');
+		let activeWeeksDataCache = {};
 
         // Header navigation elements
         const pageHeader = document.querySelector('header.main-website-ui');
@@ -755,6 +756,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          weeksData[doc.id] = doc.data();
                      });
                      
+					 activeWeeksDataCache = weeksData;
+					 
                      console.log("Fetched month data and", weeksQuerySnapshot.size, "week documents.");
 
                      // 4. Check for structural changes (new/deleted WEEKS)
@@ -1884,29 +1887,39 @@ function updateMonthUI(monthId, monthData, weeksData) {
              if (enterEditMode) {
                  // --- ENTERING EDIT MODE ---
                  daySection.classList.add('editing');
-				 daySection.classList.remove('is-collapsed'); // Force expand on edit
-                 editButton.classList.add('hidden'); // Hide Edit button
-                 editModeControls.classList.remove('hidden'); // Show controls (including Save)
+				 daySection.classList.remove('is-collapsed'); 
+                 editButton.classList.add('hidden'); 
+                 editModeControls.classList.remove('hidden'); 
                  deleteDayButton.classList.remove('hidden');
                  actionsHeader.classList.remove('hidden');
                  completionPercHeader.classList.remove('hidden');
 
-                 // --- START: MODIFIED ---
-                 // Fetch the specific WEEK document
-                 const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
-                 const weekDocSnap = await getDoc(weekDocRef);
-                 const dayData = weekDocSnap.exists() ? weekDocSnap.data().days[dayIndex] : null;
+                 // --- START: MODIFIED (INSTANT LOAD) ---
+                 let dayData = null;
+                 
+                 // 1. Try Global Cache First (Instant)
+                 if (activeWeeksDataCache && activeWeeksDataCache[weekId] && activeWeeksDataCache[weekId].days) {
+                     dayData = activeWeeksDataCache[weekId].days[dayIndex];
+                 }
+
+                 // 2. Fallback to Network if cache fails (Safety Net)
+                 if (!dayData) {
+                     console.warn("Cache miss. Fetching from network...");
+                     const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                     const weekDocSnap = await getDoc(weekDocRef);
+                     dayData = weekDocSnap.exists() ? weekDocSnap.data().days[dayIndex] : null;
+                 }
                  // --- END: MODIFIED ---
                  
                  if (!dayData) { console.error("Could not find day data to edit."); setSyncStatus("Error", "red"); return; }
 
                  tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
-                    createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, true) // Render in edit mode
+                    createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, true) 
                  ).join('');
                  daySection.querySelectorAll('.completion-checkbox').forEach(cb => cb.disabled = true);
                  setSyncStatus("Editing...", "blue");
 
-                 // --- AUTOSAVE LOGIC (START) ---
+                 // ... (Autosave logic remains the same) ...
                  const autosaveHandler = (e) => {
                      if (e.target.classList.contains('editable-input') || e.target.classList.contains('vocab-input')) {
                          if (autosaveTimer) clearTimeout(autosaveTimer);
@@ -1918,9 +1931,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  };
                  daySection.addEventListener('input', autosaveHandler);
                  daySection.autosaveHandler = autosaveHandler;
-                 // --- AUTOSAVE LOGIC (END) ---
+             }
 
-             } else {
+			 else {
                  // --- SAVING AND EXITING EDIT MODE (OPTIMISTIC) ---
                  
                  // 1. Stop autosave
@@ -2131,6 +2144,14 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 // 4. Run all saves at the same time
                 await Promise.all(savePromises);
                 
+				if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
+                    // updatePayload.days contains the full updated array for this week
+                    if (updatePayload.days) {
+                        activeWeeksDataCache[weekId].days = updatePayload.days;
+                        console.log("Global cache updated with saved data.");
+                    }
+                }
+				
                 if (wasCheckboxClick) {
                     console.log("Updated lastCompletedDay timestamp on month doc.");
                 }
