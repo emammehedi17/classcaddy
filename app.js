@@ -8253,3 +8253,16 @@ document.getElementById('copy-view-mcq-btn')?.addEventListener('click', () => {
 document.getElementById('copy-study-mcq-btn')?.addEventListener('click', () => {
     handleMcqCopy(currentStudyViewData);
 });
+
+// --- PREVENT ACCIDENTAL DATA LOSS ---
+// This checks the Sync Status text before allowing a refresh.
+window.addEventListener('beforeunload', function (e) {
+    const statusText = document.getElementById('sync-status-text');
+    
+    // If the status is "Syncing..." (yellow) or "Unsaved changes" (yellow), warn the user.
+    if (statusText && (statusText.textContent.includes('Syncing') || statusText.textContent.includes('Unsaved'))) {
+        // Standard browser command to trigger the "Are you sure?" dialog
+        e.preventDefault(); 
+        e.returnValue = ''; 
+    }
+});
