@@ -1984,33 +1984,38 @@ function updateMonthUI(monthId, monthData, weeksData) {
              }
         }
 
-/**
-         * Step 1 (Optimized): Parse DOM and prepare save data using LOCAL CACHE (Instant)
+		/**
+         * Step 1 (Robust): Parse DOM and prepare save data (Cache First -> Network Fallback)
          */
         async function parseAndPrepareSaveData(daySection, weekId, isCheckboxClick = false) {
             try {
                 const dayIndex = parseInt(daySection.dataset.dayIndex);
-                
-                // --- OPTIMIZATION: Read from Cache instead of Network ---
-                // We use the cache we populated in displayMonthPlan
                 let freshDaysArray = [];
                 
-                if (activeWeeksDataCache && activeWeeksDataCache[weekId] && activeWeeksDataCache[weekId].days) {
-                    // Use a deep copy to avoid mutating cache directly before we are ready
+                // 1. Try Reading from Cache (Instant)
+                if (typeof activeWeeksDataCache !== 'undefined' && activeWeeksDataCache[weekId] && activeWeeksDataCache[weekId].days) {
+                    // Deep copy from cache
                     freshDaysArray = JSON.parse(JSON.stringify(activeWeeksDataCache[weekId].days));
-                } else {
-                    // Fallback: If cache is missing (rare), throw error to be safe
-                    console.error("Cache miss during save. Cannot proceed instant save.");
-                    showCustomAlert("Error: Data not loaded. Please refresh.");
-                    return null;
+                } 
+                // 2. Fallback to Network (Safe) - If cache is missing/empty
+                else {
+                    console.log("Cache miss during save. Fetching from network...");
+                    const monthId = daySection.closest('.card[data-month-id]').dataset.monthId;
+                    const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                    const weekDocSnap = await getDoc(weekDocRef);
+                    
+                    if (weekDocSnap.exists()) {
+                        freshDaysArray = weekDocSnap.data().days || [];
+                    } else {
+                        throw new Error("Week document not found.");
+                    }
                 }
                 
                 const currentDayData = freshDaysArray[dayIndex];
                 
                 if (!currentDayData) {
-                    throw new Error(`Day data for index ${dayIndex} not found in cache.`);
+                    throw new Error(`Day data for index ${dayIndex} not found.`);
                 }
-                // -------------------------------------------------------
                 
                 const updatedRows = [];
                 const rowElements = daySection.querySelectorAll('tbody tr');
@@ -2081,7 +2086,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 return null;
             }
         }
-
+		
+		
         /**
          * ধাপ ২ (নতুন): ডেটাবেসে সেভ করে (Asynchronous)
          */
