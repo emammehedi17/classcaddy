@@ -1959,6 +1959,14 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  
                  const { updatedRows, updatePayload } = parseResult;
 
+                 // --- START: FIX (Instant Cache Update) ---
+                 // Update the cache immediately so re-entering Edit mode works instantly
+                 if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
+                     activeWeeksDataCache[weekId].days = updatePayload.days;
+                     console.log("Global cache updated instantly (Optimistic Save).");
+                 }
+                 // --- END: FIX ---
+
                  // 5. Update UI instantly
                  daySection.classList.remove('editing');
 				 daySection.classList.add('saving');
@@ -1982,7 +1990,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  saveDataToFirebase(monthDocRef, updatePayload, false);
 				 daySection.classList.remove('saving');
              }
-        }
+			 
+		}
 
 		/**
          * Step 1 (Robust): Parse DOM and prepare save data (Cache First -> Network Fallback)
@@ -2174,7 +2183,29 @@ function updateMonthUI(monthId, monthData, weeksData) {
             }
         }
 		
-		
+	
+	// Missing Function: Handles Autosave (Background Save without UI toggle)
+        async function saveDayPlan(monthId, weekId, daySection, isAutosave = true) {
+            try {
+                // 1. Parse data from DOM
+                const parseResult = await parseAndPrepareSaveData(daySection, weekId);
+                if (!parseResult) return;
+
+                const { updatedRows, updatePayload } = parseResult;
+
+                // 2. Update Cache Instantly (Crucial for Autosave too)
+                if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
+                    activeWeeksDataCache[weekId].days = updatePayload.days;
+                }
+
+                // 3. Save to Firebase
+                const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
+                await saveDataToFirebase(monthDocRef, updatePayload, isAutosave);
+
+            } catch (error) {
+                console.error("Autosave failed:", error);
+            }
+        }
         
 
          // Add Row (normal or vocab)
