@@ -2455,7 +2455,7 @@ function addVocabPairInputs(container, word = '', meaning = '') {
              confirmModal.style.display = 'block';
          }
 
-        // Add New Day
+        // Add New Day (UPDATED: Copies Comments)
         async function addNewDay(monthId, weekId, weekSection) {
             if (!currentUser || !userId) return;
             
@@ -2467,7 +2467,7 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  const weekDocSnap = await getDoc(weekDocRef);
                  let daysArray = [];
                  let newDayData;
-                 let newDayIndex = 0; // The index for the new day
+                 let newDayIndex = 0; 
 
                  if (weekDocSnap.exists()) {
                      daysArray = weekDocSnap.data().days || [];
@@ -2477,45 +2477,49 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                          return; 
                      }
                      
-                     newDayIndex = daysArray.length; // The new day will be at this index
+                     newDayIndex = daysArray.length; 
                      
                      const lastDayIndex = daysArray.length - 1;
                      if (lastDayIndex >= 0) {
                          const lastDayRows = daysArray[lastDayIndex].rows || [];
-                         newDayData = { dayNumber: daysArray.length + 1, date: '', rows: lastDayRows.map(row => ({ subject: row.subject || '', topic: (row.subject?.toLowerCase() === 'vocabulary') ? null : (row.topic || ''), completed: false, comment: '', completionPercentage: row.completionPercentage ?? null, vocabData: (row.subject?.toLowerCase() === 'vocabulary') ? (row.vocabData || null) : null, story: null })) };
+                         newDayData = { 
+                             dayNumber: daysArray.length + 1, 
+                             date: '', 
+                             rows: lastDayRows.map(row => ({ 
+                                 subject: row.subject || '', 
+                                 topic: (row.subject?.toLowerCase() === 'vocabulary') ? null : (row.topic || ''), 
+                                 completed: false, 
+                                 comment: row.comment || '', // <--- FIX: Copy comment from previous day
+                                 completionPercentage: row.completionPercentage ?? null, 
+                                 vocabData: (row.subject?.toLowerCase() === 'vocabulary') ? (row.vocabData || null) : null, 
+                                 story: null 
+                             })) 
+                         };
                      } else {
+                         // First day defaults
                          newDayData = { dayNumber: 1, date: '', rows: [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }] };
                      }
                      
                      await updateDoc(weekDocRef, { days: arrayUnion(newDayData) });
                      
                  } else {
-                     // newDayIndex is already 0
                      newDayData = { dayNumber: 1, date: '', rows: [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }] };
                      await setDoc(weekDocRef, { days: [newDayData] });
                  }
                  
                  console.log("New day added successfully.");
                  
-                 // --- START: NEW UI FIX ---
-                 // Manually build and insert the new day's HTML
-                 
-                 // 1. Create the new day's HTML
+                 // --- UI UPDATE LOGIC ---
                  const newDayHtml = createDayElement(monthId, weekId, newDayIndex, newDayData);
-                 
-                 // 2. Find the days container
                  const daysContainer = weekSection.querySelector('.days-container');
                  if (!daysContainer) return;
 
-                 // 3. If this is the first day, clear the "No days" message
                  if (newDayIndex === 0) {
                      daysContainer.innerHTML = '';
                  }
                  
-                 // 4. Insert the new day
                  daysContainer.insertAdjacentHTML('beforeend', newDayHtml);
 
-                 // 5. Update the "Add Day" button
                  const totalDays = newDayIndex + 1;
                  const buttonContainer = weekSection.querySelector('.days-container').nextElementSibling;
                  let newButtonHtml = '';
@@ -2528,24 +2532,19 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                      buttonContainer.outerHTML = newButtonHtml;
                  }
 
-                 // 6. Expand the new day (using the accordion logic)
                  const newDayElement = daysContainer.querySelector(`[data-day-index="${newDayIndex}"]`);
                  if (newDayElement) {
-                     // Find parent month and collapse all others
                      const monthElement = newDayElement.closest('.card[data-month-id]');
                      if (monthElement) {
                         monthElement.querySelectorAll('.day-section:not(.is-collapsed)').forEach(openDay => {
                             openDay.classList.add('is-collapsed');
                         });
                      }
-                     // Expand the new day
                      newDayElement.classList.remove('is-collapsed');
-                     // Scroll to it smoothly
                      newDayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                  }
                  
                  setSyncStatus("Synced", "green");
-                 // --- END: NEW UI FIX ---
                  
              } catch (error) { 
                  console.error("Error adding new day:", error); 
@@ -2553,7 +2552,8 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  setSyncStatus("Error", "red"); 
              }
         }
-
+		
+		
         // --- Monthly Target Edit ---
         function handleEditTargets(button, monthId) {
             const isEditing = button.dataset.editing === 'true';
