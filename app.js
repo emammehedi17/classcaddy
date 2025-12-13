@@ -2455,7 +2455,7 @@ function addVocabPairInputs(container, word = '', meaning = '') {
              confirmModal.style.display = 'block';
          }
 
-        // Add New Day (UPDATED: Copies Comments)
+       // Add New Day (UPDATED: Copies Previous Week's Last Day if Week is New)
         async function addNewDay(monthId, weekId, weekSection) {
             if (!currentUser || !userId) return;
             
@@ -2466,44 +2466,69 @@ function addVocabPairInputs(container, word = '', meaning = '') {
             try {
                  const weekDocSnap = await getDoc(weekDocRef);
                  let daysArray = [];
-                 let newDayData;
-                 let newDayIndex = 0; 
-
+                 
+                 // 1. Get current days to determine index
                  if (weekDocSnap.exists()) {
                      daysArray = weekDocSnap.data().days || [];
-                     if (daysArray.length >= 7) { 
-                         showCustomAlert("You cannot add more than 7 days to a week."); 
-                         setSyncStatus("Synced", "green"); 
-                         return; 
-                     }
-                     
-                     newDayIndex = daysArray.length; 
-                     
-                     const lastDayIndex = daysArray.length - 1;
-                     if (lastDayIndex >= 0) {
-                         const lastDayRows = daysArray[lastDayIndex].rows || [];
-                         newDayData = { 
-                             dayNumber: daysArray.length + 1, 
-                             date: '', 
-                             rows: lastDayRows.map(row => ({ 
-                                 subject: row.subject || '', 
-                                 topic: (row.subject?.toLowerCase() === 'vocabulary') ? null : (row.topic || ''), 
-                                 completed: false, 
-                                 comment: row.comment || '', // <--- FIX: Copy comment from previous day
-                                 completionPercentage: row.completionPercentage ?? null, 
-                                 vocabData: (row.subject?.toLowerCase() === 'vocabulary') ? (row.vocabData || null) : null, 
-                                 story: null 
-                             })) 
-                         };
-                     } else {
-                         // First day defaults
-                         newDayData = { dayNumber: 1, date: '', rows: [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }] };
-                     }
-                     
-                     await updateDoc(weekDocRef, { days: arrayUnion(newDayData) });
-                     
+                 }
+                 
+                 if (daysArray.length >= 7) { 
+                     showCustomAlert("You cannot add more than 7 days to a week."); 
+                     setSyncStatus("Synced", "green"); 
+                     return; 
+                 }
+
+                 let sourceRows = [];
+
+                 // 2. DETERMINE SOURCE DATA
+                 if (daysArray.length > 0) {
+                     // CASE A: Week already has days. Copy the last day of THIS week.
+                     sourceRows = daysArray[daysArray.length - 1].rows || [];
                  } else {
-                     newDayData = { dayNumber: 1, date: '', rows: [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }] };
+                     // CASE B: Week is empty. Check if we can copy from the PREVIOUS week.
+                     const currentWeekNum = parseInt(weekId.replace('week', '')); // e.g., 2
+                     
+                     if (currentWeekNum > 1) {
+                         const prevWeekId = `week${currentWeekNum - 1}`;
+                         const prevWeekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', prevWeekId);
+                         const prevWeekSnap = await getDoc(prevWeekDocRef);
+                         
+                         if (prevWeekSnap.exists()) {
+                             const prevDays = prevWeekSnap.data().days || [];
+                             if (prevDays.length > 0) {
+                                 // Found data in previous week! Use its last day.
+                                 sourceRows = prevDays[prevDays.length - 1].rows || [];
+                                 console.log(`Copied data from ${prevWeekId} for new ${weekId} day.`);
+                             }
+                         }
+                     }
+                 }
+
+                 // 3. Fallback if no source found (e.g., Week 1 Day 1)
+                 if (sourceRows.length === 0) {
+                     sourceRows = [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }];
+                 }
+
+                 // 4. Create the new day object
+                 const newDayIndex = daysArray.length;
+                 const newDayData = { 
+                     dayNumber: newDayIndex + 1, 
+                     date: '', 
+                     rows: sourceRows.map(row => ({ 
+                         subject: row.subject || '', 
+                         topic: (row.subject?.toLowerCase() === 'vocabulary') ? null : (row.topic || ''), 
+                         completed: false, 
+                         comment: row.comment || '', // Copies comment as requested previously
+                         completionPercentage: row.completionPercentage ?? null, 
+                         vocabData: (row.subject?.toLowerCase() === 'vocabulary') ? (row.vocabData || null) : null, 
+                         story: null 
+                     })) 
+                 };
+                 
+                 // 5. Save to Firebase
+                 if (weekDocSnap.exists()) {
+                     await updateDoc(weekDocRef, { days: arrayUnion(newDayData) });
+                 } else {
                      await setDoc(weekDocRef, { days: [newDayData] });
                  }
                  
@@ -2552,6 +2577,7 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  setSyncStatus("Error", "red"); 
              }
         }
+		
 		
 		
         // --- Monthly Target Edit ---
