@@ -2,7 +2,7 @@
         // Import necessary functions from Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, signInWithCustomToken, signInAnonymously, getRedirectResult, signInWithRedirect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, setDoc, doc, getDoc, collection, query, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, setDoc, doc, getDoc, collection, query, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 		
         // --- Firebase Configuration ---
         setLogLevel('debug'); // Keep debug logging enabled for now
@@ -33,6 +33,18 @@
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
+            
+            // --- NEW: ENABLE OFFLINE PERSISTENCE ---
+            enableIndexedDbPersistence(db)
+                .catch((err) => {
+                    if (err.code == 'failed-precondition') {
+                        console.log('Persistence failed: Multiple tabs open.');
+                    } else if (err.code == 'unimplemented') {
+                        console.log('Persistence not supported by this browser.');
+                    }
+                });
+            // ---------------------------------------
+
             googleProvider = new GoogleAuthProvider();
             console.log("Firebase initialized successfully.");
         } catch (error) {
