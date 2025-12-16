@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>কপ (COP) সম্মেলন ও জলবায়ু কূটনীতি - বিস্তারিত নোট</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2E7D32; /* Forest Green */
+            --secondary-color: #1565C0; /* Ocean Blue */
+            --accent-color: #F9A825; /* Sun Yellow/Gold */
+            --ai-color: #673AB7; /* Deep Purple for AI */
+            --bg-color: #F3F4F6;
+            --text-color: #333333;
+            --card-bg: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.8;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header Section */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.8rem;
+            font-weight: 700;
+        }
+
+        header p {
+            margin-top: 15px;
+            font-size: 1.3rem;
+            opacity: 0.95;
+        }
+
+        /* Container */
+        .container {
+            max-width: 950px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Card Style */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            border-left: 6px solid var(--primary-color);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 15px;
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+
+        h3 {
+            color: var(--secondary-color);
+            margin-top: 25px;
+            font-size: 1.4rem;
+            border-left: 3px solid var(--secondary-color);
+            padding-left: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        /* Highlight Boxes */
+        .highlight-box {
+            background-color: #E8F5E9;
+            border-left: 5px solid var(--accent-color);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .highlight-text {
+            color: #d84315;
+            font-weight: 600;
+        }
+
+        /* Timeline Style */
+        .timeline {
+            position: relative;
+            margin: 30px 0;
+            padding-left: 30px;
+            border-left: 4px solid #ddd;
+        }
+
+        .timeline-item {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .timeline-date {
+            font-weight: 700;
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Key Concepts Grid */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 768px) {
+            .concept-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .concept-card {
+            background: #FFF8E1;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #FFE0B2;
+            transition: transform 0.2s;
+        }
+        
+        .concept-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 12px;
+        }
+
+        ul li::before {
+            content: '➤';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        /* Tables */
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+        }
+        
+        .info-table th, .info-table td {
+            border: 1px solid #e0e0e0;
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .info-table th {
+            background-color: #f1f8e9;
+            color: var(--primary-color);
+            width: 30%;
+        }
+
+        /* AI Section Styles */
+        .ai-btn {
+            background-color: var(--ai-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Hind Siliguri', sans-serif;
+            font-weight: 600;
+            transition: background 0.3s;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .ai-btn:hover {
+            background-color: #512DA8;
+        }
+
+        .ai-btn:disabled {
+            background-color: #B39DDB;
+            cursor: not-allowed;
+        }
+
+        .ai-input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        .quiz-option {
+            display: block;
+            background: white;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .quiz-option:hover {
+            background: #f5f5f5;
+        }
+
+        .quiz-option.correct {
+            background: #C8E6C9;
+            border-color: #4CAF50;
+        }
+
+        .quiz-option.wrong {
+            background: #FFCDD2;
+            border-color: #F44336;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .feedback-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            border: 1px solid #eee;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.95rem;
+            background-color: #e0e0e0;
+            margin-top: 50px;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>কপ (COP) সম্মেলন ও জলবায়ু কূটনীতি</h1>
+    <p>ঐতিহাসিক প্রেক্ষাপট, বিস্তারিত সিদ্ধান্ত ও কনসেপ্ট নোট</p>
+</header>
+
+<div class="container">
+
+    <!-- Section 1: Detailed Historic Background -->
+    <section class="card">
+        <h2>১. ঐতিহাসিক প্রেক্ষাপট ও সম্মেলনের ধারাবাহিকতা</h2>
+        <p>দ্বিতীয় বিশ্বযুদ্ধের পর জাতিরাষ্ট্রগুলোর উত্থান এবং পরবর্তীতে অপরিকল্পিত শিল্পায়ন ও নগরায়নের ফলে বৈশ্বিক উষ্ণায়ন ও জলবায়ু পরিবর্তন এক ভয়াবহ রূপ ধারণ করে। এই সংকট মোকাবেলায় বিশ্বনেতারা একত্রিত হয়ে বিভিন্ন সময়ে গুরুত্বপূর্ণ সম্মেলন আয়োজন করেন।</p>
+        
+        <div class="timeline">
+            <div class="timeline-item">
+                <span class="timeline-date">১৯৭২: স্টকহোম সম্মেলন (সূচনা)</span>
+                সুইডেনের স্টকহোমে জাতিসংঘের মানব পরিবেশ বিষয়ক প্রথম সম্মেলন অনুষ্ঠিত হয়। এটিই ছিল পরিবেশ রক্ষার বৈশ্বিক প্রচেষ্টার প্রথম ধাপ।
+            </div>
+
+            <div class="timeline-item">
+                <span class="timeline-date">১৯৯২: ধরিত্রী সম্মেলন (Earth Summit)</span>
+                <strong>স্থান:</strong> রিও ডি জেনিরো, ব্রাজিল।<br>
+                এই সম্মেলনে জলবায়ু পরিবর্তন মোকাবেলার জন্য একটি কাঠামো তৈরি করা হয় যা <strong>UNFCCC</strong> (United Nations Framework Convention on Climate Change) নামে পরিচিত। এই সংস্থার অধীনেই প্রতিবছর কপ সম্মেলন অনুষ্ঠিত হয়।
+            </div>
+
+            <div class="timeline-item">
+                <span class="timeline-date">১৯৯৫: কপ-১ (COP-1)</span>
+                <strong>স্থান:</strong> বার্লিন, জার্মানি।<br>
+                UNFCCC-এর সদস্য দেশগুলোর প্রথম বার্ষিক সম্মেলন বা 'Conference of the Parties'। এখান থেকেই কপের যাত্রা শুরু।
+            </div>
+
+            <div class="timeline-item">
+                <span class="timeline-date">২০০২: রিও+১০ (জোহানেসবার্গ সম্মেলন)</span>
+                <strong>স্থান:</strong> জোহানেসবার্গ, দক্ষিণ আফ্রিকা।<br>
+                ১৯৯২ সালের ধরিত্রী সম্মেলনের ১০ বছর পূর্তিতে এটি অনুষ্ঠিত হয়। এই সম্মেলনের মূল ফোকাস ছিল <strong>টেকসই উন্নয়ন (Sustainable Development)</strong>।
+            </div>
+
+            <div class="timeline-item">
+                <span class="timeline-date">২০১২: রিও+২০</span>
+                <strong>স্থান:</strong> রিও ডি জেনিরো, ব্রাজিল।<br>
+                ধরিত্রী সম্মেলনের ২০ বছর পূর্তিতে আয়োজিত। এখান থেকেই <strong>সবুজ অর্থনীতি (Green Economy)</strong> ধারণাটি জোরালোভাবে প্রতিষ্ঠিত হয়।
+            </div>
+
+            <div class="timeline-item">
+                <span class="timeline-date">২০২২: স্টকহোম+৫০</span>
+                <strong>স্থান:</strong> স্টকহোম, সুইডেন।<br>
+                <strong>নামকরণের কারণ:</strong> এটি ১৯৭২ সালে অনুষ্ঠিত প্রথম পরিবেশ সম্মেলনের (স্টকহোম সম্মেলন) ৫০ বছর পূর্তি উপলক্ষে আয়োজিত হয়। তাই একে 'রিও+৩০' না বলে 'স্টকহোম+৫০' বলা হয়।
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: SDG & Green Economy -->
+    <section class="card">
+        <h2>২. টেকসই উন্নয়ন ও সবুজ অর্থনীতি</h2>
+        
+        <div class="concept-grid">
+            <div class="concept-card">
+                <h3>সবুজ অর্থনীতি (Green Economy)</h3>
+                <p>২০১২ সালের রিও+২০ সম্মেলন থেকে এই ধারণাটি মূলধারায় আসে।</p>
+                <p><strong>সংজ্ঞা:</strong> অর্থনীতির প্রতিটি সেক্টর (কৃষি, শিল্প, পর্যটন, বনাঞ্চল) থেকে অর্থনৈতিক মুনাফা বা প্রবৃদ্ধি অর্জন করা, কিন্তু তা করতে গিয়ে পরিবেশের কোনো ক্ষতি করা যাবে না।</p>
+                <p>অর্থাৎ, কার্বন নিঃসরণ কমিয়ে এবং পরিবেশবান্ধব প্রযুক্তি ব্যবহার করে যে অর্থনৈতিক কর্মকাণ্ড পরিচালিত হয়, তাই সবুজ অর্থনীতি।</p>
+            </div>
+
+            <div class="concept-card">
+                <h3>টেকসই উন্নয়ন (Sustainable Development)</h3>
+                <p>২০০২ সালের জোহানেসবার্গ সম্মেলন (রিও+১০) এর মূল প্রতিপাদ্য।</p>
+                <p><strong>মূল কথা:</strong> বর্তমান প্রজন্মের চাহিদা মেটানোর সময় ভবিষ্যৎ প্রজন্মের জন্য প্রাকৃতিক সম্পদ ও পরিবেশকে অক্ষত রাখা।</p>
+                <p>পরিবেশ ধ্বংস করে তাৎক্ষণিক উন্নয়ন নয়, বরং দীর্ঘমেয়াদী এবং ভারসাম্যপূর্ণ উন্নয়নই এর লক্ষ্য।</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: COP 30 Details & Decisions -->
+    <section class="card">
+        <h2>৩. কপ-৩০ (২০২৫): বিস্তারিত সিদ্ধান্তসমূহ</h2>
+        <div class="highlight-box">
+            <strong>মূল স্লোগান:</strong> <span class="highlight-text">গ্লোবাল মৈত্রী (Global Maitri)</span><br>
+            এটি ব্রাজিলের আমাজন বনের আদিবাসীদের একটি শব্দ। এর অর্থ <strong>"সম্মিলিত প্রচেষ্টা" (Collective Effort)</strong>। জলবায়ু পরিবর্তন একটি 'গ্লোকাল' সমস্যা হওয়ায় এটি মোকাবেলায় একক নয়, বরং সম্মিলিত প্রচেষ্টার আহ্বান জানানো হয়েছে।
+        </div>
+
+        <h3>গৃহীত প্রধান ৪টি সিদ্ধান্ত:</h3>
+        <ul>
+            <li>
+                <strong>১. তহবিল তিনগুণ বৃদ্ধি (২০৩৫):</strong><br>
+                ২০৩৫ সালের মধ্যে জলবায়ু অর্থসহায়তা (ক্ষতি ও উপশম তহবিল, প্রযুক্তি তহবিল) বর্তমানের তুলনায় তিনগুণ বৃদ্ধি করার সিদ্ধান্ত নেওয়া হয়েছে।
+            </li>
+            <li>
+                <strong>২. জাস্ট ট্রানজিশন মেকানিজম (JTM):</strong><br>
+                শিল্পযুগীয় 'পরিবেশ বিধ্বংসী অর্থনীতি' থেকে 'সবুজ অর্থনীতিতে' রূপান্তরের সময় শ্রমিক এবং সাধারণ মানুষ যেন ক্ষতিগ্রস্ত না হয়, তার জন্য একটি ন্যায়বিচারপূর্ণ কাঠামো তৈরি করা।
+            </li>
+            <li>
+                <strong>৩. ট্রপিক্যাল ফরেস্ট ফরেভার ফেসিলিটি (TFFF):</strong><br>
+                ক্রান্তীয় বনাঞ্চল (যেমন: আমাজন, পার্বত্য চট্টগ্রাম) রক্ষার জন্য একটি বিশেষ বৈশ্বিক তহবিল গঠন।
+            </li>
+            <li>
+                <strong>৪. বৈশ্বিক অভিযোজন সূচক:</strong><br>
+                জলবায়ু পরিবর্তনের সাথে খাপ খাইয়ে নেওয়া বা অভিযোজনের (Adaptation) জন্য ৫৯টি বৈশ্বিক সূচক (Indicators) গ্রহণ করা হয়েছে।
+            </li>
+        </ul>
+        <p><em>নোট: এছাড়াও ৭৩টি দেশের ১১০ কোটি হেক্টর বনাঞ্চল রক্ষার জন্য একটি প্রাথমিক তহবিল গঠনের প্রস্তাব করা হয়েছে।</em></p>
+    </section>
+
+    <!-- Section 4: Detailed Terminologies -->
+    <section class="card">
+        <h2>৪. টার্মিনোলজি ও কনসেপ্ট ব্যাখ্যা</h2>
+        
+        <h3>ক. জাস্ট ট্রানজিশন মেকানিজম (JTM) ও PPP মডেল</h3>
+        <p>অষ্টাদশ শতাব্দীর শিল্প বিপ্লবের পর থেকে যে অর্থনীতি গড়ে উঠেছিল, তা ছিল পরিবেশের জন্য ক্ষতিকর। এখন আমরা 'সবুজ অর্থনীতি'তে রূপান্তর করছি। এই রূপান্তরের সময় যেন কেউ পেছনে পড়ে না থাকে (Leave No One Behind), সেটাই JTM এর মূল কথা। এটি <strong>PPP মডেল</strong> অনুসরণ করে:</p>
+        <table class="info-table">
+            <tr>
+                <th>P - Profit (মুনাফা)</th>
+                <td>অর্থনৈতিক কর্মকাণ্ড অবশ্যই লাভজনক হতে হবে (যেমন: ব্লু ইকোনমি)।</td>
+            </tr>
+            <tr>
+                <th>P - People (জনগণ)</th>
+                <td>সেই মুনাফায় স্থানীয় জনগণ ও শ্রমিকদের ভাগ থাকতে হবে। প্রযুক্তি আসার ফলে শ্রমিকরা যেন বেকার না হয়, তাদের দক্ষতা বৃদ্ধি করতে হবে।</td>
+            </tr>
+            <tr>
+                <th>P - Planet (গ্রহ/পরিবেশ)</th>
+                <td>মুনাফা করতে গিয়ে পরিবেশ বা প্ল্যানেটের কোনো ক্ষতি করা যাবে না।</td>
+            </tr>
+        </table>
+
+        <h3>খ. ট্রপিক্যাল ফরেস্ট ফরেভার ফেসিলিটি (TFFF)</h3>
+        <p>এটি একটি উদ্ভাবনী অর্থায়ন ব্যবস্থা। এর মূল নীতি হলো <strong>"Pay for Performance"</strong>।</p>
+        <ul>
+            <li>কোনো দেশ (যেমন: ব্রাজিল বা বাংলাদেশ) তাদের ক্রান্তীয় বন রক্ষায় কতটুকু সফল বা কী পরিমাণ 'পারফরম্যান্স' দেখিয়েছে, তার ওপর ভিত্তি করে তাদের অর্থায়ন করা হবে।</li>
+            <li>এটি বন উজাড় রোধে দেশগুলোকে উৎসাহিত করবে।</li>
+        </ul>
+
+        <div class="highlight-box" style="background-color: #e3f2fd; border-left-color: var(--secondary-color);">
+            <h3>গ. মার্কেট বেসড সলিউশন (Market Based Solution)</h3>
+            <p>জলবায়ু সমস্যা সমাধানের একটি অর্থনৈতিক পদ্ধতি। এর উৎপত্তি <strong>১৯৯৭ সালের কিউট প্রটোকল (জাপান)</strong> থেকে।</p>
+            <p><strong>১. কার্বন ট্রেডিং (Carbon Trading):</strong> কার্বন নিঃসরণের একটি সীমা নির্ধারণ করে দেওয়া।</p>
+            <p><strong>২. ক্যাপ এন্ড ট্রেড (Cap and Trade):</strong> যারা কম কার্বন নিঃসরণ করবে, তারা তাদের অব্যবহৃত কোটা বা 'ক্রেডিট' বেশি নিঃসরণকারী দেশের কাছে বিক্রি করতে পারবে।</p>
+        </div>
+    </section>
+
+    <!-- Section 5: Future COPs -->
+    <section class="card">
+        <h2>৫. ভবিষ্যৎ কপ সম্মেলন</h2>
+        <table class="info-table">
+            <tr>
+                <th>কপ-৩১ (২০২৬)</th>
+                <td><strong>স্থান:</strong> আনাতালিয়া, তুরস্ক।<br><strong>সভাপতি:</strong> ক্রিস বোয়েন (অস্ট্রেলিয়া)।</td>
+            </tr>
+            <tr>
+                <th>কপ-৩২ (২০২৭)</th>
+                <td><strong>স্থান:</strong> আদ্দিস আবাবা, ইথিওপিয়া।</td>
+            </tr>
+        </table>
+    </section>
+
+    <!-- NEW Section 6: AI Study Zone -->
+    <section class="card" style="border-left-color: var(--ai-color);">
+        <h2 style="color: var(--ai-color);">৬. ✨ এআই স্টাডি জোন (Powered by Gemini)</h2>
+        <p>আপনার প্রস্তুতি যাচাই করতে এবং যেকোনো কঠিন বিষয় বুঝতে এআই-এর সাহায্য নিন।</p>
+        
+        <div class="concept-grid">
+            <!-- Feature 1: Quiz Generator -->
+            <div class="concept-card" style="background: #EDE7F6; border-color: #D1C4E9;">
+                <h3 style="color: var(--ai-color); border-color: var(--ai-color);">🧠 স্মার্ট কুইজ</h3>
+                <p>নোটের ওপর ভিত্তি করে অটোমেটিক প্রশ্ন তৈরি করুন এবং নিজেকে যাচাই করুন।</p>
+                <button onclick="generateQuiz()" id="quiz-btn" class="ai-btn">কুইজ তৈরি করুন ✨</button>
+                <div id="quiz-container" style="display:none; margin-top:15px; background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+                    <!-- Quiz content will be injected here -->
+                </div>
+            </div>
+
+            <!-- Feature 2: AI Tutor -->
+            <div class="concept-card" style="background: #E8EAF6; border-color: #C5CAE9;">
+                <h3 style="color: #3F51B5; border-color: #3F51B5;">💬 এআই টিউটর</h3>
+                <p>নোটের যেকোনো বিষয় বা টার্ম বুঝতে প্রশ্ন করুন।</p>
+                <input type="text" id="user-question" placeholder="প্রশ্ন লিখুন (যেমন: কিয়োটো প্রটোকল কী?)" class="ai-input">
+                <button onclick="askAI()" id="ask-btn" class="ai-btn" style="background-color: #3F51B5; margin-top: 10px;">জিজ্ঞাসা করুন ✨</button>
+                <div id="ai-answer" class="feedback-box" style="display:none; border-left: 4px solid #3F51B5;"></div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<footer>
+    <p>© নোট প্রস্তুতকরণ: বিসিএস ও অ্যাডমিশন প্রস্তুতির সহায়িকা | ২০২৫</p>
+</footer>
+
+<script>
+    // System provided API Key
+    const apiKey = ""; 
+
+    async function callGemini(prompt) {
+        if (!apiKey) {
+            console.warn("API Key is missing. Please ensure the environment provides the key.");
+            // For demo purposes in a non-authed environment, we might show a mock response or error.
+            // But assuming the environment injects it or handles the proxy.
+        }
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        
+        const payload = {
+            contents: [{
+                parts: [{ text: prompt }]
+            }]
+        };
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        } catch (error) {
+            console.error("Gemini API Error:", error);
+            throw error;
+        }
+    }
+
+    // Helper to get text content from the page for context
+    function getPageContext() {
+        const contentDiv = document.querySelector('.container');
+        return contentDiv.innerText;
+    }
+
+    // --- Feature 1: Smart Quiz ---
+    async function generateQuiz() {
+        const quizContainer = document.getElementById('quiz-container');
+        const btn = document.getElementById('quiz-btn');
+        const context = getPageContext();
+
+        // UI Loading State
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> তৈরি হচ্ছে...';
+        quizContainer.style.display = 'none';
+        quizContainer.innerHTML = '';
+
+        const prompt = `
+            You are a helpful tutor for BCS exams in Bangladesh. 
+            Based on the following notes about Climate Change conferences (COP, Earth Summit), generate ONE multiple-choice question (MCQ) in Bengali.
+            
+            NOTES CONTENT:
+            ${context.substring(0, 10000)}
+
+            Format your response strictly as a JSON object with no markdown formatting. Structure:
+            {
+                "question": "The question in Bengali",
+                "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+                "answer": 0, // Index of the correct option (0-3)
+                "explanation": "A short explanation in Bengali"
+            }
+        `;
+
+        try {
+            const rawResponse = await callGemini(prompt);
+            // Clean markdown code blocks if present
+            const cleanJson = rawResponse.replace(/```json/g, '').replace(/```/g, '').trim();
+            const quizData = JSON.parse(cleanJson);
+            renderQuiz(quizData);
+        } catch (error) {
+            quizContainer.style.display = 'block';
+            quizContainer.innerHTML = '<p style="color:red;">দুঃখিত, কুইজ তৈরি করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।</p>';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'নতুন কুইজ তৈরি করুন ✨';
+        }
+    }
+
+    function renderQuiz(data) {
+        const container = document.getElementById('quiz-container');
+        container.style.display = 'block';
+
+        let html = `<p style="font-weight:bold; font-size:1.1rem; margin-bottom:15px;">${data.question}</p>`;
+        
+        data.options.forEach((option, index) => {
+            html += `<div class="quiz-option" onclick="checkAnswer(this, ${index}, ${data.answer}, '${data.explanation}')">${option}</div>`;
+        });
+
+        html += `<div id="quiz-feedback" style="margin-top:15px; display:none;"></div>`;
+        container.innerHTML = html;
+    }
+
+    function checkAnswer(element, selectedIndex, correctIndex, explanation) {
+        const options = document.querySelectorAll('.quiz-option');
+        const feedback = document.getElementById('quiz-feedback');
+
+        // Disable further clicks
+        options.forEach(opt => opt.onclick = null);
+
+        if (selectedIndex === correctIndex) {
+            element.classList.add('correct');
+            feedback.innerHTML = `<p style="color: green; font-weight: bold;">✅ সঠিক উত্তর!</p><p>${explanation}</p>`;
+        } else {
+            element.classList.add('wrong');
+            options[correctIndex].classList.add('correct'); // Show correct answer
+            feedback.innerHTML = `<p style="color: red; font-weight: bold;">❌ ভুল উত্তর। সঠিক উত্তরটি হাইলাইট করা হয়েছে।</p><p>${explanation}</p>`;
+        }
+        feedback.style.display = 'block';
+    }
+
+    // --- Feature 2: AI Tutor ---
+    async function askAI() {
+        const input = document.getElementById('user-question');
+        const btn = document.getElementById('ask-btn');
+        const answerBox = document.getElementById('ai-answer');
+        const question = input.value.trim();
+        const context = getPageContext();
+
+        if (!question) return;
+
+        // UI Loading State
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> উত্তর খোঁজা হচ্ছে...';
+        answerBox.style.display = 'none';
+
+        const prompt = `
+            You are a helpful and knowledgeable tutor for Bangladeshi students. 
+            Answer the student's question in Bengali based on the provided notes context. 
+            Keep the answer concise (within 3-4 sentences) and easy to understand.
+            
+            NOTES CONTEXT:
+            ${context.substring(0, 8000)}
+
+            STUDENT QUESTION: ${question}
+        `;
+
+        try {
+            const responseText = await callGemini(prompt);
+            answerBox.style.display = 'block';
+            // Convert simple markdown bold to HTML bold if needed, or just display text
+            const formattedText = responseText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            answerBox.innerHTML = `<strong>প্রশ্ন:</strong> ${question}<br><br><strong>উত্তর:</strong> ${formattedText}`;
+        } catch (error) {
+            answerBox.style.display = 'block';
+            answerBox.innerHTML = '<p style="color:red;">দুঃখিত, উত্তর দিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।</p>';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'জিজ্ঞাসা করুন ✨';
+        }
+    }
+</script>
+
+</body>
+</html>
