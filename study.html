@@ -495,11 +495,16 @@
             return;
         }
 
-        // Updated model list to include more common aliases
+        // Expanded model list to try specific versions if general aliases fail
         const models = [
             "gemini-1.5-flash",
-            "gemini-pro",
-            "gemini-1.5-pro-latest"
+            "gemini-1.5-flash-001",
+            "gemini-1.5-flash-002",
+            "gemini-1.5-pro",
+            "gemini-1.5-pro-001",
+            "gemini-1.5-pro-002",
+            "gemini-1.0-pro",
+            "gemini-pro"
         ];
 
         let lastError = null;
@@ -539,7 +544,7 @@
             }
         }
         
-        console.error("All Gemini models failed. Please check your API Key or Network.", lastError);
+        console.error("All Gemini models failed.", lastError);
         throw lastError;
     }
 
@@ -586,7 +591,11 @@
         } catch (error) {
             console.error(error);
             quizContainer.style.display = 'block';
-            quizContainer.innerHTML = '<p style="color:red;">দুঃখিত, কুইজ তৈরি করতে সমস্যা হয়েছে। API Key টি সঠিক কিনা যাচাই করুন।</p>';
+            let msg = '<p style="color:red;">দুঃখিত, কোনো মডেল কাজ করছে না। API Key সঠিক কিনা যাচাই করুন।</p>';
+            if (error.message && error.message.includes("404")) {
+                msg += '<p style="font-size:0.9rem; color:#666; margin-top:5px;">টিপস: আপনার Google Cloud Console-এ "Generative Language API" এনাবল করা আছে কিনা দেখুন।</p>';
+            }
+            quizContainer.innerHTML = msg;
         } finally {
             btn.disabled = false;
             btn.innerHTML = 'নতুন কুইজ তৈরি করুন ✨';
@@ -670,7 +679,11 @@
             answerBox.innerHTML = `<strong>প্রশ্ন:</strong> ${question}<br><br><strong>উত্তর:</strong> ${formattedText}`;
         } catch (error) {
             answerBox.style.display = 'block';
-            answerBox.innerHTML = '<p style="color:red;">দুঃখিত, উত্তর দিতে সমস্যা হয়েছে। API Key টি সঠিক কিনা যাচাই করুন।</p>';
+            let msg = '<p style="color:red;">দুঃখিত, উত্তর পাওয়া যায়নি।</p>';
+             if (error.message && error.message.includes("404")) {
+                msg += '<p style="font-size:0.9rem; color:#666; margin-top:5px;">আপনার Google Cloud Console-এ "Generative Language API" এনাবল করা আছে কিনা দেখুন।</p>';
+            }
+            answerBox.innerHTML = msg;
         } finally {
             btn.disabled = false;
             btn.innerHTML = 'জিজ্ঞাসা করুন ✨';
