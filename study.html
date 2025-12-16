@@ -483,14 +483,16 @@
     // System provided API Key
     const apiKey = "AIzaSyB00uRvwy1rhhIR6wudlkQVQVnUHteB7zc"; 
 
+    // Global variable to store quiz data safely
+    let currentQuizData = null;
+
     async function callGemini(prompt) {
         if (!apiKey) {
             console.warn("API Key is missing. Please ensure the environment provides the key.");
-            // For demo purposes in a non-authed environment, we might show a mock response or error.
-            // But assuming the environment injects it or handles the proxy.
         }
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        // Updated model to gemini-1.5-flash for better compatibility with personal API keys
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         
         const payload = {
             contents: [{
@@ -508,6 +510,9 @@
             });
 
             if (!response.ok) {
+                // Improved error logging
+                const errData = await response.json();
+                console.error("API Error Details:", errData);
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
@@ -560,8 +565,9 @@
             const quizData = JSON.parse(cleanJson);
             renderQuiz(quizData);
         } catch (error) {
+            console.error(error);
             quizContainer.style.display = 'block';
-            quizContainer.innerHTML = '<p style="color:red;">দুঃখিত, কুইজ তৈরি করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।</p>';
+            quizContainer.innerHTML = '<p style="color:red;">দুঃখিত, কুইজ তৈরি করতে সমস্যা হয়েছে। API Key টি সঠিক কিনা যাচাই করুন।</p>';
         } finally {
             btn.disabled = false;
             btn.innerHTML = 'নতুন কুইজ তৈরি করুন ✨';
@@ -572,17 +578,25 @@
         const container = document.getElementById('quiz-container');
         container.style.display = 'block';
 
+        // Store data globally to prevent syntax errors in onclick attribute
+        currentQuizData = data;
+
         let html = `<p style="font-weight:bold; font-size:1.1rem; margin-bottom:15px;">${data.question}</p>`;
         
         data.options.forEach((option, index) => {
-            html += `<div class="quiz-option" onclick="checkAnswer(this, ${index}, ${data.answer}, '${data.explanation}')">${option}</div>`;
+            // Simplified onclick to just pass index
+            html += `<div class="quiz-option" onclick="checkAnswer(this, ${index})">${option}</div>`;
         });
 
         html += `<div id="quiz-feedback" style="margin-top:15px; display:none;"></div>`;
         container.innerHTML = html;
     }
 
-    function checkAnswer(element, selectedIndex, correctIndex, explanation) {
+    function checkAnswer(element, selectedIndex) {
+        if (!currentQuizData) return;
+        
+        const correctIndex = currentQuizData.answer;
+        const explanation = currentQuizData.explanation;
         const options = document.querySelectorAll('.quiz-option');
         const feedback = document.getElementById('quiz-feedback');
 
@@ -594,7 +608,10 @@
             feedback.innerHTML = `<p style="color: green; font-weight: bold;">✅ সঠিক উত্তর!</p><p>${explanation}</p>`;
         } else {
             element.classList.add('wrong');
-            options[correctIndex].classList.add('correct'); // Show correct answer
+            // Check if correct index is within bounds before accessing
+            if (options[correctIndex]) {
+                options[correctIndex].classList.add('correct'); // Show correct answer
+            }
             feedback.innerHTML = `<p style="color: red; font-weight: bold;">❌ ভুল উত্তর। সঠিক উত্তরটি হাইলাইট করা হয়েছে।</p><p>${explanation}</p>`;
         }
         feedback.style.display = 'block';
@@ -634,7 +651,7 @@
             answerBox.innerHTML = `<strong>প্রশ্ন:</strong> ${question}<br><br><strong>উত্তর:</strong> ${formattedText}`;
         } catch (error) {
             answerBox.style.display = 'block';
-            answerBox.innerHTML = '<p style="color:red;">দুঃখিত, উত্তর দিতে সমস্যা হয়েছে। আবার চেষ্টা করুন।</p>';
+            answerBox.innerHTML = '<p style="color:red;">দুঃখিত, উত্তর দিতে সমস্যা হয়েছে। API Key টি সঠিক কিনা যাচাই করুন।</p>';
         } finally {
             btn.disabled = false;
             btn.innerHTML = 'জিজ্ঞাসা করুন ✨';
