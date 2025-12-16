@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>কপ (COP) সম্মেলন ও জলবায়ু কূটনীতি - বিস্তারিত নোট</title>
+    <link rel="icon" href="data:,"> <!-- Suppress favicon 404 -->
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -480,7 +481,7 @@
 </footer>
 
 <script>
-    // System provided API Key
+    // Updated API Key from user logs
     const apiKey = "AIzaSyBs6hd5xGTovj7GcxBFul6fIeA47wQx5bM"; 
 
     // Global variable to store quiz data safely
@@ -489,39 +490,61 @@
     async function callGemini(prompt) {
         if (!apiKey) {
             console.warn("API Key is missing. Please ensure the environment provides the key.");
+            alert("API Key is missing!");
+            return;
         }
 
-        // Updated model to gemini-1.5-flash for better compatibility with personal API keys
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-        
-        const payload = {
-            contents: [{
-                parts: [{ text: prompt }]
-            }]
-        };
+        // List of models to try in case of 404 (Not Found) errors
+        const models = [
+            "gemini-1.5-flash",
+            "gemini-1.5-flash-latest",
+            "gemini-1.0-pro"
+        ];
 
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
+        let lastError = null;
 
-            if (!response.ok) {
-                // Improved error logging
-                const errData = await response.json();
-                console.error("API Error Details:", errData);
-                throw new Error(`HTTP error! status: ${response.status}`);
+        for (const model of models) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{
+                    parts: [{ text: prompt }]
+                }]
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    console.warn(`Model ${model} failed with status ${response.status}:`, errData);
+                    
+                    // If 404 (Not Found), try the next model in the list
+                    // If 400 (Bad Request) or 403 (Permission), the key might be wrong, but we can try others just in case.
+                    lastError = new Error(`HTTP error! status: ${response.status} on model ${model}`);
+                    continue; 
+                }
+
+                const data = await response.json();
+                // If successful, return immediately
+                return data.candidates[0].content.parts[0].text;
+
+            } catch (error) {
+                console.warn(`Network error on model ${model}:`, error);
+                lastError = error;
+                // Continue to next model
             }
-
-            const data = await response.json();
-            return data.candidates[0].content.parts[0].text;
-        } catch (error) {
-            console.error("Gemini API Error:", error);
-            throw error;
         }
+        
+        // If loop finishes without returning, all models failed
+        console.error("All Gemini models failed. Please check your API Key or Network.", lastError);
+        throw lastError;
     }
 
     // Helper to get text content from the page for context
