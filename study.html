@@ -481,8 +481,9 @@
 </footer>
 
 <script>
-    // Updated API Key from user logs
-    const apiKey = "AIzaSyBs6hd5xGTovj7GcxBFul6fIeA47wQx5bM"; 
+    // Updated API Key
+    let apiKey = "AIzaSyBs6hd5xGTovj7GcxBFul6fIeA47wQx5bM"; 
+    apiKey = apiKey.trim(); // Clean up potential whitespace
 
     // Global variable to store quiz data safely
     let currentQuizData = null;
@@ -494,11 +495,11 @@
             return;
         }
 
-        // List of models to try in case of 404 (Not Found) errors
+        // Updated model list to include more common aliases
         const models = [
             "gemini-1.5-flash",
-            "gemini-1.5-flash-latest",
-            "gemini-1.0-pro"
+            "gemini-pro",
+            "gemini-1.5-pro-latest"
         ];
 
         let lastError = null;
@@ -525,24 +526,19 @@
                     const errData = await response.json().catch(() => ({}));
                     console.warn(`Model ${model} failed with status ${response.status}:`, errData);
                     
-                    // If 404 (Not Found), try the next model in the list
-                    // If 400 (Bad Request) or 403 (Permission), the key might be wrong, but we can try others just in case.
                     lastError = new Error(`HTTP error! status: ${response.status} on model ${model}`);
                     continue; 
                 }
 
                 const data = await response.json();
-                // If successful, return immediately
                 return data.candidates[0].content.parts[0].text;
 
             } catch (error) {
                 console.warn(`Network error on model ${model}:`, error);
                 lastError = error;
-                // Continue to next model
             }
         }
         
-        // If loop finishes without returning, all models failed
         console.error("All Gemini models failed. Please check your API Key or Network.", lastError);
         throw lastError;
     }
