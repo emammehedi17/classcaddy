@@ -2012,26 +2012,20 @@ function updateMonthUI(monthId, monthData, weeksData) {
              }
         }
 		
-		//**
-         * Step 1 (Robust): Parse DOM and prepare save data (Cache First -> Network Fallback)
-         */
-        async function parseAndPrepareSaveData(daySection, weekId, isCheckboxClick = false) {
+		async function parseAndPrepareSaveData(daySection, weekId, isCheckboxClick = false) {
             try {
                 const dayIndex = parseInt(daySection.dataset.dayIndex);
                 let freshDaysArray = [];
                 let usedCache = false;
                 
-                // 1. Try Reading from Cache (Must contain the specific DAY index)
                 if (typeof activeWeeksDataCache !== 'undefined' && 
                     activeWeeksDataCache[weekId] && 
                     activeWeeksDataCache[weekId].days &&
-                    activeWeeksDataCache[weekId].days[dayIndex] // <--- NEW CHECK: Ensure this day actually exists in cache
+                    activeWeeksDataCache[weekId].days[dayIndex]
                    ) {
-                    // Deep copy from cache
                     freshDaysArray = JSON.parse(JSON.stringify(activeWeeksDataCache[weekId].days));
                     usedCache = true;
                 } 
-                // 2. Fallback to Network (If cache is missing OR stale/missing this day)
                 else {
                     console.log(`Cache miss for Day ${dayIndex}. Fetching from network...`);
                     const monthId = daySection.closest('.card[data-month-id]').dataset.monthId;
@@ -2041,8 +2035,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     if (weekDocSnap.exists()) {
                         freshDaysArray = weekDocSnap.data().days || [];
                         
-                        // Update cache for next time
-                        if (!activeWeeksDataCache) activeWeeksDataCache = {};
+                        if (typeof activeWeeksDataCache === 'undefined') activeWeeksDataCache = {};
                         if (!activeWeeksDataCache[weekId]) activeWeeksDataCache[weekId] = {};
                         activeWeeksDataCache[weekId].days = freshDaysArray;
                     } else {
@@ -2053,7 +2046,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 const currentDayData = freshDaysArray[dayIndex];
                 
                 if (!currentDayData) {
-                    // If still missing after network fetch, something is really wrong
                     throw new Error(`Day data for index ${dayIndex} not found (Total days: ${freshDaysArray.length}).`);
                 }
                 
@@ -2069,7 +2061,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     let subject, topic, comment, completed, completionPercentage, vocabData = null, story, mcqData = null;
 
                     if (daySection.classList.contains('editing') && !isCheckboxClick) {
-                         // --- EDIT MODE ---
                          subject = (row.querySelector('.subject-input')?.value || '').trim();
                          comment = (row.querySelector('.comment-input')?.value || '').trim();
                          completed = existingRowData.completed || false;
@@ -2099,7 +2090,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                              vocabData = null;
                          }
                     } else { 
-                         // --- CHECKBOX MODE ---
                          completed = row.querySelector('.completion-checkbox')?.checked || false;
                          subject = existingRowData.subject; 
                          topic = existingRowData.topic; 
@@ -2124,7 +2114,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 return null;
             }
         }
-		
 		
        /**
          * Step 2: Save to Database (UPDATED: Accepts explicit WeekID)
