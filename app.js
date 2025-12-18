@@ -3629,7 +3629,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 		
        /**
-         * Handles the user's answer selection. (UPDATED: Note on Correct/Wrong)
+         * Handles the user's answer selection. (UPDATED: Instant 100ms Advance)
          */
         function selectQuizAnswer(selectedButton, selectedOption) {
             const q = currentQuizQuestions[currentQuizQuestionIndex];
@@ -3658,7 +3658,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
             });
 
-            // --- CHANGED: SHOW NOTE IMMEDIATELY (CORRECT OR WRONG) ---
+            // --- SHOW NOTE IMMEDIATELY (CORRECT OR WRONG) ---
             if (q.note) {
                 // Remove old note just in case
                 const oldNote = document.getElementById('quiz-instant-note');
@@ -3677,11 +3677,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizNextBtn.disabled = false;
             quizSkipBtn.hidden = true;
 
-            // Auto-advance Logic
+            // Auto-advance Logic (INSTANT)
             if (isCorrect) {
-                // Optional: You can keep the auto-advance delay here
-                // or remove it if you want them to read the note first.
-                // Currently set to 1 second (1000ms) to give time to see the green color.
                 setTimeout(() => {
                     // Only auto-advance if it's NOT the last question
                     if (currentQuizQuestionIndex < currentQuizQuestions.length - 1) {
@@ -3691,9 +3688,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     } else {
                         showQuizResults();
                     }
-                }, 1000); 
+                }, 100); // <--- Changed to 100ms (Instant)
             }
         }
+		
 		
         function showQuizResults() {
 			if (quizTimerInterval) clearInterval(quizTimerInterval);
