@@ -1707,59 +1707,59 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      return;
                  }
 
-                 // Handle checkbox click
+
+                 // Handle checkbox click (OPTIMIZED: Instant Sync)
                  if (target.classList.contains('completion-checkbox')) {
                      if (!daySection?.classList.contains('editing')) {
+                         // 1. Instant Visual Feedback (Toggle Class)
                          row?.classList.toggle('row-completed', target.checked);
                          
-                         // --- START: NEW OPTIMISTIC CHECKBOX SAVE ---
-                         // চেকবক্স ক্লিক সেভ করার নতুন লজিক
                          (async () => {
                             setSyncStatus("Syncing...", "yellow");
-                            const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-                            let daysArray;
-                            try {
-                                const docSnap = await getDoc(docRef);
-                                if (!docSnap.exists()) throw new Error("Month document not found.");
-                                daysArray = docSnap.data().weeks?.[weekId]?.days || [];
-                            } catch (error) {
-                                console.error("Error fetching data for checkbox save:", error);
-                                setSyncStatus("Error", "red");
-                                return;
-                            }
                             
-                            // DOM থেকে ডেটা পড়ুন (চেকবক্সের নতুন অবস্থা সহ)
+                            const dayIndex = parseInt(daySection.dataset.dayIndex);
+                            const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
+
+                            // 2. Prepare Data (Read from DOM/Cache - Instant)
+                            // Set global flag so saveDataToFirebase knows the context
+                            isCheckboxClickGlobal = { weekId: weekId, dayIndex: dayIndex }; 
                             
-                            // --- START: MODIFIED ---
-                            // Set the global var so saveDataToFirebase knows the weekId AND dayIndex
-                            const dayIndex = parseInt(daySection.dataset.dayIndex); // <-- Add this
-                            isCheckboxClickGlobal = { weekId: weekId, dayIndex: dayIndex }; // <-- Add dayIndex
-                            const parseResult = await parseAndPrepareSaveData(daySection, weekId, true); // true = isCheckboxClick
-                            // --- END: MODIFIED ---
+                            const parseResult = await parseAndPrepareSaveData(daySection, weekId, true); 
                             
                             if (parseResult === null) {
                                 setSyncStatus("Error", "red");
+                                target.checked = !target.checked; // Revert on error
                                 return;
                             }
                             
                             const { updatedRows, updatePayload } = parseResult;
                             
-                            // তৎক্ষণাৎ প্রোগ্রেস বার আপডেট করুন
+                            // 3. Update Cache Instantly
+                            if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
+                                activeWeeksDataCache[weekId].days = updatePayload.days;
+                            }
+
+                            // 4. Update UI Progress Bars (Pass data to avoid re-fetching)
+                            // updatePayload contains { days: [...] }, which fits the structure needed
+                            updateWeeklyProgressUI(monthId, weekId, updatePayload); 
+                            
                             const dayDataForProgress = { rows: updatedRows };
-                            updateWeeklyProgressUI(monthId, weekId); // এটি রি-ফেচ করবে
                             updateDailyProgressUI(monthId, weekId, dayIndex, dayDataForProgress);
                             
-                            // ব্যাকগ্রাউন্ডে সেভ করুন
-                            saveDataToFirebase(docRef, updatePayload, true); // true = isAutosave (no green "Synced" popup)
+                            // 5. Save to Firebase (Background Process)
+                            // We use 'true' for isAutosave to avoid blocking, but handle status manually
+                            await saveDataToFirebase(monthDocRef, updatePayload, true); 
+                            
+                            setSyncStatus("Synced", "green");
                          })();
-                         // --- END: NEW OPTIMISTIC CHECKBOX SAVE ---
 
                      } else {
                          e.preventDefault();
                      }
                      return; 
                  }
-
+				 
+				 
                  // Handle other button clicks
                  if (!button) return;
                  e.preventDefault();
