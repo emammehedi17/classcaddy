@@ -3571,123 +3571,140 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          */
         function loadQuizQuestion() {
             quizOptionsContainer.innerHTML = '';
-            // --- NEW: Remove old note if exists ---
+            
+            // 1. Remove any existing note from previous render to avoid duplicates
             const oldNote = document.getElementById('quiz-instant-note');
-            if(oldNote) oldNote.remove();
-            // --------------------------------------
+            if (oldNote) oldNote.remove();
             
             const q = currentQuizQuestions[currentQuizQuestionIndex];
             
-            quizQuestionNumber.textContent = `Question ${currentQuizQuestionIndex + 1}/${currentQuizQuestions.length}`;
-            quizQuestionText.textContent = q.question;
-
-            // --- Button State Logic ---
-            quizNextBtn.disabled = (q.userAnswer === null);
-            quizSkipBtn.hidden = (q.userAnswer !== null);
-            quizPrevBtn.hidden = (currentQuizQuestionIndex === 0);
-
-            // --- START: OPTIMIZED RENDERING ---
-            // 1. একটি ভার্চুয়াল কন্টেইনার তৈরি করুন (এটি দ্রুত)
-            const fragment = new DocumentFragment();
-
-            // 2. অপশন বাটনগুলো তৈরি করুন এবং সেগুলোকে fragment-এ যোগ করুন
-            q.options.forEach(option => {
-                const button = document.createElement('button');
-                button.textContent = option;
-                button.className = "quiz-option-btn";
-				
-				if (banglaRegex.test(option)) {
-					button.classList.add('quiz-option-bangla');
-				}
-
+            // Update Question Text
+            quizQuestionText.innerHTML = `<span class="text-indigo-600 font-bold mr-2">${currentQuizQuestionIndex + 1}.</span>${escapeHtml(q.question)}`;
+            
+            // Generate Options
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors duration-200 flex items-start`;
+                
+                // Restore state if already answered
                 if (q.userAnswer !== null) {
-                    // This question has been answered, show feedback
-                    button.disabled = true;
-                    if (option === q.correctAnswer) {
-                        button.classList.add('correct');
-                    } else if (option === q.userAnswer) {
-                        button.classList.add('incorrect');
+                    if (opt === q.correctAnswer) {
+                        btn.classList.add('bg-green-100', 'border-green-300', 'text-green-800');
+                    } else if (opt === q.userAnswer && opt !== q.correctAnswer) {
+                        btn.classList.add('bg-red-100', 'border-red-300', 'text-red-800');
+                    } else {
+                        btn.classList.add('opacity-50');
                     }
-                } else {
-                    // This question is new, add click listener
-                    button.onclick = () => selectQuizAnswer(button, option);
+                    btn.disabled = true;
                 }
-                fragment.appendChild(button); // fragment-এ যোগ করুন
+                
+                btn.innerHTML = `
+                    <span class="font-bold mr-2 flex-shrink-0">${getOptionLabel(index, q.question)}.</span>
+                    <span>${escapeHtml(opt)}</span>
+                `;
+                btn.onclick = () => selectQuizAnswer(btn, opt);
+                quizOptionsContainer.appendChild(btn);
             });
 
-            // 3. সবশেষে, fragment-টিকে মাত্র একবার পেইজে যোগ করুন
-            quizOptionsContainer.appendChild(fragment);
-            // --- END: OPTIMIZED RENDERING ---
+            // Update Status Bar
+            quizProgressFill.style.width = `${((currentQuizQuestionIndex) / currentQuizQuestions.length) * 100}%`;
+            quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`;
+
+            // Control Buttons
+            quizPrevBtn.disabled = (currentQuizQuestionIndex === 0);
+            
+            // If answered, enable Next, hide Skip. Else, disable Next, show Skip.
+            if (q.userAnswer !== null) {
+                quizNextBtn.disabled = false;
+                quizSkipBtn.hidden = true;
+
+                // --- NEW: RE-RENDER NOTE IF ANSWERED (PERSISTENCE) ---
+                if (q.note) {
+                    const noteDiv = document.createElement('div');
+                    noteDiv.id = 'quiz-instant-note';
+                    noteDiv.className = 'mt-4 p-3 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm explanation-text';
+                    noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(q.note)}`;
+                    
+                    // Insert after the options
+                    quizOptionsContainer.parentNode.insertBefore(noteDiv, quizOptionsContainer.nextSibling);
+                }
+                // -----------------------------------------------------
+            } else {
+                quizNextBtn.disabled = true;
+                quizSkipBtn.hidden = false;
+            }
         }
-        
+		
+		
         /**
          * Handles the user's answer selection. (UPGRADED with Auto-Advance)
          */
         function selectQuizAnswer(selectedButton, selectedOption) {
             const q = currentQuizQuestions[currentQuizQuestionIndex];
-            
-            // Do nothing if already answered
             if (q.userAnswer !== null) return;
 
-            // Store the answer
             q.userAnswer = selectedOption;
-            const isCorrect = (selectedOption === q.correctAnswer); // Check correctness
+            const isCorrect = (selectedOption === q.correctAnswer);
             q.isCorrect = isCorrect;
             
-            // Apply scoring
-            if (isCorrect) {
-                currentQuizScore++;
-            } else {
-                currentQuizScore -= 0.25;
-            }
+            // Update Score
+            if (isCorrect) currentQuizScore += 1;
+            else currentQuizScore -= 0.25;
+            
             quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`;
 
-            // Apply visual feedback
+            // Update UI Colors
             Array.from(quizOptionsContainer.children).forEach(btn => {
+                const btnText = btn.innerText.split('.').slice(1).join('.').trim(); 
+                // Note: This text matching is a bit risky if options have dots. 
+                // Better to rely on index if possible, but keeping your existing style:
+                
+                // Re-matching logic based on your existing structure:
+                if (btn.innerHTML.includes(escapeHtml(q.correctAnswer))) {
+                     btn.classList.add('bg-green-100', 'border-green-300', 'text-green-800');
+                     btn.classList.remove('hover:bg-gray-50');
+                } else if (btn === selectedButton && !isCorrect) {
+                     btn.classList.add('bg-red-100', 'border-red-300', 'text-red-800');
+                     btn.classList.remove('hover:bg-gray-50');
+                } else {
+                     btn.classList.add('opacity-50');
+                }
                 btn.disabled = true;
-                if (btn.textContent === q.correctAnswer) {
-                    btn.classList.add('correct');
-                } else if (btn.textContent === selectedOption) {
-                    btn.classList.add('incorrect');
-                }
             });
-            
-            // --- START: NEW AUTO-ADVANCE LOGIC ---
-            if (isCorrect) {
-                // Answer is correct: Hide "Skip" and wait 1 second, then auto-advance
-                quizSkipBtn.hidden = true;
-                quizNextBtn.disabled = true; // Prevent clicking "Next" during the delay
-                
-                setTimeout(() => {
-                    // Logic copied from the 'quizNextBtn' listener
-                    currentQuizQuestionIndex++;
-                    if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
-                        showQuizResults();
-                    } else {
-                        loadQuizQuestion();
-                        quizQuestionArea.classList.add('slide-in-right'); // <-- ADD THIS
-                    }
-                }, 100); // 0.1-second (100ms) delay.
-                
-            } else {
-                // Answer is wrong: Stay on the page and enable "Next"
-                quizNextBtn.disabled = false;
-                quizSkipBtn.hidden = true;
-				// --- NEW: SHOW INSTANT NOTE ---
-                if (q.note) {
-                    const noteDiv = document.createElement('div');
-                    noteDiv.id = 'quiz-instant-note';
-                    noteDiv.className = 'mt-4 p-3 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm animate-fade-in';
-                    noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(q.note)}`;
-                    
-                    // Insert after the options container
-                    quizOptionsContainer.parentNode.insertBefore(noteDiv, quizOptionsContainer.nextSibling);
-                }
-                // ------------------------------
-            }
-            // --- END: NEW AUTO-ADVANCE LOGIC ---
-        }
 
+            // --- CHANGED: SHOW NOTE FOR ANY ANSWER (CORRECT OR WRONG) ---
+            if (q.note) {
+                // Remove existing if any (just in case)
+                const oldNote = document.getElementById('quiz-instant-note');
+                if (oldNote) oldNote.remove();
+
+                const noteDiv = document.createElement('div');
+                noteDiv.id = 'quiz-instant-note';
+                noteDiv.className = 'mt-4 p-3 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm animate-fade-in explanation-text';
+                noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(q.note)}`;
+                
+                quizOptionsContainer.parentNode.insertBefore(noteDiv, quizOptionsContainer.nextSibling);
+            }
+            // -----------------------------------------------------------
+
+            quizNextBtn.disabled = false;
+            quizSkipBtn.hidden = true;
+
+            if (isCorrect) {
+                // Auto Advance (You might want to increase this delay if you want users to read the note)
+                setTimeout(() => {
+                    if (currentQuizQuestionIndex < currentQuizQuestions.length - 1) {
+                        currentQuizQuestionIndex++;
+                        loadQuizQuestion();
+                    } else {
+                         // End of quiz
+                         // finishQuiz(); // Optional: Auto finish
+                    }
+                }, 100); 
+            }
+        }
+		
+		
         function showQuizResults() {
 			if (quizTimerInterval) clearInterval(quizTimerInterval);
             const quizEndTime = Date.now(); 
