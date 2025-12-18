@@ -1883,12 +1883,12 @@ function updateMonthUI(monthId, monthData, weeksData) {
         }
 
 
-        // Toggle Edit Mode - Updated for Button Swap AND Autosave
+        // Toggle Edit Mode - Updated for "Saving..." Indicator (Blocking Save)
         async function toggleDayEditMode(monthId, weekId, daySection, enterEditMode) {
              const dayIndex = parseInt(daySection.dataset.dayIndex);
              const tableBody = daySection.querySelector('tbody');
-             const editButton = daySection.querySelector('.edit-day-btn'); // Top right button
-             const saveButton = daySection.querySelector('.save-day-btn'); // Bottom button
+             const editButton = daySection.querySelector('.edit-day-btn'); 
+             const saveButton = daySection.querySelector('.save-day-btn'); 
              const editModeControls = daySection.querySelector('.edit-mode-controls');
              const deleteDayButton = daySection.querySelector('.delete-day-btn');
              const actionsHeader = daySection.querySelector('.actions-header');
@@ -1906,38 +1906,36 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  actionsHeader.classList.remove('hidden');
                  completionPercHeader.classList.remove('hidden');
 
-                 // --- START: MODIFIED (INSTANT LOAD) ---
+                 // --- LOAD DATA (Try Cache First) ---
                  let dayData = null;
                  
-                 // 1. Try Global Cache First (Instant)
                  if (activeWeeksDataCache && activeWeeksDataCache[weekId] && activeWeeksDataCache[weekId].days) {
                      dayData = activeWeeksDataCache[weekId].days[dayIndex];
                  }
 
-                 // 2. Fallback to Network if cache fails (Safety Net)
                  if (!dayData) {
                      console.warn("Cache miss. Fetching from network...");
                      const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
                      const weekDocSnap = await getDoc(weekDocRef);
                      dayData = weekDocSnap.exists() ? weekDocSnap.data().days[dayIndex] : null;
                  }
-                 // --- END: MODIFIED ---
                  
                  if (!dayData) { console.error("Could not find day data to edit."); setSyncStatus("Error", "red"); return; }
 
                  tableBody.innerHTML = dayData.rows.map((rowData, rowIndex) =>
                     createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, true) 
                  ).join('');
+                 
                  daySection.querySelectorAll('.completion-checkbox').forEach(cb => cb.disabled = true);
                  setSyncStatus("Editing...", "blue");
 
-                 // ... (Autosave logic remains the same) ...
+                 // Autosave Handler
                  const autosaveHandler = (e) => {
                      if (e.target.classList.contains('editable-input') || e.target.classList.contains('vocab-input')) {
                          if (autosaveTimer) clearTimeout(autosaveTimer);
                          autosaveTimer = setTimeout(() => {
                              console.log("Autosaving changes...");
-                             saveDayPlan(monthId, weekId, daySection, true); 
+                             saveDataToFirebase(doc(db, getUserPlansCollectionPath(), monthId), parseAndPrepareSaveData(daySection, weekId).updatePayload, true); 
                          }, 2500); 
                      }
                  };
@@ -1946,7 +1944,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
              }
 
 			 else {
-                 // --- SAVING AND EXITING EDIT MODE (OPTIMISTIC) ---
+                 // --- SAVING AND EXITING (BLOCKING WITH UI FEEDBACK) ---
                  
                  // 1. Stop autosave
                  if (autosaveTimer) clearTimeout(autosaveTimer);
@@ -1955,56 +1953,70 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      daySection.autosaveHandler = null;
                  }
                  
-                 // 2. Show Syncing
-                 setSyncStatus("Syncing...", "yellow");
-
-                 // 3. Get the path to the MONTH document
+                 // 2. SHOW "SAVING..." STATE
+                 const originalBtnText = saveButton.innerHTML;
+                 saveButton.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Saving...`;
+                 saveButton.disabled = true;
+                 
+                 // 3. Parse Data
                  const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
-
-                 // 4. Parse DOM and prepare data (NOW ASYNC)
+                 // We await this to get the latest values from the inputs
                  const parseResult = await parseAndPrepareSaveData(daySection, weekId);
                  
                  if (parseResult === null) {
                      setSyncStatus("Error", "red");
+                     saveButton.innerHTML = originalBtnText;
+                     saveButton.disabled = false;
                      return; 
                  }
                  
                  const { updatedRows, updatePayload } = parseResult;
 
-                 // --- START: FIX (Instant Cache Update) ---
-                 // Update the cache immediately so re-entering Edit mode works instantly
-                 if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
-                     activeWeeksDataCache[weekId].days = updatePayload.days;
-                     console.log("Global cache updated instantly (Optimistic Save).");
+                 try {
+                     // 4. WAIT FOR SAVE TO COMPLETE (Blocking)
+                     await saveDataToFirebase(monthDocRef, updatePayload, false);
+
+                     // 5. Update Cache (Post-save)
+                     if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
+                         activeWeeksDataCache[weekId].days = updatePayload.days;
+                     }
+
+                     // 6. Update UI (Exit Edit Mode)
+                     daySection.classList.remove('editing');
+                     daySection.classList.remove('is-collapsed'); 
+                     
+                     editButton.classList.remove('hidden'); 
+                     editModeControls.classList.add('hidden');
+                     deleteDayButton.classList.add('hidden');
+                     actionsHeader.classList.add('hidden');
+                     completionPercHeader.classList.add('hidden');
+
+                     // Re-render row as Read-Only
+                     tableBody.innerHTML = updatedRows.map((rowData, rowIndex) =>
+                        createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)
+                     ).join('');
+                     
+                     const dayDataForProgress = { rows: updatedRows };
+                     updateDailyProgressUI(monthId, weekId, dayIndex, dayDataForProgress);
+                     
+                     // Reset Button
+                     saveButton.innerHTML = `<i class="fas fa-save mr-1"></i> Save`;
+                     saveButton.disabled = false;
+                     
+                     daySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+                 } catch (error) {
+                     console.error("Save failed:", error);
+                     showCustomAlert("Failed to save changes. Please try again.", "error");
+                     
+                     // Revert button so user can try again
+                     saveButton.innerHTML = originalBtnText;
+                     saveButton.disabled = false;
                  }
-                 // --- END: FIX ---
-
-                 // 5. Update UI instantly
-                 daySection.classList.remove('editing');
-				 daySection.classList.add('saving');
-                 daySection.classList.remove('is-collapsed'); 
-                 editButton.classList.remove('hidden'); 
-                 editModeControls.classList.add('hidden');
-                 deleteDayButton.classList.add('hidden');
-                 actionsHeader.classList.add('hidden');
-                 completionPercHeader.classList.add('hidden');
-
-                 tableBody.innerHTML = updatedRows.map((rowData, rowIndex) =>
-                    createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)
-                 ).join('');
-                 
-                 const dayDataForProgress = { rows: updatedRows };
-                 updateDailyProgressUI(monthId, weekId, dayIndex, dayDataForProgress);
-				 
-                 daySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                 
-                 // 6. Save in background
-                 saveDataToFirebase(monthDocRef, updatePayload, false);
-				 daySection.classList.remove('saving');
              }
-			 
-		}
-
+        }
+		
+		
 		/**
          * Step 1 (Robust): Parse DOM and prepare save data (Cache First -> Network Fallback)
          */
