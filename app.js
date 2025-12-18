@@ -3567,114 +3567,100 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
         
         /**
-         * Displays the current question and options. (UPGRADED with DocumentFragment)
+         * Displays the current question and options. (UPDATED: Persists Explanation)
          */
         function loadQuizQuestion() {
             quizOptionsContainer.innerHTML = '';
             
-            // 1. Remove any existing note from previous render to avoid duplicates
+            // 1. Remove any existing note from previous render
             const oldNote = document.getElementById('quiz-instant-note');
             if (oldNote) oldNote.remove();
             
             const q = currentQuizQuestions[currentQuizQuestionIndex];
             
-            // Update Question Text
-            quizQuestionText.innerHTML = `<span class="text-indigo-600 font-bold mr-2">${currentQuizQuestionIndex + 1}.</span>${escapeHtml(q.question)}`;
-            
-            // Generate Options
-            q.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = `w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors duration-200 flex items-start`;
+            quizQuestionNumber.textContent = `Question ${currentQuizQuestionIndex + 1}/${currentQuizQuestions.length}`;
+            quizQuestionText.textContent = q.question;
+
+            // --- Button State Logic ---
+            quizNextBtn.disabled = (q.userAnswer === null);
+            quizSkipBtn.hidden = (q.userAnswer !== null);
+            quizPrevBtn.hidden = (currentQuizQuestionIndex === 0);
+
+            // --- OPTIMIZED RENDERING ---
+            const fragment = new DocumentFragment();
+
+            q.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = "quiz-option-btn";
                 
-                // Restore state if already answered
-                if (q.userAnswer !== null) {
-                    if (opt === q.correctAnswer) {
-                        btn.classList.add('bg-green-100', 'border-green-300', 'text-green-800');
-                    } else if (opt === q.userAnswer && opt !== q.correctAnswer) {
-                        btn.classList.add('bg-red-100', 'border-red-300', 'text-red-800');
-                    } else {
-                        btn.classList.add('opacity-50');
-                    }
-                    btn.disabled = true;
+                if (banglaRegex.test(option)) {
+                    button.classList.add('quiz-option-bangla');
                 }
-                
-                btn.innerHTML = `
-                    <span class="font-bold mr-2 flex-shrink-0">${getOptionLabel(index, q.question)}.</span>
-                    <span>${escapeHtml(opt)}</span>
-                `;
-                btn.onclick = () => selectQuizAnswer(btn, opt);
-                quizOptionsContainer.appendChild(btn);
+
+                if (q.userAnswer !== null) {
+                    // Question answered: Lock buttons & Show colors
+                    button.disabled = true;
+                    if (option === q.correctAnswer) {
+                        button.classList.add('correct');
+                    } else if (option === q.userAnswer) {
+                        button.classList.add('incorrect');
+                    }
+                } else {
+                    // New question: Add click listener
+                    button.onclick = () => selectQuizAnswer(button, option);
+                }
+                fragment.appendChild(button);
             });
 
-            // Update Status Bar
-            quizProgressFill.style.width = `${((currentQuizQuestionIndex) / currentQuizQuestions.length) * 100}%`;
-            quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`;
+            quizOptionsContainer.appendChild(fragment);
 
-            // Control Buttons
-            quizPrevBtn.disabled = (currentQuizQuestionIndex === 0);
-            
-            // If answered, enable Next, hide Skip. Else, disable Next, show Skip.
-            if (q.userAnswer !== null) {
-                quizNextBtn.disabled = false;
-                quizSkipBtn.hidden = true;
-
-                // --- NEW: RE-RENDER NOTE IF ANSWERED (PERSISTENCE) ---
-                if (q.note) {
-                    const noteDiv = document.createElement('div');
-                    noteDiv.id = 'quiz-instant-note';
-                    noteDiv.className = 'mt-4 p-3 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm explanation-text';
-                    noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(q.note)}`;
-                    
-                    // Insert after the options
-                    quizOptionsContainer.parentNode.insertBefore(noteDiv, quizOptionsContainer.nextSibling);
-                }
-                // -----------------------------------------------------
-            } else {
-                quizNextBtn.disabled = true;
-                quizSkipBtn.hidden = false;
+            // --- FIX: RE-RENDER NOTE IF ALREADY ANSWERED ---
+            if (q.userAnswer !== null && q.note) {
+                const noteDiv = document.createElement('div');
+                noteDiv.id = 'quiz-instant-note';
+                noteDiv.className = 'mt-4 p-3 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm explanation-text';
+                noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(q.note)}`;
+                
+                // Insert after the options container
+                quizOptionsContainer.parentNode.insertBefore(noteDiv, quizOptionsContainer.nextSibling);
             }
+            // ----------------------------------------------
         }
 		
-		
-        /**
-         * Handles the user's answer selection. (UPGRADED with Auto-Advance)
+       /**
+         * Handles the user's answer selection. (UPDATED: Note on Correct/Wrong)
          */
         function selectQuizAnswer(selectedButton, selectedOption) {
             const q = currentQuizQuestions[currentQuizQuestionIndex];
+            
+            // Do nothing if already answered
             if (q.userAnswer !== null) return;
 
+            // Store the answer
             q.userAnswer = selectedOption;
             const isCorrect = (selectedOption === q.correctAnswer);
             q.isCorrect = isCorrect;
             
-            // Update Score
+            // Apply scoring
             if (isCorrect) currentQuizScore += 1;
             else currentQuizScore -= 0.25;
             
             quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`;
 
-            // Update UI Colors
+            // Apply visual feedback to buttons
             Array.from(quizOptionsContainer.children).forEach(btn => {
-                const btnText = btn.innerText.split('.').slice(1).join('.').trim(); 
-                // Note: This text matching is a bit risky if options have dots. 
-                // Better to rely on index if possible, but keeping your existing style:
-                
-                // Re-matching logic based on your existing structure:
-                if (btn.innerHTML.includes(escapeHtml(q.correctAnswer))) {
-                     btn.classList.add('bg-green-100', 'border-green-300', 'text-green-800');
-                     btn.classList.remove('hover:bg-gray-50');
-                } else if (btn === selectedButton && !isCorrect) {
-                     btn.classList.add('bg-red-100', 'border-red-300', 'text-red-800');
-                     btn.classList.remove('hover:bg-gray-50');
-                } else {
-                     btn.classList.add('opacity-50');
-                }
                 btn.disabled = true;
+                if (btn.textContent === q.correctAnswer) {
+                    btn.classList.add('correct');
+                } else if (btn.textContent === selectedOption) {
+                    btn.classList.add('incorrect');
+                }
             });
 
-            // --- CHANGED: SHOW NOTE FOR ANY ANSWER (CORRECT OR WRONG) ---
+            // --- CHANGED: SHOW NOTE IMMEDIATELY (CORRECT OR WRONG) ---
             if (q.note) {
-                // Remove existing if any (just in case)
+                // Remove old note just in case
                 const oldNote = document.getElementById('quiz-instant-note');
                 if (oldNote) oldNote.remove();
 
@@ -3685,25 +3671,29 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 
                 quizOptionsContainer.parentNode.insertBefore(noteDiv, quizOptionsContainer.nextSibling);
             }
-            // -----------------------------------------------------------
-
+            // ---------------------------------------------------------
+            
+            // Enable "Next" button immediately so user can proceed manually
             quizNextBtn.disabled = false;
             quizSkipBtn.hidden = true;
 
+            // Auto-advance Logic
             if (isCorrect) {
-                // Auto Advance (You might want to increase this delay if you want users to read the note)
+                // Optional: You can keep the auto-advance delay here
+                // or remove it if you want them to read the note first.
+                // Currently set to 1 second (1000ms) to give time to see the green color.
                 setTimeout(() => {
+                    // Only auto-advance if it's NOT the last question
                     if (currentQuizQuestionIndex < currentQuizQuestions.length - 1) {
                         currentQuizQuestionIndex++;
                         loadQuizQuestion();
+                        quizQuestionArea.classList.add('slide-in-right');
                     } else {
-                         // End of quiz
-                         // finishQuiz(); // Optional: Auto finish
+                        showQuizResults();
                     }
-                }, 100); 
+                }, 1000); 
             }
         }
-		
 		
         function showQuizResults() {
 			if (quizTimerInterval) clearInterval(quizTimerInterval);
