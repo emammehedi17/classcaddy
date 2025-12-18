@@ -2016,17 +2016,17 @@ function updateMonthUI(monthId, monthData, weeksData) {
             try {
                 const dayIndex = parseInt(daySection.dataset.dayIndex);
                 let freshDaysArray = [];
-                let usedCache = false;
                 
+                // 1. Try Reading from Cache (Robust Check)
                 if (typeof activeWeeksDataCache !== 'undefined' && 
                     activeWeeksDataCache[weekId] && 
                     activeWeeksDataCache[weekId].days &&
                     activeWeeksDataCache[weekId].days[dayIndex]
                    ) {
                     freshDaysArray = JSON.parse(JSON.stringify(activeWeeksDataCache[weekId].days));
-                    usedCache = true;
                 } 
                 else {
+                    // 2. Fallback to Network
                     console.log(`Cache miss for Day ${dayIndex}. Fetching from network...`);
                     const monthId = daySection.closest('.card[data-month-id]').dataset.monthId;
                     const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
@@ -2034,7 +2034,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     
                     if (weekDocSnap.exists()) {
                         freshDaysArray = weekDocSnap.data().days || [];
-                        
+                        // Refill cache
                         if (typeof activeWeeksDataCache === 'undefined') activeWeeksDataCache = {};
                         if (!activeWeeksDataCache[weekId]) activeWeeksDataCache[weekId] = {};
                         activeWeeksDataCache[weekId].days = freshDaysArray;
@@ -2044,9 +2044,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 }
                 
                 const currentDayData = freshDaysArray[dayIndex];
-                
                 if (!currentDayData) {
-                    throw new Error(`Day data for index ${dayIndex} not found (Total days: ${freshDaysArray.length}).`);
+                    throw new Error(`Day data for index ${dayIndex} not found.`);
                 }
                 
                 const updatedRows = [];
@@ -2066,7 +2065,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          completed = existingRowData.completed || false;
                          const percInput = row.querySelector('.completion-perc-input')?.value;
                          completionPercentage = parsePercentage(percInput);
-                         
                          story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
                          
                          const mcqBtn = row.querySelector('.add-row-mcq-btn');
@@ -2114,6 +2112,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 return null;
             }
         }
+		
 		
        /**
          * Step 2: Save to Database (UPDATED: Accepts explicit WeekID)
@@ -2377,70 +2376,94 @@ function addVocabPairInputs(container, word = '', meaning = '') {
              showConfirmationModal(`Delete ${dayNum}`, `Are you sure you want to delete all entries for ${dayNum}? This action cannot be undone.`, () => deleteDay(monthId, weekId, daySection, dayIndex));
          }
 		 
-         function deleteDay(monthId, weekId, daySection, dayIndex) {
+         // Delete Day (UPDATED: Robust Cache-Aware)
+         async function deleteDay(monthId, weekId, daySection, dayIndex) {
             if (!currentUser || !userId) return;
             
-            const weekSection = daySection.closest('.week-section'); 
-            daySection.remove();
+            const weekSection = daySection.closest('.week-section');
+            setSyncStatus("Deleting...", "yellow");
             
-            // ... (UI logic for buttons remains the same) ...
-            const remainingDays = weekSection.querySelectorAll('.day-section').length;
-            const buttonContainer = weekSection.querySelector('.days-container').nextElementSibling;
-            let newButtonHtml = '';
-            if (remainingDays < 7) {
-                if (remainingDays > 0) {
-                    newButtonHtml = `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>`;
+            try {
+                // 1. GET DATA (Try Cache First, then Network)
+                let daysArray = [];
+                
+                // Try Cache
+                if (activeWeeksDataCache && activeWeeksDataCache[weekId] && activeWeeksDataCache[weekId].days) {
+                    // Deep copy to avoid reference issues
+                    daysArray = JSON.parse(JSON.stringify(activeWeeksDataCache[weekId].days));
                 } else {
-                    newButtonHtml = `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`;
-                    const daysContainer = weekSection.querySelector('.days-container');
-                    if (daysContainer) {
-                        daysContainer.innerHTML = '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
+                    // Fallback to Network
+                    const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                    const weekDocSnap = await getDoc(weekDocRef);
+                    if (weekDocSnap.exists()) {
+                        daysArray = weekDocSnap.data().days || [];
                     }
                 }
-            } else {
-                newButtonHtml = '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>';
+
+                // 2. VALIDATE & MODIFY
+                if (!daysArray[dayIndex]) {
+                     console.warn("Day index not found in data. UI might be out of sync.");
+                     daySection.remove(); // Just remove UI element
+                     setSyncStatus("Synced", "green");
+                     return; 
+                }
+
+                // Remove the day
+                daysArray.splice(dayIndex, 1);
+
+                // Renumber remaining days
+                daysArray.forEach((day, idx) => {
+                    day.dayNumber = idx + 1;
+                });
+
+                // 3. SAVE TO FIREBASE
+                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                await updateDoc(weekDocRef, { days: daysArray });
+
+                // 4. UPDATE CACHE INSTANTLY (Crucial Step)
+                if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
+                    activeWeeksDataCache[weekId].days = daysArray;
+                }
+
+                // 5. UPDATE UI (Re-render container to fix numbers)
+                const daysContainer = weekSection.querySelector('.days-container');
+                if (daysContainer) {
+                    daysContainer.innerHTML = ''; // Clear
+                    if (daysArray.length === 0) {
+                        daysContainer.innerHTML = '<p class="text-gray-500 italic text-sm py-4 text-center">No days added yet.</p>';
+                    } else {
+                        daysArray.forEach((dayData, idx) => {
+                            daysContainer.insertAdjacentHTML('beforeend', createDayElement(monthId, weekId, idx, dayData));
+                        });
+                    }
+                }
+
+                // Update "Add Day" button visibility
+                const buttonContainer = weekSection.querySelector('.days-container').nextElementSibling;
+                let newButtonHtml = '';
+                if (daysArray.length < 7) {
+                     if (daysArray.length > 0) {
+                         newButtonHtml = `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>`;
+                     } else {
+                         newButtonHtml = `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`;
+                     }
+                } else {
+                     newButtonHtml = '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>';
+                }
+                if (buttonContainer) {
+                     buttonContainer.outerHTML = newButtonHtml;
+                }
+
+                setSyncStatus("Deleted", "green");
+                console.log("Day deleted and re-indexed successfully.");
+
+            } catch (error) {
+                console.error("Error deleting day:", error); 
+                showCustomAlert("Error deleting day. Please refresh.", "error"); 
+                setSyncStatus("Error", "red");
             }
-            if (buttonContainer) {
-                buttonContainer.outerHTML = newButtonHtml;
-            }
-            // --- END: UI Logic ---
-            
-            setSyncStatus("Syncing...", "yellow");
-            
-            // --- START: MODIFIED ---
-            const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
-             
-            getDoc(weekDocRef).then(weekDocSnap => {
-                 if (!weekDocSnap.exists()) throw new Error("Week document not found.");
-                 
-                 let daysArray = weekDocSnap.data().days || [];
-                 
-                 if (!daysArray[dayIndex]) {
-                    console.warn("Day not found in Firestore, UI is now in sync.");
-                    setSyncStatus("Synced", "green");
-                    return; 
-                 }
-                 
-                 daysArray.splice(dayIndex, 1);
-                 for (let i = dayIndex; i < daysArray.length; i++) { daysArray[i].dayNumber = i + 1; }
-                 
-                 return updateDoc(weekDocRef, { days: daysArray });
-                 
-             }).then(() => {
-                 console.log("Delete command sent to Firestore.");
-                 
-                 // --- START: NEW FIX ---
-                 // The UI is already updated. Just set the sync status.
-                 setSyncStatus("Synced", "green");
-                 // --- END: NEW FIX ---
-                 
-             }).catch(error => {
-                 console.error("Error deleting day:", error); 
-                 showCustomAlert("Error deleting day. Please refresh.", "error"); 
-                 setSyncStatus("Error", "red");
-             });
-             // --- END: MODIFIED ---
          }
+		 
 		 
          function confirmDeleteMonth(monthId, monthName) {
              showConfirmationModal(
