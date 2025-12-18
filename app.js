@@ -2012,28 +2012,39 @@ function updateMonthUI(monthId, monthData, weeksData) {
              }
         }
 		
-		/**
+		//**
          * Step 1 (Robust): Parse DOM and prepare save data (Cache First -> Network Fallback)
          */
         async function parseAndPrepareSaveData(daySection, weekId, isCheckboxClick = false) {
             try {
                 const dayIndex = parseInt(daySection.dataset.dayIndex);
                 let freshDaysArray = [];
+                let usedCache = false;
                 
-                // 1. Try Reading from Cache (Instant)
-                if (typeof activeWeeksDataCache !== 'undefined' && activeWeeksDataCache[weekId] && activeWeeksDataCache[weekId].days) {
+                // 1. Try Reading from Cache (Must contain the specific DAY index)
+                if (typeof activeWeeksDataCache !== 'undefined' && 
+                    activeWeeksDataCache[weekId] && 
+                    activeWeeksDataCache[weekId].days &&
+                    activeWeeksDataCache[weekId].days[dayIndex] // <--- NEW CHECK: Ensure this day actually exists in cache
+                   ) {
                     // Deep copy from cache
                     freshDaysArray = JSON.parse(JSON.stringify(activeWeeksDataCache[weekId].days));
+                    usedCache = true;
                 } 
-                // 2. Fallback to Network (Safe) - If cache is missing/empty
+                // 2. Fallback to Network (If cache is missing OR stale/missing this day)
                 else {
-                    console.log("Cache miss during save. Fetching from network...");
+                    console.log(`Cache miss for Day ${dayIndex}. Fetching from network...`);
                     const monthId = daySection.closest('.card[data-month-id]').dataset.monthId;
                     const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
                     const weekDocSnap = await getDoc(weekDocRef);
                     
                     if (weekDocSnap.exists()) {
                         freshDaysArray = weekDocSnap.data().days || [];
+                        
+                        // Update cache for next time
+                        if (!activeWeeksDataCache) activeWeeksDataCache = {};
+                        if (!activeWeeksDataCache[weekId]) activeWeeksDataCache[weekId] = {};
+                        activeWeeksDataCache[weekId].days = freshDaysArray;
                     } else {
                         throw new Error("Week document not found.");
                     }
@@ -2042,7 +2053,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 const currentDayData = freshDaysArray[dayIndex];
                 
                 if (!currentDayData) {
-                    throw new Error(`Day data for index ${dayIndex} not found.`);
+                    // If still missing after network fetch, something is really wrong
+                    throw new Error(`Day data for index ${dayIndex} not found (Total days: ${freshDaysArray.length}).`);
                 }
                 
                 const updatedRows = [];
@@ -2050,7 +2062,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                 rowElements.forEach((row) => {
                     let existingRowIndex = parseInt(row.dataset.rowIndex);
-                    // Handle new rows (index might be -1 or new)
                     const existingRowData = (!isNaN(existingRowIndex) && existingRowIndex !== -1 && currentDayData.rows?.[existingRowIndex]) 
                         ? currentDayData.rows[existingRowIndex] 
                         : {};
@@ -2067,7 +2078,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          
                          story = (subject.toLowerCase() === 'vocabulary') ? (existingRowData.story || null) : null;
                          
-                         // Check for Temporary MCQ Data on the button
                          const mcqBtn = row.querySelector('.add-row-mcq-btn');
                          if (mcqBtn && mcqBtn.dataset.tempMcq) {
                              mcqData = JSON.parse(mcqBtn.dataset.tempMcq);
@@ -2110,7 +2120,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
             } catch (error) {
                 console.error("Error parsing day plan from DOM:", error);
-                showCustomAlert("Error reading data. Cannot save.");
+                showCustomAlert("Error reading data. Cannot save.", "error");
                 return null;
             }
         }
@@ -2528,7 +2538,7 @@ function addVocabPairInputs(container, word = '', meaning = '') {
              confirmModal.style.display = 'block';
          }
 
-       // Add New Day (UPDATED: Copies Previous Week's Last Day if Week is New)
+       /// Add New Day (UPDATED: Updates Cache Instantly)
         async function addNewDay(monthId, weekId, weekSection) {
             if (!currentUser || !userId) return;
             
@@ -2540,7 +2550,6 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  const weekDocSnap = await getDoc(weekDocRef);
                  let daysArray = [];
                  
-                 // 1. Get current days to determine index
                  if (weekDocSnap.exists()) {
                      daysArray = weekDocSnap.data().days || [];
                  }
@@ -2553,36 +2562,28 @@ function addVocabPairInputs(container, word = '', meaning = '') {
 
                  let sourceRows = [];
 
-                 // 2. DETERMINE SOURCE DATA
+                 // Determine Source Data
                  if (daysArray.length > 0) {
-                     // CASE A: Week already has days. Copy the last day of THIS week.
                      sourceRows = daysArray[daysArray.length - 1].rows || [];
                  } else {
-                     // CASE B: Week is empty. Check if we can copy from the PREVIOUS week.
-                     const currentWeekNum = parseInt(weekId.replace('week', '')); // e.g., 2
-                     
+                     const currentWeekNum = parseInt(weekId.replace('week', '')); 
                      if (currentWeekNum > 1) {
                          const prevWeekId = `week${currentWeekNum - 1}`;
                          const prevWeekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', prevWeekId);
                          const prevWeekSnap = await getDoc(prevWeekDocRef);
-                         
                          if (prevWeekSnap.exists()) {
                              const prevDays = prevWeekSnap.data().days || [];
                              if (prevDays.length > 0) {
-                                 // Found data in previous week! Use its last day.
                                  sourceRows = prevDays[prevDays.length - 1].rows || [];
-                                 console.log(`Copied data from ${prevWeekId} for new ${weekId} day.`);
                              }
                          }
                      }
                  }
 
-                 // 3. Fallback if no source found (e.g., Week 1 Day 1)
                  if (sourceRows.length === 0) {
                      sourceRows = [{ subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }];
                  }
 
-                 // 4. Create the new day object
                  const newDayIndex = daysArray.length;
                  const newDayData = { 
                      dayNumber: newDayIndex + 1, 
@@ -2591,23 +2592,31 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                          subject: row.subject || '', 
                          topic: (row.subject?.toLowerCase() === 'vocabulary') ? null : (row.topic || ''), 
                          completed: false, 
-                         comment: row.comment || '', // Copies comment as requested previously
+                         comment: row.comment || '', 
                          completionPercentage: row.completionPercentage ?? null, 
                          vocabData: (row.subject?.toLowerCase() === 'vocabulary') ? (row.vocabData || null) : null, 
                          story: null 
                      })) 
                  };
                  
-                 // 5. Save to Firebase
+                 // 1. Update Firebase
                  if (weekDocSnap.exists()) {
                      await updateDoc(weekDocRef, { days: arrayUnion(newDayData) });
                  } else {
                      await setDoc(weekDocRef, { days: [newDayData] });
                  }
+
+                 // 2. --- NEW: Update Global Cache Instantly ---
+                 if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
+                     if (!activeWeeksDataCache[weekId].days) activeWeeksDataCache[weekId].days = [];
+                     activeWeeksDataCache[weekId].days.push(newDayData);
+                     console.log("Global cache updated with new day.");
+                 }
+                 // --------------------------------------------
                  
                  console.log("New day added successfully.");
                  
-                 // --- UI UPDATE LOGIC ---
+                 // UI Updates
                  const newDayHtml = createDayElement(monthId, weekId, newDayIndex, newDayData);
                  const daysContainer = weekSection.querySelector('.days-container');
                  if (!daysContainer) return;
@@ -2646,11 +2655,10 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  
              } catch (error) { 
                  console.error("Error adding new day:", error); 
-                 showCustomAlert("Error adding new day."); 
+                 showCustomAlert("Error adding new day.", "error"); 
                  setSyncStatus("Error", "red"); 
              }
         }
-		
 		
 		
         // --- Monthly Target Edit ---
