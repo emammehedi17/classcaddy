@@ -4420,13 +4420,14 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
 		
 		
-       // 3. ✨ The Magic Parser Function (UPDATED: Detects Bracket Notes)
+       // 3. ✨ The Magic Parser Function (UPDATED: Detects (ক)/(a) style options)
         function parseMcqText(text) {
             let cleanText = text.replace(/\n*([০-৯0-9]+\.)/g, '\n$1');
             const mcqData = [];
             
+            // Updated Regex: Supports "a.", "(a)", "ক.", "(ক)" style delimiters
             const mcqRegex = 
-/(?:^|\n)\s*([০-৯0-9]+)\.(?!\d)((?:(?!\n\s*[০-৯0-9]+\.(?!\d))[\s\S])+?)\n\s*(?:(?:ক\.)|(?:a\.))\s*([\s\S]+?)\n\s*(?:(?:খ\.)|(?:b\.))\s*([\s\S]+?)\n\s*(?:(?:গ\.)|(?:c\.))\s*([\s\S]+?)\n\s*(?:(?:ঘ\.)|(?:d\.))\s*([\s\S]+?)\n\s*(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([\s\S]+?)(?=\n\s*[০-৯0-9]+\.(?!\d)|\n*$)/gi;
+/(?:^|\n)\s*([০-৯0-9]+)\.(?!\d)((?:(?!\n\s*[০-৯0-9]+\.(?!\d))[\s\S])+?)\n\s*(?:[\(]?(?:ক|a)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:খ|b)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:গ|c)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:ঘ|d)[\.\)])\s*([\s\S]+?)\n\s*(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([\s\S]+?)(?=\n\s*[০-৯0-9]+\.(?!\d)|\n*$)/gi;
             
             let match;
             while ((match = mcqRegex.exec(cleanText)) !== null) {
@@ -4437,10 +4438,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     let rawAnswerLine = match[7].trim();
                     let noteText = null;
 
-                    // --- NOTE PARSING LOGIC (UPDATED) ---
+                    // --- NOTE PARSING LOGIC ---
                     
                     // 1. Check for Explicit Keywords (Note:, NB:, Explanation:, etc.)
-                    // We split by newline or spaces to catch "c Note:..." or multi-line notes
                     const noteSplitRegex = /(?:[\n\s]+)(?:Note|NB|N\.B\.|Explanation|Ex|Exp|ব্যাখ্যা|দ্রষ্টব্য)\s*[:\-]?\s*/i;
                     const splitMatch = rawAnswerLine.split(noteSplitRegex);
 
@@ -4449,14 +4449,11 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                         rawAnswerLine = splitMatch[0].trim();
                         noteText = splitMatch.slice(1).join(' ').trim();
                     } else {
-                        // Case B: No keyword found, check for Implicit Brackets (...)
-                        // Looks for: "Answer (Note text)" pattern at the end of the string
-                        const bracketRegex = /^(.*?)\s*\((.+)\)$/s; // 's' flag allows dot to match newlines if needed
+                        // Case B: Check for Implicit Brackets (...)
+                        const bracketRegex = /^(.*?)\s*\((.+)\)$/s;
                         const bracketMatch = rawAnswerLine.match(bracketRegex);
                         
                         if (bracketMatch) {
-                            // bracketMatch[1] = Answer (e.g., "c")
-                            // bracketMatch[2] = Note content (e.g., "বইয়ের উত্তরে...")
                             rawAnswerLine = bracketMatch[1].trim();
                             noteText = bracketMatch[2].trim();
                         }
@@ -4502,7 +4499,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             }
             return mcqData;
         }
-		
 		
 		
 		
