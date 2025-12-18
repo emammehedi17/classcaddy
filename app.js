@@ -1906,9 +1906,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  actionsHeader.classList.remove('hidden');
                  completionPercHeader.classList.remove('hidden');
 
-                 // --- LOAD DATA (Try Cache First) ---
+                 // --- LOAD DATA ---
                  let dayData = null;
-                 
                  if (activeWeeksDataCache && activeWeeksDataCache[weekId] && activeWeeksDataCache[weekId].days) {
                      dayData = activeWeeksDataCache[weekId].days[dayIndex];
                  }
@@ -1935,7 +1934,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          if (autosaveTimer) clearTimeout(autosaveTimer);
                          autosaveTimer = setTimeout(() => {
                              console.log("Autosaving changes...");
-                             saveDataToFirebase(doc(db, getUserPlansCollectionPath(), monthId), parseAndPrepareSaveData(daySection, weekId).updatePayload, true); 
+                             // Pass weekId to autosave too
+                             saveDataToFirebase(doc(db, getUserPlansCollectionPath(), monthId), parseAndPrepareSaveData(daySection, weekId).updatePayload, true, weekId); 
                          }, 2500); 
                      }
                  };
@@ -1944,7 +1944,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
              }
 
 			 else {
-                 // --- SAVING AND EXITING (BLOCKING WITH UI FEEDBACK) ---
+                 // --- SAVING AND EXITING (BLOCKING) ---
                  
                  // 1. Stop autosave
                  if (autosaveTimer) clearTimeout(autosaveTimer);
@@ -1960,7 +1960,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  
                  // 3. Parse Data
                  const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
-                 // We await this to get the latest values from the inputs
                  const parseResult = await parseAndPrepareSaveData(daySection, weekId);
                  
                  if (parseResult === null) {
@@ -1973,15 +1972,16 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  const { updatedRows, updatePayload } = parseResult;
 
                  try {
-                     // 4. WAIT FOR SAVE TO COMPLETE (Blocking)
-                     await saveDataToFirebase(monthDocRef, updatePayload, false);
+                     // 4. WAIT FOR SAVE TO COMPLETE
+                     // We explicitly pass 'weekId' here to avoid DOM errors
+                     await saveDataToFirebase(monthDocRef, updatePayload, false, weekId);
 
-                     // 5. Update Cache (Post-save)
+                     // 5. Update Cache
                      if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
                          activeWeeksDataCache[weekId].days = updatePayload.days;
                      }
 
-                     // 6. Update UI (Exit Edit Mode)
+                     // 6. Update UI
                      daySection.classList.remove('editing');
                      daySection.classList.remove('is-collapsed'); 
                      
@@ -1991,7 +1991,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      actionsHeader.classList.add('hidden');
                      completionPercHeader.classList.add('hidden');
 
-                     // Re-render row as Read-Only
                      tableBody.innerHTML = updatedRows.map((rowData, rowIndex) =>
                         createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)
                      ).join('');
@@ -1999,7 +1998,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      const dayDataForProgress = { rows: updatedRows };
                      updateDailyProgressUI(monthId, weekId, dayIndex, dayDataForProgress);
                      
-                     // Reset Button
                      saveButton.innerHTML = `<i class="fas fa-save mr-1"></i> Save`;
                      saveButton.disabled = false;
                      
@@ -2007,15 +2005,12 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                  } catch (error) {
                      console.error("Save failed:", error);
-                     showCustomAlert("Failed to save changes. Please try again.", "error");
-                     
-                     // Revert button so user can try again
+                     // Alert handled in saveDataToFirebase
                      saveButton.innerHTML = originalBtnText;
                      saveButton.disabled = false;
                  }
              }
         }
-		
 		
 		/**
          * Step 1 (Robust): Parse DOM and prepare save data (Cache First -> Network Fallback)
@@ -2121,10 +2116,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
         }
 		
 		
-        /**
-         * ধাপ ২ (নতুন): ডেটাবেসে সেভ করে (Asynchronous)
+       /**
+         * Step 2: Save to Database (UPDATED: Accepts explicit WeekID)
          */
-        async function saveDataToFirebase(monthDocRef, updatePayload, isAutosave = false) {
+        async function saveDataToFirebase(monthDocRef, updatePayload, isAutosave = false, passedWeekId = null) {
             try {
                 if (!isAutosave) {
                     setSyncStatus("Syncing...", "yellow");
@@ -2132,25 +2127,31 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 
                 const editingDay = document.querySelector('.day-section.editing, .day-section.saving'); 
                 
-                let weekId;
+                let weekId = passedWeekId; // 1. Use passed ID if available
                 let dayIndexForTimestamp = null;
                 let wasCheckboxClick = false;
 
-                if (isAutosave && editingDay) {
-                    // This is an autosave from typing
-                    weekId = editingDay.closest('.week-section').dataset.weekId;
-                } else if (isCheckboxClickGlobal) { 
-                    // This is a checkbox click
-                    weekId = isCheckboxClickGlobal.weekId;
-                    dayIndexForTimestamp = isCheckboxClickGlobal.dayIndex;
-                    wasCheckboxClick = true;
-                    isCheckboxClickGlobal = null; // Clear it now that we've used it
-                } else {
-                    // This is a manual "Save" button click
-                    const savingDay = document.querySelector('.day-section.saving');
-                    if (savingDay) {
-                        weekId = savingDay.closest('.week-section').dataset.weekId;
-                        savingDay.classList.remove('saving'); // Clean up
+                // 2. If no ID passed, try to determine from context
+                if (!weekId) {
+                    if (isAutosave && editingDay) {
+                        // Autosave from typing
+                        weekId = editingDay.closest('.week-section').dataset.weekId;
+                    } else if (isCheckboxClickGlobal) { 
+                        // Checkbox click
+                        weekId = isCheckboxClickGlobal.weekId;
+                        dayIndexForTimestamp = isCheckboxClickGlobal.dayIndex;
+                        wasCheckboxClick = true;
+                        isCheckboxClickGlobal = null; 
+                    } else {
+                        // Manual Save (Fallback for old logic)
+                        const savingDay = document.querySelector('.day-section.saving');
+                        if (savingDay) {
+                            weekId = savingDay.closest('.week-section').dataset.weekId;
+                            savingDay.classList.remove('saving'); 
+                        } else if (editingDay) {
+                            // Support blocking save where class is still 'editing'
+                            weekId = editingDay.closest('.week-section').dataset.weekId;
+                        }
                     }
                 }
 
@@ -2158,16 +2159,11 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     throw new Error("Could not determine weekId for save operation.");
                 }
 
-                // --- START: MODIFIED - PARALLEL SAVE ---
-                
-                // 1. Create a list of promises to run
+                // --- PARALLEL SAVE ---
                 const savePromises = [];
-
-                // 2. Promise 1: Save the (large) 'days' array to the WEEK document
                 const weekDocRef = doc(db, monthDocRef.path, 'weeks', weekId);
                 savePromises.push( updateDoc(weekDocRef, updatePayload) );
                 
-                // 3. Promise 2: If it was a checkbox click, save the (small) timestamp to the MONTH document
                 if (wasCheckboxClick) {
                     const monthUpdatePayload = { 
                         lastCompletedDay: { 
@@ -2176,25 +2172,20 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             dayIndex: dayIndexForTimestamp 
                         } 
                     };
-                    // This save will trigger the onSnapshot listener for the month
                     savePromises.push( updateDoc(monthDocRef, monthUpdatePayload) );
                 }
 
-                // 4. Run all saves at the same time
                 await Promise.all(savePromises);
                 
+                // Update Cache
 				if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
-                    // updatePayload.days contains the full updated array for this week
                     if (updatePayload.days) {
                         activeWeeksDataCache[weekId].days = updatePayload.days;
                         console.log("Global cache updated with saved data.");
                     }
                 }
 				
-                if (wasCheckboxClick) {
-                    console.log("Updated lastCompletedDay timestamp on month doc.");
-                }
-                // --- END: MODIFIED - PARALLEL SAVE ---
+                if (wasCheckboxClick) console.log("Updated lastCompletedDay timestamp.");
                 
                 console.log("Save successful.");
                 if (!isAutosave) {
@@ -2202,11 +2193,11 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 }
             } catch (error) {
                 console.error("Error saving day plan to Firebase:", error);
-                showCustomAlert("Error saving changes. Please check your connection and try again.");
+                showCustomAlert("Error saving changes. Please check your connection.", "error");
                 setSyncStatus("Error", "red");
+                throw error; // Re-throw so the caller knows it failed
             }
         }
-		
 	
 	// Missing Function: Handles Autosave (Background Save without UI toggle)
         async function saveDayPlan(monthId, weekId, daySection, isAutosave = true) {
