@@ -4593,8 +4593,9 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
             // --- NEW: DISPLAY NOTE BELOW ANSWER ---
             let noteHtml = '';
             if (mcq.note) {
+                // Added 'explanation-text' class
                 noteHtml = `
-                    <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+                    <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800 explanation-text">
                         <span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(mcq.note)}
                     </div>
                 `;
@@ -7605,7 +7606,7 @@ window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
     }
 };
 
-// 3. Render the Cards (UPDATED: font-semibold for Answer)
+// 3. Render the Cards (UPDATED: With Resizable Explanation)
 function renderStudyView(mcqs) {
     if (mcqs.length === 0) {
         mcqStudyContent.innerHTML = '<div class="text-center py-10 text-gray-500">No MCQs found here.</div>';
@@ -7616,6 +7617,38 @@ function renderStudyView(mcqs) {
     mcqs.forEach((mcq, idx) => {
         const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
         const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+        
+        // --- 1. Answer Box (Green/Yellow) ---
+        let answerHtml = '';
+        if (mcq.correctAnswer) {
+             answerHtml = `
+                <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm answer-card-bg">
+                    <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg">
+                        <i class="fas fa-check text-xs"></i>
+                    </div>
+                    <div class="font-semibold text-emerald-900 text-sm answer-text">
+                        Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
+                    </div>
+                </div>`;
+        } else {
+             // Added 'answer-text' class here so it resizes too
+             answerHtml = `
+                <div class="inline-flex items-center w-full sm:w-auto bg-amber-100 border border-amber-300 rounded-lg px-4 py-2 shadow-sm">
+                    <div class="flex-shrink-0 bg-amber-200 rounded-full p-1 mr-3 text-amber-700"><i class="fas fa-exclamation text-xs"></i></div>
+                    <div class="font-semibold text-amber-900 text-sm answer-text">Note: <span class="text-amber-800">${escapeHtml(mcq.explanation || "No Answer Defined")}</span></div>
+                </div>`;
+        }
+
+        // --- 2. Note/Explanation Box (Blue) ---
+        let noteHtml = '';
+        if (mcq.note) {
+            // Added 'explanation-text' class here
+            noteHtml = `
+                <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800 explanation-text">
+                    <span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(mcq.note)}
+                </div>
+            `;
+        }
 
         html += `
             <div class="study-card">
@@ -7633,22 +7666,17 @@ function renderStudyView(mcqs) {
                 </div>
 
                 <div class="mt-4 pt-2 border-t border-dashed border-gray-200">
-                    <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm answer-card-bg">
-                        <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg">
-                            <i class="fas fa-check text-xs"></i>
-                        </div>
-                        <div class="font-semibold text-emerald-900 text-sm answer-text">
-                            Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
-                        </div>
-                    </div>
+                    ${answerHtml}
+                    ${noteHtml}
                 </div>
-
             </div>
         `;
     });
     mcqStudyContent.innerHTML = html;
+    
+    // Apply current settings immediately
+    applySettingsToDom();
 }
-
 
 	// 5. NEW: Test Handler for Study View (UPDATED: Exits Fullscreen)
 document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
@@ -8033,16 +8061,27 @@ function applySettingsToDom() {
     ['mcq-study-content', 'view-mcq-content'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
+            // Base container font
             el.style.fontSize = `${globalSettings.fontSize}px`;
+            
+            // Question
             el.querySelectorAll('.study-question').forEach(q => q.style.fontSize = `${globalSettings.fontSize}px`);
+            
+            // Options
             el.querySelectorAll('.study-opt').forEach(o => o.style.fontSize = `${globalSettings.fontSize * 0.95}px`);
+            
+            // Answers (Correct/Note)
             el.querySelectorAll('.answer-text').forEach(a => a.style.fontSize = `${globalSettings.fontSize * 0.9}px`);
+            
+            // --- NEW: Explanation Text ---
+            el.querySelectorAll('.explanation-text').forEach(e => e.style.fontSize = `${globalSettings.fontSize * 0.9}px`);
         }
     });
 
     // Update Input Boxes
     document.querySelectorAll('#mcq-font-input, #view-mcq-font-input').forEach(inp => inp.value = globalSettings.fontSize);
 }
+
 
 // 4. Save Settings
 async function saveUserPreferences() {
