@@ -3488,6 +3488,83 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             return shouldShuffle ? shuffleArray(newOptions) : newOptions;
         }
 		
+		
+		// --- Global Settings Variables ---
+let globalSettings = {
+    mcqTimer: 60 // Default value
+};
+
+// --- DOM Elements for Settings ---
+const settingsModal = document.getElementById('settings-modal');
+const settingsBtn = document.getElementById('settings-btn');
+const saveSettingsBtn = document.getElementById('save-settings-btn');
+const settingMcqTimerInput = document.getElementById('setting-mcq-timer');
+
+// --- 1. Load Settings from Firebase (Call this in updateAuthUI) ---
+async function initSettingsSync(uid) {
+    if (!uid) return;
+    try {
+        const settingsDocRef = doc(db, `artifacts/${appId}/users/${uid}/settings`, 'general');
+        const docSnap = await getDoc(settingsDocRef);
+        
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            // Update global variable
+            if (data.mcqTimer) globalSettings.mcqTimer = parseInt(data.mcqTimer);
+            console.log("Settings loaded:", globalSettings);
+        } else {
+            // Create default settings if not exists
+            await setDoc(settingsDocRef, globalSettings);
+        }
+    } catch (error) {
+        console.error("Error loading settings:", error);
+    }
+}
+
+// --- 2. Open Settings Modal ---
+if (settingsBtn) {
+    settingsBtn.addEventListener('click', () => {
+        // Populate input with current value
+        settingMcqTimerInput.value = globalSettings.mcqTimer;
+        settingsModal.style.display = 'block';
+    });
+}
+
+// --- 3. Save Settings ---
+if (saveSettingsBtn) {
+    saveSettingsBtn.addEventListener('click', async () => {
+        if (!currentUser) return;
+        
+        const newTimer = parseInt(settingMcqTimerInput.value);
+        if (isNaN(newTimer) || newTimer < 5) {
+            showCustomAlert("Please enter a valid time (min 5 seconds).", "error");
+            return;
+        }
+
+        // Update UI state
+        const originalText = saveSettingsBtn.textContent;
+        saveSettingsBtn.textContent = "Saving...";
+        saveSettingsBtn.disabled = true;
+
+        try {
+            // Update Global Variable
+            globalSettings.mcqTimer = newTimer;
+
+            // Save to Firebase
+            const settingsDocRef = doc(db, `artifacts/${appId}/users/${userId}/settings`, 'general');
+            await setDoc(settingsDocRef, { mcqTimer: newTimer }, { merge: true });
+
+            showCustomAlert("Settings saved successfully!", "success");
+            closeModal('settings-modal');
+        } catch (error) {
+            console.error("Error saving settings:", error);
+            showCustomAlert("Failed to save settings.", "error");
+        } finally {
+            saveSettingsBtn.textContent = originalText;
+            saveSettingsBtn.disabled = false;
+        }
+    });
+}
 		/**
          * Resets state and starts the quiz game.
          */
