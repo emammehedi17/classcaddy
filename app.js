@@ -3543,7 +3543,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             // --- NEW TIMING LOGIC ---
             // If MCQ Data exists, use 20 seconds. Otherwise (Vocab), use 15 seconds.
-            const secondsPerQuestion = currentMcqData ? 20 : 15;
+            const secondsPerQuestion = currentMcqData ? 40 : 15;
             const totalTimeInSeconds = totalQuestions * secondsPerQuestion;
             // ------------------------
 
@@ -4895,7 +4895,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 }));
                 
                 const totalQuestions = currentQuizQuestions.length;
-                const totalTimeInSeconds = totalQuestions * 20;
+                const totalTimeInSeconds = totalQuestions * 40;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
                 warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
@@ -5139,7 +5139,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 }));
                 
                 const totalQuestions = currentQuizQuestions.length;
-                const totalTimeInSeconds = totalQuestions * 20;
+                const totalTimeInSeconds = totalQuestions * 40;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
                 warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
@@ -7772,7 +7772,7 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
 
     // 6. Calculate Time
     const totalQuestions = currentQuizQuestions.length;
-    const totalTimeInSeconds = totalQuestions * 20;
+    const totalTimeInSeconds = totalQuestions * 40;
 
     // 7. Update Start Screen Text
     const warningP = document.getElementById('quiz-total-time-warning');
@@ -7953,7 +7953,7 @@ if (viewMcqTestBtn) {
             question: mcq.question, options: [...mcq.options], correctAnswer: mcq.correctAnswer, explanation: mcq.explanation || null, note: mcq.note || null, userAnswer: null, isCorrect: null 
         }));
         
-        const totalTime = currentQuizQuestions.length * 36;
+        const totalTime = currentQuizQuestions.length * 40;
         const warningP = document.getElementById('quiz-total-time-warning');
         warningP.querySelector('span').textContent = formatTime(totalTime);
         warningP.style.display = 'block';
