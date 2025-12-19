@@ -3543,7 +3543,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             // --- NEW TIMING LOGIC ---
             // If MCQ Data exists, use 20 seconds. Otherwise (Vocab), use 15 seconds.
-            const secondsPerQuestion = currentMcqData ? 20 : 15;
+            const secondsPerQuestion = globalSettings.mcqTimer || 20;
             const totalTimeInSeconds = totalQuestions * secondsPerQuestion;
             // ------------------------
 
@@ -8058,13 +8058,14 @@ if (viewMcqFullscreenBtn && viewMcqModalContent) {
 
 // --- START: GLOBAL SETTINGS SYNC & MODAL CONTROLS ---
 
-// 1. Global State
+/// 1. Global State (UPDATED)
 let globalSettings = {
     darkMode: false,
-    fontSize: 16
+    fontSize: 16,
+    mcqTimer: 20 // Default 20 seconds
 };
 
-// 2. Sync with Firebase on Login
+// 2. Sync with Firebase on Login (UPDATED)
 function initSettingsSync(userId) {
     const settingsRef = doc(db, `artifacts/${appId}/users/${userId}/settings`, 'preferences');
     onSnapshot(settingsRef, (docSnap) => {
@@ -8072,13 +8073,14 @@ function initSettingsSync(userId) {
             const data = docSnap.data();
             if (data.darkMode !== undefined) globalSettings.darkMode = data.darkMode;
             if (data.fontSize !== undefined) globalSettings.fontSize = data.fontSize;
+            if (data.mcqTimer !== undefined) globalSettings.mcqTimer = data.mcqTimer; // <--- NEW
+            
             applySettingsToDom();
         } else {
             setDoc(settingsRef, globalSettings, { merge: true });
         }
     });
 }
-
 // 3. Apply Settings to Screen
 function applySettingsToDom() {
     // Dark Mode
@@ -8108,6 +8110,10 @@ function applySettingsToDom() {
 
     // Update Input Boxes
     document.querySelectorAll('#mcq-font-input, #view-mcq-font-input').forEach(inp => inp.value = globalSettings.fontSize);
+    
+    // --- NEW: Update Timer Input ---
+    const timerInput = document.getElementById('mcq-timer-input');
+    if (timerInput) timerInput.value = globalSettings.mcqTimer || 20;
 }
 
 
@@ -8174,7 +8180,18 @@ function attachSettingsListeners(ids) {
         changeFont(parseInt(e.target.value));
     });
 }
-
+// --- NEW: Timer Input Listener ---
+const mcqTimerInput = document.getElementById('mcq-timer-input');
+if (mcqTimerInput) {
+    mcqTimerInput.addEventListener('change', (e) => {
+        let val = parseInt(e.target.value);
+        if (isNaN(val) || val < 5) val = 5; // Minimum 5 seconds
+        if (val > 600) val = 600; // Maximum 10 mins
+        
+        globalSettings.mcqTimer = val;
+        saveUserPreferences(); // Save to Firebase
+    });
+}
 // Initialize Listeners
 attachSettingsListeners({ btn: 'mcq-settings-btn', panel: 'mcq-settings-panel', fontInc: 'mcq-font-inc', fontDec: 'mcq-font-dec', fontInput: 'mcq-font-input' });
 attachSettingsListeners({ btn: 'view-mcq-settings-btn', panel: 'view-mcq-settings-panel', fontInc: 'view-mcq-font-inc', fontDec: 'view-mcq-font-dec', fontInput: 'view-mcq-font-input' });
