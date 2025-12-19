@@ -146,7 +146,7 @@
         <i class="fas fa-poll text-sm"></i> Results
     </button>
 
-    <button id="settings-btn" class="action-button action-button-secondary flex items-center gap-1.5">
+    <button id="main-settings-btn" class="action-button action-button-secondary flex items-center gap-1.5">
         <i class="fas fa-cog text-sm"></i> Settings
     </button>
     <button id="add-month-btn" class="action-button flex items-center gap-1.5 hidden">
@@ -920,24 +920,26 @@
             </div>
         </div>
     </div>
-	<div id="settings-modal" class="modal">
+	<div id="main-settings-modal" class="modal">
     <div class="modal-content" style="max-width: 400px;">
-        <span class="modal-close" onclick="closeModal('settings-modal')">&times;</span>
-        <h3 class="text-xl font-semibold mb-5 text-emerald-600">Settings</h3>
+        <span class="modal-close" onclick="closeModal('main-settings-modal')">&times;</span>
+        <h3 class="text-xl font-semibold mb-5 text-emerald-600">Global Settings</h3>
         
         <div class="space-y-4">
             <div>
-                <label for="setting-mcq-timer" class="block text-sm font-medium text-gray-700 mb-1">
-                    MCQ Timer (Seconds per Question)
+                <label for="main-setting-mcq-timer" class="block text-sm font-medium text-gray-700 mb-1">
+                    <i class="fas fa-stopwatch mr-1"></i> MCQ Timer (Seconds per Question)
                 </label>
-                <input type="number" id="setting-mcq-timer" class="w-full p-2 border border-gray-300 rounded-md text-gray-800 focus:ring-emerald-500 focus:border-emerald-500" placeholder="60" min="5" max="300">
-                <p class="text-xs text-gray-500 mt-1">Default is 60 seconds. Set to 15-20 for fast practice.</p>
+                <input type="number" id="main-setting-mcq-timer" class="w-full p-2 border border-gray-300 rounded-md text-gray-800 focus:ring-emerald-500 focus:border-emerald-500" placeholder="60" min="5" max="600">
+                <p class="text-xs text-gray-500 mt-1">
+                    Set the time limit for each question in quizzes. (Default: 60s)
+                </p>
             </div>
         </div>
         
         <div class="mt-6 flex justify-end gap-3">
-             <button onclick="closeModal('settings-modal')" class="action-button action-button-secondary">Cancel</button>
-             <button id="save-settings-btn" class="action-button">Save Settings</button>
+             <button onclick="closeModal('main-settings-modal')" class="action-button action-button-secondary">Cancel</button>
+             <button id="save-main-settings-btn" class="action-button">Save Changes</button>
         </div>
     </div>
 </div>

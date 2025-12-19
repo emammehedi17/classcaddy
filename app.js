@@ -8135,70 +8135,74 @@ if (viewMcqFullscreenBtn && viewMcqModalContent) {
 
 // --- START: GLOBAL SETTINGS SYNC & MODAL CONTROLS ---
 
-/// 1. Global State (UPDATED)
+// --- START: GLOBAL SETTINGS SYNC & MODAL CONTROLS ---
+
+// 1. Global State (MERGED: Dark Mode + Font Size + Timer)
+// Remove any other "let globalSettings = ..." lines in your file!
 let globalSettings = {
     darkMode: false,
     fontSize: 16,
-    mcqTimer: 60 // Default 20 seconds
+    mcqTimer: 60 // Default 60 seconds
 };
 
-// 2. Sync with Firebase on Login (UPDATED)
+// 2. Sync with Firebase on Login
 function initSettingsSync(userId) {
+    // We fetch 'preferences' AND 'general' settings if you stored them separately, 
+    // but for simplicity, let's store everything in 'preferences' now.
     const settingsRef = doc(db, `artifacts/${appId}/users/${userId}/settings`, 'preferences');
+    
     onSnapshot(settingsRef, (docSnap) => {
         if (docSnap.exists()) {
             const data = docSnap.data();
             if (data.darkMode !== undefined) globalSettings.darkMode = data.darkMode;
             if (data.fontSize !== undefined) globalSettings.fontSize = data.fontSize;
-            if (data.mcqTimer !== undefined) globalSettings.mcqTimer = data.mcqTimer; // <--- NEW
+            if (data.mcqTimer !== undefined) globalSettings.mcqTimer = data.mcqTimer;
             
             applySettingsToDom();
+            console.log("Settings synced:", globalSettings);
         } else {
             setDoc(settingsRef, globalSettings, { merge: true });
         }
     });
 }
+
 // 3. Apply Settings to Screen
 function applySettingsToDom() {
     // Dark Mode
     if (globalSettings.darkMode) document.body.classList.add('dark-mode');
     else document.body.classList.remove('dark-mode');
 
-    // Font Size (Apply to Study & View modals)
+    // Font Size
     ['mcq-study-content', 'view-mcq-content'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
-            // Base container font
             el.style.fontSize = `${globalSettings.fontSize}px`;
-            
-            // Question
             el.querySelectorAll('.study-question').forEach(q => q.style.fontSize = `${globalSettings.fontSize}px`);
-            
-            // Options
             el.querySelectorAll('.study-opt').forEach(o => o.style.fontSize = `${globalSettings.fontSize * 0.95}px`);
-            
-            // Answers (Correct/Note)
-            el.querySelectorAll('.answer-text').forEach(a => a.style.fontSize = `${globalSettings.fontSize * 0.9}px`);
-            
-            // --- NEW: Explanation Text ---
-            el.querySelectorAll('.explanation-text').forEach(e => e.style.fontSize = `${globalSettings.fontSize * 0.9}px`);
+            el.querySelectorAll('.answer-text, .explanation-text').forEach(a => a.style.fontSize = `${globalSettings.fontSize * 0.9}px`);
         }
     });
 
-    // Update Input Boxes
+    // Update Input Boxes (If they exist on the page)
     document.querySelectorAll('#mcq-font-input, #view-mcq-font-input').forEach(inp => inp.value = globalSettings.fontSize);
     
-    // --- NEW: Update Timer Input ---
-    const timerInput = document.getElementById('mcq-timer-input');
-    if (timerInput) timerInput.value = globalSettings.mcqTimer || 60;
+    // Update Timer Inputs (Both the one in Study Modal AND the new Main Settings Modal)
+    document.querySelectorAll('#mcq-timer-input, #main-setting-mcq-timer').forEach(inp => {
+        if(inp) inp.value = globalSettings.mcqTimer;
+    });
 }
 
-
-// 4. Save Settings
+// 4. Save Settings (Unified)
 async function saveUserPreferences() {
-    if (!auth.currentUser) return;
-    const settingsRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/settings`, 'preferences');
-    setDoc(settingsRef, globalSettings, { merge: true }).catch(e => console.error("Settings save error:", e));
+    if (!currentUser) return;
+    const settingsRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/settings`, 'preferences');
+    
+    try {
+        await setDoc(settingsRef, globalSettings, { merge: true });
+        // showCustomAlert("Settings saved!", "success"); // Optional: Feedback
+    } catch (e) {
+        console.error("Settings save error:", e);
+    }
 }
 
 // 5. Global Dark Mode Button Listener
@@ -8211,6 +8215,35 @@ if (globalDarkBtn) {
     });
 }
 
+// --- NEW: Main Dashboard Settings Listener ---
+const mainSettingsBtn = document.getElementById('main-settings-btn');
+const mainSettingsModal = document.getElementById('main-settings-modal');
+const mainSaveSettingsBtn = document.getElementById('save-main-settings-btn');
+
+if (mainSettingsBtn && mainSettingsModal) {
+    mainSettingsBtn.addEventListener('click', () => {
+        // Populate inputs
+        const timerInput = document.getElementById('main-setting-mcq-timer');
+        if(timerInput) timerInput.value = globalSettings.mcqTimer;
+        
+        mainSettingsModal.style.display = 'block';
+    });
+}
+
+if (mainSaveSettingsBtn) {
+    mainSaveSettingsBtn.addEventListener('click', () => {
+        const timerInput = document.getElementById('main-setting-mcq-timer');
+        let newTime = parseInt(timerInput.value);
+        
+        if (isNaN(newTime) || newTime < 5) newTime = 5;
+        
+        globalSettings.mcqTimer = newTime;
+        saveUserPreferences();
+        
+        closeModal('main-settings-modal');
+        showCustomAlert("Settings updated!", "success");
+    });
+}
 // 6. Modal Settings Listeners (Settings Button + Font Size)
 function attachSettingsListeners(ids) {
     const settingsBtn = document.getElementById(ids.btn);
