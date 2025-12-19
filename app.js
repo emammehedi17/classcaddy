@@ -4450,7 +4450,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
        // 3. ✨ The Magic Parser Function (UPDATED: Detects (ক)/(a) style options)
         function parseMcqText(text) {
-            let cleanText = text.replace(/\n*([০-৯0-9]+\.)/g, '\n$1');
+            // Fix: Added (?!\d) to prevent matching decimals like 0.005 as question numbers
+let cleanText = text.replace(/\n*([০-৯0-9]+\.(?!\d))/g, '\n$1');
             const mcqData = [];
             
             // Updated Regex: Supports "a.", "(a)", "ক.", "(ক)" style delimiters
