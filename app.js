@@ -3488,83 +3488,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             return shouldShuffle ? shuffleArray(newOptions) : newOptions;
         }
 		
-		
-		// --- Global Settings Variables ---
-let globalSettings = {
-    mcqTimer: 60 // Default value
-};
-
-// --- DOM Elements for Settings ---
-const settingsModal = document.getElementById('settings-modal');
-const settingsBtn = document.getElementById('settings-btn');
-const saveSettingsBtn = document.getElementById('save-settings-btn');
-const settingMcqTimerInput = document.getElementById('setting-mcq-timer');
-
-// --- 1. Load Settings from Firebase (Call this in updateAuthUI) ---
-async function initSettingsSync(uid) {
-    if (!uid) return;
-    try {
-        const settingsDocRef = doc(db, `artifacts/${appId}/users/${uid}/settings`, 'general');
-        const docSnap = await getDoc(settingsDocRef);
-        
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-            // Update global variable
-            if (data.mcqTimer) globalSettings.mcqTimer = parseInt(data.mcqTimer);
-            console.log("Settings loaded:", globalSettings);
-        } else {
-            // Create default settings if not exists
-            await setDoc(settingsDocRef, globalSettings);
-        }
-    } catch (error) {
-        console.error("Error loading settings:", error);
-    }
-}
-
-// --- 2. Open Settings Modal ---
-if (settingsBtn) {
-    settingsBtn.addEventListener('click', () => {
-        // Populate input with current value
-        settingMcqTimerInput.value = globalSettings.mcqTimer;
-        settingsModal.style.display = 'block';
-    });
-}
-
-// --- 3. Save Settings ---
-if (saveSettingsBtn) {
-    saveSettingsBtn.addEventListener('click', async () => {
-        if (!currentUser) return;
-        
-        const newTimer = parseInt(settingMcqTimerInput.value);
-        if (isNaN(newTimer) || newTimer < 5) {
-            showCustomAlert("Please enter a valid time (min 5 seconds).", "error");
-            return;
-        }
-
-        // Update UI state
-        const originalText = saveSettingsBtn.textContent;
-        saveSettingsBtn.textContent = "Saving...";
-        saveSettingsBtn.disabled = true;
-
-        try {
-            // Update Global Variable
-            globalSettings.mcqTimer = newTimer;
-
-            // Save to Firebase
-            const settingsDocRef = doc(db, `artifacts/${appId}/users/${userId}/settings`, 'general');
-            await setDoc(settingsDocRef, { mcqTimer: newTimer }, { merge: true });
-
-            showCustomAlert("Settings saved successfully!", "success");
-            closeModal('settings-modal');
-        } catch (error) {
-            console.error("Error saving settings:", error);
-            showCustomAlert("Failed to save settings.", "error");
-        } finally {
-            saveSettingsBtn.textContent = originalText;
-            saveSettingsBtn.disabled = false;
-        }
-    });
-}
 		/**
          * Resets state and starts the quiz game.
          */
@@ -3620,7 +3543,7 @@ if (saveSettingsBtn) {
             
             // --- NEW TIMING LOGIC ---
             // If MCQ Data exists, use 20 seconds. Otherwise (Vocab), use 15 seconds.
-            const secondsPerQuestion = globalSettings.mcqTimer || 60;
+            const secondsPerQuestion = currentMcqData ? 20 : 15;
             const totalTimeInSeconds = totalQuestions * secondsPerQuestion;
             // ------------------------
 
@@ -8135,31 +8058,21 @@ if (viewMcqFullscreenBtn && viewMcqModalContent) {
 
 // --- START: GLOBAL SETTINGS SYNC & MODAL CONTROLS ---
 
-// --- START: GLOBAL SETTINGS SYNC & MODAL CONTROLS ---
-
-// 1. Global State (MERGED: Dark Mode + Font Size + Timer)
-// Remove any other "let globalSettings = ..." lines in your file!
+// 1. Global State
 let globalSettings = {
     darkMode: false,
-    fontSize: 16,
-    mcqTimer: 60 // Default 60 seconds
+    fontSize: 16
 };
 
 // 2. Sync with Firebase on Login
 function initSettingsSync(userId) {
-    // We fetch 'preferences' AND 'general' settings if you stored them separately, 
-    // but for simplicity, let's store everything in 'preferences' now.
     const settingsRef = doc(db, `artifacts/${appId}/users/${userId}/settings`, 'preferences');
-    
     onSnapshot(settingsRef, (docSnap) => {
         if (docSnap.exists()) {
             const data = docSnap.data();
             if (data.darkMode !== undefined) globalSettings.darkMode = data.darkMode;
             if (data.fontSize !== undefined) globalSettings.fontSize = data.fontSize;
-            if (data.mcqTimer !== undefined) globalSettings.mcqTimer = data.mcqTimer;
-            
             applySettingsToDom();
-            console.log("Settings synced:", globalSettings);
         } else {
             setDoc(settingsRef, globalSettings, { merge: true });
         }
@@ -8172,37 +8085,37 @@ function applySettingsToDom() {
     if (globalSettings.darkMode) document.body.classList.add('dark-mode');
     else document.body.classList.remove('dark-mode');
 
-    // Font Size
+    // Font Size (Apply to Study & View modals)
     ['mcq-study-content', 'view-mcq-content'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
+            // Base container font
             el.style.fontSize = `${globalSettings.fontSize}px`;
+            
+            // Question
             el.querySelectorAll('.study-question').forEach(q => q.style.fontSize = `${globalSettings.fontSize}px`);
+            
+            // Options
             el.querySelectorAll('.study-opt').forEach(o => o.style.fontSize = `${globalSettings.fontSize * 0.95}px`);
-            el.querySelectorAll('.answer-text, .explanation-text').forEach(a => a.style.fontSize = `${globalSettings.fontSize * 0.9}px`);
+            
+            // Answers (Correct/Note)
+            el.querySelectorAll('.answer-text').forEach(a => a.style.fontSize = `${globalSettings.fontSize * 0.9}px`);
+            
+            // --- NEW: Explanation Text ---
+            el.querySelectorAll('.explanation-text').forEach(e => e.style.fontSize = `${globalSettings.fontSize * 0.9}px`);
         }
     });
 
-    // Update Input Boxes (If they exist on the page)
+    // Update Input Boxes
     document.querySelectorAll('#mcq-font-input, #view-mcq-font-input').forEach(inp => inp.value = globalSettings.fontSize);
-    
-    // Update Timer Inputs (Both the one in Study Modal AND the new Main Settings Modal)
-    document.querySelectorAll('#mcq-timer-input, #main-setting-mcq-timer').forEach(inp => {
-        if(inp) inp.value = globalSettings.mcqTimer;
-    });
 }
 
-// 4. Save Settings (Unified)
+
+// 4. Save Settings
 async function saveUserPreferences() {
-    if (!currentUser) return;
-    const settingsRef = doc(db, `artifacts/${appId}/users/${currentUser.uid}/settings`, 'preferences');
-    
-    try {
-        await setDoc(settingsRef, globalSettings, { merge: true });
-        // showCustomAlert("Settings saved!", "success"); // Optional: Feedback
-    } catch (e) {
-        console.error("Settings save error:", e);
-    }
+    if (!auth.currentUser) return;
+    const settingsRef = doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/settings`, 'preferences');
+    setDoc(settingsRef, globalSettings, { merge: true }).catch(e => console.error("Settings save error:", e));
 }
 
 // 5. Global Dark Mode Button Listener
@@ -8215,35 +8128,6 @@ if (globalDarkBtn) {
     });
 }
 
-// --- NEW: Main Dashboard Settings Listener ---
-const mainSettingsBtn = document.getElementById('main-settings-btn');
-const mainSettingsModal = document.getElementById('main-settings-modal');
-const mainSaveSettingsBtn = document.getElementById('save-main-settings-btn');
-
-if (mainSettingsBtn && mainSettingsModal) {
-    mainSettingsBtn.addEventListener('click', () => {
-        // Populate inputs
-        const timerInput = document.getElementById('main-setting-mcq-timer');
-        if(timerInput) timerInput.value = globalSettings.mcqTimer;
-        
-        mainSettingsModal.style.display = 'block';
-    });
-}
-
-if (mainSaveSettingsBtn) {
-    mainSaveSettingsBtn.addEventListener('click', () => {
-        const timerInput = document.getElementById('main-setting-mcq-timer');
-        let newTime = parseInt(timerInput.value);
-        
-        if (isNaN(newTime) || newTime < 5) newTime = 5;
-        
-        globalSettings.mcqTimer = newTime;
-        saveUserPreferences();
-        
-        closeModal('main-settings-modal');
-        showCustomAlert("Settings updated!", "success");
-    });
-}
 // 6. Modal Settings Listeners (Settings Button + Font Size)
 function attachSettingsListeners(ids) {
     const settingsBtn = document.getElementById(ids.btn);
@@ -8290,18 +8174,7 @@ function attachSettingsListeners(ids) {
         changeFont(parseInt(e.target.value));
     });
 }
-// --- NEW: Timer Input Listener ---
-const mcqTimerInput = document.getElementById('mcq-timer-input');
-if (mcqTimerInput) {
-    mcqTimerInput.addEventListener('change', (e) => {
-        let val = parseInt(e.target.value);
-        if (isNaN(val) || val < 5) val = 5; // Minimum 5 seconds
-        if (val > 600) val = 600; // Maximum 10 mins
-        
-        globalSettings.mcqTimer = val;
-        saveUserPreferences(); // Save to Firebase
-    });
-}
+
 // Initialize Listeners
 attachSettingsListeners({ btn: 'mcq-settings-btn', panel: 'mcq-settings-panel', fontInc: 'mcq-font-inc', fontDec: 'mcq-font-dec', fontInput: 'mcq-font-input' });
 attachSettingsListeners({ btn: 'view-mcq-settings-btn', panel: 'view-mcq-settings-panel', fontInc: 'view-mcq-font-inc', fontDec: 'view-mcq-font-dec', fontInput: 'view-mcq-font-input' });
