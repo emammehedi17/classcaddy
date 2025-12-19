@@ -3543,7 +3543,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             // --- NEW TIMING LOGIC ---
             // If MCQ Data exists, use 20 seconds. Otherwise (Vocab), use 15 seconds.
-            const secondsPerQuestion = globalSettings.mcqTimer || 20;
+            const secondsPerQuestion = globalSettings.mcqTimer || 60;
             const totalTimeInSeconds = totalQuestions * secondsPerQuestion;
             // ------------------------
 
@@ -8062,7 +8062,7 @@ if (viewMcqFullscreenBtn && viewMcqModalContent) {
 let globalSettings = {
     darkMode: false,
     fontSize: 16,
-    mcqTimer: 20 // Default 20 seconds
+    mcqTimer: 60 // Default 20 seconds
 };
 
 // 2. Sync with Firebase on Login (UPDATED)
@@ -8113,7 +8113,7 @@ function applySettingsToDom() {
     
     // --- NEW: Update Timer Input ---
     const timerInput = document.getElementById('mcq-timer-input');
-    if (timerInput) timerInput.value = globalSettings.mcqTimer || 20;
+    if (timerInput) timerInput.value = globalSettings.mcqTimer || 60;
 }
 
 
