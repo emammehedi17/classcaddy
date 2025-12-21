@@ -1930,22 +1930,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, true) 
                  ).join('');
                  
-                 daySection.querySelectorAll('.completion-checkbox').forEach(cb => cb.disabled = true);
+                daySection.querySelectorAll('.completion-checkbox').forEach(cb => cb.disabled = true);
                  setSyncStatus("Editing...", "blue");
-
-                 // Autosave Handler
-                 const autosaveHandler = (e) => {
-                     if (e.target.classList.contains('editable-input') || e.target.classList.contains('vocab-input')) {
-                         if (autosaveTimer) clearTimeout(autosaveTimer);
-                         autosaveTimer = setTimeout(() => {
-                             console.log("Autosaving changes...");
-                             // Pass weekId to autosave too
-                             saveDataToFirebase(doc(db, getUserPlansCollectionPath(), monthId), parseAndPrepareSaveData(daySection, weekId).updatePayload, true, weekId); 
-                         }, 2500); 
-                     }
-                 };
-                 daySection.addEventListener('input', autosaveHandler);
-                 daySection.autosaveHandler = autosaveHandler;
              }
 
 			 else {
