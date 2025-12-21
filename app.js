@@ -348,6 +348,11 @@
                 studyPlanContent.classList.remove('hidden');
                 loadStudyPlans();
             } else {
+                // --- CRITICAL FIX: CLEAR DATA CACHE ON LOGOUT ---
+                activeWeeksDataCache = {}; // Wipes the study plan data
+                savedResultsCache = null;  // Wipes the quiz results data
+                // ------------------------------------------------
+
                 // --- START: GUEST MODE LOGIC (LOGOUT) ---
                 isGuestMode = false;
                 // --- END: GUEST MODE LOGIC ---
