@@ -781,20 +781,15 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      const monthElement = currentMonthPlanDisplay.querySelector(`.card[data-month-id="${monthId}"]`);
                      let structureHasChanged = false;
                      
-                     if (monthElement) {
-                         const domWeekCount = monthElement.querySelectorAll('.week-section').length;
-                         const dataWeekCount = Object.keys(weeksData).length;
-                         if (domWeekCount !== dataWeekCount) {
-                             structureHasChanged = true;
-                         } else {
-                            // Check for day count changes inside each week
-                             for (const weekId in weeksData) {
-                                 const domDayCount = monthElement.querySelectorAll(`.week-section[data-week-id="${weekId}"] .day-section`).length;
-                                 const dataDayCount = weeksData[weekId]?.days?.length || 0;
-                                 if (domDayCount !== dataDayCount) {
-                                     structureHasChanged = true;
-                                     break;
-                                 }
+                    if (monthElement) {
+                         // Fix: Don't compare total week counts. Instead, check day counts for all 4 fixed weeks.
+                         for (const weekId of ['week1', 'week2', 'week3', 'week4']) {
+                             const domDayCount = monthElement.querySelectorAll(`.week-section[data-week-id="${weekId}"] .day-section`).length;
+                             const dataDayCount = weeksData[weekId]?.days?.length || 0;
+                             
+                             if (domDayCount !== dataDayCount) {
+                                 structureHasChanged = true;
+                                 break;
                              }
                          }
                      }
