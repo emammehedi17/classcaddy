@@ -1929,8 +1929,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  setSyncStatus("Editing...", "blue");
              }
 
-			 else {
-                 // --- SAVING AND EXITING (BLOCKING) ---
+			else {
+                 // --- SAVING AND EXITING (INSTANT / OPTIMISTIC) ---
                  
                  // 1. Stop autosave
                  if (autosaveTimer) clearTimeout(autosaveTimer);
@@ -1939,62 +1939,61 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      daySection.autosaveHandler = null;
                  }
                  
-                 // 2. SHOW "SAVING..." STATE
-                 const originalBtnText = saveButton.innerHTML;
-                 saveButton.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Saving...`;
-                 saveButton.disabled = true;
-                 
-                 // 3. Parse Data
+                 // 2. Parse Data Immediately
                  const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
                  const parseResult = await parseAndPrepareSaveData(daySection, weekId);
                  
                  if (parseResult === null) {
                      setSyncStatus("Error", "red");
-                     saveButton.innerHTML = originalBtnText;
-                     saveButton.disabled = false;
                      return; 
                  }
                  
                  const { updatedRows, updatePayload } = parseResult;
 
-                 try {
-                     // 4. WAIT FOR SAVE TO COMPLETE
-                     // We explicitly pass 'weekId' here to avoid DOM errors
-                     await saveDataToFirebase(monthDocRef, updatePayload, false, weekId);
-
-                     // 5. Update Cache
-                     if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
-                         activeWeeksDataCache[weekId].days = updatePayload.days;
-                     }
-
-                     // 6. Update UI
-                     daySection.classList.remove('editing');
-                     daySection.classList.remove('is-collapsed'); 
-                     
-                     editButton.classList.remove('hidden'); 
-                     editModeControls.classList.add('hidden');
-                     deleteDayButton.classList.add('hidden');
-                     actionsHeader.classList.add('hidden');
-                     completionPercHeader.classList.add('hidden');
-
-                     tableBody.innerHTML = updatedRows.map((rowData, rowIndex) =>
-                        createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)
-                     ).join('');
-                     
-                     const dayDataForProgress = { rows: updatedRows };
-                     updateDailyProgressUI(monthId, weekId, dayIndex, dayDataForProgress);
-                     
-                     saveButton.innerHTML = `<i class="fas fa-save mr-1"></i> Save`;
-                     saveButton.disabled = false;
-                     
-                     daySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-                 } catch (error) {
-                     console.error("Save failed:", error);
-                     // Alert handled in saveDataToFirebase
-                     saveButton.innerHTML = originalBtnText;
-                     saveButton.disabled = false;
+                 // 3. Update Cache INSTANTLY
+                 if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
+                     activeWeeksDataCache[weekId].days = updatePayload.days;
                  }
+
+                 // 4. Update UI INSTANTLY (Don't wait for internet)
+                 daySection.classList.remove('editing');
+                 daySection.classList.remove('is-collapsed'); 
+                 
+                 editButton.classList.remove('hidden'); 
+                 editModeControls.classList.add('hidden');
+                 deleteDayButton.classList.add('hidden');
+                 actionsHeader.classList.add('hidden');
+                 completionPercHeader.classList.add('hidden');
+
+                 // Redraw the table in Read-Only mode immediately
+                 tableBody.innerHTML = updatedRows.map((rowData, rowIndex) =>
+                    createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)
+                 ).join('');
+                 
+                 // Update progress bars
+                 const dayDataForProgress = { rows: updatedRows };
+                 updateDailyProgressUI(monthId, weekId, dayIndex, dayDataForProgress);
+                 
+                 // Reset Save Button State
+                 saveButton.innerHTML = `<i class="fas fa-save mr-1"></i> Save`;
+                 saveButton.disabled = false;
+                 
+                 daySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+                 // 5. Send to Firebase in BACKGROUND (No await)
+                 // This allows the user to continue working while we upload silently
+                 setSyncStatus("Syncing...", "yellow");
+                 
+                 saveDataToFirebase(monthDocRef, updatePayload, true, weekId)
+                    .then(() => {
+                        console.log("Background save complete.");
+                        setSyncStatus("Synced", "green");
+                    })
+                    .catch((error) => {
+                        console.error("Background save failed:", error);
+                        showCustomAlert("Save failed! Please check your connection.", "error");
+                        setSyncStatus("Error", "red");
+                    });
              }
         }
 		
