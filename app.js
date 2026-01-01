@@ -8358,3 +8358,46 @@ window.addEventListener('beforeunload', function (e) {
         e.returnValue = ''; 
     }
 });
+
+// --- SCROLL TOP/BOTTOM BUTTON ---
+(function createScrollToggleBtn() {
+    // 1. Create the button element
+    const btn = document.createElement('button');
+    btn.id = 'scroll-toggle-btn';
+    
+    // 2. Apply Styles (Fixed position, above the bottom-right corner)
+    // We use 'bottom-24' (approx 96px) to sit ABOVE the dark mode/floating buttons
+    btn.className = 'fixed bottom-24 right-5 z-40 w-10 h-10 bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-gray-900 hover:scale-110 focus:outline-none opacity-80 hover:opacity-100';
+    btn.innerHTML = '<i class="fas fa-arrow-down"></i>'; // Default icon
+    btn.title = "Scroll to Bottom";
+    
+    document.body.appendChild(btn);
+
+    const icon = btn.querySelector('i');
+
+    // 3. Monitor Scroll to change Icon
+    window.addEventListener('scroll', () => {
+        // If we are near the top (less than 300px down)
+        if (window.scrollY < 300) {
+            icon.classList.remove('fa-arrow-up');
+            icon.classList.add('fa-arrow-down');
+            btn.title = "Scroll to Bottom";
+        } else {
+            // We are scrolled down, show Up arrow
+            icon.classList.remove('fa-arrow-down');
+            icon.classList.add('fa-arrow-up');
+            btn.title = "Scroll to Top";
+        }
+    });
+
+    // 4. Click Action
+    btn.addEventListener('click', () => {
+        if (window.scrollY < 300) {
+            // We are at the top -> Scroll to Bottom
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        } else {
+            // We are down -> Scroll to Top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
+})();
