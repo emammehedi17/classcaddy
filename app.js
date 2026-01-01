@@ -2560,12 +2560,15 @@ function addVocabPairInputs(container, word = '', meaning = '') {
 
                  let sourceRows = [];
 
-                 // Determine Source Data
+                // Determine Source Data
                  if (daysArray.length > 0) {
+                     // CASE 1: Copy from yesterday (Same Week)
                      sourceRows = daysArray[daysArray.length - 1].rows || [];
                  } else {
                      const currentWeekNum = parseInt(weekId.replace('week', '')); 
+                     
                      if (currentWeekNum > 1) {
+                         // CASE 2: Copy from previous week (Same Month)
                          const prevWeekId = `week${currentWeekNum - 1}`;
                          const prevWeekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', prevWeekId);
                          const prevWeekSnap = await getDoc(prevWeekDocRef);
@@ -2574,6 +2577,34 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                              if (prevDays.length > 0) {
                                  sourceRows = prevDays[prevDays.length - 1].rows || [];
                              }
+                         }
+                     } else {
+                         // CASE 3: Copy from Previous Month (New Feature)
+                         // We are in Week 1. Look for Week 4 of the previous month.
+                         try {
+                             const parts = monthId.split('-'); // e.g., "2025-11"
+                             let y = parseInt(parts[0]);
+                             let m = parseInt(parts[1]);
+                             
+                             // Calculate previous month ID
+                             m = m - 1;
+                             if (m === 0) { m = 12; y = y - 1; }
+                             const prevMonthId = `${y}-${m.toString().padStart(2, '0')}`;
+                             
+                             // Fetch Week 4 of previous month
+                             const prevMonthWeekRef = doc(db, getUserPlansCollectionPath(), prevMonthId, 'weeks', 'week4');
+                             const prevMonthWeekSnap = await getDoc(prevMonthWeekRef);
+                             
+                             if (prevMonthWeekSnap.exists()) {
+                                 const prevMDays = prevMonthWeekSnap.data().days || [];
+                                 if (prevMDays.length > 0) {
+                                     // Get the last day of that week
+                                     sourceRows = prevMDays[prevMDays.length - 1].rows || [];
+                                     console.log(`Auto-copied data from previous month: ${prevMonthId}`);
+                                 }
+                             }
+                         } catch(err) {
+                             console.log("Could not fetch previous month data, starting fresh.", err);
                          }
                      }
                  }
