@@ -4466,13 +4466,13 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
        // 3. ✨ The Magic Parser Function (UPDATED: Detects (ক)/(a) style options)
         function parseMcqText(text) {
-            // Fix: Added (?!\d) to prevent matching decimals like 0.005 as question numbers
-let cleanText = text.replace(/\n*([০-৯0-9]+\.(?!\d))/g, '\n$1');
+            // Fix: Added (?![0-9০-৯]) to prevent matching decimals (English OR Bengali) like 2.5 or ২.৫ as question numbers
+            let cleanText = text.replace(/\n*([০-৯0-9]+\.(?![0-9০-৯]))/g, '\n$1');
             const mcqData = [];
             
-            // Updated Regex: Supports "a.", "(a)", "ক.", "(ক)" style delimiters
+            // Updated Regex: Now checks that the dot is NOT followed by any digit (English or Bengali)
             const mcqRegex = 
-/(?:^|\n)\s*([০-৯0-9]+)\.(?!\d)((?:(?!\n\s*[০-৯0-9]+\.(?!\d))[\s\S])+?)\n\s*(?:[\(]?(?:ক|a)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:খ|b)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:গ|c)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:ঘ|d)[\.\)])\s*([\s\S]+?)\n\s*(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([\s\S]+?)(?=\n\s*[০-৯0-9]+\.(?!\d)|\n*$)/gi;
+/(?:^|\n)\s*([০-৯0-9]+)\.(?![0-9০-৯])((?:(?!\n\s*[০-৯0-9]+\.(?![0-9০-৯]))[\s\S])+?)\n\s*(?:[\(]?(?:ক|a)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:খ|b)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:গ|c)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:ঘ|d)[\.\)])\s*([\s\S]+?)\n\s*(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([\s\S]+?)(?=\n\s*[০-৯0-9]+\.(?![0-9০-৯])|\n*$)/gi;
             
             let match;
             while ((match = mcqRegex.exec(cleanText)) !== null) {
