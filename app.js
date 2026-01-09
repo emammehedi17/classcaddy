@@ -8290,9 +8290,9 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     });
 }
 
-// Helper to format MCQs for clipboard (FIXED: Handles single letter answers correctly)
+// Helper to format MCQs for clipboard (ROBUST VERSION)
 function formatMcqsForClipboard(mcqs) {
-    const labels = ['a', 'b', 'c', 'd']; // অপশন লেবেল
+    const labels = ['a', 'b', 'c', 'd'];
 
     return mcqs.map((mcq, index) => {
         // 1. Format Options
@@ -8300,28 +8300,39 @@ function formatMcqsForClipboard(mcqs) {
             return `${labels[i]}. ${opt}`;
         }).join('\n');
 
-        // 2. Format Correct Answer
+        // 2. Format Correct Answer Logic
         let answerLine = "";
-        const cleanAnswer = mcq.correctAnswer ? mcq.correctAnswer.trim() : "";
+        // উত্তরটি স্ট্রিংয়ে কনভার্ট করে ও স্পেস ক্লিন করে নিচ্ছি
+        let cleanAnswer = mcq.correctAnswer ? String(mcq.correctAnswer).trim() : "";
         
-        // Fix: যদি উত্তরটি শুধু 'a', 'b', 'c', বা 'd' হয়, তবে সরাসরি সেটিই বসবে
-        if (/^[a-d]$/i.test(cleanAnswer)) {
-            answerLine = `Correct answer: ${cleanAnswer}`;
-        }
+        // চেক: উত্তরটি কি শুধু 'a', 'b', 'c', 'd' (অথবা 'a.', 'd)')?
+        const letterMatch = cleanAnswer.match(/^([a-d])[\.\)]?$/i);
+
+        if (letterMatch) {
+            // যদি শুধু লেটার হয় (যেমন: 'd'), তাহলে সরাসরি বসিয়ে দাও
+            answerLine = `Correct answer: ${letterMatch[1].toLowerCase()}`;
+        } 
         else if (cleanAnswer) {
-            // যদি উত্তরটি টেক্সট হয় (যেমন "√0.2"), তবে আমরা ইনডেক্স খুঁজব
-            const correctIndex = mcq.options.indexOf(cleanAnswer);
-            const label = (correctIndex !== -1) ? labels[correctIndex] : '?';
-            answerLine = `Correct answer: ${label}. ${cleanAnswer}`;
+            // যদি বড় টেক্সট হয়, অপশনের সাথে মিলানোর চেষ্টা করি
+            const idx = mcq.options.indexOf(cleanAnswer);
+            
+            if (idx !== -1) {
+                // মিলে গেলে: "Correct answer: c. অপশন টেক্সট"
+                answerLine = `Correct answer: ${labels[idx]}. ${cleanAnswer}`;
+            } else {
+                // না মিললেও কোনো সমস্যা নেই, যা আছে তাই বসবে (?? আসবে না)
+                answerLine = `Correct answer: ${cleanAnswer}`;
+            }
         } else {
-            // উত্তর না থাকলে ব্যাখ্যা দেখাবে (যদি থাকে)
+            // উত্তর না থাকলে
             answerLine = `Correct answer: ${mcq.explanation || 'Cancelled'}`;
         }
 
-        // 3. Format Note (Checks both 'note' and 'explanation')
+        // 3. Format Note
+        // নোট এবং এক্সপ্ল্যানেশন দুটোই চেক করবে
         const noteText = mcq.note || mcq.explanation;
         
-        // নোট যোগ করা হবে যদি তা উত্তরের লাইনে ইতিমধ্যে না থাকে
+        // নোট যদি থাকে এবং উত্তরের লাইনে অলরেডি না থাকে, তবে যোগ করো
         if (noteText && !answerLine.includes(noteText)) {
             answerLine += `\nNote: ${noteText}`;
         }
