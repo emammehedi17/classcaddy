@@ -4465,95 +4465,63 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
 		
        // 3. ✨ The Magic Parser Function (UPDATED: Detects (ক)/(a) style options)
-        function parseMcqText(text) {
-            // ১. টেক্সট ক্লিন করা
-            let cleanText = text.replace(/\r\n/g, '\n');
-            
-            // ২. পুরো টেক্সটকে প্রশ্নের নম্বর অনুযায়ী টুকরো করা (Split)
-            // এটি খুঁজবে: নতুন লাইন + ইংরেজি নম্বর + ডট (যেমন: 1. বা 50.)
-            // (?=...) ব্যবহারের ফলে নম্বরটি মুছে যাবে না, পরের টুকরোর শুরুতে থাকবে
-            const rawBlocks = cleanText.split(/\n(?=[0-9]+\.)/);
-            
-            const mcqData = [];
+        function copyQuestions() {
+    // Select all question containers
+    const questions = document.querySelectorAll('.question-container');
+    let copyText = "";
 
-            rawBlocks.forEach(block => {
-                // খালি ব্লক বা জঞ্জাল থাকলে স্কিপ করুন
-                if (!block || !block.trim()) return;
+    questions.forEach((q, index) => {
+        // 1. Get the Question Text
+        // Assumes your question text is in an element like h3 or div.question-text
+        let questionText = q.querySelector('.question-text').innerText.trim();
+        
+        // Remove the existing number if it's part of the text, to auto-number cleanly
+        questionText = questionText.replace(/^\d+\.\s*/, ''); 
 
-                // ৩. প্রতিটি ব্লকের প্রসেসিং (Safe Parsing)
-                
-                // আই ডি (ID) বের করা
-                const idMatch = block.match(/^\s*([0-9]+)\./);
-                if (!idMatch) return; // আই ডি না থাকলে বাদ
-                
-                const id = parseInt(idMatch[1]);
-                
-                // আই ডি অংশটি মুছে ফেলে শুধু কন্টেন্ট রাখা
-                let content = block.replace(/^\s*[0-9]+\.\s*/, '');
-                
-                // --- ফিক্স: ডাবল নাম্বারিং (Double Numbering) ---
-                // যদি শুরুতে বাংলা নম্বর থাকে (যেমন: ১. বা ২.) তবে মুছে ফেলো
-                content = content.replace(/^[০-৯]+\.\s*/, '');
-                
-                // --- ধাপ-১: নোট বা ব্যাখ্যা (Explanation) বের করা ---
-                let explanation = "";
-                const noteRegex = /\n\s*(?:Note|নোট|ব্যাখ্যা)[:\s]*([\s\S]*)$/i;
-                const noteMatch = content.match(noteRegex);
-                if (noteMatch) {
-                    explanation = noteMatch[1].trim();
-                    content = content.substring(0, noteMatch.index); // নোট অংশটি কন্টেন্ট থেকে সরিয়ে ফেলা হলো
-                }
-                
-                // --- ধাপ-২: সঠিক উত্তর (Correct Answer) বের করা ---
-                let correctAnswer = "";
-                const ansRegex = /\n\s*(?:Correct Answer|Correct|Answer|Ans|সঠিক উত্তর|সঠিক)[:\s]*([^\n]*)/i;
-                const ansMatch = content.match(ansRegex);
-                if (ansMatch) {
-                    correctAnswer = ansMatch[1].trim();
-                    // উত্তরের শুরুতে 'a)' বা 'ক.' থাকলে মুছে ফেলা
-                    correctAnswer = correctAnswer.replace(/^[a-dক-ঘ][\)\.]\s*/i, '');
-                    content = content.substring(0, ansMatch.index); // উত্তর অংশটি সরিয়ে ফেলা হলো
-                }
+        copyText += `${index + 1}. ${questionText}\n`;
 
-                // --- ধাপ-৩: অপশন এবং প্রশ্ন আলাদা করা ---
-                // আমরা জানি অপশনগুলো নতুন লাইনে a) b) c) বা ক) খ) দিয়ে শুরু হয়
-                
-                // প্রথম অপশনটি কোথায় শুরু হয়েছে তা বের করি
-                const firstOptionIndex = content.search(/\n\s*(?:[\(]?(?:a|b|c|d|ক|খ|গ|ঘ)[\.\)])/i);
-                
-                let question = "";
-                const options = [];
+        // 2. Get the Options
+        const labels = q.querySelectorAll('label');
+        const optionsMap = ['a', 'b', 'c', 'd'];
+        let correctAnswer = "";
 
-                if (firstOptionIndex !== -1) {
-                    // অপশন শুরুর আগ পর্যন্ত যা আছে পুরোটাই প্রশ্ন
-                    question = content.substring(0, firstOptionIndex).trim();
-                    
-                    // অপশন অংশটুকু আলাদা করা
-                    const optionsPart = content.substring(firstOptionIndex);
-                    
-                    // অপশনগুলো বের করা (Loop দিয়ে)
-                    const optionRegex = /\n\s*(?:[\(]?(?:a|b|c|d|ক|খ|গ|ঘ)[\.\)])\s*([^\n]+)/gi;
-                    let optMatch;
-                    while ((optMatch = optionRegex.exec(optionsPart)) !== null) {
-                        options.push(optMatch[1].trim());
-                    }
-                } else {
-                    // কোনো অপশন পাওয়া না গেলে পুরোটাই প্রশ্ন (Fallback)
-                    question = content.trim();
-                }
+        labels.forEach((label, i) => {
+            // Get option text (remove the radio button part if captured)
+            const optionText = label.innerText.replace(/^[a-d]\.\s*/, '').trim(); 
+            copyText += `${optionsMap[i]}. ${optionText}\n`;
 
-                // ৪. ডাটা তৈরি করা
-                mcqData.push({
-                    id: id,
-                    question: question,
-                    options: options.slice(0, 4), // প্রথম ৪টি অপশন নেওয়া
-                    correctAnswer: correctAnswer,
-                    explanation: explanation
-                });
-            });
+            // Check if this input is the correct one (using data attribute or class)
+            const input = label.querySelector('input');
+            if (input && input.value === "true") { 
+                correctAnswer = optionsMap[i];
+            }
+        });
 
-            return mcqData;
+        // 3. Append Correct Answer
+        copyText += `Correct answer: ${correctAnswer}\n`;
+
+        // 4. Get the Note/Explanation
+        // accurately target the hidden explanation div
+        const noteEl = q.querySelector('.explanation'); 
+        let noteText = "";
+        
+        if (noteEl) {
+            // .textContent grabs text even if display: none
+            noteText = noteEl.textContent.trim(); 
+            // Remove the prefix "Note:" or "Explanation:" if it exists in the div to avoid double labels
+            noteText = noteText.replace(/^(Note|Explanation):\s*/i, '');
         }
+
+        copyText += `Note: ${noteText}\n\n`;
+    });
+
+    // Execute Copy
+    navigator.clipboard.writeText(copyText).then(() => {
+        alert("Questions copied to clipboard with Notes included!");
+    }).catch(err => {
+        console.error('Failed to copy text: ', err);
+    });
+}
 		
 		
 		
