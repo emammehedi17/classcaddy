@@ -4466,43 +4466,91 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
        // 3. ✨ The Magic Parser Function (UPDATED: Detects (ক)/(a) style options)
         function parseMcqText(text) {
-            // ১. টেক্সট ক্লিন করা (অপ্রয়োজনীয় স্পেস কমানো)
+            // ১. টেক্সট ক্লিন করা
             let cleanText = text.replace(/\r\n/g, '\n');
-
+            
+            // ২. পুরো টেক্সটকে প্রশ্নের নম্বর অনুযায়ী টুকরো করা (Split)
+            // এটি খুঁজবে: নতুন লাইন + ইংরেজি নম্বর + ডট (যেমন: 1. বা 50.)
+            // (?=...) ব্যবহারের ফলে নম্বরটি মুছে যাবে না, পরের টুকরোর শুরুতে থাকবে
+            const rawBlocks = cleanText.split(/\n(?=[0-9]+\.)/);
+            
             const mcqData = [];
 
-            // ২. নতুন উন্নত Regex (Dual Numbering Support: 1. ১. format)
-            // ব্যাখ্যা:
-            // (?:^|\n)\s*([0-9]+)\.       -> শুরুতে ইংরেজি নম্বর খুঁজবে (যেমন: 1.)
-            // (?:\s*[০-৯]+\.)?            -> এরপর যদি বাংলা নম্বর থাকে (যেমন: ১.) তবে সেটাও স্কিপ করবে।
-            // ((?:(?!\n\s*a[\)\.]).)+)    -> এরপর অপশন 'a)' বা 'a.' আসার আগ পর্যন্ত সব টেক্সট প্রশ্নের অংশ হিসেবে নেবে।
-            
-            const mcqRegex = /(?:^|\n)\s*([0-9]+)\.(?:\s*[০-৯]+\.)?\s*((?:(?!\n\s*(?:[\(]?(?:ক|a)[\.\)])).)+)\n\s*(?:[\(]?(?:ক|a)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:খ|b)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:গ|c)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:ঘ|d)[\.\)])\s*([\s\S]+?)\n\s*(?:(?:সঠিক উত্তর)|(?:Correct Answer)|(?:Answer)|(?:Ans))[:\s]*([\s\S]+?)(?:\n\s*(?:Note|নোট|ব্যাখ্যা)[:\s]*([\s\S]+?))?(?=\n\s*\d+\.|$)/gi;
+            rawBlocks.forEach(block => {
+                // খালি ব্লক বা জঞ্জাল থাকলে স্কিপ করুন
+                if (!block || !block.trim()) return;
 
-            let match;
-            while ((match = mcqRegex.exec(cleanText)) !== null) {
-                // ডাটাগুলো ভেরিয়েবলে নেওয়া
-                const id = match[1].trim();
-                const question = match[2].trim();
-                const optionA = match[3].trim();
-                const optionB = match[4].trim();
-                const optionC = match[5].trim();
-                const optionD = match[6].trim();
-                let correctAns = match[7].trim();
-                const explanation = match[8] ? match[8].trim() : ""; // নোট যদি থাকে
+                // ৩. প্রতিটি ব্লকের প্রসেসিং (Safe Parsing)
+                
+                // আই ডি (ID) বের করা
+                const idMatch = block.match(/^\s*([0-9]+)\./);
+                if (!idMatch) return; // আই ডি না থাকলে বাদ
+                
+                const id = parseInt(idMatch[1]);
+                
+                // আই ডি অংশটি মুছে ফেলে শুধু কন্টেন্ট রাখা
+                let content = block.replace(/^\s*[0-9]+\.\s*/, '');
+                
+                // --- ফিক্স: ডাবল নাম্বারিং (Double Numbering) ---
+                // যদি শুরুতে বাংলা নম্বর থাকে (যেমন: ১. বা ২.) তবে মুছে ফেলো
+                content = content.replace(/^[০-৯]+\.\s*/, '');
+                
+                // --- ধাপ-১: নোট বা ব্যাখ্যা (Explanation) বের করা ---
+                let explanation = "";
+                const noteRegex = /\n\s*(?:Note|নোট|ব্যাখ্যা)[:\s]*([\s\S]*)$/i;
+                const noteMatch = content.match(noteRegex);
+                if (noteMatch) {
+                    explanation = noteMatch[1].trim();
+                    content = content.substring(0, noteMatch.index); // নোট অংশটি কন্টেন্ট থেকে সরিয়ে ফেলা হলো
+                }
+                
+                // --- ধাপ-২: সঠিক উত্তর (Correct Answer) বের করা ---
+                let correctAnswer = "";
+                const ansRegex = /\n\s*(?:Correct Answer|Correct|Answer|Ans|সঠিক উত্তর|সঠিক)[:\s]*([^\n]*)/i;
+                const ansMatch = content.match(ansRegex);
+                if (ansMatch) {
+                    correctAnswer = ansMatch[1].trim();
+                    // উত্তরের শুরুতে 'a)' বা 'ক.' থাকলে মুছে ফেলা
+                    correctAnswer = correctAnswer.replace(/^[a-dক-ঘ][\)\.]\s*/i, '');
+                    content = content.substring(0, ansMatch.index); // উত্তর অংশটি সরিয়ে ফেলা হলো
+                }
 
-                // ৩. সঠিক উত্তরটি ক্লিন করা (যাতে 'a', 'b' বা অতিরিক্ত চিহ্ন না থাকে)
-                // এটি শুধু মূল উত্তরটুকু রাখবে (যেমন: "a) উত্তর" থেকে শুধু "উত্তর" রাখবে)
-                correctAns = correctAns.replace(/^[a-dgdক-ঘ][\)\.]\s*/i, '').trim();
+                // --- ধাপ-৩: অপশন এবং প্রশ্ন আলাদা করা ---
+                // আমরা জানি অপশনগুলো নতুন লাইনে a) b) c) বা ক) খ) দিয়ে শুরু হয়
+                
+                // প্রথম অপশনটি কোথায় শুরু হয়েছে তা বের করি
+                const firstOptionIndex = content.search(/\n\s*(?:[\(]?(?:a|b|c|d|ক|খ|গ|ঘ)[\.\)])/i);
+                
+                let question = "";
+                const options = [];
 
+                if (firstOptionIndex !== -1) {
+                    // অপশন শুরুর আগ পর্যন্ত যা আছে পুরোটাই প্রশ্ন
+                    question = content.substring(0, firstOptionIndex).trim();
+                    
+                    // অপশন অংশটুকু আলাদা করা
+                    const optionsPart = content.substring(firstOptionIndex);
+                    
+                    // অপশনগুলো বের করা (Loop দিয়ে)
+                    const optionRegex = /\n\s*(?:[\(]?(?:a|b|c|d|ক|খ|গ|ঘ)[\.\)])\s*([^\n]+)/gi;
+                    let optMatch;
+                    while ((optMatch = optionRegex.exec(optionsPart)) !== null) {
+                        options.push(optMatch[1].trim());
+                    }
+                } else {
+                    // কোনো অপশন পাওয়া না গেলে পুরোটাই প্রশ্ন (Fallback)
+                    question = content.trim();
+                }
+
+                // ৪. ডাটা তৈরি করা
                 mcqData.push({
-                    id: parseInt(id),
+                    id: id,
                     question: question,
-                    options: [optionA, optionB, optionC, optionD],
-                    correctAnswer: correctAns,
+                    options: options.slice(0, 4), // প্রথম ৪টি অপশন নেওয়া
+                    correctAnswer: correctAnswer,
                     explanation: explanation
                 });
-            }
+            });
 
             return mcqData;
         }
