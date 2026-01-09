@@ -4464,7 +4464,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
 		
 		
-       // 3. ✨ The Magic Parser Function (UPDATED to capture "Note")
+     // 3. ✨ The Magic Parser Function (FINAL FIX)
 function parseMcqText(text) {
     // 1. Clean text
     let cleanText = text.replace(/\r\n/g, '\n');
@@ -4489,33 +4489,39 @@ function parseMcqText(text) {
         content = content.replace(/^[০-৯]+\.\s*/, '');
         
         // --- STEP 1: EXTRACT NOTE/EXPLANATION ---
-        // We look for Note, Explanation, নোট, or ব্যাখ্যা at the end of the block
         let note = "";
+        // Updated regex to be more flexible with colons and spaces
         const noteRegex = /\n\s*(?:Note|Explanation|নোট|ব্যাখ্যা)[:\s]*([\s\S]*)$/i;
         const noteMatch = content.match(noteRegex);
         
         if (noteMatch) {
             note = noteMatch[1].trim();
-            // Remove the note part from content so it doesn't mess up answer parsing
             content = content.substring(0, noteMatch.index);
         }
         
         // --- STEP 2: EXTRACT CORRECT ANSWER ---
         let correctAnswer = "";
-        // Looks for "Correct answer:", "Ans:", "সঠিক উত্তর:"
         const ansRegex = /\n\s*(?:Correct answer|Correct|Answer|Ans|সঠিক উত্তর|সঠিক)[:\s]*([^\n]*)/i;
         const ansMatch = content.match(ansRegex);
         
         if (ansMatch) {
-            correctAnswer = ansMatch[1].trim();
-            // Remove prefixes like "a." or "d)"
-            correctAnswer = correctAnswer.replace(/^[a-dক-ঘ][\)\.]\s*/i, '');
-            // Remove the answer part from content
+            let rawAnswer = ansMatch[1].trim();
+            
+            // FIX: Check if it's just a letter (e.g., "a", "a.", "d)")
+            // If it is, keep the letter. If it's text (e.g., "a. Apple"), strip the "a." prefix.
+            const singleLetterMatch = rawAnswer.match(/^([a-dক-ঘ])[\.\)]?$/i);
+            
+            if (singleLetterMatch) {
+                correctAnswer = singleLetterMatch[1].toLowerCase(); // Keep just "a"
+            } else {
+                // It's full text, strip the prefix "a. "
+                correctAnswer = rawAnswer.replace(/^[a-dক-ঘ][\)\.]\s+/i, '');
+            }
+
             content = content.substring(0, ansMatch.index);
         }
 
         // --- STEP 3: EXTRACT OPTIONS ---
-        // Find where the first option starts (a, b, c, d or ক, খ, গ, ঘ)
         const firstOptionIndex = content.search(/\n\s*(?:[\(]?(?:a|b|c|d|ক|খ|গ|ঘ)[\.\)])/i);
         
         let question = "";
@@ -4539,14 +4545,13 @@ function parseMcqText(text) {
             question: question,
             options: options.slice(0, 4),
             correctAnswer: correctAnswer,
-            note: note, // We store it as 'note'
-            explanation: note // We also map it to 'explanation' for compatibility
+            note: note,
+            explanation: note 
         });
     });
 
     return mcqData;
 }
-		
 		
 		
 
@@ -8290,7 +8295,7 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     });
 }
 
-// Helper to format MCQs for clipboard (ROBUST VERSION)
+// Helper to format MCQs for clipboard (FINAL FIX)
 function formatMcqsForClipboard(mcqs) {
     const labels = ['a', 'b', 'c', 'd'];
 
@@ -8300,39 +8305,33 @@ function formatMcqsForClipboard(mcqs) {
             return `${labels[i]}. ${opt}`;
         }).join('\n');
 
-        // 2. Format Correct Answer Logic
+        // 2. Format Correct Answer
         let answerLine = "";
-        // উত্তরটি স্ট্রিংয়ে কনভার্ট করে ও স্পেস ক্লিন করে নিচ্ছি
         let cleanAnswer = mcq.correctAnswer ? String(mcq.correctAnswer).trim() : "";
         
-        // চেক: উত্তরটি কি শুধু 'a', 'b', 'c', 'd' (অথবা 'a.', 'd)')?
+        // Check if answer is a single letter (a, b, c, d) with optional dot/paren
         const letterMatch = cleanAnswer.match(/^([a-d])[\.\)]?$/i);
 
         if (letterMatch) {
-            // যদি শুধু লেটার হয় (যেমন: 'd'), তাহলে সরাসরি বসিয়ে দাও
+            // Case 1: Answer is just "a" -> "Correct answer: a"
             answerLine = `Correct answer: ${letterMatch[1].toLowerCase()}`;
         } 
         else if (cleanAnswer) {
-            // যদি বড় টেক্সট হয়, অপশনের সাথে মিলানোর চেষ্টা করি
+            // Case 2: Answer is text "Apple" -> Try to find index
             const idx = mcq.options.indexOf(cleanAnswer);
-            
             if (idx !== -1) {
-                // মিলে গেলে: "Correct answer: c. অপশন টেক্সট"
                 answerLine = `Correct answer: ${labels[idx]}. ${cleanAnswer}`;
             } else {
-                // না মিললেও কোনো সমস্যা নেই, যা আছে তাই বসবে (?? আসবে না)
+                // Fallback: Just print the text
                 answerLine = `Correct answer: ${cleanAnswer}`;
             }
         } else {
-            // উত্তর না থাকলে
+            // Case 3: No answer
             answerLine = `Correct answer: ${mcq.explanation || 'Cancelled'}`;
         }
 
         // 3. Format Note
-        // নোট এবং এক্সপ্ল্যানেশন দুটোই চেক করবে
         const noteText = mcq.note || mcq.explanation;
-        
-        // নোট যদি থাকে এবং উত্তরের লাইনে অলরেডি না থাকে, তবে যোগ করো
         if (noteText && !answerLine.includes(noteText)) {
             answerLine += `\nNote: ${noteText}`;
         }
@@ -8340,7 +8339,6 @@ function formatMcqsForClipboard(mcqs) {
         return `${index + 1}. ${mcq.question}\n${optionsText}\n${answerLine}`;
     }).join('\n\n');
 }
-
 
 // Handler for Copy Buttons
 async function handleMcqCopy(data) {
