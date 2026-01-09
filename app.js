@@ -8290,29 +8290,38 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     });
 }
 
-// Helper to format MCQs for clipboard (UPDATED)
+// Helper to format MCQs for clipboard (FIXED: Handles single letter answers correctly)
 function formatMcqsForClipboard(mcqs) {
+    const labels = ['a', 'b', 'c', 'd']; // অপশন লেবেল
+
     return mcqs.map((mcq, index) => {
         // 1. Format Options
         const optionsText = mcq.options.map((opt, i) => {
-            const label = getOptionLabel(i, mcq.question); 
-            return `${label}. ${opt}`;
+            return `${labels[i]}. ${opt}`;
         }).join('\n');
 
         // 2. Format Correct Answer
         let answerLine = "";
-        if (mcq.correctAnswer) {
-            const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
-            const label = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
-            answerLine = `Correct answer: ${label}. ${mcq.correctAnswer}`;
+        const cleanAnswer = mcq.correctAnswer ? mcq.correctAnswer.trim() : "";
+        
+        // Fix: যদি উত্তরটি শুধু 'a', 'b', 'c', বা 'd' হয়, তবে সরাসরি সেটিই বসবে
+        if (/^[a-d]$/i.test(cleanAnswer)) {
+            answerLine = `Correct answer: ${cleanAnswer}`;
+        }
+        else if (cleanAnswer) {
+            // যদি উত্তরটি টেক্সট হয় (যেমন "√0.2"), তবে আমরা ইনডেক্স খুঁজব
+            const correctIndex = mcq.options.indexOf(cleanAnswer);
+            const label = (correctIndex !== -1) ? labels[correctIndex] : '?';
+            answerLine = `Correct answer: ${label}. ${cleanAnswer}`;
         } else {
+            // উত্তর না থাকলে ব্যাখ্যা দেখাবে (যদি থাকে)
             answerLine = `Correct answer: ${mcq.explanation || 'Cancelled'}`;
         }
 
-        // 3. Format Note (Checks both 'note' and 'explanation' fields)
+        // 3. Format Note (Checks both 'note' and 'explanation')
         const noteText = mcq.note || mcq.explanation;
         
-        // Only add note if it exists and isn't already part of the answer line
+        // নোট যোগ করা হবে যদি তা উত্তরের লাইনে ইতিমধ্যে না থাকে
         if (noteText && !answerLine.includes(noteText)) {
             answerLine += `\nNote: ${noteText}`;
         }
