@@ -4465,62 +4465,80 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
 		
        // 3. ✨ The Magic Parser Function (UPDATED: Detects (ক)/(a) style options)
-        function copyQuestions() {
-    // Select all question containers
-    const questions = document.querySelectorAll('.question-container');
+        // Function to handle the copying
+function copyQuestions() {
+    // 1. Target the question containers (Make sure this class matches your HTML)
+    const questions = document.querySelectorAll('.question-container'); 
     let copyText = "";
 
     questions.forEach((q, index) => {
-        // 1. Get the Question Text
-        // Assumes your question text is in an element like h3 or div.question-text
-        let questionText = q.querySelector('.question-text').innerText.trim();
+        // --- Get Question Text ---
+        // We select the element containing the question text
+        const qTextEl = q.querySelector('.question-text') || q.querySelector('h3');
+        let questionText = qTextEl ? qTextEl.innerText.trim() : "";
         
-        // Remove the existing number if it's part of the text, to auto-number cleanly
-        questionText = questionText.replace(/^\d+\.\s*/, ''); 
+        // Remove existing numbers (like "1. ") to ensure clean formatting
+        questionText = questionText.replace(/^\d+[\.\)]\s*/, ''); 
 
         copyText += `${index + 1}. ${questionText}\n`;
 
-        // 2. Get the Options
+        // --- Get Options & Correct Answer ---
+        // Find all labels inside the current question container
         const labels = q.querySelectorAll('label');
-        const optionsMap = ['a', 'b', 'c', 'd'];
-        let correctAnswer = "";
+        const optionMap = ['a', 'b', 'c', 'd'];
+        let correctOption = '';
 
         labels.forEach((label, i) => {
-            // Get option text (remove the radio button part if captured)
-            const optionText = label.innerText.replace(/^[a-d]\.\s*/, '').trim(); 
-            copyText += `${optionsMap[i]}. ${optionText}\n`;
+            // Get option text and clean it
+            let optText = label.innerText.trim();
+            // Remove existing prefixes if they exist (e.g., "a. ")
+            optText = optText.replace(/^[a-d][\.\)]\s*/i, '');
 
-            // Check if this input is the correct one (using data attribute or class)
+            copyText += `${optionMap[i]}. ${optText}\n`;
+
+            // Check if this is the correct answer
+            // This looks for the input inside the label
             const input = label.querySelector('input');
-            if (input && input.value === "true") { 
-                correctAnswer = optionsMap[i];
+            
+            // We check the value (if it's "true") OR a data attribute
+            if (input && (input.value === "true" || input.dataset.correct === "true")) {
+                correctOption = optionMap[i];
             }
         });
 
-        // 3. Append Correct Answer
-        copyText += `Correct answer: ${correctAnswer}\n`;
+        // --- Append Correct Answer ---
+        copyText += `Correct answer: ${correctOption}\n`;
 
-        // 4. Get the Note/Explanation
-        // accurately target the hidden explanation div
+        // --- Get Note/Explanation ---
+        // This is the key fix: using .textContent reads the text even if hidden
         const noteEl = q.querySelector('.explanation'); 
         let noteText = "";
-        
+
         if (noteEl) {
-            // .textContent grabs text even if display: none
-            noteText = noteEl.textContent.trim(); 
-            // Remove the prefix "Note:" or "Explanation:" if it exists in the div to avoid double labels
-            noteText = noteText.replace(/^(Note|Explanation):\s*/i, '');
+            noteText = noteEl.textContent.trim();
+            // Remove "Note:" prefix if already in the text to avoid double "Note: Note:"
+            noteText = noteText.replace(/^Note:\s*/i, '');
         }
 
         copyText += `Note: ${noteText}\n\n`;
     });
 
-    // Execute Copy
+    // --- Write to Clipboard ---
     navigator.clipboard.writeText(copyText).then(() => {
-        alert("Questions copied to clipboard with Notes included!");
+        alert(`Copied ${questions.length} questions to clipboard!`);
     }).catch(err => {
-        console.error('Failed to copy text: ', err);
+        console.error('Failed to copy: ', err);
     });
+}
+
+// Attach the listener to the button
+// Ensure your HTML button has id="copy-btn"
+const copyButton = document.getElementById('copy-btn');
+if (copyButton) {
+    // Remove old listeners by cloning (optional, but safe) or just add new one
+    copyButton.addEventListener('click', copyQuestions);
+} else {
+    console.error("Could not find button with id 'copy-btn'");
 }
 		
 		
