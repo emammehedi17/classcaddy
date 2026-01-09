@@ -4465,81 +4465,95 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
 		
        // 3. ✨ The Magic Parser Function (UPDATED: Detects (ক)/(a) style options)
-        // Function to handle the copying
-function copyQuestions() {
-    // 1. Target the question containers (Make sure this class matches your HTML)
-    const questions = document.querySelectorAll('.question-container'); 
-    let copyText = "";
-
-    questions.forEach((q, index) => {
-        // --- Get Question Text ---
-        // We select the element containing the question text
-        const qTextEl = q.querySelector('.question-text') || q.querySelector('h3');
-        let questionText = qTextEl ? qTextEl.innerText.trim() : "";
-        
-        // Remove existing numbers (like "1. ") to ensure clean formatting
-        questionText = questionText.replace(/^\d+[\.\)]\s*/, ''); 
-
-        copyText += `${index + 1}. ${questionText}\n`;
-
-        // --- Get Options & Correct Answer ---
-        // Find all labels inside the current question container
-        const labels = q.querySelectorAll('label');
-        const optionMap = ['a', 'b', 'c', 'd'];
-        let correctOption = '';
-
-        labels.forEach((label, i) => {
-            // Get option text and clean it
-            let optText = label.innerText.trim();
-            // Remove existing prefixes if they exist (e.g., "a. ")
-            optText = optText.replace(/^[a-d][\.\)]\s*/i, '');
-
-            copyText += `${optionMap[i]}. ${optText}\n`;
-
-            // Check if this is the correct answer
-            // This looks for the input inside the label
-            const input = label.querySelector('input');
+        function parseMcqText(text) {
+            // ১. টেক্সট ক্লিন করা
+            let cleanText = text.replace(/\r\n/g, '\n');
             
-            // We check the value (if it's "true") OR a data attribute
-            if (input && (input.value === "true" || input.dataset.correct === "true")) {
-                correctOption = optionMap[i];
-            }
-        });
+            // ২. পুরো টেক্সটকে প্রশ্নের নম্বর অনুযায়ী টুকরো করা (Split)
+            // এটি খুঁজবে: নতুন লাইন + ইংরেজি নম্বর + ডট (যেমন: 1. বা 50.)
+            // (?=...) ব্যবহারের ফলে নম্বরটি মুছে যাবে না, পরের টুকরোর শুরুতে থাকবে
+            const rawBlocks = cleanText.split(/\n(?=[0-9]+\.)/);
+            
+            const mcqData = [];
 
-        // --- Append Correct Answer ---
-        copyText += `Correct answer: ${correctOption}\n`;
+            rawBlocks.forEach(block => {
+                // খালি ব্লক বা জঞ্জাল থাকলে স্কিপ করুন
+                if (!block || !block.trim()) return;
 
-        // --- Get Note/Explanation ---
-        // This is the key fix: using .textContent reads the text even if hidden
-        const noteEl = q.querySelector('.explanation'); 
-        let noteText = "";
+                // ৩. প্রতিটি ব্লকের প্রসেসিং (Safe Parsing)
+                
+                // আই ডি (ID) বের করা
+                const idMatch = block.match(/^\s*([0-9]+)\./);
+                if (!idMatch) return; // আই ডি না থাকলে বাদ
+                
+                const id = parseInt(idMatch[1]);
+                
+                // আই ডি অংশটি মুছে ফেলে শুধু কন্টেন্ট রাখা
+                let content = block.replace(/^\s*[0-9]+\.\s*/, '');
+                
+                // --- ফিক্স: ডাবল নাম্বারিং (Double Numbering) ---
+                // যদি শুরুতে বাংলা নম্বর থাকে (যেমন: ১. বা ২.) তবে মুছে ফেলো
+                content = content.replace(/^[০-৯]+\.\s*/, '');
+                
+                // --- ধাপ-১: নোট বা ব্যাখ্যা (Explanation) বের করা ---
+                let explanation = "";
+                const noteRegex = /\n\s*(?:Note|নোট|ব্যাখ্যা)[:\s]*([\s\S]*)$/i;
+                const noteMatch = content.match(noteRegex);
+                if (noteMatch) {
+                    explanation = noteMatch[1].trim();
+                    content = content.substring(0, noteMatch.index); // নোট অংশটি কন্টেন্ট থেকে সরিয়ে ফেলা হলো
+                }
+                
+                // --- ধাপ-২: সঠিক উত্তর (Correct Answer) বের করা ---
+                let correctAnswer = "";
+                const ansRegex = /\n\s*(?:Correct Answer|Correct|Answer|Ans|সঠিক উত্তর|সঠিক)[:\s]*([^\n]*)/i;
+                const ansMatch = content.match(ansRegex);
+                if (ansMatch) {
+                    correctAnswer = ansMatch[1].trim();
+                    // উত্তরের শুরুতে 'a)' বা 'ক.' থাকলে মুছে ফেলা
+                    correctAnswer = correctAnswer.replace(/^[a-dক-ঘ][\)\.]\s*/i, '');
+                    content = content.substring(0, ansMatch.index); // উত্তর অংশটি সরিয়ে ফেলা হলো
+                }
 
-        if (noteEl) {
-            noteText = noteEl.textContent.trim();
-            // Remove "Note:" prefix if already in the text to avoid double "Note: Note:"
-            noteText = noteText.replace(/^Note:\s*/i, '');
+                // --- ধাপ-৩: অপশন এবং প্রশ্ন আলাদা করা ---
+                // আমরা জানি অপশনগুলো নতুন লাইনে a) b) c) বা ক) খ) দিয়ে শুরু হয়
+                
+                // প্রথম অপশনটি কোথায় শুরু হয়েছে তা বের করি
+                const firstOptionIndex = content.search(/\n\s*(?:[\(]?(?:a|b|c|d|ক|খ|গ|ঘ)[\.\)])/i);
+                
+                let question = "";
+                const options = [];
+
+                if (firstOptionIndex !== -1) {
+                    // অপশন শুরুর আগ পর্যন্ত যা আছে পুরোটাই প্রশ্ন
+                    question = content.substring(0, firstOptionIndex).trim();
+                    
+                    // অপশন অংশটুকু আলাদা করা
+                    const optionsPart = content.substring(firstOptionIndex);
+                    
+                    // অপশনগুলো বের করা (Loop দিয়ে)
+                    const optionRegex = /\n\s*(?:[\(]?(?:a|b|c|d|ক|খ|গ|ঘ)[\.\)])\s*([^\n]+)/gi;
+                    let optMatch;
+                    while ((optMatch = optionRegex.exec(optionsPart)) !== null) {
+                        options.push(optMatch[1].trim());
+                    }
+                } else {
+                    // কোনো অপশন পাওয়া না গেলে পুরোটাই প্রশ্ন (Fallback)
+                    question = content.trim();
+                }
+
+                // ৪. ডাটা তৈরি করা
+                mcqData.push({
+                    id: id,
+                    question: question,
+                    options: options.slice(0, 4), // প্রথম ৪টি অপশন নেওয়া
+                    correctAnswer: correctAnswer,
+                    explanation: explanation
+                });
+            });
+
+            return mcqData;
         }
-
-        copyText += `Note: ${noteText}\n\n`;
-    });
-
-    // --- Write to Clipboard ---
-    navigator.clipboard.writeText(copyText).then(() => {
-        alert(`Copied ${questions.length} questions to clipboard!`);
-    }).catch(err => {
-        console.error('Failed to copy: ', err);
-    });
-}
-
-// Attach the listener to the button
-// Ensure your HTML button has id="copy-btn"
-const copyButton = document.getElementById('copy-btn');
-if (copyButton) {
-    // Remove old listeners by cloning (optional, but safe) or just add new one
-    copyButton.addEventListener('click', copyQuestions);
-} else {
-    console.error("Could not find button with id 'copy-btn'");
-}
 		
 		
 		
@@ -8284,7 +8298,7 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     });
 }
 
-// Helper to format MCQs for clipboard (UPDATED: Includes Notes)
+// Helper to format MCQs for clipboard (FIXED: Supports both 'note' and 'explanation' fields)
 function formatMcqsForClipboard(mcqs) {
     return mcqs.map((mcq, index) => {
         // 1. Format Options
@@ -8300,12 +8314,17 @@ function formatMcqsForClipboard(mcqs) {
             const label = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
             answerLine = `Correct answer: ${label}. ${mcq.correctAnswer}`;
         } else {
+            // If no correct answer is defined, show the explanation/status
             answerLine = `Correct answer: ${mcq.explanation || 'Cancelled'}`;
         }
 
-        // 3. Format Note (NEW)
-        if (mcq.note) {
-            answerLine += `\nNote: ${mcq.note}`;
+        // 3. Format Note (The Fix)
+        // parseMcqText stores the note in 'explanation'. We must check both.
+        // We also ensure we don't duplicate it if it was used in the 'answerLine' above.
+        const noteText = mcq.note || (mcq.explanation && !answerLine.includes(mcq.explanation) ? mcq.explanation : null);
+
+        if (noteText) {
+            answerLine += `\nNote: ${noteText}`;
         }
 
         // 4. Combine
