@@ -4466,82 +4466,44 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
        // 3. ✨ The Magic Parser Function (UPDATED: Detects (ক)/(a) style options)
         function parseMcqText(text) {
-            // Fix: Added (?![0-9০-৯]) to prevent matching decimals (English OR Bengali) like 2.5 or ২.৫ as question numbers
-            let cleanText = text.replace(/\n*([০-৯0-9]+\.(?![0-9০-৯]))/g, '\n$1');
+            // ১. টেক্সট ক্লিন করা (অপ্রয়োজনীয় স্পেস কমানো)
+            let cleanText = text.replace(/\r\n/g, '\n');
+
             const mcqData = [];
+
+            // ২. নতুন উন্নত Regex (Dual Numbering Support: 1. ১. format)
+            // ব্যাখ্যা:
+            // (?:^|\n)\s*([0-9]+)\.       -> শুরুতে ইংরেজি নম্বর খুঁজবে (যেমন: 1.)
+            // (?:\s*[০-৯]+\.)?            -> এরপর যদি বাংলা নম্বর থাকে (যেমন: ১.) তবে সেটাও স্কিপ করবে।
+            // ((?:(?!\n\s*a[\)\.]).)+)    -> এরপর অপশন 'a)' বা 'a.' আসার আগ পর্যন্ত সব টেক্সট প্রশ্নের অংশ হিসেবে নেবে।
             
-            // Updated Regex: Now checks that the dot is NOT followed by any digit (English or Bengali)
-            const mcqRegex = 
-/(?:^|\n)\s*([০-৯0-9]+)\.(?![0-9০-৯])((?:(?!\n\s*[০-৯0-9]+\.(?![0-9০-৯]))[\s\S])+?)\n\s*(?:[\(]?(?:ক|a)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:খ|b)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:গ|c)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:ঘ|d)[\.\)])\s*([\s\S]+?)\n\s*(?:(?:সঠিক উত্তর)|(?:Correct answer)):\s*([\s\S]+?)(?=\n\s*[০-৯0-9]+\.(?![0-9০-৯])|\n*$)/gi;
-            
+            const mcqRegex = /(?:^|\n)\s*([0-9]+)\.(?:\s*[০-৯]+\.)?\s*((?:(?!\n\s*(?:[\(]?(?:ক|a)[\.\)])).)+)\n\s*(?:[\(]?(?:ক|a)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:খ|b)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:গ|c)[\.\)])\s*([\s\S]+?)\n\s*(?:[\(]?(?:ঘ|d)[\.\)])\s*([\s\S]+?)\n\s*(?:(?:সঠিক উত্তর)|(?:Correct Answer)|(?:Answer)|(?:Ans))[:\s]*([\s\S]+?)(?:\n\s*(?:Note|নোট|ব্যাখ্যা)[:\s]*([\s\S]+?))?(?=\n\s*\d+\.|$)/gi;
+
             let match;
             while ((match = mcqRegex.exec(cleanText)) !== null) {
-                try {
-                    const question = match[2].trim(); 
-                    const options = [ match[3].trim(), match[4].trim(), match[5].trim(), match[6].trim() ];
-                    
-                    let rawAnswerLine = match[7].trim();
-                    let noteText = null;
+                // ডাটাগুলো ভেরিয়েবলে নেওয়া
+                const id = match[1].trim();
+                const question = match[2].trim();
+                const optionA = match[3].trim();
+                const optionB = match[4].trim();
+                const optionC = match[5].trim();
+                const optionD = match[6].trim();
+                let correctAns = match[7].trim();
+                const explanation = match[8] ? match[8].trim() : ""; // নোট যদি থাকে
 
-                    // --- NOTE PARSING LOGIC ---
-                    
-                    // 1. Check for Explicit Keywords (Note:, NB:, Explanation:, etc.)
-                    const noteSplitRegex = /(?:[\n\s]+)(?:Note|NB|N\.B\.|Explanation|Ex|Exp|ব্যাখ্যা|দ্রষ্টব্য)\s*[:\-]?\s*/i;
-                    const splitMatch = rawAnswerLine.split(noteSplitRegex);
+                // ৩. সঠিক উত্তরটি ক্লিন করা (যাতে 'a', 'b' বা অতিরিক্ত চিহ্ন না থাকে)
+                // এটি শুধু মূল উত্তরটুকু রাখবে (যেমন: "a) উত্তর" থেকে শুধু "উত্তর" রাখবে)
+                correctAns = correctAns.replace(/^[a-dgdক-ঘ][\)\.]\s*/i, '').trim();
 
-                    if (splitMatch.length > 1) {
-                        // Case A: Found a keyword
-                        rawAnswerLine = splitMatch[0].trim();
-                        noteText = splitMatch.slice(1).join(' ').trim();
-                    } else {
-                        // Case B: Check for Implicit Brackets (...)
-                        const bracketRegex = /^(.*?)\s*\((.+)\)$/s;
-                        const bracketMatch = rawAnswerLine.match(bracketRegex);
-                        
-                        if (bracketMatch) {
-                            rawAnswerLine = bracketMatch[1].trim();
-                            noteText = bracketMatch[2].trim();
-                        }
-                    }
-                    // ------------------------------------
-
-                    const answerStringLower = rawAnswerLine.toLowerCase();
-                    let correctAnswer = null;
-
-                    // Standard Answer Detection
-                    if (answerStringLower === 'a' || answerStringLower === 'ক') correctAnswer = options[0];
-                    else if (answerStringLower === 'b' || answerStringLower === 'খ') correctAnswer = options[1];
-                    else if (answerStringLower === 'c' || answerStringLower === 'গ' || answerStringLower === 'ג') correctAnswer = options[2];
-                    else if (answerStringLower === 'd' || answerStringLower === 'ঘ') correctAnswer = options[3];
-
-                    if (correctAnswer === null) {
-                        if (answerStringLower.startsWith('a.') || answerStringLower.startsWith('ক.')) correctAnswer = options[0];
-                        else if (answerStringLower.startsWith('b.') || answerStringLower.startsWith('খ.')) correctAnswer = options[1];
-                        else if (answerStringLower.startsWith('c.') || answerStringLower.startsWith('গ.') || answerStringLower.startsWith('ג.')) correctAnswer = options[2];
-                        else if (answerStringLower.startsWith('d.') || answerStringLower.startsWith('ঘ.')) correctAnswer = options[3];
-                    }
-
-                    if (correctAnswer === null) {
-                        for (const opt of options) {
-                            if (opt === rawAnswerLine || rawAnswerLine.includes(opt) || opt.includes(rawAnswerLine)) {
-                                correctAnswer = opt;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    mcqData.push({ 
-                        question: question, 
-                        options: options, 
-                        correctAnswer: correctAnswer, 
-                        explanation: (correctAnswer ? null : rawAnswerLine),
-                        note: noteText 
-                    });
-                    
-                } catch (e) {
-                    console.error("Failed to parse one MCQ block:", e);
-                }
+                mcqData.push({
+                    id: parseInt(id),
+                    question: question,
+                    options: [optionA, optionB, optionC, optionD],
+                    correctAnswer: correctAns,
+                    explanation: explanation
+                });
             }
+
             return mcqData;
         }
 		
