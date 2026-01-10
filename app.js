@@ -3553,6 +3553,16 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             currentQuizScore = 0;
 
             quizScoreEl.textContent = `Score: 0.00`;
+
+            // --- Reset Progress & Counters ---
+            const liveCorrect = document.getElementById('quiz-live-correct');
+            const liveWrong = document.getElementById('quiz-live-wrong');
+            const progressBar = document.getElementById('quiz-progress-bar');
+            
+            if(liveCorrect) liveCorrect.textContent = '0';
+            if(liveWrong) liveWrong.textContent = '0';
+            if(progressBar) progressBar.style.width = '0%';
+            // ---------------------------------
             quizRestartBtn.onclick = runQuizGame;
             
             const totalQuestions = currentQuizQuestions.length;
@@ -3618,6 +3628,15 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const q = currentQuizQuestions[currentQuizQuestionIndex];
             
             quizQuestionNumber.textContent = `Question ${currentQuizQuestionIndex + 1}/${currentQuizQuestions.length}`;
+            
+            // --- Update Progress Bar ---
+            const progressBar = document.getElementById('quiz-progress-bar');
+            if(progressBar) {
+                const percent = ((currentQuizQuestionIndex + 1) / currentQuizQuestions.length) * 100;
+                progressBar.style.width = `${percent}%`;
+            }
+            // ---------------------------
+
             quizQuestionText.textContent = q.question;
 
             // --- Button State Logic ---
@@ -3681,9 +3700,16 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const isCorrect = (selectedOption === q.correctAnswer);
             q.isCorrect = isCorrect;
             
-            // Apply scoring
-            if (isCorrect) currentQuizScore += 1;
-            else currentQuizScore -= 0.25;
+            // Apply scoring & Update Counters
+            if (isCorrect) {
+                currentQuizScore += 1;
+                const liveCorrect = document.getElementById('quiz-live-correct');
+                if(liveCorrect) liveCorrect.textContent = parseInt(liveCorrect.textContent || '0') + 1;
+            } else {
+                currentQuizScore -= 0.25;
+                const liveWrong = document.getElementById('quiz-live-wrong');
+                if(liveWrong) liveWrong.textContent = parseInt(liveWrong.textContent || '0') + 1;
+            }
             
             quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`;
 

@@ -424,14 +424,28 @@
 
 
         <div id="quiz-main-screen" class="hidden">
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-5">
+                <div id="quiz-progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+
             <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-4">
+                     <div class="flex items-center text-green-600 font-bold" title="Correct Answers">
+                        <i class="fas fa-check mr-1.5"></i> <span id="quiz-live-correct">0</span>
+                     </div>
+                     <div class="flex items-center text-red-500 font-bold" title="Wrong Answers">
+                        <i class="fas fa-times mr-1.5"></i> <span id="quiz-live-wrong">0</span>
+                     </div>
+                </div>
+
                 <div id="quiz-question-number" class="text-lg font-bold text-indigo-600">Question 1/10</div>
                 
-                <div id="quiz-timer" class="text-xl font-bold text-red-600" style="font-family: 'Courier New', monospace;">
-                    00:00
+                <div class="flex items-center gap-4">
+                     <div id="quiz-timer" class="text-xl font-bold text-red-600" style="font-family: 'Courier New', monospace;">
+                        00:00
+                    </div>
+                    <div id="quiz-score" class="text-lg font-bold text-gray-700 hidden">Score: 0</div>
                 </div>
-                
-                <div id="quiz-score" class="text-lg font-bold text-gray-700">Score: 0</div>
             </div>
             <div id="quiz-question-area">
                 <h2 id="quiz-question-text" class="text-xl sm:text-2xl font-semibold text-gray-900 mb-6 min-h-[60px]" oncontextmenu="return false;">
