@@ -3514,6 +3514,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizMainScreen.classList.remove('hidden');
             quizMainScreen.style.display = 'block';
 
+            // --- ADD THESE LINES HERE ---
             const topicNameEl = document.getElementById('quiz-topic-name');
             if (topicNameEl && window.currentQuizSubjectInfo) {
                 const { subjectName, topicDetail } = window.currentQuizSubjectInfo;
@@ -3530,13 +3531,16 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             if(liveWrong) liveWrong.textContent = '0';
             if(liveSkipped) liveSkipped.textContent = '0';
             if(progressBar) progressBar.style.width = '0%';
-            
+            // ---------------------------------
             quizRestartBtn.onclick = runQuizGame;
             
-            // --- UPDATED TIMING LOGIC: Read from User Input ---
-            const userMinutes = parseFloat(document.getElementById('quiz-custom-time').value) || 1;
-            const totalTimeInSeconds = Math.ceil(userMinutes * 60);
-            // --------------------------------------------------
+            const totalQuestions = currentQuizQuestions.length;
+            
+            // --- NEW TIMING LOGIC ---
+            // If MCQ Data exists, use 20 seconds. Otherwise (Vocab), use 15 seconds.
+            const secondsPerQuestion = currentMcqData ? 40 : 15;
+            const totalTimeInSeconds = totalQuestions * secondsPerQuestion;
+            // ------------------------
 
             startTimer(totalTimeInSeconds); 
             
@@ -3544,7 +3548,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             quizQuestionArea.classList.remove('slide-in-right', 'slide-in-left');
         }
-		
 		
 		
 		function startTimer(totalSeconds) {
@@ -3672,10 +3675,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 const liveCorrect = document.getElementById('quiz-live-correct');
                 if(liveCorrect) liveCorrect.textContent = parseInt(liveCorrect.textContent || '0') + 1;
             } else {
-                // Read minus marking from input
-                const minusMark = parseFloat(document.getElementById('quiz-custom-negative').value) || 0;
-                currentQuizScore -= minusMark;
-                
+                currentQuizScore -= 0.25;
                 const liveWrong = document.getElementById('quiz-live-wrong');
                 if(liveWrong) liveWrong.textContent = parseInt(liveWrong.textContent || '0') + 1;
             }
@@ -4245,12 +4245,11 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 currentQuizQuestions = []; 
                 
                 const totalQuestions = questionList.length + questionList.filter(v => v.synonym).length;
-                // Calculate Default Time (Vocab = 15s per question)
-                const defaultSeconds = totalQuestions * 15;
-                const defaultMinutes = (defaultSeconds / 60).toFixed(1);
+                const totalTimeInSeconds = totalQuestions * 15;
                 
-                document.getElementById('quiz-custom-time').value = defaultMinutes;
-                document.getElementById('quiz-custom-negative').value = "0.25";
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
 
                 quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week?`;
                 quizStartBtn.classList.remove('hidden');
@@ -4845,12 +4844,11 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 currentQuizQuestions = []; 
                 
                 const totalQuestions = questionList.length + questionList.filter(v => v.synonym).length;
-                // Calculate Default Time (Vocab = 15s per question)
-                const defaultSeconds = totalQuestions * 15;
-                const defaultMinutes = (defaultSeconds / 60).toFixed(1);
+                const totalTimeInSeconds = totalQuestions * 15;
                 
-                document.getElementById('quiz-custom-time').value = defaultMinutes;
-                document.getElementById('quiz-custom-negative').value = "0.25";
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
                 quizStartBtn.classList.remove('hidden');
@@ -4942,12 +4940,11 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 }));
                 
                 const totalQuestions = currentQuizQuestions.length;
-                // Calculate Default Time (MCQ = 40s per question)
-                const defaultSeconds = totalQuestions * 40;
-                const defaultMinutes = (defaultSeconds / 60).toFixed(1);
+                const totalTimeInSeconds = totalQuestions * 40;
                 
-                document.getElementById('quiz-custom-time').value = defaultMinutes;
-                document.getElementById('quiz-custom-negative').value = "0.25";
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${mcqData.length} MCQs?`;
                 quizStartBtn.classList.remove('hidden');
@@ -5187,12 +5184,11 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 }));
                 
                 const totalQuestions = currentQuizQuestions.length;
-                // Calculate Default Time (MCQ = 40s per question)
-                const defaultSeconds = totalQuestions * 40;
-                const defaultMinutes = (defaultSeconds / 60).toFixed(1);
+                const totalTimeInSeconds = totalQuestions * 40;
                 
-                document.getElementById('quiz-custom-time').value = defaultMinutes;
-                document.getElementById('quiz-custom-negative').value = "0.25";
+                const warningP = document.getElementById('quiz-total-time-warning');
+                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${aggregatedMcqs.length} MCQs from: ${quizTitle}?`;
                 quizStartBtn.classList.remove('hidden');
@@ -7819,13 +7815,14 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
         isCorrect: null
     }));
 
-    // 6. Calculate Time Defaults
+    // 6. Calculate Time
     const totalQuestions = currentQuizQuestions.length;
-    const defaultSeconds = totalQuestions * 40;
-    const defaultMinutes = (defaultSeconds / 60).toFixed(1);
-    
-    document.getElementById('quiz-custom-time').value = defaultMinutes;
-    document.getElementById('quiz-custom-negative').value = "0.25";
+    const totalTimeInSeconds = totalQuestions * 40;
+
+    // 7. Update Start Screen Text
+    const warningP = document.getElementById('quiz-total-time-warning');
+    warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+    warningP.style.display = 'block';
     
     quizStartMessage.textContent = `Ready to test yourself on ${totalQuestions} MCQs from: ${title}?`;
     
@@ -8001,13 +7998,10 @@ if (viewMcqTestBtn) {
             question: mcq.question, options: [...mcq.options], correctAnswer: mcq.correctAnswer, explanation: mcq.explanation || null, note: mcq.note || null, userAnswer: null, isCorrect: null 
         }));
         
-        const totalQuestions = currentQuizQuestions.length;
-        // Calculate Default Time (MCQ = 40s per question)
-        const defaultSeconds = totalQuestions * 40;
-        const defaultMinutes = (defaultSeconds / 60).toFixed(1);
-        
-        document.getElementById('quiz-custom-time').value = defaultMinutes;
-        document.getElementById('quiz-custom-negative').value = "0.25";
+        const totalTime = currentQuizQuestions.length * 40;
+        const warningP = document.getElementById('quiz-total-time-warning');
+        warningP.querySelector('span').textContent = formatTime(totalTime);
+        warningP.style.display = 'block';
         
         quizStartMessage.textContent = `Ready to test yourself on ${currentQuizQuestions.length} MCQs?`;
         quizStartBtn.classList.remove('hidden');
