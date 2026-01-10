@@ -441,51 +441,36 @@
              }
         });
 
-        googleLoginBtn.addEventListener('click', async () => { 
-            try { 
-                console.log("Using signInWithRedirect for all devices to avoid COOP error.");
-                await signInWithPopup(auth, googleProvider);
-
-            } catch (error) { 
-                console.error("Google Sign-In Error:", error); 
-                 showCustomAlert(`Sign-in error: ${error.code}`, "error");
-            } 
-        });
-		
-		guestLoginBtn.addEventListener('click', () => {
-            isGuestMode = true;
-            // Create a "fake" user object for the guest session
-            const guestUser = {
-                uid: MEHEDI_UID,
-                displayName: "Guest (Viewing Mehedi's Plan)",
-                email: "read-only@guest.com",
-				photoURL: "images/profile.jpg",
-                isAnonymous: true // Use this to check for guest mode
-            };
-            // Manually call updateAuthUI with this guest user
-            updateAuthUI(guestUser);
-        });
-        async function handleLogout() { 
-            try { 
-                if (isGuestMode) {
-                    // This is a guest, just reload the UI to the logged-out state
-                    isGuestMode = false;
-                    updateAuthUI(null); // This will reset everything
-                } else {
-                    // This is a real user, sign them out
-                    if (unsubscribeActiveMonth) unsubscribeActiveMonth(); 
-                    unsubscribeActiveMonth = null; 
-                    await signOut(auth); 
-                    console.log("Logout successful.");
-                    // onAuthStateChanged will fire and call updateAuthUI(null)
-                }
-            } catch (error) { 
-                console.error("Logout Error:", error); 
-            } 
+        // --- SAFE EVENT LISTENERS (Checks if button exists first) ---
+        if (googleLoginBtn) {
+            googleLoginBtn.addEventListener('click', async () => { 
+                try { 
+                    console.log("Using signInWithRedirect for all devices to avoid COOP error.");
+                    await signInWithPopup(auth, googleProvider);
+                } catch (error) { 
+                    console.error("Google Sign-In Error:", error); 
+                     showCustomAlert(`Sign-in error: ${error.code}`, "error");
+                } 
+            });
         }
 		
-        logoutBtn.addEventListener('click', handleLogout);
-
+        if (guestLoginBtn) {
+            guestLoginBtn.addEventListener('click', () => {
+                isGuestMode = true;
+                const guestUser = {
+                    uid: MEHEDI_UID,
+                    displayName: "Guest (Viewing Mehedi's Plan)",
+                    email: "read-only@guest.com",
+    				photoURL: "images/profile.jpg",
+                    isAnonymous: true
+                };
+                updateAuthUI(guestUser);
+            });
+        }
+        
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', handleLogout);
+        }
         // --- START: ADD MOBILE DETECT HELPER ---
         function isMobileDevice() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
