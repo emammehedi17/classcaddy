@@ -3507,6 +3507,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		/**
          * Resets state and starts the quiz game.
          */
+        // GLOBAL VARIABLES FOR LIVE COUNTERS
+        let liveCorrect = 0;
+        let liveWrong = 0;
+
         function runQuizGame() {
             // 1. Hide Start Screen
             quizStartScreen.classList.add('hidden');
@@ -3549,19 +3553,25 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 currentQuizQuestions = shuffleArray(currentQuizQuestions);
             }
 
+            // RESET VARIABLES
             currentQuizQuestionIndex = 0;
             currentQuizScore = 0;
+            liveCorrect = 0; 
+            liveWrong = 0;
 
-            quizScoreEl.textContent = `Score: 0.00`;
+            // RESET UI
+            // quizScoreEl.textContent = `Score: 0.00`; // Old Score element (removed from HTML)
+            document.getElementById('live-correct-count').textContent = '0';
+            document.getElementById('live-wrong-count').textContent = '0';
+            document.getElementById('quiz-rationale-box').classList.add('hidden'); // Hide rationale
+            
             quizRestartBtn.onclick = runQuizGame;
             
             const totalQuestions = currentQuizQuestions.length;
             
             // --- NEW TIMING LOGIC ---
-            // If MCQ Data exists, use 20 seconds. Otherwise (Vocab), use 15 seconds.
             const secondsPerQuestion = currentMcqData ? 40 : 15;
             const totalTimeInSeconds = totalQuestions * secondsPerQuestion;
-            // ------------------------
 
             startTimer(totalTimeInSeconds); 
             
@@ -3569,7 +3579,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             quizQuestionArea.classList.remove('slide-in-right', 'slide-in-left');
         }
-		
 		
 		function startTimer(totalSeconds) {
             if (quizTimerInterval) clearInterval(quizTimerInterval); // Clear any old timer
@@ -3611,13 +3620,17 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         function loadQuizQuestion() {
             quizOptionsContainer.innerHTML = '';
             
-            // 1. Remove any existing note from previous render
-            const oldNote = document.getElementById('quiz-instant-note');
-            if (oldNote) oldNote.remove();
+            // 1. Hide Rationale Box for new question
+            document.getElementById('quiz-rationale-box').classList.add('hidden');
             
             const q = currentQuizQuestions[currentQuizQuestionIndex];
             
-            quizQuestionNumber.textContent = `Question ${currentQuizQuestionIndex + 1}/${currentQuizQuestions.length}`;
+            // 2. Update Progress Bar
+            const total = currentQuizQuestions.length;
+            const progressPercent = ((currentQuizQuestionIndex) / total) * 100;
+            document.getElementById('quiz-progress-fill').style.width = `${progressPercent}%`;
+
+            quizQuestionNumber.textContent = `${currentQuizQuestionIndex + 1}/${total}`;
             quizQuestionText.textContent = q.question;
 
             // --- Button State Logic ---
@@ -3654,18 +3667,15 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
             quizOptionsContainer.appendChild(fragment);
 
-            // --- FIX: RE-RENDER NOTE IF ALREADY ANSWERED ---
+            // --- SHOW RATIONALE IF ALREADY ANSWERED (Reviewing previous q) ---
             if (q.userAnswer !== null && q.note) {
-                const noteDiv = document.createElement('div');
-                noteDiv.id = 'quiz-instant-note';
-                noteDiv.className = 'mt-4 p-3 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm explanation-text';
-                noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(q.note)}`;
-                
-                // Insert after the options container
-                quizOptionsContainer.parentNode.insertBefore(noteDiv, quizOptionsContainer.nextSibling);
+                 const rationaleBox = document.getElementById('quiz-rationale-box');
+                 const rationaleText = document.getElementById('quiz-rationale-text');
+                 rationaleText.innerHTML = escapeHtml(q.note);
+                 rationaleBox.classList.remove('hidden');
             }
-            // ----------------------------------------------
         }
+		
 		
        /**
          * Handles the user's answer selection. (UPDATED: Instant 100ms Advance)
@@ -3681,11 +3691,18 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const isCorrect = (selectedOption === q.correctAnswer);
             q.isCorrect = isCorrect;
             
-            // Apply scoring
-            if (isCorrect) currentQuizScore += 1;
-            else currentQuizScore -= 0.25;
+            // --- NEW: Update Live Counters ---
+            if (isCorrect) {
+                currentQuizScore += 1;
+                liveCorrect++;
+                document.getElementById('live-correct-count').textContent = liveCorrect;
+            } else {
+                currentQuizScore -= 0.25;
+                liveWrong++;
+                document.getElementById('live-wrong-count').textContent = liveWrong;
+            }
             
-            quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`;
+            // quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`; // Removing old score
 
             // Apply visual feedback to buttons
             Array.from(quizOptionsContainer.children).forEach(btn => {
@@ -3697,29 +3714,36 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
             });
 
-            // --- SHOW NOTE IMMEDIATELY (CORRECT OR WRONG) ---
-            if (q.note) {
-                // Remove old note just in case
-                const oldNote = document.getElementById('quiz-instant-note');
-                if (oldNote) oldNote.remove();
-
-                const noteDiv = document.createElement('div');
-                noteDiv.id = 'quiz-instant-note';
-                noteDiv.className = 'mt-4 p-3 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm animate-fade-in explanation-text';
-                noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(q.note)}`;
-                
-                quizOptionsContainer.parentNode.insertBefore(noteDiv, quizOptionsContainer.nextSibling);
-            }
-            // ---------------------------------------------------------
+            // --- NEW: SHOW RATIONALE BOX ---
+            const rationaleBox = document.getElementById('quiz-rationale-box');
+            const rationaleText = document.getElementById('quiz-rationale-text');
             
-            // Enable "Next" button immediately so user can proceed manually
+            // Build the explanation content
+            let explanationHTML = "";
+            
+            if (q.note) {
+                explanationHTML = escapeHtml(q.note);
+            }
+            
+            // If the answer is WRONG, we append the Correct Answer to the explanation
+            if (!isCorrect) {
+                if (explanationHTML) explanationHTML += "<br><br>";
+                explanationHTML += `<strong class="text-emerald-600">Correct Answer:</strong> ${escapeHtml(q.correctAnswer)}`;
+            } else if (!explanationHTML) {
+                // If correct and no note exists
+                explanationHTML = `<strong class="text-emerald-600">Correct!</strong> Well done.`;
+            }
+
+            rationaleText.innerHTML = explanationHTML;
+            rationaleBox.classList.remove('hidden');
+            
+            // Enable "Next" button immediately
             quizNextBtn.disabled = false;
             quizSkipBtn.hidden = true;
 
-            // Auto-advance Logic (INSTANT)
+            // Auto-advance Logic (INSTANT) - Only if correct
             if (isCorrect) {
                 setTimeout(() => {
-                    // Only auto-advance if it's NOT the last question
                     if (currentQuizQuestionIndex < currentQuizQuestions.length - 1) {
                         currentQuizQuestionIndex++;
                         loadQuizQuestion();
@@ -3727,9 +3751,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     } else {
                         showQuizResults();
                     }
-                }, 100); // <--- Changed to 100ms (Instant)
+                }, 1000); // Increased delay slightly so they can see the green checkmark
             }
         }
+		
 		
 		
         function showQuizResults() {
