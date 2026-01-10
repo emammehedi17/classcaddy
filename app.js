@@ -111,14 +111,13 @@
         let quizStartBtn = document.getElementById('quiz-start-btn');
 		const quizTitle = document.getElementById('quiz-title');
         const quizMainScreen = document.getElementById('quiz-main-screen');
-        const quizQuestionArea = document.getElementById('quiz-question-area'); 
+        const quizQuestionArea = document.getElementById('quiz-question-area'); // <-- ADD THIS
         
-        // --- SAFE LISTENER: Only add if element exists ---
-        if (quizQuestionArea) {
-            quizQuestionArea.addEventListener('animationend', () => {
-                quizQuestionArea.classList.remove('slide-in-right', 'slide-in-left');
-            });
-        }
+        // --- MODIFIED: Moved listener to the new wrapper ---
+        quizQuestionArea.addEventListener('animationend', () => {
+            quizQuestionArea.classList.remove('slide-in-right', 'slide-in-left');
+        });
+        // --- END MODIFIED ---
         const quizQuestionNumber = document.getElementById('quiz-question-number');
         const quizScoreEl = document.getElementById('quiz-score');
         const quizQuestionText = document.getElementById('quiz-question-text');
@@ -442,36 +441,51 @@
              }
         });
 
-        // --- SAFE EVENT LISTENERS (Checks if button exists first) ---
-        if (googleLoginBtn) {
-            googleLoginBtn.addEventListener('click', async () => { 
-                try { 
-                    console.log("Using signInWithRedirect for all devices to avoid COOP error.");
-                    await signInWithPopup(auth, googleProvider);
-                } catch (error) { 
-                    console.error("Google Sign-In Error:", error); 
-                     showCustomAlert(`Sign-in error: ${error.code}`, "error");
-                } 
-            });
+        googleLoginBtn.addEventListener('click', async () => { 
+            try { 
+                console.log("Using signInWithRedirect for all devices to avoid COOP error.");
+                await signInWithPopup(auth, googleProvider);
+
+            } catch (error) { 
+                console.error("Google Sign-In Error:", error); 
+                 showCustomAlert(`Sign-in error: ${error.code}`, "error");
+            } 
+        });
+		
+		guestLoginBtn.addEventListener('click', () => {
+            isGuestMode = true;
+            // Create a "fake" user object for the guest session
+            const guestUser = {
+                uid: MEHEDI_UID,
+                displayName: "Guest (Viewing Mehedi's Plan)",
+                email: "read-only@guest.com",
+				photoURL: "images/profile.jpg",
+                isAnonymous: true // Use this to check for guest mode
+            };
+            // Manually call updateAuthUI with this guest user
+            updateAuthUI(guestUser);
+        });
+        async function handleLogout() { 
+            try { 
+                if (isGuestMode) {
+                    // This is a guest, just reload the UI to the logged-out state
+                    isGuestMode = false;
+                    updateAuthUI(null); // This will reset everything
+                } else {
+                    // This is a real user, sign them out
+                    if (unsubscribeActiveMonth) unsubscribeActiveMonth(); 
+                    unsubscribeActiveMonth = null; 
+                    await signOut(auth); 
+                    console.log("Logout successful.");
+                    // onAuthStateChanged will fire and call updateAuthUI(null)
+                }
+            } catch (error) { 
+                console.error("Logout Error:", error); 
+            } 
         }
 		
-        if (guestLoginBtn) {
-            guestLoginBtn.addEventListener('click', () => {
-                isGuestMode = true;
-                const guestUser = {
-                    uid: MEHEDI_UID,
-                    displayName: "Guest (Viewing Mehedi's Plan)",
-                    email: "read-only@guest.com",
-    				photoURL: "images/profile.jpg",
-                    isAnonymous: true
-                };
-                updateAuthUI(guestUser);
-            });
-        }
-        
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', handleLogout);
-        }
+        logoutBtn.addEventListener('click', handleLogout);
+
         // --- START: ADD MOBILE DETECT HELPER ---
         function isMobileDevice() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -3493,10 +3507,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		/**
          * Resets state and starts the quiz game.
          */
-        // GLOBAL VARIABLES FOR LIVE COUNTERS
-        let liveCorrect = 0;
-        let liveWrong = 0;
-
         function runQuizGame() {
             // 1. Hide Start Screen
             quizStartScreen.classList.add('hidden');
@@ -3539,25 +3549,19 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 currentQuizQuestions = shuffleArray(currentQuizQuestions);
             }
 
-            // RESET VARIABLES
             currentQuizQuestionIndex = 0;
             currentQuizScore = 0;
-            liveCorrect = 0; 
-            liveWrong = 0;
 
-            // RESET UI
-            // quizScoreEl.textContent = `Score: 0.00`; // Old Score element (removed from HTML)
-            document.getElementById('live-correct-count').textContent = '0';
-            document.getElementById('live-wrong-count').textContent = '0';
-            document.getElementById('quiz-rationale-box').classList.add('hidden'); // Hide rationale
-            
+            quizScoreEl.textContent = `Score: 0.00`;
             quizRestartBtn.onclick = runQuizGame;
             
             const totalQuestions = currentQuizQuestions.length;
             
             // --- NEW TIMING LOGIC ---
+            // If MCQ Data exists, use 20 seconds. Otherwise (Vocab), use 15 seconds.
             const secondsPerQuestion = currentMcqData ? 40 : 15;
             const totalTimeInSeconds = totalQuestions * secondsPerQuestion;
+            // ------------------------
 
             startTimer(totalTimeInSeconds); 
             
@@ -3565,6 +3569,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             quizQuestionArea.classList.remove('slide-in-right', 'slide-in-left');
         }
+		
 		
 		function startTimer(totalSeconds) {
             if (quizTimerInterval) clearInterval(quizTimerInterval); // Clear any old timer
@@ -3606,17 +3611,13 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         function loadQuizQuestion() {
             quizOptionsContainer.innerHTML = '';
             
-            // 1. Hide Rationale Box for new question
-            document.getElementById('quiz-rationale-box').classList.add('hidden');
+            // 1. Remove any existing note from previous render
+            const oldNote = document.getElementById('quiz-instant-note');
+            if (oldNote) oldNote.remove();
             
             const q = currentQuizQuestions[currentQuizQuestionIndex];
             
-            // 2. Update Progress Bar
-            const total = currentQuizQuestions.length;
-            const progressPercent = ((currentQuizQuestionIndex) / total) * 100;
-            document.getElementById('quiz-progress-fill').style.width = `${progressPercent}%`;
-
-            quizQuestionNumber.textContent = `${currentQuizQuestionIndex + 1}/${total}`;
+            quizQuestionNumber.textContent = `Question ${currentQuizQuestionIndex + 1}/${currentQuizQuestions.length}`;
             quizQuestionText.textContent = q.question;
 
             // --- Button State Logic ---
@@ -3653,15 +3654,18 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
             quizOptionsContainer.appendChild(fragment);
 
-            // --- SHOW RATIONALE IF ALREADY ANSWERED (Reviewing previous q) ---
+            // --- FIX: RE-RENDER NOTE IF ALREADY ANSWERED ---
             if (q.userAnswer !== null && q.note) {
-                 const rationaleBox = document.getElementById('quiz-rationale-box');
-                 const rationaleText = document.getElementById('quiz-rationale-text');
-                 rationaleText.innerHTML = escapeHtml(q.note);
-                 rationaleBox.classList.remove('hidden');
+                const noteDiv = document.createElement('div');
+                noteDiv.id = 'quiz-instant-note';
+                noteDiv.className = 'mt-4 p-3 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm explanation-text';
+                noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(q.note)}`;
+                
+                // Insert after the options container
+                quizOptionsContainer.parentNode.insertBefore(noteDiv, quizOptionsContainer.nextSibling);
             }
+            // ----------------------------------------------
         }
-		
 		
        /**
          * Handles the user's answer selection. (UPDATED: Instant 100ms Advance)
@@ -3677,18 +3681,11 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const isCorrect = (selectedOption === q.correctAnswer);
             q.isCorrect = isCorrect;
             
-            // --- NEW: Update Live Counters ---
-            if (isCorrect) {
-                currentQuizScore += 1;
-                liveCorrect++;
-                document.getElementById('live-correct-count').textContent = liveCorrect;
-            } else {
-                currentQuizScore -= 0.25;
-                liveWrong++;
-                document.getElementById('live-wrong-count').textContent = liveWrong;
-            }
+            // Apply scoring
+            if (isCorrect) currentQuizScore += 1;
+            else currentQuizScore -= 0.25;
             
-            // quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`; // Removing old score
+            quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`;
 
             // Apply visual feedback to buttons
             Array.from(quizOptionsContainer.children).forEach(btn => {
@@ -3700,36 +3697,29 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
             });
 
-            // --- NEW: SHOW RATIONALE BOX ---
-            const rationaleBox = document.getElementById('quiz-rationale-box');
-            const rationaleText = document.getElementById('quiz-rationale-text');
-            
-            // Build the explanation content
-            let explanationHTML = "";
-            
+            // --- SHOW NOTE IMMEDIATELY (CORRECT OR WRONG) ---
             if (q.note) {
-                explanationHTML = escapeHtml(q.note);
-            }
-            
-            // If the answer is WRONG, we append the Correct Answer to the explanation
-            if (!isCorrect) {
-                if (explanationHTML) explanationHTML += "<br><br>";
-                explanationHTML += `<strong class="text-emerald-600">Correct Answer:</strong> ${escapeHtml(q.correctAnswer)}`;
-            } else if (!explanationHTML) {
-                // If correct and no note exists
-                explanationHTML = `<strong class="text-emerald-600">Correct!</strong> Well done.`;
-            }
+                // Remove old note just in case
+                const oldNote = document.getElementById('quiz-instant-note');
+                if (oldNote) oldNote.remove();
 
-            rationaleText.innerHTML = explanationHTML;
-            rationaleBox.classList.remove('hidden');
+                const noteDiv = document.createElement('div');
+                noteDiv.id = 'quiz-instant-note';
+                noteDiv.className = 'mt-4 p-3 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm animate-fade-in explanation-text';
+                noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(q.note)}`;
+                
+                quizOptionsContainer.parentNode.insertBefore(noteDiv, quizOptionsContainer.nextSibling);
+            }
+            // ---------------------------------------------------------
             
-            // Enable "Next" button immediately
+            // Enable "Next" button immediately so user can proceed manually
             quizNextBtn.disabled = false;
             quizSkipBtn.hidden = true;
 
-            // Auto-advance Logic (INSTANT) - Only if correct
+            // Auto-advance Logic (INSTANT)
             if (isCorrect) {
                 setTimeout(() => {
+                    // Only auto-advance if it's NOT the last question
                     if (currentQuizQuestionIndex < currentQuizQuestions.length - 1) {
                         currentQuizQuestionIndex++;
                         loadQuizQuestion();
@@ -3737,10 +3727,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     } else {
                         showQuizResults();
                     }
-                }, 1000); // Increased delay slightly so they can see the green checkmark
+                }, 100); // <--- Changed to 100ms (Instant)
             }
         }
-		
 		
 		
         function showQuizResults() {
