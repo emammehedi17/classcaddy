@@ -3265,3 +3265,72 @@ body.dark-mode #quiz-options-container .bg-blue-50 .fa-info-circle,
 body.dark-mode .review-item .bg-blue-50 .fa-info-circle {
     color: #3b82f6 !important; /* Bright Blue Icon */
 }
+
+/* --- COMPACT QUIZ LAYOUT STYLES --- */
+
+/* Ensure the quiz modal uses Flexbox to fill height */
+#quiz-modal .modal-content {
+    display: flex !important;
+    flex-direction: column;
+    max-height: 85vh !important; /* Slightly smaller to fit mobile screens */
+    padding-bottom: 15px !important;
+}
+
+/* Custom Scrollbar for the Question Area */
+#quiz-question-area::-webkit-scrollbar {
+    width: 6px;
+}
+#quiz-question-area::-webkit-scrollbar-track {
+    background: transparent;
+}
+#quiz-question-area::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 20px;
+}
+#quiz-question-area::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+}
+
+/* --- DARK MODE FIXES FOR NEW QUIZ UI --- */
+
+/* 1. Timer & Badges */
+body.dark-mode #quiz-timer {
+    background-color: #374151 !important; /* Dark Gray */
+    color: #f87171 !important;            /* Light Red */
+    border-color: #4b5563 !important;
+}
+body.dark-mode #quiz-question-number {
+    background-color: #312e81 !important; /* Dark Indigo */
+    color: #c7d2fe !important;            /* Light Indigo */
+    border-color: #4338ca !important;
+}
+
+/* 2. Progress Bar Track */
+body.dark-mode .bg-gray-200 {
+    background-color: #374151 !important;
+}
+
+/* 3. Topic Name */
+body.dark-mode #quiz-topic-name {
+    color: #e5e7eb !important;
+}
+
+/* 4. Counter Badges (Correct/Wrong/Skip) */
+body.dark-mode .bg-emerald-50 {
+    background-color: #064e3b !important;
+    color: #6ee7b7 !important;
+}
+body.dark-mode .bg-red-50 {
+    background-color: #7f1d1d !important;
+    color: #fca5a5 !important;
+}
+body.dark-mode .bg-gray-100 {
+    background-color: #374151 !important;
+    color: #9ca3af !important;
+}
+
+/* 5. Navigation Borders */
+body.dark-mode .border-t, 
+body.dark-mode .border-b {
+    border-color: #374151 !important;
+}
