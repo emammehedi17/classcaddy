@@ -111,9 +111,9 @@
         let quizStartBtn = document.getElementById('quiz-start-btn');
 		const quizTitle = document.getElementById('quiz-title');
         const quizMainScreen = document.getElementById('quiz-main-screen');
-        const quizQuestionArea = document.getElementById('quiz-question-area');
+        const quizQuestionArea = document.getElementById('quiz-question-area'); 
         
-        // --- SAFE LISTENER: Only add if the element exists ---
+        // --- SAFE LISTENER: Only add if element exists ---
         if (quizQuestionArea) {
             quizQuestionArea.addEventListener('animationend', () => {
                 quizQuestionArea.classList.remove('slide-in-right', 'slide-in-left');
