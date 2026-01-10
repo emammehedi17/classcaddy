@@ -3924,7 +3924,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 loadQuizQuestion();
                 quizQuestionArea.classList.add('slide-in-right');
             }
-        });
+        
 
         quizPrevBtn.addEventListener('click', () => {
             if (currentQuizQuestionIndex > 0) {
