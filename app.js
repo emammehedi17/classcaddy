@@ -111,13 +111,14 @@
         let quizStartBtn = document.getElementById('quiz-start-btn');
 		const quizTitle = document.getElementById('quiz-title');
         const quizMainScreen = document.getElementById('quiz-main-screen');
-        const quizQuestionArea = document.getElementById('quiz-question-area'); // <-- ADD THIS
+        const quizQuestionArea = document.getElementById('quiz-question-area');
         
-        // --- MODIFIED: Moved listener to the new wrapper ---
-        quizQuestionArea.addEventListener('animationend', () => {
-            quizQuestionArea.classList.remove('slide-in-right', 'slide-in-left');
-        });
-        // --- END MODIFIED ---
+        // --- SAFE LISTENER: Only add if the element exists ---
+        if (quizQuestionArea) {
+            quizQuestionArea.addEventListener('animationend', () => {
+                quizQuestionArea.classList.remove('slide-in-right', 'slide-in-left');
+            });
+        }
         const quizQuestionNumber = document.getElementById('quiz-question-number');
         const quizScoreEl = document.getElementById('quiz-score');
         const quizQuestionText = document.getElementById('quiz-question-text');
