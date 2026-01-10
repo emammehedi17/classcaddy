@@ -3908,14 +3908,16 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const liveSkipped = document.getElementById('quiz-live-skipped');
             if(liveSkipped) liveSkipped.textContent = parseInt(liveSkipped.textContent || '0') + 1;
             // ------------------------------
-			
-			// --- ADD THESE LINES ---
-            const liveSkipped = document.getElementById('quiz-live-skipped');
-            if(liveSkipped) liveSkipped.textContent = parseInt(liveSkipped.textContent || '0') + 1;
-            // -----------------------
-			
+
             // "Skip" just acts like "Next" but guarantees no answer is saved
             currentQuizQuestionIndex++;
+            if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
+                showQuizResults();
+            } else {
+                loadQuizQuestion();
+                quizQuestionArea.classList.add('slide-in-right');
+            }
+        });
             if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
                 showQuizResults();
             } else {

@@ -476,59 +476,7 @@
                 </button>
             </div>
         </div>
-<div id="quiz-main-screen" class="hidden">
-            <div class="flex justify-between items-end mb-2">
-                <h3 id="quiz-topic-name" class="text-lg font-bold text-gray-800 truncate pr-4">Subject - Topic</h3>
-                <div id="quiz-question-number" class="text-lg font-bold text-indigo-600 whitespace-nowrap">Question 1/10</div>
-            </div>
 
-            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-5">
-                <div id="quiz-progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-            </div>
-
-            <div class="flex justify-between items-center mb-6">
-                <div class="flex items-center gap-4 text-sm font-bold">
-                     <div class="flex items-center text-green-600" title="Correct Answers">
-                        <i class="fas fa-check mr-1.5"></i> <span id="quiz-live-correct">0</span>
-                     </div>
-                     <div class="flex items-center text-red-500" title="Wrong Answers">
-                        <i class="fas fa-times mr-1.5"></i> <span id="quiz-live-wrong">0</span>
-                     </div>
-                     <div class="flex items-center text-gray-500" title="Skipped">
-                        <i class="fas fa-forward mr-1.5"></i> <span id="quiz-live-skipped">0</span>
-                     </div>
-                </div>
-
-                <div class="flex items-center gap-4">
-                     <div id="quiz-timer" class="text-xl font-bold text-red-600" style="font-family: 'Courier New', monospace;">
-                        00:00
-                    </div>
-                    <div id="quiz-score" class="text-lg font-bold text-gray-700 hidden">Score: 0</div>
-                </div>
-            </div>
-
-            <div id="quiz-question-area">
-                <h2 id="quiz-question-text" class="text-xl sm:text-2xl font-semibold text-gray-900 mb-6 min-h-[60px]" oncontextmenu="return false;">
-					Loading question...
-				</h2>
-                <div id="quiz-options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    </div>
-            </div>
-
-            <div class="flex justify-between items-center flex-wrap gap-2 mt-8">
-                <button id="quiz-prev-btn" class="action-button action-button-secondary">
-                    &larr; Previous
-                </button>
-                
-                <button id="quiz-skip-btn" class="action-button action-button-secondary" style="color: #4f46e5; border-color: #6366f1;">
-                    Skip <i class="fas fa-fast-forward ml-1"></i>
-                </button>
-
-                <button id="quiz-next-btn" class="action-button" style="background-color: #4f46e5;">
-                    Next Question &rarr;
-                </button>
-            </div>
-        </div>
         
         <div id="quiz-results-screen" class="hidden text-center py-10">
             <h2 class="text-3xl font-bold text-gray-900 mb-6">Quiz Completed!</h2>
