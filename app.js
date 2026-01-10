@@ -3510,59 +3510,26 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         function runQuizGame() {
             // 1. Hide Start Screen
             quizStartScreen.classList.add('hidden');
-            quizStartScreen.style.display = 'none'; 
-            
-            // 2. Hide Results & Review Screens
-            quizResultsScreen.classList.add('hidden');
-            quizResultsScreen.style.display = 'none';
-            
-            quizReviewScreen.classList.add('hidden');
-            quizReviewScreen.style.display = 'none';
-
-            // 3. SHOW Main Screen
+            quizStartScreen.style.display = 'none';
             quizMainScreen.classList.remove('hidden');
-            quizMainScreen.style.display = ''; 
+            quizMainScreen.style.display = 'block';
 
-            // --- RE-GENERATION LOGIC ---
-            if (currentVocabData) {
-                if (!currentOptionPool) {
-                    console.warn("No option pool found. Falling back.");
-                    currentOptionPool = {
-                        allWords: currentVocabData.map(v => v.word),
-                        allBanglaMeanings: currentVocabData.map(v => v.banglaMeaning),
-                        allSynonyms: currentVocabData.map(v => v.synonym).filter(Boolean)
-                    };
-                }
-                currentQuizQuestions = generateQuizData(currentVocabData, currentOptionPool);
-            } else if (currentMcqData) {
-                currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
-                    question: mcq.question,
-                    options: getProcessedOptions(mcq.options), 
-                    correctAnswer: mcq.correctAnswer,
-                    explanation: mcq.explanation || null,
-					note: mcq.note || null,
-                    userAnswer: null, 
-                    isCorrect: null 
-                }))); 
-            } else {
-                console.warn("No source data found, re-shuffling.");
-                currentQuizQuestions = shuffleArray(currentQuizQuestions);
+            // --- ADD THESE LINES HERE ---
+            const topicNameEl = document.getElementById('quiz-topic-name');
+            if (topicNameEl && window.currentQuizSubjectInfo) {
+                const { subjectName, topicDetail } = window.currentQuizSubjectInfo;
+                topicNameEl.textContent = `${subjectName || 'Quiz'} - ${topicDetail || 'General'}`;
             }
 
-            currentQuizQuestionIndex = 0;
-            currentQuizScore = 0;
-
-            quizScoreEl.textContent = `Score: 0.00`;
-
-			// --- Reset Progress & Counters ---
+            // Reset Counters
             const liveCorrect = document.getElementById('quiz-live-correct');
             const liveWrong = document.getElementById('quiz-live-wrong');
-            const liveSkipped = document.getElementById('quiz-live-skipped'); // <--- ADDED
+            const liveSkipped = document.getElementById('quiz-live-skipped');
             const progressBar = document.getElementById('quiz-progress-bar');
             
             if(liveCorrect) liveCorrect.textContent = '0';
             if(liveWrong) liveWrong.textContent = '0';
-            if(liveSkipped) liveSkipped.textContent = '0'; // <--- ADDED
+            if(liveSkipped) liveSkipped.textContent = '0';
             if(progressBar) progressBar.style.width = '0%';
             // ---------------------------------
             quizRestartBtn.onclick = runQuizGame;
@@ -3941,7 +3908,12 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const liveSkipped = document.getElementById('quiz-live-skipped');
             if(liveSkipped) liveSkipped.textContent = parseInt(liveSkipped.textContent || '0') + 1;
             // ------------------------------
-
+			
+			// --- ADD THESE LINES ---
+            const liveSkipped = document.getElementById('quiz-live-skipped');
+            if(liveSkipped) liveSkipped.textContent = parseInt(liveSkipped.textContent || '0') + 1;
+            // -----------------------
+			
             // "Skip" just acts like "Next" but guarantees no answer is saved
             currentQuizQuestionIndex++;
             if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
