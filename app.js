@@ -3554,13 +3554,15 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
             quizScoreEl.textContent = `Score: 0.00`;
 
-            // --- Reset Progress & Counters ---
+			// --- Reset Progress & Counters ---
             const liveCorrect = document.getElementById('quiz-live-correct');
             const liveWrong = document.getElementById('quiz-live-wrong');
+            const liveSkipped = document.getElementById('quiz-live-skipped'); // <--- ADDED
             const progressBar = document.getElementById('quiz-progress-bar');
             
             if(liveCorrect) liveCorrect.textContent = '0';
             if(liveWrong) liveWrong.textContent = '0';
+            if(liveSkipped) liveSkipped.textContent = '0'; // <--- ADDED
             if(progressBar) progressBar.style.width = '0%';
             // ---------------------------------
             quizRestartBtn.onclick = runQuizGame;
@@ -3935,13 +3937,18 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         });
 
         quizSkipBtn.addEventListener('click', () => {
+            // --- Update Skipped Counter ---
+            const liveSkipped = document.getElementById('quiz-live-skipped');
+            if(liveSkipped) liveSkipped.textContent = parseInt(liveSkipped.textContent || '0') + 1;
+            // ------------------------------
+
             // "Skip" just acts like "Next" but guarantees no answer is saved
             currentQuizQuestionIndex++;
             if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
                 showQuizResults();
             } else {
                 loadQuizQuestion();
-                quizQuestionArea.classList.add('slide-in-right'); // <-- ADD THIS
+                quizQuestionArea.classList.add('slide-in-right');
             }
         });
 
