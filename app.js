@@ -5922,7 +5922,7 @@ savedQuizReviewBtn.addEventListener('click', () => {
     if (!tempSavedReviewData) {
 		isReviewingSavedResult = true;
         showCustomAlert("No review data found.", "error");
-        return;
+        
     }
     
     // We re-use the *existing* quiz review screen, but populate it with saved data
