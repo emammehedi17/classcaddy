@@ -55,6 +55,17 @@
              throw new Error("Firebase initialization failed.");
         }
         // --- End Firebase Configuration ---
+		
+		// --- Quiz Settings Defaults ---
+			let quizSettings = {
+				timePerQuestion: 60, // seconds
+				negativeMark: 0.25
+			};
+			// Load from LocalStorage if exists
+			if(localStorage.getItem('cc_quiz_settings')) {
+				quizSettings = JSON.parse(localStorage.getItem('cc_quiz_settings'));
+			}
+
 
         // --- DOM Elements ---
         const authSection = document.getElementById('auth-section');
@@ -138,6 +149,70 @@
         // --- END: ADD THESE NEW ELEMENTS ---
 		const saveBtn = document.getElementById('quiz-save-btn'); // <-- ADD THIS LINE
 		
+		
+		// --- QUIZ SETTINGS EDIT LOGIC ---
+    const quizEditBtn = document.getElementById('quiz-settings-edit-btn');
+    const quizSaveBtn = document.getElementById('quiz-settings-save-btn');
+    const quizSettingsForm = document.getElementById('quiz-settings-form');
+    const quizSettingsDisplay = document.getElementById('quiz-settings-display');
+    const settingTimeInput = document.getElementById('setting-time-input');
+    const settingNegInput = document.getElementById('setting-neg-input');
+
+    if (quizEditBtn) {
+        // Init Inputs with current values
+        settingTimeInput.value = quizSettings.timePerQuestion;
+        settingNegInput.value = quizSettings.negativeMark;
+
+        quizEditBtn.addEventListener('click', () => {
+            const isHidden = quizSettingsForm.classList.contains('hidden');
+            if (isHidden) {
+                quizSettingsForm.classList.remove('hidden');
+                quizSettingsDisplay.classList.add('opacity-50'); // Dim display
+            } else {
+                quizSettingsForm.classList.add('hidden');
+                quizSettingsDisplay.classList.remove('opacity-50');
+            }
+        });
+
+        quizSaveBtn.addEventListener('click', () => {
+            const newTime = parseInt(settingTimeInput.value) || 60;
+            const newNeg = parseFloat(settingNegInput.value) || 0;
+
+            quizSettings.timePerQuestion = newTime;
+            quizSettings.negativeMark = newNeg;
+
+            // Save to Storage
+            localStorage.setItem('cc_quiz_settings', JSON.stringify(quizSettings));
+
+            // Update UI
+            updateQuizStartScreenUI();
+            
+            // Close Form
+            quizSettingsForm.classList.add('hidden');
+            quizSettingsDisplay.classList.remove('opacity-50');
+        });
+    }
+
+    // Function to update the Start Screen Text
+    function updateQuizStartScreenUI() {
+        const displayNeg = document.getElementById('display-neg-mark');
+        const displayTimeQ = document.getElementById('display-time-per-q');
+        const displayTotal = document.getElementById('display-total-time');
+        
+        // Calculate total time based on currently loaded questions
+        // If questions aren't loaded yet, default to 0 or waiting
+        const qCount = currentQuizQuestions ? currentQuizQuestions.length : 0;
+        const totalSeconds = qCount * quizSettings.timePerQuestion;
+        
+        // Format Time (MM:SS)
+        const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+        const s = (totalSeconds % 60).toString().padStart(2, '0');
+
+        if(displayNeg) displayNeg.textContent = quizSettings.negativeMark;
+        if(displayTimeQ) displayTimeQ.textContent = quizSettings.timePerQuestion + 's';
+        if(displayTotal) displayTotal.textContent = `${m}:${s}`;
+    }
+	
         
         let progressChart = null; // Holds the chart instance
 		let currentQuizResultData = null; // <-- ADD THIS
@@ -3539,10 +3614,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             const totalQuestions = currentQuizQuestions.length;
             
-            // --- NEW TIMING LOGIC ---
-            // If MCQ Data exists, use 20 seconds. Otherwise (Vocab), use 15 seconds.
-            const secondsPerQuestion = currentMcqData ? 40 : 15;
-            const totalTimeInSeconds = totalQuestions * secondsPerQuestion;
+            // --- NEW TIMING LOGIC (EDITABLE SETTINGS) ---
+            // Use the global setting for time per question
+            const totalTimeInSeconds = totalQuestions * quizSettings.timePerQuestion;
             // ------------------------
 
             startTimer(totalTimeInSeconds); 
@@ -3678,7 +3752,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 const liveCorrect = document.getElementById('quiz-live-correct');
                 if(liveCorrect) liveCorrect.textContent = parseInt(liveCorrect.textContent || '0') + 1;
             } else {
-                currentQuizScore -= 0.25;
+                currentQuizScore -= quizSettings.negativeMark;
                 const liveWrong = document.getElementById('quiz-live-wrong');
                 if(liveWrong) liveWrong.textContent = parseInt(liveWrong.textContent || '0') + 1;
             }
@@ -3775,7 +3849,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
             const answeredCount = correctCount + wrongCount;
             const correctScore = correctCount * 1;
-            const wrongScore = wrongCount * -0.25;
+            const wrongScore = wrongCount * -quizSettings.negativeMark;
             const finalScore = correctScore + wrongScore;
             const percentage = (totalQuestions > 0) ? (Math.max(0, finalScore) / totalQuestions) * 100 : 0;
             const timeTakenInSeconds = Math.round((quizEndTime - quizStartTime) / 1000);
@@ -4249,6 +4323,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 warningP.style.display = 'block';
 
                 quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week?`;
+				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
                 
                 const newStartBtn = quizStartBtn.cloneNode(true);
@@ -4848,6 +4923,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
+				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
                 
                 const newStartBtn = quizStartBtn.cloneNode(true);
@@ -4945,6 +5021,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${mcqData.length} MCQs?`;
+				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
                 
                 const newStartBtn = quizStartBtn.cloneNode(true);
@@ -5190,6 +5267,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${aggregatedMcqs.length} MCQs from: ${quizTitle}?`;
+				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
                 
                 const newStartBtn = quizStartBtn.cloneNode(true);
@@ -7825,6 +7903,7 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
     warningP.style.display = 'block';
     
     quizStartMessage.textContent = `Ready to test yourself on ${totalQuestions} MCQs from: ${title}?`;
+	updateQuizStartScreenUI(); // <--- Add this
     
     // 8. Attach Start Button
     quizStartBtn.classList.remove('hidden');
@@ -8011,6 +8090,7 @@ if (viewMcqTestBtn) {
         warningP.style.display = 'block';
         
         quizStartMessage.textContent = `Ready to test yourself on ${currentQuizQuestions.length} MCQs?`;
+		updateQuizStartScreenUI(); // <--- Add this
         quizStartBtn.classList.remove('hidden');
         
         const newStartBtn = quizStartBtn.cloneNode(true);
