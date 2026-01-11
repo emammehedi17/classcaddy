@@ -3605,6 +3605,18 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          * Resets state and starts the quiz game.
          */
         function runQuizGame() {
+            // --- FIX: Reset & Shuffle Questions for Retry ---
+            // This ensures previous answers are cleared when clicking "Try Again"
+            if (currentQuizQuestions && currentQuizQuestions.length > 0) {
+                currentQuizQuestions.forEach(q => {
+                    q.userAnswer = null;
+                    q.isCorrect = null;
+                });
+                // Shuffle the questions again for a fresh experience
+                currentQuizQuestions = shuffleArray(currentQuizQuestions);
+            }
+            // ------------------------------------------------
+
             currentQuizQuestionIndex = 0;
             currentQuizScore = 0; // Ensures score resets on retry
 			
