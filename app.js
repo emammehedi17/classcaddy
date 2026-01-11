@@ -4715,14 +4715,99 @@ function parseMcqText(text) {
 }
 		
 
-
-// 4. "View MCQ" Button Handler (UPDATED: Captures Subject)
-async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
+	// --- NEW HELPER: Shared Render Logic for View MCQ Modal ---
+function renderViewMcqUI(mcqData, mainTitleText, subTitleText, subjectName) {
     const viewMcqContent = document.getElementById('view-mcq-content');
     const subtitle = document.getElementById('view-mcq-subtitle');
     const modal = document.getElementById('view-mcq-modal');
     const modalTitle = modal.querySelector('h3');
 
+    // 1. Set Global State for features (Print, Copy, Test)
+    currentViewMcqData = {
+        title: `${mainTitleText} - ${subTitleText}`,
+        mcqs: mcqData,
+        subject: subjectName
+    };
+
+    // 2. Update Header
+    if (modalTitle) modalTitle.textContent = mainTitleText;
+    if (subtitle) subtitle.textContent = subTitleText;
+
+    // 3. Render Content
+    if (!mcqData || mcqData.length < 1) {
+        viewMcqContent.innerHTML = '<div class="text-center py-10 text-gray-500">No questions found.</div>';
+        return;
+    }
+
+    let html = '';
+    mcqData.forEach((mcq, index) => {
+        const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+        const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+        
+        let answerHtml = '';
+        if (mcq.correctAnswer) {
+             answerHtml = `
+                <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm answer-card-bg">
+                    <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg"><i class="fas fa-check text-xs"></i></div>
+                    <div class="font-semibold text-emerald-900 text-sm answer-text">Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span></div>
+                </div>`;
+        } else {
+             answerHtml = `
+                <div class="inline-flex items-center w-full sm:w-auto bg-amber-100 border border-amber-300 rounded-lg px-4 py-2 shadow-sm">
+                    <div class="flex-shrink-0 bg-amber-200 rounded-full p-1 mr-3 text-amber-700"><i class="fas fa-exclamation text-xs"></i></div>
+                    <div class="font-semibold text-amber-900 text-sm answer-text">Note: <span class="text-amber-800">${escapeHtml(mcq.explanation || "No Answer Defined")}</span></div>
+                </div>`;
+        }
+
+        let noteHtml = '';
+        if (mcq.note) {
+            noteHtml = `
+                <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800 explanation-text">
+                    <span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(mcq.note)}
+                </div>`;
+        }
+
+        // Highlight User's Wrong Answer if available (Specific to Review Mode)
+        let userWrongLabel = '';
+        if (mcq.userAnswer && mcq.userAnswer !== mcq.correctAnswer) {
+             const wrongIndex = mcq.options.indexOf(mcq.userAnswer);
+             const wrongOptLabel = (wrongIndex !== -1) ? getOptionLabel(wrongIndex, mcq.question) : '';
+             userWrongLabel = `<div class="text-xs text-red-600 font-bold mb-1"><i class="fas fa-times-circle mr-1"></i> You selected: ${wrongOptLabel}. ${escapeHtml(mcq.userAnswer)}</div>`;
+        }
+
+        html += `
+            <div class="study-card">
+                <div class="study-question text-gray-900 font-medium">
+                    <span class="text-indigo-600 font-bold mr-1">${index + 1}.</span>${escapeHtml(mcq.question)}
+                </div>
+                <div class="study-options">
+                    ${mcq.options.map((opt, i) => `
+                        <div class="study-opt text-gray-900"><span class="font-bold text-black mr-2">${getOptionLabel(i, mcq.question)}.</span>${escapeHtml(opt)}</div>
+                    `).join('')}
+                </div>
+                <div class="mt-4 pt-2 border-t border-dashed border-gray-200">
+                    ${userWrongLabel}
+                    ${answerHtml}
+                    ${noteHtml} 
+                </div>
+            </div>
+        `;
+    });
+
+    viewMcqContent.innerHTML = html;
+    
+    // Apply settings immediately (Font size, Dark mode)
+    if(typeof applySettingsToDom === 'function') applySettingsToDom();
+    
+    modal.style.display = 'block';
+}
+
+
+// 4. "View MCQ" Button Handler (UPDATED: Uses Helper)
+async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
+    const viewMcqContent = document.getElementById('view-mcq-content');
+    const modal = document.getElementById('view-mcq-modal');
+    
     viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10"><i class="fas fa-spinner fa-spin text-2xl"></i><br>Loading MCQs...</p>';
     modal.style.display = 'block';
 
@@ -4737,110 +4822,35 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
         let mcqData = [];
         let mainTitleText = `Day-${dayData.dayNumber} MCQs`;
         let subTitleText = "";
-        let subjectName = "Quick Test"; // Default
+        let subjectName = "Quick Test";
 
         if (rowIndex !== null) {
-            // Single Row Mode
+            // Single Row
             const row = dayData.rows?.[rowIndex];
             mcqData = row?.mcqData || [];
-            const subject = row?.subject || "No Subject";
-            const topic = row?.topic || "No Topic";
-            subTitleText = `${subject} | ${topic}`;
-            subjectName = subject; // Capture the real subject
+            subTitleText = `${row?.subject || "No Subject"} | ${row?.topic || "No Topic"}`;
+            subjectName = row?.subject;
         } else {
-            // All Day Mode
+            // All Day
             mcqData = dayData.rows?.reduce((acc, row) => {
-                if (row.mcqData) {
-                    acc.push(...row.mcqData);
-                }
+                if (row.mcqData) acc.push(...row.mcqData);
                 return acc;
             }, []) || [];
             subTitleText = "All Questions";
             
-            // Optional: If all rows have the same subject, use it. Otherwise 'Aggregated'
-            const subjects = new Set(dayData.rows?.filter(r => r.mcqData && r.mcqData.length > 0).map(r => r.subject));
-            if (subjects.size === 1) {
-                subjectName = [...subjects][0];
-            } else {
-                subjectName = "Aggregated";
-            }
+            const subjects = new Set(dayData.rows?.filter(r => r.mcqData?.length > 0).map(r => r.subject));
+            subjectName = (subjects.size === 1) ? [...subjects][0] : "Aggregated";
         }
 
-        if (modalTitle) modalTitle.textContent = mainTitleText;
-        if (subtitle) subtitle.textContent = subTitleText;
-
-        if (!mcqData || mcqData.length < 1) {
-            viewMcqContent.innerHTML = '<div class="text-center py-10 text-gray-500">No MCQs found for this selection.</div>';
-            currentViewMcqData = null; 
-            return;
-        }
-
-        currentViewMcqData = {
-            title: `${mainTitleText} - ${subTitleText}`,
-            mcqs: mcqData,
-            subject: subjectName // Store it for the test button
-        };
-
-        let html = '';
-        mcqData.forEach((mcq, index) => {
-            // Check if there is a valid correct answer
-            let answerHtml = '';
-            
-            if (mcq.correctAnswer) {
-                 const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
-                 const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
-                 answerHtml = `
-                    <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm answer-card-bg">
-                        <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg"><i class="fas fa-check text-xs"></i></div>
-                        <div class="font-semibold text-emerald-900 text-sm answer-text">Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span></div>
-                    </div>`;
-            } else {
-                 answerHtml = `
-                    <div class="inline-flex items-center w-full sm:w-auto bg-amber-100 border border-amber-300 rounded-lg px-4 py-2 shadow-sm">
-                        <div class="flex-shrink-0 bg-amber-200 rounded-full p-1 mr-3 text-amber-700"><i class="fas fa-exclamation text-xs"></i></div>
-                        <div class="font-semibold text-amber-900 text-sm">Note: <span class="text-amber-800">${escapeHtml(mcq.explanation || "No Answer Defined")}</span></div>
-                    </div>`;
-            }
-
-            // --- NEW: DISPLAY NOTE BELOW ANSWER ---
-            let noteHtml = '';
-            if (mcq.note) {
-                // Added 'explanation-text' class
-                noteHtml = `
-                    <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800 explanation-text">
-                        <span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(mcq.note)}
-                    </div>
-                `;
-            }
-            // --------------------------------------
-
-            html += `
-                <div class="study-card">
-                    <div class="study-question text-gray-900 font-medium">
-                        <span class="text-indigo-600 font-bold mr-1">${index + 1}.</span>${escapeHtml(mcq.question)}
-                    </div>
-                    <div class="study-options">
-                        ${mcq.options.map((opt, i) => `
-                            <div class="study-opt text-gray-900"><span class="font-bold text-black mr-2">${getOptionLabel(i, mcq.question)}.</span>${escapeHtml(opt)}</div>
-                        `).join('')}
-                    </div>
-                    <div class="mt-4 pt-2 border-t border-dashed border-gray-200">
-                        ${answerHtml}
-                        ${noteHtml} 
-                    </div>
-                </div>
-            `;
-        });
-		
-        viewMcqContent.innerHTML = html;
+        // Call the new helper
+        renderViewMcqUI(mcqData, mainTitleText, subTitleText, subjectName);
 
     } catch (error) {
-        console.error("Error loading MCQs for viewing:", error);
+        console.error("Error loading MCQs:", error);
         viewMcqContent.innerHTML = '<p class="text-center text-red-500 py-10">Could not load MCQs.</p>';
         currentViewMcqData = null;
     }
 }
-
 
 	
 		/**
@@ -8676,107 +8686,153 @@ async function saveWrongQuestionsToReview(resultData) {
     }
 }
 
-// --- NEW FUNCTION: Load and Display Wrong Answers (Fixed Sorting) ---
+// --- NEW FUNCTION: Load "Wrong Answered" Tests with Subject Tabs ---
 async function loadReviewWrongAnswers() {
     if (!currentUser || !userId) return;
 
-    reviewWrongAnsContent.innerHTML = '<p class="text-center text-gray-500 italic py-10"><i class="fas fa-spinner fa-spin mr-2"></i>Loading your weak points...</p>';
+    const container = document.getElementById('review-wrong-ans-content');
+    container.innerHTML = '<p class="text-center text-gray-500 italic py-10"><i class="fas fa-spinner fa-spin mr-2"></i>Loading your test history...</p>';
 
     try {
-        const reviewCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/reviewQuestions`);
-        
-        // --- FIX: Removed 'orderBy' to avoid Firestore Index Error ---
-        // We will sort the data using JavaScript below instead.
-        const q = query(reviewCollectionRef); 
-        const snapshot = await getDocs(q);
+        // 1. Get Results (Use Cache if available, otherwise fetch)
+        let results = savedResultsCache;
+        if (!results) {
+            console.log("Fetching results for Review tab...");
+            const resultsCollectionPath = getUserResultsCollectionPath();
+            const q = query(collection(db, resultsCollectionPath), orderBy("saveTimestamp", "desc"));
+            const querySnapshot = await getDocs(q);
+            results = [];
+            querySnapshot.forEach((doc) => results.push({ id: doc.id, ...doc.data() }));
+            savedResultsCache = results; // Update cache
+        }
 
-        if (snapshot.empty) {
-            reviewWrongAnsContent.innerHTML = `
+        // 2. Filter: Only tests with WRONG answers
+        const wrongResults = results.filter(r => r.wrongCount > 0);
+
+        if (wrongResults.length === 0) {
+            container.innerHTML = `
                 <div class="text-center py-10">
                     <div class="bg-emerald-50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
                         <i class="fas fa-check text-emerald-500 text-2xl"></i>
                     </div>
-                    <p class="text-gray-600 font-medium">No wrong answers recorded yet!</p>
-                    <p class="text-gray-400 text-sm">Save a quiz result with mistakes to populate this list.</p>
+                    <p class="text-gray-600 font-medium">Great job! No wrong answers recorded.</p>
+                    <p class="text-gray-400 text-sm">Or you haven't taken any tests yet.</p>
                 </div>`;
             return;
         }
 
-        // Group Data: Subject -> Title -> Questions
-        const groupedData = {};
-        
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            const subject = data.subject || 'General';
-            const title = data.title || 'Misc';
-            
-            if (!groupedData[subject]) groupedData[subject] = {};
-            if (!groupedData[subject][title]) groupedData[subject][title] = [];
-            
-            groupedData[subject][title].push(data);
+        // 3. Group by Subject
+        const grouped = {};
+        wrongResults.forEach(res => {
+            const sub = res.subjectName || "General";
+            if (!grouped[sub]) grouped[sub] = [];
+            grouped[sub].push(res);
         });
 
-        // Render HTML
-        let html = '';
-        
-        // --- FIX: Sort Subjects Alphabetically in JS ---
-        const sortedSubjects = Object.keys(groupedData).sort();
+        const subjects = Object.keys(grouped).sort();
 
-        for (const subject of sortedSubjects) {
-            const titles = groupedData[subject];
-            html += `<div class="mb-6">`;
-            html += `<h3 class="text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-3"><i class="fas fa-book mr-2 text-indigo-500"></i>${escapeHtml(subject)}</h3>`;
+        // 4. Build UI Structure (Tabs + Content Area)
+        let html = `
+            <div class="flex gap-2 mb-4 overflow-x-auto pb-2 custom-scrollbar border-b border-gray-100" id="wrong-ans-subject-nav">
+                ${subjects.map((sub, idx) => `
+                    <button class="px-3 py-1.5 text-xs font-semibold rounded-full border transition-colors whitespace-nowrap
+                        ${idx === 0 ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}"
+                        data-subject="${escapeHtml(sub)}">
+                        ${escapeHtml(sub)} <span class="ml-1 opacity-75 text-[10px] bg-white/50 px-1 rounded">${grouped[sub].length}</span>
+                    </button>
+                `).join('')}
+            </div>
+
+            <div id="wrong-ans-list-container" class="space-y-3">
+                </div>
+        `;
+
+        container.innerHTML = html;
+
+        // 5. Helper to Render List
+        const renderList = (subject) => {
+            const listContainer = document.getElementById('wrong-ans-list-container');
+            const tests = grouped[subject];
             
-            // --- FIX: Sort Titles Alphabetically in JS ---
-            const sortedTitles = Object.keys(titles).sort();
+            if (!tests) return;
 
-            for (const title of sortedTitles) {
-                const questions = titles[title];
-
-                html += `<div class="mb-4 ml-2">`;
-                // Title Header with Count
-                html += `
-                    <div class="flex items-center justify-between bg-white border border-gray-200 p-3 rounded-lg shadow-sm mb-2 cursor-pointer hover:bg-gray-50 transition-colors" 
-                         onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.fa-chevron-down').classList.toggle('rotate-180');">
-                        <span class="font-semibold text-gray-700 text-sm">${escapeHtml(title)}</span>
-                        <div class="flex items-center gap-3">
-                            <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full">${questions.length} Qs</span>
-                            <i class="fas fa-chevron-down text-gray-400 transition-transform duration-200"></i>
+            const listHtml = tests.map(res => {
+                const date = res.saveTimestamp?.toDate ? res.saveTimestamp.toDate().toLocaleDateString() : 'N/A';
+                return `
+                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div class="flex-grow min-w-0">
+                        <h4 class="font-bold text-gray-800 text-sm truncate" title="${escapeHtml(res.topicName)}">
+                            ${escapeHtml(res.topicDetail || res.topicName)}
+                        </h4>
+                        <div class="text-xs text-gray-500 mt-1 flex items-center gap-3">
+                            <span><i class="far fa-calendar-alt mr-1"></i>${date}</span>
+                            <span><i class="fas fa-list-ol mr-1"></i>${res.totalQuestions} Qs</span>
                         </div>
-                    </div>`;
-                
-                // Accordion Content (Hidden by default)
-                html += `<div class="hidden space-y-3 pl-2 border-l-2 border-gray-100 ml-4">`;
-                
-                questions.forEach((q, idx) => {
-                    html += `
-                        <div class="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
-                            <p class="font-medium text-gray-800 mb-2"><span class="text-red-500 font-bold mr-1">Q${idx+1}.</span> ${escapeHtml(q.question)}</p>
-                            
-                            <div class="text-xs text-gray-500 mb-2 pl-4 border-l-2 border-gray-300">
-                                ${q.options.map(opt => {
-                                    const isCorrect = opt === q.correctAnswer;
-                                    return `<div class="${isCorrect ? 'text-emerald-600 font-bold' : ''}">${isCorrect ? '✓ ' : '• '}${escapeHtml(opt)}</div>`;
-                                }).join('')}
+                    </div>
+                    
+                    <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-gray-100 pt-3 sm:pt-0">
+                        <div class="text-right">
+                            <div class="text-red-600 font-bold text-sm whitespace-nowrap">
+                                ${res.wrongCount} Wrong
                             </div>
-
-                            <div class="text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded inline-block border border-emerald-200">
-                                <b>Answer:</b> ${escapeHtml(q.correctAnswer)}
-                            </div>
-                            ${q.note ? `<div class="mt-1 text-xs text-blue-600"><i class="fas fa-info-circle mr-1"></i>${escapeHtml(q.note)}</div>` : ''}
+                            <div class="text-[10px] text-gray-400">Score: ${res.percentage}%</div>
                         </div>
-                    `;
-                });
+                        
+                        <button class="action-button text-xs view-wrong-qs-btn" 
+                                data-result-id="${res.id}" 
+                                style="background-color: #4f46e5; padding: 6px 12px;">
+                            View
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+            
+            listContainer.innerHTML = listHtml;
+        };
+
+        // Render first subject by default
+        renderList(subjects[0]);
+
+        // 6. Attach Tab Listeners
+        const navContainer = document.getElementById('wrong-ans-subject-nav');
+        navContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+
+            // Update Active State
+            navContainer.querySelectorAll('button').forEach(b => {
+                b.className = `px-3 py-1.5 text-xs font-semibold rounded-full border transition-colors whitespace-nowrap bg-white text-gray-600 border-gray-200 hover:bg-gray-50`;
+            });
+            btn.className = `px-3 py-1.5 text-xs font-semibold rounded-full border transition-colors whitespace-nowrap bg-indigo-100 text-indigo-700 border-indigo-200`;
+
+            // Render Content
+            renderList(btn.dataset.subject);
+        });
+
+        // 7. Attach "View" Button Listeners (Event Delegation)
+        document.getElementById('wrong-ans-list-container').addEventListener('click', (e) => {
+            const btn = e.target.closest('.view-wrong-qs-btn');
+            if(btn) {
+                const resultId = btn.dataset.resultId;
+                const resultData = results.find(r => r.id === resultId);
                 
-                html += `</div></div>`; // Close Title Group
+                if(resultData) {
+                    // Filter: Only Wrong Answers
+                    const wrongOnly = resultData.questions.filter(q => q.isCorrect === false);
+                    
+                    // Open Modal using helper
+                    renderViewMcqUI(
+                        wrongOnly, 
+                        "Review Mistakes", 
+                        `${resultData.topicDetail} (${resultData.wrongCount} Errors)`, 
+                        resultData.subjectName
+                    );
+                }
             }
-            html += `</div>`; // Close Subject Group
-        }
-
-        reviewWrongAnsContent.innerHTML = html;
+        });
 
     } catch (error) {
-        console.error("Error loading wrong answers:", error);
-        reviewWrongAnsContent.innerHTML = '<p class="text-center text-red-500 py-10">Error loading review data. Check console for details.</p>';
+        console.error("Error loading review data:", error);
+        container.innerHTML = '<p class="text-center text-red-500 py-10">Error loading review data.</p>';
     }
 }
