@@ -4625,110 +4625,110 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
 		
 		
-     // 3. ✨ The Magic Parser Function (FIXED)
-function parseMcqText(text) {
-    // 1. Clean text
-    let cleanText = text.replace(/\r\n/g, '\n');
-    
-    // 2. Split by question number (e.g., "1." or "90.")
-    const rawBlocks = cleanText.split(/\n(?=[0-9]+\.)/);
-    
-    const mcqData = [];
+     // 3. ✨ The Magic Parser Function (UPDATED for Bangla Support)
+    function parseMcqText(text) {
+        // 1. Clean text
+        let cleanText = text.replace(/\r\n/g, '\n');
+        
+        // 2. Split by question number (Supports English 1. and Bangla ১.)
+        // [0-9০-৯] means digits 0-9 OR Bangla digits ০-৯
+        const rawBlocks = cleanText.split(/\n(?=[0-9০-৯]+\.)/);
+        
+        const mcqData = [];
 
-    rawBlocks.forEach(block => {
-        if (!block || !block.trim()) return;
+        rawBlocks.forEach(block => {
+            if (!block || !block.trim()) return;
 
-        // Extract ID
-        const idMatch = block.match(/^\s*([0-9]+)\./);
-        if (!idMatch) return;
-        
-        const id = parseInt(idMatch[1]);
-        
-        // Remove ID from content
-        let content = block.replace(/^\s*[0-9]+\.\s*/, '');
-        // Remove Bengali numbering if present
-        content = content.replace(/^[০-৯]+\.\s*/, '');
-        
-        // --- STEP 1: EXTRACT NOTE/EXPLANATION (Do this first to clear it from content) ---
-        let note = "";
-        const noteRegex = /\n\s*(?:Note|Explanation|নোট|ব্যাখ্যা)[:\s]*([\s\S]*)$/i;
-        const noteMatch = content.match(noteRegex);
-        
-        if (noteMatch) {
-            note = noteMatch[1].trim();
-            content = content.substring(0, noteMatch.index);
-        }
-        
-        // --- STEP 2: EXTRACT RAW ANSWER STRING ---
-        let rawAnswerString = "";
-        const ansRegex = /\n\s*(?:Correct answer|Correct|Answer|Ans|সঠিক উত্তর|সঠিক)[:\s]*([^\n]*)/i;
-        const ansMatch = content.match(ansRegex);
-        
-        if (ansMatch) {
-            rawAnswerString = ansMatch[1].trim();
-            content = content.substring(0, ansMatch.index); // Remove answer line from content
-        }
-
-        // --- STEP 3: EXTRACT OPTIONS & QUESTION (Moved UP so we can use options to resolve answer) ---
-        const firstOptionIndex = content.search(/\n\s*(?:[\(]?(?:a|b|c|d|ক|খ|গ|ঘ)[\.\)])/i);
-        
-        let question = "";
-        const options = [];
-
-        if (firstOptionIndex !== -1) {
-            question = content.substring(0, firstOptionIndex).trim();
+            // Extract ID (Supports English and Bangla digits)
+            const idMatch = block.match(/^\s*([0-9০-৯]+)\./);
+            if (!idMatch) return;
             
-            const optionsPart = content.substring(firstOptionIndex);
-            const optionRegex = /\n\s*(?:[\(]?(?:a|b|c|d|ক|খ|গ|ঘ)[\.\)])\s*([^\n]+)/gi;
-            let optMatch;
-            while ((optMatch = optionRegex.exec(optionsPart)) !== null) {
-                options.push(optMatch[1].trim());
+            // Convert ID to integer (handling Bangla digits if present)
+            const idStr = idMatch[1].replace(/[০-৯]/g, d => "০১২৩৪৫৬৭৮৯".indexOf(d));
+            const id = parseInt(idStr);
+            
+            // Remove ID from content to get the body
+            let content = block.replace(/^\s*[0-9০-৯]+\.\s*/, '');
+            
+            // --- STEP 1: EXTRACT NOTE/EXPLANATION ---
+            // (Do this first to clear it from content)
+            let note = "";
+            const noteRegex = /\n\s*(?:Note|Explanation|নোট|ব্যাখ্যা)[:\s]*([\s\S]*)$/i;
+            const noteMatch = content.match(noteRegex);
+            
+            if (noteMatch) {
+                note = noteMatch[1].trim();
+                content = content.substring(0, noteMatch.index);
             }
-        } else {
-            question = content.trim();
-        }
-
-        // --- STEP 4: RESOLVE CORRECT ANSWER ---
-        // We must convert "d" into the actual text of option d (e.g., "√0.2")
-        let finalCorrectAnswer = "";
-
-        if (rawAnswerString) {
-            // Check if it is a single letter (a, b, c, d or Bangla equivalents)
-            const letterMatch = rawAnswerString.match(/^([a-dক-ঘ])[\.\)]?$/i);
             
-            if (letterMatch) {
-                // It is a letter! Map it to the option index.
-                const letter = letterMatch[1].toLowerCase();
-                const map = { 
-                    'a': 0, 'b': 1, 'c': 2, 'd': 3, 
-                    'ক': 0, 'খ': 1, 'গ': 2, 'ঘ': 3 
-                };
-                const index = map[letter];
+            // --- STEP 2: EXTRACT RAW ANSWER STRING ---
+            let rawAnswerString = "";
+            const ansRegex = /\n\s*(?:Correct answer|Correct|Answer|Ans|সঠিক উত্তর|সঠিক)[:\s]*([^\n]*)/i;
+            const ansMatch = content.match(ansRegex);
+            
+            if (ansMatch) {
+                rawAnswerString = ansMatch[1].trim();
+                content = content.substring(0, ansMatch.index); // Remove answer line from content
+            }
 
-                // If that option exists, grab the text
-                if (options[index]) {
-                    finalCorrectAnswer = options[index];
+            // --- STEP 3: EXTRACT OPTIONS & QUESTION ---
+            // Supports a,b,c,d AND ক,খ,গ,ঘ
+            const firstOptionIndex = content.search(/\n\s*(?:[\(]?(?:a|b|c|d|ক|খ|গ|ঘ)[\.\)])/i);
+            
+            let question = "";
+            const options = [];
+
+            if (firstOptionIndex !== -1) {
+                question = content.substring(0, firstOptionIndex).trim();
+                
+                const optionsPart = content.substring(firstOptionIndex);
+                const optionRegex = /\n\s*(?:[\(]?(?:a|b|c|d|ক|খ|গ|ঘ)[\.\)])\s*([^\n]+)/gi;
+                let optMatch;
+                while ((optMatch = optionRegex.exec(optionsPart)) !== null) {
+                    options.push(optMatch[1].trim());
                 }
             } else {
-                // It's not just a letter, assume it's the full text (e.g. "a. Apple")
-                // Strip the prefix "a. " if present to get just "Apple"
-                finalCorrectAnswer = rawAnswerString.replace(/^[a-dক-ঘ][\)\.]\s+/i, '');
+                question = content.trim();
             }
-        }
 
-        mcqData.push({
-            id: id,
-            question: question,
-            options: options.slice(0, 4),
-            correctAnswer: finalCorrectAnswer,
-            note: note,
-            explanation: note 
+            // --- STEP 4: RESOLVE CORRECT ANSWER ---
+            let finalCorrectAnswer = "";
+
+            if (rawAnswerString) {
+                // Check if it is a single letter (a-d OR ক-ঘ)
+                const letterMatch = rawAnswerString.match(/^([a-dক-ঘ])[\.\)]?$/i);
+                
+                if (letterMatch) {
+                    // Map letter to index 0-3
+                    const letter = letterMatch[1].toLowerCase(); // Note: Bangla chars don't change case like English
+                    const map = { 
+                        'a': 0, 'b': 1, 'c': 2, 'd': 3, 
+                        'ক': 0, 'খ': 1, 'গ': 2, 'ঘ': 3 
+                    };
+                    const index = map[letter];
+
+                    // If that option exists, grab the text
+                    if (options[index]) {
+                        finalCorrectAnswer = options[index];
+                    }
+                } else {
+                    // It's full text, strip prefix if present (e.g. "ক. উত্তর")
+                    finalCorrectAnswer = rawAnswerString.replace(/^[a-dক-ঘ][\)\.]\s+/i, '');
+                }
+            }
+
+            mcqData.push({
+                id: id,
+                question: question,
+                options: options.slice(0, 4),
+                correctAnswer: finalCorrectAnswer,
+                note: note,
+                explanation: note 
+            });
         });
-    });
 
-    return mcqData;
-}
-		
+        return mcqData;
+    }
 
 	// --- NEW HELPER: Shared Render Logic for View MCQ Modal ---
 function renderViewMcqUI(mcqData, mainTitleText, subTitleText, subjectName) {
