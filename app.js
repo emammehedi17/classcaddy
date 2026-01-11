@@ -5922,13 +5922,6 @@ savedQuizReviewBtn.addEventListener('click', () => {
 });
 
 
-    if (!tempSavedReviewData) {
-		isReviewingSavedResult = true;
-        showCustomAlert("No review data found.", "error");
-        
-    }
-    
-
 
 // --- Listener for the "Try Again" button in the SAVED modal ---
 document.getElementById('saved-quiz-restart-btn').addEventListener('click', () => {
