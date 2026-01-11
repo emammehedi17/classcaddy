@@ -3584,11 +3584,24 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          * Resets state and starts the quiz game.
          */
         function runQuizGame() {
-			currentQuizQuestionIndex = 0;
-			currentQuizScore = 0;
-            // 1. Hide Start Screen
+            currentQuizQuestionIndex = 0;
+            currentQuizScore = 0; // Ensures score resets on retry
+			
+            // 1. Hide ALL other screens to prevent overlaps
             quizStartScreen.classList.add('hidden');
             quizStartScreen.style.display = 'none';
+            
+            // --- FIX: Explicitly hide Results & Review screens ---
+            quizResultsScreen.classList.add('hidden');
+            quizResultsScreen.style.display = 'none';
+            
+            if(typeof quizReviewScreen !== 'undefined') {
+                quizReviewScreen.classList.add('hidden');
+                quizReviewScreen.style.display = 'none';
+            }
+            // -----------------------------------------------------
+
+            // 2. Show Main Game Screen
             quizMainScreen.classList.remove('hidden');
             quizMainScreen.style.display = 'block';
 
