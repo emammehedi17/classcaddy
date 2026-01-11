@@ -267,7 +267,7 @@
         let quizRemainingSeconds = 0; // <-- এই লাইনটি যোগ করুন
 		let quizStartTime = 0;
         // --- END: QUIZ STATE VARIABLES ---
-		
+		let isReviewingSavedResult = false; // <--- ADD THIS to track where we came from
 		// --- START: ADD THESE ---
         let currentMonthDeleteTarget = null; // Stores {monthId, monthName}
         const deleteMonthConfirmModal = document.getElementById('delete-month-confirm-modal');
@@ -4069,21 +4069,23 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         
         // 1. Button on Results Page: "Review Wrong"
         quizReviewBtn.addEventListener('click', () => {
+			isReviewingSavedResult = false;
             showReviewScreen();
         });
         
         // 2. Button on Review Page: "Back to Results"
         quizBackToResultsBtn.addEventListener('click', () => {
-            const resultsScreen = document.getElementById('quiz-results-screen');
-            const reviewScreen = document.getElementById('quiz-review-screen');
-
-            // 1. Hide Review Screen (Forcefully)
-            reviewScreen.classList.add('hidden');
-            reviewScreen.style.display = 'none';
-
-            // 2. Show Results Screen (Clear the inline 'display: none')
-            resultsScreen.classList.remove('hidden');
-            resultsScreen.style.display = ''; 
+            quizReviewScreen.classList.add('hidden');
+            
+            // --- FIX: Check where we came from ---
+            if (isReviewingSavedResult) {
+                // Case A: Go back to the Saved Result Modal
+                closeModal('quiz-modal'); // Close the review container
+                openModal('view-saved-result-modal'); // Re-open the saved result
+            } else {
+                // Case B: Go back to the Live Quiz Result Screen
+                quizResultsScreen.classList.remove('hidden');
+            }
         });
         
         function showReviewScreen() {
@@ -5883,6 +5885,7 @@ function openSavedResultModal(resultData) {
 // --- Listener for the "Review Wrong" button in the SAVED modal ---
 savedQuizReviewBtn.addEventListener('click', () => {
     if (!tempSavedReviewData) {
+		isReviewingSavedResult = true;
         showCustomAlert("No review data found.", "error");
         return;
     }
