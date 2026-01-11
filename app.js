@@ -5925,24 +5925,7 @@ savedQuizReviewBtn.addEventListener('click', () => {
         
     }
     
-    // We re-use the *existing* quiz review screen, but populate it with saved data
-    
-    // 1. Set the main quiz variable to our saved data
-    currentQuizQuestions = tempSavedReviewData;
-    
-    // 2. Call the existing review function
-    showReviewScreen(); // This is the function from line ~1890
-    
-    // 3. Show the main quiz modal and hide the "saved result" modal
-    closeModal('view-saved-result-modal');
-    quizModal.style.display = 'block';
-    
-    // 4. Ensure the quiz modal is showing the *review* screen, not the start/main/results screen
-    quizStartScreen.classList.add('hidden');
-    quizMainScreen.classList.add('hidden');
-    quizResultsScreen.classList.add('hidden');
-    quizReviewScreen.classList.remove('hidden');
-});
+
 
 // --- Listener for the "Try Again" button in the SAVED modal ---
 document.getElementById('saved-quiz-restart-btn').addEventListener('click', () => {
