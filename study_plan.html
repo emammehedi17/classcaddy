@@ -568,14 +568,15 @@
         </div>
 		
 		<div id="quiz-review-screen" class="hidden">
-            <div class="flex justify-between items-center mb-5">
-                <h3 class="text-2xl font-semibold text-indigo-600">Review Wrong Answers</h3>
-                <button id="quiz-back-to-results-btn" class="action-button action-button-secondary">
-                    &larr; Back to Results
-                </button>
-            </div>
-            <div id="quiz-review-content" class="kalpurush" style="max-height: 60vh; overflow-y: auto; padding: 5px;">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Review Incorrect Answers</h2>
+            <div id="quiz-review-content" class="mb-6 space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
                 </div>
+            <div class="flex justify-end gap-2">
+                <button id="quiz-test-weakness-btn" class="action-button" style="background-color: #f59e0b;">
+                    <i class="fas fa-dumbbell mr-1"></i> Test Weak Points
+                </button>
+                <button id="quiz-back-to-results-btn" class="action-button action-button-secondary">Back to Results</button>
+            </div>
         </div>
         
 

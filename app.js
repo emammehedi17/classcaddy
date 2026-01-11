@@ -142,7 +142,28 @@
         const quizRestartBtn = document.getElementById('quiz-restart-btn');
 		// --- START: ADD THESE NEW ELEMENTS ---
         const quizReviewBtn = document.getElementById('quiz-review-btn');
-        
+        // --- NEW: Test Weakness Button Listener ---
+        const quizTestWeaknessBtn = document.getElementById('quiz-test-weakness-btn');
+        if (quizTestWeaknessBtn) {
+            quizTestWeaknessBtn.addEventListener('click', () => {
+                // 1. Filter to keep only Wrong/Skipped questions
+                const weakQuestions = currentQuizQuestions.filter(q => q.isCorrect !== true);
+                
+                if (weakQuestions.length === 0) {
+                    showCustomAlert("No weak points to test!", "success");
+                    return;
+                }
+
+                // 2. Set them as the new quiz questions
+                currentQuizQuestions = weakQuestions;
+                
+                // 3. Set the flag
+                isWeaknessTest = true;
+
+                // 4. Start the game (RunQuizGame will handle hiding the review screen)
+                runQuizGame();
+            });
+        }
         const quizReviewScreen = document.getElementById('quiz-review-screen');
         const quizReviewContent = document.getElementById('quiz-review-content');
         const quizBackToResultsBtn = document.getElementById('quiz-back-to-results-btn');
@@ -228,7 +249,7 @@
 		let isCheckboxClickGlobal = null;
 		let currentMcqTarget = null;
 		let autosaveTimer = null;
-		
+		let isWeaknessTest = false; // <--- ADD THIS
 		// --- START: GUEST MODE VARS ---
         const MEHEDI_UID = "0RngZmzJioaZB4XiKKvGB7lKlxv1"; // <-- PASTE YOUR UID
         let isGuestMode = false;
@@ -3956,6 +3977,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 correctScore: correctScore,
                 wrongScore: wrongScore,
                 finalScore: finalScore,
+				isWeakness: isWeaknessTest,
                 totalQuestions: totalQuestions,
                 percentage: parseFloat(percentage.toFixed(1)),
                 timeTakenInSeconds: timeTakenInSeconds,
@@ -4271,6 +4293,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
 		// 4. Function to start a week-long quiz (FIXED OVERLAP)
         async function startWeekQuiz(monthId, weekId) {
+			isWeaknessTest = false;
             quizTitle.textContent = 'Vocabulary Quiz';
             window.currentQuizSourceInfo = { monthId, weekId };
 			window.currentQuizSubjectInfo = { subjectName: "Vocabulary", topicDetail: "Weekly Vocabulary" };
@@ -4877,6 +4900,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 		
 		// 5. "Quiz" বাটনে ক্লিক করলে (Vocabulary-এর জন্য)
         async function startQuiz(monthId, weekId, dayIndex, rowIndex) {
+			isWeaknessTest = false;
             quizTitle.textContent = 'Vocabulary Quiz';
             window.currentQuizSourceInfo = { monthId, weekId, dayIndex, rowIndex };
             currentMcqTarget = null; 
@@ -4973,6 +4997,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 		
         // 5. "MCQ Test" বাটনে ক্লিক করলে (UPGRADED)
         async function startMcqQuiz(monthId, weekId, dayIndex, rowIndex) {
+			isWeaknessTest = false;
             quizTitle.textContent = 'MCQ Quiz';
 			currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
 			
@@ -5194,6 +5219,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 
         // 7. Function to start a quiz (day, week, or month) (LOGIC FIXED)
         async function startAggregatedMcqQuiz(quizType, monthId, weekId = null, dayIndex = null) {
+			isWeaknessTest = false;
             quizTitle.textContent = 'MCQ Quiz';
 			currentMcqTarget = { quizType, monthId, weekId, dayIndex };
             closeModal('mcq-quiz-center-modal');
@@ -5623,8 +5649,6 @@ function calculateOverallStats(results) {
     };
 }
 
-// --- Create Table HTML ---
-// --- Create Table HTML (UPGRADED for "By Day" and "By Subject") ---
 function createResultsTable(results, tableType, stats) { 
     if (results.length === 0) {
         return `<p class="text-center text-gray-500 italic py-10">No results found for this view.</p>`;
@@ -5635,15 +5659,13 @@ function createResultsTable(results, tableType, stats) {
             year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
         }) : 'N/A';
         
-        // --- NEW LOGIC: Choose which topic name to display ---
         let topicDisplayName = '';
         if (tableType === 'by-day') {
-            topicDisplayName = res.topicName; // e.g., "Basic View - Day 2..."
-        } else { // 'by-subject'
-            topicDisplayName = res.topicDetail; // e.g., "Chapter 1: Intro" or "Vocabulary"
+            topicDisplayName = res.topicName;
+        } else { 
+            topicDisplayName = res.topicDetail;
         }
         
-        // --- Topic link logic (remains the same) ---
         const topicLinkHtml = `
             <a href="${res.topicLink || '#'}" class="topic-link" 
                data-link="${res.topicLink || '#'}" 
@@ -5652,11 +5674,20 @@ function createResultsTable(results, tableType, stats) {
             </a>
         `;
         
+        // --- NEW COLUMN LOGIC ---
+        const weakPointBadge = res.isWeakness 
+            ? `<span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">Yes</span>` 
+            : `<span class="text-gray-300">-</span>`;
+        // ------------------------
+        
         return `
             <tr>
                 <td class="sl-col">${index + 1}</td>
                 <td class="date-col">${date}</td>
                 <td class="topic-col">${topicLinkHtml}</td>
+                
+                <td class="text-center">${weakPointBadge}</td> 
+                
                 <td class="score-col">${res.finalScore.toFixed(2)}</td>
                 <td class="score-col">${res.totalQuestions}</td>
                 <td class="time-col">${formatTime(res.timeTakenInSeconds)}</td> 
@@ -5670,7 +5701,6 @@ function createResultsTable(results, tableType, stats) {
         `;
     }).join('');
 
-    // Determine chart type for the button
     const chartButtonType = (tableType === 'by-day') ? 'all' : 'subject';
 
     return `
@@ -5680,6 +5710,9 @@ function createResultsTable(results, tableType, stats) {
                     <th class="sl-col">SL.</th>
                     <th class="date-col">Date</th>
                     <th class="topic-col">Exam Topic</th>
+                    
+                    <th class="text-center" style="width: 100px;">Weak Points</th>
+                    
                     <th class="score-col">Obtained</th>
                     <th class="score-col">Full</th> 
                     <th class="time-col">Time Taken</th> 
@@ -5692,8 +5725,7 @@ function createResultsTable(results, tableType, stats) {
             </tbody>
             <tfoot>
                 <tr>
-                    <th colspan="3">Overall Performance</th>
-                    <th class="score-col">${stats.totalObtained.toFixed(2)}</th>
+                    <th colspan="4">Overall Performance</th> <th class="score-col">${stats.totalObtained.toFixed(2)}</th>
                     <th class="score-col">${stats.totalFull}</th>
                     <th class="time-col">${formatTime(stats.totalTime)}</th>
                     <th class="percent-col">${stats.overallPercentage}%</th>
@@ -7863,6 +7895,7 @@ function renderStudyView(mcqs) {
 
 	// 5. NEW: Test Handler for Study View (UPDATED: Exits Fullscreen)
 document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
+	isWeaknessTest = false;
     if (!currentStudyViewData || currentStudyViewData.mcqs.length === 0) {
         showCustomAlert("No MCQs available to test.", "error");
         return;
@@ -8061,6 +8094,7 @@ if (mcqFullscreenBtn && mcqStudyModalContent) {
 
 // 1. Test Button (View MCQ Modal) - (UPDATED: Uses Correct Subject)
 const viewMcqTestBtn = document.getElementById('view-mcq-test-btn');
+isWeaknessTest = false;
 if (viewMcqTestBtn) {
     viewMcqTestBtn.addEventListener('click', () => {
         if (!currentViewMcqData || !currentViewMcqData.mcqs.length) {
