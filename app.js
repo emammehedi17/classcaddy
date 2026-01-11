@@ -3961,7 +3961,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             document.getElementById('summary-percentage').textContent = `${percentage.toFixed(1)}%`;
             document.getElementById('summary-time-taken').textContent = formatTime(timeTakenInSeconds);
             
-            if (wrongCount > 0) {
+            // MODIFIED: Show review if Wrong OR Skipped
+            if (wrongCount > 0 || notAnsweredCount > 0) {
                 quizReviewBtn.style.display = 'inline-flex';
             } else {
                 quizReviewBtn.style.display = 'none';
@@ -4036,7 +4037,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
             quizReviewContent.innerHTML = '';
             
-            const wrongAnswers = currentQuizQuestions.filter(q => q.isCorrect === false);
+            // MODIFIED: Include Wrong (false) AND Skipped (null)
+			const wrongAnswers = currentQuizQuestions.filter(q => q.isCorrect !== true);
             
             if (wrongAnswers.length === 0) {
                 quizReviewContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">You got all questions correct!</p>';
@@ -5748,8 +5750,8 @@ function openSavedResultModal(resultData) {
     document.getElementById('saved-summary-percentage').textContent = `${resultData.percentage.toFixed(1)}%`;
     document.getElementById('saved-summary-time-taken').textContent = formatTime(resultData.timeTakenInSeconds);
 
-    // Show/Hide review button
-    if (resultData.wrongCount > 0) {
+    // Show/Hide review button (Modified for Skipped)
+    if (resultData.wrongCount > 0 || resultData.notAnsweredCount > 0) {
         savedQuizReviewBtn.style.display = 'inline-flex';
         // Pass the question data to a temp variable for the review button to use
         tempSavedReviewData = resultData.questions;
