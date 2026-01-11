@@ -5897,20 +5897,21 @@ function openSavedResultModal(resultData) {
 
 // --- Listener for the "Review Wrong" button in the SAVED modal ---
 savedQuizReviewBtn.addEventListener('click', () => {
-    // 1. Error Check: If no data, stop immediately.
+    // 1. Check if data exists. If NOT, stop and show error.
     if (!tempSavedReviewData) {
         showCustomAlert("No review data found.", "error");
-        return; 
+        return;
     }
     
-    // 2. Success: NOW we set the flag because we are proceeding.
-    // (This was the missing/misplaced line)
+    // 2. Success! Set the flag so "Back" button knows where to go.
+    // (This line must be OUTSIDE the if block)
     isReviewingSavedResult = true; 
     
-    // 3. Continue with the review logic...
+    // 3. Set the data and show the screen
     currentQuizQuestions = tempSavedReviewData;
     showReviewScreen(); 
     
+    // 4. Handle Modals
     closeModal('view-saved-result-modal');
     quizModal.style.display = 'block';
     
@@ -5919,6 +5920,8 @@ savedQuizReviewBtn.addEventListener('click', () => {
     quizResultsScreen.classList.add('hidden');
     quizReviewScreen.classList.remove('hidden');
 });
+
+
     if (!tempSavedReviewData) {
 		isReviewingSavedResult = true;
         showCustomAlert("No review data found.", "error");
