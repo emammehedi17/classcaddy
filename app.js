@@ -4073,20 +4073,31 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             showReviewScreen();
         });
         
-        // 2. Button on Review Page: "Back to Results"
-        quizBackToResultsBtn.addEventListener('click', () => {
-            quizReviewScreen.classList.add('hidden');
-            
-            // --- FIX: Check where we came from ---
-            if (isReviewingSavedResult) {
-                // Case A: Go back to the Saved Result Modal
-                closeModal('quiz-modal'); // Close the review container
-                openModal('view-saved-result-modal'); // Re-open the saved result
-            } else {
-                // Case B: Go back to the Live Quiz Result Screen
-                quizResultsScreen.classList.remove('hidden');
-            }
-        });
+        // 2. Button on Review Page: "Back to Results" (ROBUST FIX)
+        const oldBackBtn = document.getElementById('quiz-back-to-results-btn');
+        if (oldBackBtn) {
+            // Remove old listeners by cloning the button
+            const newBackBtn = oldBackBtn.cloneNode(true);
+            oldBackBtn.parentNode.replaceChild(newBackBtn, oldBackBtn);
+
+            // Attach the new, clean listener
+            newBackBtn.addEventListener('click', () => {
+                const quizReviewScreen = document.getElementById('quiz-review-screen');
+                const quizResultsScreen = document.getElementById('quiz-results-screen');
+                
+                // Always hide review screen first
+                if(quizReviewScreen) quizReviewScreen.classList.add('hidden');
+                
+                if (isReviewingSavedResult) {
+                    // Case A: Go back to the Saved Result Modal
+                    closeModal('quiz-modal'); 
+                    openModal('view-saved-result-modal'); 
+                } else {
+                    // Case B: Go back to the Live Quiz Result Screen
+                    if(quizResultsScreen) quizResultsScreen.classList.remove('hidden');
+                }
+            });
+        }
         
         function showReviewScreen() {
             // ... (keep the force hide/show logic at the top) ...
