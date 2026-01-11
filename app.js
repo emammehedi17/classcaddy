@@ -5466,7 +5466,7 @@ document.getElementById('quiz-save-btn').addEventListener('click', async () => {
 
         // Invalidate cache
         savedResultsCache = null;
-
+		await saveWrongQuestionsToReview(currentQuizResultData);
         showCustomAlert("Result saved successfully!", "success");
         saveBtn.innerHTML = `<i class="fas fa-check mr-2"></i>Saved!`;
         // We leave it disabled to prevent duplicate saves
@@ -5491,6 +5491,9 @@ const showResultsSheetBtn = document.getElementById('show-results-sheet-btn');
 // --- MODIFIED ---
 const tabBtnByDay = document.getElementById('tab-btn-by-day');
 const tabBtnBySubject = document.getElementById('tab-btn-by-subject');
+const tabBtnReviewYourself = document.getElementById('tab-btn-review-yourself');
+const tabContentReviewYourself = document.getElementById('tab-content-review-yourself');
+const reviewWrongAnsContent = document.getElementById('review-wrong-ans-content');
 const tabContentByDay = document.getElementById('tab-content-by-day');
 const tabContentBySubject = document.getElementById('tab-content-by-subject');
 const byDayResultsList = document.getElementById('by-day-results-list');
@@ -5521,6 +5524,22 @@ tabBtnBySubject.addEventListener('click', () => {
     tabContentByDay.classList.add('hidden');
 });
 
+if (tabBtnReviewYourself) {
+        tabBtnReviewYourself.addEventListener('click', () => {
+            // UI Toggle
+            tabBtnReviewYourself.classList.add('active-tab');
+            tabBtnByDay.classList.remove('active-tab');
+            tabBtnBySubject.classList.remove('active-tab');
+            
+            tabContentReviewYourself.classList.remove('hidden');
+            tabContentByDay.classList.add('hidden');
+            tabContentBySubject.classList.add('hidden');
+
+            // Load Data
+            loadReviewWrongAnswers();
+        });
+    }
+	
 // --- Fetch and Render Data ---
 async function loadAndDisplayResults() {
     if (!currentUser || !userId) {
@@ -8598,4 +8617,137 @@ if (scrollBtn) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
+}
+
+// --- NEW FUNCTION: Save Wrong Answers to Review Collection ---
+async function saveWrongQuestionsToReview(resultData) {
+    if (!resultData.wrongCount && !resultData.notAnsweredCount) return;
+
+    const reviewCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/reviewQuestions`);
+    const batch = writeBatch(db);
+    let batchCount = 0;
+
+    // Filter for Wrong (false) or Skipped (null/undefined)
+    const wrongQuestions = resultData.questions.filter(q => q.isCorrect !== true);
+
+    for (const q of wrongQuestions) {
+        // Create a unique ID based on the question text to prevent duplicates
+        // We use a simple base64 encode of the question text as the ID
+        const docId = btoa(unescape(encodeURIComponent(q.question))).substring(0, 150); 
+        const docRef = doc(reviewCollectionRef, docId);
+
+        const reviewData = {
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            explanation: q.explanation || null,
+            note: q.note || null,
+            subject: resultData.subjectName || 'General',
+            title: resultData.topicDetail || 'Quiz',
+            savedAt: Timestamp.now(),
+            lastWrongAt: Timestamp.now() // Update timestamp to show it's recent
+        };
+
+        batch.set(docRef, reviewData, { merge: true }); // Merge updates timestamp if exists
+        batchCount++;
+    }
+
+    if (batchCount > 0) {
+        await batch.commit();
+        console.log(`Saved ${batchCount} wrong questions to Review Yourself.`);
+    }
+}
+
+// --- NEW FUNCTION: Load and Display Wrong Answers ---
+async function loadReviewWrongAnswers() {
+    if (!currentUser || !userId) return;
+
+    reviewWrongAnsContent.innerHTML = '<p class="text-center text-gray-500 italic py-10"><i class="fas fa-spinner fa-spin mr-2"></i>Loading your weak points...</p>';
+
+    try {
+        const reviewCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/reviewQuestions`);
+        // Order by Subject, then Title, then Time
+        const q = query(reviewCollectionRef, orderBy("subject"), orderBy("title"));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+            reviewWrongAnsContent.innerHTML = `
+                <div class="text-center py-10">
+                    <div class="bg-emerald-50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-check text-emerald-500 text-2xl"></i>
+                    </div>
+                    <p class="text-gray-600 font-medium">No wrong answers recorded yet!</p>
+                    <p class="text-gray-400 text-sm">Save a quiz result with mistakes to populate this list.</p>
+                </div>`;
+            return;
+        }
+
+        // Group Data: Subject -> Title -> Questions
+        const groupedData = {};
+        
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const subject = data.subject || 'General';
+            const title = data.title || 'Misc';
+            
+            if (!groupedData[subject]) groupedData[subject] = {};
+            if (!groupedData[subject][title]) groupedData[subject][title] = [];
+            
+            groupedData[subject][title].push(data);
+        });
+
+        // Render HTML
+        let html = '';
+        
+        for (const [subject, titles] of Object.entries(groupedData)) {
+            html += `<div class="mb-6">`;
+            html += `<h3 class="text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-3"><i class="fas fa-book mr-2 text-indigo-500"></i>${escapeHtml(subject)}</h3>`;
+            
+            for (const [title, questions] of Object.entries(titles)) {
+                html += `<div class="mb-4 ml-2">`;
+                // Title Header with Count
+                html += `
+                    <div class="flex items-center justify-between bg-white border border-gray-200 p-3 rounded-lg shadow-sm mb-2 cursor-pointer hover:bg-gray-50 transition-colors" 
+                         onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.fa-chevron-down').classList.toggle('rotate-180');">
+                        <span class="font-semibold text-gray-700 text-sm">${escapeHtml(title)}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full">${questions.length} Qs</span>
+                            <i class="fas fa-chevron-down text-gray-400 transition-transform duration-200"></i>
+                        </div>
+                    </div>`;
+                
+                // Accordion Content (Hidden by default)
+                html += `<div class="hidden space-y-3 pl-2 border-l-2 border-gray-100 ml-4">`;
+                
+                questions.forEach((q, idx) => {
+                    html += `
+                        <div class="bg-gray-50 p-3 rounded border border-gray-200 text-sm">
+                            <p class="font-medium text-gray-800 mb-2"><span class="text-red-500 font-bold mr-1">Q${idx+1}.</span> ${escapeHtml(q.question)}</p>
+                            
+                            <div class="text-xs text-gray-500 mb-2 pl-4 border-l-2 border-gray-300">
+                                ${q.options.map(opt => {
+                                    const isCorrect = opt === q.correctAnswer;
+                                    return `<div class="${isCorrect ? 'text-emerald-600 font-bold' : ''}">${isCorrect ? '✓ ' : '• '}${escapeHtml(opt)}</div>`;
+                                }).join('')}
+                            </div>
+
+                            <div class="text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded inline-block border border-emerald-200">
+                                <b>Answer:</b> ${escapeHtml(q.correctAnswer)}
+                            </div>
+                            ${q.note ? `<div class="mt-1 text-xs text-blue-600"><i class="fas fa-info-circle mr-1"></i>${escapeHtml(q.note)}</div>` : ''}
+                        </div>
+                    `;
+                });
+                
+                html += `</div></div>`; // Close Title Group
+            }
+            html += `</div>`; // Close Subject Group
+        }
+
+        reviewWrongAnsContent.innerHTML = html;
+
+    } catch (error) {
+        console.error("Error loading wrong answers:", error);
+        reviewWrongAnsContent.innerHTML = '<p class="text-center text-red-500 py-10">Error loading review data.</p>';
+    }
 }
