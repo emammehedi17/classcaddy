@@ -217,6 +217,7 @@
         let progressChart = null; // Holds the chart instance
 		let currentQuizResultData = null; // <-- ADD THIS
 		let savedResultsCache = null; // <-- ADD THIS, for caching results
+		let isQuizResultSaved = false;
         let currentUser = null;
         let userId = null;
         let unsubscribePlans = null; // For the list of month buttons
@@ -3938,7 +3939,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 timeTakenInSeconds: timeTakenInSeconds,
                 questions: questionsSnapshot 
             };
-            
+            isQuizResultSaved = false;
+			
             if(saveBtn) {
                 if (isGuestMode) {
                     saveBtn.style.display = 'none'; 
@@ -4133,39 +4135,45 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		
 		
         /**
-         * Checks if a quiz is in progress OR review is active before closing the modal.
+         * Checks if a quiz is in progress OR if results are unsaved before closing.
          */
         window.closeQuizModal = function() {
             const mainScreen = document.getElementById('quiz-main-screen');
-            const reviewScreen = document.getElementById('quiz-review-screen'); // <-- NEW: Get review screen
+            const reviewScreen = document.getElementById('quiz-review-screen');
+            const resultsScreen = document.getElementById('quiz-results-screen');
             
             const isQuizInProgress = !mainScreen.classList.contains('hidden');
-            const isReviewing = !reviewScreen.classList.contains('hidden'); // <-- NEW: Check if visible
+            const isReviewing = !reviewScreen.classList.contains('hidden');
+            const isResultsShowing = !resultsScreen.classList.contains('hidden');
 
             if (isQuizInProgress) {
-                // Case 1: Quiz is in progress. Show 3-button "Yes/No/Submit" modal.
+                // Case 1: Quiz is actively running. Show the 3-button modal.
                 showQuizConfirmationModal();
                 
-            } else if (isReviewing) {
-                // --- START: NEW LOGIC ---
-                // Case 2: Review screen is visible. Show a simple "Yes/No" modal.
-                // We re-use the generic confirmation modal for this.
-                showConfirmationModal(
-                    "Close Review",
-                    "Are you sure you want to close the quiz? You can review your answers again from the results page.",
-                    () => {
-                        // This is the 'onConfirm' action (user clicks "Confirm")
-                        closeModal('quiz-modal'); // This is the *real* close function
-                    }
-                );
-                // --- END: NEW LOGIC ---
+            } else if (isResultsShowing || isReviewing) {
+                // Case 2: On Results OR Review screen. Check if saved.
+                if (!isGuestMode && !isQuizResultSaved) {
+                    // Result NOT saved: Ask to discard
+                    showConfirmationModal(
+                        "Discard Results?",
+                        "You haven't saved your result yet. Are you sure you want to close? This data will be lost.",
+                        () => {
+                            // User clicked "Yes/Confirm" -> Close the modal
+                            closeModal('quiz-modal');
+                        }
+                    );
+                } else {
+                    // Result IS saved (or Guest mode): Close immediately
+                    closeModal('quiz-modal');
+                }
                 
             } else {
-                // Case 3: On Start or Results screen. Close without warning.
+                // Case 3: On Start screen or others. Close immediately.
                 closeModal('quiz-modal');
             }
         }
-
+		
+		
         // --- START: NEW QUIZ CENTER LOGIC ---
 
         const quizCenterModal = document.getElementById('quiz-center-modal');
@@ -5402,6 +5410,7 @@ document.getElementById('quiz-save-btn').addEventListener('click', async () => {
         showCustomAlert("Result saved successfully!", "success");
         saveBtn.innerHTML = `<i class="fas fa-check mr-2"></i>Saved!`;
         // We leave it disabled to prevent duplicate saves
+		isQuizResultSaved = true; // <--- ADD THIS (Mark as saved)
 
     } catch (error) {
         console.error("Error saving quiz result:", error);
