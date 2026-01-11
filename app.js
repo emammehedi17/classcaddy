@@ -8632,7 +8632,7 @@ if (scrollBtn) {
     });
 }
 
-// --- NEW FUNCTION: Save Wrong Answers to Review Collection ---
+/// --- NEW FUNCTION: Save Wrong Answers to Review Collection ---
 async function saveWrongQuestionsToReview(resultData) {
     if (!resultData.wrongCount && !resultData.notAnsweredCount) return;
 
@@ -8676,8 +8676,7 @@ async function saveWrongQuestionsToReview(resultData) {
     }
 }
 
-
-// --- NEW FUNCTION: Load and Display Wrong Answers ---
+// --- NEW FUNCTION: Load and Display Wrong Answers (Fixed Sorting) ---
 async function loadReviewWrongAnswers() {
     if (!currentUser || !userId) return;
 
@@ -8685,8 +8684,10 @@ async function loadReviewWrongAnswers() {
 
     try {
         const reviewCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/reviewQuestions`);
-        // Order by Subject, then Title, then Time
-        const q = query(reviewCollectionRef, orderBy("subject"), orderBy("title"));
+        
+        // --- FIX: Removed 'orderBy' to avoid Firestore Index Error ---
+        // We will sort the data using JavaScript below instead.
+        const q = query(reviewCollectionRef); 
         const snapshot = await getDocs(q);
 
         if (snapshot.empty) {
@@ -8718,11 +8719,20 @@ async function loadReviewWrongAnswers() {
         // Render HTML
         let html = '';
         
-        for (const [subject, titles] of Object.entries(groupedData)) {
+        // --- FIX: Sort Subjects Alphabetically in JS ---
+        const sortedSubjects = Object.keys(groupedData).sort();
+
+        for (const subject of sortedSubjects) {
+            const titles = groupedData[subject];
             html += `<div class="mb-6">`;
             html += `<h3 class="text-lg font-bold text-gray-800 border-b border-gray-200 pb-1 mb-3"><i class="fas fa-book mr-2 text-indigo-500"></i>${escapeHtml(subject)}</h3>`;
             
-            for (const [title, questions] of Object.entries(titles)) {
+            // --- FIX: Sort Titles Alphabetically in JS ---
+            const sortedTitles = Object.keys(titles).sort();
+
+            for (const title of sortedTitles) {
+                const questions = titles[title];
+
                 html += `<div class="mb-4 ml-2">`;
                 // Title Header with Count
                 html += `
@@ -8767,6 +8777,6 @@ async function loadReviewWrongAnswers() {
 
     } catch (error) {
         console.error("Error loading wrong answers:", error);
-        reviewWrongAnsContent.innerHTML = '<p class="text-center text-red-500 py-10">Error loading review data.</p>';
+        reviewWrongAnsContent.innerHTML = '<p class="text-center text-red-500 py-10">Error loading review data. Check console for details.</p>';
     }
 }
