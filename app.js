@@ -8646,7 +8646,12 @@ async function saveWrongQuestionsToReview(resultData) {
     for (const q of wrongQuestions) {
         // Create a unique ID based on the question text to prevent duplicates
         // We use a simple base64 encode of the question text as the ID
-        const docId = btoa(unescape(encodeURIComponent(q.question))).substring(0, 150); 
+        // FIX: Replace '/' with '_' and '+' with '-' to make it safe for Firebase paths
+        const docId = btoa(unescape(encodeURIComponent(q.question)))
+            .replace(/\//g, '_')
+            .replace(/\+/g, '-')
+            .substring(0, 150); 
+            
         const docRef = doc(reviewCollectionRef, docId);
 
         const reviewData = {
@@ -8670,6 +8675,7 @@ async function saveWrongQuestionsToReview(resultData) {
         console.log(`Saved ${batchCount} wrong questions to Review Yourself.`);
     }
 }
+
 
 // --- NEW FUNCTION: Load and Display Wrong Answers ---
 async function loadReviewWrongAnswers() {
