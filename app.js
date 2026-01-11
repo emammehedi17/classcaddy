@@ -5510,36 +5510,49 @@ showResultsSheetBtn.addEventListener('click', () => {
     loadAndDisplayResults();
 });
 
-// --- Tab Switching ---
+// --- Tab Switching (Updated for 3 Tabs) ---
 tabBtnByDay.addEventListener('click', () => {
+    // Activate Day
     tabBtnByDay.classList.add('active-tab');
     tabBtnBySubject.classList.remove('active-tab');
+    if(tabBtnReviewYourself) tabBtnReviewYourself.classList.remove('active-tab');
+
+    // Show Content
     tabContentByDay.classList.remove('hidden');
     tabContentBySubject.classList.add('hidden');
+    if(tabContentReviewYourself) tabContentReviewYourself.classList.add('hidden');
 });
+
 tabBtnBySubject.addEventListener('click', () => {
+    // Activate Subject
     tabBtnBySubject.classList.add('active-tab');
     tabBtnByDay.classList.remove('active-tab');
+    if(tabBtnReviewYourself) tabBtnReviewYourself.classList.remove('active-tab');
+
+    // Show Content
     tabContentBySubject.classList.remove('hidden');
     tabContentByDay.classList.add('hidden');
+    if(tabContentReviewYourself) tabContentReviewYourself.classList.add('hidden');
 });
 
 if (tabBtnReviewYourself) {
-        tabBtnReviewYourself.addEventListener('click', () => {
-            // UI Toggle
-            tabBtnReviewYourself.classList.add('active-tab');
-            tabBtnByDay.classList.remove('active-tab');
-            tabBtnBySubject.classList.remove('active-tab');
-            
-            tabContentReviewYourself.classList.remove('hidden');
-            tabContentByDay.classList.add('hidden');
-            tabContentBySubject.classList.add('hidden');
+    tabBtnReviewYourself.addEventListener('click', () => {
+        // Activate Review
+        tabBtnReviewYourself.classList.add('active-tab');
+        tabBtnByDay.classList.remove('active-tab');
+        tabBtnBySubject.classList.remove('active-tab');
+        
+        // Show Content
+        tabContentReviewYourself.classList.remove('hidden');
+        tabContentByDay.classList.add('hidden');
+        tabContentBySubject.classList.add('hidden');
 
-            // Load Data
-            loadReviewWrongAnswers();
-        });
-    }
-	
+        // Load Data
+        loadReviewWrongAnswers();
+    });
+}
+
+
 // --- Fetch and Render Data ---
 async function loadAndDisplayResults() {
     if (!currentUser || !userId) {
