@@ -171,20 +171,38 @@
             <button id="tab-btn-by-subject" class="result-tab-btn">
                 <i class="fas fa-tags mr-2"></i> By Subject
             </button>
+            <button id="tab-btn-review-yourself" class="result-tab-btn">
+                <i class="fas fa-user-check mr-2"></i> Review Yourself
+            </button>
         </div>
-    
+
         <div class="" style="overflow-y: auto; flex-grow: 1; padding-top: 1rem;">
+
             <div id="tab-content-by-day" class="result-tab-content">
                 <div id="by-day-results-list" class="results-table-container">
                     <p class="text-center text-gray-500 italic py-10">Loading all results by day...</p>
                 </div>
             </div>
+
             <div id="tab-content-by-subject" class="result-tab-content hidden">
                 <div id="subject-sub-tabs-nav" class="flex border-b border-gray-200 -mt-3 mb-2" style="overflow-x: auto;">
                     </div>
                 <div id="subject-sub-tabs-content" class="results-table-container">
                     </div>
             </div>
+
+            <div id="tab-content-review-yourself" class="result-tab-content hidden">
+                <div class="flex gap-2 mb-4 border-b border-gray-100 pb-2">
+                    <button id="subtab-btn-wrong-ans" class="px-3 py-1 text-xs font-bold text-white bg-indigo-500 rounded-full shadow-sm">
+                        Wrong Answered
+                    </button>
+                </div>
+
+                <div id="review-wrong-ans-content" class="max-h-[55vh] overflow-y-auto custom-scrollbar space-y-4">
+                    <p class="text-center text-gray-500 italic py-10">Loading wrong answers...</p>
+                </div>
+            </div>
+
         </div>
     
       </div>
