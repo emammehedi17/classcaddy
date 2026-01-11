@@ -4929,15 +4929,16 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 
                 currentMcqData = mcqData;
                 currentVocabData = null;
-                currentQuizQuestions = currentMcqData.map(mcq => ({
-                    question: mcq.question,
-                    options: [...mcq.options],
-                    correctAnswer: mcq.correctAnswer,
+                // ADDED shuffleArray HERE
+				currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({
+					question: mcq.question,
+					options: [...mcq.options],
+					correctAnswer: mcq.correctAnswer,
 					explanation: mcq.explanation || null,
 					note: mcq.note || null,
-                    userAnswer: null,
-                    isCorrect: null
-                }));
+					userAnswer: null,
+					isCorrect: null
+				})));
                 
                 const totalQuestions = currentQuizQuestions.length;
                 const totalTimeInSeconds = totalQuestions * 40;
@@ -5173,15 +5174,16 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 
                 currentMcqData = aggregatedMcqs; 
                 currentVocabData = null;
-                currentQuizQuestions = currentMcqData.map(mcq => ({ 
-                    question: mcq.question,
-                    options: [...mcq.options],
-                    correctAnswer: mcq.correctAnswer,
+                // ADDED shuffleArray HERE
+				currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
+					question: mcq.question,
+					options: [...mcq.options],
+					correctAnswer: mcq.correctAnswer,
 					explanation: mcq.explanation || null,
 					note: mcq.note || null,
-                    userAnswer: null,
-                    isCorrect: null
-                }));
+					userAnswer: null,
+					isCorrect: null
+				})));
                 
                 const totalQuestions = currentQuizQuestions.length;
                 const totalTimeInSeconds = totalQuestions * 40;
@@ -7805,15 +7807,16 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
     currentMcqData = mcqData;
     currentVocabData = null;
     
-    currentQuizQuestions = currentMcqData.map(mcq => ({ 
-        question: mcq.question,
-        options: [...mcq.options],
-        correctAnswer: mcq.correctAnswer,
+    // ADDED shuffleArray HERE
+	currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
+		question: mcq.question,
+		options: [...mcq.options],
+		correctAnswer: mcq.correctAnswer,
 		explanation: mcq.explanation || null,
 		note: mcq.note || null,
-        userAnswer: null,
-        isCorrect: null
-    }));
+		userAnswer: null,
+		isCorrect: null
+	})));
 
     // 6. Calculate Time
     const totalQuestions = currentQuizQuestions.length;
@@ -7994,10 +7997,17 @@ if (viewMcqTestBtn) {
         
         currentMcqData = mcqData;
         currentVocabData = null;
-        currentQuizQuestions = currentMcqData.map(mcq => ({ 
-            question: mcq.question, options: [...mcq.options], correctAnswer: mcq.correctAnswer, explanation: mcq.explanation || null, note: mcq.note || null, userAnswer: null, isCorrect: null 
-        }));
-        
+        // ADDED shuffleArray HERE
+		currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
+			question: mcq.question, 
+			options: [...mcq.options], 
+			correctAnswer: mcq.correctAnswer, 
+			explanation: mcq.explanation || null, 
+			note: mcq.note || null, 
+			userAnswer: null, 
+			isCorrect: null 
+		})));
+				
         const totalTime = currentQuizQuestions.length * 40;
         const warningP = document.getElementById('quiz-total-time-warning');
         warningP.querySelector('span').textContent = formatTime(totalTime);
