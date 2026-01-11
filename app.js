@@ -3508,6 +3508,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          * Resets state and starts the quiz game.
          */
         function runQuizGame() {
+			currentQuizQuestionIndex = 0;
+			
             // 1. Hide Start Screen
             quizStartScreen.classList.add('hidden');
             quizStartScreen.style.display = 'none';
@@ -3919,13 +3921,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 quizQuestionArea.classList.add('slide-in-right');
             }
         });
-            if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
-                showQuizResults();
-            } else {
-                loadQuizQuestion();
-                quizQuestionArea.classList.add('slide-in-right');
-            }
-        
+           
 
         quizPrevBtn.addEventListener('click', () => {
             if (currentQuizQuestionIndex > 0) {
