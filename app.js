@@ -3526,12 +3526,13 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const liveWrong = document.getElementById('quiz-live-wrong');
             const liveSkipped = document.getElementById('quiz-live-skipped');
             const progressBar = document.getElementById('quiz-progress-bar');
-            
+            const quizScoreEl = document.getElementById('quiz-score'); // <--- ADD THIS
+
             if(liveCorrect) liveCorrect.textContent = '0';
             if(liveWrong) liveWrong.textContent = '0';
             if(liveSkipped) liveSkipped.textContent = '0';
             if(progressBar) progressBar.style.width = '0%';
-            // ---------------------------------
+            if(quizScoreEl) quizScoreEl.textContent = 'Score: 0.00'; // <--- ADD THIS
             quizRestartBtn.onclick = runQuizGame;
             
             const totalQuestions = currentQuizQuestions.length;

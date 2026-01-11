@@ -425,39 +425,29 @@
 
         <div id="quiz-main-screen" class="hidden flex flex-col h-full">
     
-    <div class="flex items-center gap-3 mb-2 pt-2">
-        <div id="quiz-timer" class="flex-shrink-0 bg-gray-100 text-red-600 font-mono font-bold px-2 py-1 rounded text-sm border border-gray-200">
-            00:00
-        </div>
-
-        <div class="flex-grow bg-gray-200 rounded-full h-2">
-            <div id="quiz-progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-        </div>
-
-        <div id="quiz-question-number" class="flex-shrink-0 text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded border border-indigo-100">
-            1/10
-        </div>
-    </div>
-
     <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-2">
-        <h3 id="quiz-topic-name" class="text-sm font-semibold text-gray-700 truncate pr-2 max-w-[50%]">
+        <h3 id="quiz-topic-name" class="text-sm font-semibold text-gray-700 truncate pr-2 max-w-[30%]">
             Subject - Topic
         </h3>
 
-        <div class="flex items-center gap-3 text-xs font-bold">
-            <div class="flex items-center text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded" title="Correct">
+        <div id="quiz-score" class="text-xs font-bold text-white bg-indigo-600 px-4 py-1.5 rounded-full shadow-md mx-2 whitespace-nowrap">
+            Score: 0.00
+        </div>
+
+        <div class="flex items-center gap-2 text-xs font-bold flex-shrink-0">
+            <div class="flex items-center text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100" title="Correct">
                 <i class="fas fa-check mr-1"></i> <span id="quiz-live-correct">0</span>
             </div>
-            <div class="flex items-center text-red-500 bg-red-50 px-1.5 py-0.5 rounded" title="Wrong">
+            <div class="flex items-center text-red-500 bg-red-50 px-2 py-1 rounded border border-red-100" title="Wrong">
                 <i class="fas fa-times mr-1"></i> <span id="quiz-live-wrong">0</span>
             </div>
-            <div class="flex items-center text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded" title="Skipped">
+            <div class="flex items-center text-gray-500 bg-gray-100 px-2 py-1 rounded border border-gray-200" title="Skipped">
                 <i class="fas fa-forward mr-1"></i> <span id="quiz-live-skipped">0</span>
             </div>
-            <div id="quiz-score" class="hidden">Score: 0</div>
         </div>
     </div>
-
+	
+	
     <div id="quiz-question-area" class="flex-grow overflow-y-auto custom-scrollbar pr-1">
         <h2 id="quiz-question-text" class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-relaxed" oncontextmenu="return false;">
             Loading question...
