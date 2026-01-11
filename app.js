@@ -3689,7 +3689,16 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             // --- Button State Logic ---
             quizNextBtn.disabled = (q.userAnswer === null);
             quizSkipBtn.hidden = (q.userAnswer !== null);
-            quizPrevBtn.hidden = (currentQuizQuestionIndex === 0);
+            
+            // MODIFIED: Use visibility instead of hidden to keep the layout structure
+            // This ensures 'Next' stays on the right even if it's the only visible button
+            if (currentQuizQuestionIndex === 0) {
+                quizPrevBtn.classList.remove('hidden'); // Ensure display is not none
+                quizPrevBtn.style.visibility = 'hidden'; // Make invisible but keep space
+            } else {
+                quizPrevBtn.classList.remove('hidden');
+                quizPrevBtn.style.visibility = 'visible';
+            }
 
             // --- OPTIMIZED RENDERING ---
             const fragment = new DocumentFragment();
