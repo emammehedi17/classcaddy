@@ -3584,7 +3584,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          */
         function runQuizGame() {
 			currentQuizQuestionIndex = 0;
-			
+			currentQuizScore = 0;
             // 1. Hide Start Screen
             quizStartScreen.classList.add('hidden');
             quizStartScreen.style.display = 'none';
