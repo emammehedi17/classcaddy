@@ -5099,7 +5099,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 // ADDED shuffleArray HERE
 				currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({
 					question: mcq.question,
-					options: [...mcq.options],
+					options: getProcessedOptions(mcq.options),
 					correctAnswer: mcq.correctAnswer,
 					explanation: mcq.explanation || null,
 					note: mcq.note || null,
@@ -5346,7 +5346,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 // ADDED shuffleArray HERE
 				currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
 					question: mcq.question,
-					options: [...mcq.options],
+					options: getProcessedOptions(mcq.options),
 					correctAnswer: mcq.correctAnswer,
 					explanation: mcq.explanation || null,
 					note: mcq.note || null,
@@ -8022,7 +8022,7 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
     // ADDED shuffleArray HERE
 	currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
 		question: mcq.question,
-		options: [...mcq.options],
+		options: getProcessedOptions(mcq.options),
 		correctAnswer: mcq.correctAnswer,
 		explanation: mcq.explanation || null,
 		note: mcq.note || null,
@@ -8214,7 +8214,7 @@ if (viewMcqTestBtn) {
         // ADDED shuffleArray HERE
 		currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
 			question: mcq.question, 
-			options: [...mcq.options], 
+			options: getProcessedOptions(mcq.options), 
 			correctAnswer: mcq.correctAnswer, 
 			explanation: mcq.explanation || null, 
 			note: mcq.note || null, 
