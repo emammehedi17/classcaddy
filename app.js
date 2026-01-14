@@ -3605,20 +3605,27 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          * Resets state and starts the quiz game.
          */
         function runQuizGame() {
-            // --- FIX: Reset & Shuffle Questions for Retry ---
-            // This ensures previous answers are cleared when clicking "Try Again"
+            // --- FIX: Reset & Shuffle Questions AND Options for Retry ---
             if (currentQuizQuestions && currentQuizQuestions.length > 0) {
                 currentQuizQuestions.forEach(q => {
+                    // 1. Reset Answer State
                     q.userAnswer = null;
                     q.isCorrect = null;
+                    
+                    // 2. RESHUFFLE OPTIONS (The missing piece!)
+                    // This ensures options change position every time you restart
+                    if (q.options) {
+                        q.options = getProcessedOptions(q.options);
+                    }
                 });
-                // Shuffle the questions again for a fresh experience
+
+                // 3. Shuffle the order of questions
                 currentQuizQuestions = shuffleArray(currentQuizQuestions);
             }
             // ------------------------------------------------
 
             currentQuizQuestionIndex = 0;
-            currentQuizScore = 0; // Ensures score resets on retry
+            currentQuizScore = 0; 
 			
             // 1. Hide ALL other screens to prevent overlaps
             quizStartScreen.classList.add('hidden');
@@ -3638,7 +3645,6 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizMainScreen.classList.remove('hidden');
             quizMainScreen.style.display = 'block';
 
-            // --- ADD THESE LINES HERE ---
             const topicNameEl = document.getElementById('quiz-topic-name');
             if (topicNameEl && window.currentQuizSubjectInfo) {
                 const { subjectName, topicDetail } = window.currentQuizSubjectInfo;
@@ -3650,19 +3656,19 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const liveWrong = document.getElementById('quiz-live-wrong');
             const liveSkipped = document.getElementById('quiz-live-skipped');
             const progressBar = document.getElementById('quiz-progress-bar');
-            const quizScoreEl = document.getElementById('quiz-score'); // <--- ADD THIS
+            const quizScoreEl = document.getElementById('quiz-score'); 
 
             if(liveCorrect) liveCorrect.textContent = '0';
             if(liveWrong) liveWrong.textContent = '0';
             if(liveSkipped) liveSkipped.textContent = '0';
             if(progressBar) progressBar.style.width = '0%';
-            if(quizScoreEl) quizScoreEl.textContent = 'Score: 0.00'; // <--- ADD THIS
+            if(quizScoreEl) quizScoreEl.textContent = 'Score: 0.00'; 
+            
             quizRestartBtn.onclick = runQuizGame;
             
             const totalQuestions = currentQuizQuestions.length;
             
             // --- NEW TIMING LOGIC (EDITABLE SETTINGS) ---
-            // Use the global setting for time per question
             const totalTimeInSeconds = totalQuestions * quizSettings.timePerQuestion;
             // ------------------------
 
@@ -3672,6 +3678,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             
             quizQuestionArea.classList.remove('slide-in-right', 'slide-in-left');
         }
+		
 		
 		
 		function startTimer(totalSeconds) {
