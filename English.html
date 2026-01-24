@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Literary Periods & Authors</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #e74c3c;
+            --text-color: #333;
+            --bg-color: #ecf0f1;
+            --modal-bg: #fff;
+            --card-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .period-section {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .period-title {
+            color: var(--secondary-color);
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .period-date {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin-left: 10px;
+            font-weight: normal;
+        }
+
+        .authors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .author-card {
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            border: 1px solid #ddd;
+            font-weight: 600;
+        }
+
+        .author-card:hover {
+            transform: translateY(-3px);
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: var(--modal-bg);
+            padding: 2.5rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: var(--accent-color);
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 1rem;
+        }
+
+        .author-name {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+        }
+
+        .author-dates {
+            color: #666;
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        .info-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .info-section h3 {
+            color: var(--accent-color);
+            margin-bottom: 0.8rem;
+            font-size: 1.3rem;
+        }
+
+        .works-list, .quotes-list {
+            list-style-type: none;
+            padding-left: 10px;
+        }
+
+        .works-list li, .quotes-list li {
+            margin-bottom: 0.8rem;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+
+        .works-list li::before {
+            content: "📚";
+            position: absolute;
+            left: -10px;
+            color: var(--primary-color);
+        }
+
+        .quotes-list li::before {
+            content: "❝";
+            position: absolute;
+            left: -10px;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e1f5fe;
+            color: #2980b9;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .period-title { font-size: 1.5rem; }
+            .modal-content { width: 95%; padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1>Masterpieces of English Literature</h1>
+        <p>Explore the lives and works of 59 great authors across literary history</p>
+    </div>
+</header>
+
+<div class="container" id="periods-container">
+    <!-- Content will be injected by JavaScript -->
+</div>
+
+<!-- Modal Structure -->
+<div class="modal" id="authorModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div class="modal-header">
+            <h2 class="author-name" id="modalName">Author Name</h2>
+            <p class="author-dates" id="modalDates">1800 - 1850</p>
+            <div id="modalTags" style="margin-top: 10px;"></div>
+        </div>
+        
+        <div class="info-section">
+            <h3>Biography & Significance</h3>
+            <p id="modalBio">Biography content goes here...</p>
+        </div>
+
+        <div class="info-section">
+            <h3>Major Literary Works</h3>
+            <ul class="works-list" id="modalWorks">
+                <!-- Works will be injected here -->
+            </ul>
+        </div>
+
+        <div class="info-section">
+            <h3>Famous Quotes</h3>
+            <ul class="quotes-list" id="modalQuotes">
+                <!-- Quotes will be injected here -->
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Period Data
+    const periodsInfo = {
+        "Middle English Period": "1066 - 1500",
+        "The Renaissance": "1500 - 1660",
+        "Neoclassical Period": "1660 - 1798",
+        "The Romantic Period": "1798 - 1832",
+        "The Victorian Period": "1832 - 1901",
+        "The Modern Period": "1901 - 1939",
+        "Post-Modern Period": "1939 - Present",
+        "American Literature": "Various",
+        "Russian Literature": "Various",
+        "French Literature": "Various",
+        "African Literature": "Various"
+    };
+
+    // Author Data Database
+    const authorsData = [
+        // --- Middle English Period ---
+        {
+            name: "Geoffrey Chaucer",
+            period: "Middle English Period",
+            dates: "1343 - 1400",
+            tags: ["Father of English Literature", "Morning Star of Renaissance"],
+            bio: "The first great poet to write in English (Middle English). He captured the essence of 14th-century society.",
+            works: [
+                "<b>The Canterbury Tales</b>: Collection of stories told by pilgrims.",
+                "<b>Troilus and Criseyde</b>: Tragic romance.",
+                "<b>The House of Fame</b>: Dream vision.",
+                "<b>The Legend of Good Women</b>: Dream vision.",
+                "<b>Parliament of Fowls</b>: Dream vision."
+            ],
+            quotes: [
+                "He was a verray, parfit gentil knyght."
+            ]
+        },
+        {
+            name: "William Langland",
+            period: "Middle English Period",
+            dates: "1332 - 1386",
+            tags: ["Alliterative Verse", "Satire"],
+            bio: "A contemporary of Chaucer, known for his religious and social satire.",
+            works: [
+                "<b>Piers Plowman</b>: An allegorical dream vision exploring Christian life and social corruption."
+            ],
+            quotes: [
+                "Who is true to his word and works... is like to our Lord."
+            ]
+        },
+
+        // --- The Renaissance ---
+        {
+            name: "Edmund Spenser",
+            period: "The Renaissance",
+            dates: "1552 - 1599",
+            tags: ["Poets' Poet", "Spenserian Stanza"],
+            bio: "Celebrated as the 'Poets' Poet'. He innovated the Spenserian stanza and sonnet form.",
+            works: [
+                "<b>The Faerie Queene</b>: An epic allegory praising Queen Elizabeth I.",
+                "<b>The Shepheardes Calender</b>: Pastoral poetry.",
+                "<b>Amoretti</b>: Sonnet cycle.",
+                "<b>Epithalamion</b>: Marriage song.",
+                "<b>Prothalamion</b>: Spousal verse.",
+                "<b>Astrophel</b>: Elegy.",
+                "<b>The Ruins of Time</b>: Poem.",
+                "<b>Four Hymns</b>: Religious poems."
+            ],
+            quotes: [
+                "For there is nothing lost, that may be found, if sought.",
+                "One day I wrote her name upon the strand..."
+            ]
+        },
+        {
+            name: "Sir Philip Sidney",
+            period: "The Renaissance",
+            dates: "1554 - 1586",
+            tags: ["Courtier", "Critic", "Sonneteer"],
+            bio: "A soldier, poet, and courtier, representing the ideal Renaissance man.",
+            works: [
+                "<b>Astrophel and Stella</b>: The first English sonnet sequence.",
+                "<b>An Apology for Poetry</b>: A major work of literary criticism.",
+                "<b>Arcadia</b>: A pastoral romance."
+            ],
+            quotes: [
+                "Fool, said my Muse to me, look in thy heart, and write."
+            ]
+        },
+        {
+            name: "Thomas Kyd",
+            period: "The Renaissance",
+            dates: "1558 - 1594",
+            tags: ["University Wit", "Revenge Tragedy"],
+            bio: "A key figure in the development of Elizabethan drama, particularly the revenge tragedy genre.",
+            works: [
+                "<b>The Spanish Tragedy</b>: Established the genre of revenge tragedy, influencing Shakespeare's Hamlet.",
+                 "<b>Ur-Hamlet</b>: (Lost play)."
+            ],
+            quotes: [
+                "O eyes! no eyes, but fountains fraught with tears."
+            ]
+        },
+        {
+            name: "Christopher Marlowe",
+            period: "The Renaissance",
+            dates: "1564 - 1593",
+            tags: ["Father of English Tragedy", "University Wit", "Blank Verse"],
+            bio: "A contemporary of Shakespeare and the father of English tragedy. Known for his 'Mighty Line' (blank verse). Died young in a tavern brawl.",
+            works: [
+                "<b>Doctor Faustus</b>: Tragedy of a man selling his soul for power.",
+                "<b>The Jew of Malta</b>: Revenge tragedy.",
+                "<b>Tamburlaine the Great</b>: Historical tragedy.",
+                "<b>Edward II</b>: Historical tragedy.",
+                "<b>Dido, Queen of Carthage</b>: Tragedy.",
+                "<b>The Passionate Shepherd to His Love</b>: Lyric poem.",
+                "<b>Hero and Leander</b>: Narrative poem."
+            ],
+            quotes: [
+                "Was this the face that launched a thousand ships?",
+                "Sweet Helen, make me immortal with a kiss.",
+                "Come live with me and be my love."
+            ]
+        },
+        {
+            name: "William Shakespeare",
+            period: "The Renaissance",
+            dates: "1564 - 1616",
+            tags: ["Bard of Avon", "Playwright", "Poet"],
+            bio: "The greatest dramatist in English literature. He wrote 37 plays and 154 sonnets. His works explore human nature with profound depth.",
+            works: [
+                "<b>Hamlet</b>: Tragedy of a prince seeking revenge.",
+                "<b>Macbeth</b>: Tragedy of ambition and guilt.",
+                "<b>Othello</b>: Tragedy of jealousy and manipulation.",
+                "<b>King Lear</b>: Tragedy of age and folly.",
+                "<b>Romeo and Juliet</b>: Tragic romance.",
+                "<b>Julius Caesar</b>: Historical tragedy.",
+                "<b>Antony and Cleopatra</b>: Historical tragedy.",
+                "<b>The Tempest</b>: His swan song (Romance).",
+                "<b>As You Like It</b>: Comedy.",
+                "<b>Twelfth Night</b>: Comedy.",
+                "<b>A Midsummer Night's Dream</b>: Comedy.",
+                "<b>The Merchant of Venice</b>: Tragi-comedy.",
+                "<b>Measure for Measure</b>: Dark comedy.",
+                "<b>Sonnets</b>: 154 sonnets."
+            ],
+            quotes: [
+                "To be or not to be, that is the question.",
+                "All the world's a stage.",
+                "Cowards die many times before their deaths."
+            ]
+        },
+        {
+            name: "Ben Jonson",
+            period: "The Renaissance",
+            dates: "1572 - 1637",
+            tags: ["Comedy of Humours", "Realism", "First Poet Laureate (Unofficial)"],
+            bio: "Famous for his satirical plays and 'Comedy of Humours'. He was a friend and rival of Shakespeare.",
+            works: [
+                "<b>Volpone</b>: A satire on greed.",
+                "<b>The Alchemist</b>: Comedy about fraud.",
+                "<b>Every Man in His Humour</b>: Introduced comedy of humours.",
+                "<b>Every Man Out of His Humour</b>: Comedy.",
+                "<b>The Silent Woman (Epicoene)</b>: Comedy.",
+                "<b>Sejanus His Fall</b>: Tragedy.",
+                "<b>Catiline His Conspiracy</b>: Tragedy."
+            ],
+            quotes: [
+                "He was not of an age, but for all time! (About Shakespeare)",
+                "Drink to me only with thine eyes.",
+                "Language most shows a man: Speak, that I may see thee."
+            ]
+        },
+        {
+            name: "John Donne",
+            period: "The Renaissance",
+            dates: "1572 - 1631",
+            tags: ["Metaphysical Poet", "Conceit", "Wit"],
+            bio: "The leader of the Metaphysical poets, known for his intellectual wit and unique conceits in love and religious poetry.",
+            works: [
+                "<b>The Sun Rising</b>: Love poem challenging the sun.",
+                "<b>The Good Morrow</b>: Spiritual awakening in love.",
+                "<b>A Valediction: Forbidding Mourning</b>: Compares lovers to a compass.",
+                "<b>The Canonization</b>: Love poem.",
+                "<b>The Flea</b>: Witty love poem.",
+                "<b>Holy Sonnets</b>: Religious sonnets (Death, be not proud).",
+                "<b>Devotions upon Emergent Occasions</b>: Prose ('No man is an island')."
+            ],
+            quotes: [
+                "No man is an island.",
+                "For God's sake hold your tongue, and let me love.",
+                "Death, be not proud."
+            ]
+        },
+        {
+            name: "Francis Bacon",
+            period: "The Renaissance",
+            dates: "1561 - 1626",
+            tags: ["Father of English Essay", "Empiricism"],
+            bio: "The father of the English essay and modern prose. His style is aphoristic and practical.",
+            works: [
+                "<b>Of Studies</b>: On the benefits of reading.",
+                "<b>Of Truth</b>: On the nature of truth and lies.",
+                "<b>Of Marriage and Single Life</b>: Essay.",
+                "<b>Of Revenge</b>: Essay.",
+                "<b>Of Friendship</b>: Essay.",
+                "<b>Of Love</b>: Essay.",
+                "<b>Novum Organum</b>: Scientific philosophy.",
+                "<b>The New Atlantis</b>: Utopian fiction."
+            ],
+            quotes: [
+                "Knowledge is power.",
+                "Reading maketh a full man; conference a ready man; and writing an exact man."
+            ]
+        },
+         {
+            name: "John Webster",
+            period: "The Renaissance",
+            dates: "1580 - 1632",
+            tags: ["Dark Tragedy", "Jacobean Dramatist"],
+            bio: "Known for his dark, macabre tragedies that explore the depths of human evil.",
+            works: [
+                "<b>The Duchess of Malfi</b>: A revenge tragedy about a noblewoman who marries beneath her class.",
+                "<b>The White Devil</b>: A tragedy based on real events in Italy."
+            ],
+            quotes: [
+                "Cover her face; mine eyes dazzle: she died young."
+            ]
+        },
+
+        // --- Neoclassical Period ---
+        {
+            name: "John Milton",
+            period: "Neoclassical Period",
+            dates: "1608 - 1674",
+            tags: ["Epic Poet", "Blind Poet", "Puritan"],
+            bio: "The great epic poet who wrote his masterpiece while blind. He justified the ways of God to men.",
+            works: [
+                "<b>Paradise Lost</b>: Epic about the Fall of Man.",
+                "<b>Paradise Regained</b>: Sequel to Paradise Lost.",
+                "<b>Samson Agonistes</b>: Poetic drama.",
+                "<b>Lycidas</b>: Pastoral elegy.",
+                "<b>Areopagitica</b>: Defense of free speech.",
+                "<b>On His Blindness</b>: Sonnet."
+            ],
+            quotes: [
+                "Better to reign in hell, than serve in heaven.",
+                "They also serve who only stand and wait."
+            ]
+        },
+        {
+            name: "John Bunyan",
+            period: "Neoclassical Period",
+            dates: "1628 - 1688",
+            tags: ["Allegory", "Puritan Preacher"],
+            bio: "A Puritan preacher who wrote one of the most famous Christian allegories while imprisoned.",
+            works: [
+                "<b>The Pilgrim's Progress</b>: Allegory of a Christian's journey to the Celestial City.",
+                "<b>The Life and Death of Mr. Badman</b>: Allegory.",
+                "<b>Grace Abounding to the Chief of Sinners</b>: Autobiography."
+            ],
+            quotes: [
+                "He who would valiant be 'gainst all disaster, let him in constancy follow the Master."
+            ]
+        },
+        {
+            name: "John Dryden",
+            period: "Neoclassical Period",
+            dates: "1631 - 1700",
+            tags: ["Father of Modern Criticism", "First Poet Laureate"],
+            bio: "Dominated the Restoration period. He established the heroic couplet and modern prose style.",
+            works: [
+                "<b>All for Love</b>: Tragedy based on Antony and Cleopatra.",
+                "<b>Absalom and Achitophel</b>: Political satire.",
+                "<b>Mac Flecknoe</b>: Mock-heroic satire.",
+                "<b>Essay of Dramatic Poesy</b>: Literary criticism."
+            ],
+            quotes: [
+                "Errors, like straws, upon the surface flow.",
+                "He who would search for pearls must dive below."
+            ]
+        },
+        {
+            name: "William Congreve",
+            period: "Neoclassical Period",
+            dates: "1670 - 1729",
+            tags: ["Comedy of Manners", "Wit"],
+            bio: "The master of Restoration Comedy of Manners, known for his brilliant wit and satire of high society.",
+            works: [
+                "<b>The Way of the World</b>: His masterpiece comedy.",
+                "<b>Love for Love</b>: Popular comedy.",
+                "<b>The Mourning Bride</b>: His only tragedy.",
+                "<b>The Old Bachelor</b>: Comedy.",
+                "<b>The Double Dealer</b>: Comedy."
+            ],
+            quotes: [
+                "Music has charms to soothe a savage breast.",
+                "Hell has no fury like a woman scorned."
+            ]
+        },
+        {
+            name: "Alexander Pope",
+            period: "Neoclassical Period",
+            dates: "1688 - 1744",
+            tags: ["Mock Heroic Poet", "Satirist", "Heroic Couplet"],
+            bio: "The greatest poet of the 18th century, famous for his satirical verse and mastery of the heroic couplet.",
+            works: [
+                "<b>The Rape of the Lock</b>: Mock-heroic epic.",
+                "<b>An Essay on Man</b>: Philosophical poem.",
+                "<b>An Essay on Criticism</b>: Literary criticism in verse.",
+                "<b>The Dunciad</b>: Satire.",
+                "<b>Epistle to Dr. Arbuthnot</b>: Satire.",
+                "<b>Translation of Homer</b>: Iliad and Odyssey."
+            ],
+            quotes: [
+                "A little learning is a dangerous thing.",
+                "To err is human, to forgive divine.",
+                "Fools rush in where angels fear to tread."
+            ]
+        },
+        {
+            name: "Jonathan Swift",
+            period: "Neoclassical Period",
+            dates: "1667 - 1745",
+            tags: ["Greatest Satirist", "Misanthrope"],
+            bio: "The greatest prose satirist in English literature. He used irony to criticize human folly and corruption.",
+            works: [
+                "<b>Gulliver's Travels</b>: Satire on human nature and travelogues.",
+                "<b>A Tale of a Tub</b>: Religious satire.",
+                "<b>The Battle of the Books</b>: Mock-heroic satire.",
+                "<b>A Modest Proposal</b>: Political satire.",
+                "<b>A Journal to Stella</b>: Personal letters."
+            ],
+            quotes: [
+                "May you live all the days of your life.",
+                "We have just enough religion to make us hate, but not enough to make us love."
+            ]
+        },
+        {
+            name: "Daniel Defoe",
+            period: "Neoclassical Period",
+            dates: "1660 - 1731",
+            tags: ["Father of English Novel", "Realism"],
+            bio: "Pioneer of the English novel, known for his realistic fiction and journalistic style.",
+            works: [
+                "<b>Robinson Crusoe</b>: First realistic English novel.",
+                "<b>Moll Flanders</b>: Picaresque novel.",
+                "<b>A Journal of the Plague Year</b>: Historical fiction.",
+                "<b>Colonel Jack</b>: Novel.",
+                "<b>Captain Singleton</b>: Novel.",
+                "<b>The True-Born Englishman</b>: Satirical poem."
+            ],
+            quotes: [
+                "He is not poor that has little, but that desire much.",
+                "The fear of danger is ten thousand times more terrifying than danger itself."
+            ]
+        },
+        {
+            name: "Henry Fielding",
+            period: "Neoclassical Period",
+            dates: "1707 - 1754",
+            tags: ["Father of English Novel", "Picaresque"],
+            bio: "A key figure in the development of the English novel. He wrote the first 'comic epic in prose'.",
+            works: [
+                "<b>Tom Jones</b>: His masterpiece picaresque novel.",
+                "<b>Joseph Andrews</b>: Satire/Parody of Richardson's Pamela.",
+                "<b>Amelia</b>: Social novel.",
+                "<b>Jonathan Wild</b>: Satirical novel.",
+                "<b>Tom Thumb</b>: Satirical play."
+            ],
+            quotes: [
+                "Love and scandal are the best sweeteners of tea.",
+                "Adversity is the trial of principle."
+            ]
+        },
+        {
+            name: "Thomas Gray",
+            period: "Neoclassical Period",
+            dates: "1716 - 1771",
+            tags: ["Graveyard Poet", "Elegy"],
+            bio: "A precursor to Romanticism, known for his melancholic and reflective poetry.",
+            works: [
+                "<b>Elegy Written in a Country Churchyard</b>: Masterpiece on mortality.",
+                "<b>Ode on a Distant Prospect of Eton College</b>: Poem.",
+                "<b>Ode on the Death of a Favourite Cat</b>: Mock-elegy.",
+                "<b>The Bard</b>: Pindaric ode.",
+                "<b>The Progress of Poesy</b>: Pindaric ode."
+            ],
+            quotes: [
+                "The paths of glory lead but to the grave.",
+                "Where ignorance is bliss, 'tis folly to be wise.",
+                "Full many a flower is born to blush unseen."
+            ]
+        },
+        {
+            name: "Dr. Samuel Johnson",
+            period: "Neoclassical Period",
+            dates: "1709 - 1784",
+            tags: ["Lexicographer", "Critic", "Father of Dictionary"],
+            bio: "The dominant literary figure of his age. He compiled the first comprehensive English dictionary.",
+            works: [
+                "<b>A Dictionary of the English Language</b>: First major English dictionary.",
+                "<b>Preface to Shakespeare</b>: Literary criticism.",
+                "<b>Rasselas</b>: Philosophical novel.",
+                "<b>Lives of the English Poets</b>: Biographical criticism.",
+                "<b>The Vanity of Human Wishes</b>: Poem."
+            ],
+            quotes: [
+                "Patriotism is the last refuge of a scoundrel.",
+                "Example is always more efficacious than precept."
+            ]
+        },
+        {
+            name: "Edmund Burke",
+            period: "Neoclassical Period",
+            dates: "1729 - 1797",
+            tags: ["Orator", "Father of Modern Conservatism"],
+            bio: "Statesman and philosopher, known for his powerful oratory and criticism of the French Revolution.",
+            works: [
+                "<b>Reflections on the Revolution in France</b>: Critique of radicalism.",
+                "<b>Speech on Conciliation with America</b>.",
+                "<b>Speech on East India Bill</b>.",
+                "<b>A Philosophical Enquiry into... the Sublime and Beautiful</b>: Aesthetics."
+            ],
+            quotes: [
+                "The greater the power, the more dangerous the abuse.",
+                "Superstition is the religion of feeble minds.",
+                "Example is the school of mankind."
+            ]
+        },
+
+        // --- The Romantic Period ---
+        {
+            name: "William Blake",
+            period: "The Romantic Period",
+            dates: "1757 - 1827",
+            tags: ["Visionary", "Poet & Painter", "Mystic"],
+            bio: "A visionary poet and artist who rebelled against rationalism. His works explore the duality of the human soul.",
+            works: [
+                "<b>Songs of Innocence</b>: Poems on childhood purity (The Lamb).",
+                "<b>Songs of Experience</b>: Poems on adult corruption (The Tyger).",
+                "<b>The Marriage of Heaven and Hell</b>: Prophetic prose/verse.",
+                "<b>Milton</b>: Prophetic book.",
+                "<b>Jerusalem</b>: Prophetic book."
+            ],
+            quotes: [
+                "Tyger Tyger, burning bright.",
+                "The road of excess leads to the palace of wisdom."
+            ]
+        },
+        {
+            name: "William Wordsworth",
+            period: "The Romantic Period",
+            dates: "1770 - 1850",
+            tags: ["Poet of Nature", "Lake Poet", "Pantheism"],
+            bio: "Pioneer of the Romantic movement with Coleridge. He saw nature as a living teacher and healer.",
+            works: [
+                "<b>Lyrical Ballads</b>: Launched Romanticism (with Coleridge).",
+                "<b>The Prelude</b>: Autobiographical epic.",
+                "<b>Daffodils (I Wandered Lonely as a Cloud)</b>: Famous nature poem.",
+                "<b>Tintern Abbey</b>: Philosophical reflection on nature.",
+                "<b>The Solitary Reaper</b>: Lyrical ballad.",
+                "<b>Ode: Intimations of Immortality</b>: Ode.",
+                "<b>Lucy Poems</b>: Series of poems."
+            ],
+            quotes: [
+                "Child is the father of man.",
+                "Nature never did betray the heart that loved her.",
+                "Poetry is the spontaneous overflow of powerful feelings."
+            ]
+        },
+        {
+            name: "S.T. Coleridge",
+            period: "The Romantic Period",
+            dates: "1772 - 1834",
+            tags: ["Supernaturalism", "Opium Eater", "Lake Poet"],
+            bio: "Co-founder of Romanticism. Known for introducing supernatural elements and mystery into poetry.",
+            works: [
+                "<b>The Rime of the Ancient Mariner</b>: Ballad of sin and redemption.",
+                "<b>Kubla Khan</b>: Dream fragment.",
+                "<b>Christabel</b>: Unfinished supernatural poem.",
+                "<b>Biographia Literaria</b>: Literary criticism.",
+                "<b>Dejection: An Ode</b>: Personal ode."
+            ],
+            quotes: [
+                "Water, water, everywhere, nor any drop to drink.",
+                "He prayeth best, who loveth best all things both great and small."
+            ]
+        },
+        {
+            name: "Sir Walter Scott",
+            period: "The Romantic Period",
+            dates: "1771 - 1832",
+            tags: ["Father of Historical Novel", "Wizard of the North"],
+            bio: "Popularized the historical novel. His works blended history with romance and adventure.",
+            works: [
+                "<b>Ivanhoe</b>: Medieval romance.",
+                "<b>Waverley</b>: First historical novel.",
+                "<b>Kenilworth</b>: Historical novel.",
+                "<b>The Talisman</b>: Novel about Crusades.",
+                "<b>The Lady of the Lake</b>: Narrative poem.",
+                "<b>The Lay of the Last Minstrel</b>: Narrative poem.",
+                "<b>Marmion</b>: Narrative poem."
+            ],
+            quotes: [
+                "Breathes there the man, with soul so dead...",
+                "Oh, what a tangled web we weave."
+            ]
+        },
+        {
+            name: "Jane Austen",
+            period: "The Romantic Period",
+            dates: "1775 - 1817",
+            tags: ["Anti-romantic", "Domestic Novel", "Irony"],
+            bio: "Wrote about the domestic lives of the gentry with wit and irony, focusing on marriage and social status.",
+            works: [
+                "<b>Pride and Prejudice</b>: Elizabeth Bennet & Mr. Darcy.",
+                "<b>Sense and Sensibility</b>: Logic vs Emotion.",
+                "<b>Emma</b>: A matchmaking heroine.",
+                "<b>Mansfield Park</b>: Novel.",
+                "<b>Persuasion</b>: Novel.",
+                "<b>Northanger Abbey</b>: Gothic parody."
+            ],
+            quotes: [
+                "It is a truth universally acknowledged...",
+                "A lady's imagination is very rapid."
+            ]
+        },
+        {
+            name: "Lord Byron",
+            period: "The Romantic Period",
+            dates: "1788 - 1824",
+            tags: ["Rebel Poet", "Byronic Hero", "Satirist"],
+            bio: "Famous for his flamboyant lifestyle and creation of the 'Byronic Hero'. A fierce satirist and romantic.",
+            works: [
+                "<b>Don Juan</b>: Epic satire.",
+                "<b>Childe Harold's Pilgrimage</b>: Travel narrative.",
+                "<b>The Vision of Judgement</b>: Satire.",
+                "<b>She Walks in Beauty</b>: Lyrical poem."
+            ],
+            quotes: [
+                "Man's love is of man's life a thing apart, 'tis woman's whole existence.",
+                "I awoke one morning and found myself famous."
+            ]
+        },
+        {
+            name: "P.B. Shelley",
+            period: "The Romantic Period",
+            dates: "1792 - 1822",
+            tags: ["Revolutionary Poet", "Poet of Hope", "Lyrical"],
+            bio: "A rebel poet who wrote against tyranny and oppression. He was a master of lyrical poetry.",
+            works: [
+                "<b>Ode to the West Wind</b>: Poem of revolution and rebirth.",
+                "<b>To a Skylark</b>: Praise of pure joy.",
+                "<b>Ozymandias</b>: Sonnet on vanity of power.",
+                "<b>Adonais</b>: Elegy for Keats.",
+                "<b>Prometheus Unbound</b>: Lyrical drama.",
+                "<b>The Cenci</b>: Tragedy.",
+                "<b>A Defence of Poetry</b>: Essay."
+            ],
+            quotes: [
+                "If Winter comes, can Spring be far behind?",
+                "Our sweetest songs are those that tell of saddest thought."
+            ]
+        },
+        {
+            name: "John Keats",
+            period: "The Romantic Period",
+            dates: "1795 - 1821",
+            tags: ["Poet of Beauty", "Sensuousness", "Negative Capability"],
+            bio: "The youngest Romantic poet, known for his sensual imagery and odes. He died tragically young of TB.",
+            works: [
+                "<b>Ode to a Nightingale</b>: On mortality and art.",
+                "<b>Ode on a Grecian Urn</b>: On eternal beauty.",
+                "<b>Ode to Autumn</b>: Celebration of nature.",
+                "<b>Endymion</b>: Poetic romance.",
+                "<b>Hyperion</b>: Epic fragment.",
+                "<b>Isabella</b>: Narrative poem."
+            ],
+            quotes: [
+                "A thing of beauty is a joy forever.",
+                "Beauty is truth, truth beauty.",
+                "Heard melodies are sweet, but those unheard are sweeter."
+            ]
+        },
+
+        // --- The Victorian Period ---
+        {
+            name: "Alfred, Lord Tennyson",
+            period: "The Victorian Period",
+            dates: "1809 - 1892",
+            tags: ["Poet Laureate", "Representative Poet"],
+            bio: "The most representative poet of the Victorian age. Known for his musical verse and melancholic tone.",
+            works: [
+                "<b>In Memoriam</b>: Elegy for Arthur Hallam.",
+                "<b>Ulysses</b>: Dramatic monologue.",
+                "<b>The Lady of Shalott</b>: Arthurian ballad.",
+                "<b>The Lotos-Eaters</b>: Poem.",
+                "<b>Locksley Hall</b>: Poem."
+            ],
+            quotes: [
+                "Tis better to have loved and lost than never to have loved at all.",
+                "To strive, to seek, to find, and not to yield."
+            ]
+        },
+        {
+            name: "William Makepeace Thackeray",
+            period: "The Victorian Period",
+            dates: "1811 - 1863",
+            tags: ["Satirist", "Rival of Dickens"],
+            bio: "Born in Calcutta. Known for his satirical works portraying the vanity and snobbery of British society.",
+            works: [
+                "<b>Vanity Fair</b>: A novel without a hero (Becky Sharp).",
+                "<b>The History of Henry Esmond</b>: Historical novel.",
+                "<b>The Newcomes</b>: Family saga.",
+                "<b>The Virginians</b>: Sequel to Henry Esmond.",
+                "<b>Barry Lyndon</b>: Picaresque novel.",
+                "<b>The Book of Snobs</b>: Satire."
+            ],
+            quotes: [
+                "The world is a looking-glass.",
+                "Which of us is happy in this world?"
+            ]
+        },
+        {
+            name: "Charles Dickens",
+            period: "The Victorian Period",
+            dates: "1812 - 1870",
+            tags: ["Greatest Victorian Novelist", "Social Critic"],
+            bio: "The most popular novelist of his era. He critiqued social injustice, poverty, and class stratification.",
+            works: [
+                "<b>David Copperfield</b>: Autobiographical novel.",
+                "<b>Oliver Twist</b>: Critique of the workhouse.",
+                "<b>A Tale of Two Cities</b>: Historical novel (French Revolution).",
+                "<b>Great Expectations</b>: Pip's journey.",
+                "<b>A Christmas Carol</b>: Novella.",
+                "<b>Hard Times</b>: Social satire.",
+                "<b>The Pickwick Papers</b>: First novel."
+            ],
+            quotes: [
+                "It was the best of times, it was the worst of times.",
+                "Charity begins at home.",
+                "Please, sir, I want some more."
+            ]
+        },
+        {
+            name: "Robert Browning",
+            period: "The Victorian Period",
+            dates: "1812 - 1889",
+            tags: ["Dramatic Monologue", "Optimist"],
+            bio: "Master of the dramatic monologue. Known for his psychological insight and optimism.",
+            works: [
+                "<b>My Last Duchess</b>: Study of a possessive duke.",
+                "<b>The Patriot</b>: Politics and fickleness.",
+                "<b>Andrea del Sarto</b>: The faultless painter.",
+                "<b>The Pied Piper of Hamelin</b>: Children's poem.",
+                "<b>Rabbi Ben Ezra</b>: Philosophical poem.",
+                "<b>Fra Lippo Lippi</b>: Dramatic monologue."
+            ],
+            quotes: [
+                "God is in His Heaven, All's right with the world!",
+                "I gave commands; Then all smiles stopped together."
+            ]
+        },
+        {
+            name: "George Eliot",
+            period: "The Victorian Period",
+            dates: "1819 - 1880",
+            tags: ["Psychological Novelist", "Realism"],
+            bio: "Pen name of Mary Ann Evans. Known for her realism and psychological depth in rural settings.",
+            works: [
+                "<b>Silas Marner</b>: The weaver of Raveloe.",
+                "<b>Middlemarch</b>: Study of provincial life.",
+                "<b>The Mill on the Floss</b>: Tragic sibling bond.",
+                "<b>Adam Bede</b>: Novel.",
+                "<b>Daniel Deronda</b>: Novel."
+            ],
+            quotes: [
+                "Don't judge a book by its cover.",
+                "It is never too late to be what you might have been."
+            ]
+        },
+        {
+            name: "Matthew Arnold",
+            period: "The Victorian Period",
+            dates: "1822 - 1888",
+            tags: ["Critic", "Melancholic Poet"],
+            bio: "A poet and cultural critic who wrote about the isolation of modern life and the loss of faith.",
+            works: [
+                "<b>Dover Beach</b>: A poem about the loss of religious faith.",
+                "<b>The Scholar Gipsy</b>: About a student who leaves Oxford for a gypsy life.",
+                "<b>Sohrab and Rustum</b>: Narrative poem.",
+                "<b>Thyrsis</b>: Elegy.",
+                "<b>Culture and Anarchy</b>: Social criticism."
+            ],
+            quotes: [
+                "Poetry is a criticism of life."
+            ]
+        },
+        {
+            name: "Thomas Hardy",
+            period: "The Victorian Period",
+            dates: "1840 - 1928",
+            tags: ["Pessimist", "Regional Novelist (Wessex)"],
+            bio: "A novelist and poet who portrayed characters struggling against fate and nature in the fictional Wessex.",
+            works: [
+                "<b>Tess of the d'Urbervilles</b>: Tragedy of a pure woman.",
+                "<b>Far from the Madding Crowd</b>: Pastoral novel.",
+                "<b>The Mayor of Casterbridge</b>: Character is fate.",
+                "<b>Jude the Obscure</b>: Tragic novel.",
+                "<b>The Return of the Native</b>: Novel."
+            ],
+            quotes: [
+                "Happiness was but the occasional episode in a general drama of pain.",
+                "The President of the Immortals had ended his sport with Tess."
+            ]
+        },
+        {
+            name: "Robert Louis Stevenson",
+            period: "The Victorian Period",
+            dates: "1850 - 1894",
+            tags: ["Adventure", "Storyteller (Tusitala)"],
+            bio: "Scottish author known for adventure novels and exploring the duality of human nature.",
+            works: [
+                "<b>Treasure Island</b>: Pirate adventure.",
+                "<b>The Strange Case of Dr. Jekyll and Mr. Hyde</b>: Psychological thriller.",
+                "<b>Kidnapped</b>: Historical adventure.",
+                "<b>A Child's Garden of Verses</b>: Poetry."
+            ],
+            quotes: [
+                "To travel hopefully is a better thing than to arrive.",
+                "Man is not truly one, but truly two."
+            ]
+        },
+        {
+            name: "Oscar Wilde",
+            period: "The Victorian Period",
+            dates: "1854 - 1900",
+            tags: ["Aestheticism", "Wit", "Satire"],
+            bio: "Irish playwright and poet known for his biting wit, flamboyant style, and imprisonment.",
+            works: [
+                "<b>The Picture of Dorian Gray</b>: Novel about vanity and sin.",
+                "<b>The Importance of Being Earnest</b>: Masterpiece comedy.",
+                "<b>Lady Windermere's Fan</b>: Comedy.",
+                "<b>The Happy Prince</b>: Fairy tale.",
+                "<b>The Selfish Giant</b>: Fairy tale."
+            ],
+            quotes: [
+                "I can resist everything except temptation.",
+                "All art is quite useless."
+            ]
+        },
+
+        // --- The Modern Period ---
+        {
+            name: "G.B. Shaw",
+            period: "The Modern Period",
+            dates: "1856 - 1950",
+            tags: ["Father of Modern Drama", "Iconoclast", "Nobel & Oscar"],
+            bio: "The greatest modern playwright. Used drama to discuss social issues and ideas.",
+            works: [
+                "<b>Arms and the Man</b>: Anti-romantic comedy.",
+                "<b>Man and Superman</b>: Philosophy of Life Force.",
+                "<b>Pygmalion</b>: Social mobility and language.",
+                "<b>Caesar and Cleopatra</b>: Historical play.",
+                "<b>Saint Joan</b>: Historical play."
+            ],
+            quotes: [
+                "God is on the side of big battalions.",
+                "There are two tragedies in life. One is not to get your heart's desire. The other is to get it."
+            ]
+        },
+        {
+            name: "Joseph Conrad",
+            period: "The Modern Period",
+            dates: "1857 - 1924",
+            tags: ["Mariner", "Psychological Realism"],
+            bio: "Polish-British writer known for his sea stories and exploration of the human psyche.",
+            works: [
+                "<b>Heart of Darkness</b>: Critique of imperialism in Congo.",
+                "<b>Lord Jim</b>: Tale of guilt and redemption."
+            ],
+            quotes: [
+                "The horror! The horror!"
+            ]
+        },
+        {
+            name: "Rudyard Kipling",
+            period: "The Modern Period",
+            dates: "1865 - 1936",
+            tags: ["Imperialism", "Short Story", "Nobel Laureate"],
+            bio: "Born in India. Famous for stories and poems about British soldiers in India and children's tales.",
+            works: [
+                "<b>The Jungle Book</b>: Mowgli's stories.",
+                "<b>Kim</b>: Spy novel in India.",
+                "<b>Just So Stories</b>: Children's stories.",
+                "<b>Plain Tales from the Hills</b>: Short stories.",
+                "<b>If—</b>: Inspirational poem.",
+                "<b>Gunga Din</b>: Poem.",
+                "<b>The White Man's Burden</b>: Poem."
+            ],
+            quotes: [
+                "East is East, and West is West.",
+                "If you can keep your head when all about you are losing theirs..."
+            ]
+        },
+        {
+            name: "W.B. Yeats",
+            period: "The Modern Period",
+            dates: "1865 - 1939",
+            tags: ["Irish National Poet", "Symbolism"],
+            bio: "Key figure in the Irish Literary Revival. His poetry evolved from romanticism to hard-edged modernism.",
+            works: [
+                "<b>The Second Coming</b>: Apocalyptic vision.",
+                "<b>Sailing to Byzantium</b>: Art vs. Mortality.",
+                "<b>The Lake Isle of Innisfree</b>: Nature lyric.",
+                "<b>Easter 1916</b>: Political poem.",
+                "<b>No Second Troy</b>: Poem about Maud Gonne."
+            ],
+            quotes: [
+                "Things fall apart; the centre cannot hold.",
+                "A terrible beauty is born."
+            ]
+        },
+        {
+            name: "H.G. Wells",
+            period: "The Modern Period",
+            dates: "1866 - 1946",
+            tags: ["Father of Sci-Fi", "Futurist"],
+            bio: "Prolific writer in many genres, but best known as a father of science fiction.",
+            works: [
+                "<b>The Time Machine</b>: Time travel.",
+                "<b>The Invisible Man</b>: Science gone wrong.",
+                "<b>The War of the Worlds</b>: Alien invasion.",
+                "<b>The First Men in the Moon</b>: Sci-Fi.",
+                "<b>A Short History of the World</b>: History."
+            ],
+            quotes: [
+                "History is a race between education and catastrophe."
+            ]
+        },
+        {
+            name: "Bertrand Russell",
+            period: "The Modern Period",
+            dates: "1872 - 1970",
+            tags: ["Philosopher", "Logician", "Nobel Prize"],
+            bio: "A polymath who wrote on philosophy, logic, mathematics, and social issues. A prominent anti-war activist.",
+            works: [
+                "<b>A History of Western Philosophy</b>: Comprehensive overview.",
+                "<b>The Conquest of Happiness</b>: Self-help.",
+                "<b>Marriage and Morals</b>: Controversial social views.",
+                "<b>The Problems of Philosophy</b>: Philosophy.",
+                "<b>Why I Am Not a Christian</b>: Essay collection."
+            ],
+            quotes: [
+                "War does not determine who is right - only who is left."
+            ]
+        },
+        {
+            name: "W. Somerset Maugham",
+            period: "The Modern Period",
+            dates: "1874 - 1965",
+            tags: ["Storyteller", "Realism"],
+            bio: "A playwright, novelist, and short story writer. Known for his clear style and understanding of human nature.",
+            works: [
+                "<b>Of Human Bondage</b>: Semi-autobiographical masterpiece.",
+                "<b>The Moon and Sixpence</b>: Based on Paul Gauguin.",
+                "<b>The Razor's Edge</b>: Spiritual quest.",
+                "<b>Cakes and Ale</b>: Satire.",
+                "<b>The Luncheon</b>: Humorous short story."
+            ],
+            quotes: [
+                "Money is like a sixth sense without which you cannot make a complete use of the other five."
+            ]
+        },
+        {
+            name: "E.M. Forster",
+            period: "The Modern Period",
+            dates: "1879 - 1970",
+            tags: ["Humanism", "Social Critic"],
+            bio: "Examined class difference and hypocrisy in early 20th-century British society. Associated with Bloomsbury Group.",
+            works: [
+                "<b>A Passage to India</b>: Clash of cultures.",
+                "<b>A Room with a View</b>: Romance and social critique.",
+                "<b>Howards End</b>: 'Only connect'.",
+                "<b>Where Angels Fear to Tread</b>: Novel.",
+                "<b>Aspects of the Novel</b>: Literary criticism."
+            ],
+            quotes: [
+                "Only connect!",
+                "Death destroys a man: the idea of Death saves him."
+            ]
+        },
+        {
+            name: "James Joyce",
+            period: "The Modern Period",
+            dates: "1882 - 1941",
+            tags: ["Stream of Consciousness", "Modernist"],
+            bio: "Irish writer who revolutionized the novel with his experimental use of language and stream of consciousness.",
+            works: [
+                "<b>Ulysses</b>: A day in the life of Leopold Bloom.",
+                "<b>A Portrait of the Artist as a Young Man</b>: Semi-autobiographical.",
+                "<b>Dubliners</b>: Short stories.",
+                "<b>Finnegans Wake</b>: Complex novel."
+            ],
+            quotes: [
+                "History is a nightmare from which I am trying to awake."
+            ]
+        },
+        {
+            name: "Virginia Woolf",
+            period: "The Modern Period",
+            dates: "1882 - 1941",
+            tags: ["Stream of Consciousness", "Feminist"],
+            bio: "Central figure of the Bloomsbury Group. Pioneer of stream of consciousness and feminist criticism.",
+            works: [
+                "<b>Mrs. Dalloway</b>: One day in a woman's life.",
+                "<b>To the Lighthouse</b>: Family dynamics and time.",
+                "<b>A Room of One's Own</b>: Feminist essay.",
+                "<b>The Waves</b>: Experimental novel.",
+                "<b>Orlando</b>: Novel."
+            ],
+            quotes: [
+                "A woman must have money and a room of her own if she is to write fiction."
+            ]
+        },
+        {
+            name: "D.H. Lawrence",
+            period: "The Modern Period",
+            dates: "1885 - 1930",
+            tags: ["Psychology", "Instinct", "Controversial"],
+            bio: "Explored the dehumanizing effects of modernity and industrialization on human relationships and sexuality.",
+            works: [
+                "<b>Sons and Lovers</b>: Oedipus complex.",
+                "<b>Lady Chatterley's Lover</b>: Class and sexuality.",
+                "<b>The Rainbow</b>: Family saga.",
+                "<b>Women in Love</b>: Sequel to The Rainbow.",
+                "<b>Snake</b>: Poem."
+            ],
+            quotes: [
+                "Trust the tale, not the teller.",
+                "Be a good animal, true to your animal instincts."
+            ]
+        },
+        {
+            name: "T.S. Eliot",
+            period: "The Modern Period",
+            dates: "1888 - 1965",
+            tags: ["Modernist", "Critic", "Objective Correlative"],
+            bio: "A dominant figure in modern poetry and criticism. Portrayed the disillusionment of the post-war generation.",
+            works: [
+                "<b>The Waste Land</b>: Epic of modern decay.",
+                "<b>The Love Song of J. Alfred Prufrock</b>: Modern alienation.",
+                "<b>Murder in the Cathedral</b>: Poetic drama.",
+                "<b>The Hollow Men</b>: Poem.",
+                "<b>Four Quartets</b>: Religious poems.",
+                "<b>The Sacred Wood</b>: Essays."
+            ],
+            quotes: [
+                "April is the cruellest month.",
+                "This is the way the world ends, not with a bang but a whimper."
+            ]
+        },
+
+        // --- Post-Modern Period ---
+        {
+            name: "George Orwell",
+            period: "Post-Modern Period",
+            dates: "1903 - 1950",
+            tags: ["Dystopia", "Political Satire", "Anti-totalitarian"],
+            bio: "Famous for his lucid prose and awareness of social injustice. He opposed totalitarianism.",
+            works: [
+                "<b>1984</b>: Dystopian surveillance state.",
+                "<b>Animal Farm</b>: Allegory of the Russian Revolution.",
+                "<b>Shooting an Elephant</b>: Essay on imperialism.",
+                "<b>Burmese Days</b>: Novel."
+            ],
+            quotes: [
+                "Big Brother is watching you.",
+                "All animals are equal, but some animals are more equal than others."
+            ]
+        },
+        {
+            name: "Jean-Paul Sartre",
+            period: "Post-Modern Period",
+            dates: "1905 - 1980",
+            tags: ["Existentialism", "French Philosopher"],
+            bio: "Key figure in Existentialism. He declined the Nobel Prize in 1964.",
+            works: [
+                "<b>Nausea</b>: Novel on existential angst.",
+                "<b>No Exit</b>: Play ('Hell is other people').",
+                "<b>Being and Nothingness</b>: Philosophical text.",
+                "<b>The Flies</b>: Play."
+            ],
+            quotes: [
+                "Man is condemned to be free.",
+                "Hell is other people."
+            ]
+        },
+        {
+            name: "Samuel Beckett",
+            period: "Post-Modern Period",
+            dates: "1906 - 1989",
+            tags: ["Absurd Drama", "Nobel Prize"],
+            bio: "Irish avant-garde writer, a key figure in the Theatre of the Absurd.",
+            works: [
+                "<b>Waiting for Godot</b>: A play where two characters wait for someone who never arrives."
+            ],
+            quotes: [
+                "Nothing happens. Nobody comes, nobody goes. It's awful."
+            ]
+        },
+        {
+            name: "William Golding",
+            period: "Post-Modern Period",
+            dates: "1911 - 1993",
+            tags: ["Nobel Prize", "Allegory"],
+            bio: "British novelist who explored the dark side of human nature.",
+            works: [
+                "<b>Lord of the Flies</b>: Allegorical novel about boys stranded on an island descending into savagery."
+            ],
+            quotes: [
+                "Maybe there is a beast... maybe it's only us."
+            ]
+        },
+        {
+            name: "Seamus Heaney",
+            period: "Post-Modern Period",
+            dates: "1939 - 2013",
+            tags: ["Nobel Prize", "Irish"],
+            bio: "Irish poet, playwright, and translator. Known for his lyrical beauty and ethical depth.",
+            works: [
+                "<b>Death of a Naturalist</b>: Poetry collection.",
+                "<b>Beowulf</b>: Acclaimed translation."
+            ],
+            quotes: [
+                "Walk on air against your better judgment."
+            ]
+        },
+        {
+            name: "Arundhati Roy",
+            period: "Post-Modern Period",
+            dates: "1961 - Present",
+            tags: ["Booker Prize", "Activist"],
+            bio: "Indian author and activist. Known for her lyrical prose and political stance.",
+            works: [
+                "<b>The God of Small Things</b>: Family tragedy in Kerala.",
+                "<b>The Ministry of Utmost Happiness</b>: Political novel.",
+                "<b>The Algebra of Infinite Justice</b>: Essays."
+            ],
+            quotes: [
+                "That's what careless words do. They make people love you a little less."
+            ]
+        },
+        {
+            name: "A.P.J. Abdul Kalam",
+            period: "Post-Modern Period",
+            dates: "1931 - 2015",
+            tags: ["Missile Man", "Visionary"],
+            bio: "Scientist and former President of India. His writings inspire youth and development.",
+            works: [
+                "<b>Wings of Fire</b>: Autobiography.",
+                "<b>Ignited Minds</b>: Inspiring youth.",
+                "<b>India 2020</b>: Vision for the future."
+            ],
+            quotes: [
+                "Dream is not that which you see while sleeping it is something that does not let you sleep."
+            ]
+        },
+
+        // --- American Literature ---
+        {
+            name: "Ralph Waldo Emerson",
+            period: "American Literature",
+            dates: "1803 - 1882",
+            tags: ["Transcendentalism", "Essayist"],
+            bio: "Leader of the Transcendentalist movement, championing individualism and nature.",
+            works: [
+                "<b>Self-Reliance</b>: Essay on individualism.",
+                "<b>Nature</b>: Foundation of Transcendentalism.",
+                "<b>The American Scholar</b>: Speech."
+            ],
+            quotes: [
+                "To be great is to be misunderstood.",
+                "Trust thyself: every heart vibrates to that iron string."
+            ]
+        },
+        {
+            name: "Herman Melville",
+            period: "American Literature",
+            dates: "1819 - 1891",
+            tags: ["Sea Adventure", "Symbolism"],
+            bio: "Author of Moby-Dick. His works explore complex themes of good, evil, and man's place in the universe.",
+            works: [
+                "<b>Moby-Dick</b>: Epic hunt for a white whale.",
+                "<b>Typee</b>: Adventure novel.",
+                "<b>Omoo</b>: Adventure novel.",
+                "<b>Bartleby, the Scrivener</b>: Story of passive resistance.",
+                "<b>Billy Budd</b>: Posthumous novella."
+            ],
+            quotes: [
+                "Call me Ishmael.",
+                "I would prefer not to."
+            ]
+        },
+        {
+            name: "Walt Whitman",
+            period: "American Literature",
+            dates: "1819 - 1892",
+            tags: ["Father of Free Verse", "Democracy"],
+            bio: "A humanist who was part of the transition between transcendentalism and realism.",
+            works: [
+                "<b>Leaves of Grass</b>: A poetry collection he revised throughout his life.",
+                "<b>Song of Myself</b>: Epic celebration of the self.",
+                "<b>O Captain! My Captain!</b>: Elegy for Lincoln."
+            ],
+            quotes: [
+                "I celebrate myself, and sing myself."
+            ]
+        },
+        {
+            name: "Emily Dickinson",
+            period: "American Literature",
+            dates: "1830 - 1886",
+            tags: ["Recluse", "Unique Style"],
+            bio: "A reclusive poet known for her unconventional punctuation and themes of death and immortality.",
+            works: [
+                "<b>Because I could not stop for Death</b>: Famous poem on mortality.",
+                "<b>Hope is the thing with feathers</b>: Metaphorical poem.",
+                "<b>I taste a liquor never brewed</b>: Nature poem."
+            ],
+            quotes: [
+                "Hope is the thing with feathers that perches in the soul."
+            ]
+        },
+         {
+            name: "Mark Twain",
+            period: "American Literature",
+            dates: "1835 - 1910",
+            tags: ["Humorist", "Realism"],
+            bio: "Often called the 'Father of American Literature'. Known for his humor and social criticism.",
+            works: [
+                "<b>The Adventures of Huckleberry Finn</b>: Often called the Great American Novel.",
+                "<b>The Adventures of Tom Sawyer</b>: Classic boyhood adventure."
+            ],
+            quotes: [
+                "The secret of getting ahead is getting started."
+            ]
+        },
+        {
+            name: "O. Henry",
+            period: "American Literature",
+            dates: "1862 - 1910",
+            tags: ["Short Story", "Twist Ending"],
+            bio: "Master of the short story with surprise endings. He wrote about the lives of ordinary people.",
+            works: [
+                "<b>The Gift of the Magi</b>: Story of sacrificial love.",
+                "<b>The Last Leaf</b>: Story of hope and art.",
+                "<b>The Cop and the Anthem</b>: Irony of fate.",
+                "<b>Cabbages and Kings</b>: Novel."
+            ],
+            quotes: [
+                "Life is made up of sobs, sniffles, and smiles."
+            ]
+        },
+        {
+            name: "Robert Frost",
+            period: "American Literature",
+            dates: "1874 - 1963",
+            tags: ["Rural Life", "Modernist"],
+            bio: "Known for his realistic depictions of rural life and command of American colloquial speech.",
+            works: [
+                "<b>The Road Not Taken</b>: Famous poem on choices.",
+                "<b>Stopping by Woods on a Snowy Evening</b>: Meditation on duty and rest.",
+                "<b>Mending Wall</b>: Poem."
+            ],
+            quotes: [
+                "Two roads diverged in a wood, and I—I took the one less traveled by."
+            ]
+        },
+        {
+            name: "Pearl S. Buck",
+            period: "American Literature",
+            dates: "1892 - 1973",
+            tags: ["Nobel Prize", "China"],
+            bio: "First American woman to win the Nobel Prize. She wrote extensively about life in China.",
+            works: [
+                "<b>The Good Earth</b>: Life of a Chinese farmer.",
+                "<b>Sons</b>: Sequel to The Good Earth.",
+                "<b>A House Divided</b>: Final part of the trilogy.",
+                "<b>East Wind: West Wind</b>: Novel."
+            ],
+            quotes: [
+                "Hunger makes a thief of any man."
+            ]
+        },
+        {
+            name: "Ernest Hemingway",
+            period: "American Literature",
+            dates: "1899 - 1961",
+            tags: ["Lost Generation", "Iceberg Theory", "Nobel Prize"],
+            bio: "Known for his understated style and adventurous life. He wrote about war, love, and loss.",
+            works: [
+                "<b>The Old Man and the Sea</b>: Struggle against nature.",
+                "<b>A Farewell to Arms</b>: War and love.",
+                "<b>For Whom the Bell Tolls</b>: Spanish Civil War.",
+                "<b>The Sun Also Rises</b>: Lost Generation."
+            ],
+            quotes: [
+                "A man can be destroyed but not defeated.",
+                "Courage is grace under pressure."
+            ]
+        },
+        {
+            name: "Arthur Miller",
+            period: "American Literature",
+            dates: "1915 - 2005",
+            tags: ["Playwright", "Social Drama"],
+            bio: "A prominent playwright in 20th-century American theater.",
+            works: [
+                "<b>Death of a Salesman</b>: Critique of the American Dream.",
+                "<b>The Crucible</b>: Allegory for McCarthyism."
+            ],
+            quotes: [
+                "He's a man way out there in the blue, riding on a smile and a shoeshine."
+            ]
+        },
+
+        // --- Other Literatures ---
+        {
+             name: "Victor Hugo",
+             period: "French Literature",
+             dates: "1802-1885",
+             tags: ["Novel", "Romanticism"],
+             bio: "French writer.",
+             works: [
+                 "<b>Les Misérables</b>: Novel.",
+                 "<b>The Hunchback of Notre-Dame</b>: Novel."
+             ],
+             quotes: ["To love another person is to see the face of God."]
+        },
+        {
+             name: "Leo Tolstoy",
+             period: "Russian Literature",
+             dates: "1828-1910",
+             tags: ["Novel", "Realism"],
+             bio: "Russian writer.",
+             works: [
+                 "<b>War and Peace</b>: Epic novel.",
+                 "<b>Anna Karenina</b>: Novel."
+             ],
+             quotes: ["All happy families are alike; each unhappy family is unhappy in its own way."]
+        },
+        {
+             name: "Chinua Achebe",
+             period: "African Literature",
+             dates: "1930-2013",
+             tags: ["Novel", "Post-colonial"],
+             bio: "Nigerian novelist.",
+             works: [
+                 "<b>Things Fall Apart</b>: Classic African novel.",
+                 "<b>No Longer at Ease</b>: Novel."
+             ],
+             quotes: ["The center cannot hold."]
+        }
+    ];
+
+    // Function to render the authors by period
+    function renderAuthors() {
+        const container = document.getElementById('periods-container');
+        
+        // Group authors by period
+        const periods = {};
+        authorsData.forEach(author => {
+            if (!periods[author.period]) {
+                periods[author.period] = [];
+            }
+            periods[author.period].push(author);
+        });
+
+        // Define order of periods
+        const periodOrder = [
+            "Middle English Period",
+            "The Renaissance",
+            "Neoclassical Period",
+            "The Romantic Period",
+            "The Victorian Period",
+            "The Modern Period",
+            "Post-Modern Period",
+            "American Literature",
+            "French Literature",
+            "Russian Literature",
+            "African Literature"
+        ];
+
+        // Create HTML for each period in order
+        periodOrder.forEach(periodName => {
+            if (periods[periodName]) {
+                const authors = periods[periodName];
+                const section = document.createElement('div');
+                section.className = 'period-section';
+                
+                const headerDiv = document.createElement('div');
+                
+                const title = document.createElement('span');
+                title.className = 'period-title';
+                title.textContent = periodName;
+                
+                const date = document.createElement('span');
+                date.className = 'period-date';
+                date.textContent = `(${periodsInfo[periodName] || ''})`;
+                
+                headerDiv.appendChild(title);
+                headerDiv.appendChild(date);
+                section.appendChild(headerDiv);
+                
+                // Add a break for spacing
+                const br = document.createElement('br');
+                section.appendChild(br);
+                
+                const grid = document.createElement('div');
+                grid.className = 'authors-grid';
+                
+                authors.forEach(author => {
+                    const card = document.createElement('div');
+                    card.className = 'author-card';
+                    card.textContent = author.name;
+                    card.onclick = () => openModal(author);
+                    grid.appendChild(card);
+                });
+                
+                section.appendChild(grid);
+                container.appendChild(section);
+            }
+        });
+    }
+
+    // Modal Functions
+    function openModal(author) {
+        document.getElementById('modalName').textContent = author.name;
+        document.getElementById('modalDates').textContent = author.dates;
+        document.getElementById('modalBio').innerHTML = author.bio;
+        
+        // Render Tags
+        const tagsContainer = document.getElementById('modalTags');
+        tagsContainer.innerHTML = '';
+        author.tags.forEach(tag => {
+            const span = document.createElement('span');
+            span.className = 'tag';
+            span.textContent = tag;
+            tagsContainer.appendChild(span);
+        });
+
+        // Render Works
+        const worksList = document.getElementById('modalWorks');
+        worksList.innerHTML = '';
+        author.works.forEach(work => {
+            const li = document.createElement('li');
+            li.innerHTML = work;
+            worksList.appendChild(li);
+        });
+
+        // Render Quotes
+        const quotesList = document.getElementById('modalQuotes');
+        quotesList.innerHTML = '';
+        author.quotes.forEach(quote => {
+            const li = document.createElement('li');
+            li.textContent = quote;
+            quotesList.appendChild(li);
+        });
+
+        document.getElementById('authorModal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('authorModal').classList.remove('active');
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('authorModal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+
+    // Initial Render
+    renderAuthors();
+
+</script>
+
+</body>
+</html>
