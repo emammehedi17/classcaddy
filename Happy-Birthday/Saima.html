@@ -175,6 +175,7 @@
             text-align: center;
             position: relative;
             overflow: hidden;
+            flex-shrink: 0; /* Header won't shrink */
         }
 
         .card-header h3 {
@@ -196,11 +197,37 @@
         .card-header::before { width: 100px; height: 100px; top: -50px; left: -20px; }
         .card-header::after { width: 80px; height: 80px; bottom: -30px; right: -10px; }
 
+        .quiz-form {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            overflow: hidden; /* Contains the scroll area */
+        }
+
         .quiz-content {
-            padding: 25px;
+            padding: 20px 25px;
             flex-grow: 1;
             overflow-y: auto;
             background: #fdfdfd;
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: rgba(0,0,0,0.1) transparent;
+        }
+        
+        .quiz-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .quiz-content::-webkit-scrollbar-thumb {
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 3px;
+        }
+
+        .quiz-footer {
+            padding: 15px 25px;
+            background: #fff;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            flex-shrink: 0;
+            z-index: 5;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.02);
         }
 
         /* Progress Bar */
@@ -208,6 +235,7 @@
             background: #eee;
             height: 6px;
             width: 100%;
+            flex-shrink: 0;
         }
         .progress-bar {
             height: 100%;
@@ -302,7 +330,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 10px;
+            margin-top: 0; /* Removed margin as it's inside footer */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -324,10 +352,11 @@
             padding: 10px;
             border-radius: 8px;
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px; /* Adjusted spacing */
             display: none;
             border: 1px solid #ff767550;
             animation: shake 0.5s;
+            font-size: 0.9rem;
         }
 
         @keyframes shake {
@@ -458,7 +487,7 @@
             img: "pic (1).jpg",
             caption: "ভার্সিটির এই লাল দালান সাক্ষী, আমাদের এই ৩ বছরের প্রতিটি মুহূর্ত কতটা দামী। আমার লক্ষ্মীমন্ত মেয়েটা এভাবেই সবসময় আমার পাশে থাকুক।",
             questions: [
-                { q: "১. আপনার ভালোবাসার মানুষের নাম কী?", opts: ["মেহেদী", "মেহেদি", "ইমাম মেহেদী", "ইমাম মেহেদি"], correct: 3 }, 
+                { q: "১. আপনার ভালোবাসার মানুষের নাম কী?", opts: ["মেহেদী", "মেহেদি", "ইমাম মেহেদী", "ইমাম মেহেদি"], correct: 2 }, 
                 { q: "২. তার উচ্চতা কত?", opts: ["5'3''", "5'4''", "5'5''", "5'6''"], correct: 2 }
             ]
         },
@@ -722,13 +751,16 @@
                     <div class="progress-wrapper">
                         <div class="progress-bar" id="bar-${item.id}"></div>
                     </div>
-                    <div class="quiz-content">
-                        <form onsubmit="checkAnswer(event, ${item.id})">
+                    
+                    <form onsubmit="checkAnswer(event, ${item.id})" class="quiz-form">
+                        <div class="quiz-content">
                             ${questionsHTML}
+                        </div>
+                        <div class="quiz-footer">
                             <div class="error-msg" id="error-${item.id}"><i class="fa-solid fa-circle-exclamation"></i> উফফ! উত্তর ভুল হয়েছে বেবি! 🥺</div>
                             <button type="submit" class="submit-btn"><i class="fa-solid fa-lock-open"></i> Unlock Memory</button>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
 
                 <div class="card-face card-back">
