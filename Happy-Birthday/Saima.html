@@ -37,13 +37,126 @@
             min-height: 100vh;
             color: var(--text-dark);
             overflow-x: hidden;
-            padding-bottom: 80px;
+            /* Padding removed here, handled in main-content */
         }
 
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
+        }
+
+        /* --- Login Screen Styles --- */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid white;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .login-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: -webkit-linear-gradient(#ff4081, #ff80ab);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-title {
+            font-family: 'Galada', cursive;
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+            background: #f9f9f9;
+        }
+
+        .login-input:focus {
+            border-color: var(--accent-color);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(232, 67, 147, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to right, #d63384, #6f42c1);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(111, 66, 193, 0.4);
+        }
+
+        .login-error {
+            color: #ff4757;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            display: none;
+            font-weight: 500;
+        }
+
+        /* --- Main Content (Initially Hidden) --- */
+        #main-content {
+            display: none; /* Controlled by JS */
+            opacity: 0;
+            transition: opacity 1s ease;
+            padding-bottom: 80px;
         }
 
         /* --- Header Section --- */
@@ -330,7 +443,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 0; /* Removed margin as it's inside footer */
+            margin-top: 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -352,7 +465,7 @@
             padding: 10px;
             border-radius: 8px;
             text-align: center;
-            margin-bottom: 10px; /* Adjusted spacing */
+            margin-bottom: 10px;
             display: none;
             border: 1px solid #ff767550;
             animation: shake 0.5s;
@@ -434,41 +547,106 @@
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
             .letter-container { padding: 50px 25px 30px; margin: 0 15px; }
-            .card-container { height: 750px; } /* Taller on mobile for scrolling text */
+            .card-container { height: 750px; }
             .gallery { grid-template-columns: 1fr; padding: 15px; }
+            .login-card { margin: 20px; }
         }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>শুভ জন্মদিন লক্ষ্মীমন্ত ❤️</h1>
-    <div class="letter-container">
-        <div class="envelope-icon">💌</div>
-        <div class="letter-text">
-            <p><strong>প্রিয় সায়মা,</strong></p>
-            <p>
-                আজ তোমার জন্মদিন। আমাদের সম্পর্কের এই ৩ বছরে কত স্মৃতি, কত মান-অভিমান, কত খুনসুটি জমে আছে। আমি প্রকাশ করতে পারিনা দেখে তুমি হয়তো ভাবো আমি তোমাকে কম ভালোবাসি, কিন্তু বিশ্বাস করো, আমার সবটুকু জুড়ে শুধু তুমি। তোমার ওই রাগ, ওই অভিমান, আর দিনশেষে আমার কাছে ফিরে আসা—এসব ছাড়া আমি অসম্পূর্ণ। আমাদের ভবিষ্যৎ নিয়ে যত অনিশ্চয়তাই থাকুক, আজকের এই দিনটা শুধুই আমাদের।
-            </p>
-            <p>
-                তোমার জন্মদিনে আমি চাইনি গতানুগতিক কোনো উপহার দিতে। তাই তোমার জন্য এই ছোট্ট আয়োজন। এখানে আমাদের ২৭টি বিশেষ মুহূর্তের ছবি লুকানো আছে। কিন্তু ছবিগুলো দেখতে হলে তোমাকে কিছু প্রশ্নের উত্তর দিতে হবে। জানি তুমি সবগুলোর উত্তর পারবে।
-            </p>
-            <p style="text-align: center; margin-top: 20px; font-weight: 600; color: var(--accent-color);">
-                ভালোবাসি তোমায়, জানপাখি।<br>শুভ জন্মদিন!
-            </p>
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+        <div class="login-card">
+            <div class="login-icon"><i class="fa-solid fa-heart"></i></div>
+            <h2 class="login-title">স্বাগতম জানপাখি ❤️</h2>
+            <form id="loginForm">
+                <div class="input-group">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="username" class="login-input" placeholder="Name" required autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-key"></i>
+                    <input type="password" id="password" class="login-input" placeholder="Password" required>
+                </div>
+                <button type="submit" class="login-btn">প্রবেশ করুন</button>
+                <div id="loginError" class="login-error">নাম বা পাসওয়ার্ড ভুল হয়েছে! 😢</div>
+            </form>
         </div>
     </div>
-</header>
 
-<div class="gallery" id="gallery">
-    <!-- Cards will be injected here via JS -->
-</div>
+    <!-- MAIN CONTENT (Wrapped) -->
+    <div id="main-content">
+        <header>
+            <h1>শুভ জন্মদিন লক্ষ্মীমন্ত ❤️</h1>
+            <div class="letter-container">
+                <div class="envelope-icon">💌</div>
+                <div class="letter-text">
+                    <p><strong>প্রিয় সায়মা,</strong></p>
+                    <p>
+                        আজ তোমার জন্মদিন। আমাদের সম্পর্কের এই ৩ বছরে কত স্মৃতি, কত মান-অভিমান, কত খুনসুটি জমে আছে। আমি প্রকাশ করতে পারিনা দেখে তুমি হয়তো ভাবো আমি তোমাকে কম ভালোবাসি, কিন্তু বিশ্বাস করো, আমার সবটুকু জুড়ে শুধু তুমি। তোমার ওই রাগ, ওই অভিমান, আর দিনশেষে আমার কাছে ফিরে আসা—এসব ছাড়া আমি অসম্পূর্ণ। আমাদের ভবিষ্যৎ নিয়ে যত অনিশ্চয়তাই থাকুক, আজকের এই দিনটা শুধুই আমাদের।
+                    </p>
+                    <p>
+                        তোমার জন্মদিনে আমি চাইনি গতানুগতিক কোনো উপহার দিতে। তাই তোমার জন্য এই ছোট্ট আয়োজন। এখানে আমাদের ২৭টি বিশেষ মুহূর্তের ছবি লুকানো আছে। কিন্তু ছবিগুলো দেখতে হলে তোমাকে কিছু প্রশ্নের উত্তর দিতে হবে। জানি তুমি সবগুলোর উত্তর পারবে।
+                    </p>
+                    <p style="text-align: center; margin-top: 20px; font-weight: 600; color: var(--accent-color);">
+                        ভালোবাসি তোমায়, জানপাখি।<br>শুভ জন্মদিন!
+                    </p>
+                </div>
+            </div>
+        </header>
 
-<footer>
-    <p>সারা জীবন এভাবেই পাশে থেকো। ❤️</p>
-</footer>
+        <div class="gallery" id="gallery">
+            <!-- Cards will be injected here via JS -->
+        </div>
+
+        <footer>
+            <p>সারা জীবন এভাবেই পাশে থেকো। ❤️</p>
+        </footer>
+    </div>
 
 <script>
+    // --- LOGIN LOGIC ---
+    const loginForm = document.getElementById('loginForm');
+    const loginScreen = document.getElementById('login-screen');
+    const mainContent = document.getElementById('main-content');
+    const loginError = document.getElementById('loginError');
+
+    // Hardcoded Credentials
+    const CORRECT_USER = "Lokkhimonto";
+    const CORRECT_PASS = "08Feb2026";
+
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const user = document.getElementById('username').value.trim();
+        const pass = document.getElementById('password').value.trim();
+
+        if (user === CORRECT_USER && pass === CORRECT_PASS) {
+            // Success
+            loginError.style.display = 'none';
+            loginScreen.style.transition = "opacity 0.8s ease";
+            loginScreen.style.opacity = '0';
+            
+            setTimeout(() => {
+                loginScreen.style.display = 'none';
+                mainContent.style.display = 'block';
+                // Trigger reflow
+                mainContent.offsetHeight;
+                mainContent.style.opacity = '1';
+            }, 800);
+        } else {
+            // Error
+            loginError.style.display = 'block';
+            // Shake animation reset
+            loginError.style.animation = 'none';
+            loginError.offsetHeight; /* trigger reflow */
+            loginError.style.animation = 'shake 0.5s';
+        }
+    });
+
+    // --- MAIN APP LOGIC ---
+    
     // --- VIBRANT COLOR PALETTES ---
     const colorPalettes = [
         { primary: '#FF3366', secondary: '#BA265D', accent: '#8C1C46' }, // Hot Pink
@@ -487,7 +665,7 @@
             img: "pic (1).jpg",
             caption: "ভার্সিটির এই লাল দালান সাক্ষী, আমাদের এই ৩ বছরের প্রতিটি মুহূর্ত কতটা দামী। আমার লক্ষ্মীমন্ত মেয়েটা এভাবেই সবসময় আমার পাশে থাকুক।",
             questions: [
-                { q: "১. আপনার ভালোবাসার মানুষের নাম কী?", opts: ["মেহেদী", "মেহেদি", "ইমাম মেহেদী", "ইমাম মেহেদি"], correct: 2 }, 
+                { q: "১. আপনার ভালোবাসার মানুষের নাম কী?", opts: ["মেহেদী", "মেহেদি", "ইমাম মেহেদী", "ইমাম মেহেদি"], correct: 3 }, 
                 { q: "২. তার উচ্চতা কত?", opts: ["5'3''", "5'4''", "5'5''", "5'6''"], correct: 2 }
             ]
         },
