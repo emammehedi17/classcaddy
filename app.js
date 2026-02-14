@@ -8955,3 +8955,33 @@ if (document.readyState === 'loading') {
 } else {
     checkExternalResourceStart();
 }
+
+// --- AUTO LOGIN HANDLER ---
+// Checks if user came from "Sign in" button in resources page
+function checkAutoLogin() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+
+    if (action === 'signin') {
+        // Clear the URL param so it doesn't loop
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+
+        // Trigger Google Sign In
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(auth, provider)
+            .then((result) => {
+                console.log("Auto-login success:", result.user.email);
+            })
+            .catch((error) => {
+                console.error("Auto-login error:", error);
+            });
+    }
+}
+
+// Run check on load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkAutoLogin);
+} else {
+    checkAutoLogin();
+}
