@@ -21,7 +21,7 @@
             background-color: #f3f4f6; /* Keeping content area light for cards */
         }
         
-        /* Header Styles from your code */
+        /* Header Styles */
         header {
             background-color: rgba(17, 24, 39, 0.95);
             backdrop-filter: blur(8px);
@@ -53,7 +53,7 @@
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <!-- =================== HEADER START (Copied & Adjusted) =================== -->
+    <!-- =================== HEADER START =================== -->
     <header class="fixed top-0 left-0 right-0 z-50">
         <div class="container mx-auto px-6 py-3">
             <nav class="flex justify-between items-center">
@@ -89,12 +89,17 @@
                     <a href="contact.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Contact</a>
                 </div>
 
-                <!-- Right Side: DU Logo & Sign Up -->
+                <!-- Right Side: DU Logo & Google Sign In -->
                 <div class="hidden md:flex items-center gap-4">
                     <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
                         <img src="images/du_logo.png" onerror="this.src='https://via.placeholder.com/48'" alt="DU Logo" class="h-12 w-12 rounded-full border-2 border-gray-600 object-cover">
                     </a>
-                    <a href="index.html#signup" class="px-6 py-3 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 rounded-full transition-colors text-white">Sign Up</a>
+                    
+                    <!-- Google Sign In Button -->
+                    <a href="study_plan.html" class="flex items-center gap-2 bg-white text-gray-700 hover:bg-gray-100 px-4 py-2 rounded-full font-medium transition-colors border border-gray-300 shadow-sm">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5">
+                        <span class="text-sm font-semibold">Sign in</span>
+                    </a>
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -123,6 +128,7 @@
                 <a href="study_plan.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Study Plan</a>
                 <a href="about.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">About</a>
                 <a href="contact.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Contact</a>
+                <a href="study_plan.html" class="block px-6 py-3 text-sm text-emerald-400 font-bold hover:bg-gray-700 transition-colors">Sign In</a>
             </div>
         </div>
     </header>
@@ -146,8 +152,40 @@
 
     </main>
 
-    <!-- =================== FOOTER SECTION (Copied & Adjusted) =================== -->
-    <footer class="bg-gray-900 border-t border-gray-800 pt-16 pb-8 mt-auto">
+    <!-- =================== FEEDBACK SECTION =================== -->
+    <section class="feedback-section py-20 bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-4xl font-bold mb-4 text-white">Feedback</h2>
+                    <p class="text-gray-400 mb-8">We value your input to make Class Caddy better. Please share your suggestions, report any issues, or let us know what you love!</p>
+                    <div class="flex gap-6">
+                        <a href="https://facebook.com/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-facebook-f fa-2x"></i></a>
+                        <a href="https://wa.me/+8801743303877" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-whatsapp fa-2x"></i></a>
+                        <a href="https://t.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-telegram fa-2x"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <form onsubmit="event.preventDefault(); alert('Thank you for your feedback!');">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                            <input type="email" placeholder="Enter Email Address" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white transition-all">
+                        </div>
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Your suggestion/Feedback</label>
+                            <textarea rows="4" placeholder="Write your complaint or suggestion" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white transition-all"></textarea>
+                        </div>
+                        <div class="mt-6">
+                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =================== FOOTER SECTION =================== -->
+    <footer class="bg-gray-900 border-t border-gray-800 pt-16 pb-8">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
                 <div class="col-span-1">
@@ -162,9 +200,9 @@
                 <div class="col-span-1">
                     <h3 class="font-semibold text-white mb-4">Contact Us</h3>
                     <ul class="space-y-3">
-                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fa-solid fa-phone"></i> Support</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-facebook-f"></i> Facebook</a></li>
+                        <li><a href="tel:+8801743303877" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fa-solid fa-phone"></i> Support</a></li>
+                        <li><a href="https://wa.me/+8801743303877" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                        <li><a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-facebook-f"></i> Facebook</a></li>
                     </ul>
                 </div>
                 <div class="col-span-1">
