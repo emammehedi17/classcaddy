@@ -9,15 +9,42 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kalpurush:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-        body { font-family: 'Inter', 'Kalpurush', sans-serif; background-color: #f3f4f6; }
+        body { 
+            font-family: 'Poppins', 'Hind Siliguri', sans-serif; 
+            background-color: #f3f4f6; /* Keeping content area light for cards */
+        }
+        
+        /* Header Styles from your code */
+        header {
+            background-color: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #374151;
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) translateX(-50%);
+            transition: all 0.3s ease;
+        }
+        .dropdown-menu.is-open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) translateX(-50%);
+        }
+
+        /* Resources Grid Styles */
         .folder-card:hover { transform: translateY(-5px); }
-        /* Custom Scrollbar for consistent look */
+        
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -26,27 +53,83 @@
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <!-- Header (Matching ch-1_1.1&1.2.html Dark Theme) -->
-    <nav class="bg-[#111827] border-b border-gray-800 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <span class="text-2xl font-bold text-white">
-                        <i class="fas fa-graduation-cap text-teal-400"></i> Class Caddy
-                    </span>
-                    <span class="ml-3 px-2 py-1 bg-gray-800 text-xs rounded text-gray-400 font-medium border border-gray-700">Resources</span>
-                </div>
-                <div class="flex items-center">
-                    <a href="study_plan.html" class="text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                        <i class="fas fa-arrow-left mr-2"></i> Dashboard
+    <!-- =================== HEADER START (Copied & Adjusted) =================== -->
+    <header class="fixed top-0 left-0 right-0 z-50">
+        <div class="container mx-auto px-6 py-3">
+            <nav class="flex justify-between items-center">
+                <!-- Left Side: Profile & Title -->
+                <div class="flex items-center gap-4">
+                    <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
+                        <img src="images/profile.jpg" onerror="this.src='https://via.placeholder.com/48'" alt="Profile" class="h-12 w-12 rounded-full border-2 border-emerald-400 object-cover">
+                    </a>
+                    <a href="index.html">
+                        <h1 class="text-2xl font-bold text-white">Class Caddy</h1>
                     </a>
                 </div>
+
+                <!-- Center: Desktop Navigation -->
+                <div class="hidden md:flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full p-1">
+                    <a href="index.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Home</a>
+                    
+                    <div id="academic-dropdown" class="relative group">
+                        <button id="academic-button" class="px-6 py-2 text-sm font-semibold text-gray-400 hover:text-white rounded-full transition-colors flex items-center">
+                            <a href="academic.html">Academic</a>
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="academic-menu" class="dropdown-menu absolute top-full left-1/2 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
+                            <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 405</a>
+                            <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 406</a>
+                            <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 407</a>
+                            <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 408 (B)</a>
+                        </div>
+                    </div>
+
+                    <a href="study_plan.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Study Plan</a>
+                    <a href="about.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">About</a>
+                    <a href="contact.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Contact</a>
+                </div>
+
+                <!-- Right Side: DU Logo & Sign Up -->
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
+                        <img src="images/du_logo.png" onerror="this.src='https://via.placeholder.com/48'" alt="DU Logo" class="h-12 w-12 rounded-full border-2 border-gray-600 object-cover">
+                    </a>
+                    <a href="index.html#signup" class="px-6 py-3 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 rounded-full transition-colors text-white">Sign Up</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="text-white focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Mobile Menu Panel -->
+            <div id="mobile-menu" class="hidden md:hidden bg-gray-800 border-t border-gray-700 -mx-6 mt-3">
+                <a href="index.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Home</a>
+                <div>
+                    <button id="mobile-academic-button" class="w-full text-left px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex justify-between items-center">
+                        <span>Academic</span>
+                        <svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="mobile-academic-menu" class="hidden pl-8 bg-gray-900">
+                        <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 405</a>
+                        <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 406</a>
+                        <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 407</a>
+                        <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 408 (B)</a>
+                    </div>
+                </div>
+                <a href="study_plan.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Study Plan</a>
+                <a href="about.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">About</a>
+                <a href="contact.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Contact</a>
             </div>
         </div>
-    </nav>
+    </header>
+    <!-- =================== HEADER END =================== -->
 
     <!-- Main Content -->
-    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full pt-32">
         
         <div class="text-center mb-10">
             <h1 class="text-3xl font-bold text-gray-800 mb-2">Study Resources Library</h1>
@@ -63,14 +146,49 @@
 
     </main>
 
-    <!-- Footer (Matching ch-1_1.1&1.2.html Dark Theme) -->
-    <footer class="bg-[#111827] text-white py-8 mt-auto border-t border-gray-800">
-        <div class="container mx-auto px-4 text-center">
-            <p class="text-sm opacity-75">&copy; 2024 Class Caddy. All rights reserved.</p>
-            <div class="mt-4 flex justify-center space-x-4">
-                <a href="#" class="text-gray-400 hover:text-teal-400 transition-colors"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="text-gray-400 hover:text-teal-400 transition-colors"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="text-gray-400 hover:text-teal-400 transition-colors"><i class="fab fa-instagram"></i></a>
+    <!-- =================== FOOTER SECTION (Copied & Adjusted) =================== -->
+    <footer class="bg-gray-900 border-t border-gray-800 pt-16 pb-8 mt-auto">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-3">
+                        <li><a href="about.html" class="text-gray-400 hover:text-emerald-400 transition">About Us</a></li>
+                        <li><a href="academic.html" class="text-gray-400 hover:text-emerald-400 transition">Courses</a></li>
+                        <li><a href="https://eco.du.ac.bd/" target="_blank" class="text-gray-400 hover:text-emerald-400 transition">DU Student Portal</a></li>
+                        <li><a href="https://result.du.ac.bd/" target="_blank" class="text-gray-400 hover:text-emerald-400 transition">DU Result Portal</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Contact Us</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fa-solid fa-phone"></i> Support</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-facebook-f"></i> Facebook</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Others</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Gallery</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-2 lg:col-span-2">
+                     <h3 class="font-semibold text-white mb-4">Download App</h3>
+                     <div class="flex flex-col sm:flex-row lg:flex-col gap-4">
+                        <a href="#" class="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center gap-3 hover:bg-gray-700 transition">
+                            <i class="fab fa-google-play fa-2x text-white"></i>
+                            <div>
+                                <p class="text-xs text-gray-400">GET IT ON</p>
+                                <p class="text-lg font-semibold text-white">Google Play</p>
+                            </div>
+                        </a>
+                     </div>
+                </div>
+            </div>
+            <div class="mt-16 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+                <p>&copy; 2025 Class Caddy. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -78,9 +196,42 @@
     <!-- Import Question Data -->
     <script src="questions.js"></script>
 
-    <!-- Render Logic -->
+    <!-- Page Logic -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            /* =================== HEADER LOGIC =================== */
+            // Dropdown Logic
+            const academicDropdown = document.getElementById('academic-dropdown');
+            if (academicDropdown) {
+                const menu = document.getElementById('academic-menu');
+                const button = document.getElementById('academic-button');
+                let hideTimeout;
+                const showMenu = () => { clearTimeout(hideTimeout); menu.classList.add('is-open'); };
+                const hideMenu = () => { menu.classList.remove('is-open'); };
+                const hideMenuWithDelay = () => { hideTimeout = setTimeout(hideMenu, 300); };
+                button.addEventListener('click', (event) => { event.stopPropagation(); menu.classList.toggle('is-open'); });
+                academicDropdown.addEventListener('mouseenter', showMenu);
+                academicDropdown.addEventListener('mouseleave', hideMenuWithDelay);
+                window.addEventListener('click', (event) => { if (!academicDropdown.contains(event.target)) { hideMenu(); } });
+            }
+
+            // Mobile Menu Logic
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileAcademicButton = document.getElementById('mobile-academic-button');
+            const mobileAcademicMenu = document.getElementById('mobile-academic-menu');
+
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+            }
+            if (mobileAcademicButton && mobileAcademicMenu) {
+                mobileAcademicButton.addEventListener('click', () => {
+                    mobileAcademicMenu.classList.toggle('hidden');
+                    mobileAcademicButton.querySelector('svg').classList.toggle('rotate-180');
+                });
+            }
+
+            /* =================== RESOURCES GRID LOGIC =================== */
             const grid = document.getElementById('resources-grid');
             
             // Check if database exists
