@@ -16,6 +16,9 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- Custom CSS Link (Adjusted Path) -->
+    <link rel="stylesheet" href="../../style.css">
+
     <style>
         /* ================= GLOBAL STYLES ================= */
         body {
@@ -23,6 +26,13 @@
             background-color: #111827; /* Dark background matching Class Caddy */
             color: white;
             overflow-x: hidden;
+        }
+
+        /* Prevent Text Selection globally for quiz content */
+        .no-select {
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10 and IE 11 */
+            user-select: none; /* Standard syntax */
         }
 
         /* Header Backdrop Blur */
@@ -50,7 +60,6 @@
             /* Theme: Class Caddy Emerald */
             --primary-color: #10b981; /* Emerald 500 */
             --primary-dark: #059669; /* Emerald 600 */
-            --bg-gradient: linear-gradient(135deg, #e0f2f1 0%, #ffffff 100%);
             
             /* Quiz Status Colors */
             --success: #16a34a; /* Green 600 */
@@ -189,6 +198,8 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            /* Allow copying button text/interaction */
+            user-select: auto; 
         }
         .btn-action:hover {
             background: var(--primary-color);
@@ -207,10 +218,8 @@
                 <!-- Left Side: Profile & Title -->
                 <div class="flex items-center gap-4">
                     <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
-                        <!-- Updated path: ../../images/ -->
                         <img src="../../images/profile.jpg" onerror="this.src='https://via.placeholder.com/48'" alt="Profile" class="h-12 w-12 rounded-full border-2 border-emerald-400 object-cover">
                     </a>
-                    <!-- Updated path: ../../index.html -->
                     <a href="../../index.html">
                         <h1 class="text-2xl font-bold text-white">Class Caddy</h1>
                     </a>
@@ -290,8 +299,8 @@
                 <p class="text-gray-400">Test your knowledge on various fields of Biology</p>
             </div>
 
-            <!-- Quiz Container -->
-            <div class="quiz-card-wrapper">
+            <!-- Quiz Container (no-select class added here) -->
+            <div class="quiz-card-wrapper no-select">
                 
                 <!-- Action Bar -->
                 <div class="flex justify-between items-center p-5 bg-gray-50 rounded-t-lg border-b border-gray-100">
@@ -462,6 +471,9 @@
         </div>
     </footer>
 
+    <!-- Custom Script (Adjusted Path) -->
+    <script src="../../script.js"></script>
+
     <script>
         /* =================== HEADER LOGIC =================== */
         // Dropdown Logic
@@ -497,16 +509,16 @@
 
         /* =================== QUIZ LOGIC =================== */
         const mcqData = [
-            { id: 1, q: "What is the correct Bangla terminology for 'Cytology'?", options: ["Bangshagatibidya", "Shrenibinyasbidya", "Koshbidya", "Tissuetattwa"], correct: 2, note: "Cytology discusses the structure, function, and division of cells. Its Bangla meaning is Koshbidya." },
-            { id: 2, q: "Which Bangla term corresponds to the branch 'Histology'?", options: ["Tissuetattwa", "Angasangsthan", "Sharirbidya", "Bibaortanbidya"], correct: 0, note: "Histology deals with the structure, arrangement, and function of tissues. Its Bangla meaning is Tissuetattwa." },
-            { id: 3, q: "What is the Bangla name for the branch 'Entomology'?", options: ["Kitattwa", "Parajibibidya", "Matshabidya", "Anujibbidya"], correct: 0, note: "Entomology studies the life, merits, demerits, and control of insects. Its Bangla meaning is Kitattwa." },
-            { id: 4, q: "'Embryology' is known in Bangla as which of the following?", options: ["Bastubidya", "Vrunbidya", "Jibbhugol", "Pratnatattwa"], correct: 1, note: "Embryology discusses the origin and development of the embryo. Its Bangla meaning is Vrunbidya." },
-            { id: 5, q: "Which Bangla term is used for 'Endocrinology'?", options: ["Hormonebidya", "Enzymebidya", "Srishtibidya", "Snayubidya"], correct: 0, note: "Endocrinology studies hormones and their functions in the body. Its Bangla meaning is Hormonebidya." },
-            { id: 6, q: "What is the Bangla terminology for 'Palaeontology'?", options: ["Pratnatattwabidya", "Bibartanbidya", "Bongshogotibidya", "Shrenibinyasbidya"], correct: 0, note: "Palaeontology deals with prehistoric life and fossils. Its Bangla meaning is Pratnatattwabidya." },
-            { id: 7, q: "'Biogeography' is referred to in Bangla as which of the following?", options: ["Jibparishankhyan", "Jibbhugol", "Paribeshbigyan", "Prani-bhugol"], correct: 1, note: "Biogeography discusses the geographical distribution and adaptation of organisms. Its Bangla meaning is Jibbhugol." },
-            { id: 8, q: "What is the correct Bangla meaning of 'Parasitology'?", options: ["Parajibibidya", "Anujibbidya", "Rogtattwa", "Kittattwa"], correct: 0, note: "Parasitology studies parasitism, the life of parasites, and host-parasite relationships. Its Bangla meaning is Parajibibidya." },
-            { id: 9, q: "Which Bangla term corresponds to 'Taxonomy'?", options: ["Shrenibinyasbidya", "Angasangsthanbidya", "Sharirbrittabidya", "Bangshagatibidya"], correct: 0, note: "Taxonomy deals with the principles and classification of organisms. Its Bangla meaning is Shrenibinyasbidya." },
-            { id: 10, q: "'Morphology' is known in Bangla as which of the following?", options: ["Angasangsthanbidya", "Abhyantarinbidya", "Bahyikgathanbidya", "Sharirkriyabidya"], correct: 0, note: "Morphology deals with the external and internal structure of organisms. Its Bangla meaning is Angasangsthanbidya." },
+            { id: 1, q: "What is the correct Bangla terminology for 'Cytology'?", options: ["বংশগতিবিদ্যা", "শ্রেণিবিন্যাসবিদ্যা", "কোষবিদ্যা", "টিস্যুতত্ত্ব"], correct: 2, note: "Cytology discusses the structure, function, and division of cells. Its Bangla meaning is Koshbidya (কোষবিদ্যা)." },
+            { id: 2, q: "Which Bangla term corresponds to the branch 'Histology'?", options: ["টিস্যুতত্ত্ব", "অঙ্গসংস্থান", "শরীরবিদ্যা", "বিবর্তনবিদ্যা"], correct: 0, note: "Histology deals with the structure, arrangement, and function of tissues. Its Bangla meaning is Tissuetattwa (টিস্যুতত্ত্ব)." },
+            { id: 3, q: "What is the Bangla name for the branch 'Entomology'?", options: ["কীটতত্ত্ব", "পরজীবীবিদ্যা", "মৎস্যবিদ্যা", "অণুজীববিদ্যা"], correct: 0, note: "Entomology studies the life, merits, demerits, and control of insects. Its Bangla meaning is Kitattwa (কীটতত্ত্ব)." },
+            { id: 4, q: "'Embryology' is known in Bangla as which of the following?", options: ["বাস্তুবিদ্যা", "ভ্রূণবিদ্যা", "জীবভূগোল", "প্রত্নতত্ত্ব"], correct: 1, note: "Embryology discusses the origin and development of the embryo. Its Bangla meaning is Vrunbidya (ভ্রূণবিদ্যা)." },
+            { id: 5, q: "Which Bangla term is used for 'Endocrinology'?", options: ["হরমোনবিদ্যা", "এনজাইমবিদ্যা", "সৃষ্টিবিদ্যা", "স্নায়ুবিদ্যা"], correct: 0, note: "Endocrinology studies hormones and their functions in the body. Its Bangla meaning is Hormonebidya (হরমোনবিদ্যা)." },
+            { id: 6, q: "What is the Bangla terminology for 'Palaeontology'?", options: ["প্রত্নতত্ত্ববিদ্যা", "বিবর্তনবিদ্যা", "বংশগতিবিদ্যা", "শ্রেণিবিন্যাসবিদ্যা"], correct: 0, note: "Palaeontology deals with prehistoric life and fossils. Its Bangla meaning is Pratnatattwabidya (প্রত্নতত্ত্ববিদ্যা)." },
+            { id: 7, q: "'Biogeography' is referred to in Bangla as which of the following?", options: ["জীবপরিসংখ্যান", "জীবভূগোল", "পরিবেশবিজ্ঞান", "প্রাণী-ভূগোল"], correct: 1, note: "Biogeography discusses the geographical distribution and adaptation of organisms. Its Bangla meaning is Jibbhugol (জীবভূগোল)." },
+            { id: 8, q: "What is the correct Bangla meaning of 'Parasitology'?", options: ["পরজীবীবিদ্যা", "অণুজীববিদ্যা", "রোগতত্ত্ব", "কীটতত্ত্ব"], correct: 0, note: "Parasitology studies parasitism, the life of parasites, and host-parasite relationships. Its Bangla meaning is Parajibibidya (পরজীবীবিদ্যা)." },
+            { id: 9, q: "Which Bangla term corresponds to 'Taxonomy'?", options: ["শ্রেণিবিন্যাসবিদ্যা", "অঙ্গসংস্থানবিদ্যা", "শরীরবৃত্তবিদ্যা", "বংশগতিবিদ্যা"], correct: 0, note: "Taxonomy deals with the principles and classification of organisms. Its Bangla meaning is Shrenibinyasbidya (শ্রেণিবিন্যাসবিদ্যা)." },
+            { id: 10, q: "'Morphology' is known in Bangla as which of the following?", options: ["অঙ্গসংস্থানবিদ্যা", "অভ্যন্তরীণবিদ্যা", "বাহ্যিকগঠনবিদ্যা", "শরীরক্রিয়াবিদ্যা"], correct: 0, note: "Morphology deals with the external and internal structure of organisms. Its Bangla meaning is Angasangsthanbidya (অঙ্গসংস্থানবিদ্যা)." },
             { id: 11, q: "From which language did the term 'Biology' originate?", options: ["Latin and French", "Greek and Latin", "Greek and French", "Only from Greek"], correct: 3, note: "The term Biology is derived from the two Greek words 'Bios' (life) and 'Logos' (knowledge)." },
             { id: 12, q: "Who is regarded as the father of Biology?", options: ["Theophrastus", "Aristotle", "Carolus Linnaeus", "Gregor Mendel"], correct: 1, note: "The Greek philosopher Aristotle is considered the father of Biology." },
             { id: 13, q: "Which of the following is a branch of Physical Biology?", options: ["Microbiology", "Physiology", "Agriculture", "Entomology"], correct: 1, note: "Physiology is a branch of Physical Biology dealing with biochemical activities of living beings. The others are Applied Biology." },
