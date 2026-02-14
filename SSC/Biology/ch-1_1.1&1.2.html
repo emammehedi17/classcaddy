@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biology Branches Quiz - Class Caddy</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts (Poppins & Hind Siliguri) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* ================= GLOBAL STYLES ================= */
+        body {
+            font-family: 'Poppins', 'Hind Siliguri', sans-serif;
+            background-color: #111827; /* Dark background matching Class Caddy */
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Header Backdrop Blur */
+        header {
+            background-color: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #374151;
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) translateX(-50%);
+            transition: all 0.3s ease;
+        }
+        .dropdown-menu.is-open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) translateX(-50%);
+        }
+
+        /* ================= QUIZ SPECIFIC STYLES ================= */
+        :root {
+            /* Theme: Class Caddy Emerald */
+            --primary-color: #10b981; /* Emerald 500 */
+            --primary-dark: #059669; /* Emerald 600 */
+            --bg-gradient: linear-gradient(135deg, #e0f2f1 0%, #ffffff 100%);
+            
+            /* Quiz Status Colors */
+            --success: #16a34a; /* Green 600 */
+            --error: #dc2626;   /* Red 600 */
+            --warning: #ca8a04; /* Yellow 600 */
+        }
+
+        /* Quiz Card Container */
+        .quiz-card-wrapper {
+            background-color: rgba(255, 255, 255, 0.98);
+            color: #1f2937; /* Gray 800 */
+            border-radius: 1rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            border-top: 6px solid var(--primary-color);
+            min-height: 500px;
+            position: relative;
+        }
+
+        .quiz-start {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 450px;
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(to bottom, #ffffff, #f0fdf4);
+            border-radius: 0 0 1rem 1rem;
+        }
+
+        .big-start-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            margin-top: 25px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+            transition: transform 0.2s, background 0.3s;
+            font-weight: bold;
+        }
+        .big-start-btn:hover { 
+            transform: translateY(-2px); 
+            background: var(--primary-dark);
+        }
+
+        /* Quiz Header */
+        .quiz-header {
+            padding: 20px;
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            display: none;
+        }
+
+        .timer {
+            background: #fff1f2;
+            color: #e11d48;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 1.1rem;
+            border: 1px solid #fecdd3;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #f3f4f6;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Options */
+        .option-btn {
+            padding: 16px 20px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #374151;
+            font-weight: 500;
+            position: relative;
+        }
+        .option-btn:hover:not(.disabled) {
+            border-color: var(--primary-color);
+            background: #ecfdf5;
+        }
+        .option-btn.correct { 
+            background: #dcfce7; 
+            border-color: var(--success); 
+            color: var(--success); 
+        }
+        .option-btn.wrong { 
+            background: #fee2e2; 
+            border-color: var(--error); 
+            color: var(--error); 
+        }
+        .option-btn.disabled { 
+            pointer-events: none; 
+            opacity: 0.7; 
+        }
+
+        .explanation {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fffbeb;
+            border-left: 5px solid var(--warning);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #92400e;
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .btn-action {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 8px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-action:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <!-- =================== HEADER START =================== -->
+    <header class="fixed top-0 left-0 right-0 z-50">
+        <div class="container mx-auto px-6 py-3">
+            <nav class="flex justify-between items-center">
+                <!-- Left Side: Profile & Title -->
+                <div class="flex items-center gap-4">
+                    <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
+                        <!-- Updated path: ../../images/ -->
+                        <img src="../../images/profile.jpg" onerror="this.src='https://via.placeholder.com/48'" alt="Profile" class="h-12 w-12 rounded-full border-2 border-emerald-400 object-cover">
+                    </a>
+                    <!-- Updated path: ../../index.html -->
+                    <a href="../../index.html">
+                        <h1 class="text-2xl font-bold text-white">Class Caddy</h1>
+                    </a>
+                </div>
+
+                <!-- Center: Desktop Navigation -->
+                <div class="hidden md:flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full p-1">
+                    <a href="../../index.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Home</a>
+                    
+                    <div id="academic-dropdown" class="relative group">
+                        <button id="academic-button" class="px-6 py-2 text-sm font-semibold text-gray-400 hover:text-white rounded-full transition-colors flex items-center">
+                            <a href="../../academic.html">Academic</a>
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="academic-menu" class="dropdown-menu absolute top-full left-1/2 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
+                            <a href="../../course-405.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 405</a>
+                            <a href="../../course-406.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 406</a>
+                            <a href="../../course-407.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 407</a>
+                            <a href="../../course-408.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 408 (B)</a>
+                        </div>
+                    </div>
+
+                    <a href="../../study_plan.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Study Plan</a>
+                    <a href="../../about.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">About</a>
+                    <a href="../../contact.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Contact</a>
+                </div>
+
+                <!-- Right Side: DU Logo & Sign Up -->
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
+                        <img src="../../images/du_logo.png" onerror="this.src='https://via.placeholder.com/48'" alt="DU Logo" class="h-12 w-12 rounded-full border-2 border-gray-600 object-cover">
+                    </a>
+                    <a href="../../index.html#signup" class="px-6 py-3 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 rounded-full transition-colors text-white">Sign Up</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="text-white focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Mobile Menu Panel -->
+            <div id="mobile-menu" class="hidden md:hidden bg-gray-800 border-t border-gray-700 -mx-6 mt-3">
+                <a href="../../index.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Home</a>
+                <div>
+                    <button id="mobile-academic-button" class="w-full text-left px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex justify-between items-center">
+                        <span>Academic</span>
+                        <svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="mobile-academic-menu" class="hidden pl-8 bg-gray-900">
+                        <a href="../../course-405.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 405</a>
+                        <a href="../../course-406.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 406</a>
+                        <a href="../../course-407.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 407</a>
+                        <a href="../../course-408.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 408 (B)</a>
+                    </div>
+                </div>
+                <a href="../../study_plan.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Study Plan</a>
+                <a href="../../about.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">About</a>
+                <a href="../../contact.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Contact</a>
+            </div>
+        </div>
+    </header>
+    <!-- =================== HEADER END =================== -->
+
+    <!-- Main Content Wrapper -->
+    <div class="relative pt-32 pb-20 px-4 min-h-screen">
+        <!-- Background Gradients -->
+        <div class="absolute top-32 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl -z-10"></div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl -z-10"></div>
+
+        <div class="container mx-auto max-w-4xl">
+            <!-- Title Area -->
+            <div class="text-center mb-10">
+                <h1 class="text-3xl md:text-4xl font-bold text-emerald-400 mb-3"><i class="fas fa-microscope mr-2"></i> Biology Branches Quiz</h1>
+                <p class="text-gray-400">Test your knowledge on various fields of Biology</p>
+            </div>
+
+            <!-- Quiz Container -->
+            <div class="quiz-card-wrapper">
+                
+                <!-- Action Bar -->
+                <div class="flex justify-between items-center p-5 bg-gray-50 rounded-t-lg border-b border-gray-100">
+                    <div class="text-emerald-600 font-semibold flex items-center gap-2">
+                        <i class="fas fa-clipboard-check"></i> Practice MCQs
+                    </div>
+                    <button class="btn-action" onclick="copyMCQs()">
+                        <i class="far fa-copy"></i> Copy Questions
+                    </button>
+                </div>
+
+                <!-- Start Screen -->
+                <div class="quiz-start" id="start-screen">
+                    <div style="width: 80px; height: 80px; background: #d1fae5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                        <i class="fas fa-dna" style="font-size: 2.5rem; color: #10b981;"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Ready to Start?</h2>
+                    <p class="text-gray-500 mb-6">25 Questions • Total Time: 14m 35s</p>
+                    <div class="bg-yellow-50 text-yellow-700 px-4 py-2 rounded-full text-sm font-medium border border-yellow-200">
+                        <i class="fas fa-stopwatch mr-1"></i> 35 seconds per question (Total)
+                    </div>
+                    <button class="big-start-btn" onclick="startQuiz()">Start Quiz</button>
+                </div>
+
+                <!-- Quiz Interface -->
+                <div class="quiz-header" id="quiz-header">
+                    <div class="flex justify-between items-center mb-4">
+                        <span id="q-number" class="text-emerald-600 font-bold">Question 1/25</span>
+                        <span class="timer"><i class="far fa-clock"></i> <span id="time-left">14:35</span></span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center text-sm font-semibold text-gray-500">
+                        <div class="flex gap-3">
+                            <span class="px-2 py-1 rounded bg-green-100 text-green-700"><i class="fas fa-check"></i> <span id="score-c">0</span></span>
+                            <span class="px-2 py-1 rounded bg-red-100 text-red-700"><i class="fas fa-times"></i> <span id="score-w">0</span></span>
+                        </div>
+                        <span class="text-emerald-600">Score: <span id="score-t">0</span></span>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="p-6 md:p-8" id="quiz-body" style="display: none;">
+                    <div class="text-xl font-semibold text-gray-800 mb-6 leading-relaxed" id="quiz-q">Question text...</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="options-box">
+                        <!-- Options injected by JS -->
+                    </div>
+                    <div class="explanation" id="exp-box">
+                        <h4 class="font-bold mb-2 flex items-center gap-2"><i class="fas fa-lightbulb"></i> Note:</h4>
+                        <span id="exp-text"></span>
+                    </div>
+                </div>
+
+                <div class="p-5 bg-gray-50 border-t border-gray-100 rounded-b-lg flex justify-between" id="quiz-footer" style="display: none;">
+                    <button class="px-5 py-2 rounded-lg border border-gray-300 text-gray-500 hover:bg-gray-200 transition font-medium" onclick="skipQuestion()">Skip</button>
+                    <button class="px-6 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition font-bold shadow-md" onclick="nextQuestion()">Next <i class="fas fa-arrow-right ml-1"></i></button>
+                </div>
+
+                <!-- Result Screen -->
+                <div class="text-center p-10 hidden" id="result-screen">
+                    <div class="w-32 h-32 rounded-full mx-auto mb-6 flex items-center justify-center relative" id="final-circle" style="background: conic-gradient(#10b981 0%, #e5e7eb 0%);">
+                        <div class="w-28 h-28 bg-white rounded-full flex flex-col items-center justify-center">
+                            <span class="text-4xl font-bold text-emerald-500" id="final-score">0</span>
+                            <span class="text-xs text-gray-400 uppercase tracking-widest">Score</span>
+                        </div>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Quiz Completed!</h2>
+                    <p class="text-gray-500 mb-8">Performance Summary</p>
+                    
+                    <div class="flex justify-center gap-4 mb-8 flex-wrap">
+                        <div class="bg-green-50 p-4 rounded-xl min-w-[100px]">
+                            <b class="text-2xl text-green-600 block" id="final-c">0</b>
+                            <span class="text-xs text-gray-500 uppercase">Correct</span>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-xl min-w-[100px]">
+                            <b class="text-2xl text-red-600 block" id="final-w">0</b>
+                            <span class="text-xs text-gray-500 uppercase">Wrong</span>
+                        </div>
+                        <div class="bg-gray-100 p-4 rounded-xl min-w-[100px]">
+                            <b class="text-2xl text-gray-600 block" id="final-s">0</b>
+                            <span class="text-xs text-gray-500 uppercase">Skipped</span>
+                        </div>
+                    </div>
+                    <button class="big-start-btn" onclick="location.reload()">Try Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================== FEEDBACK SECTION =================== -->
+    <section class="feedback-section py-20 bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-4xl font-bold mb-4 text-white">Feedback</h2>
+                    <p class="text-gray-400 mb-8">We value your input to make Class Caddy better. Please share your suggestions, report any issues, or let us know what you love!</p>
+                    <div class="flex gap-6">
+                        <a href="https://facebook.com/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-facebook-f fa-2x"></i></a>
+                        <a href="https://wa.me/+8801743303877" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-whatsapp fa-2x"></i></a>
+                        <a href="https://t.me/emammehedi17" target="_blank" class="text-gray-400 hover:text-emerald-400 transition-colors"><i class="fab fa-telegram fa-2x"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <form onsubmit="event.preventDefault(); alert('Thank you for your feedback!');">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                            <input type="email" placeholder="Enter Email Address" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white transition-all">
+                        </div>
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Your suggestion/Feedback</label>
+                            <textarea rows="4" placeholder="Write your complaint or suggestion" class="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-white transition-all"></textarea>
+                        </div>
+                        <div class="mt-6">
+                            <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg transition-colors text-lg">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =================== FOOTER SECTION =================== -->
+    <footer class="bg-gray-900 border-t border-gray-800 pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Quick Links</h3>
+                    <ul class="space-y-3">
+                        <li><a href="../../about.html" class="text-gray-400 hover:text-emerald-400 transition">About Us</a></li>
+                        <li><a href="../../academic.html" class="text-gray-400 hover:text-emerald-400 transition">Courses</a></li>
+                        <li><a href="https://eco.du.ac.bd/" target="_blank" class="text-gray-400 hover:text-emerald-400 transition">DU Student Portal</a></li>
+                        <li><a href="https://result.du.ac.bd/" target="_blank" class="text-gray-400 hover:text-emerald-400 transition">DU Result Portal</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Contact Us</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fa-solid fa-phone"></i> Support</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-facebook-f"></i> Facebook</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-1">
+                    <h3 class="font-semibold text-white mb-4">Others</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Gallery</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-emerald-400 transition">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="col-span-2 lg:col-span-2">
+                     <h3 class="font-semibold text-white mb-4">Download App</h3>
+                     <div class="flex flex-col sm:flex-row lg:flex-col gap-4">
+                        <a href="#" class="bg-gray-800 border border-gray-700 rounded-lg p-3 flex items-center gap-3 hover:bg-gray-700 transition">
+                            <i class="fab fa-google-play fa-2x text-white"></i>
+                            <div>
+                                <p class="text-xs text-gray-400">GET IT ON</p>
+                                <p class="text-lg font-semibold text-white">Google Play</p>
+                            </div>
+                        </a>
+                     </div>
+                </div>
+            </div>
+            <div class="mt-16 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
+                <p>&copy; 2025 Class Caddy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        /* =================== HEADER LOGIC =================== */
+        // Dropdown Logic
+        const academicDropdown = document.getElementById('academic-dropdown');
+        if (academicDropdown) {
+            const menu = document.getElementById('academic-menu');
+            const button = document.getElementById('academic-button');
+            let hideTimeout;
+            const showMenu = () => { clearTimeout(hideTimeout); menu.classList.add('is-open'); };
+            const hideMenu = () => { menu.classList.remove('is-open'); };
+            const hideMenuWithDelay = () => { hideTimeout = setTimeout(hideMenu, 300); };
+            button.addEventListener('click', (event) => { event.stopPropagation(); menu.classList.toggle('is-open'); });
+            academicDropdown.addEventListener('mouseenter', showMenu);
+            academicDropdown.addEventListener('mouseleave', hideMenuWithDelay);
+            window.addEventListener('click', (event) => { if (!academicDropdown.contains(event.target)) { hideMenu(); } });
+        }
+
+        // Mobile Menu Logic
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileAcademicButton = document.getElementById('mobile-academic-button');
+        const mobileAcademicMenu = document.getElementById('mobile-academic-menu');
+
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+        }
+        if (mobileAcademicButton && mobileAcademicMenu) {
+            mobileAcademicButton.addEventListener('click', () => {
+                mobileAcademicMenu.classList.toggle('hidden');
+                mobileAcademicButton.querySelector('svg').classList.toggle('rotate-180');
+            });
+        }
+
+        /* =================== QUIZ LOGIC =================== */
+        const mcqData = [
+            { id: 1, q: "What is the correct Bangla terminology for 'Cytology'?", options: ["Bangshagatibidya", "Shrenibinyasbidya", "Koshbidya", "Tissuetattwa"], correct: 2, note: "Cytology discusses the structure, function, and division of cells. Its Bangla meaning is Koshbidya." },
+            { id: 2, q: "Which Bangla term corresponds to the branch 'Histology'?", options: ["Tissuetattwa", "Angasangsthan", "Sharirbidya", "Bibaortanbidya"], correct: 0, note: "Histology deals with the structure, arrangement, and function of tissues. Its Bangla meaning is Tissuetattwa." },
+            { id: 3, q: "What is the Bangla name for the branch 'Entomology'?", options: ["Kitattwa", "Parajibibidya", "Matshabidya", "Anujibbidya"], correct: 0, note: "Entomology studies the life, merits, demerits, and control of insects. Its Bangla meaning is Kitattwa." },
+            { id: 4, q: "'Embryology' is known in Bangla as which of the following?", options: ["Bastubidya", "Vrunbidya", "Jibbhugol", "Pratnatattwa"], correct: 1, note: "Embryology discusses the origin and development of the embryo. Its Bangla meaning is Vrunbidya." },
+            { id: 5, q: "Which Bangla term is used for 'Endocrinology'?", options: ["Hormonebidya", "Enzymebidya", "Srishtibidya", "Snayubidya"], correct: 0, note: "Endocrinology studies hormones and their functions in the body. Its Bangla meaning is Hormonebidya." },
+            { id: 6, q: "What is the Bangla terminology for 'Palaeontology'?", options: ["Pratnatattwabidya", "Bibartanbidya", "Bongshogotibidya", "Shrenibinyasbidya"], correct: 0, note: "Palaeontology deals with prehistoric life and fossils. Its Bangla meaning is Pratnatattwabidya." },
+            { id: 7, q: "'Biogeography' is referred to in Bangla as which of the following?", options: ["Jibparishankhyan", "Jibbhugol", "Paribeshbigyan", "Prani-bhugol"], correct: 1, note: "Biogeography discusses the geographical distribution and adaptation of organisms. Its Bangla meaning is Jibbhugol." },
+            { id: 8, q: "What is the correct Bangla meaning of 'Parasitology'?", options: ["Parajibibidya", "Anujibbidya", "Rogtattwa", "Kittattwa"], correct: 0, note: "Parasitology studies parasitism, the life of parasites, and host-parasite relationships. Its Bangla meaning is Parajibibidya." },
+            { id: 9, q: "Which Bangla term corresponds to 'Taxonomy'?", options: ["Shrenibinyasbidya", "Angasangsthanbidya", "Sharirbrittabidya", "Bangshagatibidya"], correct: 0, note: "Taxonomy deals with the principles and classification of organisms. Its Bangla meaning is Shrenibinyasbidya." },
+            { id: 10, q: "'Morphology' is known in Bangla as which of the following?", options: ["Angasangsthanbidya", "Abhyantarinbidya", "Bahyikgathanbidya", "Sharirkriyabidya"], correct: 0, note: "Morphology deals with the external and internal structure of organisms. Its Bangla meaning is Angasangsthanbidya." },
+            { id: 11, q: "From which language did the term 'Biology' originate?", options: ["Latin and French", "Greek and Latin", "Greek and French", "Only from Greek"], correct: 3, note: "The term Biology is derived from the two Greek words 'Bios' (life) and 'Logos' (knowledge)." },
+            { id: 12, q: "Who is regarded as the father of Biology?", options: ["Theophrastus", "Aristotle", "Carolus Linnaeus", "Gregor Mendel"], correct: 1, note: "The Greek philosopher Aristotle is considered the father of Biology." },
+            { id: 13, q: "Which of the following is a branch of Physical Biology?", options: ["Microbiology", "Physiology", "Agriculture", "Entomology"], correct: 1, note: "Physiology is a branch of Physical Biology dealing with biochemical activities of living beings. The others are Applied Biology." },
+            { id: 14, q: "Which of the following is considered an Applied branch of Biology?", options: ["Palaeontology", "Biogeography", "Parasitology", "Embryology"], correct: 2, note: "Parasitology is an Applied branch related to parasites. The others are branches of Physical Biology." },
+            { id: 15, q: "What is the other name for 'Internal Morphology'?", options: ["Cytology", "Anatomy", "Genetics", "Ecology"], correct: 1, note: "Internal Morphology, which deals with internal structures of the body, is also called Anatomy." },
+            { id: 16, q: "Which branch deals with the mutual relationship between organisms and their environment?", options: ["Evolution", "Ecology", "Ethology", "Genetics"], correct: 1, note: "Ecology is the branch of Physical Biology that studies the inter-relationship between organisms and their environment." },
+            { id: 17, q: "What is the primary subject matter of 'Evolution'?", options: ["Gradual development of life", "Classification of organisms", "Functions of body organs", "Distribution of animals"], correct: 0, note: "Evolution studies the origin of life and its gradual development over time." },
+            { id: 18, q: "Which branch of biology uses mathematical concepts and statistics?", options: ["Bioinformatics", "Biostatistics", "Biochemistry", "Biotechnology"], correct: 1, note: "Biostatistics applies statistics to biological data. Bioinformatics mainly uses computer technology for biological analysis." },
+            { id: 19, q: "Which branch discusses the cultivation and management of forests?", options: ["Horticulture", "Agriculture", "Forestry", "Pharmacy"], correct: 2, note: "Forestry is the Applied Biology branch dedicated to the management and conservation of forests and their resources." },
+            { id: 20, q: "Which branch is concerned with the science of drugs and medicines?", options: ["Pathology", "Pharmacy", "Medicine", "Surgery"], correct: 1, note: "Pharmacy involves the technology and science of preparing and dispensing drugs and medicines." },
+            { id: 21, q: "Which branch deals with the chemical composition and processes in living beings?", options: ["Biochemistry", "Biophysics", "Biotechnology", "Biostatistics"], correct: 0, note: "Biochemistry studies the chemical processes and substances within living organisms." },
+            { id: 22, q: "What is the subject matter of 'Endocrinology'?", options: ["Enzymes and digestion", "Hormones and glands", "Bones and muscles", "Nerves and brain"], correct: 1, note: "Endocrinology is the study of the endocrine system, its glands, and the hormones they secrete." },
+            { id: 23, q: "Which branch studies organisms that are invisible to the naked eye?", options: ["Microbiology", "Parasitology", "Entomology", "Cytology"], correct: 0, note: "Microbiology focuses on microscopic organisms like viruses, bacteria, and fungi." },
+            { id: 24, q: "Which branch of biology is closely related to technology and industry?", options: ["Biotechnology", "Biogeography", "Palaeontology", "Morphology"], correct: 0, note: "Biotechnology uses biological systems or living organisms to develop or create products for technological applications." },
+            { id: 25, q: "Which branch focuses on the laws and principles of heredity?", options: ["Genetics", "Bionics", "Physics", "Ethics"], correct: 0, note: "Genetics is the Physical Biology branch that studies genes, heredity, and variation in organisms." }
+        ];
+
+        let currentQ = 0;
+        let scoreTotal = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let skippedCount = 0;
+        
+        // Timer Logic Update: 35s per question as TOTAL
+        const TIME_PER_QUESTION = 35;
+        const TOTAL_QUIZ_TIME = mcqData.length * TIME_PER_QUESTION; // 25 * 35 = 875s
+        let timeLeft = TOTAL_QUIZ_TIME;
+        let timerId;
+        let isAnswered = false;
+
+        const startScreen = document.getElementById('start-screen');
+        const quizHeader = document.getElementById('quiz-header');
+        const quizBody = document.getElementById('quiz-body');
+        const quizFooter = document.getElementById('quiz-footer');
+        const resultScreen = document.getElementById('result-screen');
+        
+        const qText = document.getElementById('quiz-q');
+        const optBox = document.getElementById('options-box');
+        const expBox = document.getElementById('exp-box');
+        const expText = document.getElementById('exp-text');
+        const timerDisplay = document.getElementById('time-left');
+        const progressBar = document.getElementById('progress-fill');
+        
+        const scoreC = document.getElementById('score-c');
+        const scoreW = document.getElementById('score-w');
+        const scoreT = document.getElementById('score-t');
+        const qNum = document.getElementById('q-number');
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function startTimer() {
+            timerDisplay.textContent = formatTime(timeLeft);
+            timerId = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = formatTime(timeLeft);
+                
+                // Progress Bar (Time Remaining)
+                const percentage = (timeLeft / TOTAL_QUIZ_TIME) * 100;
+                
+                if(timeLeft <= 0) {
+                    clearInterval(timerId);
+                    finishQuiz();
+                }
+            }, 1000);
+        }
+
+        function startQuiz() {
+            startScreen.style.display = 'none';
+            quizHeader.style.display = 'block';
+            quizBody.style.display = 'block';
+            quizFooter.style.display = 'flex';
+            loadQuestion(0);
+            startTimer();
+        }
+
+        function loadQuestion(idx) {
+            isAnswered = false;
+            expBox.style.display = 'none';
+            const data = mcqData[idx];
+            
+            qNum.textContent = `Question ${idx + 1}/${mcqData.length}`;
+            qText.textContent = `${idx + 1}. ${data.q}`;
+            
+            // Progress Bar for Questions
+            const prog = ((idx) / mcqData.length) * 100;
+            progressBar.style.width = `${prog}%`;
+
+            optBox.innerHTML = '';
+            data.options.forEach((opt, i) => {
+                const btn = document.createElement('div');
+                btn.className = 'option-btn';
+                btn.textContent = opt;
+                btn.onclick = () => checkAnswer(i, btn, data.correct);
+                optBox.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, btn, correct) {
+            if(isAnswered) return;
+            isAnswered = true;
+            const allBtns = document.querySelectorAll('.option-btn');
+            allBtns.forEach(b => b.classList.add('disabled'));
+
+            if(selected === correct) {
+                btn.classList.add('correct');
+                scoreTotal += 1;
+                correctCount++;
+                scoreC.textContent = correctCount;
+            } else {
+                btn.classList.add('wrong');
+                allBtns[correct].classList.add('correct');
+                wrongCount++;
+                scoreW.textContent = wrongCount;
+            }
+            scoreT.textContent = scoreTotal;
+            
+            expText.textContent = mcqData[currentQ].note;
+            expBox.style.display = 'block';
+        }
+
+        function nextQuestion() {
+            if(currentQ < mcqData.length - 1) {
+                currentQ++;
+                loadQuestion(currentQ);
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function skipQuestion() {
+            if(!isAnswered) skippedCount++;
+            nextQuestion();
+        }
+
+        function finishQuiz() {
+            clearInterval(timerId);
+            quizHeader.style.display = 'none';
+            quizBody.style.display = 'none';
+            quizFooter.style.display = 'none';
+            resultScreen.style.display = 'block';
+            
+            document.getElementById('final-score').textContent = scoreTotal;
+            document.getElementById('final-c').textContent = correctCount;
+            document.getElementById('final-w').textContent = wrongCount;
+            document.getElementById('final-s').textContent = skippedCount;
+            
+            const percentage = (scoreTotal / mcqData.length) * 100;
+            document.getElementById('final-circle').style.background = `conic-gradient(#10b981 ${percentage}%, #e5e7eb ${percentage}%)`;
+        }
+
+        function copyMCQs() {
+            let text = "";
+            mcqData.forEach(item => {
+                text += `${item.id}. ${item.q}\n`;
+                item.options.forEach((opt, i) => {
+                    text += `${String.fromCharCode(97+i)}. ${opt}\n`;
+                });
+                text += `Correct answer: ${String.fromCharCode(97+item.correct)}\n`;
+                text += `Note: ${item.note}\n\n`;
+            });
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    const btn = document.querySelector('.btn-action');
+                    const originalHTML = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => { btn.innerHTML = originalHTML; }, 2000);
+                }).catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert("All questions copied to clipboard!");
+        }
+    </script>
+
+</body>
+</html>
