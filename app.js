@@ -8861,116 +8861,152 @@ async function loadReviewWrongAnswers() {
     }
 }
 
-// --- NEW PRINT ANSWER SCRIPT FEATURE ---
+// --- PRINT ANSWER SCRIPT FEATURE (FIXED) ---
 
+// বাটন ক্লিক ইভেন্ট লিসেনার
 document.getElementById('quiz-print-btn').addEventListener('click', function() {
     printAnswerScript();
 });
 
 function printAnswerScript() {
-    // 1. Gather Data needed for the Header
-    const subjectTopic = document.getElementById('quiz-topic-name').innerText || "General Knowledge";
-    const totalQuestions = currentQuestions.length; // Uses the global variable from app.js
-    const totalMarks = totalQuestions * 1; // Assuming 1 mark per question
-    const obtainedMarks = parseFloat(document.getElementById('summary-final-score').innerText) || 0;
+    // ১. সঠিক ভেরিয়েবল থেকে ডাটা নেওয়া (আপনার app.js অনুযায়ী)
+    const questions = currentQuizQuestions; // এটিই আপনার মূল প্রশ্নের লিস্ট [Line 42]
+    const answers = userQuizAnswers;        // এটি ব্যবহারকারীর উত্তরের লিস্ট [Line 43]
+
+    // যদি কোনো প্রশ্ন না থাকে, তবে প্রিন্ট হবে না
+    if (!questions || questions.length === 0) {
+        alert("No questions to print!");
+        return;
+    }
+
+    // ২. হেডারের তথ্য জোগাড় করা
+    // সাবজেক্ট ও টপিক বের করার চেষ্টা (যদি প্রশ্নের ভেতরে থাকে)
+    let subjectName = "General / Vocabulary";
+    let topicName = document.getElementById('quiz-topic-name').innerText;
+    
+    // যদি প্রশ্নের অবজেক্টে subject বা topic থাকে, তবে সেটি ব্যবহার করবে
+    if (questions[0].subject) subjectName = questions[0].subject;
+    if (questions[0].topic) topicName = questions[0].topic;
+
+    const totalQuestions = questions.length;
+    
+    // নম্বর এবং সময় বের করা (DOM থেকে)
+    const obtainedMarkText = document.getElementById('summary-correct-score').innerText; // যেমন "+5.00"
+    const obtainedMark = parseFloat(obtainedMarkText.replace('+', '')) || 0;
+    const totalMark = totalQuestions * 1; // ধরে নিচ্ছি প্রতি প্রশ্নে ১ নম্বর
     const timeTaken = document.getElementById('summary-time-taken').innerText;
     
-    // Get current date
+    // বর্তমান তারিখ
     const date = new Date().toLocaleDateString('en-GB', {
         day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
 
-    // 2. Start constructing the HTML
+    // ৩. প্রিন্ট উইন্ডোর HTML তৈরি করা
     let printContent = `
     <html>
     <head>
-        <title>Answer Script - ${subjectTopic}</title>
+        <title>Answer Script - ${topicName}</title>
         <style>
-            body { font-family: 'Kalpurush', 'Inter', sans-serif; padding: 20px; color: #000; }
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kalpurush&display=swap');
+            body { font-family: 'Kalpurush', 'Inter', sans-serif; padding: 30px; color: #1f2937; line-height: 1.5; }
+            
+            /* Header Box Design */
             .header-box { 
-                border: 2px solid #333; padding: 15px; margin-bottom: 25px; border-radius: 8px; 
-                display: flex; justify-content: space-between; align-items: center; bg-color: #f9f9f9;
+                border: 2px solid #374151; padding: 20px; margin-bottom: 30px; border-radius: 10px; 
+                display: flex; justify-content: space-between; align-items: center; background-color: #f9fafb;
             }
-            .header-info h2 { margin: 0 0 5px 0; font-size: 18px; color: #4f46e5; }
-            .header-info p { margin: 2px 0; font-size: 14px; font-weight: 600; }
-            .score-box { text-align: right; }
-            .score-big { font-size: 24px; font-weight: bold; color: #059669; }
-            .question-item { margin-bottom: 20px; page-break-inside: avoid; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
-            .q-text { font-weight: bold; font-size: 16px; margin-bottom: 8px; }
+            .header-left h1 { margin: 0 0 5px 0; font-size: 22px; color: #4f46e5; }
+            .header-left p { margin: 4px 0; font-size: 14px; font-weight: 600; color: #4b5563; }
+            
+            .score-box { text-align: right; border-left: 1px solid #d1d5db; padding-left: 20px; }
+            .score-big { font-size: 32px; font-weight: bold; color: #059669; line-height: 1; }
+            .score-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #6b7280; margin-top: 5px; }
+
+            /* Question List Design */
+            .question-item { margin-bottom: 25px; page-break-inside: avoid; border-bottom: 1px dashed #e5e7eb; padding-bottom: 20px; }
+            .q-text { font-weight: bold; font-size: 16px; margin-bottom: 12px; color: #111827; }
+            
             .options-list { list-style-type: none; padding-left: 0; margin: 0; }
             .opt { 
-                padding: 4px 8px; margin-bottom: 2px; border-radius: 4px; font-size: 14px; 
-                border: 1px solid transparent; display: block;
+                padding: 6px 12px; margin-bottom: 4px; border-radius: 6px; font-size: 14px; 
+                border: 1px solid transparent; display: flex; justify-content: space-between; align-items: center;
             }
-            /* Styles for correct/wrong answers */
-            .opt.correct { background-color: #d1fae5; border-color: #10b981; color: #064e3b; font-weight: bold; }
-            .opt.user-wrong { background-color: #fee2e2; border-color: #ef4444; text-decoration: line-through; color: #991b1b; }
-            .opt.user-selected { border: 1px solid #6366f1; } /* Blue border if selected but not strictly wrong/right styling overlap */
+            
+            /* Styles for answers */
+            .opt.correct { background-color: #d1fae5; border-color: #10b981; color: #064e3b; font-weight: 600; }
+            .opt.user-wrong { background-color: #fee2e2; border-color: #ef4444; text-decoration: line-through; color: #991b1b; opacity: 0.8; }
+            .opt.user-selected-correct { border: 2px solid #059669; } /* ইউজার সঠিক দিলে বর্ডার গাঢ় হবে */
             
             .explanation { 
-                margin-top: 8px; padding: 8px; background-color: #f3f4f6; 
-                border-left: 3px solid #6366f1; font-size: 13px; color: #374151; 
+                margin-top: 12px; padding: 12px; background-color: #eff6ff; 
+                border-left: 4px solid #3b82f6; font-size: 13px; color: #1e3a8a; border-radius: 4px;
             }
+            
             .badge { 
-                display: inline-block; padding: 2px 6px; border-radius: 4px; 
-                font-size: 10px; text-transform: uppercase; margin-left: 5px; color: white;
+                font-size: 10px; font-weight: bold; text-transform: uppercase; 
+                padding: 2px 6px; border-radius: 4px; color: white; margin-left: 8px; white-space: nowrap;
             }
-            .badge-user { background-color: #6366f1; }
             .badge-correct { background-color: #10b981; }
+            .badge-wrong { background-color: #ef4444; }
+            .badge-user { background-color: #6366f1; }
         </style>
     </head>
     <body>
         <div class="header-box">
-            <div class="header-info">
-                <h2>${subjectTopic}</h2>
-                <p>Time Taken: ${timeTaken}</p>
+            <div class="header-left">
+                <h1>${subjectName}</h1>
+                <p>Topic: ${topicName}</p>
                 <p>Date: ${date}</p>
+                <p>Time Taken: ${timeTaken}</p>
             </div>
             <div class="score-box">
-                <div class="score-big">${obtainedMarks} / ${totalMarks}</div>
-                <p>Obtained Marks</p>
+                <div class="score-big">${obtainedMark} / ${totalMark}</div>
+                <div class="score-label">Obtained Marks</div>
             </div>
         </div>
 
         <div class="questions-container">
     `;
 
-    // 3. Loop through questions to build the list
-    // Note: Assuming 'currentQuestions' and 'userAnswers' are the global variables from your app.js
-    currentQuestions.forEach((q, index) => {
-        const userSelectedIdx = userAnswers[index]; // 0, 1, 2, 3 or undefined
-        const correctIdx = q.correct; // 0, 1, 2, 3
+    // ৪. লুপ চালিয়ে প্রশ্ন এবং উত্তর সাজানো
+    questions.forEach((q, index) => {
+        // userQuizAnswers একটি অবজেক্ট, তাই ইনডেক্স দিয়ে ভ্যালু বের করতে হবে
+        const userSelectedIdx = answers[index]; 
+        const correctIdx = q.correct;
 
         printContent += `<div class="question-item">
-            <div class="q-text">${index + 1}. ${q.question}</div>
+            <div class="q-text">Q${index + 1}. ${q.question}</div>
             <ul class="options-list">`;
 
         q.options.forEach((opt, optIdx) => {
             let classList = 'opt';
             let badges = '';
 
-            // Logic for styling
+            // ১. এটি কি সঠিক উত্তর?
             if (optIdx === correctIdx) {
                 classList += ' correct';
-                badges += `<span class="badge badge-correct">Correct</span>`;
+                badges += `<span class="badge badge-correct">Correct Answer</span>`;
             }
             
+            // ২. ইউজার কি এটি সিলেক্ট করেছিল?
             if (optIdx === userSelectedIdx) {
                 if (optIdx !== correctIdx) {
+                    // ভুল উত্তর দিয়েছে
                     classList += ' user-wrong';
-                    badges += `<span class="badge badge-user">Your Answer</span>`;
+                    badges += `<span class="badge badge-wrong">Your Answer</span>`;
                 } else {
-                     // If user is correct, adding a small indicator
-                     badges += `<span class="badge badge-user" style="background-color:#047857;">You</span>`;
+                    // সঠিক উত্তর দিয়েছে
+                    classList += ' user-selected-correct';
+                    badges = `<span class="badge badge-user">Your Answer (Correct)</span>`; // আগের ব্যাজ রিপ্লেস করবে
                 }
             }
 
-            printContent += `<li class="${classList}">${opt} ${badges}</li>`;
+            printContent += `<li class="${classList}"><span>${opt}</span> ${badges}</li>`;
         });
 
         printContent += `</ul>`;
 
-        // Add explanation if it exists
+        // ৫. ব্যাখ্যা (Explanation) যোগ করা (যদি থাকে)
         if (q.explanation) {
             printContent += `<div class="explanation"><strong>Explanation:</strong> ${q.explanation}</div>`;
         }
@@ -8981,13 +9017,22 @@ function printAnswerScript() {
     printContent += `
         </div>
         <script>
-            window.onload = function() { window.print(); }
+            // পেজ লোড হলেই প্রিন্ট ডায়ালগ আসবে
+            window.onload = function() { 
+                window.print(); 
+                // মোবাইল ব্রাউজারে প্রিন্ট ডায়ালগ বন্ধ করলে উইন্ডো ক্লোজ করার জন্য (অপশনাল)
+                // setTimeout(function(){ window.close(); }, 500);
+            }
         </script>
     </body>
     </html>`;
 
-    // 4. Open New Window and Print
+    // ৬. নতুন উইন্ডোতে ওপেন করা
     const printWindow = window.open('', '_blank');
-    printWindow.document.write(printContent);
-    printWindow.document.close();
+    if (printWindow) {
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+    } else {
+        alert("Pop-up blocked! Please allow pop-ups for this website to print.");
+    }
 }
