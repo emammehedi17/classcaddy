@@ -8834,7 +8834,8 @@ async function loadReviewWrongAnswers() {
         });
 
         // 7. Attach "View" Button Listeners (Event Delegation)
-        document.getElementById('wrong-ans-list-container').addEventListener('click', (e) => {
+        const wrongAnsList = document.getElementById('wrong-ans-list-container');
+if (wrongAnsList) wrongAnsList.addEventListener('click', (e) => {
             const btn = e.target.closest('.view-wrong-qs-btn');
             if(btn) {
                 const resultId = btn.dataset.resultId;
@@ -8862,7 +8863,7 @@ async function loadReviewWrongAnswers() {
 }
 
 
-// --- RESOURCES / LIBRARY SYSTEM (UPDATED) ---
+// --- RESOURCES / LIBRARY SYSTEM (FINAL FIXED VERSION) ---
 
 const globalResources = [
     {
@@ -8887,81 +8888,60 @@ const globalResources = [
                 ]
             }
         ]
-    },
-    {
-        folderName: "English Literature",
-        files: [
-            {
-                title: "Shakespeare Basics",
-                subject: "English",
-                questions: [
-                    {
-                        question: "Who wrote Hamlet?",
-                        options: ["Marlowe", "Shakespeare", "Milton", "Bacon"],
-                        correctAnswer: "Shakespeare",
-                        explanation: "William Shakespeare wrote Hamlet."
-                    }
-                ]
-            }
-        ]
     }
 ];
 
+// Safe Initialization Function
 function initResourcesSystem() {
-    console.log("Resources System: Initializing..."); // Debug Message
+    console.log("Resources System: Checking elements..."); 
 
     const resourcesBtn = document.getElementById('resources-btn');
     const resourcesModal = document.getElementById('resources-modal');
-    const closeResourcesBtn = document.getElementById('close-resources-btn');
     const container = document.getElementById('resources-container');
+    const closeResourcesBtn = document.getElementById('close-resources-btn');
 
-    if (!resourcesBtn) {
-        console.error("Resources System Error: 'resources-btn' not found in HTML.");
-        return;
-    }
-    
-    if (!resourcesModal) {
-        console.error("Resources System Error: 'resources-modal' not found in HTML.");
-        return;
+    // Safety Check: If HTML is missing, stop without crashing
+    if (!resourcesBtn || !resourcesModal || !container) {
+        console.warn("Resources System: Required HTML elements not found. Skipping init.");
+        return; 
     }
 
-    console.log("Resources System: Button and Modal found. Attaching listeners.");
+    console.log("Resources System: Ready.");
 
     // Open Modal
-    resourcesBtn.addEventListener('click', (e) => {
+    resourcesBtn.onclick = function(e) {
         e.preventDefault();
-        console.log("Resources button clicked!");
         renderResources();
         resourcesModal.classList.remove('hidden');
-        resourcesModal.classList.add('flex'); // Ensure flex is added for centering
-    });
+        resourcesModal.classList.add('flex');
+    };
 
     // Close Modal
     if(closeResourcesBtn) {
-        closeResourcesBtn.addEventListener('click', () => {
+        closeResourcesBtn.onclick = function() {
             resourcesModal.classList.add('hidden');
             resourcesModal.classList.remove('flex');
-        });
+        };
     }
 
-    // Close on clicking outside
-    resourcesModal.addEventListener('click', (e) => {
+    // Close on Outside Click
+    resourcesModal.onclick = function(e) {
         if (e.target === resourcesModal) {
             resourcesModal.classList.add('hidden');
             resourcesModal.classList.remove('flex');
         }
-    });
+    };
 
     function renderResources() {
         container.innerHTML = ''; 
 
         globalResources.forEach((folder) => {
             const folderDiv = document.createElement('div');
-            folderDiv.className = 'bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow';
+            folderDiv.className = 'bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4';
             
             const folderTitle = document.createElement('h4');
-            folderTitle.className = 'font-bold text-gray-700 mb-3 flex items-center border-b pb-2';
-            folderTitle.innerHTML = `<i class="fas fa-folder text-yellow-500 mr-2 text-xl"></i> ${folder.folderName}`;
+            folderTitle.className = 'font-bold text-gray-700 mb-2 border-b pb-1';
+            folderTitle.innerHTML = `<i class="fas fa-folder text-yellow-500 mr-2"></i> ${folder.folderName}`;
             folderDiv.appendChild(folderTitle);
 
             const fileList = document.createElement('ul');
@@ -8970,16 +8950,16 @@ function initResourcesSystem() {
             folder.files.forEach((file) => {
                 const li = document.createElement('li');
                 const btn = document.createElement('button');
-                btn.className = 'w-full text-left text-sm text-gray-600 hover:text-teal-600 hover:bg-white p-2 rounded flex items-center transition-colors border border-transparent hover:border-gray-200';
-                btn.innerHTML = `<i class="fas fa-file-alt text-teal-500 mr-2"></i> ${file.title}`;
+                btn.className = 'w-full text-left text-sm text-gray-700 hover:text-white hover:bg-teal-600 p-2 rounded transition-colors border border-gray-200';
+                btn.innerHTML = `<i class="fas fa-file-alt mr-2"></i> ${file.title}`;
                 
-                btn.addEventListener('click', () => {
+                btn.onclick = function() {
                     if(confirm(`Start exam: "${file.title}"?`)) {
                         startResourceQuiz(file);
                         resourcesModal.classList.add('hidden');
                         resourcesModal.classList.remove('flex');
                     }
-                });
+                };
 
                 li.appendChild(btn);
                 fileList.appendChild(li);
@@ -8991,59 +8971,30 @@ function initResourcesSystem() {
     }
 
     function startResourceQuiz(resourceData) {
-        console.log("Starting Quiz:", resourceData.title);
-        
         // Hide other sections
-        const setupSec = document.getElementById('setup-section');
-        const quizSec = document.getElementById('quiz-section');
-        const resultSec = document.getElementById('result-section');
-
-        if(setupSec) setupSec.classList.add('hidden');
-        if(resultSec) resultSec.classList.add('hidden');
-        if(quizSec) quizSec.classList.remove('hidden');
+        if(document.getElementById('setup-section')) document.getElementById('setup-section').classList.add('hidden');
+        if(document.getElementById('result-section')) document.getElementById('result-section').classList.add('hidden');
+        if(document.getElementById('quiz-section')) document.getElementById('quiz-section').classList.remove('hidden');
         
-        // Attempt to Inject Data into Variables
-        // IMPORTANT: These variables must match what you use in your main app.js code
-        try {
-            // Assign to Global Window object if strictly needed, or direct variable assignment
-            // We try updating the variables directly first
-            
-            if (typeof currentQuestions !== 'undefined') currentQuestions = resourceData.questions;
-            else window.currentQuestions = resourceData.questions;
+        // Set Global Variables
+        window.currentQuestions = resourceData.questions;
+        window.currentSubject = resourceData.subject || "Resource Quiz";
+        window.currentQuestionIndex = 0;
+        window.score = 0;
+        window.userAnswers = new Array(resourceData.questions.length).fill(null);
 
-            if (typeof currentSubject !== 'undefined') currentSubject = resourceData.subject;
-            else window.currentSubject = resourceData.subject;
-
-            // Reset State
-            if (typeof currentQuestionIndex !== 'undefined') currentQuestionIndex = 0;
-            if (typeof score !== 'undefined') score = 0;
-            if (typeof userAnswers !== 'undefined') userAnswers = new Array(resourceData.questions.length).fill(null);
-
-            // Trigger Render
-            if (typeof loadQuestion === 'function') {
-                loadQuestion();
-            } else if (typeof renderQuestion === 'function') {
-                renderQuestion();
-            } else {
-                console.error("Could not find function to render question (loadQuestion or renderQuestion).");
-                alert("Error: Quiz function not found. Check console.");
-            }
-
-            // Start Timer if available
-            if (typeof startTimer === 'function') startTimer();
-            if (typeof updateQuestionCount === 'function') updateQuestionCount();
-
-        } catch (err) {
-            console.error("Error starting quiz:", err);
-            alert("Something went wrong starting the quiz. See console.");
-        }
+        // Call Existing Functions
+        if (typeof renderQuestion === 'function') renderQuestion();
+        else if (typeof loadQuestion === 'function') loadQuestion();
+        
+        if (typeof startTimer === 'function') startTimer();
+        if (typeof updateQuestionCount === 'function') updateQuestionCount();
     }
 }
 
-// Force Initialize (Robust Check)
+// Run when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initResourcesSystem);
 } else {
-    // If DOM is already ready, run immediately
     initResourcesSystem();
 }
