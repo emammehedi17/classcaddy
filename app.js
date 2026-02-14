@@ -8985,3 +8985,135 @@ if (document.readyState === 'loading') {
 } else {
     checkAutoLogin();
 }
+
+
+// --- NEW PRINT ANSWER SCRIPT FEATURE ---
+
+document.getElementById('quiz-print-btn').addEventListener('click', function() {
+    printAnswerScript();
+});
+
+function printAnswerScript() {
+    // 1. Gather Data needed for the Header
+    const subjectTopic = document.getElementById('quiz-topic-name').innerText || "General Knowledge";
+    const totalQuestions = currentQuestions.length; // Uses the global variable from app.js
+    const totalMarks = totalQuestions * 1; // Assuming 1 mark per question
+    const obtainedMarks = parseFloat(document.getElementById('summary-final-score').innerText) || 0;
+    const timeTaken = document.getElementById('summary-time-taken').innerText;
+    
+    // Get current date
+    const date = new Date().toLocaleDateString('en-GB', {
+        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+
+    // 2. Start constructing the HTML
+    let printContent = `
+    <html>
+    <head>
+        <title>Answer Script - ${subjectTopic}</title>
+        <style>
+            body { font-family: 'Kalpurush', 'Inter', sans-serif; padding: 20px; color: #000; }
+            .header-box { 
+                border: 2px solid #333; padding: 15px; margin-bottom: 25px; border-radius: 8px; 
+                display: flex; justify-content: space-between; align-items: center; bg-color: #f9f9f9;
+            }
+            .header-info h2 { margin: 0 0 5px 0; font-size: 18px; color: #4f46e5; }
+            .header-info p { margin: 2px 0; font-size: 14px; font-weight: 600; }
+            .score-box { text-align: right; }
+            .score-big { font-size: 24px; font-weight: bold; color: #059669; }
+            .question-item { margin-bottom: 20px; page-break-inside: avoid; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
+            .q-text { font-weight: bold; font-size: 16px; margin-bottom: 8px; }
+            .options-list { list-style-type: none; padding-left: 0; margin: 0; }
+            .opt { 
+                padding: 4px 8px; margin-bottom: 2px; border-radius: 4px; font-size: 14px; 
+                border: 1px solid transparent; display: block;
+            }
+            /* Styles for correct/wrong answers */
+            .opt.correct { background-color: #d1fae5; border-color: #10b981; color: #064e3b; font-weight: bold; }
+            .opt.user-wrong { background-color: #fee2e2; border-color: #ef4444; text-decoration: line-through; color: #991b1b; }
+            .opt.user-selected { border: 1px solid #6366f1; } /* Blue border if selected but not strictly wrong/right styling overlap */
+            
+            .explanation { 
+                margin-top: 8px; padding: 8px; background-color: #f3f4f6; 
+                border-left: 3px solid #6366f1; font-size: 13px; color: #374151; 
+            }
+            .badge { 
+                display: inline-block; padding: 2px 6px; border-radius: 4px; 
+                font-size: 10px; text-transform: uppercase; margin-left: 5px; color: white;
+            }
+            .badge-user { background-color: #6366f1; }
+            .badge-correct { background-color: #10b981; }
+        </style>
+    </head>
+    <body>
+        <div class="header-box">
+            <div class="header-info">
+                <h2>${subjectTopic}</h2>
+                <p>Time Taken: ${timeTaken}</p>
+                <p>Date: ${date}</p>
+            </div>
+            <div class="score-box">
+                <div class="score-big">${obtainedMarks} / ${totalMarks}</div>
+                <p>Obtained Marks</p>
+            </div>
+        </div>
+
+        <div class="questions-container">
+    `;
+
+    // 3. Loop through questions to build the list
+    // Note: Assuming 'currentQuestions' and 'userAnswers' are the global variables from your app.js
+    currentQuestions.forEach((q, index) => {
+        const userSelectedIdx = userAnswers[index]; // 0, 1, 2, 3 or undefined
+        const correctIdx = q.correct; // 0, 1, 2, 3
+
+        printContent += `<div class="question-item">
+            <div class="q-text">${index + 1}. ${q.question}</div>
+            <ul class="options-list">`;
+
+        q.options.forEach((opt, optIdx) => {
+            let classList = 'opt';
+            let badges = '';
+
+            // Logic for styling
+            if (optIdx === correctIdx) {
+                classList += ' correct';
+                badges += `<span class="badge badge-correct">Correct</span>`;
+            }
+            
+            if (optIdx === userSelectedIdx) {
+                if (optIdx !== correctIdx) {
+                    classList += ' user-wrong';
+                    badges += `<span class="badge badge-user">Your Answer</span>`;
+                } else {
+                     // If user is correct, adding a small indicator
+                     badges += `<span class="badge badge-user" style="background-color:#047857;">You</span>`;
+                }
+            }
+
+            printContent += `<li class="${classList}">${opt} ${badges}</li>`;
+        });
+
+        printContent += `</ul>`;
+
+        // Add explanation if it exists
+        if (q.explanation) {
+            printContent += `<div class="explanation"><strong>Explanation:</strong> ${q.explanation}</div>`;
+        }
+
+        printContent += `</div>`;
+    });
+
+    printContent += `
+        </div>
+        <script>
+            window.onload = function() { window.print(); }
+        </script>
+    </body>
+    </html>`;
+
+    // 4. Open New Window and Print
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+}
