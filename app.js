@@ -8860,3 +8860,182 @@ async function loadReviewWrongAnswers() {
         container.innerHTML = '<p class="text-center text-red-500 py-10">Error loading review data.</p>';
     }
 }
+
+
+// --- RESOURCES / LIBRARY SYSTEM ---
+
+// 1. Define your folders and MCQ sets here
+const globalResources = [
+    {
+        folderName: "General Knowledge",
+        files: [
+            {
+                title: "BCS Preparation - Set A",
+                subject: "General Knowledge",
+                questions: [
+                    {
+                        question: "What is the capital of Bangladesh?",
+                        options: ["Dhaka", "Chittagong", "Sylhet", "Khulna"],
+                        correctAnswer: "Dhaka",
+                        explanation: "Dhaka is the capital city."
+                    },
+                    {
+                        question: "How many colors are in a rainbow?",
+                        options: ["5", "6", "7", "8"],
+                        correctAnswer: "7",
+                        explanation: "Red, Orange, Yellow, Green, Blue, Indigo, Violet."
+                    }
+                ]
+            },
+            {
+                title: "International Affairs - Set 1",
+                subject: "General Knowledge",
+                questions: [
+                    {
+                        question: "Which represents the UN?",
+                        options: ["United Nations", "United Nets", "Union National", "None"],
+                        correctAnswer: "United Nations",
+                        explanation: "UN stands for United Nations."
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        folderName: "English Literature",
+        files: [
+            {
+                title: "Shakespeare Basics",
+                subject: "English",
+                questions: [
+                    {
+                        question: "Who wrote Hamlet?",
+                        options: ["Marlowe", "Shakespeare", "Milton", "Bacon"],
+                        correctAnswer: "Shakespeare",
+                        explanation: "William Shakespeare wrote Hamlet."
+                    }
+                ]
+            }
+        ]
+    }
+];
+
+// 2. Initialize Resources Functionality
+document.addEventListener('DOMContentLoaded', () => {
+    const resourcesBtn = document.getElementById('resources-btn');
+    const resourcesModal = document.getElementById('resources-modal');
+    const closeResourcesBtn = document.getElementById('close-resources-btn');
+    const container = document.getElementById('resources-container');
+
+    // Open Modal
+    if(resourcesBtn) {
+        resourcesBtn.addEventListener('click', () => {
+            renderResources();
+            resourcesModal.classList.remove('hidden');
+        });
+    }
+
+    // Close Modal
+    if(closeResourcesBtn) {
+        closeResourcesBtn.addEventListener('click', () => {
+            resourcesModal.classList.add('hidden');
+        });
+    }
+
+    // Function to Render Folders and Files
+    function renderResources() {
+        container.innerHTML = ''; // Clear previous
+
+        globalResources.forEach((folder, folderIndex) => {
+            // Create Folder Card
+            const folderDiv = document.createElement('div');
+            folderDiv.className = 'bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow';
+            
+            // Folder Title
+            const folderTitle = document.createElement('h4');
+            folderTitle.className = 'font-bold text-gray-700 mb-3 flex items-center border-b pb-2';
+            folderTitle.innerHTML = `<i class="fas fa-folder text-yellow-500 mr-2 text-xl"></i> ${folder.folderName}`;
+            folderDiv.appendChild(folderTitle);
+
+            // File List
+            const fileList = document.createElement('ul');
+            fileList.className = 'space-y-2';
+
+            folder.files.forEach((file, fileIndex) => {
+                const li = document.createElement('li');
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left text-sm text-gray-600 hover:text-teal-600 hover:bg-white p-2 rounded flex items-center transition-colors border border-transparent hover:border-gray-200';
+                btn.innerHTML = `<i class="fas fa-file-alt text-teal-500 mr-2"></i> ${file.title}`;
+                
+                // On Click: Start Quiz
+                btn.addEventListener('click', () => {
+                    if(confirm(`Start exam: "${file.title}"?`)) {
+                        startResourceQuiz(file);
+                        resourcesModal.classList.add('hidden');
+                    }
+                });
+
+                li.appendChild(btn);
+                fileList.appendChild(li);
+            });
+
+            folderDiv.appendChild(fileList);
+            container.appendChild(folderDiv);
+        });
+    }
+
+    // Function to Start the Quiz (Injects into existing UI)
+    function startResourceQuiz(resourceData) {
+        // Switch to Quiz Section
+        document.getElementById('setup-section').classList.add('hidden');
+        document.getElementById('quiz-section').classList.remove('hidden');
+        document.getElementById('result-section').classList.add('hidden');
+        
+        // Use existing variables from app.js logic
+        // Note: Assuming 'currentQuestions', 'currentSubject', 'quizTimer', etc. are global or accessible.
+        // If they are not accessible, we might need to adapt this part based on your specific app.js structure.
+        // Since I cannot see the full scope, I will try to use the most likely implementation.
+        
+        // Reset Logic
+        if (typeof currentQuestions !== 'undefined') currentQuestions = resourceData.questions;
+        if (typeof currentSubject !== 'undefined') currentSubject = resourceData.subject || "Resource Quiz";
+        
+        // If your app uses a specific function to start, call it here. 
+        // Based on typical logic:
+        // 1. Render first question
+        // 2. Start Timer
+        
+        // Assuming there is a function like 'loadQuestion(0)' or similar in your code:
+        // We trigger the internal logic.
+        
+        // HACK: To integrate with your existing code without rewriting it, 
+        // we will assume you have a 'startQuiz' function or we manually trigger the UI update.
+        
+        // Let's try to simulate the "Start Quiz" button click but with injected data.
+        // NOTE: You must ensure 'currentQuestions' is a global variable in app.js
+        window.currentQuestions = resourceData.questions;
+        window.currentSubject = resourceData.subject;
+        window.quizDuration = 20 * 60; // Default 20 mins or set per file
+        
+        // Reset counters
+        if(typeof currentQuestionIndex !== 'undefined') currentQuestionIndex = 0;
+        if(typeof score !== 'undefined') score = 0;
+        if(typeof userAnswers !== 'undefined') userAnswers = Array(resourceData.questions.length).fill(null);
+        
+        // Trigger UI update
+        // Search for the function that renders the question in your app.js and call it here.
+        // Usually it is named 'loadQuestion()' or 'renderQuestion()'.
+        if (typeof loadQuestion === 'function') {
+            loadQuestion();
+        } else if (typeof renderQuestion === 'function') {
+            renderQuestion();
+        } else {
+            alert("Error: Could not find the quiz starter function. Please check app.js variable names.");
+        }
+        
+        // Start Timer
+        if (typeof startTimer === 'function') startTimer();
+    }
+});
+
+
