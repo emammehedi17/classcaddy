@@ -38,7 +38,7 @@
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <!-- =================== HEADER START (From study_plan.html) =================== -->
+    <!-- =================== HEADER START =================== -->
     <header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200 main-website-ui shadow-sm">
         <div class="container mx-auto px-6 py-3">
             <nav class="flex justify-between items-center">
@@ -72,10 +72,20 @@
                         <img src="images/du_logo.png" alt="DU Logo" class="h-10 w-10 rounded-full border border-gray-200 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/eeeeee/111827?text=DU';">
                     </a>
                     <div id="auth-container-desktop" class="auth-container text-sm">
-                        <!-- Using Google Sign In as requested previously, integrated into this design -->
-                        <a href="study_plan.html?action=signin" class="px-5 py-2 font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors flex items-center gap-2">
-                             Sign In
-                        </a>
+                        <!-- Desktop Login Button -->
+                        <button id="desktop-login-btn" class="login-view flex items-center gap-2 bg-white text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-full font-medium transition-colors border border-gray-300 shadow-sm">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5">
+                            <span class="text-sm font-semibold">Sign in</span>
+                        </button>
+                        
+                        <!-- Desktop User Profile (Hidden by default) -->
+                        <div id="desktop-user-profile" class="profile-view hidden flex items-center gap-3">
+                            <div class="text-right hidden sm:block">
+                                <p class="user-name text-sm font-semibold text-gray-800 leading-tight">User</p>
+                                <button class="logout-btn text-xs text-red-500 hover:text-red-700 font-medium">Log Out</button>
+                            </div>
+                            <img class="user-photo w-9 h-9 rounded-full border border-gray-300 object-cover" src="" alt="User">
+                        </div>
                     </div>
                 </div>
                 <div class="md:hidden flex items-center">
@@ -101,8 +111,21 @@
                 <a href="study_plan.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Study Plan</a> 
                 <a href="about.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">About</a>
                 <a href="contact.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Contact</a>
+                
                 <div id="auth-container-mobile" class="auth-container px-6 py-4 border-t border-gray-200">
-                    <a href="study_plan.html?action=signin" class="block w-full text-center text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full py-2 transition-colors">Sign In</a>
+                    <!-- Mobile Login Button -->
+                    <button id="mobile-login-btn" class="login-view w-full flex justify-center items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full py-2 transition-colors">
+                        <span class="text-sm font-semibold">Sign In with Google</span>
+                    </button>
+
+                    <!-- Mobile User Profile -->
+                    <div id="mobile-user-profile" class="profile-view hidden flex flex-col items-center gap-3">
+                         <div class="flex items-center gap-3">
+                             <img class="user-photo w-10 h-10 rounded-full border border-gray-300 object-cover" src="" alt="User">
+                             <p class="user-name text-sm font-semibold text-gray-800">User Name</p>
+                         </div>
+                         <button class="logout-btn w-full text-center text-xs text-red-500 font-medium border border-red-200 px-3 py-2 rounded-full bg-white">Log Out</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -209,10 +232,81 @@
     <!-- Import Question Data -->
     <script src="questions.js"></script>
 
-    <!-- Page Logic -->
-    <script>
+    <!-- Firebase Auth & Page Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Firebase Configuration (Same as app.js)
+        const firebaseConfig = {
+          apiKey: "AIzaSyAj7MDnrnzKUO73BXG0jeM-uBGrAH3XiAY",
+          authDomain: "study-plan17.firebaseapp.com",
+          projectId: "study-plan17",
+          storageBucket: "study-plan17.appspot.com",
+          messagingSenderId: "394648483332",
+          appId: "1:394648483332:web:31c0d7a8" // Copied from your app.js logic
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // DOM Elements for Auth
+        const loginBtns = document.querySelectorAll('#desktop-login-btn, #mobile-login-btn');
+        const logoutBtns = document.querySelectorAll('.logout-btn');
+        const loginViews = document.querySelectorAll('.login-view');
+        const profileViews = document.querySelectorAll('.profile-view');
+        const userNameDisplays = document.querySelectorAll('.user-name');
+        const userPhotoDisplays = document.querySelectorAll('.user-photo');
+
+        // Login Function
+        const login = async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+                // Auth state listener will handle UI updates
+                console.log("Logged in successfully!");
+            } catch (error) {
+                console.error("Login Error:", error);
+                alert("Login failed. Please try again.");
+            }
+        };
+
+        // Logout Function
+        const logout = async () => {
+            try {
+                await signOut(auth);
+                console.log("Logged out successfully!");
+            } catch (error) {
+                console.error("Logout Error:", error);
+            }
+        };
+
+        // Attach Listeners
+        loginBtns.forEach(btn => btn.addEventListener('click', login));
+        logoutBtns.forEach(btn => btn.addEventListener('click', logout));
+
+        // Auth State Listener
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in
+                loginViews.forEach(el => el.classList.add('hidden'));
+                profileViews.forEach(el => el.classList.remove('hidden'));
+                
+                // Update UI with user info
+                userNameDisplays.forEach(el => el.textContent = user.displayName || "User");
+                userPhotoDisplays.forEach(el => {
+                    el.src = user.photoURL || "https://via.placeholder.com/40";
+                });
+            } else {
+                // User is signed out
+                loginViews.forEach(el => el.classList.remove('hidden'));
+                profileViews.forEach(el => el.classList.add('hidden'));
+            }
+        });
+
+        // --- EXISTING PAGE LOGIC (Dropdowns & Grid) ---
         document.addEventListener('DOMContentLoaded', () => {
-            /* =================== HEADER LOGIC =================== */
             // Academic Dropdown Logic
             const academicDropdown = document.getElementById('academic-dropdown');
             if (academicDropdown) {
@@ -223,8 +317,6 @@
                     e.stopPropagation();
                     menu.classList.toggle('hidden');
                 });
-
-                // Close dropdown when clicking outside
                 window.addEventListener('click', (e) => {
                     if (!academicDropdown.contains(e.target)) {
                         menu.classList.add('hidden');
@@ -247,29 +339,23 @@
             if (mobileAcademicButton && mobileAcademicMenu) {
                 mobileAcademicButton.addEventListener('click', () => {
                     mobileAcademicMenu.classList.toggle('hidden');
-                    // Optional: Rotate icon
                     const icon = mobileAcademicButton.querySelector('svg');
                     if(icon) icon.classList.toggle('rotate-180');
                 });
             }
 
-            /* =================== RESOURCES GRID LOGIC =================== */
+            // Resources Grid Logic
             const grid = document.getElementById('resources-grid');
-            
-            // Check if database exists
             if (typeof questionDatabase === 'undefined') {
                 grid.innerHTML = `<p class="text-red-500 text-center col-span-full">Error: questions.js not found!</p>`;
                 return;
             }
 
             grid.innerHTML = ''; // Clear loader
-
             questionDatabase.forEach(folder => {
-                // Create Folder Card
                 const card = document.createElement('div');
                 card.className = "folder-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300";
                 
-                // Card Header
                 let html = `
                     <div class="p-5 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
                         <h3 class="font-bold text-gray-800 text-lg flex items-center">
@@ -284,7 +370,6 @@
                         <ul class="space-y-3">
                 `;
 
-                // Add Files inside Card
                 folder.files.forEach(file => {
                     html += `
                         <li>
