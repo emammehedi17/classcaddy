@@ -8871,7 +8871,7 @@ document.getElementById('quiz-print-btn').addEventListener('click', function() {
 function printAnswerScript() {
     // ১. সঠিক ভেরিয়েবল থেকে ডাটা নেওয়া (আপনার app.js অনুযায়ী)
     const questions = currentQuizQuestions; // এটিই আপনার মূল প্রশ্নের লিস্ট [Line 42]
-    const answers = userQuizAnswers;        // এটি ব্যবহারকারীর উত্তরের লিস্ট [Line 43]
+    const answers = userAnswers;            // সঠিক ভেরিয়েবল নাম
 
     // যদি কোনো প্রশ্ন না থাকে, তবে প্রিন্ট হবে না
     if (!questions || questions.length === 0) {
