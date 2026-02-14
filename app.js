@@ -8862,9 +8862,8 @@ async function loadReviewWrongAnswers() {
 }
 
 
-// --- RESOURCES / LIBRARY SYSTEM ---
+// --- RESOURCES / LIBRARY SYSTEM (UPDATED) ---
 
-// 1. Define your folders and MCQ sets here
 const globalResources = [
     {
         folderName: "General Knowledge",
@@ -8884,18 +8883,6 @@ const globalResources = [
                         options: ["5", "6", "7", "8"],
                         correctAnswer: "7",
                         explanation: "Red, Orange, Yellow, Green, Blue, Indigo, Violet."
-                    }
-                ]
-            },
-            {
-                title: "International Affairs - Set 1",
-                subject: "General Knowledge",
-                questions: [
-                    {
-                        question: "Which represents the UN?",
-                        options: ["United Nations", "United Nets", "Union National", "None"],
-                        correctAnswer: "United Nations",
-                        explanation: "UN stands for United Nations."
                     }
                 ]
             }
@@ -8920,58 +8907,77 @@ const globalResources = [
     }
 ];
 
-// 2. Initialize Resources Functionality
-document.addEventListener('DOMContentLoaded', () => {
+function initResourcesSystem() {
+    console.log("Resources System: Initializing..."); // Debug Message
+
     const resourcesBtn = document.getElementById('resources-btn');
     const resourcesModal = document.getElementById('resources-modal');
     const closeResourcesBtn = document.getElementById('close-resources-btn');
     const container = document.getElementById('resources-container');
 
-    // Open Modal
-    if(resourcesBtn) {
-        resourcesBtn.addEventListener('click', () => {
-            renderResources();
-            resourcesModal.classList.remove('hidden');
-        });
+    if (!resourcesBtn) {
+        console.error("Resources System Error: 'resources-btn' not found in HTML.");
+        return;
     }
+    
+    if (!resourcesModal) {
+        console.error("Resources System Error: 'resources-modal' not found in HTML.");
+        return;
+    }
+
+    console.log("Resources System: Button and Modal found. Attaching listeners.");
+
+    // Open Modal
+    resourcesBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log("Resources button clicked!");
+        renderResources();
+        resourcesModal.classList.remove('hidden');
+        resourcesModal.classList.add('flex'); // Ensure flex is added for centering
+    });
 
     // Close Modal
     if(closeResourcesBtn) {
         closeResourcesBtn.addEventListener('click', () => {
             resourcesModal.classList.add('hidden');
+            resourcesModal.classList.remove('flex');
         });
     }
 
-    // Function to Render Folders and Files
-    function renderResources() {
-        container.innerHTML = ''; // Clear previous
+    // Close on clicking outside
+    resourcesModal.addEventListener('click', (e) => {
+        if (e.target === resourcesModal) {
+            resourcesModal.classList.add('hidden');
+            resourcesModal.classList.remove('flex');
+        }
+    });
 
-        globalResources.forEach((folder, folderIndex) => {
-            // Create Folder Card
+    function renderResources() {
+        container.innerHTML = ''; 
+
+        globalResources.forEach((folder) => {
             const folderDiv = document.createElement('div');
             folderDiv.className = 'bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow';
             
-            // Folder Title
             const folderTitle = document.createElement('h4');
             folderTitle.className = 'font-bold text-gray-700 mb-3 flex items-center border-b pb-2';
             folderTitle.innerHTML = `<i class="fas fa-folder text-yellow-500 mr-2 text-xl"></i> ${folder.folderName}`;
             folderDiv.appendChild(folderTitle);
 
-            // File List
             const fileList = document.createElement('ul');
             fileList.className = 'space-y-2';
 
-            folder.files.forEach((file, fileIndex) => {
+            folder.files.forEach((file) => {
                 const li = document.createElement('li');
                 const btn = document.createElement('button');
                 btn.className = 'w-full text-left text-sm text-gray-600 hover:text-teal-600 hover:bg-white p-2 rounded flex items-center transition-colors border border-transparent hover:border-gray-200';
                 btn.innerHTML = `<i class="fas fa-file-alt text-teal-500 mr-2"></i> ${file.title}`;
                 
-                // On Click: Start Quiz
                 btn.addEventListener('click', () => {
                     if(confirm(`Start exam: "${file.title}"?`)) {
                         startResourceQuiz(file);
                         resourcesModal.classList.add('hidden');
+                        resourcesModal.classList.remove('flex');
                     }
                 });
 
@@ -8984,58 +8990,60 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Function to Start the Quiz (Injects into existing UI)
     function startResourceQuiz(resourceData) {
-        // Switch to Quiz Section
-        document.getElementById('setup-section').classList.add('hidden');
-        document.getElementById('quiz-section').classList.remove('hidden');
-        document.getElementById('result-section').classList.add('hidden');
+        console.log("Starting Quiz:", resourceData.title);
         
-        // Use existing variables from app.js logic
-        // Note: Assuming 'currentQuestions', 'currentSubject', 'quizTimer', etc. are global or accessible.
-        // If they are not accessible, we might need to adapt this part based on your specific app.js structure.
-        // Since I cannot see the full scope, I will try to use the most likely implementation.
+        // Hide other sections
+        const setupSec = document.getElementById('setup-section');
+        const quizSec = document.getElementById('quiz-section');
+        const resultSec = document.getElementById('result-section');
+
+        if(setupSec) setupSec.classList.add('hidden');
+        if(resultSec) resultSec.classList.add('hidden');
+        if(quizSec) quizSec.classList.remove('hidden');
         
-        // Reset Logic
-        if (typeof currentQuestions !== 'undefined') currentQuestions = resourceData.questions;
-        if (typeof currentSubject !== 'undefined') currentSubject = resourceData.subject || "Resource Quiz";
-        
-        // If your app uses a specific function to start, call it here. 
-        // Based on typical logic:
-        // 1. Render first question
-        // 2. Start Timer
-        
-        // Assuming there is a function like 'loadQuestion(0)' or similar in your code:
-        // We trigger the internal logic.
-        
-        // HACK: To integrate with your existing code without rewriting it, 
-        // we will assume you have a 'startQuiz' function or we manually trigger the UI update.
-        
-        // Let's try to simulate the "Start Quiz" button click but with injected data.
-        // NOTE: You must ensure 'currentQuestions' is a global variable in app.js
-        window.currentQuestions = resourceData.questions;
-        window.currentSubject = resourceData.subject;
-        window.quizDuration = 20 * 60; // Default 20 mins or set per file
-        
-        // Reset counters
-        if(typeof currentQuestionIndex !== 'undefined') currentQuestionIndex = 0;
-        if(typeof score !== 'undefined') score = 0;
-        if(typeof userAnswers !== 'undefined') userAnswers = Array(resourceData.questions.length).fill(null);
-        
-        // Trigger UI update
-        // Search for the function that renders the question in your app.js and call it here.
-        // Usually it is named 'loadQuestion()' or 'renderQuestion()'.
-        if (typeof loadQuestion === 'function') {
-            loadQuestion();
-        } else if (typeof renderQuestion === 'function') {
-            renderQuestion();
-        } else {
-            alert("Error: Could not find the quiz starter function. Please check app.js variable names.");
+        // Attempt to Inject Data into Variables
+        // IMPORTANT: These variables must match what you use in your main app.js code
+        try {
+            // Assign to Global Window object if strictly needed, or direct variable assignment
+            // We try updating the variables directly first
+            
+            if (typeof currentQuestions !== 'undefined') currentQuestions = resourceData.questions;
+            else window.currentQuestions = resourceData.questions;
+
+            if (typeof currentSubject !== 'undefined') currentSubject = resourceData.subject;
+            else window.currentSubject = resourceData.subject;
+
+            // Reset State
+            if (typeof currentQuestionIndex !== 'undefined') currentQuestionIndex = 0;
+            if (typeof score !== 'undefined') score = 0;
+            if (typeof userAnswers !== 'undefined') userAnswers = new Array(resourceData.questions.length).fill(null);
+
+            // Trigger Render
+            if (typeof loadQuestion === 'function') {
+                loadQuestion();
+            } else if (typeof renderQuestion === 'function') {
+                renderQuestion();
+            } else {
+                console.error("Could not find function to render question (loadQuestion or renderQuestion).");
+                alert("Error: Quiz function not found. Check console.");
+            }
+
+            // Start Timer if available
+            if (typeof startTimer === 'function') startTimer();
+            if (typeof updateQuestionCount === 'function') updateQuestionCount();
+
+        } catch (err) {
+            console.error("Error starting quiz:", err);
+            alert("Something went wrong starting the quiz. See console.");
         }
-        
-        // Start Timer
-        if (typeof startTimer === 'function') startTimer();
     }
-});
+}
 
-
+// Force Initialize (Robust Check)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initResourcesSystem);
+} else {
+    // If DOM is already ready, run immediately
+    initResourcesSystem();
+}
