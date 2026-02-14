@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resources Library - Class Caddy</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kalpurush:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        body { font-family: 'Inter', 'Kalpurush', sans-serif; background-color: #f3f4f6; }
+        .folder-card:hover { transform: translateY(-5px); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-indigo-600">
+                        <i class="fas fa-graduation-cap"></i> Class Caddy
+                    </span>
+                    <span class="ml-3 px-2 py-1 bg-gray-100 text-xs rounded text-gray-500 font-medium">Resources</span>
+                </div>
+                <div class="flex items-center">
+                    <a href="study_plan.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i> Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Study Resources Library</h1>
+            <p class="text-gray-600">Browse our collection of MCQs and study materials.</p>
+        </div>
+
+        <!-- Folders Grid -->
+        <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Folders will be loaded here by JavaScript -->
+            <div class="col-span-full text-center py-10">
+                <i class="fas fa-spinner fa-spin text-4xl text-indigo-300"></i>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer (Copied from your provided file) -->
+    <footer class="bg-gray-900 text-white py-8 mt-auto">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm opacity-75">&copy; 2024 Class Caddy. All rights reserved.</p>
+            <div class="mt-4 flex justify-center space-x-4">
+                <a href="#" class="hover:text-teal-400 transition-colors"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="hover:text-teal-400 transition-colors"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-teal-400 transition-colors"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Import Question Data -->
+    <script src="questions.js"></script>
+
+    <!-- Render Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('resources-grid');
+            
+            // Check if database exists
+            if (typeof questionDatabase === 'undefined') {
+                grid.innerHTML = `<p class="text-red-500 text-center col-span-full">Error: questions.js not found!</p>`;
+                return;
+            }
+
+            grid.innerHTML = ''; // Clear loader
+
+            questionDatabase.forEach(folder => {
+                // Create Folder Card
+                const card = document.createElement('div');
+                card.className = "folder-card bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300";
+                
+                // Card Header
+                let html = `
+                    <div class="p-5 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+                        <h3 class="font-bold text-gray-800 text-lg flex items-center">
+                            <i class="fas ${folder.icon || 'fa-folder'} text-indigo-500 mr-3 text-xl"></i> 
+                            ${folder.folderName}
+                        </h3>
+                        <span class="text-xs font-semibold bg-indigo-100 text-indigo-600 px-2 py-1 rounded-full">
+                            ${folder.files.length} Sets
+                        </span>
+                    </div>
+                    <div class="p-4 bg-white">
+                        <ul class="space-y-3">
+                `;
+
+                // Add Files inside Card
+                folder.files.forEach(file => {
+                    html += `
+                        <li>
+                            <a href="study_plan.html?action=start_resource&id=${file.id}" 
+                               class="flex items-center p-2 rounded-lg hover:bg-indigo-50 text-gray-600 hover:text-indigo-700 transition-colors group">
+                                <span class="w-8 h-8 rounded-full bg-gray-100 text-gray-400 group-hover:bg-indigo-100 group-hover:text-indigo-600 flex items-center justify-center mr-3 text-sm">
+                                    <i class="fas fa-file-alt"></i>
+                                </span>
+                                <span class="font-medium text-sm">${file.title}</span>
+                                <i class="fas fa-chevron-right ml-auto text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            </a>
+                        </li>
+                    `;
+                });
+
+                html += `</ul></div>`;
+                card.innerHTML = html;
+                grid.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>

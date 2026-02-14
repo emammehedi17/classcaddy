@@ -8863,138 +8863,95 @@ if (wrongAnsList) wrongAnsList.addEventListener('click', (e) => {
 }
 
 
-// --- RESOURCES / LIBRARY SYSTEM (FINAL FIXED VERSION) ---
+// --- EXTERNAL RESOURCE HANDLER ---
 
-const globalResources = [
-    {
-        folderName: "General Knowledge",
-        files: [
-            {
-                title: "BCS Preparation - Set A",
-                subject: "General Knowledge",
-                questions: [
-                    {
-                        question: "What is the capital of Bangladesh?",
-                        options: ["Dhaka", "Chittagong", "Sylhet", "Khulna"],
-                        correctAnswer: "Dhaka",
-                        explanation: "Dhaka is the capital city."
-                    },
-                    {
-                        question: "How many colors are in a rainbow?",
-                        options: ["5", "6", "7", "8"],
-                        correctAnswer: "7",
-                        explanation: "Red, Orange, Yellow, Green, Blue, Indigo, Violet."
-                    }
-                ]
-            }
-        ]
-    }
-];
+// This function checks if the user came from resources.html
+function checkExternalResourceStart() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    const resourceId = urlParams.get('id');
 
-// Safe Initialization Function
-function initResourcesSystem() {
-    console.log("Resources System: Checking elements..."); 
+    if (action === 'start_resource' && resourceId) {
+        console.log("External Resource Request Detected:", resourceId);
 
-    const resourcesBtn = document.getElementById('resources-btn');
-    const resourcesModal = document.getElementById('resources-modal');
-    const container = document.getElementById('resources-container');
-    const closeResourcesBtn = document.getElementById('close-resources-btn');
-
-    // Safety Check: If HTML is missing, stop without crashing
-    if (!resourcesBtn || !resourcesModal || !container) {
-        console.warn("Resources System: Required HTML elements not found. Skipping init.");
-        return; 
-    }
-
-    console.log("Resources System: Ready.");
-
-    // Open Modal
-    resourcesBtn.onclick = function(e) {
-        e.preventDefault();
-        renderResources();
-        resourcesModal.classList.remove('hidden');
-        resourcesModal.classList.add('flex');
-    };
-
-    // Close Modal
-    if(closeResourcesBtn) {
-        closeResourcesBtn.onclick = function() {
-            resourcesModal.classList.add('hidden');
-            resourcesModal.classList.remove('flex');
-        };
-    }
-
-    // Close on Outside Click
-    resourcesModal.onclick = function(e) {
-        if (e.target === resourcesModal) {
-            resourcesModal.classList.add('hidden');
-            resourcesModal.classList.remove('flex');
+        // 1. Find the question set from questions.js (variable: questionDatabase)
+        if (typeof questionDatabase === 'undefined') {
+            console.error("questionDatabase not loaded. Check script imports.");
+            alert("Error: Resource data missing.");
+            return;
         }
-    };
 
-    function renderResources() {
-        container.innerHTML = ''; 
+        let foundFile = null;
+        // Search through folders
+        for (const folder of questionDatabase) {
+            const file = folder.files.find(f => f.id === resourceId);
+            if (file) {
+                foundFile = file;
+                break;
+            }
+        }
 
-        globalResources.forEach((folder) => {
-            const folderDiv = document.createElement('div');
-            folderDiv.className = 'bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4';
-            
-            const folderTitle = document.createElement('h4');
-            folderTitle.className = 'font-bold text-gray-700 mb-2 border-b pb-1';
-            folderTitle.innerHTML = `<i class="fas fa-folder text-yellow-500 mr-2"></i> ${folder.folderName}`;
-            folderDiv.appendChild(folderTitle);
-
-            const fileList = document.createElement('ul');
-            fileList.className = 'space-y-2';
-
-            folder.files.forEach((file) => {
-                const li = document.createElement('li');
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left text-sm text-gray-700 hover:text-white hover:bg-teal-600 p-2 rounded transition-colors border border-gray-200';
-                btn.innerHTML = `<i class="fas fa-file-alt mr-2"></i> ${file.title}`;
-                
-                btn.onclick = function() {
-                    if(confirm(`Start exam: "${file.title}"?`)) {
-                        startResourceQuiz(file);
-                        resourcesModal.classList.add('hidden');
-                        resourcesModal.classList.remove('flex');
-                    }
-                };
-
-                li.appendChild(btn);
-                fileList.appendChild(li);
-            });
-
-            folderDiv.appendChild(fileList);
-            container.appendChild(folderDiv);
-        });
-    }
-
-    function startResourceQuiz(resourceData) {
-        // Hide other sections
-        if(document.getElementById('setup-section')) document.getElementById('setup-section').classList.add('hidden');
-        if(document.getElementById('result-section')) document.getElementById('result-section').classList.add('hidden');
-        if(document.getElementById('quiz-section')) document.getElementById('quiz-section').classList.remove('hidden');
-        
-        // Set Global Variables
-        window.currentQuestions = resourceData.questions;
-        window.currentSubject = resourceData.subject || "Resource Quiz";
-        window.currentQuestionIndex = 0;
-        window.score = 0;
-        window.userAnswers = new Array(resourceData.questions.length).fill(null);
-
-        // Call Existing Functions
-        if (typeof renderQuestion === 'function') renderQuestion();
-        else if (typeof loadQuestion === 'function') loadQuestion();
-        
-        if (typeof startTimer === 'function') startTimer();
-        if (typeof updateQuestionCount === 'function') updateQuestionCount();
+        if (foundFile) {
+            console.log("File Found:", foundFile.title);
+            startExternalQuiz(foundFile);
+        } else {
+            alert("Resource not found. ID: " + resourceId);
+        }
     }
 }
 
-// Run when DOM is ready
+function startExternalQuiz(fileData) {
+    // Wait for Auth to be ready (User must be logged in to save)
+    // We assume the main app logic handles the "Not Logged In" UI automatically.
+    // We just inject the questions.
+
+    const checkAuthInterval = setInterval(() => {
+        // Check if Firebase Auth is initialized and user state is known
+        // (Assuming 'auth' variable is available or we wait for UI readiness)
+        
+        // Better approach: Interact with the UI directly
+        const quizSection = document.getElementById('quiz-section');
+        
+        if (quizSection) {
+            clearInterval(checkAuthInterval);
+
+            // Hide Setup, Show Quiz
+            document.getElementById('setup-section').classList.add('hidden');
+            document.getElementById('result-section').classList.add('hidden');
+            quizSection.classList.remove('hidden');
+
+            // Set Global Variables used by your Quiz Engine
+            window.currentQuestions = fileData.questions;
+            window.currentSubject = fileData.subject;
+            
+            // Reset Quiz State
+            window.currentQuestionIndex = 0;
+            window.score = 0;
+            window.userAnswers = new Array(fileData.questions.length).fill(null);
+            
+            // Set Timer (Optional: 20 mins default)
+            window.quizDuration = 20 * 60; 
+
+            // Trigger UI Render
+            // We call your existing functions
+            if (typeof loadQuestion === 'function') {
+                loadQuestion();
+            } else if (typeof renderQuestion === 'function') {
+                renderQuestion();
+            }
+
+            if (typeof startTimer === 'function') startTimer();
+            if (typeof updateQuestionCount === 'function') updateQuestionCount();
+
+            // Clear the URL so refreshing doesn't restart the quiz
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }, 500); // Check every 500ms
+}
+
+// Run check on load
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initResourcesSystem);
+    document.addEventListener('DOMContentLoaded', checkExternalResourceStart);
 } else {
-    initResourcesSystem();
+    checkExternalResourceStart();
 }
