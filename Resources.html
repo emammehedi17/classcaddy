@@ -9,38 +9,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;700&family=Kalpurush:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kalpurush:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
         body { 
-            font-family: 'Poppins', 'Hind Siliguri', sans-serif; 
-            background-color: #f3f4f6; /* Keeping content area light for cards */
+            font-family: 'Inter', 'Kalpurush', sans-serif; 
+            background-color: #f8fafc; /* Matches study_plan.html bg */
         }
         
-        /* Header Styles */
-        header {
-            background-color: rgba(17, 24, 39, 0.95);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid #374151;
-        }
-
-        /* Dropdown Menu */
-        .dropdown-menu {
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px) translateX(-50%);
-            transition: all 0.3s ease;
-        }
-        .dropdown-menu.is-open {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) translateX(-50%);
-        }
-
         /* Resources Grid Styles */
         .folder-card:hover { transform: translateY(-5px); }
         
@@ -49,86 +29,81 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Dropdown Styles to match study_plan.html behavior */
+        #academic-menu {
+            transition: opacity 0.2s, visibility 0.2s;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <!-- =================== HEADER START =================== -->
-    <header class="fixed top-0 left-0 right-0 z-50">
+    <!-- =================== HEADER START (From study_plan.html) =================== -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200 main-website-ui shadow-sm">
         <div class="container mx-auto px-6 py-3">
             <nav class="flex justify-between items-center">
-                <!-- Left Side: Profile & Title -->
                 <div class="flex items-center gap-4">
                     <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
-                        <img src="images/profile.jpg" onerror="this.src='https://via.placeholder.com/48'" alt="Profile" class="h-12 w-12 rounded-full border-2 border-emerald-400 object-cover">
+                        <img src="images/profile.jpg" alt="Profile" class="h-10 w-10 rounded-full border-2 border-emerald-500 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/ffffff/059669?text=CC';">
                     </a>
                     <a href="index.html">
-                        <h1 class="text-2xl font-bold text-white">Class Caddy</h1>
+                        <h1 class="text-xl font-bold text-gray-800">Class Caddy</h1>
                     </a>
                 </div>
-
-                <!-- Center: Desktop Navigation -->
-                <div class="hidden md:flex items-center gap-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-full p-1">
-                    <a href="index.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Home</a>
-                    
-                    <div id="academic-dropdown" class="relative group">
-                        <button id="academic-button" class="px-6 py-2 text-sm font-semibold text-gray-400 hover:text-white rounded-full transition-colors flex items-center">
-                            <a href="academic.html">Academic</a>
-                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                <div class="hidden md:flex items-center gap-1 bg-gray-100/50 border border-gray-200 rounded-full p-1 text-sm">
+                    <a href="index.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Home</a>
+                    <div id="academic-dropdown" class="relative">
+                        <button id="academic-button" class="px-5 py-1.5 font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors flex items-center">
+                            <a href="academic.html" class="flex items-center">Academic <svg class="w-4 h-4 ml-1 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></a>
                         </button>
-                        <div id="academic-menu" class="dropdown-menu absolute top-full left-1/2 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
-                            <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 405</a>
-                            <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 406</a>
-                            <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 407</a>
-                            <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">Course 408 (B)</a>
+                        <div id="academic-menu" class="dropdown-menu absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg hidden">
+                            <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Course 405</a>
+                            <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Course 406</a>
+                            <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Course 407</a>
+                            <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Course 408 (B)</a>
                         </div>
                     </div>
-
-                    <a href="study_plan.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Study Plan</a>
-                    <a href="about.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">About</a>
-                    <a href="contact.html" class="px-6 py-2 text-sm text-gray-400 hover:text-white transition-colors">Contact</a>
+                    <a href="study_plan.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Study Plan</a> 
+                    <a href="about.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">About</a>
+                    <a href="contact.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Contact</a>
                 </div>
-
-                <!-- Right Side: DU Logo & Google Sign In -->
                 <div class="hidden md:flex items-center gap-4">
                     <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
-                        <img src="images/du_logo.png" onerror="this.src='https://via.placeholder.com/48'" alt="DU Logo" class="h-12 w-12 rounded-full border-2 border-gray-600 object-cover">
+                        <img src="images/du_logo.png" alt="DU Logo" class="h-10 w-10 rounded-full border border-gray-200 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/eeeeee/111827?text=DU';">
                     </a>
-                    
-                    <!-- Google Sign In Button -->
-                    <a href="study_plan.html" class="flex items-center gap-2 bg-white text-gray-700 hover:bg-gray-100 px-4 py-2 rounded-full font-medium transition-colors border border-gray-300 shadow-sm">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5">
-                        <span class="text-sm font-semibold">Sign in</span>
-                    </a>
+                    <div id="auth-container-desktop" class="auth-container text-sm">
+                        <!-- Using Google Sign In as requested previously, integrated into this design -->
+                        <a href="study_plan.html?action=signin" class="px-5 py-2 font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors flex items-center gap-2">
+                             Sign In
+                        </a>
+                    </div>
                 </div>
-
-                <!-- Mobile Menu Button -->
                 <div class="md:hidden flex items-center">
-                    <button id="mobile-menu-button" class="text-white focus:outline-none">
+                    <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                     </button>
                 </div>
             </nav>
-
-            <!-- Mobile Menu Panel -->
-            <div id="mobile-menu" class="hidden md:hidden bg-gray-800 border-t border-gray-700 -mx-6 mt-3">
-                <a href="index.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Home</a>
+            <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 -mx-6 mt-3 shadow-md">
+                <a href="index.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Home</a>
                 <div>
-                    <button id="mobile-academic-button" class="w-full text-left px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors flex justify-between items-center">
+                    <button id="mobile-academic-button" class="w-full text-left px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors flex justify-between items-center">
                         <span>Academic</span>
-                        <svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        <svg class="w-4 h-4 transition-transform duration-300 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
-                    <div id="mobile-academic-menu" class="hidden pl-8 bg-gray-900">
-                        <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 405</a>
-                        <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 406</a>
-                        <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 407</a>
-                        <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors">Course 408 (B)</a>
+                    <div id="mobile-academic-menu" class="hidden pl-8 bg-gray-50">
+                        <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 transition-colors">Course 405</a>
+                        <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 transition-colors">Course 406</a>
+                        <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 transition-colors">Course 407</a>
+                        <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 transition-colors">Course 408 (B)</a>
                     </div>
                 </div>
-                <a href="study_plan.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Study Plan</a>
-                <a href="about.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">About</a>
-                <a href="contact.html" class="block px-6 py-3 text-sm text-gray-300 hover:bg-gray-700 transition-colors">Contact</a>
-                <a href="study_plan.html" class="block px-6 py-3 text-sm text-emerald-400 font-bold hover:bg-gray-700 transition-colors">Sign In</a>
+                <a href="study_plan.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Study Plan</a> 
+                <a href="about.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">About</a>
+                <a href="contact.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Contact</a>
+                <div id="auth-container-mobile" class="auth-container px-6 py-4 border-t border-gray-200">
+                    <a href="study_plan.html?action=signin" class="block w-full text-center text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full py-2 transition-colors">Sign In</a>
+                </div>
             </div>
         </div>
     </header>
@@ -238,19 +213,23 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             /* =================== HEADER LOGIC =================== */
-            // Dropdown Logic
+            // Academic Dropdown Logic
             const academicDropdown = document.getElementById('academic-dropdown');
             if (academicDropdown) {
                 const menu = document.getElementById('academic-menu');
                 const button = document.getElementById('academic-button');
-                let hideTimeout;
-                const showMenu = () => { clearTimeout(hideTimeout); menu.classList.add('is-open'); };
-                const hideMenu = () => { menu.classList.remove('is-open'); };
-                const hideMenuWithDelay = () => { hideTimeout = setTimeout(hideMenu, 300); };
-                button.addEventListener('click', (event) => { event.stopPropagation(); menu.classList.toggle('is-open'); });
-                academicDropdown.addEventListener('mouseenter', showMenu);
-                academicDropdown.addEventListener('mouseleave', hideMenuWithDelay);
-                window.addEventListener('click', (event) => { if (!academicDropdown.contains(event.target)) { hideMenu(); } });
+                
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    menu.classList.toggle('hidden');
+                });
+
+                // Close dropdown when clicking outside
+                window.addEventListener('click', (e) => {
+                    if (!academicDropdown.contains(e.target)) {
+                        menu.classList.add('hidden');
+                    }
+                });
             }
 
             // Mobile Menu Logic
@@ -260,12 +239,17 @@
             const mobileAcademicMenu = document.getElementById('mobile-academic-menu');
 
             if (mobileMenuButton && mobileMenu) {
-                mobileMenuButton.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
             }
+
             if (mobileAcademicButton && mobileAcademicMenu) {
                 mobileAcademicButton.addEventListener('click', () => {
                     mobileAcademicMenu.classList.toggle('hidden');
-                    mobileAcademicButton.querySelector('svg').classList.toggle('rotate-180');
+                    // Optional: Rotate icon
+                    const icon = mobileAcademicButton.querySelector('svg');
+                    if(icon) icon.classList.toggle('rotate-180');
                 });
             }
 
