@@ -8834,8 +8834,7 @@ async function loadReviewWrongAnswers() {
         });
 
         // 7. Attach "View" Button Listeners (Event Delegation)
-        const wrongAnsList = document.getElementById('wrong-ans-list-container');
-if (wrongAnsList) wrongAnsList.addEventListener('click', (e) => {
+        document.getElementById('wrong-ans-list-container').addEventListener('click', (e) => {
             const btn = e.target.closest('.view-wrong-qs-btn');
             if(btn) {
                 const resultId = btn.dataset.resultId;
@@ -8861,131 +8860,6 @@ if (wrongAnsList) wrongAnsList.addEventListener('click', (e) => {
         container.innerHTML = '<p class="text-center text-red-500 py-10">Error loading review data.</p>';
     }
 }
-
-
-// --- EXTERNAL RESOURCE HANDLER ---
-
-// This function checks if the user came from resources.html
-function checkExternalResourceStart() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const action = urlParams.get('action');
-    const resourceId = urlParams.get('id');
-
-    if (action === 'start_resource' && resourceId) {
-        console.log("External Resource Request Detected:", resourceId);
-
-        // 1. Find the question set from questions.js (variable: questionDatabase)
-        if (typeof questionDatabase === 'undefined') {
-            console.error("questionDatabase not loaded. Check script imports.");
-            alert("Error: Resource data missing.");
-            return;
-        }
-
-        let foundFile = null;
-        // Search through folders
-        for (const folder of questionDatabase) {
-            const file = folder.files.find(f => f.id === resourceId);
-            if (file) {
-                foundFile = file;
-                break;
-            }
-        }
-
-        if (foundFile) {
-            console.log("File Found:", foundFile.title);
-            startExternalQuiz(foundFile);
-        } else {
-            alert("Resource not found. ID: " + resourceId);
-        }
-    }
-}
-
-function startExternalQuiz(fileData) {
-    // Wait for Auth to be ready (User must be logged in to save)
-    // We assume the main app logic handles the "Not Logged In" UI automatically.
-    // We just inject the questions.
-
-    const checkAuthInterval = setInterval(() => {
-        // Check if Firebase Auth is initialized and user state is known
-        // (Assuming 'auth' variable is available or we wait for UI readiness)
-        
-        // Better approach: Interact with the UI directly
-        const quizSection = document.getElementById('quiz-section');
-        
-        if (quizSection) {
-            clearInterval(checkAuthInterval);
-
-            // Hide Setup, Show Quiz
-            document.getElementById('setup-section').classList.add('hidden');
-            document.getElementById('result-section').classList.add('hidden');
-            quizSection.classList.remove('hidden');
-
-            // Set Global Variables used by your Quiz Engine
-            window.currentQuestions = fileData.questions;
-            window.currentSubject = fileData.subject;
-            
-            // Reset Quiz State
-            window.currentQuestionIndex = 0;
-            window.score = 0;
-            window.userAnswers = new Array(fileData.questions.length).fill(null);
-            
-            // Set Timer (Optional: 20 mins default)
-            window.quizDuration = 20 * 60; 
-
-            // Trigger UI Render
-            // We call your existing functions
-            if (typeof loadQuestion === 'function') {
-                loadQuestion();
-            } else if (typeof renderQuestion === 'function') {
-                renderQuestion();
-            }
-
-            if (typeof startTimer === 'function') startTimer();
-            if (typeof updateQuestionCount === 'function') updateQuestionCount();
-
-            // Clear the URL so refreshing doesn't restart the quiz
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }, 500); // Check every 500ms
-}
-
-// Run check on load
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', checkExternalResourceStart);
-} else {
-    checkExternalResourceStart();
-}
-
-// --- AUTO LOGIN HANDLER ---
-// Checks if user came from "Sign in" button in resources page
-function checkAutoLogin() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const action = urlParams.get('action');
-
-    if (action === 'signin') {
-        // Clear the URL param so it doesn't loop
-        const newUrl = window.location.pathname;
-        window.history.replaceState({}, document.title, newUrl);
-
-        // Trigger Google Sign In
-        const provider = new GoogleAuthProvider();
-        signInWithPopup(auth, provider)
-            .then((result) => {
-                console.log("Auto-login success:", result.user.email);
-            })
-            .catch((error) => {
-                console.error("Auto-login error:", error);
-            });
-    }
-}
-
-// Run check on load
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', checkAutoLogin);
-} else {
-    checkAutoLogin();
-}
-
 
 // --- NEW PRINT ANSWER SCRIPT FEATURE ---
 
