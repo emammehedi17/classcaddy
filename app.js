@@ -8885,7 +8885,7 @@ function printAnswerScript() {
         else if (q.isCorrect === false) wrongCount++;
     });
     
-    // Calculate Score
+    // Calculate Score (assuming 1 mark per question, minus negative mark)
     const negMark = (typeof quizSettings !== 'undefined') ? quizSettings.negativeMark : 0.25;
     const obtainedMark = (correctCount * 1) - (wrongCount * negMark);
     const totalMark = questions.length;
@@ -8896,7 +8896,6 @@ function printAnswerScript() {
     const date = new Date().toLocaleDateString('en-GB', {
         day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
-    const currentYear = new Date().getFullYear();
 
     // 3. Build HTML
     let printContent = `
@@ -8907,7 +8906,6 @@ function printAnswerScript() {
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kalpurush&display=swap');
             body { font-family: 'Inter', 'Kalpurush', sans-serif; padding: 40px; color: #1f2937; line-height: 1.5; }
             
-            /* Header */
             .header { 
                 border-bottom: 2px solid #374151; padding-bottom: 20px; margin-bottom: 30px; 
                 display: flex; justify-content: space-between; align-items: flex-start;
@@ -8921,7 +8919,6 @@ function printAnswerScript() {
             .score-val { font-size: 28px; font-weight: bold; color: #059669; }
             .score-lbl { font-size: 11px; text-transform: uppercase; color: #6b7280; letter-spacing: 1px; }
 
-            /* Questions */
             .q-item { margin-bottom: 20px; break-inside: avoid; border-bottom: 1px dashed #e5e7eb; padding-bottom: 15px; }
             .q-text { font-weight: bold; font-size: 15px; margin-bottom: 8px; }
             
@@ -8929,6 +8926,8 @@ function printAnswerScript() {
                 padding: 4px 8px; margin-bottom: 3px; border-radius: 4px; font-size: 13px; 
                 border: 1px solid transparent; display: flex; justify-content: space-between;
             }
+            
+            /* Answer Styles */
             .opt.correct { background-color: #d1fae5; border-color: #10b981; color: #064e3b; font-weight: 600; }
             .opt.wrong-choice { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; text-decoration: line-through; }
             .opt.user-correct { border: 2px solid #059669; background-color: #d1fae5; }
@@ -8936,21 +8935,11 @@ function printAnswerScript() {
             .badge { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; color: white; margin-left: 10px; }
             .bg-green { background-color: #10b981; }
             .bg-red { background-color: #ef4444; }
-            .note { margin-top: 8px; padding: 8px; background-color: #eff6ff; border-left: 3px solid #3b82f6; font-size: 12px; color: #1e3a8a; }
-
-            /* Footer Section */
-            .print-footer {
-                margin-top: 50px;
-                border-top: 2px solid #374151;
-                padding-top: 20px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                page-break-inside: avoid;
+            
+            .note { 
+                margin-top: 8px; padding: 8px; background-color: #eff6ff; 
+                border-left: 3px solid #3b82f6; font-size: 12px; color: #1e3a8a; 
             }
-            .footer-info p { margin: 3px 0; font-size: 13px; color: #1f2937; font-weight: 600; }
-            .footer-info .copyright { font-size: 11px; color: #6b7280; margin-top: 8px; font-weight: 400; }
-            .footer-qr img { width: 80px; height: 80px; border: 1px solid #e5e7eb; padding: 2px; border-radius: 4px; }
         </style>
     </head>
     <body>
@@ -8958,7 +8947,7 @@ function printAnswerScript() {
             <div>
                 <h1>${topicName}</h1>
                 <p>Date: ${date}</p>
-                <p>Total Questions: ${totalMark}</p>
+                <p>Questions: ${totalMark}</p>
             </div>
             <div class="score-card">
                 <div class="score-val">${obtainedMark.toFixed(2)}</div>
@@ -8986,6 +8975,7 @@ function printAnswerScript() {
             if (isUserSelected) {
                 if (isCorrectAnswer) {
                     className += ' user-correct'; 
+                    // Badge remains "Correct Answer" but style shows user picked it
                 } else {
                     className += ' wrong-choice';
                     badge = `<span class="badge bg-red">Your Answer</span>`;
@@ -9002,7 +8992,220 @@ function printAnswerScript() {
         printContent += `</div>`;
     });
 
-    // 5. Add Footer (Modified)
+    printContent += `
+        <script>
+            window.onload = function() { window.print(); }
+        </script>
+    </body></html>`;
+
+    // 5. Open Window
+    const win = window.open('', '_blank');
+    if (win) {
+        win.document.write(printContent);
+        win.document.close();
+    } else {
+        alert("Please allow popups to print.");
+    }
+}function printAnswerScript() {
+    // 1. Get Data from Global State
+    const questions = currentQuizQuestions;
+
+    if (!questions || questions.length === 0) {
+        showCustomAlert("No questions to print!", "error");
+        return;
+    }
+
+    // 2. Calculate Stats
+    let correctCount = 0;
+    let wrongCount = 0;
+    let notAnsweredCount = 0;
+
+    questions.forEach(q => {
+        if (q.isCorrect === true) correctCount++;
+        else if (q.isCorrect === false) wrongCount++;
+        else notAnsweredCount++;
+    });
+
+    const answeredCount = correctCount + wrongCount;
+    
+    // Calculate Score
+    const negMark = (typeof quizSettings !== 'undefined') ? quizSettings.negativeMark : 0.25;
+    const obtainedMark = (correctCount * 1) - (wrongCount * negMark);
+    const totalMark = questions.length;
+    const percentage = (totalMark > 0) ? ((Math.max(0, obtainedMark) / totalMark) * 100).toFixed(2) : 0.00;
+    
+    // Get Duration from DOM
+    const durationEl = document.getElementById('summary-time-taken');
+    const duration = durationEl ? durationEl.textContent : "N/A";
+
+    // Get Header Info
+    const topicEl = document.getElementById('quiz-topic-name');
+    const topicName = topicEl ? topicEl.textContent : "Quiz Result";
+    const date = new Date().toLocaleDateString('en-GB', {
+        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+    const currentYear = new Date().getFullYear();
+
+    // 3. Build HTML
+    let printContent = `
+    <html>
+    <head>
+        <title>Answer Script - ${topicName}</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kalpurush&display=swap');
+            body { font-family: 'Inter', 'Kalpurush', sans-serif; padding: 30px; color: #1f2937; line-height: 1.4; font-size: 12px; }
+            
+            /* Header Layout */
+            .header { 
+                border-bottom: 2px solid #374151; padding-bottom: 15px; margin-bottom: 20px; 
+                display: flex; justify-content: space-between; align-items: flex-start;
+            }
+            .header-info h1 { margin: 0 0 5px 0; font-size: 20px; color: #4f46e5; }
+            .header-info p { margin: 2px 0; font-size: 12px; color: #4b5563; font-weight: 600;}
+            
+            /* New Result Summary Box */
+            .result-box { 
+                width: 280px;
+                background: #f9fafb; 
+                border: 1px solid #e5e7eb; 
+                border-radius: 6px; 
+                padding: 10px;
+            }
+            .result-row-large { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
+            .result-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px; }
+            
+            .lbl { color: #6b7280; font-weight: 600; }
+            .val { color: #111827; font-weight: bold; }
+            
+            .score-big { font-size: 18px; color: #059669; font-weight: 800; }
+            .score-big-red { font-size: 18px; color: #4f46e5; font-weight: 800; }
+
+            /* Two Column Layout */
+            .questions-wrapper {
+                column-count: 2;
+                column-gap: 30px;
+            }
+
+            /* Questions */
+            .q-item { 
+                margin-bottom: 15px; 
+                break-inside: avoid; /* Prevents cutting question in half */
+                page-break-inside: avoid;
+                border-bottom: 1px dashed #e5e7eb; 
+                padding-bottom: 10px; 
+            }
+            .q-text { font-weight: bold; font-size: 13px; margin-bottom: 6px; }
+            
+            .opt { 
+                padding: 2px 6px; margin-bottom: 2px; border-radius: 3px; font-size: 11px; 
+                border: 1px solid transparent; display: flex; justify-content: space-between;
+            }
+            .opt.correct { background-color: #d1fae5; border-color: #10b981; color: #064e3b; font-weight: 600; }
+            .opt.wrong-choice { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; text-decoration: line-through; }
+            .opt.user-correct { border: 1px solid #059669; background-color: #d1fae5; }
+            
+            .badge { font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 3px; color: white; margin-left: 5px; }
+            .bg-green { background-color: #10b981; }
+            .bg-red { background-color: #ef4444; }
+            
+            .note { margin-top: 5px; padding: 5px; background-color: #eff6ff; border-left: 2px solid #3b82f6; font-size: 11px; color: #1e3a8a; }
+
+            /* Footer Section */
+            .print-footer {
+                margin-top: 30px;
+                border-top: 1px solid #374151;
+                padding-top: 15px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                page-break-inside: avoid;
+            }
+            .footer-info p { margin: 2px 0; font-size: 11px; color: #1f2937; font-weight: 600; }
+            .footer-info .copyright { font-size: 10px; color: #6b7280; margin-top: 5px; font-weight: 400; }
+            .footer-qr img { width: 60px; height: 60px; border: 1px solid #e5e7eb; padding: 2px; border-radius: 4px; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div class="header-info">
+                <h1>${topicName}</h1>
+                <p>Date: ${date}</p>
+                <p>Candidate ID: ${currentUser ? (currentUser.email || currentUser.uid.substring(0,8)) : 'Guest'}</p>
+            </div>
+            
+            <div class="result-box">
+                <div class="result-row-large">
+                    <div>
+                        <div class="lbl">Obtained Mark</div>
+                        <div class="score-big">${obtainedMark.toFixed(2)}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="lbl">Full Mark</div>
+                        <div class="score-big-red">${totalMark}</div>
+                    </div>
+                </div>
+                <div class="result-row">
+                    <span class="lbl">Percentage:</span> <span class="val">${percentage}%</span>
+                </div>
+                <div class="result-row">
+                    <span class="lbl">Total Questions:</span> <span class="val">${totalMark}</span>
+                </div>
+                 <div class="result-row">
+                    <span class="lbl">Answered:</span> <span class="val">${answeredCount}</span>
+                </div>
+                 <div class="result-row">
+                    <span class="lbl">Unanswered:</span> <span class="val">${notAnsweredCount}</span>
+                </div>
+                <div class="result-row">
+                    <span class="lbl">Skipped:</span> <span class="val">${notAnsweredCount}</span> 
+                </div>
+                <div class="result-row">
+                    <span class="lbl">Duration:</span> <span class="val">${duration}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="questions-wrapper">
+    `;
+
+    // 4. Loop Questions
+    questions.forEach((q, index) => {
+        printContent += `<div class="q-item"><div class="q-text">Q${index + 1}. ${q.question}</div>`;
+        
+        q.options.forEach(opt => {
+            let className = 'opt';
+            let badge = '';
+
+            const isCorrectAnswer = (opt === q.correctAnswer);
+            const isUserSelected = (opt === q.userAnswer);
+
+            if (isCorrectAnswer) {
+                className += ' correct';
+                // badge = `<span class="badge bg-green">Correct</span>`; // Optional: reduced clutter for 2-col
+            }
+            
+            if (isUserSelected) {
+                if (isCorrectAnswer) {
+                    className += ' user-correct'; 
+                } else {
+                    className += ' wrong-choice';
+                    badge = `<span class="badge bg-red">Your Answer</span>`;
+                }
+            }
+
+            printContent += `<div class="${className}"><span>${opt}</span>${badge}</div>`;
+        });
+
+        if (q.note || q.explanation) {
+            printContent += `<div class="note"><strong>Note:</strong> ${q.note || q.explanation}</div>`;
+        }
+        
+        printContent += `</div>`;
+    });
+
+    printContent += `</div>`; // End questions-wrapper
+
+    // 5. Add Footer
     printContent += `
         <div class="print-footer">
             <div class="footer-info">
