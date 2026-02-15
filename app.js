@@ -8989,9 +8989,9 @@ function printAnswerScript() {
             .opt.correct { background-color: #d1fae5; border-color: #10b981; color: #064e3b; font-weight: 600; }
             .opt.correct .opt-label { border-color: #059669; color: #064e3b; background: white; }
 
-            /* Wrong Choice Styles - Fixed to only strikethrough text */
+            /* Wrong Choice Styles */
             .opt.wrong-choice { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
-            .opt.wrong-choice .opt-content span:last-child { text-decoration: line-through; } /* Only strikethrough the option text */
+            .opt.wrong-choice .opt-content span:last-child { text-decoration: line-through; } 
             .opt.wrong-choice .opt-label { border-color: #b91c1c; color: #b91c1c; background: white; }
 
             .opt.user-correct { border: 1px solid #059669; background-color: #d1fae5; }
@@ -9081,8 +9081,11 @@ function printAnswerScript() {
             if (isUserSelected) {
                 if (isCorrectAnswer) {
                     className += ' user-correct'; 
+                    // Correctly answered: Green Badge
+                    badge = `<span class="badge bg-green">Your Answer</span>`;
                 } else {
                     className += ' wrong-choice';
+                    // Wrongly answered: Red Badge
                     badge = `<span class="badge bg-red">Your Answer</span>`;
                 }
             }
@@ -9125,7 +9128,7 @@ function printAnswerScript() {
         </script>
     </body></html>`;
 
-    // 6. Open New Tab (Restored)
+    // 6. Open New Tab
     const win = window.open('', '_blank');
     if (win) {
         win.document.write(printContent);
