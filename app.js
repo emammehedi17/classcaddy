@@ -8880,29 +8880,34 @@ function printAnswerScript() {
     // 2. Calculate Stats
     let correctCount = 0;
     let wrongCount = 0;
-    let notAnsweredCount = 0;
+    let skippedCount = 0; // Renamed from notAnswered for clarity
 
     questions.forEach(q => {
         if (q.isCorrect === true) correctCount++;
         else if (q.isCorrect === false) wrongCount++;
-        else notAnsweredCount++;
+        else skippedCount++;
     });
 
-    const answeredCount = correctCount + wrongCount;
-    
     // Calculate Score
     const negMark = (typeof quizSettings !== 'undefined') ? quizSettings.negativeMark : 0.25;
     const obtainedMark = (correctCount * 1) - (wrongCount * negMark);
     const totalMark = questions.length;
     const percentage = (totalMark > 0) ? ((Math.max(0, obtainedMark) / totalMark) * 100).toFixed(2) : 0.00;
     
-    // Get Duration from DOM
-    const durationEl = document.getElementById('summary-time-taken');
-    const duration = durationEl ? durationEl.textContent : "N/A";
+    // Get TOTAL Duration (Allocated Time) instead of Time Taken
+    // We try to get it from the settings display, or calculate it if missing
+    let totalDuration = "N/A";
+    const totalTimeEl = document.getElementById('display-total-time');
+    if (totalTimeEl) {
+        totalDuration = totalTimeEl.textContent.trim();
+    }
 
-    // Get Header Info
+    // Get Header Info & Formatting
     const topicEl = document.getElementById('quiz-topic-name');
-    const topicName = topicEl ? topicEl.textContent : "Quiz Result";
+    let topicName = topicEl ? topicEl.textContent : "Topic";
+    // Add "Exam on" prefix
+    const titleText = `Exam on ${topicName}`;
+
     const date = new Date().toLocaleDateString('en-GB', {
         day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
@@ -8912,10 +8917,10 @@ function printAnswerScript() {
     let printContent = `
     <html>
     <head>
-        <title>Answer Script - ${topicName}</title>
+        <title>${titleText}</title>
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kalpurush&display=swap');
-            body { font-family: 'Inter', 'Kalpurush', sans-serif; padding: 30px; color: #1f2937; line-height: 1.4; font-size: 12px; }
+            body { font-family: 'Inter', 'Kalpurush', sans-serif; padding: 20px 40px; color: #1f2937; line-height: 1.4; font-size: 12px; }
             
             /* Header Layout */
             .header { 
@@ -8925,7 +8930,7 @@ function printAnswerScript() {
             .header-info h1 { margin: 0 0 5px 0; font-size: 20px; color: #4f46e5; }
             .header-info p { margin: 2px 0; font-size: 12px; color: #4b5563; font-weight: 600;}
             
-            /* New Result Summary Box */
+            /* Result Summary Box */
             .result-box { 
                 width: 280px;
                 background: #f9fafb; 
@@ -8934,7 +8939,7 @@ function printAnswerScript() {
                 padding: 10px;
             }
             .result-row-large { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
-            .result-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px; }
+            .result-row { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 11px; }
             
             .lbl { color: #6b7280; font-weight: 600; }
             .val { color: #111827; font-weight: bold; }
@@ -8950,13 +8955,13 @@ function printAnswerScript() {
 
             /* Questions */
             .q-item { 
-                margin-bottom: 15px; 
-                break-inside: avoid; /* Prevents cutting question in half */
+                margin-bottom: 12px; 
+                break-inside: avoid; 
                 page-break-inside: avoid;
                 border-bottom: 1px dashed #e5e7eb; 
-                padding-bottom: 10px; 
+                padding-bottom: 8px; 
             }
-            .q-text { font-weight: bold; font-size: 13px; margin-bottom: 6px; }
+            .q-text { font-weight: bold; font-size: 13px; margin-bottom: 5px; }
             
             .opt { 
                 padding: 2px 6px; margin-bottom: 2px; border-radius: 3px; font-size: 11px; 
@@ -8990,7 +8995,7 @@ function printAnswerScript() {
     <body>
         <div class="header">
             <div class="header-info">
-                <h1>${topicName}</h1>
+                <h1>${titleText}</h1>
                 <p>Date: ${date}</p>
                 <p>Candidate ID: ${currentUser ? (currentUser.email || currentUser.uid.substring(0,8)) : 'Guest'}</p>
             </div>
@@ -9013,16 +9018,16 @@ function printAnswerScript() {
                     <span class="lbl">Total Questions:</span> <span class="val">${totalMark}</span>
                 </div>
                  <div class="result-row">
-                    <span class="lbl">Answered:</span> <span class="val">${answeredCount}</span>
+                    <span class="lbl">Correct:</span> <span class="val" style="color:#059669;">${correctCount}</span>
                 </div>
                  <div class="result-row">
-                    <span class="lbl">Unanswered:</span> <span class="val">${notAnsweredCount}</span>
+                    <span class="lbl">Wrong:</span> <span class="val" style="color:#dc2626;">${wrongCount}</span>
                 </div>
                 <div class="result-row">
-                    <span class="lbl">Skipped:</span> <span class="val">${notAnsweredCount}</span> 
+                    <span class="lbl">Skipped:</span> <span class="val">${skippedCount}</span> 
                 </div>
                 <div class="result-row">
-                    <span class="lbl">Duration:</span> <span class="val">${duration}</span>
+                    <span class="lbl">Duration:</span> <span class="val">${totalDuration}</span>
                 </div>
             </div>
         </div>
@@ -9043,7 +9048,6 @@ function printAnswerScript() {
 
             if (isCorrectAnswer) {
                 className += ' correct';
-                // badge = `<span class="badge bg-green">Correct</span>`; // Optional: reduced clutter for 2-col
             }
             
             if (isUserSelected) {
@@ -9080,18 +9084,37 @@ function printAnswerScript() {
                 <img src="https://classcaddy.netlify.app/images/qr2.png" alt="Scan to Visit">
             </div>
         </div>
-        
-        <script>
-            window.onload = function() { window.print(); }
-        </script>
     </body></html>`;
 
-    // 6. Open Window
-    const win = window.open('', '_blank');
-    if (win) {
-        win.document.write(printContent);
-        win.document.close();
-    } else {
-        alert("Please allow popups to print.");
+    // 6. Direct Print (Hidden Iframe)
+    // This avoids opening a new tab
+    let iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+
+    let doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(printContent);
+    doc.close();
+
+    // Wait for content to load then print
+    iframe.onload = function() {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        
+        // Optional: Remove iframe after printing
+        setTimeout(() => {
+            document.body.removeChild(iframe);
+        }, 2000);
+    };
+    
+    // For browsers that don't trigger onload for doc.write sometimes
+    if (iframe.contentWindow.document.readyState === 'complete') {
+        iframe.onload();
     }
 }
