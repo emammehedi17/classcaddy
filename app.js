@@ -8861,6 +8861,13 @@ async function loadReviewWrongAnswers() {
     }
 }
 
+// --- PRINT ANSWER SCRIPT FEATURE (FIXED) ---
+
+// বাটন ক্লিক ইভেন্ট লিসেনার
+document.getElementById('quiz-print-btn').addEventListener('click', function() {
+    printAnswerScript();
+});
+
 function printAnswerScript() {
     // 1. Get Data from Global State
     const questions = currentQuizQuestions;
