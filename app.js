@@ -8918,7 +8918,7 @@ function printAnswerScript() {
         <title>${titleText}</title>
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kalpurush&display=swap');
-            body { font-family: 'Inter', 'Kalpurush', sans-serif; padding: 20px 40px; color: #1f2937; line-height: 1.4; font-size: 12px; }
+            body { font-family: 'Inter', 'Kalpurush', sans-serif; padding: 40px; color: #1f2937; line-height: 1.4; font-size: 12px; }
             
             /* Header Layout */
             .header { 
@@ -8972,7 +8972,7 @@ function printAnswerScript() {
                 display: inline-block;
                 width: 18px;
                 height: 18px;
-                line-height: 16px; /* Vertical align adjustment */
+                line-height: 16px; 
                 text-align: center;
                 border: 1px solid #6b7280;
                 border-radius: 50%;
@@ -8981,7 +8981,7 @@ function printAnswerScript() {
                 font-weight: 700;
                 flex-shrink: 0;
                 color: #374151;
-                text-transform: lowercase; /* Forces a, b, c, d */
+                text-transform: lowercase; 
             }
 
             .opt-content { display: flex; align-items: flex-start; }
@@ -9067,7 +9067,7 @@ function printAnswerScript() {
             let badge = '';
 
             // Generate label (a, b, c, d)
-            const label = String.fromCharCode(97 + i); // 97 is 'a'
+            const label = String.fromCharCode(97 + i); 
 
             const isCorrectAnswer = (opt === q.correctAnswer);
             const isUserSelected = (opt === q.userAnswer);
@@ -9117,34 +9117,18 @@ function printAnswerScript() {
                 <img src="https://classcaddy.netlify.app/images/qr2.png" alt="Scan to Visit">
             </div>
         </div>
+        
+        <script>
+            window.onload = function() { window.print(); }
+        </script>
     </body></html>`;
 
-    // 6. Direct Print (Hidden Iframe)
-    let iframe = document.createElement('iframe');
-    iframe.style.position = 'fixed';
-    iframe.style.right = '0';
-    iframe.style.bottom = '0';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = '0';
-    document.body.appendChild(iframe);
-
-    let doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(printContent);
-    doc.close();
-
-    // Wait for content to load then print
-    iframe.onload = function() {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-        setTimeout(() => {
-            document.body.removeChild(iframe);
-        }, 2000);
-    };
-    
-    // Fallback trigger
-    if (iframe.contentWindow.document.readyState === 'complete') {
-        iframe.onload();
+    // 6. Open New Tab
+    const win = window.open('', '_blank');
+    if (win) {
+        win.document.write(printContent);
+        win.document.close();
+    } else {
+        showCustomAlert("Please allow popups to print!", "error");
     }
 }
