@@ -8880,7 +8880,7 @@ function printAnswerScript() {
     // 2. Calculate Stats
     let correctCount = 0;
     let wrongCount = 0;
-    let skippedCount = 0; // Renamed from notAnswered for clarity
+    let skippedCount = 0; 
 
     questions.forEach(q => {
         if (q.isCorrect === true) correctCount++;
@@ -8894,18 +8894,16 @@ function printAnswerScript() {
     const totalMark = questions.length;
     const percentage = (totalMark > 0) ? ((Math.max(0, obtainedMark) / totalMark) * 100).toFixed(2) : 0.00;
     
-    // Get TOTAL Duration (Allocated Time) instead of Time Taken
-    // We try to get it from the settings display, or calculate it if missing
+    // Get TOTAL Duration (Allocated Time)
     let totalDuration = "N/A";
     const totalTimeEl = document.getElementById('display-total-time');
     if (totalTimeEl) {
         totalDuration = totalTimeEl.textContent.trim();
     }
 
-    // Get Header Info & Formatting
+    // Get Header Info
     const topicEl = document.getElementById('quiz-topic-name');
     let topicName = topicEl ? topicEl.textContent : "Topic";
-    // Add "Exam on" prefix
     const titleText = `Exam on ${topicName}`;
 
     const date = new Date().toLocaleDateString('en-GB', {
@@ -8961,17 +8959,42 @@ function printAnswerScript() {
                 border-bottom: 1px dashed #e5e7eb; 
                 padding-bottom: 8px; 
             }
-            .q-text { font-weight: bold; font-size: 13px; margin-bottom: 5px; }
+            .q-text { font-weight: bold; font-size: 13px; margin-bottom: 8px; }
             
+            /* Options Styling */
             .opt { 
-                padding: 2px 6px; margin-bottom: 2px; border-radius: 3px; font-size: 11px; 
-                border: 1px solid transparent; display: flex; justify-content: space-between;
+                padding: 3px 6px; margin-bottom: 2px; border-radius: 4px; font-size: 12px; 
+                border: 1px solid transparent; display: flex; justify-content: space-between; align-items: flex-start;
             }
+            
+            /* Circular Labels (a, b, c, d) */
+            .opt-label {
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                line-height: 16px; /* Vertical align adjustment */
+                text-align: center;
+                border: 1px solid #6b7280;
+                border-radius: 50%;
+                margin-right: 8px;
+                font-size: 10px;
+                font-weight: 700;
+                flex-shrink: 0;
+                color: #374151;
+                text-transform: lowercase; /* Forces a, b, c, d */
+            }
+
+            .opt-content { display: flex; align-items: flex-start; }
+
             .opt.correct { background-color: #d1fae5; border-color: #10b981; color: #064e3b; font-weight: 600; }
+            .opt.correct .opt-label { border-color: #059669; color: #064e3b; background: white; }
+
             .opt.wrong-choice { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; text-decoration: line-through; }
+            .opt.wrong-choice .opt-label { border-color: #b91c1c; color: #b91c1c; background: white; }
+
             .opt.user-correct { border: 1px solid #059669; background-color: #d1fae5; }
             
-            .badge { font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 3px; color: white; margin-left: 5px; }
+            .badge { font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 3px; color: white; margin-left: 5px; white-space: nowrap; margin-top: 1px;}
             .bg-green { background-color: #10b981; }
             .bg-red { background-color: #ef4444; }
             
@@ -9039,9 +9062,12 @@ function printAnswerScript() {
     questions.forEach((q, index) => {
         printContent += `<div class="q-item"><div class="q-text">Q${index + 1}. ${q.question}</div>`;
         
-        q.options.forEach(opt => {
+        q.options.forEach((opt, i) => {
             let className = 'opt';
             let badge = '';
+
+            // Generate label (a, b, c, d)
+            const label = String.fromCharCode(97 + i); // 97 is 'a'
 
             const isCorrectAnswer = (opt === q.correctAnswer);
             const isUserSelected = (opt === q.userAnswer);
@@ -9059,7 +9085,14 @@ function printAnswerScript() {
                 }
             }
 
-            printContent += `<div class="${className}"><span>${opt}</span>${badge}</div>`;
+            printContent += `
+            <div class="${className}">
+                <div class="opt-content">
+                    <span class="opt-label">${label}</span>
+                    <span>${opt}</span>
+                </div>
+                ${badge}
+            </div>`;
         });
 
         if (q.note || q.explanation) {
@@ -9087,7 +9120,6 @@ function printAnswerScript() {
     </body></html>`;
 
     // 6. Direct Print (Hidden Iframe)
-    // This avoids opening a new tab
     let iframe = document.createElement('iframe');
     iframe.style.position = 'fixed';
     iframe.style.right = '0';
@@ -9106,14 +9138,12 @@ function printAnswerScript() {
     iframe.onload = function() {
         iframe.contentWindow.focus();
         iframe.contentWindow.print();
-        
-        // Optional: Remove iframe after printing
         setTimeout(() => {
             document.body.removeChild(iframe);
         }, 2000);
     };
     
-    // For browsers that don't trigger onload for doc.write sometimes
+    // Fallback trigger
     if (iframe.contentWindow.document.readyState === 'complete') {
         iframe.onload();
     }
