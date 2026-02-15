@@ -8885,7 +8885,7 @@ function printAnswerScript() {
         else if (q.isCorrect === false) wrongCount++;
     });
     
-    // Calculate Score (assuming 1 mark per question, minus negative mark)
+    // Calculate Score
     const negMark = (typeof quizSettings !== 'undefined') ? quizSettings.negativeMark : 0.25;
     const obtainedMark = (correctCount * 1) - (wrongCount * negMark);
     const totalMark = questions.length;
@@ -8896,6 +8896,7 @@ function printAnswerScript() {
     const date = new Date().toLocaleDateString('en-GB', {
         day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
     });
+    const currentYear = new Date().getFullYear();
 
     // 3. Build HTML
     let printContent = `
@@ -8906,6 +8907,7 @@ function printAnswerScript() {
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kalpurush&display=swap');
             body { font-family: 'Inter', 'Kalpurush', sans-serif; padding: 40px; color: #1f2937; line-height: 1.5; }
             
+            /* Header */
             .header { 
                 border-bottom: 2px solid #374151; padding-bottom: 20px; margin-bottom: 30px; 
                 display: flex; justify-content: space-between; align-items: flex-start;
@@ -8919,6 +8921,7 @@ function printAnswerScript() {
             .score-val { font-size: 28px; font-weight: bold; color: #059669; }
             .score-lbl { font-size: 11px; text-transform: uppercase; color: #6b7280; letter-spacing: 1px; }
 
+            /* Questions */
             .q-item { margin-bottom: 20px; break-inside: avoid; border-bottom: 1px dashed #e5e7eb; padding-bottom: 15px; }
             .q-text { font-weight: bold; font-size: 15px; margin-bottom: 8px; }
             
@@ -8926,8 +8929,6 @@ function printAnswerScript() {
                 padding: 4px 8px; margin-bottom: 3px; border-radius: 4px; font-size: 13px; 
                 border: 1px solid transparent; display: flex; justify-content: space-between;
             }
-            
-            /* Answer Styles */
             .opt.correct { background-color: #d1fae5; border-color: #10b981; color: #064e3b; font-weight: 600; }
             .opt.wrong-choice { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; text-decoration: line-through; }
             .opt.user-correct { border: 2px solid #059669; background-color: #d1fae5; }
@@ -8935,11 +8936,21 @@ function printAnswerScript() {
             .badge { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; color: white; margin-left: 10px; }
             .bg-green { background-color: #10b981; }
             .bg-red { background-color: #ef4444; }
-            
-            .note { 
-                margin-top: 8px; padding: 8px; background-color: #eff6ff; 
-                border-left: 3px solid #3b82f6; font-size: 12px; color: #1e3a8a; 
+            .note { margin-top: 8px; padding: 8px; background-color: #eff6ff; border-left: 3px solid #3b82f6; font-size: 12px; color: #1e3a8a; }
+
+            /* Footer Section */
+            .print-footer {
+                margin-top: 50px;
+                border-top: 2px solid #374151;
+                padding-top: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                page-break-inside: avoid;
             }
+            .footer-info p { margin: 3px 0; font-size: 13px; color: #1f2937; font-weight: 600; }
+            .footer-info .copyright { font-size: 11px; color: #6b7280; margin-top: 8px; font-weight: 400; }
+            .footer-qr img { width: 80px; height: 80px; border: 1px solid #e5e7eb; padding: 2px; border-radius: 4px; }
         </style>
     </head>
     <body>
@@ -8947,7 +8958,7 @@ function printAnswerScript() {
             <div>
                 <h1>${topicName}</h1>
                 <p>Date: ${date}</p>
-                <p>Questions: ${totalMark}</p>
+                <p>Total Questions: ${totalMark}</p>
             </div>
             <div class="score-card">
                 <div class="score-val">${obtainedMark.toFixed(2)}</div>
@@ -8975,7 +8986,6 @@ function printAnswerScript() {
             if (isUserSelected) {
                 if (isCorrectAnswer) {
                     className += ' user-correct'; 
-                    // Badge remains "Correct Answer" but style shows user picked it
                 } else {
                     className += ' wrong-choice';
                     badge = `<span class="badge bg-red">Your Answer</span>`;
@@ -8992,13 +9002,26 @@ function printAnswerScript() {
         printContent += `</div>`;
     });
 
+    // 5. Add Footer (Modified)
     printContent += `
+        <div class="print-footer">
+            <div class="footer-info">
+                <p>Instructor: Emam Mehedi</p>
+                <p>Facebook: fb.com/emammehedi17</p>
+                <p>Phone: 01743303877</p> 
+                <p class="copyright">&copy; ${currentYear} Class Caddy. All rights reserved.</p>
+            </div>
+            <div class="footer-qr">
+                <img src="https://classcaddy.netlify.app/images/qr2.png" alt="Scan to Visit">
+            </div>
+        </div>
+        
         <script>
             window.onload = function() { window.print(); }
         </script>
     </body></html>`;
 
-    // 5. Open Window
+    // 6. Open Window
     const win = window.open('', '_blank');
     if (win) {
         win.document.write(printContent);
