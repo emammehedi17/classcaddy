@@ -8557,118 +8557,153 @@ function printAnswerScript() {
     });
     const currentYear = new Date().getFullYear();
 
-    // 3. Build HTML (Mobile Responsive Style Injection)
+    // 3. Build HTML
     let printContent = `
     <html>
     <head>
         <title>${titleText}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kalpurush&display=swap');
-            body { font-family: 'Inter', 'Kalpurush', sans-serif; padding: 20px; color: #1f2937; line-height: 1.4; font-size: 14px; background: #fff; }
+            body { font-family: 'Inter', 'Kalpurush', sans-serif; padding: 40px; color: #1f2937; line-height: 1.4; font-size: 12px; }
             
-            /* Responsive Container */
-            .container { max-width: 800px; margin: 0 auto; }
-
             /* Header Layout */
             .header { 
                 border-bottom: 2px solid #374151; padding-bottom: 15px; margin-bottom: 20px; 
-                display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 20px;
+                display: flex; justify-content: space-between; align-items: flex-start;
             }
-            .header-info { flex: 1; min-width: 200px; }
             .header-info h1 { margin: 0 0 5px 0; font-size: 20px; color: #4f46e5; }
             .header-info p { margin: 2px 0; font-size: 12px; color: #4b5563; font-weight: 600;}
             
-            /* Result Summary Box (Responsive) */
+            /* Result Summary Box */
             .result-box { 
-                width: 100%; max-width: 300px;
-                background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px;
+                width: 280px;
+                background: #f9fafb; 
+                border: 1px solid #e5e7eb; 
+                border-radius: 6px; 
+                padding: 10px;
             }
             .result-row-large { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
-            .result-row { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 12px; }
+            .result-row { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 11px; }
             
             .lbl { color: #6b7280; font-weight: 600; }
             .val { color: #111827; font-weight: bold; }
+            
             .score-big { font-size: 18px; color: #059669; font-weight: 800; }
             .score-big-red { font-size: 18px; color: #4f46e5; font-weight: 800; }
 
-            /* Responsive Columns */
+            /* Two Column Layout */
             .questions-wrapper {
-                column-count: 2; column-gap: 30px;
-            }
-            @media (max-width: 768px) {
-                .questions-wrapper { column-count: 1; }
-                .header { flex-direction: column; }
-                .result-box { max-width: 100%; }
+                column-count: 2;
+                column-gap: 30px;
             }
 
             /* Questions */
             .q-item { 
-                margin-bottom: 12px; break-inside: avoid; page-break-inside: avoid;
-                border-bottom: 1px dashed #e5e7eb; padding-bottom: 8px; 
+                margin-bottom: 12px; 
+                break-inside: avoid; 
+                page-break-inside: avoid;
+                border-bottom: 1px dashed #e5e7eb; 
+                padding-bottom: 8px; 
             }
-            .q-text { font-weight: bold; font-size: 14px; margin-bottom: 8px; }
+            .q-text { font-weight: bold; font-size: 13px; margin-bottom: 8px; }
             
             /* Options Styling */
             .opt { 
-                padding: 4px 6px; margin-bottom: 2px; border-radius: 4px; font-size: 13px; 
+                padding: 3px 6px; margin-bottom: 2px; border-radius: 4px; font-size: 12px; 
                 border: 1px solid transparent; display: flex; justify-content: space-between; align-items: flex-start;
             }
+            
+            /* Circular Labels (a, b, c, d) */
             .opt-label {
-                display: inline-block; width: 20px; height: 20px; line-height: 18px; 
-                text-align: center; border: 1px solid #6b7280; border-radius: 50%; margin-right: 8px;
-                font-size: 11px; font-weight: 700; flex-shrink: 0; color: #374151;
+                display: inline-block;
+                width: 18px;
+                height: 18px;
+                line-height: 16px; 
+                text-align: center;
+                border: 1px solid #6b7280;
+                border-radius: 50%;
+                margin-right: 8px;
+                font-size: 10px;
+                font-weight: 700;
+                flex-shrink: 0;
+                color: #374151;
+                text-transform: lowercase; 
             }
-            .opt-content { display: flex; align-items: flex-start; flex: 1; }
+
+            .opt-content { display: flex; align-items: flex-start; }
 
             .opt.correct { background-color: #d1fae5; border-color: #10b981; color: #064e3b; font-weight: 600; }
             .opt.correct .opt-label { border-color: #059669; color: #064e3b; background: white; }
 
+            /* Wrong Choice Styles */
             .opt.wrong-choice { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
             .opt.wrong-choice .opt-content span:last-child { text-decoration: line-through; } 
             .opt.wrong-choice .opt-label { border-color: #b91c1c; color: #b91c1c; background: white; }
 
             .opt.user-correct { border: 1px solid #059669; background-color: #d1fae5; }
             
-            .badge { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; color: white; margin-left: 5px; white-space: nowrap; }
+            .badge { font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 3px; color: white; margin-left: 5px; white-space: nowrap; margin-top: 1px; text-decoration: none !important;}
             .bg-green { background-color: #10b981; }
             .bg-red { background-color: #ef4444; }
             
-            .note { margin-top: 5px; padding: 5px; background-color: #eff6ff; border-left: 2px solid #3b82f6; font-size: 12px; color: #1e3a8a; }
+            .note { margin-top: 5px; padding: 5px; background-color: #eff6ff; border-left: 2px solid #3b82f6; font-size: 11px; color: #1e3a8a; }
 
-            /* Footer */
+            /* Footer Section */
             .print-footer {
-                margin-top: 30px; border-top: 1px solid #374151; padding-top: 15px;
-                display: flex; justify-content: space-between; align-items: center; page-break-inside: avoid;
+                margin-top: 30px;
+                border-top: 1px solid #374151;
+                padding-top: 15px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                page-break-inside: avoid;
             }
-            .footer-info p { margin: 2px 0; font-size: 12px; color: #1f2937; font-weight: 600; }
+            .footer-info p { margin: 2px 0; font-size: 11px; color: #1f2937; font-weight: 600; }
             .footer-info .copyright { font-size: 10px; color: #6b7280; margin-top: 5px; font-weight: 400; }
             .footer-qr img { width: 60px; height: 60px; border: 1px solid #e5e7eb; padding: 2px; border-radius: 4px; }
         </style>
     </head>
     <body>
-        <div class="container">
-            <div class="header">
-                <div class="header-info">
-                    <h1>${titleText}</h1>
-                    <p>Date: ${date}</p>
-                    <p>Candidate ID: ${currentUser ? (currentUser.email || currentUser.uid.substring(0,8)) : 'Guest'}</p>
-                </div>
-                
-                <div class="result-box">
-                    <div class="result-row-large">
-                        <div><div class="lbl">Obtained</div><div class="score-big">${obtainedMark.toFixed(2)}</div></div>
-                        <div style="text-align:right;"><div class="lbl">Full Mark</div><div class="score-big-red">${totalMark}</div></div>
+        <div class="header">
+            <div class="header-info">
+                <h1>${titleText}</h1>
+                <p>Date: ${date}</p>
+                <p>Candidate ID: ${currentUser ? (currentUser.email || currentUser.uid.substring(0,8)) : 'Guest'}</p>
+            </div>
+            
+            <div class="result-box">
+                <div class="result-row-large">
+                    <div>
+                        <div class="lbl">Obtained Mark</div>
+                        <div class="score-big">${obtainedMark.toFixed(2)}</div>
                     </div>
-                    <div class="result-row"><span class="lbl">Percentage:</span> <span class="val">${percentage}%</span></div>
-                    <div class="result-row"><span class="lbl">Correct:</span> <span class="val" style="color:#059669;">${correctCount}</span></div>
-                    <div class="result-row"><span class="lbl">Wrong:</span> <span class="val" style="color:#dc2626;">${wrongCount}</span></div>
-                    <div class="result-row"><span class="lbl">Skipped:</span> <span class="val">${skippedCount}</span></div>
-                    <div class="result-row"><span class="lbl">Duration:</span> <span class="val">${totalDuration}</span></div>
+                    <div style="text-align:right;">
+                        <div class="lbl">Full Mark</div>
+                        <div class="score-big-red">${totalMark}</div>
+                    </div>
+                </div>
+                <div class="result-row">
+                    <span class="lbl">Percentage:</span> <span class="val">${percentage}%</span>
+                </div>
+                <div class="result-row">
+                    <span class="lbl">Total Questions:</span> <span class="val">${totalMark}</span>
+                </div>
+                 <div class="result-row">
+                    <span class="lbl">Correct:</span> <span class="val" style="color:#059669;">${correctCount}</span>
+                </div>
+                 <div class="result-row">
+                    <span class="lbl">Wrong:</span> <span class="val" style="color:#dc2626;">${wrongCount}</span>
+                </div>
+                <div class="result-row">
+                    <span class="lbl">Skipped:</span> <span class="val">${skippedCount}</span> 
+                </div>
+                <div class="result-row">
+                    <span class="lbl">Duration:</span> <span class="val">${totalDuration}</span>
                 </div>
             </div>
+        </div>
 
-            <div class="questions-wrapper">
+        <div class="questions-wrapper">
     `;
 
     // 4. Loop Questions
@@ -8678,18 +8713,25 @@ function printAnswerScript() {
         q.options.forEach((opt, i) => {
             let className = 'opt';
             let badge = '';
+
+            // Generate label (a, b, c, d)
             const label = String.fromCharCode(97 + i); 
+
             const isCorrectAnswer = (opt === q.correctAnswer);
             const isUserSelected = (opt === q.userAnswer);
 
-            if (isCorrectAnswer) className += ' correct';
+            if (isCorrectAnswer) {
+                className += ' correct';
+            }
             
             if (isUserSelected) {
                 if (isCorrectAnswer) {
                     className += ' user-correct'; 
+                    // Correctly answered: Green Badge
                     badge = `<span class="badge bg-green">Your Answer</span>`;
                 } else {
                     className += ' wrong-choice';
+                    // Wrongly answered: Red Badge
                     badge = `<span class="badge bg-red">Your Answer</span>`;
                 }
             }
@@ -8711,22 +8753,23 @@ function printAnswerScript() {
         printContent += `</div>`;
     });
 
-    printContent += `</div>`; // End wrapper
+    printContent += `</div>`; // End questions-wrapper
 
     // 5. Add Footer
     printContent += `
-            <div class="print-footer">
-                <div class="footer-info">
-                    <p>Instructor: Emam Mehedi</p>
-                    <p>Facebook: fb.com/emammehedi17</p>
-                    <p>Phone: 01743303877</p> 
-                    <p class="copyright">&copy; ${currentYear} Class Caddy.</p>
-                </div>
-                <div class="footer-qr">
-                    <img src="https://classcaddy.netlify.app/images/qr2.png" alt="Scan to Visit">
-                </div>
+        <div class="print-footer">
+            <div class="footer-info">
+                <p>Instructor: Emam Mehedi</p>
+                <p>Facebook: fb.com/emammehedi17</p>
+                <p>Phone: 01743303877</p> 
+                <p class="copyright">&copy; ${currentYear} Class Caddy. All rights reserved.</p>
             </div>
-        </div> <script>
+            <div class="footer-qr">
+                <img src="https://classcaddy.netlify.app/images/qr2.png" alt="Scan to Visit">
+            </div>
+        </div>
+        
+        <script>
             window.onload = function() { window.print(); }
         </script>
     </body></html>`;

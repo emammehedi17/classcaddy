@@ -716,22 +716,24 @@
       </div>
     </div>
     <div id="master-mcq-modal" class="modal">
-	  <div class="modal-content" style="max-width: 600px; height: 85vh; display: flex; flex-direction: column;">
-		<div class="modal-header-sticky border-b pb-3 mb-4">
-		  <h3 class="text-2xl font-semibold text-emerald-600">MCQ Repository</h3>
-		  <span class="modal-close" onclick="closeModal('master-mcq-modal')">&times;</span>
-		</div>
-		
-		<div id="master-mcq-menu-content" class="custom-scrollbar" style="overflow-y: auto; flex-grow: 1; padding-right: 5px;">
-		</div>
+      <div class="modal-content" style="max-width: 600px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header-sticky border-b pb-3 mb-4">
+          <h3 class="text-2xl font-semibold text-emerald-600">MCQ Repository</h3>
+          <p class="text-xs text-gray-500 mt-1">Select a specific topic, day, week, or month to study.</p>
+          <span class="modal-close text-3xl leading-none cursor-pointer hover:text-gray-800 text-gray-400" onclick="closeModal('master-mcq-modal')">&times;</span>
+        </div>
+        
+        <div id="master-mcq-menu-content" class="custom-scrollbar" style="overflow-y: auto; flex-grow: 1; padding-right: 5px;">
+        </div>
 
-		<div class="modal-footer-sticky border-t pt-3 mt-3">
-			<button id="show-mcq-quiz-center-btn" class="action-button w-full sm:w-auto" style="background-color: #4f46e5;">
-				<i class="fas fa-brain mr-1.5"></i> Test Yourself
-			</button>
-		</div>
-	  </div>
-	</div>
+        <div class="modal-footer-sticky border-t pt-3 mt-3 flex justify-between items-center">
+            <button id="show-mcq-quiz-center-btn" class="action-button" style="background-color: #4f46e5;">
+                <i class="fas fa-brain mr-1.5"></i> Test Yourself
+            </button>
+        </div>
+      </div>
+    </div>
+
    
 		
 	<div id="mcq-study-modal" class="modal" style="z-index: 106; overflow: hidden;">
@@ -848,14 +850,15 @@
 	
 	
 	
-	<button id="scroll-toggle-btn" class="fixed bottom-24 right-5 z-[100] w-12 h-12 bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-gray-900 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100" title="Scroll">
-		<i class="fas fa-arrow-down"></i>
-	</button>
+	<button id="scroll-toggle-btn" class="fixed bottom-24 right-5 z-[100] w-12 h-12 bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-gray-900 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100" title="Scroll to Bottom">
+    <i class="fas fa-arrow-down"></i>
+</button>
 
-	<button id="global-dark-mode-btn" class="fixed bottom-5 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-lg border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 transition-transform" title="Toggle Dark Mode">
-		<i class="fas fa-moon text-2xl"></i>
-	</button>
-		
+	<!-- GLOBAL DARK MODE TOGGLE -->
+    <button id="global-dark-mode-btn" class="fixed bottom-5 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-lg border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 transition-transform" title="Toggle Dark Mode">
+        <i class="fas fa-moon text-2xl"></i>
+    </button>
+	
     
 
     <div id="backup-restore-modal" class="modal">
