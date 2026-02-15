@@ -8894,7 +8894,7 @@ function printAnswerScript() {
     const totalMark = questions.length;
     const percentage = (totalMark > 0) ? ((Math.max(0, obtainedMark) / totalMark) * 100).toFixed(2) : 0.00;
     
-    // Get TOTAL Duration (Allocated Time)
+    // Get TOTAL Duration
     let totalDuration = "N/A";
     const totalTimeEl = document.getElementById('display-total-time');
     if (totalTimeEl) {
@@ -8989,12 +8989,14 @@ function printAnswerScript() {
             .opt.correct { background-color: #d1fae5; border-color: #10b981; color: #064e3b; font-weight: 600; }
             .opt.correct .opt-label { border-color: #059669; color: #064e3b; background: white; }
 
-            .opt.wrong-choice { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; text-decoration: line-through; }
+            /* Wrong Choice Styles - Fixed to only strikethrough text */
+            .opt.wrong-choice { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
+            .opt.wrong-choice .opt-content span:last-child { text-decoration: line-through; } /* Only strikethrough the option text */
             .opt.wrong-choice .opt-label { border-color: #b91c1c; color: #b91c1c; background: white; }
 
             .opt.user-correct { border: 1px solid #059669; background-color: #d1fae5; }
             
-            .badge { font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 3px; color: white; margin-left: 5px; white-space: nowrap; margin-top: 1px;}
+            .badge { font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 3px; color: white; margin-left: 5px; white-space: nowrap; margin-top: 1px; text-decoration: none !important;}
             .bg-green { background-color: #10b981; }
             .bg-red { background-color: #ef4444; }
             
@@ -9123,7 +9125,7 @@ function printAnswerScript() {
         </script>
     </body></html>`;
 
-    // 6. Open New Tab
+    // 6. Open New Tab (Restored)
     const win = window.open('', '_blank');
     if (win) {
         win.document.write(printContent);
