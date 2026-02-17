@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biology Ch-1: Lessons on Life</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0fdf4;
+            scroll-behavior: smooth;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+        }
+        .scientific-name {
+            font-style: italic;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.1em;
+        }
+        .kingdom-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4ade80;
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #22c55e;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center text-green-700 font-bold text-xl">
+                    <i class="fas fa-dna mr-2"></i> BioNotes <span class="text-xs ml-1 bg-green-100 px-2 rounded">Class 9</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#basics" class="hover:bg-green-100 px-3 py-2 rounded-md text-sm font-medium">Basics</a>
+                        <a href="#classification" class="hover:bg-green-100 px-3 py-2 rounded-md text-sm font-medium">Classification</a>
+                        <a href="#kingdoms" class="hover:bg-green-100 px-3 py-2 rounded-md text-sm font-medium">5 Kingdoms</a>
+                        <a href="#nomenclature" class="hover:bg-green-100 px-3 py-2 rounded-md text-sm font-medium">Nomenclature</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-green-600 to-emerald-800 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Chapter 1: Lessons on Life</h1>
+            <p class="text-xl opacity-90">From the microscopic cell to the classification of the living world.</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 space-y-12">
+
+        <!-- SECTION 1: BASICS (1.1 & 1.2) -->
+        <section id="basics">
+            <div class="flex items-center mb-6">
+                <div class="bg-green-600 w-2 h-8 rounded mr-3"></div>
+                <h2 class="text-3xl font-bold text-gray-800">Biology: The Basics</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Definition -->
+                <div class="glass-card p-6 border-l-4 border-blue-500">
+                    <h3 class="text-xl font-bold mb-3 text-blue-700"><i class="fas fa-book-open mr-2"></i>What is Biology?</h3>
+                    <p class="text-gray-600">
+                        Derived from Greek words <b>Bios</b> (Life) and <b>Logos</b> (Knowledge). It is the science of living beings.
+                        <br><br>
+                        Two main original branches:
+                    </p>
+                    <ul class="mt-2 space-y-2">
+                        <li class="flex items-center"><i class="fas fa-leaf text-green-500 w-6"></i> <b>Botany:</b> Discussion of plants.</li>
+                        <li class="flex items-center"><i class="fas fa-otter text-orange-500 w-6"></i> <b>Zoology:</b> Discussion of animals.</li>
+                    </ul>
+                </div>
+
+                <!-- Branches -->
+                <div class="glass-card p-6">
+                    <h3 class="text-xl font-bold mb-3 text-purple-700"><i class="fas fa-code-branch mr-2"></i>Branches of Biology</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                        <div class="bg-purple-50 p-3 rounded">
+                            <h4 class="font-bold text-purple-800 mb-2">Physical Biology</h4>
+                            <p class="text-gray-500 text-xs mb-2">Theoretical / Fundamental knowledge</p>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li>Morphology</li>
+                                <li>Physiology</li>
+                                <li>Cytology</li>
+                                <li>Genetics</li>
+                                <li>Evolution</li>
+                            </ul>
+                        </div>
+                        <div class="bg-pink-50 p-3 rounded">
+                            <h4 class="font-bold text-pink-800 mb-2">Applied Biology</h4>
+                            <p class="text-gray-500 text-xs mb-2">Life-oriented / Practical use</p>
+                            <ul class="list-disc list-inside text-gray-700">
+                                <li>Agriculture</li>
+                                <li>Medical Science</li>
+                                <li>Microbiology</li>
+                                <li>Forestry</li>
+                                <li>Biotechnology</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: CLASSIFICATION SYSTEM (1.3) -->
+        <section id="classification">
+            <div class="flex items-center mb-6">
+                <div class="bg-indigo-600 w-2 h-8 rounded mr-3"></div>
+                <h2 class="text-3xl font-bold text-gray-800">Classification System</h2>
+            </div>
+            
+            <div class="glass-card p-8 bg-indigo-50 border border-indigo-100">
+                <p class="mb-6 text-center text-gray-700 max-w-2xl mx-auto">
+                    In 1969, R.H. Whittaker proposed the 5-Kingdom system. Later, in 1974, Margulis modified it into two Super Kingdoms.
+                </p>
+                
+                <!-- Tree Diagram -->
+                <div class="flex flex-col items-center">
+                    <div class="bg-gray-800 text-white px-6 py-2 rounded-full font-bold shadow-lg mb-4">Living World</div>
+                    <div class="h-8 w-1 bg-gray-300"></div>
+                    
+                    <!-- Super Kingdoms -->
+                    <div class="grid grid-cols-2 gap-8 w-full max-w-4xl relative">
+                        <!-- Connector Line -->
+                        <div class="absolute top-0 left-1/4 right-1/4 h-1 bg-gray-300 -mt-1"></div>
+
+                        <!-- Left Side -->
+                        <div class="flex flex-col items-center">
+                            <div class="h-4 w-1 bg-gray-300"></div>
+                            <div class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg border-2 border-yellow-400 font-bold mb-4 text-center">
+                                Super Kingdom 1<br><span class="text-sm font-normal text-black">Prokaryota</span>
+                            </div>
+                            <div class="h-4 w-1 bg-gray-300"></div>
+                            <div class="bg-white p-2 rounded shadow text-sm font-semibold border-l-4 border-yellow-500">Kingdom 1: Monera</div>
+                        </div>
+
+                        <!-- Right Side -->
+                        <div class="flex flex-col items-center">
+                            <div class="h-4 w-1 bg-gray-300"></div>
+                            <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg border-2 border-blue-400 font-bold mb-4 text-center">
+                                Super Kingdom 2<br><span class="text-sm font-normal text-black">Eukaryota</span>
+                            </div>
+                            <div class="h-4 w-1 bg-gray-300"></div>
+                            <div class="grid grid-cols-2 gap-2 w-full text-center">
+                                <div class="bg-white p-2 rounded shadow text-sm border-l-4 border-blue-500">K-2: Protista</div>
+                                <div class="bg-white p-2 rounded shadow text-sm border-l-4 border-amber-700">K-3: Fungi</div>
+                                <div class="bg-white p-2 rounded shadow text-sm border-l-4 border-green-600">K-4: Plantae</div>
+                                <div class="bg-white p-2 rounded shadow text-sm border-l-4 border-red-500">K-5: Animalia</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: 5 KINGDOMS DETAIL -->
+        <section id="kingdoms">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Characteristics of the 5 Kingdoms</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Kingdom 1: Monera -->
+                <div class="glass-card overflow-hidden hover:shadow-xl transition-all duration-300">
+                    <div class="bg-yellow-400 h-2"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">1. Monera</h3>
+                            <i class="fas fa-bacteria text-3xl text-yellow-500 opacity-50"></i>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li><i class="fas fa-check text-yellow-500 mr-2"></i>Basically unicellular, filamentous, or colonial.</li>
+                            <li><i class="fas fa-check text-yellow-500 mr-2"></i><b>Prokaryotic:</b> Chromatin present but no nuclear membrane.</li>
+                            <li><i class="fas fa-check text-yellow-500 mr-2"></i>No membrane-bound organelles (mitochondria, plastids absent).</li>
+                            <li><i class="fas fa-check text-yellow-500 mr-2"></i>Reproduction mainly by binary fission.</li>
+                            <li><i class="fas fa-check text-yellow-500 mr-2"></i>Nutrition: Autotrophic (photosynthesis) or Heterotrophic.</li>
+                        </ul>
+                        <div class="mt-4 pt-4 border-t border-gray-100 text-xs font-bold text-gray-500">
+                            Examples: <span class="scientific-name text-yellow-700">Bacteria, Nostoc</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kingdom 2: Protista -->
+                <div class="glass-card overflow-hidden hover:shadow-xl transition-all duration-300">
+                    <div class="bg-blue-400 h-2"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">2. Protista</h3>
+                            <i class="fas fa-water text-3xl text-blue-500 opacity-50"></i>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li><i class="fas fa-check text-blue-500 mr-2"></i>Unicellular or multicellular colonial.</li>
+                            <li><i class="fas fa-check text-blue-500 mr-2"></i><b>Eukaryotic:</b> Well-defined nucleus (nuclear membrane present).</li>
+                            <li><i class="fas fa-check text-blue-500 mr-2"></i>DNA wrapped with protein inside chromatin.</li>
+                            <li><i class="fas fa-check text-blue-500 mr-2"></i>Move via pseudopodia, flagella, or cilia.</li>
+                            <li><i class="fas fa-check text-blue-500 mr-2"></i>Reproduction: Asexual (Mitosis) or Sexual (Conjugation).</li>
+                        </ul>
+                        <div class="mt-4 pt-4 border-t border-gray-100 text-xs font-bold text-gray-500">
+                            Examples: <span class="scientific-name text-blue-700">Amoeba, Diatoms</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kingdom 3: Fungi -->
+                <div class="glass-card overflow-hidden hover:shadow-xl transition-all duration-300">
+                    <div class="bg-amber-700 h-2"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">3. Fungi</h3>
+                            <i class="fas fa-shrub text-3xl text-amber-700 opacity-50"></i>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li><i class="fas fa-check text-amber-700 mr-2"></i>Most are terrestrial, saprophytic, or parasitic.</li>
+                            <li><i class="fas fa-check text-amber-700 mr-2"></i>Body consists of thread-like <b>hyphae</b> (mycelium).</li>
+                            <li><i class="fas fa-check text-amber-700 mr-2"></i>Cell wall made of <b>Chitin</b>.</li>
+                            <li><i class="fas fa-check text-amber-700 mr-2"></i>No chloroplasts (Heterotrophic).</li>
+                            <li><i class="fas fa-check text-amber-700 mr-2"></i>Reproduce by haploid spores.</li>
+                        </ul>
+                        <div class="mt-4 pt-4 border-t border-gray-100 text-xs font-bold text-gray-500">
+                            Examples: <span class="scientific-name text-amber-900">Yeast, Penicillium, Mushroom</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kingdom 4: Plantae -->
+                <div class="glass-card overflow-hidden hover:shadow-xl transition-all duration-300">
+                    <div class="bg-green-600 h-2"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">4. Plantae</h3>
+                            <i class="fas fa-tree text-3xl text-green-600 opacity-50"></i>
+                        </div>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li><i class="fas fa-check text-green-600 mr-2"></i>Autotrophic (photosynthetic), multicellular eukaryotes.</li>
+                            <li><i class="fas fa-check text-green-600 mr-2"></i>Cell wall made of <b>Cellulose</b>.</li>
+                            <li><i class="fas fa-check text-green-600 mr-2"></i>Possess complex tissue systems.</li>
+                            <li><i class="fas fa-check text-green-600 mr-2"></i>Reproduction: Sexual (Anisogamous) and Asexual.</li>
+                            <li><i class="fas fa-check text-green-600 mr-2"></i>Embryo is formed from zygote.</li>
+                        </ul>
+                        <div class="mt-4 pt-4 border-t border-gray-100 text-xs font-bold text-gray-500">
+                            Examples: <span class="scientific-name text-green-800">Artocarpus (Jackfruit), Spirogyra</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kingdom 5: Animalia -->
+                <div class="glass-card overflow-hidden hover:shadow-xl transition-all duration-300 lg:col-span-2 lg:w-1/2 lg:mx-auto">
+                    <div class="bg-red-500 h-2"></div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold text-gray-800">5. Animalia</h3>
+                            <i class="fas fa-paw text-3xl text-red-500 opacity-50"></i>
+                        </div>
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <ul class="space-y-2 text-sm text-gray-600">
+                                <li><i class="fas fa-check text-red-500 mr-2"></i>Multicellular eukaryotes with no cell wall.</li>
+                                <li><i class="fas fa-check text-red-500 mr-2"></i>No plastids (Heterotrophic).</li>
+                                <li><i class="fas fa-check text-red-500 mr-2"></i>Usually have vacuole-free cells.</li>
+                            </ul>
+                            <ul class="space-y-2 text-sm text-gray-600">
+                                <li><i class="fas fa-check text-red-500 mr-2"></i>Complex tissue systems (Nerves, Muscles).</li>
+                                <li><i class="fas fa-check text-red-500 mr-2"></i>Sexual reproduction (Oogamous).</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100 text-xs font-bold text-gray-500">
+                            Examples: <span class="scientific-name text-red-800">Homo sapiens (Human), Panthera tigris (Tiger)</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 4: NOMENCLATURE & LINNAEUS -->
+        <section id="nomenclature" class="bg-white rounded-2xl shadow-lg p-8 relative overflow-hidden">
+            <!-- Background Decoration -->
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-gray-100 rounded-full opacity-50"></div>
+
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                
+                <!-- Carolus Linnaeus Profile -->
+                <div class="w-full md:w-1/3 bg-gray-50 border border-gray-200 p-6 rounded-xl text-center">
+                    <div class="w-24 h-24 bg-gray-300 rounded-full mx-auto mb-4 overflow-hidden border-4 border-white shadow">
+                         <!-- Placeholder for Linnaeus Image -->
+                         <img src="https://upload.wikimedia.org/wikipedia/commons/6/68/Carl_von_Linn%C3%A9_by_Alexander_Roslin.jpg" alt="Linnaeus" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">Carolus Linnaeus</h3>
+                    <p class="text-sm text-gray-500 italic mb-3">Father of Taxonomy</p>
+                    <p class="text-sm text-gray-700 text-left">
+                        A Swedish naturalist. In his book <i>Systema Naturae</i> (10th Ed, 1758), he introduced the rules of Binomial Nomenclature.
+                    </p>
+                </div>
+
+                <!-- Naming Rules -->
+                <div class="w-full md:w-2/3">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Binomial Nomenclature</h2>
+                    <p class="mb-4 text-gray-600">The system of naming an organism with two parts: the <b>Genus</b> and the <b>Species</b>.</p>
+                    
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                        <h4 class="font-bold text-yellow-800 mb-2">ICBN Rules:</h4>
+                        <ul class="list-none space-y-2 text-sm text-gray-700">
+                            <li><span class="font-bold mr-2">1.</span> Language must be <span class="bg-white px-1 rounded border">Latin</span>.</li>
+                            <li><span class="font-bold mr-2">2.</span> Two parts: Genus (starts with Capital) + Species (small letter).</li>
+                            <li><span class="font-bold mr-2">3.</span> Must be unique for every organism.</li>
+                            <li><span class="font-bold mr-2">4.</span> In print: <i>Italicized</i>.</li>
+                            <li><span class="font-bold mr-2">5.</span> Handwritten: <span class="underline decoration-1">Underlined separately</span>.</li>
+                        </ul>
+                    </div>
+                    <div class="text-center text-xl text-gray-500 font-mono bg-gray-100 p-2 rounded">
+                        Genus + species = <span class="scientific-name text-black">Homo sapiens</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: PAGE 13 TABLE -->
+        <section class="pb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Scientific Names (Page 13)</h2>
+            <div class="overflow-x-auto shadow-lg rounded-lg">
+                <table class="min-w-full bg-white">
+                    <thead class="bg-gray-800 text-white">
+                        <tr>
+                            <th class="py-3 px-6 text-left">Common Name</th>
+                            <th class="py-3 px-6 text-left">Scientific Name (Binomial)</th>
+                            <th class="py-3 px-6 text-left hidden sm:table-cell">Type</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700">
+                        <tr class="border-b hover:bg-green-50">
+                            <td class="py-3 px-6 font-medium">Paddy (Rice)</td>
+                            <td class="py-3 px-6 scientific-name text-green-700">Oryza sativa</td>
+                            <td class="py-3 px-6 hidden sm:table-cell"><span class="kingdom-badge bg-green-100 text-green-800">Plant</span></td>
+                        </tr>
+                        <tr class="border-b hover:bg-green-50 bg-gray-50">
+                            <td class="py-3 px-6 font-medium">Jute</td>
+                            <td class="py-3 px-6 scientific-name text-green-700">Corchorus capsularis</td>
+                            <td class="py-3 px-6 hidden sm:table-cell"><span class="kingdom-badge bg-green-100 text-green-800">Plant</span></td>
+                        </tr>
+                        <tr class="border-b hover:bg-green-50">
+                            <td class="py-3 px-6 font-medium">Mango</td>
+                            <td class="py-3 px-6 scientific-name text-green-700">Mangifera indica</td>
+                            <td class="py-3 px-6 hidden sm:table-cell"><span class="kingdom-badge bg-green-100 text-green-800">Plant</span></td>
+                        </tr>
+                        <tr class="border-b hover:bg-green-50 bg-gray-50">
+                            <td class="py-3 px-6 font-medium">Jackfruit</td>
+                            <td class="py-3 px-6 scientific-name text-green-700">Artocarpus heterophyllus</td>
+                            <td class="py-3 px-6 hidden sm:table-cell"><span class="kingdom-badge bg-green-100 text-green-800">Plant</span></td>
+                        </tr>
+                        <tr class="border-b hover:bg-green-50">
+                            <td class="py-3 px-6 font-medium">Water Lily</td>
+                            <td class="py-3 px-6 scientific-name text-green-700">Nymphaea nouchali</td>
+                            <td class="py-3 px-6 hidden sm:table-cell"><span class="kingdom-badge bg-green-100 text-green-800">Plant</span></td>
+                        </tr>
+                        <tr class="border-b hover:bg-green-50 bg-gray-50">
+                            <td class="py-3 px-6 font-medium">China Rose</td>
+                            <td class="py-3 px-6 scientific-name text-green-700">Hibiscus rosa-sinensis</td>
+                            <td class="py-3 px-6 hidden sm:table-cell"><span class="kingdom-badge bg-green-100 text-green-800">Plant</span></td>
+                        </tr>
+                        <tr class="border-b hover:bg-yellow-50">
+                            <td class="py-3 px-6 font-medium">Cholera Germ</td>
+                            <td class="py-3 px-6 scientific-name text-yellow-700">Vibrio cholerae</td>
+                            <td class="py-3 px-6 hidden sm:table-cell"><span class="kingdom-badge bg-yellow-100 text-yellow-800">Monera</span></td>
+                        </tr>
+                        <tr class="border-b hover:bg-blue-50 bg-gray-50">
+                            <td class="py-3 px-6 font-medium">Malaria Germ</td>
+                            <td class="py-3 px-6 scientific-name text-blue-700">Plasmodium vivax</td>
+                            <td class="py-3 px-6 hidden sm:table-cell"><span class="kingdom-badge bg-blue-100 text-blue-800">Protista</span></td>
+                        </tr>
+                        <tr class="border-b hover:bg-red-50">
+                            <td class="py-3 px-6 font-medium">Cockroach</td>
+                            <td class="py-3 px-6 scientific-name text-red-700">Periplaneta americana</td>
+                            <td class="py-3 px-6 hidden sm:table-cell"><span class="kingdom-badge bg-red-100 text-red-800">Animal</span></td>
+                        </tr>
+                        <tr class="border-b hover:bg-red-50 bg-gray-50">
+                            <td class="py-3 px-6 font-medium">Honey Bee</td>
+                            <td class="py-3 px-6 scientific-name text-red-700">Apis indica</td>
+                            <td class="py-3 px-6 hidden sm:table-cell"><span class="kingdom-badge bg-red-100 text-red-800">Animal</span></td>
+                        </tr>
+                        <tr class="border-b hover:bg-red-50">
+                            <td class="py-3 px-6 font-medium">Toad</td>
+                            <td class="py-3 px-6 scientific-name text-red-700">Duttaphrynus melanostictus</td>
+                            <td class="py-3 px-6 hidden sm:table-cell"><span class="kingdom-badge bg-red-100 text-red-800">Animal</span></td>
+                        </tr>
+                        <tr class="border-b hover:bg-red-50 bg-gray-50">
+                            <td class="py-3 px-6 font-medium">Magpie Robin (Doel)</td>
+                            <td class="py-3 px-6 scientific-name text-red-700">Copsychus saularis</td>
+                            <td class="py-3 px-6 hidden sm:table-cell"><span class="kingdom-badge bg-red-100 text-red-800">Animal</span></td>
+                        </tr>
+                        <tr class="border-b hover:bg-red-50">
+                            <td class="py-3 px-6 font-medium">Royal Bengal Tiger</td>
+                            <td class="py-3 px-6 scientific-name text-red-700">Panthera tigris</td>
+                            <td class="py-3 px-6 hidden sm:table-cell"><span class="kingdom-badge bg-red-100 text-red-800">Animal</span></td>
+                        </tr>
+                        <tr class="hover:bg-red-50 bg-gray-50">
+                            <td class="py-3 px-6 font-medium">Human</td>
+                            <td class="py-3 px-6 scientific-name text-red-700">Homo sapiens</td>
+                            <td class="py-3 px-6 hidden sm:table-cell"><span class="kingdom-badge bg-red-100 text-red-800">Animal</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8 text-center">
+        <p class="mb-2">Class 9 Biology • Chapter 1 Review</p>
+        <p class="text-sm opacity-50">Generated for study purposes</p>
+    </footer>
+
+</body>
+</html>
