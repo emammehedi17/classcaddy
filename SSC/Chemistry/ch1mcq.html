@@ -1,0 +1,411 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Clipboard, Check, X, Clock, Play, Award, Copy, Info, FlaskConical, Microscope, Zap } from 'lucide-react';
+
+const App = () => {
+  const [view, setView] = useState('start'); // start, quiz, result
+  const [currentQ, setCurrentQ] = useState(0);
+  const [scoreC, setScoreC] = useState(0);
+  const [scoreW, setScoreW] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(35);
+  const [selectedOpt, setSelectedOpt] = useState(null);
+  const [showExp, setShowExp] = useState(false);
+  const [quizComplete, setQuizComplete] = useState(false);
+  const timerRef = useRef(null);
+
+  const questions = [
+    // --- 1.1 DEFINITION & HISTORY ---
+    { q: "Which branch of science deals with the transformation of matter?", options: ["Chemistry", "Physology", "Astronomy", "Botany___"], correct: 0, exp: "Chemistry is defined as the science dealing with composition, structure, and transformation of matter." },
+    { q: "Chemistry is classified as a branch of which major science?", options: ["Natural Science", "Social Science_", "Formal Science_", "Applied Science"], correct: 0, exp: "Chemistry is a fundamental branch of natural science." },
+    { q: "The ancient word 'Kemia' from which Chemistry is derived originated in?", options: ["Egypt", "China", "India", "Italy"], correct: 0, exp: "History suggests the word Chemistry originated from the Egyptian word 'Kemia'." },
+    { q: "What was the Arabic version of the word 'Kemia'?", options: ["Al-Kimiya", "Al-Jabr__", "Al-Hayyan", "Al-Qanun_"], correct: 0, exp: "The word Kemia was transformed into Al-Kimiya in Arabic." },
+    { q: "Practitioners of ancient chemistry were known as?", options: ["Alchemists", "Physicists", "Biologists", "Geologists"], correct: 0, exp: "Ancient practitioners were called Alchemists." },
+    { q: "Who is traditionally called the 'first' Alchemist in history?", options: ["Jabir Ibn Hayyan", "Robert Boyle___", "John Dalton____", "Antony Lavoiser"], correct: 0, exp: "Jabir Ibn Hayyan is recognized as a pioneering figure in alchemy." },
+    { q: "Which of these did Alchemists unsuccessfully try to create from cheap metals?", options: ["Gold", "Iron", "Lead", "Zinc"], correct: 0, exp: "Alchemists focused on trying to turn base metals into gold." },
+    { q: "Who is considered the 'Father of Modern Chemistry'?", options: ["Antony Lavoiser", "Robert Boyle___", "Jabir Hayyan___", "Joseph Priestly"], correct: 0, exp: "Antony Lavoiser is regarded as the father of modern chemistry." },
+    { q: "Alchemy refers to the chemistry practiced during which era?", options: ["Medieval", "Classic__", "Modern___", "Ancient__"], correct: 0, exp: "Alchemy is the term for medieval chemical practices." },
+    { q: "Which element's properties are NOT the primary focus of early Alchemy?", options: ["Uranium", "Mercury", "Sulfur_", "Arsenic"], correct: 0, exp: "Uranium is a modern discovery; Alchemists worked with accessible metals like Mercury and Sulfur." },
+
+    // --- 1.2 SCOPE OF CHEMISTRY ---
+    { q: "What percentage of the air is composed of Oxygen?", options: ["21%", "78%", "01%", "10%"], correct: 0, exp: "Oxygen makes up about 21% of our atmosphere." },
+    { q: "Which gas in the air do plants use to make food?", options: ["Carbon Dioxide", "Nitrogen Gas_", "Hydrogen Gas_", "Oxygen Gas___"], correct: 0, exp: "Plants take in Carbon Dioxide for photosynthesis." },
+    { q: "What is the result of the reaction between Oxygen and food in the body?", options: ["Energy_", "Water__", "Sugar__", "Starch_"], correct: 0, exp: "Respiration involves oxygen reacting with food to release energy." },
+    { q: "The process of food production in plants is called?", options: ["Photosynthesis", "Metabolism____", "Transpiration_", "Respiration___"], correct: 0, exp: "Plants produce glucose via photosynthesis." },
+    { q: "Fertilizers are added to soil to provide which nutrient primarily?", options: ["Nitrogen", "Chlorine", "Fluorine", "Bromine_"], correct: 0, exp: "Soil requires nitrogen-based fertilizers for plant growth." },
+    { q: "What chemical reaction occurs when we burn wood?", options: ["Combustion", "Diffusion_", "Effusion__", "Reduction"], correct: 0, exp: "Burning wood is a combustion reaction." },
+    { q: "Which gas is the primary product of burning wood or gas?", options: ["Carbon Dioxide", "Carbon Oxygen_", "Nitrogen Oxide", "Sulfur Dioxide"], correct: 0, exp: "Combustion of organic fuels releases carbon dioxide." },
+    { q: "The building blocks of our bodies like DNA are studied in which field?", options: ["Chemistry", "Physics__", "Geology_", "Logic___"], correct: 0, exp: "Biomolecules like DNA are fundamentally chemical structures." },
+    { q: "What is the main component of paper according to the textbook?", options: ["Cellulose", "Proteins_", "Glycogen_", "Fructose_"], correct: 0, exp: "Paper is primarily made of cellulose from plants." },
+    { q: "The digestion of food in the stomach is a/an?", options: ["Chemical Process", "Physical Change", "Atomic Fission_", "Nuclear Fusion_"], correct: 0, exp: "Digestion involves breaking down food through chemical reactions." },
+
+    // --- 1.3 RELATION WITH OTHER SCIENCES ---
+    { q: "Which subject is used to provide mathematical logic to chemical theories?", options: ["Mathematics", "History____", "Ethics_____", "Geography_"], correct: 0, exp: "Chemistry relies on Mathematics for formulas and calculations." },
+    { q: "The branch 'Biochemistry' is a combination of Chemistry and?", options: ["Biology", "Physics", "Geology", "History"], correct: 0, exp: "Biochemistry studies chemical processes in living organisms." },
+    { q: "Thermodynamics and Light studies bridge Chemistry with which subject?", options: ["Physics", "Botany_", "Zoology", "Maths__"], correct: 0, exp: "Physical properties like heat and light are studied in Physics." },
+    { q: "Calculating the amount of product in a reaction requires?", options: ["Mathematics", "Philosophy_", "Psychology_", "Sociology__"], correct: 0, exp: "Stoichiometry involves mathematical calculations." },
+    { q: "Understanding the composition of minerals in rocks involves?", options: ["Geology", "Botany_", "History", "Civics_"], correct: 0, exp: "Chemistry relates to Geology through the analysis of minerals." },
+
+    // --- 1.4 IMPORTANCE OF CHEMISTRY ---
+    { q: "What helps prevent insects from attacking crops?", options: ["Insecticides", "Fertilizers_", "Antibiotics", "Hormones___"], correct: 0, exp: "Insecticides are chemicals used to kill or repel insects." },
+    { q: "What is used to keep food fresh for longer periods?", options: ["Preservatives", "Catalysts____", "Solvents_____", "Inhibitors___"], correct: 0, exp: "Food preservatives slow down spoilage." },
+    { q: "Over-use of which chemical causes damage to the environment?", options: ["Fertilizers", "Distilled H2O", "Vitamins____", "Pure Oxygen_"], correct: 0, exp: "Excessive fertilizer use can lead to water and soil pollution." },
+    { q: "Which substance can cause the 'Greenhouse Effect' if in excess?", options: ["Carbon Dioxide", "Nitrogen Gas_", "Oxygen Gas___", "Helium Gas___"], correct: 0, exp: "Increased CO2 is a primary driver of global warming." },
+    { q: "Chemical industries can produce harmful ______ as byproducts.", options: ["Waste", "Sugar", "Water", "Fiber"], correct: 0, exp: "Industrial waste can be toxic if not managed properly." },
+
+    // --- 1.5 RESEARCH IN CHEMISTRY ---
+    { q: "What is the first step in the scientific research process?", options: ["Identifying Subject", "Collecting Data___", "Doing Experiment__", "Analyzing Results_"], correct: 0, exp: "Research starts with defining or identifying the subject." },
+    { q: "After identifying a subject, a researcher must ______ information.", options: ["Collect", "Destroy", "Ignore_", "Forget_"], correct: 0, exp: "Literature review or data collection is the second step." },
+    { q: "A 'Hypothesis' is essentially a/an?", options: ["Probable Result", "Final Solution_", "External Factor", "Random Guess___"], correct: 0, exp: "A hypothesis is an educated guess or probable outcome." },
+    { q: "What follows information collection in the research steps?", options: ["Planning Method", "Final Report__", "Public Speech_", "Award Ceremony"], correct: 0, exp: "After collecting data, the experimental plan is devised." },
+    { q: "What is the final step of a research project?", options: ["Result Analysis", "Starting Over_", "Keeping Secret", "Ignoring Facts"], correct: 0, exp: "The last phase is discussing and analyzing the results." },
+
+    // --- 1.6 LABORATORY SAFETY & SYMBOLS ---
+    { q: "Which symbol features a skull and two crossed bones?", options: ["Toxic Substance", "Flammable Gas_", "Explosive Item", "Oxidizing Agent"], correct: 0, exp: "The skull and crossbones indicates toxicity." },
+    { q: "The symbol for 'Flammable' shows which of the following?", options: ["Fire Flame", "Dead Fish_", "Exclamation", "Moving Fan"], correct: 0, exp: "A fire/flame symbol indicates flammable materials." },
+    { q: "What should you wear to protect your eyes in the laboratory?", options: ["Safety Goggles", "Dark Sun Glass", "Reading Glass", "Contact Lenses"], correct: 0, exp: "Safety goggles are mandatory to protect eyes from splashes." },
+    { q: "Which symbol represents an 'Environmental Hazard'?", options: ["Dead Tree/Fish", "Broken Glass_", "Heavy Weight_", "Sparking Plug"], correct: 0, exp: "A dead tree and fish indicate ecological toxicity." },
+    { q: "The 'Radioactive' symbol resembles which object?", options: ["Three-blade Fan", "Circular Ball_", "Triangle Shape", "Square Pattern"], correct: 0, exp: "The trefoil symbol looks like a three-bladed fan." },
+    { q: "Corrosive substances can damage which of the following?", options: ["Skin and Metal", "Plastic Only_", "Glass Bottles", "Wooden Desks_"], correct: 0, exp: "Corrosives destroy living tissue and corrode metals." },
+    { q: "Which gas is extremely harmful if inhaled in the lab?", options: ["Chlorine Gas_", "Oxygen Gas___", "Nitrogen Gas_", "Helium Gas___"], correct: 0, exp: "Chlorine and other toxic gases require fume hood usage." },
+    { q: "What is the most basic piece of safety clothing in a lab?", options: ["Apron", "Scarf", "Gloves", "Boots_"], correct: 0, exp: "An apron protects clothing and skin from spills." },
+    { q: "Which symbol warns about an 'Explosive' substance?", options: ["Bursting Bomb", "Fire Triangle", "Radiant Sun__", "Cloudy Sky___"], correct: 0, exp: "A bursting bomb symbol indicates explosives." },
+    { q: "Irritant substances mainly cause trouble for the?", options: ["Skin and Eyes", "Bones and Hair", "Teeth and Gum", "Nails and Ear"], correct: 0, exp: "Irritants cause itching or redness on skin/eyes." },
+    { q: "Which of these is a health-hazard (long-term) symbol?", options: ["Body Silhouette", "Empty Circle__", "Double Arrow__", "Wavy Lines____"], correct: 0, exp: "The silhouette with a star-burst on the chest signifies systemic health risks." },
+    { q: "Radioactive rays like Gamma can cause which disease?", options: ["Cancer", "Flu___", "Cough", "Cold_"], correct: 0, exp: "Radiation is a known carcinogen." },
+    { q: "Before leaving the lab, you must always?", options: ["Wash your hands", "Switch off AC__", "Close windows__", "Pack your bags"], correct: 0, exp: "Hand hygiene is critical after handling chemicals." },
+    { q: "Pesticides used in farming are studied under which branch?", options: ["Applied Chem_", "Pure Physics", "Soft Botany_", "Hard Geology"], correct: 0, exp: "The application of chemicals for utility falls under applied chemistry." },
+    { q: "What is 'CFC' primarily responsible for?", options: ["Ozone Depletion", "Water Cooling_", "Soil Hardening", "Oxygen Increase"], correct: 0, exp: "Chlorofluorocarbons destroy the ozone layer." },
+
+    // Adding more to reach 100...
+    { q: "Which of these is NOT a step of scientific research?", options: ["Dreaming Outcome", "Subject Choice_", "Data Gathering", "Method Planning"], correct: 0, exp: "Subjective dreaming is not a scientific step." },
+    { q: "A researcher must report results even if they are?", options: ["Negative", "Beautiful", "Positive_", "Exciting_"], correct: 0, exp: "Objectivity requires reporting all findings." },
+    { q: "What is the main danger of 'Oxidizing' chemicals?", options: ["Aid Fire Start", "Cause Freeze_", "Stop Reaction", "Absorb Oxygen"], correct: 0, exp: "Oxidizers provide oxygen that fuels fires." },
+    { q: "The 'Exclamation Mark' symbol in chemistry represents?", options: ["Irritant Risk", "Toxic Poison_", "Radioactive__", "High Voltage_"], correct: 0, exp: "The exclamation mark warns of irritants or moderate hazards." },
+    { q: "Where should you perform experiments that release toxic gas?", options: ["Fume Cupboard", "Window Side__", "Center Table_", "Lab Entrance_"], correct: 0, exp: "A fume hood/cupboard safely vents toxic gases." },
+    { q: "Chemistry is the study of matter and its ______.", options: ["Changes", "Speed__", "Weight_", "Color__"], correct: 0, exp: "Chemistry focuses on the transformation of substances." },
+    { q: "Which metal did Alchemists try to turn into gold?", options: ["Copper", "Iron__", "Silver", "Zinc__"], correct: 0, exp: "Common metals like copper and lead were experimental targets." },
+    { q: "The 'trefoil' symbol is strictly for which hazard?", options: ["Radiation", "Chemical__", "Electric__", "Magnetic__"], correct: 0, exp: "The trefoil is the international symbol for radiation." },
+    { q: "What does 'LPG' stand for in fuel chemistry?", options: ["Liquid Petro Gas", "Low Power Green", "Light Pure Gas_", "Lead Plus Gold_"], correct: 0, exp: "Liquefied Petroleum Gas." },
+    { q: "Which chemical is a primary component of natural gas?", options: ["Methane", "Propane", "Butane_", "Ethane_"], correct: 0, exp: "Methane is the main component of natural gas." },
+    { q: "Which science explores the internal energy of atoms?", options: ["Physics", "History", "Civics_", "Arts___"], correct: 0, exp: "Atomic energy is a crossover of Physics and Chemistry." },
+    { q: "A scientist who studies life via chemistry is a?", options: ["Biochemist", "Geochemist", "Physicist_", "Astronomer"], correct: 0, exp: "Biochemists study the chemistry of life." },
+    { q: "Excessive use of pesticides can kill ______ in soil.", options: ["Useful Insects", "Large Mammals_", "Plastic Bags_", "Metallic Ores"], correct: 0, exp: "Pesticides often harm non-target beneficial insects." },
+    { q: "Which of these is a liquid preservative?", options: ["Vinegar", "Stone__", "Paper__", "Glass__"], correct: 0, exp: "Vinegar (Acetic acid solution) is a common preservative." },
+    { q: "Scientific research is a ______ process.", options: ["Systematic", "Randomized_", "Accidental_", "Subjective_"], correct: 0, exp: "Science follows a strict, repeatable system." },
+    { q: "What is the result of 'Experimental data analysis'?", options: ["Conclusion", "Hypothesis_", "Questioning", "Observation"], correct: 0, exp: "Analysis leads to a final conclusion." },
+    { q: "Why are chemicals kept in 'Airtight' bottles?", options: ["Prevent React", "Keep Cool___", "Easy Carry__", "Looks Good__"], correct: 0, exp: "Many chemicals react with air or moisture." },
+    { q: "Chemical burns on skin should be washed with?", options: ["Lots of Water", "Hot Coffee__", "Thick Oil___", "Dry Towel___"], correct: 0, exp: "Immediate flushing with water is standard first aid." },
+    { q: "Which branch of Chemistry is about carbon compounds?", options: ["Organic Chem_", "Inorganic Ch", "Nuclear Chem", "Physical Ch_"], correct: 0, exp: "Organic chemistry is the study of carbon-based matter." },
+    { q: "What helps in understanding the color of a flame?", options: ["Chemistry", "Sociology", "Economics", "Politics_"], correct: 0, exp: "Flame tests and colors are chemical properties." },
+    { q: "Which chemical is found in soap?", options: ["Alkali", "Sugar_", "Starch", "Fiber_"], correct: 0, exp: "Soaps are salts of fatty acids made with alkalis." },
+    { q: "The ozone layer protects us from ______ rays.", options: ["Ultraviolet", "Visible Blue", "Infra-Red__", "Green Light"], correct: 0, exp: "UV rays are filtered by the ozone layer." },
+    { q: "Global warming is mainly caused by ______ fuels.", options: ["Fossil", "Sunlight", "Wind____", "Water___"], correct: 0, exp: "Burning fossil fuels releases greenhouse gases." },
+    { q: "Which metal is liquid at room temperature?", options: ["Mercury", "Gallium", "Cesium_", "Sodium_"], correct: 0, exp: "Mercury is the only metal liquid at standard room temp." },
+    { q: "Chemistry can solve the problem of ______ in crops.", options: ["Nutrient Loss", "Windy Weather", "Night Falling", "Sun Burning_"], correct: 0, exp: "Fertilizers replenish soil nutrients." },
+    { q: "Chemistry explains why iron ______ in open air.", options: ["Rusts", "Melts", "Boils", "Glows"], correct: 0, exp: "Oxidation of iron results in rust." },
+    { q: "What do we call the mass of a single molecule?", options: ["Molecular Mass", "Atomic Weight_", "Volume Density", "Molar Gravity_"], correct: 0, exp: "It is the sum of atomic masses in a molecule." },
+    { q: "Which lab safety device handles small fires?", options: ["Extinguisher", "Water Bucket", "Sand Box____", "All of these"], correct: 3, exp: "Multiple tools exist for fire safety." },
+    { q: "Working with acids requires wearing ______ gloves.", options: ["Rubber", "Woolen", "Cotton", "Silk__"], correct: 0, exp: "Rubber/Nitrile gloves resist chemical corrosion." },
+    { q: "Who developed the Law of Conservation of Mass?", options: ["Lavoisier", "Dalton___", "Newton____", "Einstein__"], correct: 0, exp: "Antony Lavoisier formulated this law." },
+    { q: "Chemistry knowledge is used to make ______.", options: ["Medicines", "Sculpture", "Paintings", "Clothing_"], correct: 0, exp: "Pharmacology is a major chemical application." },
+    { q: "The 'Corrosive' symbol shows liquid on a ______.", options: ["Hand/Metal", "Face/Glass", "Eye/Plastic", "Foot/Wood_"], correct: 0, exp: "It shows drops eating into a hand and a metal bar." },
+    { q: "What gas is produced by ants when they bite?", options: ["Formic Acid", "Acetic Acid", "Citric Acid", "Nitric Acid"], correct: 0, exp: "Ants inject formic acid." },
+    { q: "Chemical energy in a battery is converted to?", options: ["Electricity", "Gravitation", "Sound Wave_", "Magnetism__"], correct: 0, exp: "Batteries use chemical reactions to produce power." },
+    { q: "Which chemical keeps swimming pools clean?", options: ["Chlorine", "Fluorine", "Bromine_", "Iodine__"], correct: 0, exp: "Chlorine is a common disinfectant." },
+    { q: "In the lab, chemicals should never be ______.", options: ["Tasted", "Stored", "Labeled", "Opened"], correct: 0, exp: "Tasting chemicals is strictly forbidden." },
+    { q: "What is the primary study of 'Inorganic Chemistry'?", options: ["Non-Living_", "Human Body", "Plant Life", "Forestry__"], correct: 0, exp: "It focuses on minerals and non-organic compounds." },
+    { q: "Which science helps study the age of fossils?", options: ["Chemistry", "Civics___", "Biology__", "Physics__"], correct: 0, exp: "Carbon dating is a chemical/physical technique." },
+    { q: "What is the risk of keeping flammable near fire?", options: ["Explosion", "Cooling__", "Freezing_", "Nothing__"], correct: 0, exp: "Fire triggers flammable materials." },
+    { q: "What part of a plant absorbs soil nutrients?", options: ["Roots", "Leaf_", "Stem_", "Bud__"], correct: 0, exp: "Roots take in water and chemical minerals." },
+    { q: "What gas do humans exhale during breathing?", options: ["Carbon Dioxide", "Nitrogen Gas_", "Hydrogen Gas_", "Oxygen Gas___"], correct: 0, exp: "CO2 is a waste product of respiration." },
+    { q: "Which chemical is the main part of milk?", options: ["Calcium_", "Iron____", "Sodium__", "Potassium"], correct: 0, exp: "Milk is rich in Calcium compounds." },
+    { q: "Chemistry is the ______ of all sciences.", options: ["Mother", "Sister", "Father", "Friend"], correct: 0, exp: "Often called the central science." },
+    { q: "What symbol is used for oxidizing substances?", options: ["Circle/Flame", "Broken Bone_", "Dead Animal_", "Falling Star"], correct: 0, exp: "An 'O' with flames indicates an oxidizer." },
+    { q: "What can damage the eyes in a lab?", options: ["Liquid Spray", "Air Blow___", "Light Beam_", "Sound Noise"], correct: 0, exp: "Chemical splashes are the main risk." },
+    { q: "A good research report should be ______.", options: ["Unbiased", "Secret__", "Complex_", "Short___"], correct: 0, exp: "Scientific reports must be objective." },
+    { q: "Which chemical is used to make glass?", options: ["Silica_", "Carbon_", "Oxygen_", "Nitrate"], correct: 0, exp: "Silica (sand) is the main ingredient." },
+    { q: "Which acid is found in lemons?", options: ["Citric", "Formic", "Nitric", "Boroc_"], correct: 0, exp: "Lemons contain citric acid." },
+    { q: "What gas is used in fire extinguishers?", options: ["Carbon Dioxide", "Hydrogen Gas_", "Oxygen Gas___", "Nitrogen Gas_"], correct: 0, exp: "CO2 smothers fire by displacing oxygen." },
+    { q: "Chemistry study is ______ for a better world.", options: ["Essential", "Optional_", "Harmful__", "Useless__"], correct: 0, exp: "Chemistry is key to progress." }
+  ];
+
+  useEffect(() => {
+    if (view === 'quiz' && !selectedOpt && timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => prev - 1);
+      }, 1000);
+    } else {
+      clearInterval(timerRef.current);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [view, timeLeft, selectedOpt]);
+
+  useEffect(() => {
+    if (timeLeft === 0 && !selectedOpt) {
+      handleAnswer(-1);
+    }
+  }, [timeLeft]);
+
+  const startQuiz = () => {
+    setView('quiz');
+    setCurrentQ(0);
+    setScoreC(0);
+    setScoreW(0);
+    setTimeLeft(35);
+    setQuizComplete(false);
+  };
+
+  const handleAnswer = (idx) => {
+    setSelectedOpt(idx);
+    setShowExp(true);
+    if (idx === questions[currentQ].correct) {
+      setScoreC(prev => prev + 1);
+    } else {
+      setScoreW(prev => prev + 1);
+    }
+  };
+
+  const nextQuestion = () => {
+    if (currentQ < questions.length - 1) {
+      setCurrentQ(prev => prev + 1);
+      setSelectedOpt(null);
+      setShowExp(false);
+      setTimeLeft(35);
+    } else {
+      setQuizComplete(true);
+      setView('result');
+    }
+  };
+
+  const skipQuestion = () => {
+    nextQuestion();
+  };
+
+  const copyMCQs = () => {
+    let text = `Chemistry Chapter 1 Mega Quiz (100 Questions)\nGenerated for Study\n\n`;
+    questions.forEach((q, i) => {
+      text += `${i + 1}. ${q.q}\n`;
+      const labels = ['A', 'B', 'C', 'D'];
+      q.options.forEach((opt, j) => {
+        text += `   ${labels[j]}) ${opt}\n`;
+      });
+      text += `Correct: ${labels[q.correct]}\nNote: ${q.exp}\n\n`;
+    });
+
+    const el = document.createElement('textarea');
+    el.value = text;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    alert('All 100 Questions copied to clipboard!');
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-emerald-500/30">
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-emerald-500 p-2 rounded-lg">
+              <FlaskConical className="w-5 h-5 text-white" />
+            </div>
+            <h1 className="text-xl font-bold tracking-tight">Class Caddy</h1>
+          </div>
+          <button 
+            onClick={copyMCQs}
+            className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-full text-sm font-semibold transition-all"
+          >
+            <Copy className="w-4 h-4" />
+            <span className="hidden sm:inline">Export Questions</span>
+          </button>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="pt-24 pb-12 px-4">
+        <div className="max-w-3xl mx-auto">
+          
+          {view === 'start' && (
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-2xl">
+              <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Microscope className="w-10 h-10 text-emerald-500" />
+              </div>
+              <h2 className="text-3xl font-bold mb-4">Chapter 1: Concepts of Chemistry</h2>
+              <p className="text-slate-400 mb-8 max-w-md mx-auto">
+                Test your knowledge with 100 questions covering everything from the history of Alchemy to Laboratory Safety symbols.
+              </p>
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                  <span className="block text-2xl font-bold">100</span>
+                  <span className="text-xs text-slate-500 uppercase tracking-widest">Questions</span>
+                </div>
+                <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                  <span className="block text-2xl font-bold">35s</span>
+                  <span className="text-xs text-slate-500 uppercase tracking-widest">Per Question</span>
+                </div>
+              </div>
+              <button 
+                onClick={startQuiz}
+                className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 px-12 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-emerald-500/20 active:scale-95"
+              >
+                Start Mega Quiz
+              </button>
+            </div>
+          )}
+
+          {view === 'quiz' && (
+            <div className="space-y-6">
+              {/* Quiz Status */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="text-sm">
+                    <span className="text-slate-500">Question</span>
+                    <div className="font-bold text-emerald-400">{currentQ + 1} / 100</div>
+                  </div>
+                  <div className="h-8 w-px bg-slate-800"></div>
+                  <div className="flex gap-2">
+                    <span className="px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 text-xs font-bold">✓ {scoreC}</span>
+                    <span className="px-2 py-1 rounded bg-rose-500/10 text-rose-400 text-xs font-bold">✗ {scoreW}</span>
+                  </div>
+                </div>
+                <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border ${timeLeft < 10 ? 'bg-rose-500/10 border-rose-500/50 text-rose-400 animate-pulse' : 'bg-slate-800 border-slate-700 text-slate-300'}`}>
+                  <Clock className="w-4 h-4" />
+                  <span className="font-mono font-bold text-lg">{timeLeft}s</span>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                <div 
+                  className="bg-emerald-500 h-full transition-all duration-500"
+                  style={{ width: `${((currentQ + 1) / 100) * 100}%` }}
+                ></div>
+              </div>
+
+              {/* Question Card */}
+              <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
+                <h3 className="text-slate-900 text-xl sm:text-2xl font-bold mb-8 leading-tight">
+                  {questions[currentQ].q}
+                </h3>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {questions[currentQ].options.map((opt, i) => {
+                    let btnClass = "w-full text-left p-5 rounded-2xl border-2 transition-all flex items-center justify-between font-medium ";
+                    if (selectedOpt === null) {
+                      btnClass += "border-slate-100 bg-slate-50 text-slate-700 hover:border-emerald-500 hover:bg-emerald-50";
+                    } else {
+                      if (i === questions[currentQ].correct) {
+                        btnClass += "border-emerald-500 bg-emerald-50 text-emerald-700";
+                      } else if (i === selectedOpt) {
+                        btnClass += "border-rose-500 bg-rose-50 text-rose-700";
+                      } else {
+                        btnClass += "border-slate-100 bg-slate-50 text-slate-400 opacity-50";
+                      }
+                    }
+
+                    return (
+                      <button 
+                        key={i} 
+                        disabled={selectedOpt !== null}
+                        onClick={() => handleAnswer(i)}
+                        className={btnClass}
+                      >
+                        <span className="font-mono">{opt}</span>
+                        {selectedOpt !== null && i === questions[currentQ].correct && <Check className="w-5 h-5" />}
+                        {selectedOpt === i && i !== questions[currentQ].correct && <X className="w-5 h-5" />}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {showExp && (
+                  <div className="mt-8 p-6 bg-amber-50 rounded-2xl border border-amber-100 animate-in fade-in slide-in-from-top-4">
+                    <div className="flex items-center gap-2 text-amber-700 font-bold mb-2">
+                      <Info className="w-5 h-5" />
+                      Textbook Note:
+                    </div>
+                    <p className="text-amber-900 text-sm leading-relaxed">
+                      {questions[currentQ].exp}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer Actions */}
+              <div className="flex justify-between items-center pt-4">
+                <button 
+                  onClick={skipQuestion}
+                  className="px-6 py-3 rounded-xl text-slate-400 hover:text-white transition-colors"
+                >
+                  Skip Question
+                </button>
+                <button 
+                  disabled={selectedOpt === null}
+                  onClick={nextQuestion}
+                  className={`px-10 py-3 rounded-xl font-bold transition-all ${selectedOpt !== null ? 'bg-emerald-500 hover:bg-emerald-600 scale-105 shadow-xl shadow-emerald-500/20' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}`}
+                >
+                  {currentQ === 99 ? 'See Results' : 'Next Question'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {view === 'result' && (
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-2xl">
+              <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/20">
+                <Award className="w-12 h-12 text-white" />
+              </div>
+              <h2 className="text-3xl font-bold mb-2">Quiz Finished!</h2>
+              <p className="text-slate-400 mb-8">Here is how you performed in Chapter 1.</p>
+              
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                  <span className="block text-3xl font-bold text-emerald-400">{scoreC}</span>
+                  <span className="text-xs text-slate-500 uppercase font-bold tracking-widest">Correct</span>
+                </div>
+                <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                  <span className="block text-3xl font-bold text-rose-400">{scoreW}</span>
+                  <span className="text-xs text-slate-500 uppercase font-bold tracking-widest">Wrong</span>
+                </div>
+                <div className="bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                  <span className="block text-3xl font-bold text-amber-400">{100 - (scoreC + scoreW)}</span>
+                  <span className="text-xs text-slate-500 uppercase font-bold tracking-widest">Skipped</span>
+                </div>
+              </div>
+
+              <div className="bg-emerald-500/10 border border-emerald-500/20 p-6 rounded-2xl mb-8">
+                <div className="text-slate-400 text-sm mb-1 uppercase tracking-widest font-bold">Accuracy Score</div>
+                <div className="text-5xl font-black text-emerald-500">{Math.round((scoreC / 100) * 100)}%</div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button 
+                  onClick={() => setView('start')}
+                  className="flex-1 bg-slate-800 hover:bg-slate-700 py-4 rounded-2xl font-bold transition-all"
+                >
+                  Restart Quiz
+                </button>
+                <button 
+                  onClick={copyMCQs}
+                  className="flex-1 bg-emerald-500 hover:bg-emerald-600 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2"
+                >
+                  <Copy className="w-5 h-5" />
+                  Export Results
+                </button>
+              </div>
+            </div>
+          )}
+
+        </div>
+      </main>
+
+      {/* Footer Info */}
+      <footer className="py-8 text-center text-slate-600 text-sm border-t border-slate-900 mt-auto">
+        <p>© Class Caddy • Educational Resource for Chapter 1</p>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
