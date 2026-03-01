@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemistry Chapter 1 Mega Quiz V3 - Class Caddy</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Poppins', 'Hind Siliguri', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .no-select {
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        header {
+            background-color: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #1e293b;
+        }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        .quiz-card {
+            background-color: #ffffff;
+            color: #1e293b;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-top: 8px solid var(--primary);
+            min-height: 500px;
+            position: relative;
+        }
+
+        .option-btn {
+            width: 100%;
+            text-align: left;
+            padding: 1.25rem;
+            border: 2px solid #f1f5f9;
+            background: #f8fafc;
+            border-radius: 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .option-btn:hover:not(.disabled) {
+            border-color: var(--primary);
+            background: #f0fdf4;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+            color: #166534;
+        }
+
+        .option-btn.wrong {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .option-btn.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .timer-box {
+            font-family: 'Monaco', 'Consolas', monospace;
+            background: #fff1f2;
+            color: #e11d48;
+            border: 1px solid #fecdd3;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .explanation-box {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-500 p-2 rounded-lg shadow-lg shadow-emerald-500/20">
+                    <i class="fas fa-flask text-white"></i>
+                </div>
+                <h1 class="text-xl font-bold text-white tracking-tight">Class Caddy</h1>
+            </div>
+            <button onclick="copyMCQs()" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 px-5 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2">
+                <i class="far fa-copy"></i> Copy V3 Set
+            </button>
+        </div>
+    </header>
+
+    <main class="pt-28 pb-12 px-4">
+        <div class="max-w-3xl mx-auto">
+            
+            <!-- Start Screen -->
+            <div id="start-screen" class="bg-slate-900 border border-slate-800 rounded-[2rem] p-10 text-center shadow-2xl">
+                <div class="w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-8">
+                    <i class="fas fa-vial text-4xl text-emerald-500"></i>
+                </div>
+                <h2 class="text-3xl font-bold mb-4">Chapter 1 Mega Quiz <span class="text-emerald-400">V3</span></h2>
+                <p class="text-slate-400 mb-10 leading-relaxed">
+                    Set 1 (30) + Set 2 (30) + New (40) <br>
+                    Deep dive into GHS Symbols and Environmental Chemistry.
+                </p>
+                <div class="grid grid-cols-2 gap-4 mb-10">
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                        <span class="block text-3xl font-bold">100</span>
+                        <span class="text-xs text-slate-500 uppercase font-bold tracking-widest">Questions</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                        <span class="block text-3xl font-bold">35s</span>
+                        <span class="text-xs text-slate-500 uppercase font-bold tracking-widest">Per Item</span>
+                    </div>
+                </div>
+                <button onclick="startQuiz()" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 px-16 py-4 rounded-2xl font-bold text-lg transition-all shadow-xl shadow-emerald-500/20 active:scale-95">
+                    Start Version 3
+                </button>
+            </div>
+
+            <!-- Quiz Interface -->
+            <div id="quiz-interface" class="hidden space-y-6">
+                <!-- Status Bar -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-lg">
+                    <div class="flex items-center gap-4">
+                        <div class="text-sm">
+                            <span class="text-slate-500 font-semibold">Progress</span>
+                            <div class="font-bold text-emerald-400"><span id="curr-q-idx">1</span> / 100</div>
+                        </div>
+                        <div class="h-8 w-px bg-slate-800"></div>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/20">
+                                <i class="fas fa-check mr-1"></i> <span id="score-c">0</span>
+                            </span>
+                            <span class="px-3 py-1 rounded-lg bg-rose-500/10 text-rose-400 text-xs font-bold border border-rose-500/20">
+                                <i class="fas fa-times mr-1"></i> <span id="score-w">0</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div id="timer-display" class="timer-box px-5 py-2 rounded-xl flex items-center gap-2">
+                        <i class="far fa-clock"></i>
+                        <span class="font-bold text-lg" id="time-left">35</span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700 shadow-inner">
+                    <div id="progress-bar-fill" class="progress-fill" style="width: 0%"></div>
+                </div>
+
+                <!-- Question Card -->
+                <div class="quiz-card p-8 sm:p-12 no-select">
+                    <h3 id="question-text" class="text-2xl font-bold mb-10 leading-snug">
+                        Loading...
+                    </h3>
+
+                    <div id="options-container" class="grid grid-cols-1 gap-4">
+                        <!-- Options injected here -->
+                    </div>
+
+                    <div id="explanation-container" class="hidden mt-10 p-6 explanation-box rounded-2xl">
+                        <div class="flex items-center gap-2 text-amber-700 font-bold mb-2">
+                            <i class="fas fa-info-circle"></i> Textbook Note:
+                        </div>
+                        <p id="explanation-text" class="text-amber-900 text-sm leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex justify-between items-center py-4">
+                    <button onclick="skipQuestion()" class="px-8 py-3 rounded-xl text-slate-400 hover:text-white font-semibold transition-colors">
+                        Skip
+                    </button>
+                    <button id="next-btn" onclick="nextQuestion()" disabled class="px-12 py-3 rounded-xl font-bold bg-slate-800 text-slate-500 cursor-not-allowed transition-all">
+                        Next Question
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result Screen -->
+            <div id="result-screen" class="hidden bg-slate-900 border border-slate-800 rounded-[2rem] p-10 text-center shadow-2xl">
+                <div class="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-emerald-500/30">
+                    <i class="fas fa-award text-4xl text-white"></i>
+                </div>
+                <h2 class="text-3xl font-bold mb-2">V3 Completed!</h2>
+                <p class="text-slate-400 mb-10">Chapter 1 Total Mastery Summary</p>
+
+                <div class="grid grid-cols-3 gap-4 mb-10">
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                        <span id="final-c" class="block text-3xl font-bold text-emerald-400">0</span>
+                        <span class="text-xs text-slate-500 uppercase font-bold tracking-widest">Correct</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                        <span id="final-w" class="block text-3xl font-bold text-rose-400">0</span>
+                        <span class="text-xs text-slate-500 uppercase font-bold tracking-widest">Wrong</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                        <span id="final-a" class="block text-3xl font-bold text-amber-400">0%</span>
+                        <span class="text-xs text-slate-500 uppercase font-bold tracking-widest">Accuracy</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button onclick="location.reload()" class="flex-1 bg-slate-800 hover:bg-slate-700 py-4 rounded-2xl font-bold transition-all">
+                        Restart
+                    </button>
+                    <button onclick="copyMCQs()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 py-4 rounded-2xl font-bold transition-all shadow-lg shadow-emerald-500/20">
+                        Export Full V3
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const questions = [
+            // --- BLOCK 1: 30 FROM SET 1 (FOUNDATIONS) ---
+            { q: "Which branch of science deals with the transformation of matter?", options: ["Chemistry", "Physology", "Astronomy", "Botany___"], correct: 0, exp: "Chemistry is the science dealing with composition, structure, and transformation of matter." },
+            { q: "Chemistry is classified as a branch of which major science?", options: ["Natural Science", "Social Science_", "Formal Science_", "Applied Science"], correct: 0, exp: "Chemistry is a fundamental branch of natural science." },
+            { q: "The ancient word 'Kemia' from which Chemistry is derived originated in?", options: ["Egypt", "China", "India", "Italy"], correct: 0, exp: "History suggests the word Chemistry originated from the Egyptian word 'Kemia'." },
+            { q: "What was the Arabic version of the word 'Kemia'?", options: ["Al-Kimiya", "Al-Jabr__", "Al-Hayyan", "Al-Qanun_"], correct: 0, exp: "The word Kemia was transformed into Al-Kimiya in Arabic." },
+            { q: "Practitioners of ancient chemistry were known as?", options: ["Alchemists", "Physicists", "Biologists", "Geologists"], correct: 0, exp: "Ancient practitioners were called Alchemists." },
+            { q: "Who is traditionally called the 'first' Alchemist in history?", options: ["Jabir Ibn Hayyan", "Robert Boyle___", "John Dalton____", "Antony Lavoiser"], correct: 0, exp: "Jabir Ibn Hayyan is recognized as a pioneering figure in alchemy." },
+            { q: "Which of these did Alchemists unsuccessfully try to create from cheap metals?", options: ["Gold", "Iron", "Lead", "Zinc"], correct: 0, exp: "Alchemists focused on trying to turn base metals into gold." },
+            { q: "Who is considered the 'Father of Modern Chemistry'?", options: ["Antony Lavoiser", "Robert Boyle___", "Jabir Hayyan___", "Joseph Priestly"], correct: 0, exp: "Antony Lavoiser is regarded as the father of modern chemistry." },
+            { q: "Alchemy refers to the chemistry practiced during which era?", options: ["Medieval", "Classic__", "Modern___", "Ancient__"], correct: 0, exp: "Alchemy is the term for medieval chemical practices." },
+            { q: "Which element's properties are NOT the primary focus of early Alchemy?", options: ["Uranium", "Mercury", "Sulfur_", "Arsenic"], correct: 0, exp: "Uranium is a modern discovery; Alchemists worked with accessible metals like Mercury and Sulfur." },
+            { q: "What percentage of the air is composed of Oxygen?", options: ["21%", "78%", "01%", "10%"], correct: 0, exp: "Oxygen makes up about 21% of our atmosphere." },
+            { q: "Which gas in the air do plants use to make food?", options: ["Carbon Dioxide", "Nitrogen Gas_", "Hydrogen Gas_", "Oxygen Gas___"], correct: 0, exp: "Plants take in Carbon Dioxide for photosynthesis." },
+            { q: "What is the result of the reaction between Oxygen and food in the body?", options: ["Energy_", "Water__", "Sugar__", "Starch_"], correct: 0, exp: "Respiration involves oxygen reacting with food to release energy." },
+            { q: "The process of food production in plants is called?", options: ["Photosynthesis", "Metabolism____", "Transpiration_", "Respiration___"], correct: 0, exp: "Plants produce glucose via photosynthesis." },
+            { q: "Fertilizers are added to soil to provide which nutrient primarily?", options: ["Nitrogen", "Chlorine", "Fluorine", "Bromine_"], correct: 0, exp: "Soil requires nitrogen-based fertilizers for plant growth." },
+            { q: "What chemical reaction occurs when we burn wood?", options: ["Combustion", "Diffusion_", "Effusion__", "Reduction"], correct: 0, exp: "Burning wood is a combustion reaction." },
+            { q: "Which gas is the primary product of burning wood or gas?", options: ["Carbon Dioxide", "Carbon Oxygen_", "Nitrogen Oxide", "Sulfur Dioxide"], correct: 0, exp: "Combustion of organic fuels releases carbon dioxide." },
+            { q: "The building blocks of our bodies like DNA are studied in which field?", options: ["Chemistry", "Physics__", "Geology_", "Logic___"], correct: 0, exp: "Biomolecules like DNA are fundamentally chemical structures." },
+            { q: "What is the main component of paper according to the textbook?", options: ["Cellulose", "Proteins_", "Glycogen_", "Fructose_"], correct: 0, exp: "Paper is primarily made of cellulose from plants." },
+            { q: "The digestion of food in the stomach is a/an?", options: ["Chemical Process", "Physical Change", "Atomic Fission_", "Nuclear Fusion_"], correct: 0, exp: "Digestion involves breaking down food through chemical reactions." },
+            { q: "Which subject is used to provide mathematical logic to chemical theories?", options: ["Mathematics", "History____", "Ethics_____", "Geography_"], correct: 0, exp: "Chemistry relies on Mathematics for formulas and calculations." },
+            { q: "The branch 'Biochemistry' is a combination of Chemistry and?", options: ["Biology", "Physics", "Geology", "History"], correct: 0, exp: "Biochemistry studies chemical processes in living organisms." },
+            { q: "Thermodynamics and Light studies bridge Chemistry with which subject?", options: ["Physics", "Botany_", "Zoology", "Maths__"], correct: 0, exp: "Physical properties like heat and light are studied in Physics." },
+            { q: "Calculating the amount of product in a reaction requires?", options: ["Mathematics", "Philosophy_", "Psychology_", "Sociology__"], correct: 0, exp: "Stoichiometry involves mathematical calculations." },
+            { q: "Understanding the composition of minerals in rocks involves?", options: ["Geology", "Botany_", "History", "Civics_"], correct: 0, exp: "Chemistry relates to Geology through the analysis of minerals." },
+            { q: "What helps prevent insects from attacking crops?", options: ["Insecticides", "Fertilizers_", "Antibiotics", "Hormones___"], correct: 0, exp: "Insecticides are chemicals used to kill or repel insects." },
+            { q: "What is used to keep food fresh for longer periods?", options: ["Preservatives", "Catalysts____", "Solvents_____", "Inhibitors___"], correct: 0, exp: "Food preservatives slow down spoilage." },
+            { q: "Over-use of which chemical causes damage to the environment?", options: ["Fertilizers", "Distilled H2O", "Vitamins____", "Pure Oxygen_"], correct: 0, exp: "Excessive fertilizer use can lead to water and soil pollution." },
+            { q: "Which substance can cause the 'Greenhouse Effect' if in excess?", options: ["Carbon Dioxide", "Nitrogen Gas_", "Oxygen Gas___", "Helium Gas___"], correct: 0, exp: "Increased CO2 is a primary driver of global warming." },
+            { q: "Chemical industries can produce harmful ______ as byproducts.", options: ["Waste", "Sugar", "Water", "Fiber"], correct: 0, exp: "Industrial waste can be toxic if not managed properly." },
+
+            // --- BLOCK 2: 30 FROM SET 2 (RESEARCH & SAFETY BASICS) ---
+            { q: "What is the first step in the scientific research process?", options: ["Identifying Subject", "Collecting Data___", "Doing Experiment__", "Analyzing Results_"], correct: 0, exp: "Research starts with defining or identifying the subject." },
+            { q: "After identifying a subject, a researcher must ______ information.", options: ["Collect", "Destroy", "Ignore_", "Forget_"], correct: 0, exp: "Literature review or data collection is the second step." },
+            { q: "A 'Hypothesis' is essentially a/an?", options: ["Probable Result", "Final Solution_", "External Factor", "Random Guess___"], correct: 0, exp: "A hypothesis is an educated guess or probable outcome." },
+            { q: "What follows information collection in the research steps?", options: ["Planning Method", "Final Report__", "Public Speech_", "Award Ceremony"], correct: 0, exp: "After collecting data, the experimental plan is devised." },
+            { q: "What is the final step of a research project?", options: ["Result Analysis", "Starting Over_", "Keeping Secret", "Ignoring Facts"], correct: 0, exp: "The last phase is discussing and analyzing the results." },
+            { q: "Which symbol features a skull and two crossed bones?", options: ["Toxic Substance", "Flammable Gas_", "Explosive Item", "Oxidizing Agent"], correct: 0, exp: "The skull and crossbones indicates toxicity." },
+            { q: "The symbol for 'Flammable' shows which of the following?", options: ["Fire Flame", "Dead Fish_", "Exclamation", "Moving Fan"], correct: 0, exp: "A fire/flame symbol indicates flammable materials." },
+            { q: "What should you wear to protect your eyes in the laboratory?", options: ["Safety Goggles", "Dark Sun Glass", "Reading Glass", "Contact Lenses"], correct: 0, exp: "Safety goggles are mandatory to protect eyes from splashes." },
+            { q: "Which symbol represents an 'Environmental Hazard'?", options: ["Dead Tree/Fish", "Broken Glass_", "Heavy Weight_", "Sparking Plug"], correct: 0, exp: "A dead tree and fish indicate ecological toxicity." },
+            { q: "The 'Radioactive' symbol resembles which object?", options: ["Three-blade Fan", "Circular Ball_", "Triangle Shape", "Square Pattern"], correct: 0, exp: "The trefoil symbol looks like a three-bladed fan." },
+            { q: "Which chemical is the primary component of 'Cooking Gas' (LPG)?", options: ["Propane/Butane", "Methane/Ethane", "Carbon/Oxygen_", "Helium/Neon___"], correct: 0, exp: "LPG is a mixture of propane and butane gas." },
+            { q: "What is the specific byproduct of burning methane gas (Natural Gas)?", options: ["Water Vapor_", "Nitrogen Gas", "Solid Carbon", "Helium Gas_"], correct: 0, exp: "Combustion of methane produces CO2 and water vapor." },
+            { q: "Which chemical compound causes the hardness of bones?", options: ["Calcium Phosphate", "Sodium Carbonate_", "Iron Sulfate____", "Magnesium Oxide_"], correct: 0, exp: "Bones are made of calcium phosphate compounds." },
+            { q: "What is the core substance that chemists study to understand the universe?", options: ["Matter", "Energy", "Spirit", "Vacuum"], correct: 0, exp: "Chemistry is the study of matter's composition and changes." },
+            { q: "The 'Exclamation Mark' symbol indicates what level of hazard?", options: ["Moderate Hazard_", "Fatal Poisoning", "Atomic Radiation", "Complete Safety"], correct: 0, exp: "An exclamation mark symbol signifies irritants or moderate health risks." },
+            { q: "Which chemical symbol represents 'Oxidizing Substances'?", options: ["Circle with Fire", "Crossed Bones__", "Bursting Bomb__", "Silhouette Star"], correct: 0, exp: "Oxidizers have an 'O' with a flame on top." },
+            { q: "What should you NOT do with flammable chemicals in the lab?", options: ["Keep near fire", "Store in glass", "Label clearly_", "Wash with water"], correct: 0, exp: "Flammables must be kept far away from heat or open flames." },
+            { q: "Which symbol warns of a substance that can cause skin cancer?", options: ["Body Silhouette", "Exclamation Mark", "Trefoil Symbol_", "Fire Triangle__"], correct: 0, exp: "Systemic health hazards like carcinogens are shown by a body silhouette." },
+            { q: "Substances labeled as 'Corrosive' should be handled with?", options: ["Rubber Gloves", "Woolen Socks", "Cotton Shirt", "Silk Scarf__"], correct: 0, exp: "Rubber or nitrile gloves are required for corrosives." },
+            { q: "What does the 'Bursting Bomb' symbol represent?", options: ["Explosive Matter", "Toxic Liquid___", "Flammable Gas__", "Irritant Vapor_"], correct: 0, exp: "A bursting bomb indicates explosives." },
+            { q: "Which gas can be released by 'Oxidizing' substances to feed a fire?", options: ["Oxygen Gas", "Helium Gas", "Neon Gas__", "Argon Gas_"], correct: 0, exp: "Oxidizers release oxygen which accelerates combustion." },
+            { q: "The 'Environmental Hazard' symbol is specifically for protecting?", options: ["Aquatic Life", "Deep Space_", "Volcanoes__", "Furniture__"], correct: 0, exp: "It warns that the chemical is toxic to fish and trees (ecology)." },
+            { q: "What is the name of the international system for hazard symbols?", options: ["GHS System", "XYZ System", "ABC System", "ISO System"], correct: 0, exp: "Globally Harmonized System (GHS) of Classification and Labelling of Chemicals." },
+            { q: "Irritant substances mainly cause itching or redness on the?", options: ["Skin and Eyes", "Bones and Hair", "Teeth and Gum", "Nails and Ear"], correct: 0, exp: "Irritants cause external physical discomfort on contact." },
+            { q: "Radioactive materials must be kept in containers made of?", options: ["Lead Metal", "Glass Tube", "Wood Box__", "Paper Bag_"], correct: 0, exp: "Lead is used to shield/block radioactive rays." },
+            { q: "How should you store 'Environmental Hazard' chemicals?", options: ["Collect Waste", "Pour in Sink", "Burn in Open", "Bury in Soil"], correct: 0, exp: "Hazardous waste must be collected separately for treatment." },
+            { q: "Chemistry relates to 'Botany' through the study of?", options: ["Photosynthesis", "Gravity______", "History______", "Ethics_______"], correct: 0, exp: "Photosynthesis is a chemical process in plants." },
+            { q: "What warns you about 'Atomic Radiation' in a lab?", options: ["Trefoil Logo", "Skull Symbol", "Fire Signal_", "Bomb Graphic"], correct: 0, exp: "The trefoil symbol represents ionizing radiation." },
+            { q: "Chemistry is the ______ of all sciences.", options: ["Mother", "Sister", "Father", "Friend"], correct: 0, exp: "Often called the central science." },
+            { q: "How should you handle an 'Irritant' gas?", options: ["Fume Hood_", "Open Room_", "Paper Mask", "Deep Sniff"], correct: 0, exp: "Irritant gases should be handled in a fume hood." },
+
+            // --- BLOCK 3: 40 NEW QUESTIONS (GHS & ENVIRONMENTAL NUANCES) ---
+            { q: "Which GHS symbol specifically indicates a 'Gas Under Pressure'?", options: ["Gas Cylinder_", "Broken Bone__", "Bursting Bomb", "Fire Triangle"], correct: 0, exp: "A gas cylinder symbol indicates compressed gases." },
+            { q: "Which chemical is used to measure the level of pollution in water?", options: ["Oxygen Level_", "Sodium Level_", "Nitrogen Lev", "Helium Level"], correct: 0, exp: "Dissolved oxygen (DO) is a common metric for water quality." },
+            { q: "What is the primary study of 'Environmental Chemistry'?", options: ["Source/Effect", "Price/Cost__", "Speed/Weight", "Color/Size__"], correct: 0, exp: "Environmental chemistry focuses on the source and effect of chemicals." },
+            { q: "The 'Skull and Crossbones' indicates what type of hazard?", options: ["Acute Toxicity", "Chronic Risk_", "Minor Itching", "No Real Risk"], correct: 0, exp: "It signifies immediate and severe poisoning (acute toxicity)." },
+            { q: "Which of these is a 'Long-term Health Hazard' (Chronic)?", options: ["Respiratory S.", "Acute Cough__", "Minor Redness", "Quick Sneeze_"], correct: 0, exp: "Respiratory sensitization is a long-term systemic risk." },
+            { q: "The symbol showing liquid eating into a hand is called?", options: ["Corrosive___", "Toxic_______", "Flammable___", "Irritant____"], correct: 0, exp: "Corrosive symbols show destruction of living tissue." },
+            { q: "Which chemical symbol is mandatory on a bottle of 'Benzene'?", options: ["Body Star____", "Skull Bones__", "Bursting Bomb", "Empty Circle_"], correct: 0, exp: "Benzene is a carcinogen, requiring the systemic health hazard symbol." },
+            { q: "What indicates a substance can fuel a fire but is not the fuel?", options: ["Oxidizing O_", "Flammable F_", "Explosive E_", "Radioactive R"], correct: 0, exp: "Oxidizers (O) provide oxygen for combustion." },
+            { q: "Which gas is released when we use 'Insecticide' sprays?", options: ["Aerosols____", "Solid Powder", "Water Drops_", "Ice Crystals"], correct: 0, exp: "Sprays often contain chemical aerosols." },
+            { q: "Chemistry helps in the 'Industrial Production' of?", options: ["Soap/Deterge", "Rocks/Stones", "Grass/Leaves", "Sand/Clay___"], correct: 0, exp: "Industrial chemistry produces cleaners like soap." },
+            { q: "Which science overlaps with Chemistry for 'Medical diagnosis'?", options: ["Biochemistry_", "Astrophysics_", "Logic/Ethics_", "Social Sci___"], correct: 0, exp: "Biochemistry helps in clinical testing and diagnosis." },
+            { q: "What is the risk of dumping lab waste in 'Standard Drains'?", options: ["Water Hazard_", "Cooling Pipe", "Cleaning Tap", "No Risk Ever"], correct: 0, exp: "Toxic chemicals contaminate the water system." },
+            { q: "Which GHS symbol has a silhouette with a star-burst on chest?", options: ["Health Hazard", "Toxic Hazard", "Radioactive_", "Explosive___"], correct: 0, exp: "This is the Chronic/Systemic Health Hazard symbol." },
+            { q: "Before starting an experiment, you must read the ______.", options: ["Methodology_", "Final Report", "Moral Values", "Price Labels"], correct: 0, exp: "Understanding the procedure (methodology) is the first lab step." },
+            { q: "Which acid is found in 'Ant' bites according to textbooks?", options: ["Formic Acid_", "Citric Acid_", "Nitric Acid_", "Boric Acid__"], correct: 0, exp: "Ants and bees inject formic acid (methanoic acid)." },
+            { q: "What is the result of 'Improper storage' of flammables?", options: ["Fire Hazard__", "Cold Hazard__", "Clean Room__", "Safe Space__"], correct: 0, exp: "Flammables near heat lead to fire hazards." },
+            { q: "The trefoil symbol (☢) indicates 'Ionizing' ______.", options: ["Radiation___", "Reflection__", "Refraction__", "Absorption__"], correct: 0, exp: "It is the symbol for ionizing radiation." },
+            { q: "Which chemical is used to preserve 'Fruit Juice'?", options: ["Preservatives", "Catalysts____", "Pigments_____", "Alloys_______"], correct: 0, exp: "Chemical preservatives prevent juice from fermenting." },
+            { q: "What does 'MSDS' stand for in chemical safety context?", options: ["Material Data", "Medical Dept", "Motor Device", "Method Design"], correct: 0, exp: "Material Safety Data Sheet (often part of GHS labelling)." },
+            { q: "Which symbol warns about an 'Unstable Explosive'?", options: ["Bursting Bomb", "Fire Flame__", "Empty Circle", "Skull/Bones_"], correct: 0, exp: "The bursting bomb is for explosives and self-reactives." },
+            { q: "What is the core ingredient of 'Fertilizers' like Urea?", options: ["Nitrogen____", "Iron________", "Sodium______", "Gold________"], correct: 0, exp: "Urea provides nitrogen for plant growth." },
+            { q: "Chemistry is the study of ______ and its properties.", options: ["Matter______", "Vacuum______", "Spirit______", "Emotion_____"], correct: 0, exp: "Chemistry focuses on matter." },
+            { q: "Which chemical overlap explains the 'Age of Earth'?", options: ["Geochemistry", "Biochemistry", "Physics_____", "Astronomy___"], correct: 0, exp: "Analyzing mineral ages is Geochemistry." },
+            { q: "What can damage the 'Central Nervous System' (CNS)?", options: ["Toxic Chem___", "Pure Water__", "Fresh Air___", "Sunlight____"], correct: 0, exp: "Certain neurotoxins are chronic health hazards." },
+            { q: "Where should you keep 'Oxidizing' agents in the lab?", options: ["Cool/Dry Plac", "Hot/Wet Plac", "Near Window_", "Lab Entrance"], correct: 0, exp: "Oxidizers must be kept cool and away from fuels." },
+            { q: "Which gas is essential for 'Human Metabolism'?", options: ["Oxygen Gas___", "Nitrogen Gas_", "Helium Gas___", "Argon Gas____"], correct: 0, exp: "Humans require oxygen for aerobic respiration." },
+            { q: "What does the 'Dead Fish' symbol strictly protect?", options: ["Environment_", "Body Health_", "Metal Tools_", "Lab Tables__"], correct: 0, exp: "It is for environmental/ecological hazard warning." },
+            { q: "Which science studies the 'Composition of Ores'?", options: ["Analytical Ch", "Nuclear Chem", "Organic Chem", "Botany______"], correct: 0, exp: "Analyzing ore composition is analytical chemistry." },
+            { q: "What symbol is found on a 'Concentrated Acid' bottle?", options: ["Corrosive___", "Explosive____", "Radioactive_", "Flammable___"], correct: 0, exp: "Strong acids destroy tissue and metal." },
+            { q: "Which step in research involves 'Data Graphing'?", options: ["Results Anal", "Subject Cho", "Data Collec", "Method Plan"], correct: 0, exp: "Graphing and tabulation occur during result analysis." },
+            { q: "A 'Controlled Experiment' allows testing of one ______.", options: ["Variable____", "Hypothesis__", "Conclusion__", "Researcher__"], correct: 0, exp: "Controlled experiments isolate a single variable." },
+            { q: "Chemistry explains the 'Burning of Candles' as a?", options: ["Chemical Ch_", "Physical Ch_", "Nuclear Fiss", "Static Force"], correct: 0, exp: "Combustion of wax is a chemical change." },
+            { q: "What chemical is used in 'Refrigerators' for cooling?", options: ["Refrigerants", "Fertilizers_", "Preservativ", "Antiseptics"], correct: 0, exp: "Chemical refrigerants absorb heat for cooling." },
+            { q: "The 'Exclamation' symbol warns about what on skin?", options: ["Irritation__", "Burning Skin", "Cancerous__", "No Danger___"], correct: 0, exp: "Exclamation mark indicates minor irritation." },
+            { q: "What is the 'Systematic Study' of knowledge called?", options: ["Science_____", "Art_________", "History_____", "Opinion_____"], correct: 0, exp: "Science is the systematic study of the natural world." },
+            { q: "Chemistry relates to 'Archaeology' via ______.", options: ["Carbon Dating", "Speed Tests__", "Color Mixing_", "Water Weight"], correct: 0, exp: "Isotopic analysis is used for dating artifacts." },
+            { q: "Which chemical is the main part of 'Wood Ash'?", options: ["Potash______", "Sodium______", "Iron________", "Copper______"], correct: 0, exp: "Wood ash contains potassium carbonate (potash)." },
+            { q: "What is the primary risk of 'Radioactive' waste?", options: ["Mutation____", "Iching______", "Headache____", "Sweating____"], correct: 0, exp: "Radiation causes genetic mutations and cancer." },
+            { q: "A researcher should be 'Honest' during which step?", options: ["All Steps___", "Only Result", "Only Method", "Final Speech"], correct: 0, exp: "Scientific ethics require honesty throughout." },
+            { q: "What is the result of 'Chlorine' gas inhalation?", options: ["Lungs Damage", "Hair Loss___", "Nail Growth_", "Finger Ache_"], correct: 0, exp: "Chlorine is an acute respiratory toxin." }
+        ];
+
+        let currentQIdx = 0;
+        let scoreC = 0;
+        let scoreW = 0;
+        let timer;
+        let timeLeft = 35;
+        let isAnswered = false;
+
+        function startQuiz() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-interface').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            isAnswered = false;
+            const q = questions[currentQIdx];
+            document.getElementById('curr-q-idx').innerText = currentQIdx + 1;
+            document.getElementById('question-text').innerText = q.q;
+            document.getElementById('progress-bar-fill').style.width = `${((currentQIdx + 1) / questions.length) * 100}%`;
+            document.getElementById('next-btn').disabled = true;
+            document.getElementById('next-btn').classList.add('bg-slate-800', 'text-slate-500');
+            document.getElementById('next-btn').classList.remove('bg-emerald-500', 'text-white', 'hover:bg-emerald-600');
+            document.getElementById('explanation-container').classList.add('hidden');
+
+            const optionsBox = document.getElementById('options-container');
+            optionsBox.innerHTML = '';
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<span>${opt}</span>`;
+                btn.onclick = () => selectOption(idx);
+                optionsBox.appendChild(btn);
+            });
+
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 35;
+            document.getElementById('time-left').innerText = timeLeft;
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('time-left').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    if (!isAnswered) selectOption(-1); 
+                }
+            }, 1000);
+        }
+
+        function selectOption(idx) {
+            if (isAnswered) return;
+            isAnswered = true;
+            clearInterval(timer);
+
+            const q = questions[currentQIdx];
+            const btns = document.querySelectorAll('.option-btn');
+            
+            btns.forEach((btn, i) => {
+                btn.classList.add('disabled');
+                if (i === q.correct) {
+                    btn.classList.add('correct');
+                    btn.innerHTML += '<i class="fas fa-check"></i>';
+                } else if (i === idx) {
+                    btn.classList.add('wrong');
+                    btn.innerHTML += '<i class="fas fa-times"></i>';
+                }
+            });
+
+            if (idx === q.correct) {
+                scoreC++;
+                document.getElementById('score-c').innerText = scoreC;
+            } else if (idx !== -1) {
+                scoreW++;
+                document.getElementById('score-w').innerText = scoreW;
+            }
+
+            document.getElementById('explanation-text').innerText = q.exp;
+            document.getElementById('explanation-container').classList.remove('hidden');
+
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.disabled = false;
+            nextBtn.classList.remove('bg-slate-800', 'text-slate-500');
+            nextBtn.classList.add('bg-emerald-500', 'text-white', 'hover:bg-emerald-600', 'shadow-lg');
+        }
+
+        function nextQuestion() {
+            currentQIdx++;
+            if (currentQIdx < questions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function skipQuestion() {
+            nextQuestion();
+        }
+
+        function showResults() {
+            document.getElementById('quiz-interface').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-c').innerText = scoreC;
+            document.getElementById('final-w').innerText = scoreW;
+            document.getElementById('final-a').innerText = Math.round((scoreC / questions.length) * 100) + "%";
+        }
+
+        function copyMCQs() {
+            let content = "Chemistry Chapter 1 Mega Quiz V3 (100 Questions)\n";
+            content += "Composition: 30 from Set 1, 30 from Set 2, 40 New\n\n";
+            questions.forEach((q, i) => {
+                content += `${i + 1}. ${q.q}\n`;
+                const labels = ["A", "B", "C", "D"];
+                q.options.forEach((opt, j) => {
+                    content += `   ${labels[j]}) ${opt}\n`;
+                });
+                content += `Correct: ${labels[q.correct]}\nNote: ${q.exp}\n\n`;
+            });
+
+            const el = document.createElement('textarea');
+            el.value = content;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert('Version 3 (Hybrid Set) copied to clipboard!');
+        }
+    </script>
+</body>
+</html>
