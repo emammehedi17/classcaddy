@@ -527,12 +527,30 @@
         </button>
 
         <button id="quiz-next-btn" class="action-button text-xs px-4 py-2" style="background-color: #4f46e5;">
-            Next &rarr;
-        </button>
-    </div>
+            Next &rarr;
+        </button>
+    </div>
 </div>
-        
-        <div id="quiz-results-screen" class="hidden text-center py-10">
+
+        <div id="quiz-skipped-prompt-screen" class="hidden flex flex-col h-full bg-white relative z-10" style="min-height: 400px; justify-content: center;">
+            <div class="flex flex-col items-center justify-center p-6 text-center h-full">
+                <div class="w-16 h-16 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-question text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Wait a second!</h2>
+                <p class="text-gray-600 mb-8">You have <span id="skipped-prompt-count" class="font-bold text-amber-600 text-lg">0</span> skipped questions.</p>
+                <div class="w-full max-w-sm mx-auto space-y-3">
+                    <button id="skipped-prompt-answer-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition-colors">
+                        Answer <span id="skipped-prompt-btn-count">0</span> Qs
+                    </button>
+                    <button id="skipped-prompt-submit-btn" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 rounded-lg transition-colors">
+                        Submit Test Anyway
+                    </button>
+                </div>
+            </div>
+        </div>
+                
+        <div id="quiz-results-screen" class="hidden text-center py-10">
             <h2 class="text-3xl font-bold text-gray-900 mb-6">Quiz Completed!</h2>
             
             <div class="result-summary-list kalpurush">

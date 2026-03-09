@@ -141,6 +141,13 @@
         const quizFinalScore = document.getElementById('summary-final-score');
 		const quizPercentage = document.getElementById('summary-percentage'); // <-- MODIFIED
         const quizRestartBtn = document.getElementById('quiz-restart-btn');
+		const quizSkippedPromptScreen = document.getElementById('quiz-skipped-prompt-screen');
+        const skippedPromptSubmitBtn = document.getElementById('skipped-prompt-submit-btn');
+        const skippedPromptAnswerBtn = document.getElementById('skipped-prompt-answer-btn');
+        
+        let isCatchingUpSkipped = false;
+        let skippedQueue = [];
+        let skippedQueueIndex = 0;
 		// --- START: ADD THESE NEW ELEMENTS ---
         const quizReviewBtn = document.getElementById('quiz-review-btn');
         // --- NEW: Test Weakness Button Listener ---
@@ -3631,6 +3638,18 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             currentQuizQuestionIndex = 0;
             currentQuizScore = 0; 
 			
+			currentQuizQuestionIndex = 0;
+            currentQuizScore = 0; 
+            
+            // --- NEW: Reset Skipped State ---
+            isCatchingUpSkipped = false;
+            skippedQueue = [];
+            skippedQueueIndex = 0;
+            if(quizSkippedPromptScreen) {
+                quizSkippedPromptScreen.classList.add('hidden');
+                quizSkippedPromptScreen.style.display = 'none';
+            }
+			
             // 1. Hide ALL other screens to prevent overlaps
             quizStartScreen.classList.add('hidden');
             quizStartScreen.style.display = 'none';
@@ -3868,20 +3887,11 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizSkipBtn.hidden = true;
 
             // Auto-advance Logic (INSTANT)
-            // If strict mode is ON (!showAnswersInstantly), always auto-advance. 
-            // If normal mode is ON, only auto-advance if they got it right.
-            if (!quizSettings.showAnswersInstantly || isCorrect) {
-                setTimeout(() => {
-                    // Only auto-advance if it's NOT the last question
-                    if (currentQuizQuestionIndex < currentQuizQuestions.length - 1) {
-                        currentQuizQuestionIndex++;
-                        loadQuizQuestion();
-                        quizQuestionArea.classList.add('slide-in-right');
-                    } else {
-                        showQuizResults();
-                    }
-                }, 150); // 150ms gives a tiny visual flash of your selection before sliding
-            }
+            if (!quizSettings.showAnswersInstantly || isCorrect) {
+                setTimeout(() => {
+                    advanceQuiz(); // <-- Now handles skipped logic automatically
+                }, 150); 
+            }
         }
 		
 		
@@ -3907,10 +3917,16 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 reviewScreen.classList.add('hidden');
                 reviewScreen.style.display = 'none';
             }
+            if (quizSkippedPromptScreen) {
+                quizSkippedPromptScreen.classList.add('hidden');
+                quizSkippedPromptScreen.style.display = 'none';
+            }
             if (resultsScreen) {
                 resultsScreen.classList.remove('hidden');
                 resultsScreen.style.display = ''; 
             }
+			
+			
 			
             // --- STATS CALCULATIONS ---
             const totalQuestions = currentQuizQuestions.length;
@@ -4053,42 +4069,102 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 		
 		
-        // --- START: ADD NEW QUIZ NAV LISTENERS ---
-        quizNextBtn.addEventListener('click', () => {
-            currentQuizQuestionIndex++;
-            if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
-                showQuizResults();
+        // --- START: NEW QUIZ ADVANCE & END LOGIC ---
+        function handleQuizEnd() {
+            const skippedCount = currentQuizQuestions.filter(q => q.userAnswer === null).length;
+            
+            if (skippedCount > 0) {
+                // Show Prompt
+                document.getElementById('skipped-prompt-count').textContent = skippedCount;
+                document.getElementById('skipped-prompt-btn-count').textContent = skippedCount;
+                
+                quizMainScreen.classList.add('hidden');
+                quizMainScreen.style.display = 'none';
+                
+                quizSkippedPromptScreen.classList.remove('hidden');
+                quizSkippedPromptScreen.style.display = 'block';
             } else {
-                loadQuizQuestion();
-                quizQuestionArea.classList.add('slide-in-right'); // <-- ADD THIS
+                showQuizResults();
             }
-        });
+        }
 
-        quizSkipBtn.addEventListener('click', () => {
-            // --- Update Skipped Counter ---
-            const liveSkipped = document.getElementById('quiz-live-skipped');
-            if(liveSkipped) liveSkipped.textContent = parseInt(liveSkipped.textContent || '0') + 1;
-            // ------------------------------
-
-            // "Skip" just acts like "Next" but guarantees no answer is saved
-            currentQuizQuestionIndex++;
-            if (currentQuizQuestionIndex >= currentQuizQuestions.length) {
-                showQuizResults();
+        function advanceQuiz() {
+            if (isCatchingUpSkipped) {
+                skippedQueueIndex++;
+                if (skippedQueueIndex < skippedQueue.length) {
+                    currentQuizQuestionIndex = skippedQueue[skippedQueueIndex];
+                    loadQuizQuestion();
+                    quizQuestionArea.classList.add('slide-in-right');
+                } else {
+                    handleQuizEnd(); // Check if any remain skipped
+                }
             } else {
+                if (currentQuizQuestionIndex < currentQuizQuestions.length - 1) {
+                    currentQuizQuestionIndex++;
+                    loadQuizQuestion();
+                    quizQuestionArea.classList.add('slide-in-right');
+                } else {
+                    handleQuizEnd();
+                }
+            }
+        }
+
+        if (skippedPromptSubmitBtn) {
+            skippedPromptSubmitBtn.addEventListener('click', () => {
+                quizSkippedPromptScreen.classList.add('hidden');
+                quizSkippedPromptScreen.style.display = 'none';
+                showQuizResults(); // Submit anyway
+            });
+        }
+
+        if (skippedPromptAnswerBtn) {
+            skippedPromptAnswerBtn.addEventListener('click', () => {
+                // Build queue of skipped indices
+                skippedQueue = [];
+                currentQuizQuestions.forEach((q, i) => {
+                    if (q.userAnswer === null) skippedQueue.push(i);
+                });
+                
+                skippedQueueIndex = 0;
+                isCatchingUpSkipped = true;
+                currentQuizQuestionIndex = skippedQueue[skippedQueueIndex];
+                
+                quizSkippedPromptScreen.classList.add('hidden');
+                quizSkippedPromptScreen.style.display = 'none';
+                
+                quizMainScreen.classList.remove('hidden');
+                quizMainScreen.style.display = 'block';
+                
                 loadQuizQuestion();
                 quizQuestionArea.classList.add('slide-in-right');
-            }
-        });
-           
+            });
+        }
 
+        quizNextBtn.addEventListener('click', advanceQuiz);
+
+        quizSkipBtn.addEventListener('click', () => {
+            const liveSkipped = document.getElementById('quiz-live-skipped');
+            if(liveSkipped) liveSkipped.textContent = parseInt(liveSkipped.textContent || '0') + 1;
+            advanceQuiz();
+        });
+            
         quizPrevBtn.addEventListener('click', () => {
-            if (currentQuizQuestionIndex > 0) {
-                currentQuizQuestionIndex--;
-                loadQuizQuestion();
-                quizQuestionArea.classList.add('slide-in-left'); // <-- ADD THIS
+            if (isCatchingUpSkipped) {
+                if (skippedQueueIndex > 0) {
+                    skippedQueueIndex--;
+                    currentQuizQuestionIndex = skippedQueue[skippedQueueIndex];
+                    loadQuizQuestion();
+                    quizQuestionArea.classList.add('slide-in-left');
+                }
+            } else {
+                if (currentQuizQuestionIndex > 0) {
+                    currentQuizQuestionIndex--;
+                    loadQuizQuestion();
+                    quizQuestionArea.classList.add('slide-in-left');
+                }
             }
         });
-        // --- END: ADD NEW QUIZ NAV LISTENERS ---
+        // --- END: NEW QUIZ ADVANCE & END LOGIC ---
 
         // --- START: NEW REVIEW SCREEN LOGIC ---
         
@@ -4241,8 +4317,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const isQuizInProgress = !mainScreen.classList.contains('hidden');
             const isReviewing = !reviewScreen.classList.contains('hidden');
             const isResultsShowing = !resultsScreen.classList.contains('hidden');
+            const isPromptShowing = quizSkippedPromptScreen && !quizSkippedPromptScreen.classList.contains('hidden');
 
-            if (isQuizInProgress) {
+            if (isQuizInProgress || isPromptShowing) {
                 // Case 1: Quiz is actively running. Show the 3-button modal.
                 showQuizConfirmationModal();
                 
