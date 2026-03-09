@@ -4200,31 +4200,37 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         });
         
         // 2. Button on Review Page: "Back to Results" (FIXED)
-        const oldBackBtn = document.getElementById('quiz-back-to-results-btn');
-        if (oldBackBtn) {
-            // Remove old listeners by cloning the button
-            const newBackBtn = oldBackBtn.cloneNode(true);
-            oldBackBtn.parentNode.replaceChild(newBackBtn, oldBackBtn);
+        const oldBackBtn = document.getElementById('quiz-back-to-results-btn');
+        if (oldBackBtn) {
+            // Remove old listeners by cloning the button
+            const newBackBtn = oldBackBtn.cloneNode(true);
+            oldBackBtn.parentNode.replaceChild(newBackBtn, oldBackBtn);
 
-            // Attach the new, clean listener
-            newBackBtn.addEventListener('click', () => {
-                const quizReviewScreen = document.getElementById('quiz-review-screen');
-                const quizResultsScreen = document.getElementById('quiz-results-screen');
-                const savedResultModal = document.getElementById('view-saved-result-modal');
-                
-                // Always hide review screen first
-                if(quizReviewScreen) quizReviewScreen.classList.add('hidden');
-                
-                if (isReviewingSavedResult) {
-                    // Case A: Go back to the Saved Result Modal
-                    closeModal('quiz-modal'); 
-                    if(savedResultModal) savedResultModal.style.display = 'block'; // FIXED: Directly show modal
-                } else {
-                    // Case B: Go back to the Live Quiz Result Screen
-                    if(quizResultsScreen) quizResultsScreen.classList.remove('hidden');
+            // Attach the new, clean listener
+            newBackBtn.addEventListener('click', () => {
+                const quizReviewScreen = document.getElementById('quiz-review-screen');
+                const quizResultsScreen = document.getElementById('quiz-results-screen');
+                const savedResultModal = document.getElementById('view-saved-result-modal');
+                
+                // Always hide review screen first
+                if(quizReviewScreen) {
+                    quizReviewScreen.classList.add('hidden');
+                    quizReviewScreen.style.display = 'none'; // Ensure inline style is hidden
                 }
-            });
-        }
+                
+                if (isReviewingSavedResult) {
+                    // Case A: Go back to the Saved Result Modal
+                    closeModal('quiz-modal'); 
+                    if(savedResultModal) savedResultModal.style.display = 'block'; 
+                } else {
+                    // Case B: Go back to the Live Quiz Result Screen
+                    if(quizResultsScreen) {
+                        quizResultsScreen.classList.remove('hidden');
+                        quizResultsScreen.style.display = ''; // Clear the 'none' override
+                    }
+                }
+            });
+        }
 		
 		
         function showReviewScreen() {
