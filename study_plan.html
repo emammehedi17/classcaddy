@@ -496,12 +496,17 @@
         </div>
 
         <div class="flex items-center gap-2 text-xs font-bold flex-shrink-0">
-            <div class="flex items-center text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100" title="Correct">
+            <div id="badge-correct" class="flex items-center text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100" title="Correct">
                 <i class="fas fa-check mr-1"></i> <span id="quiz-live-correct">0</span>
             </div>
-            <div class="flex items-center text-red-500 bg-red-50 px-2 py-1 rounded border border-red-100" title="Wrong">
+            <div id="badge-wrong" class="flex items-center text-red-500 bg-red-50 px-2 py-1 rounded border border-red-100" title="Wrong">
                 <i class="fas fa-times mr-1"></i> <span id="quiz-live-wrong">0</span>
             </div>
+            
+            <div id="badge-answered" class="hidden items-center text-indigo-600 bg-indigo-50 px-2 py-1 rounded border border-indigo-200" title="Answered">
+                <i class="fas fa-pen mr-1"></i> <span id="quiz-live-answered">0</span>
+            </div>
+
             <div class="flex items-center text-gray-500 bg-gray-100 px-2 py-1 rounded border border-gray-200" title="Skipped">
                 <i class="fas fa-forward mr-1"></i> <span id="quiz-live-skipped">0</span>
             </div>

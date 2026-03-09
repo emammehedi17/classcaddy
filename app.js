@@ -3678,14 +3678,35 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const liveCorrect = document.getElementById('quiz-live-correct');
             const liveWrong = document.getElementById('quiz-live-wrong');
             const liveSkipped = document.getElementById('quiz-live-skipped');
+            const liveAnswered = document.getElementById('quiz-live-answered');
             const progressBar = document.getElementById('quiz-progress-bar');
             const quizScoreEl = document.getElementById('quiz-score'); 
+            
+            const badgeCorrect = document.getElementById('badge-correct');
+            const badgeWrong = document.getElementById('badge-wrong');
+            const badgeAnswered = document.getElementById('badge-answered');
 
             if(liveCorrect) liveCorrect.textContent = '0';
             if(liveWrong) liveWrong.textContent = '0';
             if(liveSkipped) liveSkipped.textContent = '0';
+            if(liveAnswered) liveAnswered.textContent = '0';
             if(progressBar) progressBar.style.width = '0%';
             if(quizScoreEl) quizScoreEl.textContent = 'Score: 0.00'; 
+            
+            // --- NEW: Toggle display based on strict mode ---
+            if (quizSettings.showAnswersInstantly) {
+                // Normal Mode
+                if (quizScoreEl) quizScoreEl.style.display = 'block';
+                if (badgeCorrect) badgeCorrect.style.display = 'flex';
+                if (badgeWrong) badgeWrong.style.display = 'flex';
+                if (badgeAnswered) badgeAnswered.style.display = 'none';
+            } else {
+                // Strict Mode (Hide hints, just show answered & skipped)
+                if (quizScoreEl) quizScoreEl.style.display = 'none';
+                if (badgeCorrect) badgeCorrect.style.display = 'none';
+                if (badgeWrong) badgeWrong.style.display = 'none';
+                if (badgeAnswered) badgeAnswered.style.display = 'flex';
+            }
             
             quizRestartBtn.onclick = runQuizGame;
             
@@ -3848,6 +3869,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 const liveWrong = document.getElementById('quiz-live-wrong');
                 if(liveWrong) liveWrong.textContent = parseInt(liveWrong.textContent || '0') + 1;
             }
+            
+            // --- NEW: Increment Answered counter for strict mode ---
+            const liveAnswered = document.getElementById('quiz-live-answered');
+            if(liveAnswered) liveAnswered.textContent = parseInt(liveAnswered.textContent || '0') + 1;
             
             quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`;
 
