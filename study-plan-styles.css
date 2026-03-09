@@ -3403,3 +3403,15 @@ body.dark-mode .border-t,
 body.dark-mode .border-b {
     border-color: #374151 !important;
 }
+
+/* --- NEW: NEUTRAL SELECTION FOR QUIZ --- */
+.quiz-option-btn.selected-neutral {
+    background-color: #e0e7ff !important; /* indigo-100 */
+    border-color: #6366f1 !important; /* indigo-500 */
+    color: #3730a3 !important; /* indigo-800 */
+}
+body.dark-mode .quiz-option-btn.selected-neutral {
+    background-color: #312e81 !important; /* indigo-900 */
+    border-color: #6366f1 !important; /* indigo-500 */
+    color: #e0e7ff !important; /* indigo-100 */
+}

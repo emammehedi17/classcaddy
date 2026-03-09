@@ -59,7 +59,8 @@
 		// --- Quiz Settings Defaults ---
 			let quizSettings = {
 				timePerQuestion: 60, // seconds
-				negativeMark: 0.25
+				negativeMark: 0.25,
+				showAnswersInstantly: true // <-- NEW
 			};
 			// Load from LocalStorage if exists
 			if(localStorage.getItem('cc_quiz_settings')) {
@@ -177,30 +178,33 @@
     const quizSettingsForm = document.getElementById('quiz-settings-form');
     const quizSettingsDisplay = document.getElementById('quiz-settings-display');
     const settingTimeInput = document.getElementById('setting-time-input');
-    const settingNegInput = document.getElementById('setting-neg-input');
+    const settingNegInput = document.getElementById('setting-neg-input');
+    const settingShowAnswers = document.getElementById('setting-show-answers');
 
-    if (quizEditBtn) {
-        // Init Inputs with current values
-        settingTimeInput.value = quizSettings.timePerQuestion;
-        settingNegInput.value = quizSettings.negativeMark;
+    if (quizEditBtn) {
+        // Init Inputs with current values
+        settingTimeInput.value = quizSettings.timePerQuestion;
+        settingNegInput.value = quizSettings.negativeMark;
+        if(settingShowAnswers) settingShowAnswers.checked = quizSettings.showAnswersInstantly;
 
-        quizEditBtn.addEventListener('click', () => {
-            const isHidden = quizSettingsForm.classList.contains('hidden');
-            if (isHidden) {
-                quizSettingsForm.classList.remove('hidden');
-                quizSettingsDisplay.classList.add('opacity-50'); // Dim display
-            } else {
-                quizSettingsForm.classList.add('hidden');
-                quizSettingsDisplay.classList.remove('opacity-50');
-            }
-        });
+        quizEditBtn.addEventListener('click', () => {
+            const isHidden = quizSettingsForm.classList.contains('hidden');
+            if (isHidden) {
+                quizSettingsForm.classList.remove('hidden');
+                quizSettingsDisplay.classList.add('opacity-50'); // Dim display
+            } else {
+                quizSettingsForm.classList.add('hidden');
+                quizSettingsDisplay.classList.remove('opacity-50');
+            }
+        });
 
-        quizSaveBtn.addEventListener('click', () => {
-            const newTime = parseInt(settingTimeInput.value) || 60;
-            const newNeg = parseFloat(settingNegInput.value) || 0;
+        quizSaveBtn.addEventListener('click', () => {
+            const newTime = parseInt(settingTimeInput.value) || 60;
+            const newNeg = parseFloat(settingNegInput.value) || 0;
 
-            quizSettings.timePerQuestion = newTime;
-            quizSettings.negativeMark = newNeg;
+            quizSettings.timePerQuestion = newTime;
+            quizSettings.negativeMark = newNeg;
+            if(settingShowAnswers) quizSettings.showAnswersInstantly = settingShowAnswers.checked;
 
             // Save to Storage
             localStorage.setItem('cc_quiz_settings', JSON.stringify(quizSettings));
@@ -3766,14 +3770,20 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
 
                 if (q.userAnswer !== null) {
-                    // Question answered: Lock buttons & Show colors
-                    button.disabled = true;
-                    if (option === q.correctAnswer) {
-                        button.classList.add('correct');
-                    } else if (option === q.userAnswer) {
-                        button.classList.add('incorrect');
-                    }
-                } else {
+                    // Question answered: Lock buttons & Show colors
+                    button.disabled = true;
+                    if (quizSettings.showAnswersInstantly) {
+                        if (option === q.correctAnswer) {
+                            button.classList.add('correct');
+                        } else if (option === q.userAnswer) {
+                            button.classList.add('incorrect');
+                        }
+                    } else {
+                        if (option === q.userAnswer) {
+                            button.classList.add('selected-neutral');
+                        }
+                    }
+                } else {
                     // New question: Add click listener
                     button.onclick = () => selectQuizAnswer(button, option);
                 }
@@ -3783,8 +3793,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizOptionsContainer.appendChild(fragment);
 
             // --- FIX: RE-RENDER NOTE IF ALREADY ANSWERED ---
-            if (q.userAnswer !== null && q.note) {
-                const noteDiv = document.createElement('div');
+            if (q.userAnswer !== null && q.note && quizSettings.showAnswersInstantly) {
+                const noteDiv = document.createElement('div');
                 noteDiv.id = 'quiz-instant-note';
                 noteDiv.className = 'mt-4 p-3 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm explanation-text';
                 noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(q.note)}`;
@@ -3823,17 +3833,23 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`;
 
             // Apply visual feedback to buttons
-            Array.from(quizOptionsContainer.children).forEach(btn => {
-                btn.disabled = true;
-                if (btn.textContent === q.correctAnswer) {
-                    btn.classList.add('correct');
-                } else if (btn.textContent === selectedOption) {
-                    btn.classList.add('incorrect');
-                }
-            });
+            Array.from(quizOptionsContainer.children).forEach(btn => {
+                btn.disabled = true;
+                if (quizSettings.showAnswersInstantly) {
+                    if (btn.textContent === q.correctAnswer) {
+                        btn.classList.add('correct');
+                    } else if (btn.textContent === selectedOption) {
+                        btn.classList.add('incorrect');
+                    }
+                } else {
+                    if (btn.textContent === selectedOption) {
+                        btn.classList.add('selected-neutral');
+                    }
+                }
+            });
 
-            // --- SHOW NOTE IMMEDIATELY (CORRECT OR WRONG) ---
-            if (q.note) {
+            // --- SHOW NOTE IMMEDIATELY (CORRECT OR WRONG) ---
+            if (q.note && quizSettings.showAnswersInstantly) {
                 // Remove old note just in case
                 const oldNote = document.getElementById('quiz-instant-note');
                 if (oldNote) oldNote.remove();
@@ -3852,8 +3868,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizSkipBtn.hidden = true;
 
             // Auto-advance Logic (INSTANT)
-            if (isCorrect) {
-                setTimeout(() => {
+            if (isCorrect && quizSettings.showAnswersInstantly) {
+                setTimeout(() => {
                     // Only auto-advance if it's NOT the last question
                     if (currentQuizQuestionIndex < currentQuizQuestions.length - 1) {
                         currentQuizQuestionIndex++;
