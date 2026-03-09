@@ -3915,7 +3915,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             if (!quizSettings.showAnswersInstantly || isCorrect) {
                 setTimeout(() => {
                     advanceQuiz(); // <-- Now handles skipped logic automatically
-                }, 150); 
+                }, 0); 
             }
         }
 		
