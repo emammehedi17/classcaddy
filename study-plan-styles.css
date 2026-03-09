@@ -1,8 +1,12 @@
 
         /* --- Light Theme & Motivational Styles --- */
         html { scroll-behavior: smooth; }
+        /* --- Force Inter for English, Kalpurush for Bangla globally --- */
+        html, body, input, textarea, select, button {
+            font-family: 'Inter', 'Kalpurush', sans-serif !important;
+        }
+
         body {
-            font-family: 'Inter', 'Kalpurush', 'Poppins', sans-serif; /* Prioritize Inter */
             background-color: #f8fafc; /* Lighter gray background (slate-50) */
             color: #1f2937; /* gray-800 */
             -webkit-font-smoothing: antialiased; /* Smoother fonts */
