@@ -3541,4 +3541,18 @@ body.dark-mode .skeleton {
     body.dark-mode .day-section-body .study-table td[data-label="Actions"] {
         border-top-color: #374151 !important;
     }
+	
+	/* --- Force Mobile Cards to Never Change Background Color on Hover or Done --- */
+    .day-section-body .study-table tbody tr:hover,
+    .day-section-body .study-table tr.row-completed,
+    .day-section-body .study-table tr.row-completed:hover {
+        background-color: #ffffff !important; /* Lock to white */
+    }
+
+    /* Apply the same lock for Dark Mode */
+    body.dark-mode .day-section-body .study-table tbody tr:hover,
+    body.dark-mode .day-section-body .study-table tr.row-completed,
+    body.dark-mode .day-section-body .study-table tr.row-completed:hover {
+        background-color: #1f2937 !important; /* Lock to dark gray */
+    }
 }
