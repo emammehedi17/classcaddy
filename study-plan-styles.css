@@ -3419,3 +3419,23 @@ body.dark-mode .quiz-option-btn.selected-neutral {
     border-color: #6366f1 !important; /* indigo-500 */
     color: #e0e7ff !important; /* indigo-100 */
 }
+
+/* --- NEW: SKELETON LOADER ANIMATIONS --- */
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+.skeleton {
+    animation: shimmer 2s infinite linear;
+    background: #e5e7eb;
+    background-image: linear-gradient(to right, #e5e7eb 0%, #f3f4f6 20%, #e5e7eb 40%, #e5e7eb 100%);
+    background-repeat: no-repeat;
+    background-size: 1000px 100%;
+    border-radius: 4px;
+}
+
+body.dark-mode .skeleton {
+    background: #374151;
+    background-image: linear-gradient(to right, #374151 0%, #4b5563 20%, #374151 40%, #374151 100%);
+}

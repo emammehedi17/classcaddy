@@ -833,7 +833,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
              // 1. We are loading a new month (isAlreadyActive = false)
              // 2. We are RE-loading the current month to show a new day (isAlreadyActive = true, anchorId = true)
 
-             currentMonthPlanDisplay.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading...</p>';
+             currentMonthPlanDisplay.innerHTML = getStudyPlanSkeleton();
              selectMonthMessage.classList.add('hidden');
 
              if (unsubscribeActiveMonth) {
@@ -1062,7 +1062,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
             const totalVocabCountSpan = document.getElementById('total-vocab-count');
             
             modal.style.display = "block";
-            contentDiv.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading all vocabularies...</p>';
+            contentDiv.innerHTML = getListSkeleton();
             if (totalVocabCountSpan) totalVocabCountSpan.textContent = "...";
             setSyncStatus("Loading...", "blue");
 
@@ -4956,7 +4956,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
     const viewMcqContent = document.getElementById('view-mcq-content');
     const modal = document.getElementById('view-mcq-modal');
     
-    viewMcqContent.innerHTML = '<p class="text-center text-gray-500 italic py-10"><i class="fas fa-spinner fa-spin text-2xl"></i><br>Loading MCQs...</p>';
+    viewMcqContent.innerHTML = getCardSkeleton();
     modal.style.display = 'block';
 
     try {
@@ -5728,9 +5728,9 @@ async function loadAndDisplayResults() {
     }
 
     // Set loading state
-    byDayResultsList.innerHTML = `<p class="text-center text-gray-500 italic py-10">Loading all results...</p>`;
+    byDayResultsList.innerHTML = getListSkeleton();
     subjectSubTabsNav.innerHTML = '';
-    subjectSubTabsContent.innerHTML = `<p class="text-center text-gray-500 italic py-10">Loading subject results...</p>`;
+    subjectSubTabsContent.innerHTML = getListSkeleton();
 
     try {
         console.log("Fetching results from Firestore...");
@@ -7491,7 +7491,7 @@ async function displayMcqMenu() {
     if (!auth.currentUser) { showCustomAlert("Please log in."); return; }
     
     masterMcqModal.style.display = "block";
-    masterMcqMenuContent.innerHTML = '<p class="text-center text-gray-500 py-10"><i class="fas fa-spinner fa-spin"></i> Loading Repository...</p>';
+    masterMcqMenuContent.innerHTML = getListSkeleton();
 
     try {
         const userId = auth.currentUser.uid;
@@ -7628,7 +7628,7 @@ if (masterMcqMenuContent) {
 // 2. Open Study Modal (Fetcher)
 window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
     mcqStudyModal.style.display = 'block';
-    mcqStudyContent.innerHTML = '<p class="text-center py-20"><i class="fas fa-spinner fa-spin text-4xl text-indigo-300"></i></p>';
+    mcqStudyContent.innerHTML = getCardSkeleton();
     
     // Setup Header
     const titleEl = document.getElementById('study-modal-title');
@@ -8906,3 +8906,62 @@ function printAnswerScript(savedData = null) {
     }
 }
 
+// --- SKELETON LOADER HELPERS ---
+function getStudyPlanSkeleton() {
+    return `
+        <div class="mb-12 p-6 card border border-gray-100">
+            <div class="flex justify-between items-start mb-6">
+                <div class="skeleton h-8 w-64 rounded"></div>
+                <div class="flex gap-2"><div class="skeleton h-8 w-32 rounded"></div></div>
+            </div>
+            <div class="flex gap-6 mb-10 overflow-hidden">
+                <div class="skeleton h-32 w-32 rounded-full flex-shrink-0"></div>
+                <div class="skeleton h-32 w-32 rounded-full flex-shrink-0"></div>
+                <div class="skeleton h-32 w-32 rounded-full flex-shrink-0"></div>
+            </div>
+            <div class="space-y-6">
+                <div class="skeleton h-6 w-48 rounded mb-2"></div>
+                <div class="skeleton h-32 w-full rounded-lg"></div>
+                <div class="skeleton h-6 w-48 rounded mb-2 mt-6"></div>
+                <div class="skeleton h-32 w-full rounded-lg"></div>
+            </div>
+        </div>
+    `;
+}
+
+function getListSkeleton() {
+    return `
+        <div class="space-y-4 p-2">
+            <div class="skeleton h-14 w-full rounded-lg"></div>
+            <div class="skeleton h-14 w-full rounded-lg"></div>
+            <div class="skeleton h-14 w-full rounded-lg"></div>
+            <div class="skeleton h-14 w-full rounded-lg"></div>
+            <div class="skeleton h-14 w-full rounded-lg"></div>
+        </div>
+    `;
+}
+
+function getCardSkeleton() {
+    return `
+        <div class="study-card mb-4 p-5 border border-gray-200 rounded-lg bg-white shadow-sm">
+            <div class="skeleton h-5 w-3/4 rounded mb-5"></div>
+            <div class="space-y-3 mb-5">
+                <div class="skeleton h-4 w-1/2 rounded"></div>
+                <div class="skeleton h-4 w-2/3 rounded"></div>
+                <div class="skeleton h-4 w-1/2 rounded"></div>
+                <div class="skeleton h-4 w-3/4 rounded"></div>
+            </div>
+            <div class="skeleton h-10 w-48 rounded"></div>
+        </div>
+        <div class="study-card mb-4 p-5 border border-gray-200 rounded-lg bg-white shadow-sm">
+            <div class="skeleton h-5 w-4/5 rounded mb-5"></div>
+            <div class="space-y-3 mb-5">
+                <div class="skeleton h-4 w-2/3 rounded"></div>
+                <div class="skeleton h-4 w-1/2 rounded"></div>
+                <div class="skeleton h-4 w-3/4 rounded"></div>
+                <div class="skeleton h-4 w-1/2 rounded"></div>
+            </div>
+            <div class="skeleton h-10 w-48 rounded"></div>
+        </div>
+    `;
+}
