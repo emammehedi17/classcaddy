@@ -607,59 +607,7 @@
         #academic-menu a { color: #374151; }
         #academic-menu a:hover { background-color: #f3f4f6; }
 
-        /* --- Mobile Responsiveness for Table --- */
-        @media (max-width: 768px) {
-            .study-table thead { display: none; } /* Hide table header */
-            .study-table tbody, .study-table tr, .study-table td { display: block; width: 100%; } /* Stack elements */
-            .study-table tr {
-                border: none; /* Removed border */
-                border-radius: 6px;
-                margin-bottom: 1rem;
-                padding: 0.75rem; /* Add internal padding */
-                background-color: rgba(255,255,255,0.5); /* Slight white background */
-            }
-            .study-table td {
-                padding: 8px 0; /* Adjust padding */
-                border: none; /* Remove internal cell borders */
-                position: relative;
-                padding-left: 45%; /* Make space for the label */
-                text-align: left;
-                min-height: 24px; /* Ensure space even if empty */
-            }
-            .study-table td::before { /* Add labels */
-                content: attr(data-label);
-                position: absolute;
-                left: 8px; /* Padding for label */
-                width: 40%; /* Width of the label area */
-                font-weight: 600;
-                color: #374151; /* gray-700 */
-                font-size: 0.75rem; /* text-xs */
-                text-transform: uppercase;
-                white-space: nowrap;
-            }
-            /* Specific adjustments for certain cells */
-            .study-table td.center-cell { padding-left: 0; text-align: center; } /* Center Done checkbox */
-            .study-table td.center-cell::before { display: none; } /* No label needed for checkbox/delete */
-            .study-table td.actions-cell, .study-table td.completion-perc-cell { padding-left: 0; text-align: center; }
-            .study-table td.actions-cell::before, .study-table td.completion-perc-cell::before { display: none; }
-
-            .vocab-topic-cell { padding-left: 0 !important; } /* Full width for vocab/topic */
-            .vocab-topic-cell::before { display: none !important; } /* No label needed */
-            .vocab-word { display: block; margin-bottom: 6px; text-align: center; } /* Stack vocab words */
-            .vocab-pair { flex-direction: column; align-items: stretch; } /* Stack vocab edit inputs */
-
-            .editable-input, .vocab-input { font-size: 0.95rem; } /* Slightly larger inputs on mobile */
-            textarea.editable-input { min-height: 50px; }
-
-             /* Adjust button positions */
-            .day-section .flex.justify-between .edit-day-btn { /* Make Edit button smaller */
-                 padding: 6px 10px; font-size: 0.75rem;
-            }
-             .edit-mode-controls {
-                 display: flex; flex-wrap: wrap; gap: 8px; /* Arrange buttons */
-             }
-             .edit-mode-controls .save-day-btn { order: 99; } /* Push save button to end */
-        }
+     
 		
 		/* --- Circular Progress Trackers (NEW) --- */
         .progress-trackers-container {
@@ -1494,18 +1442,6 @@
     background-color: #e0e7ff; /* indigo-100 */
 }
 
-/* 3. Handle mobile view data-labels */
-@media (max-width: 768px) {
-    .study-table td.questions-col,
-    .study-table td.test-col {
-        padding-left: 0; /* Center the buttons */
-        text-align: center;
-    }
-    .study-table td.questions-col::before,
-    .study-table td.test-col::before {
-        display: none; /* Hide the data-label, button is clear */
-    }
-}
 /* --- END: NEW ROW-LEVEL MCQ/TEST COLUMN STYLES --- */
 
 
@@ -3452,89 +3388,155 @@ body.dark-mode .skeleton {
     .day-section-body .study-table tr { 
         display: block; 
         width: 100%;
-        box-sizing: border-box; /* Ensures padding doesn't push elements out */
+        box-sizing: border-box; 
     }
     
+    /* Hide the standard horizontal table headers */
     .day-section-body .study-table thead tr { 
         display: none;
     }
     
+    /* The Card Container (tr) */
     .day-section-body .study-table tr {
         background: #ffffff;
         border: 1px solid #e5e7eb;
         border-radius: 0.75rem;
         margin-bottom: 1.25rem;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
-        overflow: hidden;
+        position: relative; /* Allows absolute positioning for checkbox */
+        display: flex;
+        flex-wrap: wrap; /* Allows sections to stack and sit side-by-side */
+        padding: 1rem;
     }
-    
-    /* Cell Style: Added 'gap' and 'break-word' to prevent overlapping */
+
+    /* Base Reset for all cells inside the card */
     .day-section-body .study-table td:not(.hidden) { 
         border: none !important;
-        border-bottom: 1px dashed #e5e7eb !important; 
-        padding: 1rem !important; /* Slightly more padding for breathing room */
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
+        padding: 0 !important;
         text-align: left !important;
-        gap: 0.6rem; /* <--- THIS FIXES THE OVERLAPPING */
-        overflow-wrap: break-word; /* <--- THIS FIXES SPILLING TEXT */
+        margin-bottom: 0.8rem;
+        width: 100%;
+        overflow-wrap: break-word;
         word-break: break-word;
     }
-    
-    .day-section-body .study-table td.hidden {
-        display: none !important;
-    }
-    
-    .day-section-body .study-table td:last-child {
-        border-bottom: none !important;
-    }
-    
-    .day-section-body .study-table td::before { 
+
+    /* Add Labels back specifically for Topic and Comment */
+    .day-section-body .study-table td[data-label="Topic / Vocab"]::before,
+    .day-section-body .study-table td[data-label="Comment"]::before { 
         content: attr(data-label);
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
         font-weight: 700;
         color: #6b7280;
         display: block;
-        width: 100%;
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.25rem;
     }
 
-    /* Make inputs, textareas, and vocab containers behave nicely */
-    .day-section-body .study-table td .editable-input,
-    .day-section-body .study-table td .vocab-container {
+    /* 1. TOP RIGHT: Checkbox (Done) */
+    .day-section-body .study-table td[data-label="Done"] {
+        position: absolute;
+        top: 1.1rem;
+        right: 1rem;
+        width: auto;
+        margin-bottom: 0;
+        z-index: 10;
+    }
+    /* Hide the text label for the checkbox */
+    .day-section-body .study-table td[data-label="Done"]::before {
+        display: none;
+    }
+    /* Make checkbox larger for easier mobile tapping */
+    .day-section-body .study-table td[data-label="Done"] input[type="checkbox"] {
+        width: 1.5rem;
+        height: 1.5rem;
+        cursor: pointer;
+    }
+
+    /* 2. TOP LEFT: Subject (Acts as Card Title) */
+    .day-section-body .study-table td[data-label="Subject"] {
+        order: 1;
+        padding-right: 3rem !important; /* Prevents text overlapping with checkbox */
+        margin-bottom: 1rem;
+    }
+    .day-section-body .study-table td[data-label="Subject"] .subject-display {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #059669; /* Emerald 600 */
+        display: block;
+        line-height: 1.2;
+    }
+    /* Show "Subject" label only when editing */
+    .day-section-body .study-table tr.editing-mode td[data-label="Subject"]::before {
+        content: attr(data-label);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: #6b7280;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    /* 3. MIDDLE: Topic */
+    .day-section-body .study-table td[data-label="Topic / Vocab"] {
+        order: 2;
+    }
+
+    /* 4. BOTTOM TEXT: Comment */
+    .day-section-body .study-table td[data-label="Comment"] {
+        order: 3;
+        margin-bottom: 1rem;
+    }
+
+    /* 5. BOTTOM BUTTONS: View Qs & Quiz */
+    /* They sit side-by-side because width is auto */
+    .day-section-body .study-table td[data-label="Questions"],
+    .day-section-body .study-table td[data-label="Test"] {
+        order: 4;
+        width: auto;
+        margin-right: 0.5rem;
+        margin-bottom: 0;
+    }
+    /* Remove labels from the button wrappers */
+    .day-section-body .study-table td[data-label="Questions"]::before,
+    .day-section-body .study-table td[data-label="Test"]::before {
+        display: none;
+    }
+
+    /* 6. EDIT MODE: % and Delete Actions */
+    .day-section-body .study-table td[data-label="%"] {
+        order: 5;
+    }
+    .day-section-body .study-table td[data-label="Actions"] {
+        order: 6;
+        display: flex;
+        justify-content: flex-end;
         width: 100%;
-        max-width: 100%;
+        margin-top: 0.5rem;
+        border-top: 1px dashed #e5e7eb !important;
+        padding-top: 0.75rem !important;
+    }
+
+    /* Keep hidden columns completely hidden */
+    .day-section-body .study-table td.hidden {
+        display: none !important;
+    }
+
+    /* Prevent inputs from overflowing */
+    .day-section-body .study-table td .editable-input {
+        width: 100%;
         box-sizing: border-box;
     }
 
-    .day-section-body .study-table td.center-cell {
-        align-items: flex-start;
-    }
-
-    .day-section-body .study-table td.actions-cell {
-        background-color: #f9fafb;
-        flex-direction: row;
-        justify-content: flex-end;
-    }
-    .day-section-body .study-table td.actions-cell::before {
-        display: none;
-    }
-    
-    /* --- Dark Mode Overrides for Mobile Cards --- */
+    /* --- Dark Mode Overrides --- */
     body.dark-mode .day-section-body .study-table tr {
         background: #1f2937;
         border-color: #374151;
     }
-    body.dark-mode .day-section-body .study-table td {
-        border-bottom-color: #374151 !important;
+    body.dark-mode .day-section-body .study-table td[data-label="Subject"] .subject-display {
+        color: #34d399; /* Lighter emerald for dark backgrounds */
     }
-    body.dark-mode .day-section-body .study-table td::before {
-        color: #9ca3af;
-    }
-    body.dark-mode .day-section-body .study-table td.actions-cell {
-        background-color: #111827;
+    body.dark-mode .day-section-body .study-table td[data-label="Actions"] {
+        border-top-color: #374151 !important;
     }
 }
