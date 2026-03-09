@@ -3439,3 +3439,102 @@ body.dark-mode .skeleton {
     background: #374151;
     background-image: linear-gradient(to right, #374151 0%, #4b5563 20%, #374151 40%, #374151 100%);
 }
+
+/* ==========================================================================
+   --- MOBILE FRIENDLY TABLE CARDS (STUDY PLAN) ---
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* Target only the daily study plan tables so we don't break summary modals */
+    .day-section-body .study-table, 
+    .day-section-body .study-table thead, 
+    .day-section-body .study-table tbody, 
+    .day-section-body .study-table th, 
+    .day-section-body .study-table td, 
+    .day-section-body .study-table tr { 
+        display: block; 
+        width: 100%;
+    }
+    
+    /* Hide standard horizontal headers */
+    .day-section-body .study-table thead tr { 
+        display: none;
+    }
+    
+    /* Card Style for each Row */
+    .day-section-body .study-table tr {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem; /* Soft rounded corners */
+        margin-bottom: 1.25rem; /* Gap between cards */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
+        overflow: hidden;
+    }
+    
+    /* Cell Style (Stacked layout) */
+    .day-section-body .study-table td:not(.hidden) { 
+        border: none !important;
+        border-bottom: 1px dashed #e5e7eb !important; 
+        padding: 0.85rem 1rem !important;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left !important;
+    }
+    
+    /* Protect Tailwind's hidden class from being overridden */
+    .day-section-body .study-table td.hidden {
+        display: none !important;
+    }
+    
+    .day-section-body .study-table td:last-child {
+        border-bottom: none !important;
+    }
+    
+    /* Data Label Generation (Reads the header name from HTML data-label) */
+    .day-section-body .study-table td::before { 
+        content: attr(data-label);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 700;
+        color: #6b7280;
+        margin-bottom: 0.4rem;
+        display: block;
+        width: 100%;
+    }
+
+    /* Make inputs and textareas stretch to fill the mobile screen easily */
+    .day-section-body .study-table td .editable-input {
+        width: 100%;
+    }
+
+    /* Checkbox alignment */
+    .day-section-body .study-table td.center-cell {
+        align-items: flex-start;
+    }
+
+    /* The "Actions" row (Delete button) styling */
+    .day-section-body .study-table td.actions-cell {
+        background-color: #f9fafb;
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+    .day-section-body .study-table td.actions-cell::before {
+        display: none; /* Hide label for the trash can row */
+    }
+    
+    /* --- Dark Mode Overrides for Mobile Cards --- */
+    body.dark-mode .day-section-body .study-table tr {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    body.dark-mode .day-section-body .study-table td {
+        border-bottom-color: #374151 !important;
+    }
+    body.dark-mode .day-section-body .study-table td::before {
+        color: #9ca3af;
+    }
+    body.dark-mode .day-section-body .study-table td.actions-cell {
+        background-color: #111827;
+    }
+}
