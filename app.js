@@ -5661,6 +5661,7 @@ const subjectSubTabsContent = document.getElementById('subject-sub-tabs-content'
 
 const savedQuizReviewBtn = document.getElementById('saved-quiz-review-btn');
 let tempSavedReviewData = null; // Holds questions for the review button
+let currentViewingSavedResult = null; // Holds the ENTIRE result for printing and retrying
 
 // --- Open the Result Sheet ---
 showResultsSheetBtn.addEventListener('click', () => {
@@ -6003,6 +6004,7 @@ function attachTopicLinkListeners() {
 
 // --- Open the "View Saved Result" Modal ---
 function openSavedResultModal(resultData) {
+    currentViewingSavedResult = resultData; // Set the global state
     document.getElementById('saved-result-topic-name').textContent = resultData.topicName;
     document.getElementById('saved-summary-answered-count').textContent = resultData.answeredCount;
     document.getElementById('saved-summary-correct-count').textContent = resultData.correctCount;
@@ -6058,18 +6060,18 @@ savedQuizReviewBtn.addEventListener('click', () => {
 
 // --- Listener for the "Try Again" button in the SAVED modal ---
 document.getElementById('saved-quiz-restart-btn').addEventListener('click', () => {
-    if (!tempSavedReviewData) {
+    if (!currentViewingSavedResult || !currentViewingSavedResult.questions) {
         showCustomAlert("No quiz data found to restart.", "error");
         return;
     }
     
     // ১. গ্লোবাল কুইজ স্টেট সেট করুন
-    currentVocabData = null; // সোর্স ক্লিয়ার করুন
-    currentMcqData = null; // সোর্স ক্লিয়ার করুন
+    currentVocabData = null; // সোর্স ক্লিয়ার করুন
+    currentMcqData = null; // সোর্স ক্লিয়ার করুন
 
     // --- START: FIX ---
     // প্রশ্নগুলোকে " পরিষ্কার" করতে হবে (পুরনো উত্তর মুছে ফেলতে হবে)
-    const cleanQuestions = tempSavedReviewData.map(q => {
+    const cleanQuestions = currentViewingSavedResult.questions.map(q => {
         // ...q (স্প্রেড অপারেটর) দিয়ে পুরনো প্রশ্নটি কপি করুন
         // তারপর userAnswer এবং isCorrect রিসেট করুন
         return {
@@ -8635,14 +8637,23 @@ async function loadReviewWrongAnswers() {
 
 // --- PRINT ANSWER SCRIPT FEATURE (FIXED) ---
 
-// বাটন ক্লিক ইভেন্ট লিসেনার
-document.getElementById('quiz-print-btn').addEventListener('click', function() {
+// --- PRINT ANSWER SCRIPT FEATURE ---
+
+// 1. Live Quiz Print Button
+document.getElementById('quiz-print-btn')?.addEventListener('click', function() {
     printAnswerScript();
 });
 
-function printAnswerScript() {
-    // 1. Get Data from Global State
-    const questions = currentQuizQuestions;
+// 2. Saved Result Print Button
+document.getElementById('saved-quiz-print-btn')?.addEventListener('click', function() {
+    if (currentViewingSavedResult) {
+        printAnswerScript(currentViewingSavedResult);
+    }
+});
+
+function printAnswerScript(savedData = null) {
+    // 1. Get Data (Either from passed history or live global state)
+    const questions = savedData ? savedData.questions : currentQuizQuestions;
 
     if (!questions || questions.length === 0) {
         showCustomAlert("No questions to print!", "error");
@@ -8654,33 +8665,54 @@ function printAnswerScript() {
     let wrongCount = 0;
     let skippedCount = 0; 
 
-    questions.forEach(q => {
-        if (q.isCorrect === true) correctCount++;
-        else if (q.isCorrect === false) wrongCount++;
-        else skippedCount++;
-    });
+    if (savedData) {
+        correctCount = savedData.correctCount;
+        wrongCount = savedData.wrongCount;
+        skippedCount = savedData.notAnsweredCount;
+    } else {
+        questions.forEach(q => {
+            if (q.isCorrect === true) correctCount++;
+            else if (q.isCorrect === false) wrongCount++;
+            else skippedCount++;
+        });
+    }
 
     // Calculate Score
     const negMark = (typeof quizSettings !== 'undefined') ? quizSettings.negativeMark : 0.25;
-    const obtainedMark = (correctCount * 1) - (wrongCount * negMark);
+    const obtainedMark = savedData ? savedData.finalScore : ((correctCount * 1) - (wrongCount * negMark));
     const totalMark = questions.length;
-    const percentage = (totalMark > 0) ? ((Math.max(0, obtainedMark) / totalMark) * 100).toFixed(2) : 0.00;
+    const percentage = savedData ? savedData.percentage : ((totalMark > 0) ? ((Math.max(0, obtainedMark) / totalMark) * 100).toFixed(2) : "0.00");
     
     // Get TOTAL Duration
     let totalDuration = "N/A";
-    const totalTimeEl = document.getElementById('display-total-time');
-    if (totalTimeEl) {
-        totalDuration = totalTimeEl.textContent.trim();
+    if (savedData && savedData.timeTakenInSeconds) {
+        totalDuration = formatTime(savedData.timeTakenInSeconds);
+    } else {
+        const totalTimeEl = document.getElementById('display-total-time');
+        if (totalTimeEl) totalDuration = totalTimeEl.textContent.trim();
     }
 
     // Get Header Info
-    const topicEl = document.getElementById('quiz-topic-name');
-    let topicName = topicEl ? topicEl.textContent : "Topic";
+    let topicName = "Topic";
+    if (savedData) {
+        topicName = savedData.topicName || savedData.topicDetail || "Saved Quiz";
+    } else {
+        const topicEl = document.getElementById('quiz-topic-name');
+        if (topicEl) topicName = topicEl.textContent;
+    }
     const titleText = `Exam on ${topicName}`;
 
-    const date = new Date().toLocaleDateString('en-GB', {
-        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
+    // Get Date
+    let dateStr;
+    if (savedData && savedData.saveTimestamp && savedData.saveTimestamp.toDate) {
+        dateStr = savedData.saveTimestamp.toDate().toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+    } else {
+        dateStr = new Date().toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+    }
     const currentYear = new Date().getFullYear();
 
     // 3. Build HTML
@@ -8697,8 +8729,9 @@ function printAnswerScript() {
                 border-bottom: 2px solid #374151; padding-bottom: 15px; margin-bottom: 20px; 
                 display: flex; justify-content: space-between; align-items: flex-start;
             }
-            .header-info h1 { margin: 0 0 5px 0; font-size: 20px; color: #4f46e5; }
-            .header-info p { margin: 2px 0; font-size: 12px; color: #4b5563; font-weight: 600;}
+            .header-info { display: flex; flex-direction: column; gap: 2px; }
+            .header-info h1 { margin: 0; line-height: 1; font-size: 20px; color: #4f46e5; }
+            .header-info p { margin: 0; line-height: 1.2; font-size: 12px; color: #4b5563; font-weight: 600;}
             
             /* Result Summary Box */
             .result-box { 
@@ -8718,18 +8751,12 @@ function printAnswerScript() {
             .score-big-red { font-size: 18px; color: #4f46e5; font-weight: 800; }
 
             /* Two Column Layout */
-            .questions-wrapper {
-                column-count: 2;
-                column-gap: 30px;
-            }
+            .questions-wrapper { column-count: 2; column-gap: 30px; }
 
             /* Questions */
             .q-item { 
-                margin-bottom: 12px; 
-                break-inside: avoid; 
-                page-break-inside: avoid;
-                border-bottom: 1px dashed #e5e7eb; 
-                padding-bottom: 8px; 
+                margin-bottom: 12px; break-inside: avoid; page-break-inside: avoid;
+                border-bottom: 1px dashed #e5e7eb; padding-bottom: 8px; 
             }
             .q-text { font-weight: bold; font-size: 13px; margin-bottom: 8px; }
             
@@ -8739,50 +8766,30 @@ function printAnswerScript() {
                 border: 1px solid transparent; display: flex; justify-content: space-between; align-items: flex-start;
             }
             
-            /* Circular Labels (a, b, c, d) */
             .opt-label {
-                display: inline-block;
-                width: 18px;
-                height: 18px;
-                line-height: 16px; 
-                text-align: center;
-                border: 1px solid #6b7280;
-                border-radius: 50%;
-                margin-right: 8px;
-                font-size: 10px;
-                font-weight: 700;
-                flex-shrink: 0;
-                color: #374151;
-                text-transform: lowercase; 
+                display: inline-block; width: 18px; height: 18px; line-height: 16px; 
+                text-align: center; border: 1px solid #6b7280; border-radius: 50%;
+                margin-right: 8px; font-size: 10px; font-weight: 700; flex-shrink: 0;
+                color: #374151; text-transform: lowercase; 
             }
 
             .opt-content { display: flex; align-items: flex-start; }
-
             .opt.correct { background-color: #d1fae5; border-color: #10b981; color: #064e3b; font-weight: 600; }
             .opt.correct .opt-label { border-color: #059669; color: #064e3b; background: white; }
-
-            /* Wrong Choice Styles */
             .opt.wrong-choice { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
             .opt.wrong-choice .opt-content span:last-child { text-decoration: line-through; } 
             .opt.wrong-choice .opt-label { border-color: #b91c1c; color: #b91c1c; background: white; }
-
             .opt.user-correct { border: 1px solid #059669; background-color: #d1fae5; }
             
             .badge { font-size: 9px; font-weight: bold; padding: 1px 4px; border-radius: 3px; color: white; margin-left: 5px; white-space: nowrap; margin-top: 1px; text-decoration: none !important;}
             .bg-green { background-color: #10b981; }
             .bg-red { background-color: #ef4444; }
-            
             .note { margin-top: 5px; padding: 5px; background-color: #eff6ff; border-left: 2px solid #3b82f6; font-size: 11px; color: #1e3a8a; }
 
             /* Footer Section */
             .print-footer {
-                margin-top: 30px;
-                border-top: 1px solid #374151;
-                padding-top: 15px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                page-break-inside: avoid;
+                margin-top: 30px; border-top: 1px solid #374151; padding-top: 15px;
+                display: flex; justify-content: space-between; align-items: center; page-break-inside: avoid;
             }
             .footer-info p { margin: 2px 0; font-size: 11px; color: #1f2937; font-weight: 600; }
             .footer-info .copyright { font-size: 10px; color: #6b7280; margin-top: 5px; font-weight: 400; }
@@ -8791,18 +8798,18 @@ function printAnswerScript() {
     </head>
     <body>
         <div class="header">
-            <div class="header-info" style="display: flex; flex-direction: column; gap: 2px;">
-                <h1 style="margin: 0; line-height: auto;">${titleText}</h1>
-                <p style="margin: 0; line-height: 0.5;">Date: ${date}</p>
-                <p style="margin: 0 0 2px 0; line-height: auto;">Candidate ID: ${currentUser ? (currentUser.email || currentUser.uid.substring(0,8)) : 'Guest'}</p>
+            <div class="header-info">
+                <h1>${titleText}</h1>
+                <p>Date: ${dateStr}</p>
+                <p style="margin-bottom: 2px;">Candidate ID: ${currentUser ? (currentUser.email || currentUser.uid.substring(0,8)) : 'Guest'}</p>
                 <img src="https://classcaddy.netlify.app/images/qr2.png" alt="Scan to Visit" style="display: block; width: 50px; height: 50px; margin: 0; border: 1px solid #e5e7eb; padding: 2px; border-radius: 4px;">
-            </div>
-            
-            <div class="result-box">
+            </div>
+            
+            <div class="result-box">
                 <div class="result-row-large">
                     <div>
                         <div class="lbl">Obtained Mark</div>
-                        <div class="score-big">${obtainedMark.toFixed(2)}</div>
+                        <div class="score-big">${Number(obtainedMark).toFixed(2)}</div>
                     </div>
                     <div style="text-align:right;">
                         <div class="lbl">Full Mark</div>
@@ -8829,7 +8836,6 @@ function printAnswerScript() {
                 </div>
             </div>
         </div>
-
         <div class="questions-wrapper">
     `;
 
@@ -8840,35 +8846,26 @@ function printAnswerScript() {
         q.options.forEach((opt, i) => {
             let className = 'opt';
             let badge = '';
-
-            // Generate label (a, b, c, d)
             const label = String.fromCharCode(97 + i); 
 
             const isCorrectAnswer = (opt === q.correctAnswer);
             const isUserSelected = (opt === q.userAnswer);
 
-            if (isCorrectAnswer) {
-                className += ' correct';
-            }
+            if (isCorrectAnswer) className += ' correct';
             
             if (isUserSelected) {
                 if (isCorrectAnswer) {
                     className += ' user-correct'; 
-                    // Correctly answered: Green Badge
                     badge = `<span class="badge bg-green">Your Answer</span>`;
                 } else {
                     className += ' wrong-choice';
-                    // Wrongly answered: Red Badge
                     badge = `<span class="badge bg-red">Your Answer</span>`;
                 }
             }
 
             printContent += `
             <div class="${className}">
-                <div class="opt-content">
-                    <span class="opt-label">${label}</span>
-                    <span>${opt}</span>
-                </div>
+                <div class="opt-content"><span class="opt-label">${label}</span><span>${opt}</span></div>
                 ${badge}
             </div>`;
         });
@@ -8876,7 +8873,6 @@ function printAnswerScript() {
         if (q.note || q.explanation) {
             printContent += `<div class="note"><strong>Note:</strong> ${q.note || q.explanation}</div>`;
         }
-        
         printContent += `</div>`;
     });
 
@@ -8895,7 +8891,6 @@ function printAnswerScript() {
                 <img src="https://classcaddy.netlify.app/images/qr2.png" alt="Scan to Visit">
             </div>
         </div>
-        
         <script>
             window.onload = function() { window.print(); }
         </script>
@@ -8910,3 +8905,4 @@ function printAnswerScript() {
         showCustomAlert("Please allow popups to print!", "error");
     }
 }
+
