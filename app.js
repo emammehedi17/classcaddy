@@ -8786,9 +8786,9 @@ function printAnswerScript() {
     <body>
         <div class="header">
             <div class="header-info" style="display: flex; flex-direction: column; gap: 2px;">
-                <h1 style="margin: 0; line-height: 1;">${titleText}</h1>
-                <p style="margin: 0; line-height: 1.2;">Date: ${date}</p>
-                <p style="margin: 0 0 2px 0; line-height: 1.2;">Candidate ID: ${currentUser ? (currentUser.email || currentUser.uid.substring(0,8)) : 'Guest'}</p>
+                <h1 style="margin: 0; line-height: 0.5;">${titleText}</h1>
+                <p style="margin: 0; line-height: 0.5;">Date: ${date}</p>
+                <p style="margin: 0 0 2px 0; line-height: 0.5;">Candidate ID: ${currentUser ? (currentUser.email || currentUser.uid.substring(0,8)) : 'Guest'}</p>
                 <img src="https://classcaddy.netlify.app/images/qr2.png" alt="Scan to Visit" style="display: block; width: 50px; height: 50px; margin: 0; border: 1px solid #e5e7eb; padding: 2px; border-radius: 4px;">
             </div>
             
