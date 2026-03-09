@@ -3868,18 +3868,20 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizSkipBtn.hidden = true;
 
             // Auto-advance Logic (INSTANT)
-            if (isCorrect && quizSettings.showAnswersInstantly) {
+            // If strict mode is ON (!showAnswersInstantly), always auto-advance. 
+            // If normal mode is ON, only auto-advance if they got it right.
+            if (!quizSettings.showAnswersInstantly || isCorrect) {
                 setTimeout(() => {
-                    // Only auto-advance if it's NOT the last question
-                    if (currentQuizQuestionIndex < currentQuizQuestions.length - 1) {
-                        currentQuizQuestionIndex++;
-                        loadQuizQuestion();
-                        quizQuestionArea.classList.add('slide-in-right');
-                    } else {
-                        showQuizResults();
-                    }
-                }, 100); // <--- Changed to 100ms (Instant)
-            }
+                    // Only auto-advance if it's NOT the last question
+                    if (currentQuizQuestionIndex < currentQuizQuestions.length - 1) {
+                        currentQuizQuestionIndex++;
+                        loadQuizQuestion();
+                        quizQuestionArea.classList.add('slide-in-right');
+                    } else {
+                        showQuizResults();
+                    }
+                }, 150); // 150ms gives a tiny visual flash of your selection before sliding
+            }
         }
 		
 		
