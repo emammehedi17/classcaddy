@@ -8965,3 +8965,55 @@ function getCardSkeleton() {
         </div>
     `;
 }
+
+// --- NEW: KEYBOARD SHORTCUTS FOR QUIZZES ---
+document.addEventListener('keydown', (e) => {
+    // 1. Only run if the live quiz screen is actually active and visible
+    const quizMainScreen = document.getElementById('quiz-main-screen');
+    if (!quizMainScreen || quizMainScreen.classList.contains('hidden') || quizMainScreen.style.display === 'none') {
+        return;
+    }
+
+    // 2. Prevent triggering if the user happens to be typing in an input field somewhere
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    // 3. Get the current option buttons on the screen
+    const options = document.querySelectorAll('#quiz-options-container .quiz-option-btn');
+    
+    // 4. Map the keys to button clicks
+    switch(e.key.toLowerCase()) {
+        case '1':
+        case 'a':
+            if (options[0] && !options[0].disabled) options[0].click();
+            break;
+        case '2':
+        case 'b':
+            if (options[1] && !options[1].disabled) options[1].click();
+            break;
+        case '3':
+        case 'c':
+            if (options[2] && !options[2].disabled) options[2].click();
+            break;
+        case '4':
+        case 'd':
+            if (options[3] && !options[3].disabled) options[3].click();
+            break;
+        case 'enter':
+        case 'arrowright':
+            const nextBtn = document.getElementById('quiz-next-btn');
+            // Only click next if it's enabled (e.g., they answered or strict mode allows it)
+            if (nextBtn && !nextBtn.disabled && !nextBtn.hidden) nextBtn.click();
+            break;
+        case ' ': // Spacebar
+            e.preventDefault(); // Prevent the spacebar from scrolling the page down
+            const skipBtn = document.getElementById('quiz-skip-btn');
+            if (skipBtn && !skipBtn.hidden && skipBtn.style.display !== 'none') skipBtn.click();
+            break;
+        case 'arrowleft':
+            const prevBtn = document.getElementById('quiz-prev-btn');
+            if (prevBtn && !prevBtn.disabled && !prevBtn.classList.contains('hidden') && prevBtn.style.visibility !== 'hidden') {
+                prevBtn.click();
+            }
+            break;
+    }
+});
