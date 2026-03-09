@@ -8789,7 +8789,7 @@ function printAnswerScript() {
                 <h1>${titleText}</h1>
                 <p>Date: ${date}</p>
                 <p>Candidate ID: ${currentUser ? (currentUser.email || currentUser.uid.substring(0,8)) : 'Guest'}</p>
-                <img src="https://classcaddy.netlify.app/images/qr2.png" alt="Scan to Visit" style="width: 60px; height: 60px; margin-top: 12px; border: 1px solid #e5e7eb; padding: 2px; border-radius: 4px;">
+                <img src="https://classcaddy.netlify.app/images/qr2.png" alt="Scan to Visit" style="display: block; width: 55px; height: 55px; margin-top: 4px; border: 1px solid #e5e7eb; padding: 2px; border-radius: 4px;">
             </div>
             
             <div class="result-box">
