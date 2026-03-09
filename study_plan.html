@@ -527,19 +527,25 @@
             </div>
     </div>
 
-    <div class="flex justify-between items-center flex-wrap gap-2 mt-3 pt-2 border-t border-gray-100 flex-shrink-0">
-        <button id="quiz-prev-btn" class="action-button action-button-secondary text-xs px-3 py-2">
-            &larr; Prev
-        </button>
+    <div class="flex items-center w-full mt-3 pt-2 border-t border-gray-100 flex-shrink-0">
+        <div class="flex-1 flex justify-start">
+            <button id="quiz-prev-btn" class="action-button action-button-secondary text-xs px-3 py-2">
+                &larr; Prev
+            </button>
+        </div>
         
-        <button id="quiz-skip-btn" class="action-button action-button-secondary text-xs px-3 py-2" style="color: #4f46e5; border-color: #6366f1;">
-            Skip <i class="fas fa-fast-forward ml-1"></i>
-        </button>
+        <div class="flex-1 flex justify-center">
+            <button id="quiz-skip-btn" class="action-button action-button-secondary text-xs px-3 py-2" style="color: #4f46e5; border-color: #6366f1;">
+                Skip <i class="fas fa-fast-forward ml-1"></i>
+            </button>
+        </div>
 
-        <button id="quiz-next-btn" class="action-button text-xs px-4 py-2" style="background-color: #4f46e5;">
-            Next &rarr;
-        </button>
-    </div>
+        <div class="flex-1 flex justify-end">
+            <button id="quiz-next-btn" class="action-button text-xs px-4 py-2" style="background-color: #4f46e5;">
+                Next &rarr;
+            </button>
+        </div>
+    </div>
 </div>
 
         <div id="quiz-skipped-prompt-screen" class="hidden flex flex-col h-full bg-white relative z-10" style="min-height: 400px; justify-content: center;">
