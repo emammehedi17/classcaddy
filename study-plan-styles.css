@@ -3522,10 +3522,12 @@ body.dark-mode .skeleton {
         display: none !important;
     }
 
-    /* Prevent inputs from overflowing */
-    .day-section-body .study-table td .editable-input {
+    /* Prevent inputs from overflowing and remove backgrounds */
+    .day-section-body .study-table td .editable-input,
+    .day-section-body .study-table td .vocab-input {
         width: 100%;
         box-sizing: border-box;
+        background-color: transparent !important; /* Removes the grey background */
     }
 
     /* --- Dark Mode Overrides --- */
