@@ -9,19 +9,46 @@
     <!-- html2pdf.js for saving the cover page as PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- Google Fonts for Academic Look -->
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Amiri:wght@400;700&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
     
     <style>
         body {
             background-color: #f3f4f6;
-        }
-        
-        .font-serif-academic {
-            font-family: 'Merriweather', serif;
+            transition: all 0.3s ease;
         }
         
         .font-arabic {
             font-family: 'Amiri', serif;
+        }
+
+        .name-design {
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(90deg, #fef08a, #f59e0b, #fef08a);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shine 3s linear infinite;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        /* Dynamic CSS Variables for Themes */
+        :root {
+            --primary-color: #1e3a8a;
+            --text-color: #000000;
+            --font-main: 'Merriweather', 'Amiri', serif;
+            --border-outer-width: 4px;
+            --border-outer-style: solid;
+            --border-inner-width: 1px;
+            --border-inner-style: solid;
+            --bg-color: #ffffff;
+            --title-border-style: solid;
         }
 
         /* A4 Paper Dimensions for preview */
@@ -29,12 +56,51 @@
             width: 210mm;
             height: 297mm;
             max-height: 297mm;
-            background-color: white;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             position: relative;
             margin: 0 auto;
             box-sizing: border-box;
             overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .theme-outer-border {
+            border-color: var(--primary-color);
+            border-width: var(--border-outer-width);
+            border-style: var(--border-outer-style);
+            transition: all 0.4s ease;
+        }
+
+        .theme-inner-border {
+            border-color: var(--primary-color);
+            border-width: var(--border-inner-width);
+            border-style: var(--border-inner-style);
+            transition: all 0.4s ease;
+        }
+
+        .theme-title-border {
+            border-top-width: 2px;
+            border-bottom-width: 2px;
+            border-color: var(--primary-color);
+            border-style: var(--title-border-style);
+            transition: all 0.4s ease;
+        }
+
+        /* RTL support for layout mirroring */
+        [dir="rtl"] .rtl-flip {
+            flex-direction: row-reverse;
+            text-align: right;
+        }
+        [dir="rtl"] .rtl-flip-pr {
+            padding-right: 0;
+            padding-left: 2rem;
+        }
+        [dir="rtl"] .rtl-flip-pl {
+            padding-left: 0;
+            padding-right: 2rem;
         }
 
         /* High-quality native print fallback */
@@ -70,9 +136,12 @@
 
     <!-- Top Header -->
     <header class="bg-blue-900 text-white py-4 shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Dhaka University Cover Page Generator</h1>
-            <p class="text-sm opacity-80 hidden md:block">Department of Arabic</p>
+        <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-2">
+            <h1 class="text-xl md:text-2xl font-bold flex flex-wrap items-center gap-2">
+                <span data-i18n="appTitle">Cover Page Generator By</span>
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="name-design text-2xl md:text-3xl ml-1 border-b border-transparent hover:border-yellow-400 transition-all duration-300">Emam Mehedi</a>
+            </h1>
+            <p class="text-sm opacity-80 hidden md:block" data-i18n="headerSub">Department of Arabic</p>
         </div>
     </header>
 
@@ -80,42 +149,66 @@
         <div class="flex flex-col lg:flex-row gap-8">
             
             <!-- Left Side: Form Input Section -->
-            <div class="w-full lg:w-1/3">
+            <div class="w-full lg:w-1/3 space-y-4">
+                
+                <!-- Language Switcher -->
+                <div class="bg-white rounded-xl shadow-md p-4 flex justify-between items-center gap-2">
+                    <span class="text-sm font-bold text-gray-600" data-i18n="langLabel">Language:</span>
+                    <div class="flex gap-2">
+                        <button onclick="changeLanguage('bn')" class="px-3 py-1.5 text-sm font-bold rounded-md bg-green-100 text-green-800 hover:bg-green-200 border border-green-300 transition shadow-sm">বাংলা</button>
+                        <button onclick="changeLanguage('en')" class="px-3 py-1.5 text-sm font-bold rounded-md bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-300 transition shadow-sm">English</button>
+                        <button onclick="changeLanguage('ar')" class="px-3 py-1.5 text-sm font-bold rounded-md bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-300 transition shadow-sm font-arabic">العربية</button>
+                    </div>
+                </div>
+
                 <div class="bg-white rounded-xl shadow-lg p-6 sticky top-24">
-                    <h2 class="text-xl font-bold mb-6 text-gray-800 border-b pb-2">Enter Assignment Details</h2>
+                    <h2 class="text-xl font-bold mb-4 text-gray-800" data-i18n="enterDetails">Enter Assignment Details</h2>
                     
+                    <!-- Style Selector -->
+                    <div class="mb-6 border-b-2 border-gray-100 pb-4">
+                        <label for="styleSelector" class="block text-sm font-bold text-indigo-700 mb-1 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 10.243v3.999z" clip-rule="evenodd" />
+                            </svg>
+                            <span data-i18n="styleLabel">Choose Cover Style</span>
+                        </label>
+                        <select id="styleSelector" onchange="applyStyle(this.value)" class="w-full px-3 py-2 border-2 border-indigo-200 bg-indigo-50 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-gray-800 font-semibold cursor-pointer">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+
                     <form id="cover-form" class="space-y-4">
                         
                         <!-- 1. Name -->
                         <div>
-                            <label for="studentName" class="block text-sm font-semibold text-gray-700 mb-1">1. Name <span class="text-red-500">*</span></label>
-                            <input type="text" id="studentName" required
+                            <label for="studentName" class="block text-sm font-semibold text-gray-700 mb-1"><span data-i18n="l_name">1. Name</span> <span class="text-red-500">*</span></label>
+                            <input type="text" id="studentName" required data-i18n-placeholder="p_name"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                                 placeholder="e.g. Md. Abdullah">
                         </div>
 
                         <!-- 2. Class Roll -->
                         <div>
-                            <label for="classRoll" class="block text-sm font-semibold text-gray-700 mb-1">2. Class Roll (New 4 digit) <span class="text-red-500">*</span></label>
-                            <input type="text" id="classRoll" required pattern="\d{4}" maxlength="4"
+                            <label for="classRoll" class="block text-sm font-semibold text-gray-700 mb-1"><span data-i18n="l_classRoll">2. Class Roll (New 4 digit)</span> <span class="text-red-500">*</span></label>
+                            <input type="text" id="classRoll" required pattern="\d{4}" maxlength="4" data-i18n-placeholder="p_classRoll"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                                 placeholder="e.g. 1045" title="Please enter exactly 4 digits">
                         </div>
 
                         <!-- 3. Exam Roll -->
                         <div>
-                            <label for="examRoll" class="block text-sm font-semibold text-gray-700 mb-1">3. Exam Roll <span class="text-red-500">*</span></label>
-                            <input type="text" id="examRoll" required
+                            <label for="examRoll" class="block text-sm font-semibold text-gray-700 mb-1"><span data-i18n="l_examRoll">3. Exam Roll</span> <span class="text-red-500">*</span></label>
+                            <input type="text" id="examRoll" required data-i18n-placeholder="p_examRoll"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                                 placeholder="e.g. 502134">
                         </div>
 
                         <!-- 4. Book Name -->
                         <div>
-                            <label for="bookName" class="block text-sm font-semibold text-gray-700 mb-1">4. Book Name <span class="text-red-500">*</span></label>
+                            <label for="bookName" class="block text-sm font-semibold text-gray-700 mb-1"><span data-i18n="l_book">4. Book Name</span> <span class="text-red-500">*</span></label>
                             <select id="bookName" required
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition font-arabic text-lg" dir="auto">
-                                <option value="" disabled selected>Select a book</option>
+                                <option value="" disabled selected data-i18n="p_book">Select a book</option>
                                 <option value="تايباحصلاو ةباحصلا تاماركل ةصق">1. تايباحصلاو ةباحصلا تاماركل ةصق</option>
                                 <option value="تازجعم و ..ءايبنا">2. تازجعم و ..ءايبنا</option>
                                 <option value="ملاعلا يف السإلا ةمهم">3. ملاعلا يف السإلا ةمهم</option>
@@ -124,16 +217,16 @@
 
                         <!-- 5. Page Numbers -->
                         <div>
-                            <label for="pageNumbers" class="block text-sm font-semibold text-gray-700 mb-1">5. Page numbers <span class="text-red-500">*</span></label>
-                            <input type="text" id="pageNumbers" required
+                            <label for="pageNumbers" class="block text-sm font-semibold text-gray-700 mb-1"><span data-i18n="l_pages">5. Page numbers</span> <span class="text-red-500">*</span></label>
+                            <input type="text" id="pageNumbers" required data-i18n-placeholder="p_pages"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                                 placeholder="e.g. 15-30">
                         </div>
 
                         <!-- 6. Date of submission -->
                         <div>
-                            <label for="submissionDate" class="block text-sm font-semibold text-gray-700 mb-1">6. Date of submission</label>
-                            <input type="text" id="submissionDate" placeholder="dd/mm/yyyy"
+                            <label for="submissionDate" class="block text-sm font-semibold text-gray-700 mb-1"><span data-i18n="l_date">6. Date of submission</span></label>
+                            <input type="text" id="submissionDate" placeholder="dd/mm/yyyy" data-i18n-placeholder="p_date"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
                         </div>
 
@@ -144,9 +237,9 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                   <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
-                                Download Cover Page
+                                <span data-i18n="btnDownload">Download Cover Page</span>
                             </button>
-                            <p class="text-xs text-center text-gray-500 mt-2">Downloads an A4 size PDF automatically.</p>
+                            <p class="text-xs text-center text-gray-500 mt-2" data-i18n="btnHelp">Downloads an A4 size PDF automatically.</p>
                         </div>
                     </form>
                 </div>
@@ -156,31 +249,32 @@
             <div class="w-full lg:w-2/3 overflow-x-auto bg-gray-200 rounded-xl p-4 flex justify-center items-start border border-gray-300" id="preview-container">
                 
                 <!-- Actual A4 Paper DOM -->
-                <div id="cover-page-preview" class="a4-paper font-serif-academic text-black bg-white p-[12mm]">
-                    <!-- Outer & Inner Arabic Style Border -->
-                    <div class="border-[4px] border-[#1e3a8a] h-full w-full p-1 box-border">
-                        <div class="border border-[#1e3a8a] h-full w-full flex flex-col relative px-10 py-12 box-border">
+                <div id="cover-page-preview" class="a4-paper bg-white p-[12mm]" dir="ltr">
+                    <!-- Outer & Inner Academic Style Border -->
+                    <div class="theme-outer-border h-full w-full p-1 box-border">
+                        <div class="theme-inner-border h-full w-full flex flex-col relative px-10 py-12 box-border">
                             
                             <!-- Header / Bismillah -->
                             <div class="text-center w-full">
-                                <span class="font-arabic text-4xl leading-normal text-black">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span>
+                                <span class="font-arabic text-4xl leading-normal" data-i18n="bismillah" style="color: var(--text-color);">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span>
                             </div>
 
                             <!-- Title Area perfectly centered vertically -->
                             <div class="my-auto w-full text-center flex flex-col items-center justify-center">
-                                <div class="border-t-2 border-b-2 border-[#1e3a8a] py-6 w-full flex flex-col items-center justify-center gap-4">
+                                <div class="theme-title-border py-6 w-full flex flex-col items-center justify-center gap-4">
                                     <h2 class="text-2xl font-bold flex flex-col items-center justify-center gap-3 w-full">
-                                        <span class="block text-2xl font-bold uppercase tracking-wide">Assignment on Translation of</span>
-                                        <span id="preview-book" class="font-arabic text-3xl font-bold text-black min-h-[40px] inline-block mt-2"></span>
+                                        <span class="block text-2xl font-bold uppercase tracking-wide" data-i18n="assignmentOn">Assignment on Translation of</span>
+                                        <span id="preview-book" class="font-arabic text-3xl font-bold min-h-[40px] inline-block mt-2" style="color: var(--text-color);"></span>
                                     </h2>
-                                    <p class="text-lg font-semibold mt-2">Pages: <span id="preview-pages" class="border-b border-dashed border-gray-400 min-w-[50px] inline-block px-2 text-center"></span></p>
+                                    <p class="text-lg font-semibold mt-2"><span data-i18n="coverPages">Pages:</span> <span id="preview-pages" class="border-b border-dashed min-w-[50px] inline-block px-2 text-center" style="border-color: var(--text-color);"></span></p>
                                 </div>
 
                                 <!-- Small Decorative Design -->
-                                <div class="w-full flex justify-center mt-8">
-                                    <svg width="70" height="35" viewBox="0 0 100 50" fill="none" stroke="#4b72aa" stroke-width="2.5">
-                                        <path d="M20,25 Q40,25 50,10 Q60,25 80,25 Q60,25 50,40 Q40,25 20,25 Z" fill="#a0b5d6" opacity="0.6"/>
-                                        <line x1="50" y1="10" x2="50" y2="40" stroke="#4b72aa" stroke-width="1.5" opacity="0.6"/>
+                                <div class="w-full flex justify-center mt-8 relative">
+                                    <svg width="70" height="35" viewBox="0 0 100 50" fill="none" style="stroke: var(--primary-color); stroke-width: 2.5;">
+                                        <path d="M20,25 Q40,25 50,10 Q60,25 80,25 Q60,25 50,40 Q40,25 20,25 Z" style="fill: var(--primary-color); opacity: 0.2; stroke: none;"/>
+                                        <path d="M20,25 Q40,25 50,10 Q60,25 80,25 Q60,25 50,40 Q40,25 20,25 Z" fill="none" style="opacity: 0.8;"/>
+                                        <line x1="50" y1="10" x2="50" y2="40" style="stroke-width: 1.5; opacity: 0.6;"/>
                                     </svg>
                                 </div>
                             </div>
@@ -188,38 +282,37 @@
                             <!-- Bottom Sections -->
                             <div>
                                 <!-- Submitted Details -->
-                                <div class="flex justify-between w-full mt-4 text-[17px] leading-relaxed">
+                                <div class="flex justify-between w-full mt-4 text-[17px] leading-relaxed rtl-flip">
                                     <!-- Submitted To -->
-                                    <div class="w-1/2 pr-4 text-left">
-                                        <p class="mb-1 text-black font-semibold">Submitted to:</p>
-                                        <p class="font-bold text-black">Dr. Abu Jamal Md. Qutubul Islam Numani</p>
-                                        <p class="text-black">Professor,</p>
-                                        <p class="text-black">Department of Arabic,</p>
-                                        <p class="text-black">University of Dhaka.</p>
+                                    <div class="w-1/2 pr-4 text-left rtl-flip-pr" id="submitted-to-box">
+                                        <p class="mb-1 font-semibold" data-i18n="subTo">Submitted to:</p>
+                                        <p class="font-bold" data-i18n="profName">Dr. Abu Jamal Md. Qutubul Islam Numani</p>
+                                        <p data-i18n="profTitle">Professor,</p>
+                                        <p data-i18n="profDept">Department of Arabic,</p>
+                                        <p data-i18n="profUni">University of Dhaka.</p>
                                     </div>
                                     
                                     <!-- Submitted By -->
-                                    <div class="w-1/2 pl-8 text-left">
-                                        <p class="mb-1 text-black font-semibold">Submitted by:</p>
-                                        <p class="font-bold text-black min-h-[28px]" id="preview-name"></p>
-                                        <p class="text-black">Class Roll: <span id="preview-class-roll" class="font-bold"></span></p>
-                                        <p class="text-black">Exam Roll: <span id="preview-exam-roll" class="font-bold"></span></p>
+                                    <div class="w-1/2 pl-8 text-left rtl-flip-pl border-l border-transparent" id="submitted-by-box" style="border-left-color: rgba(0,0,0,0.1);">
+                                        <p class="mb-1 font-semibold" data-i18n="subBy">Submitted by:</p>
+                                        <p class="font-bold min-h-[28px]" id="preview-name"></p>
+                                        <p><span data-i18n="cRoll">Class Roll:</span> <span id="preview-class-roll" class="font-bold"></span></p>
+                                        <p><span data-i18n="eRoll">Exam Roll:</span> <span id="preview-exam-roll" class="font-bold"></span></p>
                                     </div>
                                 </div>
 
                                 <!-- Bottom Section (Date) -->
                                 <div class="w-full text-center mt-12 mb-4">
-                                    <p class="text-lg font-semibold text-black">Date of Submission: <span id="preview-date">dd/mm/yyyy</span></p>
+                                    <p class="text-lg font-semibold"><span data-i18n="dateSub">Date of Submission:</span> <span id="preview-date">dd/mm/yyyy</span></p>
                                 </div>
 
                                 <!-- Footer Image / Fallback -->
                                 <div class="mt-4 w-full flex flex-col items-center justify-center pt-2 min-h-[90px]">
-                                    <!-- Note: In local environment, make sure footer.png is in the same folder -->
                                     <img id="footer-logo" src="footer.png" alt="Department Footer" class="max-h-[90px] object-contain" 
                                         onerror="this.style.display='none'; document.getElementById('footer-fallback').style.display='flex';">
                                     
                                     <div id="footer-fallback" class="hidden flex-col items-center justify-center w-full border-t border-gray-400 pt-4 opacity-50">
-                                        <p class="text-sm font-bold uppercase tracking-widest text-black">Department of Arabic, University of Dhaka</p>
+                                        <p class="text-sm font-bold uppercase tracking-widest" data-i18n="footerTxt">Department of Arabic, University of Dhaka</p>
                                         <p class="text-xs italic mt-1">(Replace with footer.png)</p>
                                     </div>
                                 </div>
@@ -257,7 +350,200 @@
     </div>
 
     <script>
-        // DOM Elements setup
+        // --- 1. LANGUAGE AND TRANSLATION LOGIC ---
+        const translations = {
+            en: {
+                appTitle: "Cover Page Generator By",
+                headerSub: "Department of Arabic",
+                langLabel: "Language:",
+                enterDetails: "Enter Assignment Details",
+                styleLabel: "Choose Cover Style",
+                l_name: "1. Name",
+                p_name: "e.g. Md. Abdullah",
+                l_classRoll: "2. Class Roll (New 4 digit)",
+                p_classRoll: "e.g. 1045",
+                l_examRoll: "3. Exam Roll",
+                p_examRoll: "e.g. 502134",
+                l_book: "4. Book Name",
+                p_book: "Select a book",
+                l_pages: "5. Page numbers",
+                p_pages: "e.g. 15-30",
+                l_date: "6. Date of submission",
+                p_date: "dd/mm/yyyy",
+                btnDownload: "Download Cover Page",
+                btnHelp: "Downloads an A4 size PDF automatically.",
+                bismillah: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+                assignmentOn: "Assignment on Translation of",
+                coverPages: "Pages:",
+                subTo: "Submitted to:",
+                profName: "Dr. Abu Jamal Md. Qutubul Islam Numani",
+                profTitle: "Professor,",
+                profDept: "Department of Arabic,",
+                profUni: "University of Dhaka.",
+                subBy: "Submitted by:",
+                cRoll: "Class Roll:",
+                eRoll: "Exam Roll:",
+                dateSub: "Date of Submission:",
+                footerTxt: "Department of Arabic, University of Dhaka"
+            },
+            bn: {
+                appTitle: "কভার পেজ জেনারেটর - তৈরি করেছেন",
+                headerSub: "আরবি বিভাগ",
+                langLabel: "ভাষা:",
+                enterDetails: "অ্যাসাইনমেন্টের তথ্য দিন",
+                styleLabel: "কভার স্টাইল নির্বাচন করুন",
+                l_name: "১. নাম",
+                p_name: "যেমন: মোঃ আব্দুল্লাহ",
+                l_classRoll: "২. ক্লাস রোল (নতুন ৪ ডিজিট)",
+                p_classRoll: "যেমন: ১০৪৫",
+                l_examRoll: "৩. পরীক্ষার রোল",
+                p_examRoll: "যেমন: ৫০২১৩৪",
+                l_book: "৪. বইয়ের নাম",
+                p_book: "একটি বই নির্বাচন করুন",
+                l_pages: "৫. পৃষ্ঠা নম্বর",
+                p_pages: "যেমন: ১৫-৩০",
+                l_date: "৬. জমা দেওয়ার তারিখ",
+                p_date: "দিন/মাস/বছর",
+                btnDownload: "কভার পেজ ডাউনলোড করুন",
+                btnHelp: "এটি স্বয়ংক্রিয়ভাবে A4 সাইজের PDF ডাউনলোড করবে।",
+                bismillah: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+                assignmentOn: "অনুবাদ অ্যাসাইনমেন্ট:",
+                coverPages: "পৃষ্ঠা:",
+                subTo: "যার কাছে জমা দেওয়া হচ্ছে:",
+                profName: "ড. আবু জামাল মো. কুতুবুল ইসলাম নোমানী",
+                profTitle: "অধ্যাপক,",
+                profDept: "আরবি বিভাগ,",
+                profUni: "ঢাকা বিশ্ববিদ্যালয়।",
+                subBy: "যে জমা দিচ্ছে:",
+                cRoll: "ক্লাস রোল:",
+                eRoll: "পরীক্ষার রোল:",
+                dateSub: "জমা দেওয়ার তারিখ:",
+                footerTxt: "আরবি বিভাগ, ঢাকা বিশ্ববিদ্যালয়"
+            },
+            ar: {
+                appTitle: "منشئ صفحة الغلاف بواسطة",
+                headerSub: "قسم اللغة العربية",
+                langLabel: "لغة:",
+                enterDetails: "أدخل تفاصيل التعيين",
+                styleLabel: "اختر نمط الغلاف",
+                l_name: "١. الاسم",
+                p_name: "مثال: محمد عبد الله",
+                l_classRoll: "٢. رقم الفصل (٤ أرقام)",
+                p_classRoll: "مثال: ١٠٤٥",
+                l_examRoll: "٣. رقم الامتحان",
+                p_examRoll: "مثال: ٥٠٢١٣٤",
+                l_book: "٤. اسم الكتاب",
+                p_book: "اختر كتابا",
+                l_pages: "٥. أرقام الصفحات",
+                p_pages: "مثال: ١٥-٣٠",
+                l_date: "٦. تاريخ التقديم",
+                p_date: "يوم/شهر/سنة",
+                btnDownload: "تحميل صفحة الغلاف",
+                btnHelp: "يتم تحميل ملف PDF بحجم A4 تلقائيًا.",
+                bismillah: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+                assignmentOn: "مهمة ترجمة عن كتاب",
+                coverPages: "الصفحات:",
+                subTo: "مقدم إلى:",
+                profName: "الدكتور أبو جمال محمد قطب الإسلام النعماني",
+                profTitle: "أستاذ،",
+                profDept: "قسم اللغة العربية،",
+                profUni: "جامعة دكا.",
+                subBy: "مقدم من:",
+                cRoll: "رقم الفصل:",
+                eRoll: "رقم الامتحان:",
+                dateSub: "تاريخ التقديم:",
+                footerTxt: "قسم اللغة العربية، جامعة دكا"
+            }
+        };
+
+        function changeLanguage(lang) {
+            // Apply text translations
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+
+            // Apply placeholder translations
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[lang][key]) {
+                    el.placeholder = translations[lang][key];
+                }
+            });
+
+            // Apply direction for Arabic
+            const coverPreview = document.getElementById('cover-page-preview');
+            const formContainer = document.getElementById('cover-form');
+            if (lang === 'ar') {
+                coverPreview.setAttribute('dir', 'rtl');
+                formContainer.setAttribute('dir', 'rtl');
+                // Adjust border for Arabic RTL layout
+                document.getElementById('submitted-by-box').style.borderLeftColor = 'transparent';
+                document.getElementById('submitted-by-box').style.borderRightColor = 'rgba(0,0,0,0.1)';
+            } else {
+                coverPreview.setAttribute('dir', 'ltr');
+                formContainer.setAttribute('dir', 'ltr');
+                // Revert border
+                document.getElementById('submitted-by-box').style.borderRightColor = 'transparent';
+                document.getElementById('submitted-by-box').style.borderLeftColor = 'rgba(0,0,0,0.1)';
+            }
+            
+            // Update preview to reflect empty/default state formatting in new language
+            updatePreview();
+        }
+
+        // --- 2. THEMES AND STYLES LOGIC ---
+        const coverStyles = [
+            { name: "01. Classic Blue (Default)", primary: "#1e3a8a", text: "#000000", font: "'Merriweather', 'Amiri', serif", oW: "4px", oS: "solid", iW: "1px", iS: "solid", tS: "solid", bg: "#ffffff" },
+            { name: "02. Formal Black & White", primary: "#000000", text: "#000000", font: "'Times New Roman', 'Amiri', serif", oW: "5px", oS: "solid", iW: "2px", iS: "solid", tS: "solid", bg: "#ffffff" },
+            { name: "03. Oxford Crimson", primary: "#7f1d1d", text: "#000000", font: "'Georgia', 'Amiri', serif", oW: "5px", oS: "double", iW: "1px", iS: "solid", tS: "solid", bg: "#fffafb" },
+            { name: "04. Emerald Academic", primary: "#064e3b", text: "#052e16", font: "'Merriweather', 'Amiri', serif", oW: "3px", oS: "solid", iW: "1px", iS: "dashed", tS: "dashed", bg: "#f8faf9" },
+            { name: "05. Royal Purple", primary: "#4c1d95", text: "#1e1b4b", font: "Palatino, 'Amiri', serif", oW: "4px", oS: "solid", iW: "1px", iS: "solid", tS: "solid", bg: "#faf5ff" },
+            { name: "06. Charcoal Minimalist", primary: "#374151", text: "#111827", font: "Arial, sans-serif", oW: "1px", oS: "solid", iW: "0px", iS: "solid", tS: "solid", bg: "#ffffff" },
+            { name: "07. Double Lined Classic", primary: "#1e3a8a", text: "#000000", font: "'Times New Roman', 'Amiri', serif", oW: "6px", oS: "double", iW: "4px", iS: "double", tS: "double", bg: "#ffffff" },
+            { name: "08. Dashed Academic", primary: "#1f2937", text: "#000000", font: "'Courier New', Courier, monospace", oW: "2px", oS: "solid", iW: "2px", iS: "dashed", tS: "dashed", bg: "#ffffff" },
+            { name: "09. Vintage Garamond", primary: "#451a03", text: "#291304", font: "Garamond, 'Amiri', serif", oW: "3px", oS: "solid", iW: "1px", iS: "solid", tS: "solid", bg: "#fefce8" },
+            { name: "10. Modern Sans Navy", primary: "#1e40af", text: "#0f172a", font: "Helvetica, Arial, sans-serif", oW: "4px", oS: "solid", iW: "1px", iS: "solid", tS: "solid", bg: "#f8fafc" },
+            { name: "11. Elegant Gold & Black", primary: "#b45309", text: "#000000", font: "'Georgia', 'Amiri', serif", oW: "6px", oS: "double", iW: "1px", iS: "solid", tS: "solid", bg: "#fffcf2" },
+            { name: "12. Chocolate Brown", primary: "#78350f", text: "#381c00", font: "'Times New Roman', 'Amiri', serif", oW: "5px", oS: "solid", iW: "1px", iS: "solid", tS: "solid", bg: "#fffbeb" },
+            { name: "13. Slate Gray Standard", primary: "#475569", text: "#0f172a", font: "Verdana, sans-serif", oW: "3px", oS: "solid", iW: "1px", iS: "solid", tS: "solid", bg: "#ffffff" },
+            { name: "14. Midnight Thick Outline", primary: "#020617", text: "#000000", font: "'Merriweather', 'Amiri', serif", oW: "8px", oS: "solid", iW: "2px", iS: "solid", tS: "solid", bg: "#ffffff" },
+            { name: "15. Crimson & Gold Tint", primary: "#991b1b", text: "#431407", font: "Palatino, 'Amiri', serif", oW: "4px", oS: "solid", iW: "2px", iS: "solid", tS: "solid", bg: "#fff7ed" },
+            { name: "16. Teal Professional", primary: "#115e59", text: "#042f2e", font: "Arial, sans-serif", oW: "3px", oS: "solid", iW: "1px", iS: "dashed", tS: "solid", bg: "#ffffff" },
+            { name: "17. Typewriter Retro", primary: "#000000", text: "#000000", font: "'Courier New', monospace", oW: "2px", oS: "solid", iW: "1px", iS: "solid", tS: "dashed", bg: "#f5f5f4" },
+            { name: "18. Georgia Soft Blue", primary: "#3b82f6", text: "#1e3a8a", font: "'Georgia', 'Amiri', serif", oW: "4px", oS: "solid", iW: "1px", iS: "solid", tS: "solid", bg: "#f0f9ff" },
+            { name: "19. Solid Indigo", primary: "#4338ca", text: "#312e81", font: "'Times New Roman', 'Amiri', serif", oW: "5px", oS: "solid", iW: "1px", iS: "solid", tS: "solid", bg: "#ffffff" },
+            { name: "20. Monochrome Dashed", primary: "#000000", text: "#000000", font: "'Merriweather', 'Amiri', serif", oW: "2px", oS: "dashed", iW: "1px", iS: "dashed", tS: "dashed", bg: "#ffffff" }
+        ];
+
+        // Populate dropdown
+        const styleSelector = document.getElementById('styleSelector');
+        coverStyles.forEach((style, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = style.name;
+            styleSelector.appendChild(option);
+        });
+
+        function applyStyle(index) {
+            const style = coverStyles[index];
+            const root = document.documentElement;
+            
+            // Set CSS Variables
+            root.style.setProperty('--primary-color', style.primary);
+            root.style.setProperty('--text-color', style.text);
+            root.style.setProperty('--font-main', style.font);
+            root.style.setProperty('--border-outer-width', style.oW);
+            root.style.setProperty('--border-outer-style', style.oS);
+            root.style.setProperty('--border-inner-width', style.iW);
+            root.style.setProperty('--border-inner-style', style.iS);
+            root.style.setProperty('--title-border-style', style.tS);
+            root.style.setProperty('--bg-color', style.bg);
+        }
+
+        // --- 3. FORM AND PREVIEW LOGIC ---
         const inputs = {
             name: document.getElementById('studentName'),
             classRoll: document.getElementById('classRoll'),
@@ -276,7 +562,6 @@
             submissionDate: document.getElementById('preview-date')
         };
 
-        // Custom Modal Logic
         function showModal(message, isPrintPrompt = false) {
             document.getElementById('modal-message').textContent = message;
             const modal = document.getElementById('custom-modal');
@@ -304,9 +589,15 @@
             }
         }
 
-        // Live Update Functionality
         function updatePreview() {
-            previews.name.textContent = inputs.name.value || '[Your Name]';
+            // Defaults based on current language
+            const lang = document.getElementById('cover-page-preview').getAttribute('dir') === 'rtl' ? 'ar' : 
+                         (document.querySelector('[data-i18n="l_name"]').textContent.includes('নাম') ? 'bn' : 'en');
+            
+            const defName = lang === 'bn' ? '[আপনার নাম]' : (lang === 'ar' ? '[اسمك]' : '[Your Name]');
+            const defDate = translations[lang]['p_date'];
+
+            previews.name.textContent = inputs.name.value || defName;
             previews.classRoll.textContent = inputs.classRoll.value || '____';
             previews.examRoll.textContent = inputs.examRoll.value || '______';
             previews.bookName.textContent = inputs.bookName.value || '';
@@ -316,7 +607,7 @@
             }
 
             previews.pageNumbers.textContent = inputs.pageNumbers.value || '________';
-            previews.submissionDate.textContent = inputs.submissionDate.value || 'dd/mm/yyyy';
+            previews.submissionDate.textContent = inputs.submissionDate.value || defDate;
         }
 
         Object.values(inputs).forEach(input => {
@@ -324,9 +615,11 @@
             input.addEventListener('change', updatePreview);
         });
 
+        // Initialize defaults
         updatePreview();
+        applyStyle(0);
 
-        // PDF Download Logic
+        // --- 4. PDF DOWNLOAD LOGIC ---
         function downloadCoverPage() {
             const form = document.getElementById('cover-form');
             
@@ -357,7 +650,6 @@
                 pagebreak:    { mode: 'avoid-all' }
             };
 
-            // Detect if running inside a restricted iframe (like AI preview)
             const isIframe = window !== window.parent;
 
             if (window.html2pdf && !isIframe) {
@@ -371,10 +663,8 @@
                     showModal("Auto PDF generation failed. Would you like to use the high-quality Print dialog instead? (Select 'Save as PDF' as the printer)", true);
                 });
             } else {
-                // If in iframe/preview, show a helpful message and offer print fallback
                 downloadBtn.innerHTML = originalBtnHtml;
                 downloadBtn.disabled = false;
-                
                 if (isIframe) {
                     showModal("Note: Auto-download is blocked inside this AI preview window for security. \n\nTo use auto-download, please save this code as an .html file on your computer. Alternatively, you can use the Print Dialog right now and choose 'Save as PDF'.", true);
                 } else {
