@@ -28,6 +28,7 @@
         .a4-paper {
             width: 210mm;
             height: 297mm;
+            max-height: 297mm;
             background-color: white;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             position: relative;
@@ -351,8 +352,9 @@
                 margin:       0,
                 filename:     `Cover_Page_${inputs.classRoll.value}_${inputs.name.value.replace(/\s+/g, '_')}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: 'avoid-all' }
             };
 
             // Detect if running inside a restricted iframe (like AI preview)
