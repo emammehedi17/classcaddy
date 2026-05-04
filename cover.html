@@ -247,32 +247,32 @@
                         </div>
 
                         <!-- Action Button -->
-                        <div class="pt-4 mt-6 border-t">
-                            <button type="button" onclick="downloadCoverPage()"
-                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-200 flex justify-center items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                                <span data-i18n="btnDownload">Download Cover Page</span>
-                            </button>
-                            <p class="text-xs text-center text-gray-500 mt-2" data-i18n="btnHelp">Downloads an A4 size PDF automatically.</p>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Right Side: Live Preview Section -->
-            <div class="w-full lg:w-2/3 overflow-x-auto bg-gray-200 rounded-xl p-4 flex justify-center items-start border border-gray-300" id="preview-container">
-                
-                <!-- Actual A4 Paper DOM -->
-                <div id="cover-page-preview" class="a4-paper bg-white p-[12mm]" dir="ltr" lang="en">
-                    <!-- Outer & Inner Academic Style Border -->
-                    <div class="theme-outer-border h-full w-full p-1 box-border">
-                        <div class="theme-inner-border h-full w-full flex flex-col relative px-10 py-12 box-border">
+                    <form id="cover-form">
+                        <!-- Grid layout: 2 columns on mobile, 1 column on desktop -->
+                        <div class="grid grid-cols-2 gap-3 lg:grid-cols-1 lg:gap-y-4">
                             
-                            <!-- Header / Bismillah -->
-                            <div class="text-center w-full shrink-0">
-                                <span class="font-arabic text-4xl leading-normal" data-i18n="bismillah" style="color: var(--text-color);">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span>
+                            <!-- 1. Class Roll (Moved to Top) -->
+                            <div>
+                                <label for="classRoll" class="block text-sm font-semibold text-gray-700 mb-1 truncate"><span data-i18n="l_classRoll">1. Class Roll (New 4 digit)</span> <span class="text-red-500">*</span></label>
+                                <input type="text" id="classRoll" required pattern="\d{4}" maxlength="4" data-i18n-placeholder="p_classRoll"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
+                                    placeholder="e.g. 1045" title="Please enter exactly 4 digits">
+                            </div>
+
+                            <!-- 2. Name -->
+                            <div>
+                                <label for="studentName" class="block text-sm font-semibold text-gray-700 mb-1 truncate"><span data-i18n="l_name">2. Name</span> <span class="text-red-500">*</span></label>
+                                <input type="text" id="studentName" required data-i18n-placeholder="p_name"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
+                                    placeholder="e.g. Md. Abdullah">
+                            </div>
+
+                            <!-- 3. Exam Roll -->
+                            <div>
+                                <label for="examRoll" class="block text-sm font-semibold text-gray-700 mb-1 truncate"><span data-i18n="l_examRoll">3. Exam Roll</span> <span class="text-red-500">*</span></label>
+                                <input type="text" id="examRoll" required data-i18n-placeholder="p_examRoll"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
+                                    placeholder="e.g. 502134">
                             </div>
 
                             <!-- Title Area pushed further down using padding-top (pt-28) -->
@@ -374,10 +374,10 @@
                 langLabel: "Language:",
                 enterDetails: "Enter Assignment Details",
                 styleLabel: "Choose Cover Style",
-                l_name: "1. Name",
-                p_name: "e.g. Md. Abdullah",
-                l_classRoll: "2. Class Roll (New 4 digit)",
+                l_classRoll: "1. Class Roll (New 4 digit)",
                 p_classRoll: "e.g. 1045",
+                l_name: "2. Name",
+                p_name: "e.g. Md. Abdullah",
                 l_examRoll: "3. Exam Roll",
                 p_examRoll: "e.g. 502134",
                 l_book: "4. Book Name",
@@ -408,10 +408,10 @@
                 langLabel: "ভাষা:",
                 enterDetails: "অ্যাসাইনমেন্টের তথ্য দিন",
                 styleLabel: "কভার স্টাইল নির্বাচন করুন",
-                l_name: "১. নাম",
-                p_name: "যেমন: মোঃ আব্দুল্লাহ",
-                l_classRoll: "২. ক্লাস রোল (নতুন ৪ ডিজিট)",
+                l_classRoll: "১. ক্লাস রোল (নতুন ৪ ডিজিট)",
                 p_classRoll: "যেমন: ১০৪৫",
+                l_name: "২. নাম",
+                p_name: "যেমন: মোঃ আব্দুল্লাহ",
                 l_examRoll: "৩. পরীক্ষার রোল",
                 p_examRoll: "যেমন: ৫০২১৩৪",
                 l_book: "৪. বইয়ের নাম",
@@ -442,10 +442,10 @@
                 langLabel: "لغة:",
                 enterDetails: "أدخل تفاصيل التعيين",
                 styleLabel: "اختر نمط الغلاف",
-                l_name: "١. الاسم",
-                p_name: "مثال: محمد عبد الله",
-                l_classRoll: "٢. رقم الفصل (٤ أرقام)",
+                l_classRoll: "١. رقم الفصل (٤ أرقام)",
                 p_classRoll: "مثال: ١٠٤٥",
+                l_name: "٢. الاسم",
+                p_name: "مثال: محمد عبد الله",
                 l_examRoll: "٣. رقم الامتحان",
                 p_examRoll: "مثال: ٥٠٢١٣٤",
                 l_book: "٤. اسم الكتاب",
@@ -568,8 +568,8 @@
 
         // --- 3. FORM AND PREVIEW LOGIC ---
         const inputs = {
-            name: document.getElementById('studentName'),
             classRoll: document.getElementById('classRoll'),
+            name: document.getElementById('studentName'),
             examRoll: document.getElementById('examRoll'),
             bookName: document.getElementById('bookName'),
             pageNumbers: document.getElementById('pageNumbers'),
@@ -584,6 +584,118 @@
             pageNumbers: document.getElementById('preview-pages'),
             submissionDate: document.getElementById('preview-date')
         };
+
+        // Student Database for Auto-fill functionality
+        const studentDatabase = {
+            "1064": { name: "Md. Misbah Uddin", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "1-8" },
+            "1076": { name: "Md. Jahidul Islam", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "9-16" },
+            "2720": { name: "Md. Misbahul Mukarrabin Tahmid", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "17-24" },
+            "2722": { name: "Abdur Rahman", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "25-32" },
+            "2723": { name: "Kazi Mohaiminul Islam", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "33-40" },
+            "2730": { name: "Ammarah", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "41-48" },
+            "2740": { name: "Imam Mahadi Hasan Mahadi", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "49-56" },
+            "2748": { name: "Mohammad Rahmat Ullah", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "57-64" },
+            "2749": { name: "Md. Fajlul Kadir", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "65-72" },
+            "2754": { name: "Fatematuz Zahura", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "73-80" },
+            "2762": { name: "Mohammad Nasrullah", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "81-88" },
+            "2772": { name: "Tasfia Tasnim", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "89-96" },
+            "2773": { name: "Miskatul Jannat Mim", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "97-104" },
+            "2774": { name: "Farita Jannat Mim", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "105-112" },
+            "2775": { name: "Md. Masum Billah", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "113-120" },
+            "2776": { name: "Muhammad Imran Hossain", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "121-128" },
+            "2780": { name: "Humyra Sadia", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "129-136" },
+            "2781": { name: "Md. Rasel Mahmud", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "137-144" },
+            "2782": { name: "Hadiul Ahmed", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "145-152" },
+            "2783": { name: "Md. Shamim Hossain", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "153-160" },
+            "2784": { name: "Junayed Hossain", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "161-168" },
+            "2789": { name: "Md. Habib Ullah", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "169-176" },
+            "2790": { name: "Jafor Ullah", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "177-184" },
+            "2806": { name: "Md. Yasir Khan", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "185-192" },
+            "2812": { name: "Mohammad Ullah", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "193-200" },
+            "2814": { name: "Mohammad Mohsin", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "201-208" },
+            "2830": { name: "Abu Ubaida", book: "تايباحصلاو ةباحصلا تاماركل ةصق", pages: "209-212" },
+            "2832": { name: "Sawkat Jahan Rifat", book: "تازجعم و ..ءايبنا", pages: "4-10" },
+            "2834": { name: "Asma Afroz Noshin", book: "تازجعم و ..ءايبنا", pages: "11-17" },
+            "2842": { name: "Shaquiq Abdullah Isha", book: "تازجعم و ..ءايبنا", pages: "18-24" },
+            "2843": { name: "Abdullah", book: "تازجعم و ..ءايبنا", pages: "25-31" },
+            "2844": { name: "Abdullah Al-Mamun", book: "تازجعم و ..ءايبنا", pages: "32-38" },
+            "2852": { name: "Md. Rezaur Rahman Fuad", book: "تازجعم و ..ءايبنا", pages: "39-45" },
+            "2853": { name: "Md. Aminur Rahman", book: "تازجعم و ..ءايبنا", pages: "46-52" },
+            "2854": { name: "Md. Tazkerul Islam", book: "تازجعم و ..ءايبنا", pages: "53-59" },
+            "2855": { name: "Md. Fahim Shahriar", book: "تازجعم و ..ءايبنا", pages: "60-66" },
+            "2856": { name: "Zahangir Alam", book: "تازجعم و ..ءايبنا", pages: "67-73" },
+            "2857": { name: "Chamiya Binte Belal", book: "تازجعم و ..ءايبنا", pages: "74-80" },
+            "2863": { name: "Md. Abdul Muktadir", book: "تازجعم و ..ءايبنا", pages: "81-87" },
+            "2864": { name: "Md. Khalid Saifullah", book: "تازجعم و ..ءايبنا", pages: "88-94" },
+            "2865": { name: "Md. Azizur Rahman Murad", book: "تازجعم و ..ءايبنا", pages: "95-101" },
+            "2866": { name: "Saima Ali", book: "تازجعم و ..ءايبنا", pages: "102-108" },
+            "2867": { name: "Umme Sadia Margoba", book: "تازجعم و ..ءايبنا", pages: "109-115" },
+            "2869": { name: "Anisa Tabassum", book: "تازجعم و ..ءايبنا", pages: "116-122" },
+            "2872": { name: "Arif Hasan", book: "تازجعم و ..ءايبنا", pages: "123-129" },
+            "2873": { name: "Hafsa Khanam", book: "تازجعم و ..ءايبنا", pages: "130-136" },
+            "2874": { name: "Masuma", book: "تازجعم و ..ءايبنا", pages: "137-143" },
+            "2876": { name: "Masura Khatun", book: "تازجعم و ..ءايبنا", pages: "144-150" },
+            "2877": { name: "Al Jubaere", book: "تازجعم و ..ءايبنا", pages: "151-157" },
+            "2878": { name: "Md. Emam Mehedi", book: "تازجعم و ..ءايبنا", pages: "158-164" },
+            "2881": { name: "Md. Baker Hossen", book: "تازجعم و ..ءايبنا", pages: "165-171" },
+            "2883": { name: "Aklima Akter", book: "تازجعم و ..ءايبنا", pages: "172-178" },
+            "2884": { name: "Md. Mehedy Hasan", book: "تازجعم و ..ءايبنا", pages: "179-185" },
+            "2885": { name: "Abdullah Md. Minhaz", book: "تازجعم و ..ءايبنا", pages: "186-192" },
+            "2887": { name: "Md. Mahamudul Hasan Mahdi", book: "تازجعم و ..ءايبنا", pages: "193-199" },
+            "2888": { name: "Md. Mujahidul Islam", book: "تازجعم و ..ءايبنا", pages: "200-206" },
+            "2889": { name: "Md. Parvej Hawlader", book: "تازجعم و ..ءايبنا", pages: "207-213" },
+            "2890": { name: "Mohammad Ibrahim Khallil", book: "تازجعم و ..ءايبنا", pages: "214-220" },
+            "2891": { name: "Md. Tarazul Islam Tusar", book: "تازجعم و ..ءايبنا", pages: "221-227" },
+            "2893": { name: "Mofazzal Hosain", book: "تازجعم و ..ءايبنا", pages: "228-234" },
+            "2894": { name: "Md. Shahin Alom", book: "تازجعم و ..ءايبنا", pages: "235-241" },
+            "2895": { name: "Md. Abdul Kader", book: "تازجعم و ..ءايبنا", pages: "242-248" },
+            "2896": { name: "Md. Imran Hossain", book: "تازجعم و ..ءايبنا", pages: "249-255" },
+            "2897": { name: "Miraz", book: "تازجعم و ..ءايبنا", pages: "256-262" },
+            "2898": { name: "Md. Masud Alam", book: "تازجعم و ..ءايبنا", pages: "263-269" },
+            "2899": { name: "Md. Diluar Hossen", book: "تازجعم و ..ءايبنا", pages: "270-276" },
+            "2900": { name: "Abdul Muhit Ekram", book: "تازجعم و ..ءايبنا", pages: "277-283" },
+            "2901": { name: "Jubayer Ahmed", book: "تازجعم و ..ءايبنا", pages: "284-290" },
+            "2902": { name: "Rayhana Akter", book: "ملاعلا يف السإلا ةمهم", pages: "121-122" },
+            "2903": { name: "Mahiya Binte Mamun", book: "ملاعلا يف السإلا ةمهم", pages: "123-129" },
+            "2909": { name: "Md. Riadul Islam", book: "ملاعلا يف السإلا ةمهم", pages: "130-136" },
+            "2911": { name: "Rakib Hossain", book: "ملاعلا يف السإلا ةمهم", pages: "137-143" },
+            "2917": { name: "Md. Jahidul Islam", book: "ملاعلا يف السإلا ةمهم", pages: "144-150" },
+            "2918": { name: "Md. Tawfiql Islam", book: "ملاعلا يف السإلا ةمهم", pages: "151-157" },
+            "2919": { name: "Md. Hasanuzzaman", book: "ملاعلا يف السإلا ةمهم", pages: "158-164" },
+            "2920": { name: "Mohammad Azizur Rahman Manik", book: "ملاعلا يف السإلا ةمهم", pages: "165-171" },
+            "2922": { name: "Mohammad Younus Shamim", book: "ملاعلا يف السإلا ةمهم", pages: "172-178" },
+            "2923": { name: "Ahmmod Ullah", book: "ملاعلا يف السإلا ةمهم", pages: "179-185" },
+            "2924": { name: "Abdullah", book: "ملاعلا يف السإلا ةمهم", pages: "186-192" },
+            "2925": { name: "Md. Rafiqul Hasan Shahed", book: "ملاعلا يف السإلا ةمهم", pages: "193-199" },
+            "2926": { name: "Md. Shahriar Rahman", book: "ملاعلا يف السإلا ةمهم", pages: "200-206" },
+            "2927": { name: "Mohammad Saidul Islam", book: "ملاعلا يف السإلا ةمهم", pages: "207-213" },
+            "2928": { name: "Md. Khalid Hasan", book: "ملاعلا يف السإلا ةمهم", pages: "214-220" },
+            "2929": { name: "Md. Shah Alam", book: "ملاعلا يف السإلا ةمهم", pages: "221-227" },
+            "2930": { name: "Md. Rayhan Shikdar", book: "ملاعلا يف السإلا ةمهم", pages: "228-234" },
+            "2934": { name: "Morium Akter", book: "ملاعلا يف السإلا ةمهم", pages: "235-241" },
+            "2935": { name: "Rubiea Akter", book: "ملاعلا يف السإلا ةمهم", pages: "242-248" },
+            "2936": { name: "Mahmuda Akter", book: "ملاعلا يف السإلا ةمهم", pages: "249-255" },
+            "2973": { name: "Ahmed Al Sabah", book: "ملاعلا يف السإلا ةمهم", pages: "256-262" },
+            "2986": { name: "Anju Mia", book: "ملاعلا يف السإلا ةمهم", pages: "263-269" },
+            "2999": { name: "Md. Abu Talab", book: "ملاعلا يف السإلا ةمهم", pages: "270-276" },
+            "3004": { name: "Mohammad Mojahidul Islam Irfan", book: "ملاعلا يف السإلا ةمهم", pages: "277-283" },
+            "3003": { name: "Md. Arafat Ali", book: "ملاعلا يف السإلا ةمهم", pages: "284-290" },
+            "3006": { name: "Md. Shakibul Islam", book: "ملاعلا يف السإلا ةمهم", pages: "291-297" }
+        };
+
+        // Handle auto-filling fields when roll number is inputted
+        inputs.classRoll.addEventListener('input', (e) => {
+            const roll = e.target.value.trim();
+            if (roll.length === 4) {
+                const student = studentDatabase[roll];
+                if (student) {
+                    inputs.name.value = student.name;
+                    inputs.bookName.value = student.book;
+                    inputs.pageNumbers.value = student.pages;
+                    updatePreview(); // immediately reflect on preview
+                }
+            }
+        });
 
         function showModal(message, isPrintPrompt = false) {
             document.getElementById('modal-message').textContent = message;
