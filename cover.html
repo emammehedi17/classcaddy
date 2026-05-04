@@ -6,8 +6,6 @@
     <title>Assignment Cover Page Generator</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- html2pdf.js for saving the cover page as PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- Google Fonts for Academic Look & Bangla Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Amiri:wght@400;700;900&family=Playfair+Display:ital,wght@1,700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     
@@ -19,8 +17,8 @@
         
         .font-arabic {
             font-family: 'Amiri', serif;
-            /* Force normal letter spacing so Arabic ligatures do not break */
-            letter-spacing: normal !important;
+            letter-spacing: normal !important; /* Fixed broken Arabic ligatures */
+            word-spacing: normal !important;
             text-rendering: optimizeLegibility;
         }
 
@@ -36,9 +34,7 @@
         }
         
         @keyframes shine {
-            to {
-                background-position: 200% center;
-            }
+            to { background-position: 200% center; }
         }
 
         /* Dynamic CSS Variables for Themes */
@@ -77,40 +73,28 @@
 
         /* Enforce specific Arabic sizes when RTL */
         #cover-page-preview[dir="rtl"] .title-lang-adaptive {
-            font-size: 2.25rem; /* Enlarged title for Arabic */
+            font-size: 2.25rem; 
             line-height: 3rem;
             font-family: 'Amiri', serif;
+            letter-spacing: normal !important; /* Ensure no spacing breaks Arabic text */
         }
 
         /* RTL support for layout mirroring and right alignment */
-        [dir="rtl"] .rtl-flip {
-            flex-direction: row-reverse;
-        }
-        [dir="rtl"] .rtl-flip-pr {
-            padding-right: 0;
-            padding-left: 2rem;
-        }
-        [dir="rtl"] .rtl-flip-pl {
-            padding-left: 0;
-            padding-right: 2rem;
-        }
-        /* Ensure specific elements align right in Arabic */
-        #cover-page-preview[dir="rtl"] .text-left {
-            text-align: right !important;
-        }
+        [dir="rtl"] .rtl-flip { flex-direction: row-reverse; }
+        [dir="rtl"] .rtl-flip-pr { padding-right: 0; padding-left: 2rem; }
+        [dir="rtl"] .rtl-flip-pl { padding-left: 0; padding-right: 2rem; }
+        #cover-page-preview[dir="rtl"] .text-left { text-align: right !important; }
 
         .theme-outer-border {
             border-color: var(--primary-color);
             border-width: var(--border-outer-width);
             border-style: var(--border-outer-style);
-            transition: all 0.4s ease;
         }
 
         .theme-inner-border {
             border-color: var(--primary-color);
             border-width: var(--border-inner-width);
             border-style: var(--border-inner-style);
-            transition: all 0.4s ease;
         }
 
         .theme-title-border {
@@ -118,45 +102,48 @@
             border-bottom-width: 2px;
             border-color: var(--primary-color);
             border-style: var(--title-border-style);
-            transition: all 0.4s ease;
         }
 
-        /* High-quality native print fallback with fixes for blank page */
+        /* Perfect Native PDF Print Setup */
         @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0; 
+            }
             html, body {
-                width: 210mm;
-                height: 297mm;
+                width: 210mm !important;
+                height: 297mm !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                background-color: white !important;
                 overflow: hidden !important;
-                background: white;
             }
-            #app-container > div:first-child, header {
+            /* Hide UI Elements */
+            header, #app-container > div:first-child, #custom-modal {
                 display: none !important;
             }
             #preview-container {
+                width: 210mm !important;
+                height: 297mm !important;
                 padding: 0 !important;
                 margin: 0 !important;
                 border: none !important;
                 background: white !important;
-                width: 210mm;
-                height: 297mm;
+                box-shadow: none !important;
             }
             .a4-paper {
-                box-shadow: none !important;
-                border: none !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
                 margin: 0 !important;
                 padding: 12mm !important;
-                width: 210mm !important;
-                height: 296mm !important; /* Slightly reduced to prevent spilling to 2nd page */
-                max-height: 296mm !important;
-                page-break-after: avoid;
-                page-break-inside: avoid;
+                box-shadow: none !important;
+                border: none !important;
+                page-break-inside: avoid !important;
+                page-break-after: avoid !important;
+                page-break-before: avoid !important;
                 overflow: hidden !important;
-            }
-            @page {
-                size: A4 portrait;
-                margin: 0;
+                transform: none !important;
             }
         }
     </style>
@@ -207,7 +194,7 @@
                     </div>
 
                     <form id="cover-form" class="space-y-4">
-                        <!-- 1. Class Roll (Moved to Top) -->
+                        <!-- 1. Class Roll -->
                         <div>
                             <label for="classRoll" class="block text-sm font-semibold text-gray-700 mb-1 truncate"><span data-i18n="l_classRoll">1. Class Roll (New 4 digit)</span> <span class="text-red-500">*</span></label>
                             <input type="text" id="classRoll" required pattern="\d{4}" maxlength="4" data-i18n-placeholder="p_classRoll"
@@ -288,17 +275,16 @@
                             </div>
 
                             <!-- Title Area pushed further down using padding-top (pt-28) -->
-                            <!-- Replaced flex-col on the title wrappers to avoid html2canvas RTL separation bug -->
                             <div class="flex-grow w-full flex flex-col items-center justify-center pt-28">
                                 <div class="theme-title-border py-6 w-full text-center">
                                     
                                     <div class="text-2xl font-bold mb-3">
-                                        <span class="block text-2xl font-bold tracking-wide title-lang-adaptive" data-i18n="assignmentOn">Assignment on the Translation of</span>
+                                        <!-- Removed letter-spacing classes to prevent Arabic breakage -->
+                                        <span class="block text-2xl font-bold title-lang-adaptive" data-i18n="assignmentOn">Assignment on the Translation of</span>
                                     </div>
                                     
-                                    <!-- Explicit block container with RTL direction to fix canvas Arabic rendering -->
                                     <div dir="rtl" class="w-full text-center mb-4">
-                                        <span id="preview-book" class="font-arabic text-3xl font-bold inline-block" style="color: var(--text-color); direction: rtl; unicode-bidi: isolate;"></span>
+                                        <span id="preview-book" class="font-arabic text-3xl font-bold inline-block" style="color: var(--text-color); direction: rtl;"></span>
                                     </div>
                                     
                                     <div class="text-lg font-semibold mt-2">
@@ -367,14 +353,14 @@
     <div id="custom-modal" class="fixed inset-0 bg-black bg-opacity-60 z-[100] hidden flex items-center justify-center px-4 transition-opacity">
         <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl transform transition-transform scale-100">
             <div class="flex items-center gap-3 mb-4">
-                <div class="bg-yellow-100 p-2 rounded-full text-yellow-600">
+                <div class="bg-blue-100 p-2 rounded-full text-blue-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800">Notice</h3>
+                <h3 class="text-xl font-bold text-gray-800">Save as PDF</h3>
             </div>
-            <p class="text-gray-600 mb-6" id="modal-message"></p>
+            <p class="text-gray-600 mb-6" id="modal-message">For perfect HD quality and correct Arabic text, please select <strong>'Save as PDF'</strong> in the Print window.</p>
             <div class="flex justify-end gap-3">
                 <button id="modal-secondary-btn" onclick="closeModal(false)" class="hidden bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition duration-200">
                     Cancel
@@ -504,7 +490,6 @@
         }
 
         function changeLanguage(lang) {
-            // Apply text translations
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[lang][key]) {
@@ -512,7 +497,6 @@
                 }
             });
 
-            // Apply placeholder translations
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.getAttribute('data-i18n-placeholder');
                 if (translations[lang][key]) {
@@ -520,7 +504,6 @@
                 }
             });
 
-            // Apply direction and fonts
             const coverPreview = document.getElementById('cover-page-preview');
             const formContainer = document.getElementById('cover-form');
             if(coverPreview) {
@@ -539,7 +522,6 @@
                 }
             }
             
-            // Adjust border for Arabic RTL layout
             const submittedByBox = document.getElementById('submitted-by-box');
             if(submittedByBox) {
                 if (lang === 'ar') {
@@ -551,7 +533,6 @@
                 }
             }
             
-            // Update preview to reflect empty/default state formatting in new language
             updatePreview();
         }
 
@@ -579,7 +560,6 @@
             { name: "20. Monochrome Dashed", primary: "#000000", text: "#000000", font: "'Merriweather', 'Amiri', serif", oW: "2px", oS: "dashed", iW: "1px", iS: "dashed", tS: "dashed", bg: "#ffffff" }
         ];
 
-        // Populate dropdown
         const styleSelector = document.getElementById('styleSelector');
         coverStyles.forEach((style, index) => {
             const option = document.createElement('option');
@@ -591,8 +571,6 @@
         function applyStyle(index) {
             const style = coverStyles[index];
             const root = document.documentElement;
-            
-            // Set CSS Variables
             root.style.setProperty('--primary-color', style.primary);
             root.style.setProperty('--text-color', style.text);
             root.style.setProperty('--font-main', style.font);
@@ -724,28 +702,30 @@
         // Handle auto-filling fields when roll number is inputted
         let wasAutoFilled = false; // Track if fields were auto-filled by database
 
-        if(inputs.classRoll) {
-            inputs.classRoll.addEventListener('input', (e) => {
-                const roll = e.target.value.trim();
-                const student = roll.length === 4 ? studentDatabase[roll] : null;
-                
-                if (student) {
-                    inputs.name.value = student.name;
-                    inputs.bookName.value = student.book;
-                    inputs.pageNumbers.value = student.pages;
-                    wasAutoFilled = true; // Mark as auto-filled
-                    updatePreview(); // immediately reflect on preview
-                } else if (wasAutoFilled) {
-                    // Only clear fields if they were previously auto-filled, 
-                    // so we don't destroy manual input by mistake.
-                    inputs.name.value = "";
-                    inputs.bookName.value = "";
-                    inputs.pageNumbers.value = "";
-                    wasAutoFilled = false;
-                    updatePreview();
-                }
-            });
-        }
+        ['input', 'change'].forEach(evt => {
+            if(inputs.classRoll) {
+                inputs.classRoll.addEventListener(evt, (e) => {
+                    const roll = e.target.value.trim();
+                    const student = roll.length === 4 ? studentDatabase[roll] : null;
+                    
+                    if (student) {
+                        inputs.name.value = student.name;
+                        inputs.bookName.value = student.book;
+                        inputs.pageNumbers.value = student.pages;
+                        wasAutoFilled = true; // Mark as auto-filled
+                        updatePreview(); // immediately reflect on preview
+                    } else if (wasAutoFilled) {
+                        // Only clear fields if they were previously auto-filled, 
+                        // so we don't destroy manual input by mistake.
+                        inputs.name.value = "";
+                        inputs.bookName.value = "";
+                        inputs.pageNumbers.value = "";
+                        wasAutoFilled = false;
+                        updatePreview();
+                    }
+                });
+            }
+        });
 
         function showModal(message, isPrintPrompt = false) {
             document.getElementById('modal-message').textContent = message;
@@ -841,56 +821,9 @@
                 form.reportValidity();
                 return;
             }
-
-            const element = document.getElementById('cover-page-preview');
-            const downloadBtn = document.querySelector('button[type="button"]');
             
-            if(!element || !downloadBtn) return;
-            
-            const originalBtnHtml = downloadBtn.innerHTML;
-            
-            downloadBtn.innerHTML = `
-                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Generating PDF...
-            `;
-            downloadBtn.disabled = true;
-
-            const rollValue = inputs.classRoll ? inputs.classRoll.value : 'Roll';
-            const nameValue = inputs.name ? inputs.name.value.replace(/\s+/g, '_') : 'Name';
-
-            const opt = {
-                margin:       0,
-                filename:     `Cover_Page_${rollValue}_${nameValue}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: 'avoid-all' }
-            };
-
-            const isIframe = window !== window.parent;
-
-            if (window.html2pdf && !isIframe) {
-                html2pdf().set(opt).from(element).save().then(() => {
-                    downloadBtn.innerHTML = originalBtnHtml;
-                    downloadBtn.disabled = false;
-                }).catch(err => {
-                    console.error("PDF Error: ", err);
-                    downloadBtn.innerHTML = originalBtnHtml;
-                    downloadBtn.disabled = false;
-                    showModal("Auto PDF generation failed. Would you like to use the high-quality Print dialog instead? (Select 'Save as PDF' as the printer)", true);
-                });
-            } else {
-                downloadBtn.innerHTML = originalBtnHtml;
-                downloadBtn.disabled = false;
-                if (isIframe) {
-                    showModal("Note: Auto-download is blocked inside this AI preview window for security. \n\nTo use auto-download, please save this code as an .html file on your computer. Alternatively, you can use the Print Dialog right now and choose 'Save as PDF'.", true);
-                } else {
-                    showModal("PDF library failed to load. Use the Print Dialog to save as PDF instead.", true);
-                }
-            }
+            // Auto open the print window since native print avoids all formatting issues
+            showModal("For perfect HD quality and correct Arabic text, please select 'Save as PDF' in the Print window.", true);
         }
     </script>
 </body>
