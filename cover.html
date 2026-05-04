@@ -355,17 +355,14 @@
             <div class="flex items-center gap-3 mb-4">
                 <div class="bg-blue-100 p-2 rounded-full text-blue-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-gray-800">Save as PDF</h3>
+                <h3 class="text-xl font-bold text-gray-800">Notice</h3>
             </div>
-            <p class="text-gray-600 mb-6" id="modal-message">For perfect HD quality and correct Arabic text, please select <strong>'Save as PDF'</strong> in the Print window.</p>
+            <p class="text-gray-600 mb-6" id="modal-message"></p>
             <div class="flex justify-end gap-3">
-                <button id="modal-secondary-btn" onclick="closeModal(false)" class="hidden bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg transition duration-200">
-                    Cancel
-                </button>
-                <button id="modal-primary-btn" onclick="closeModal(true)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200">
+                <button onclick="closeModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200">
                     OK
                 </button>
             </div>
@@ -727,31 +724,15 @@
             }
         });
 
-        function showModal(message, isPrintPrompt = false) {
+        function showModal(message) {
             document.getElementById('modal-message').textContent = message;
             const modal = document.getElementById('custom-modal');
-            const primaryBtn = document.getElementById('modal-primary-btn');
-            const secondaryBtn = document.getElementById('modal-secondary-btn');
-            
-            if(isPrintPrompt) {
-                modal.setAttribute('data-action', 'print');
-                primaryBtn.textContent = "Open Print Dialog";
-                secondaryBtn.classList.remove('hidden');
-            } else {
-                modal.removeAttribute('data-action');
-                primaryBtn.textContent = "OK";
-                secondaryBtn.classList.add('hidden');
-            }
-            
             modal.classList.remove('hidden');
         }
 
-        function closeModal(executeAction) {
+        function closeModal() {
             const modal = document.getElementById('custom-modal');
             modal.classList.add('hidden');
-            if (executeAction && modal.getAttribute('data-action') === 'print') {
-                window.print();
-            }
         }
 
         function updatePreview() {
@@ -821,9 +802,56 @@
                 form.reportValidity();
                 return;
             }
+
+            const element = document.getElementById('cover-page-preview');
+            const downloadBtn = document.querySelector('button[type="button"]');
             
-            // Auto open the print window since native print avoids all formatting issues
-            showModal("For perfect HD quality and correct Arabic text, please select 'Save as PDF' in the Print window.", true);
+            if(!element || !downloadBtn) return;
+            
+            const originalBtnHtml = downloadBtn.innerHTML;
+            
+            downloadBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Generating PDF...
+            `;
+            downloadBtn.disabled = true;
+
+            const rollValue = inputs.classRoll ? inputs.classRoll.value : 'Roll';
+            const nameValue = inputs.name ? inputs.name.value.replace(/\s+/g, '_') : 'Name';
+
+            const opt = {
+                margin:       0,
+                filename:     `Cover_Page_${rollValue}_${nameValue}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: 'avoid-all' }
+            };
+
+            const isIframe = window !== window.parent;
+
+            if (window.html2pdf && !isIframe) {
+                html2pdf().set(opt).from(element).save().then(() => {
+                    downloadBtn.innerHTML = originalBtnHtml;
+                    downloadBtn.disabled = false;
+                }).catch(err => {
+                    console.error("PDF Error: ", err);
+                    downloadBtn.innerHTML = originalBtnHtml;
+                    downloadBtn.disabled = false;
+                    showModal("Something went wrong with PDF generation. Please try again.");
+                });
+            } else {
+                downloadBtn.innerHTML = originalBtnHtml;
+                downloadBtn.disabled = false;
+                if (isIframe) {
+                    showModal("Auto-download is blocked inside this AI preview window for security.\n\nPlease save this code as an .html file on your computer and open it directly in your browser to download.");
+                } else {
+                    showModal("PDF library failed to load. Please check your internet connection.");
+                }
+            }
         }
     </script>
 </body>
