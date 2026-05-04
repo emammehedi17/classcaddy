@@ -6,6 +6,9 @@
     <title>Assignment Cover Page Generator</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html-to-image and jsPDF for perfect native Arabic rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Google Fonts for Academic Look & Bangla Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Amiri:wght@400;700;900&family=Playfair+Display:ital,wght@1,700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     
@@ -104,48 +107,6 @@
             border-style: var(--title-border-style);
         }
 
-        /* Perfect Native PDF Print Setup */
-        @media print {
-            @page {
-                size: A4 portrait;
-                margin: 0; 
-            }
-            html, body {
-                width: 210mm !important;
-                height: 297mm !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                background-color: white !important;
-                overflow: hidden !important;
-            }
-            /* Hide UI Elements */
-            header, #app-container > div:first-child, #custom-modal {
-                display: none !important;
-            }
-            #preview-container {
-                width: 210mm !important;
-                height: 297mm !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                border: none !important;
-                background: white !important;
-                box-shadow: none !important;
-            }
-            .a4-paper {
-                width: 210mm !important;
-                height: 297mm !important;
-                max-height: 297mm !important;
-                margin: 0 !important;
-                padding: 12mm !important;
-                box-shadow: none !important;
-                border: none !important;
-                page-break-inside: avoid !important;
-                page-break-after: avoid !important;
-                page-break-before: avoid !important;
-                overflow: hidden !important;
-                transform: none !important;
-            }
-        }
     </style>
 </head>
 <body class="text-gray-800 antialiased min-h-screen">
@@ -279,7 +240,6 @@
                                 <div class="theme-title-border py-6 w-full text-center">
                                     
                                     <div class="text-2xl font-bold mb-3">
-                                        <!-- Removed letter-spacing classes to prevent Arabic breakage -->
                                         <span class="block text-2xl font-bold title-lang-adaptive" data-i18n="assignmentOn">Assignment on the Translation of</span>
                                     </div>
                                     
@@ -821,37 +781,46 @@
 
             const rollValue = inputs.classRoll ? inputs.classRoll.value : 'Roll';
             const nameValue = inputs.name ? inputs.name.value.replace(/\s+/g, '_') : 'Name';
+            const filename = `Cover_Page_${rollValue}_${nameValue}.pdf`;
 
-            const opt = {
-                margin:       0,
-                filename:     `Cover_Page_${rollValue}_${nameValue}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false, scrollY: 0 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: 'avoid-all' }
-            };
+            // Temporarily remove styling that might interfere with rendering
+            const originalShadow = element.style.boxShadow;
+            const originalTransform = element.style.transform;
+            element.style.boxShadow = 'none';
+            element.style.transform = 'none';
 
-            const isIframe = window !== window.parent;
-
-            if (window.html2pdf && !isIframe) {
-                html2pdf().set(opt).from(element).save().then(() => {
-                    downloadBtn.innerHTML = originalBtnHtml;
-                    downloadBtn.disabled = false;
-                }).catch(err => {
-                    console.error("PDF Error: ", err);
-                    downloadBtn.innerHTML = originalBtnHtml;
-                    downloadBtn.disabled = false;
-                    showModal("Something went wrong with PDF generation. Please try again.");
-                });
-            } else {
+            // Use html-to-image to generate a high quality PNG natively from the DOM
+            htmlToImage.toPng(element, { 
+                pixelRatio: 2, 
+                backgroundColor: '#ffffff'
+            })
+            .then(function (dataUrl) {
+                // Restore styling
+                element.style.boxShadow = originalShadow;
+                element.style.transform = originalTransform;
+                
+                // Use jsPDF to place the image into an A4 document
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                
+                pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save(filename);
+                
                 downloadBtn.innerHTML = originalBtnHtml;
                 downloadBtn.disabled = false;
-                if (isIframe) {
-                    showModal("Auto-download is blocked inside this AI preview window for security.\n\nPlease save this code as an .html file on your computer and open it directly in your browser to download.");
-                } else {
-                    showModal("PDF library failed to load. Please check your internet connection.");
-                }
-            }
+            })
+            .catch(function (error) {
+                console.error("PDF Error: ", error);
+                // Restore styling
+                element.style.boxShadow = originalShadow;
+                element.style.transform = originalTransform;
+                
+                downloadBtn.innerHTML = originalBtnHtml;
+                downloadBtn.disabled = false;
+                showModal("Something went wrong with PDF generation. Please try again.");
+            });
         }
     </script>
 </body>
