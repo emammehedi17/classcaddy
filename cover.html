@@ -8,8 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- html2pdf.js for saving the cover page as PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- Google Fonts for Academic Look -->
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Amiri:wght@400;700&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <!-- Google Fonts for Academic Look & Bangla Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Amiri:wght@400;700;900&family=Playfair+Display:ital,wght@1,700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         body {
@@ -67,6 +67,35 @@
             transition: all 0.4s ease;
         }
 
+        /* Enforce Bangla Fonts when language is Bengali */
+        #cover-page-preview[lang="bn"] {
+            font-family: 'Kalpurush', 'Hind Siliguri', 'Sutonny MJ', sans-serif !important;
+        }
+
+        /* Enforce specific Arabic sizes when RTL */
+        #cover-page-preview[dir="rtl"] .title-lang-adaptive {
+            font-size: 2.25rem; /* Enlarged title for Arabic */
+            line-height: 3rem;
+            font-family: 'Amiri', serif;
+        }
+
+        /* RTL support for layout mirroring and right alignment */
+        [dir="rtl"] .rtl-flip {
+            flex-direction: row-reverse;
+        }
+        [dir="rtl"] .rtl-flip-pr {
+            padding-right: 0;
+            padding-left: 2rem;
+        }
+        [dir="rtl"] .rtl-flip-pl {
+            padding-left: 0;
+            padding-right: 2rem;
+        }
+        /* Ensure specific elements align right in Arabic */
+        #cover-page-preview[dir="rtl"] .text-left {
+            text-align: right !important;
+        }
+
         .theme-outer-border {
             border-color: var(--primary-color);
             border-width: var(--border-outer-width);
@@ -87,20 +116,6 @@
             border-color: var(--primary-color);
             border-style: var(--title-border-style);
             transition: all 0.4s ease;
-        }
-
-        /* RTL support for layout mirroring */
-        [dir="rtl"] .rtl-flip {
-            flex-direction: row-reverse;
-            text-align: right;
-        }
-        [dir="rtl"] .rtl-flip-pr {
-            padding-right: 0;
-            padding-left: 2rem;
-        }
-        [dir="rtl"] .rtl-flip-pl {
-            padding-left: 0;
-            padding-right: 2rem;
         }
 
         /* High-quality native print fallback */
@@ -249,21 +264,21 @@
             <div class="w-full lg:w-2/3 overflow-x-auto bg-gray-200 rounded-xl p-4 flex justify-center items-start border border-gray-300" id="preview-container">
                 
                 <!-- Actual A4 Paper DOM -->
-                <div id="cover-page-preview" class="a4-paper bg-white p-[12mm]" dir="ltr">
+                <div id="cover-page-preview" class="a4-paper bg-white p-[12mm]" dir="ltr" lang="en">
                     <!-- Outer & Inner Academic Style Border -->
                     <div class="theme-outer-border h-full w-full p-1 box-border">
                         <div class="theme-inner-border h-full w-full flex flex-col relative px-10 py-12 box-border">
                             
                             <!-- Header / Bismillah -->
-                            <div class="text-center w-full">
+                            <div class="text-center w-full shrink-0">
                                 <span class="font-arabic text-4xl leading-normal" data-i18n="bismillah" style="color: var(--text-color);">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span>
                             </div>
 
-                            <!-- Title Area perfectly centered vertically -->
-                            <div class="my-auto w-full text-center flex flex-col items-center justify-center">
+                            <!-- Title Area perfectly centered and pushed slightly down -->
+                            <div class="flex-grow w-full flex flex-col items-center justify-center pt-10">
                                 <div class="theme-title-border py-6 w-full flex flex-col items-center justify-center gap-4">
                                     <h2 class="text-2xl font-bold flex flex-col items-center justify-center gap-3 w-full">
-                                        <span class="block text-2xl font-bold uppercase tracking-wide" data-i18n="assignmentOn">Assignment on Translation of</span>
+                                        <span class="block text-2xl font-bold uppercase tracking-wide title-lang-adaptive" data-i18n="assignmentOn">Assignment on Translation of</span>
                                         <span id="preview-book" class="font-arabic text-3xl font-bold min-h-[40px] inline-block mt-2" style="color: var(--text-color);"></span>
                                     </h2>
                                     <p class="text-lg font-semibold mt-2"><span data-i18n="coverPages">Pages:</span> <span id="preview-pages" class="border-b border-dashed min-w-[50px] inline-block px-2 text-center" style="border-color: var(--text-color);"></span></p>
@@ -280,9 +295,9 @@
                             </div>
 
                             <!-- Bottom Sections -->
-                            <div>
+                            <div class="shrink-0 w-full mt-4">
                                 <!-- Submitted Details -->
-                                <div class="flex justify-between w-full mt-4 text-[17px] leading-relaxed rtl-flip">
+                                <div class="flex justify-between w-full text-[17px] leading-relaxed rtl-flip">
                                     <!-- Submitted To -->
                                     <div class="w-1/2 pr-4 text-left rtl-flip-pr" id="submitted-to-box">
                                         <p class="mb-1 font-semibold" data-i18n="subTo">Submitted to:</p>
@@ -388,7 +403,7 @@
             },
             bn: {
                 appTitle: "কভার পেজ জেনারেটর - তৈরি করেছেন",
-                headerSub: "আরবি বিভাগ",
+                headerSub: "আরবী বিভাগ",
                 langLabel: "ভাষা:",
                 enterDetails: "অ্যাসাইনমেন্টের তথ্য দিন",
                 styleLabel: "কভার স্টাইল নির্বাচন করুন",
@@ -409,16 +424,16 @@
                 bismillah: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
                 assignmentOn: "অনুবাদ অ্যাসাইনমেন্ট:",
                 coverPages: "পৃষ্ঠা:",
-                subTo: "যার কাছে জমা দেওয়া হচ্ছে:",
+                subTo: "জমা গ্রহণকারী:",
                 profName: "ড. আবু জামাল মো. কুতুবুল ইসলাম নোমানী",
                 profTitle: "অধ্যাপক,",
-                profDept: "আরবি বিভাগ,",
+                profDept: "আরবী বিভাগ,",
                 profUni: "ঢাকা বিশ্ববিদ্যালয়।",
-                subBy: "যে জমা দিচ্ছে:",
+                subBy: "জমা প্রদানকারী:",
                 cRoll: "ক্লাস রোল:",
                 eRoll: "পরীক্ষার রোল:",
                 dateSub: "জমা দেওয়ার তারিখ:",
-                footerTxt: "আরবি বিভাগ, ঢাকা বিশ্ববিদ্যালয়"
+                footerTxt: "আরবী বিভাগ, ঢাকা বিশ্ববিদ্যালয়"
             },
             ar: {
                 appTitle: "منشئ صفحة الغلاف بواسطة",
@@ -456,6 +471,11 @@
             }
         };
 
+        function convertToBanglaNumber(str) {
+            const banglaDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
+            return String(str).replace(/[0-9]/g, w => banglaDigits[w]);
+        }
+
         function changeLanguage(lang) {
             // Apply text translations
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -473,9 +493,11 @@
                 }
             });
 
-            // Apply direction for Arabic
+            // Apply direction and fonts
             const coverPreview = document.getElementById('cover-page-preview');
             const formContainer = document.getElementById('cover-form');
+            coverPreview.setAttribute('lang', lang);
+            
             if (lang === 'ar') {
                 coverPreview.setAttribute('dir', 'rtl');
                 formContainer.setAttribute('dir', 'rtl');
@@ -590,24 +612,39 @@
         }
 
         function updatePreview() {
-            // Defaults based on current language
-            const lang = document.getElementById('cover-page-preview').getAttribute('dir') === 'rtl' ? 'ar' : 
-                         (document.querySelector('[data-i18n="l_name"]').textContent.includes('নাম') ? 'bn' : 'en');
+            // Determine active language
+            const coverPreview = document.getElementById('cover-page-preview');
+            const lang = coverPreview.getAttribute('lang') || 'en';
             
             const defName = lang === 'bn' ? '[আপনার নাম]' : (lang === 'ar' ? '[اسمك]' : '[Your Name]');
             const defDate = translations[lang]['p_date'];
 
-            previews.name.textContent = inputs.name.value || defName;
-            previews.classRoll.textContent = inputs.classRoll.value || '____';
-            previews.examRoll.textContent = inputs.examRoll.value || '______';
+            // Get Input Values
+            let pName = inputs.name.value || defName;
+            let pClassRoll = inputs.classRoll.value || '____';
+            let pExamRoll = inputs.examRoll.value || '______';
+            let pPageNums = inputs.pageNumbers.value || '________';
+            let pDate = inputs.submissionDate.value || defDate;
+
+            // Convert numbers to Bengali digits if language is Bengali
+            if (lang === 'bn') {
+                pClassRoll = convertToBanglaNumber(pClassRoll);
+                pExamRoll = convertToBanglaNumber(pExamRoll);
+                pPageNums = convertToBanglaNumber(pPageNums);
+                pDate = convertToBanglaNumber(pDate);
+            }
+
+            previews.name.textContent = pName;
+            previews.classRoll.textContent = pClassRoll;
+            previews.examRoll.textContent = pExamRoll;
             previews.bookName.textContent = inputs.bookName.value || '';
             
             if(!inputs.bookName.value) {
                 previews.bookName.innerHTML = "&nbsp;";
             }
 
-            previews.pageNumbers.textContent = inputs.pageNumbers.value || '________';
-            previews.submissionDate.textContent = inputs.submissionDate.value || defDate;
+            previews.pageNumbers.textContent = pPageNums;
+            previews.submissionDate.textContent = pDate;
         }
 
         Object.values(inputs).forEach(input => {
