@@ -19,6 +19,9 @@
         
         .font-arabic {
             font-family: 'Amiri', serif;
+            /* Force normal letter spacing so Arabic ligatures do not break */
+            letter-spacing: normal !important;
+            text-rendering: optimizeLegibility;
         }
 
         .name-design {
@@ -118,27 +121,38 @@
             transition: all 0.4s ease;
         }
 
-        /* High-quality native print fallback */
+        /* High-quality native print fallback with fixes for blank page */
         @media print {
-            body {
+            html, body {
+                width: 210mm;
+                height: 297mm;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
                 background: white;
             }
             #app-container > div:first-child, header {
-                display: none;
+                display: none !important;
             }
             #preview-container {
                 padding: 0 !important;
                 margin: 0 !important;
                 border: none !important;
                 background: white !important;
+                width: 210mm;
+                height: 297mm;
             }
             .a4-paper {
                 box-shadow: none !important;
                 border: none !important;
                 margin: 0 !important;
-                width: 210mm;
-                height: 297mm;
+                padding: 12mm !important;
+                width: 210mm !important;
+                height: 296mm !important; /* Slightly reduced to prevent spilling to 2nd page */
+                max-height: 296mm !important;
                 page-break-after: avoid;
+                page-break-inside: avoid;
+                overflow: hidden !important;
             }
             @page {
                 size: A4 portrait;
@@ -274,14 +288,22 @@
                             </div>
 
                             <!-- Title Area pushed further down using padding-top (pt-28) -->
+                            <!-- Replaced flex-col on the title wrappers to avoid html2canvas RTL separation bug -->
                             <div class="flex-grow w-full flex flex-col items-center justify-center pt-28">
-                                <div class="theme-title-border py-6 w-full flex flex-col items-center justify-center gap-4">
-                                    <h2 class="text-2xl font-bold flex flex-col items-center justify-center gap-3 w-full">
-                                        <!-- Removed 'uppercase' class to respect capitalization rules -->
+                                <div class="theme-title-border py-6 w-full text-center">
+                                    
+                                    <div class="text-2xl font-bold mb-3">
                                         <span class="block text-2xl font-bold tracking-wide title-lang-adaptive" data-i18n="assignmentOn">Assignment on the Translation of</span>
-                                        <span id="preview-book" class="font-arabic text-3xl font-bold min-h-[40px] inline-block mt-2" style="color: var(--text-color);"></span>
-                                    </h2>
-                                    <p class="text-lg font-semibold mt-2"><span data-i18n="coverPages">Pages:</span> <span id="preview-pages" class="border-b border-dashed min-w-[50px] inline-block px-2 text-center" style="border-color: var(--text-color);"></span></p>
+                                    </div>
+                                    
+                                    <!-- Explicit block container with RTL direction to fix canvas Arabic rendering -->
+                                    <div dir="rtl" class="w-full text-center mb-4">
+                                        <span id="preview-book" class="font-arabic text-3xl font-bold inline-block" style="color: var(--text-color); direction: rtl; unicode-bidi: isolate;"></span>
+                                    </div>
+                                    
+                                    <div class="text-lg font-semibold mt-2">
+                                        <span data-i18n="coverPages">Pages:</span> <span id="preview-pages" class="border-b border-dashed min-w-[50px] inline-block px-2 text-center" style="border-color: var(--text-color);"></span>
+                                    </div>
                                 </div>
 
                                 <!-- Small Decorative Design -->
