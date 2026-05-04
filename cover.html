@@ -694,17 +694,27 @@
         };
 
         // Handle auto-filling fields when roll number is inputted
+        let wasAutoFilled = false; // Track if fields were auto-filled by database
+
         if(inputs.classRoll) {
             inputs.classRoll.addEventListener('input', (e) => {
                 const roll = e.target.value.trim();
-                if (roll.length === 4) {
-                    const student = studentDatabase[roll];
-                    if (student) {
-                        inputs.name.value = student.name;
-                        inputs.bookName.value = student.book;
-                        inputs.pageNumbers.value = student.pages;
-                        updatePreview(); // immediately reflect on preview
-                    }
+                const student = roll.length === 4 ? studentDatabase[roll] : null;
+                
+                if (student) {
+                    inputs.name.value = student.name;
+                    inputs.bookName.value = student.book;
+                    inputs.pageNumbers.value = student.pages;
+                    wasAutoFilled = true; // Mark as auto-filled
+                    updatePreview(); // immediately reflect on preview
+                } else if (wasAutoFilled) {
+                    // Only clear fields if they were previously auto-filled, 
+                    // so we don't destroy manual input by mistake.
+                    inputs.name.value = "";
+                    inputs.bookName.value = "";
+                    inputs.pageNumbers.value = "";
+                    wasAutoFilled = false;
+                    updatePreview();
                 }
             });
         }
