@@ -13,6 +13,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Amiri:wght@400;700;900&family=Playfair+Display:ital,wght@1,700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
+        /* Import Kalpurush explicitly for Bangla Numbers */
+        @font-face {
+            font-family: 'Kalpurush';
+            src: url('https://fonts.gstatic.com/ea/kalpurush/v1/kalpurush-regular.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         body {
             background-color: #f3f4f6;
             transition: all 0.3s ease;
@@ -74,6 +82,11 @@
             font-family: 'Kalpurush', 'Hind Siliguri', 'Sutonny MJ', sans-serif !important;
         }
 
+        /* Force Kalpurush font specifically for Bangla numbers */
+        #cover-page-preview[lang="bn"] .bn-number {
+            font-family: 'Kalpurush', sans-serif !important;
+        }
+
         /* Enforce specific Arabic sizes when RTL */
         #cover-page-preview[dir="rtl"] .title-lang-adaptive {
             font-size: 2.25rem; 
@@ -107,6 +120,48 @@
             border-style: var(--title-border-style);
         }
 
+        /* Perfect Native PDF Print Setup */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0; 
+            }
+            html, body {
+                width: 210mm !important;
+                height: 297mm !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: white !important;
+                overflow: hidden !important;
+            }
+            /* Hide UI Elements */
+            header, #app-container > div:first-child, #custom-modal {
+                display: none !important;
+            }
+            #preview-container {
+                width: 210mm !important;
+                height: 297mm !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                border: none !important;
+                background: white !important;
+                box-shadow: none !important;
+            }
+            .a4-paper {
+                width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                margin: 0 !important;
+                padding: 12mm !important;
+                box-shadow: none !important;
+                border: none !important;
+                page-break-inside: avoid !important;
+                page-break-after: avoid !important;
+                page-break-before: avoid !important;
+                overflow: hidden !important;
+                transform: none !important;
+            }
+        }
     </style>
 </head>
 <body class="text-gray-800 antialiased min-h-screen">
@@ -202,7 +257,7 @@
                         <!-- 6. Date of submission -->
                         <div>
                             <label for="submissionDate" class="block text-sm font-semibold text-gray-700 mb-1 truncate"><span data-i18n="l_date">6. Date of submission</span></label>
-                            <input type="text" id="submissionDate" placeholder="dd/mm/yyyy" data-i18n-placeholder="p_date"
+                            <input type="text" id="submissionDate" data-i18n-placeholder="p_date"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm">
                         </div>
 
@@ -248,7 +303,7 @@
                                     </div>
                                     
                                     <div class="text-lg font-semibold mt-2">
-                                        <span data-i18n="coverPages">Pages:</span> <span id="preview-pages" class="border-b border-dashed min-w-[50px] inline-block px-2 text-center" style="border-color: var(--text-color);"></span>
+                                        <span data-i18n="coverPages">Pages:</span> <span id="preview-pages" class="border-b border-dashed min-w-[50px] inline-block px-2 text-center bn-number" style="border-color: var(--text-color);"></span>
                                     </div>
                                 </div>
 
@@ -279,14 +334,14 @@
                                     <div class="w-1/2 pl-8 text-left rtl-flip-pl border-l border-transparent" id="submitted-by-box" style="border-left-color: rgba(0,0,0,0.1);">
                                         <p class="mb-1 font-semibold" data-i18n="subBy">Submitted by:</p>
                                         <p class="font-bold min-h-[28px]" id="preview-name"></p>
-                                        <p><span data-i18n="cRoll">Class Roll:</span> <span id="preview-class-roll" class="font-bold"></span></p>
-                                        <p><span data-i18n="eRoll">Exam Roll:</span> <span id="preview-exam-roll" class="font-bold"></span></p>
+                                        <p><span data-i18n="cRoll">Class Roll:</span> <span id="preview-class-roll" class="font-bold bn-number"></span></p>
+                                        <p><span data-i18n="eRoll">Exam Roll:</span> <span id="preview-exam-roll" class="font-bold bn-number"></span></p>
                                     </div>
                                 </div>
 
                                 <!-- Bottom Section (Date) -->
                                 <div class="w-full text-center mt-12 mb-4">
-                                    <p class="text-lg font-semibold"><span data-i18n="dateSub">Date of Submission:</span> <span id="preview-date">dd/mm/yyyy</span></p>
+                                    <p class="text-lg font-semibold"><span data-i18n="dateSub">Date of Submission:</span> <span id="preview-date" class="bn-number"></span></p>
                                 </div>
 
                                 <!-- Footer Image / Fallback -->
@@ -703,7 +758,8 @@
             const lang = coverPreview.getAttribute('lang') || 'en';
             
             const defName = lang === 'bn' ? '[আপনার নাম]' : (lang === 'ar' ? '[اسمك]' : '[Your Name]');
-            const defDate = translations[lang]['p_date'];
+            // Removed default date, will be left empty if no user input
+            const defDate = "";
 
             // Safely get input values
             let pName = inputs.name ? inputs.name.value || defName : defName;
