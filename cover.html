@@ -476,6 +476,11 @@
             return String(str).replace(/[0-9]/g, w => banglaDigits[w]);
         }
 
+        function convertToArabicNumber(str) {
+            const arabicDigits = {'0': '٠', '1': '١', '2': '٢', '3': '٣', '4': '٤', '5': '٥', '6': '٦', '7': '٧', '8': '٨', '9': '٩'};
+            return String(str).replace(/[0-9]/g, w => arabicDigits[w]);
+        }
+
         function changeLanguage(lang) {
             // Apply text translations
             document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -770,6 +775,13 @@
                 pExamRoll = convertToBanglaNumber(pExamRoll);
                 pPageNums = convertToBanglaNumber(pPageNums);
                 pDate = convertToBanglaNumber(pDate);
+            } 
+            // Convert numbers to Arabic digits if language is Arabic
+            else if (lang === 'ar') {
+                pClassRoll = convertToArabicNumber(pClassRoll);
+                pExamRoll = convertToArabicNumber(pExamRoll);
+                pPageNums = convertToArabicNumber(pPageNums);
+                pDate = convertToArabicNumber(pDate);
             }
 
             if(previews.name) previews.name.textContent = pName;
