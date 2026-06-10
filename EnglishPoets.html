@@ -182,8 +182,15 @@
             { name: "Francis Bacon", life: "1561 - 1626", era: "Renaissance/Jacobean", years: "1558-1625", works: "Of Studies, Of Truth, Of Marriage and Single Life, Novum Organum, The New Atlantis", file: "EnglishPoets/francis_bacon_note.html", img: "https://upload.wikimedia.org/wikipedia/commons/1/11/Francis_Bacon%2C_Viscount_St_Alban_from_NPG_%282%29.jpg" }
         ];
 
-        // Sort authors alphabetically
-        authorsData.sort((a, b) => a.name.localeCompare(b.name));
+        // Sort authors chronologically by birth year
+        authorsData.sort((a, b) => {
+            const birthYearA = parseInt(a.life.match(/\d{4}/)[0]);
+            const birthYearB = parseInt(b.life.match(/\d{4}/)[0]);
+            if (birthYearA === birthYearB) {
+                return a.name.localeCompare(b.name);
+            }
+            return birthYearA - birthYearB;
+        });
 
         const grid = document.getElementById('author-grid');
         const countSpan = document.getElementById('count');
