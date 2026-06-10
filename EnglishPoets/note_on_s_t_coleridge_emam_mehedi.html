@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on S.T. Coleridge - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme: Midnight Ocean & Mystic Violet */
+        :root {
+            --primary-color: #1E1B4B; /* Indigo 950 / Midnight Blue */
+            --secondary-color: #7E22CE; /* Purple 600 / Mystic Violet */
+            --accent-color: #F3E8FF; /* Purple 50 */
+            --bg-color: #FAFAFA; 
+            --card-bg: #FFFFFF;
+            --text-main: #000000; 
+            --border-color: #D8B4FE; /* Purple 300 */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-color);
+            color: var(--text-main); line-height: 1.6;
+            background-image: linear-gradient(135deg, #EEF2FF 0%, #FAF5FF 100%);
+        }
+
+        .eng-text { font-family: 'Times New Roman', Times, serif; font-size: 1.1em; }
+        .bn-number { font-family: 'Kalpurush', 'Times New Roman', serif; font-size: 1.05em; font-weight: 500; }
+
+        .theme-header {
+            background: linear-gradient(135deg, var(--primary-color), #312E81, #4C1D95);
+            color: white; border-bottom: 6px solid var(--secondary-color);
+            position: relative; box-shadow: 0 4px 20px rgba(30, 27, 75, 0.3);
+        }
+
+        .section-heading {
+            color: var(--primary-color); border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px; margin-bottom: 1.5rem; font-weight: 700;
+            display: inline-block; position: relative; text-transform: uppercase;
+        }
+        
+        .section-heading::after {
+            content: '🌊'; position: absolute; bottom: -15px; right: -35px;
+            color: var(--secondary-color); font-size: 1.5rem;
+        }
+
+        .content-card {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem; transition: all 0.3s ease; border-top: 3px solid transparent;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(126, 34, 206, 0.15); border-top: 3px solid var(--secondary-color);
+        }
+
+        .masterpiece-card {
+            background-color: #F5F3FF; border: 1px solid #C4B5FD; border-left: 5px solid var(--secondary-color);
+        }
+
+        .quote-container {
+            border-left: 5px solid var(--secondary-color); background: #EEF2FF;
+            padding: 15px 20px; border-radius: 0 10px 10px 0; margin-bottom: 1.2rem;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.04); border: 1px solid #E0E7FF;
+        }
+
+        .terminology {
+            background-color: #E0E7FF; padding: 0 5px; border-radius: 4px;
+            font-weight: 500; color: #000000; border: 1px dashed #7E22CE; font-size: 0.95em;
+        }
+
+        .qr-corner { position: absolute; bottom: 15px; right: 15px; width: 65px; height: 65px; background: white; padding: 4px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;}
+        .qr-corner img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+        .master-footer { background: #ffffff; border-top: 5px solid var(--primary-color); padding: 30px 20px; text-align: center; position: relative; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-indigo-200">
+        
+        <header class="theme-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">এস. টি. কোলরিজ (<span class="eng-text">S.T. Coleridge</span>)</h1>
+            <p class="text-xl text-[#D8B4FE] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1772 - 1834</span></p>
+            
+            <p class="text-lg mb-6 text-indigo-50 text-justify">
+                স্যামুয়েল টেলর কোলরিজ ছিলেন ওয়ার্ডসওয়ার্থের ঘনিষ্ঠ বন্ধু এবং রোমান্টিক যুগের আরেকজন প্রতিষ্ঠাতা। যেখানে ওয়ার্ডসওয়ার্থ প্রকৃতিকে নিয়ে লিখতেন, সেখানে কোলরিজ সাধারণ ঘটনার মাঝে অতিপ্রাকৃত (<span class="eng-text font-bold text-[#D8B4FE]">Supernatural</span>) বা অলৌকিক বিষয়বস্তুকে কবিতায় ফুটিয়ে তুলতে অত্যন্ত পারদর্শী ছিলেন।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="QR Code" onerror="this.src='https://placehold.co/65x65/1E1B4B/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <main class="p-6 md:p-10">
+            <!-- Section 1 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#1E1B4B]"><strong class="text-lg text-[#1E1B4B]">পুরো নাম:</strong> <span class="eng-text">Samuel Taylor Coleridge</span>।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#1E1B4B]"><strong class="text-lg text-[#1E1B4B]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The Romantic Period</span>।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#7E22CE] bg-[#F5F3FF]">
+                        <strong class="text-lg text-[#7E22CE]">আফিম আসক্তি:</strong> তিনি <span class="eng-text font-bold">Opium Eater</span> (আফিমখোর) ছিলেন। শারীরিক অসুস্থতার কারণে তিনি আফিম সেবন শুরু করেন এবং পরে এর প্রতি চরম আসক্ত হয়ে পড়েন।
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#1E1B4B] bg-indigo-50">
+                        <strong class="text-lg text-[#1E1B4B]">সাহিত্যিক তত্ত্ব:</strong> তিনি <span class="eng-text font-bold text-[#7E22CE]">'Willing suspension of disbelief'</span> (<span class="terminology">অবিশ্বাসকে স্বেচ্ছায় স্থগিত রাখা</span>) তত্ত্বের প্রবর্তক, যা পাঠকদের অলৌকিক গল্প উপভোগ করতে সাহায্য করে।
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="content-card bg-white border-t-4 border-t-[#1E1B4B] text-black">
+                    <ul class="space-y-3 text-lg">
+                        <li><strong class="eng-text text-[#1E1B4B]">Poet of Supernaturalism:</strong> অতিপ্রাকৃত বা অলৌকিকতার কবি।</li>
+                        <li><strong class="eng-text text-[#1E1B4B]">Opium Eater:</strong> আফিম সেবনকারী।</li>
+                        <li><strong class="eng-text text-[#1E1B4B]">Lake Poet:</strong> লেক পয়েট। <span class="text-sm bg-purple-50 p-1 rounded inline-block mt-1">(ওয়ার্ডসওয়ার্থের সাথে তিনিও লেক ডিস্ট্রিক্টে থাকতেন)।</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                
+                <div class="space-y-6">
+                    <!-- Masterpiece -->
+                    <div class="content-card masterpiece-card relative overflow-hidden shadow-md">
+                        <div class="absolute top-0 right-0 bg-[#E0E7FF] text-[#7E22CE] px-4 py-1 rounded-bl-xl font-bold border-l border-b border-[#A5B4FC]">Masterpiece</div>
+                        <h3 class="text-2xl font-bold text-[#1E1B4B] mb-3">ক. বিখ্যাত কবিতাসমূহ ***</h3>
+                        
+                        <ul class="list-none space-y-4 text-black">
+                            <li class="bg-white p-3 rounded border border-purple-200">
+                                <strong class="eng-text font-bold text-xl text-[#7E22CE]">The Rime of the Ancient Mariner:</strong> এটি তাঁর সর্বশ্রেষ্ঠ কবিতা (<span class="eng-text">Ballad</span>)। এক বৃদ্ধ নাবিকের গল্প যে কারণ ছাড়াই একটি অ্যালবাট্রস (<span class="eng-text font-bold text-[#7E22CE]">Albatross</span>) পাখিকে হত্যা করে এবং এর ফলে জাহাজে চরম অভিশাপ নেমে আসে।
+                            </li>
+                            <li class="bg-white p-3 rounded border border-purple-200">
+                                <strong class="eng-text font-bold text-xl text-[#7E22CE]">Kubla Khan:</strong> এটি একটি স্বপ্নদৃশ্য বা <span class="eng-text font-bold">Dream Fragment</span>। আফিম খেয়ে ঘুমের ঘোরে দেখা স্বপ্নের ভিত্তিতে তিনি এটি রচনা করেছিলেন।
+                            </li>
+                            <li class="bg-white p-3 rounded border border-purple-200">
+                                <strong class="eng-text font-bold text-xl text-[#7E22CE]">Lyrical Ballads (1798):</strong> ওয়ার্ডসওয়ার্থের সাথে লেখা এই যুগান্তকারী বইটিতে কোলরিজের <strong class="text-lg bn-number text-red-600">৪</strong>টি কবিতা ছিল।
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Other Works -->
+                    <div class="content-card border-t-4 border-t-[#1E1B4B]">
+                        <h3 class="text-xl font-bold text-[#1E1B4B] mb-3">খ. অন্যান্য রচনা</h3>
+                        <ul class="list-disc list-inside space-y-3 text-black">
+                            <li><strong class="eng-text font-bold text-[#7E22CE]">Christabel:</strong> একটি অসমাপ্ত অতিপ্রাকৃত কবিতা।</li>
+                            <li><strong class="eng-text font-bold text-[#7E22CE]">Dejection: An Ode:</strong> নিজের হতাশা ও কাব্যিক ক্ষমতা হারিয়ে ফেলার কষ্ট নিয়ে লেখা কবিতা।</li>
+                            <li class="list-none mt-2"><strong class="eng-text font-bold text-[#7E22CE] text-lg">Biographia Literaria:</strong> এটি তাঁর সর্বশ্রেষ্ঠ গদ্য ও সাহিত্য সমালোচনামূলক গ্রন্থ।</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>)</h2>
+                
+                <div class="grid grid-cols-1 gap-4 mt-4">
+                    <div class="quote-container border-l-[6px] border-l-[#7E22CE] bg-[#F5F3FF]">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#1E1B4B]">1. "Water, water, everywhere, / And all the boards did shrink; / Water, water, everywhere, / Nor any drop to drink."</p>
+                        <p class="text-black mb-1">(চারিদিকে শুধু জল আর জল, তবু পান করার মতো এক ফোঁটাও নেই)</p>
+                        <p class="text-sm text-black"><strong>উৎস:</strong> <span class="eng-text">The Rime of the Ancient Mariner</span>.</p>
+                    </div>
+                    <div class="quote-container border-l-[6px] border-l-[#7E22CE] bg-[#F5F3FF]">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#1E1B4B]">2. "He prayeth best, who loveth best / All things both great and small."</p>
+                        <p class="text-black mb-1">(সেই ব্যক্তিই সেরা প্রার্থনা করে, যে ঈশ্বরের সৃষ্টি ছোট-বড় সব কিছুকে ভালোবাসে)</p>
+                        <p class="text-sm text-black"><strong>উৎস:</strong> <span class="eng-text">The Rime of the Ancient Mariner</span>.</p>
+                    </div>
+                    <div class="quote-container !mb-0 border-l-[#1E1B4B] bg-indigo-50">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#1E1B4B]">3. "Alone, alone, all, all alone, / Alone on a wide wide sea!"</p>
+                        <p class="text-black text-sm">(একা, একা, একেবারেই একা, এক বিশাল বিস্তৃত সমুদ্রের মাঝে একা) - <span class="eng-text">The Rime of the Ancient Mariner</span>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5 -->
+            <section class="bg-gradient-to-br from-[#1E1B4B] to-[#312E81] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8 border-t-4 border-[#7E22CE]">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#4C1D95] pb-3">একনজরে মনে রাখার মতো তথ্য</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start"><span class="text-[#D8B4FE] mr-3 font-bold text-xl">🌊</span><p>তিনি <span class="eng-text font-bold">Poet of Supernaturalism</span> এবং <span class="eng-text font-bold">Opium Eater</span>।</p></div>
+                    <div class="flex items-start"><span class="text-[#D8B4FE] mr-3 font-bold text-xl">🌊</span><p><span class="eng-text font-bold">Lyrical Ballads</span>-এ তাঁর ৪টি কবিতা ছিল।</p></div>
+                    <div class="flex items-start"><span class="text-[#D8B4FE] mr-3 font-bold text-xl">🌊</span><p>বিখ্যাত উক্তি "<span class="eng-text font-bold">Water, water everywhere...</span>" The Rime of the Ancient Mariner থেকে নেওয়া।</p></div>
+                    <div class="flex items-start"><span class="text-[#D8B4FE] mr-3 font-bold text-xl">🌊</span><p>অ্যালবাট্রস (<span class="eng-text font-bold">Albatross</span>) পাখির কথা তাঁর কবিতায় আছে।</p></div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="QR Code" onerror="this.src='https://placehold.co/65x65/1E1B4B/FFF?text=QR'">
+            </a>
+        </footer>
+    </div>
+
+    <!-- Script for Bangla Numbers -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) { textNodes.push(n); }
+                }
+            }
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number'; span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>
