@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on O. Henry - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts: Hind Siliguri for Bangla -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme Configuration: Classic Vintage & Warm Amber */
+        :root {
+            --primary-color: #451A03; /* Deep Warm Brown / Dark Amber */
+            --secondary-color: #D97706; /* Amber / Golden Orange */
+            --accent-color: #FEF3C7; /* Light Amber / Warm Sand */
+            --bg-color: #FAFAF9; /* Warm Off-white */
+            --card-bg: #FFFFFF;
+            --text-main: #000000; /* STRICTLY FULL BLACK FOR NORMAL TEXT */
+            --border-color: #D6D3D1; /* Warm Gray */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* English Font Class */
+        .eng-text {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1em;
+        }
+
+        /* Bangla Numbers Font Class */
+        .bn-number {
+            font-family: 'Kalpurush', 'Times New Roman', serif;
+            font-size: 1.05em;
+            font-weight: 500;
+        }
+
+        /* Custom Styles for Design Elements */
+        .vintage-header {
+            background: linear-gradient(135deg, var(--primary-color), #78350F);
+            color: white;
+            border-bottom: 6px solid var(--secondary-color);
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .section-heading {
+            color: var(--primary-color);
+            border-left: 6px solid var(--secondary-color);
+            background: linear-gradient(to right, #FEF3C7, transparent);
+            padding: 8px 15px;
+            margin-bottom: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            font-weight: 700;
+            display: inline-block;
+            padding-right: 40px;
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem;
+            color: var(--text-main);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .content-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(217, 119, 6, 0.1);
+        }
+
+        /* Definition/Highlight Box */
+        .highlight-box {
+            background-color: #FFFBEB; /* Very light amber */
+            border: 2px dashed var(--secondary-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        /* Quotes Styling */
+        .quote-container {
+            border-left: 4px solid var(--primary-color);
+            background: var(--accent-color);
+            padding: 15px 20px;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 1.2rem;
+            position: relative;
+        }
+        
+        .quote-container::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            font-size: 4rem;
+            color: rgba(217, 119, 6, 0.2);
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+
+        /* Terminology Styling - Highlight without changing text color */
+        .terminology {
+            background-color: #FDE047; /* Soft yellow highlight */
+            padding: 0 5px;
+            border-radius: 4px;
+            font-weight: 500;
+            color: #000000; /* Keeping text strictly black */
+            border: 1px solid #FACC15;
+            font-size: 0.95em;
+        }
+
+        /* Badge and Footer Specifics */
+        .qr-corner {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 65px;
+            height: 65px;
+            background: white;
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+        .qr-corner:hover {
+            transform: scale(1.1);
+        }
+        .qr-corner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .master-footer {
+            background: #ffffff;
+            border-top: 5px solid var(--primary-color);
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden relative border border-gray-200">
+        
+        <!-- Header -->
+        <header class="vintage-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">ও. হেনরি (<span class="eng-text">O. Henry</span>)</h1>
+            <p class="text-xl text-[#FDE68A] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1862 - 1910</span></p>
+            
+            <p class="text-lg mb-6 text-white text-justify" style="color: #ffffff;">
+                ও. হেনরি (<span class="eng-text">O. Henry</span>) ছিলেন একজন বিখ্যাত আমেরিকান ছোটগল্পকার (<span class="eng-text">Short Story Writer</span>)। তার আসল নাম উইলিয়াম সিডনি পোর্টার (<span class="eng-text">William Sydney Porter</span>)। তিনি তার গল্পের শেষে চমকপ্রদ এবং অপ্রত্যাশিত সমাপ্তি বা "<span class="eng-text">Twist Ending</span>"-এর (<span class="terminology">গল্পের শেষে এমন ঘটনা ঘটা যা পাঠক একেবারেই আশা করেনি</span>) জন্য বিশ্বব্যাপী পরিচিত। সাধারণ মানুষের জীবন, তাদের ত্যাগ এবং ভালোবাসার অনন্য সব গল্প তিনি লিখে গেছেন। ব্যাংকে চাকরির সময় তহবিল তছরুপের দায়ে তাকে ৩ বছর জেল খাটতে হয়েছিল, এবং জেলে থাকাকালেই তিনি ছদ্মনামে লেখালেখি শুরু করেন।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <!-- Creator Badge -->
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                
+                <!-- Header QR Code -->
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" class="w-full h-full object-cover rounded" onerror="this.src='https://placehold.co/65x65/D97706/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="p-6 md:p-10">
+
+            <!-- Section 1: Biography -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#451A03]">
+                        <p><strong class="text-lg text-[#451A03]">আসল নাম:</strong> <span class="eng-text">William Sydney Porter</span> (উইলিয়াম সিডনি পোর্টার)।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#D97706]">
+                        <p><strong class="text-lg text-[#D97706]">ছদ্মনাম (<span class="eng-text">Pen-name</span>):</strong> <span class="eng-text">O. Henry</span> (ও. হেনরি)।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#451A03]">
+                        <p><strong class="text-lg text-[#451A03]">জন্ম:</strong> ১৮৬২ সালে যুক্তরাষ্ট্রের নর্থ ক্যারোলাইনায় (<span class="eng-text">North Carolina</span>)।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#451A03]">
+                        <p><strong class="text-lg text-[#451A03]">মৃত্যু:</strong> ১৯১০ সালে (লিভার সিরোসিসে আক্রান্ত হয়ে)।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#451A03]">
+                        <p><strong class="text-lg text-[#451A03]">পেশা:</strong> ফার্মাসিস্ট, ড্রাফটসম্যান, ব্যাংক টেলার এবং সাংবাদিক।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#D97706] bg-[#FFFBEB]">
+                        <p><strong class="text-lg text-[#D97706]">কারাবরণ:</strong> তিনি ব্যাংকের তহবিল তছরুপের (<span class="eng-text">Embezzlement</span> - <span class="terminology">বেআইনিভাবে অন্যের বা প্রতিষ্ঠানের অর্থ আত্মসাৎ করা</span>) দায়ে অভিযুক্ত হয়ে ৩ বছর (১৮৯৮-১৯০১) জেলে ছিলেন। সেখানেই তিনি তার মেয়ের জন্য এবং নিজের পরিচয় গোপন রাখতে '<span class="eng-text font-bold">O. Henry</span>' ছদ্মনামে গল্প লেখা শুরু করেন।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#451A03]">
+                        <p><strong class="text-lg text-[#451A03]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The Modern Period (1901-1939)</span>।</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Titles -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="content-card bg-white">
+                    <ul class="space-y-4 text-lg">
+                        <li class="flex items-start">
+                            <span class="text-[#D97706] text-2xl mr-3 leading-none">★</span>
+                            <span><strong class="eng-text text-[#451A03]">Master of Surprise Endings:</strong> গল্পের শেষে অপ্রত্যাশিত মোড় বা চমক দেওয়ার জাদুকর।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#D97706] text-2xl mr-3 leading-none">★</span>
+                            <span><strong class="eng-text text-[#451A03]">The American Guy de Maupassant:</strong> তাকে ফরাসি ছোটগল্পকার গি দ্য মোপাসাঁ-র সাথে তুলনা করা হয় (উভয়েই ছোটগল্প এবং টুইস্ট এন্ডিংয়ের জন্য বিখ্যাত)।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#D97706] text-2xl mr-3 leading-none">★</span>
+                            <span><strong class="eng-text text-[#451A03]">O. Henry Award:</strong> তার সম্মানে প্রতি বছর আমেরিকায় ছোটগল্পের জন্য '<span class="eng-text">O. Henry Award</span>' প্রদান করা হয়।</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3: Literary Works -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                <p class="mb-5 text-lg text-black">ও. হেনরি মূলত তার ছোটগল্পের (<span class="eng-text">Short Stories</span>) জন্য বিখ্যাত। তার একমাত্র উপন্যাস <span class="eng-text font-bold">Cabbages and Kings</span>।</p>
+
+                <div class="space-y-6">
+                    <!-- The Gift of the Magi -->
+                    <div class="content-card border-t-4 border-t-[#D97706] shadow-md">
+                        <h3 class="text-xl font-bold text-[#451A03] mb-3">ক. দ্য গিফট অফ দ্য মেজাই (<span class="eng-text">The Gift of the Magi</span>) ***</h3>
+                        <p class="text-black font-semibold mb-2 bg-amber-50 inline-block px-2 py-1 rounded border border-amber-200">এটি তার সবচেয়ে বিখ্যাত এবং জনপ্রিয় ছোটগল্প।</p>
+                        <ul class="list-none space-y-3 text-black mt-2">
+                            <li><strong class="text-[#451A03]">বিষয়বস্তু:</strong> জিম (<span class="eng-text">Jim</span>) এবং ডেলা (<span class="eng-text">Della</span>) নামের এক দরিদ্র দম্পতির একে অপরের প্রতি নিঃস্বার্থ ভালোবাসার গল্প। বড়দিনে একে অপরকে উপহার দেওয়ার জন্য তারা তাদের সবচেয়ে মূল্যবান সম্পদ বিসর্জন দেয়।</li>
+                            <li class="bg-[#FAFAF9] p-4 border border-[#E7E5E4] rounded-lg">
+                                <strong class="text-[#451A03]">কাহিনী সংক্ষেপ:</strong> ডেলার সুন্দর লম্বা চুল ছিল, যা সে বিক্রি করে জিমের জন্য একটি ঘড়ির চেইন (<span class="eng-text">Platinum Fob Chain</span>) কেনে। অন্যদিকে, জিম তার সাধের সোনার ঘড়িটি বিক্রি করে ডেলার চুলের জন্য এক সেট চিরুনি (<span class="eng-text">Combs</span>) কেনে। শেষে দেখা যায়, তাদের উপহারগুলো ব্যবহারের অযোগ্য হয়ে পড়েছে, কিন্তু তাদের ভালোবাসা প্রমাণিত হয়েছে। ও. হেনরি তাদের তুলনা করেছেন 'ম্যাজাই' (<span class="eng-text">Magi</span> - <span class="terminology">সেই জ্ঞানী ব্যক্তিরা যারা যিশুর জন্মের সময় উপহার নিয়ে এসেছিলেন</span>) এর সাথে।
+                            </li>
+                            <li><strong class="text-[#451A03]"><span class="eng-text">Theme</span>:</strong> নিঃস্বার্থ ভালোবাসা এবং ত্যাগ (<span class="eng-text">Selfless love and sacrifice</span>).</li>
+                        </ul>
+                    </div>
+
+                    <!-- The Last Leaf -->
+                    <div class="content-card border-t-4 border-t-[#451A03] shadow-md">
+                        <h3 class="text-xl font-bold text-[#451A03] mb-3">খ. দ্য লাস্ট লিফ (<span class="eng-text">The Last Leaf</span>)</h3>
+                        <p class="text-black font-semibold mb-2">এটিও একটি বিশ্ববিখ্যাত ছোটগল্প।</p>
+                        <ul class="list-none space-y-3 text-black">
+                            <li><strong class="text-[#451A03]">বিষয়বস্তু:</strong> নিউমোনিয়ায় আক্রান্ত তরুণী শিল্পী জনসি (<span class="eng-text">Johnsy</span>)-র বেঁচে থাকার ইচ্ছা এবং এক ব্যর্থ বৃদ্ধ চিত্রকর বেহরম্যান (<span class="eng-text">Behrman</span>)-এর আত্মত্যাগের গল্প।</li>
+                            <li class="bg-[#FAFAF9] p-4 border border-[#E7E5E4] rounded-lg">
+                                <strong class="text-[#451A03]">কাহিনী সংক্ষেপ:</strong> জনসি বিশ্বাস করত জানালার বাইরের আইভি লতার শেষ পাতাটি ঝরে পড়ার সাথে সাথে সে মারা যাবে। কিন্তু ঝড়ের রাতেও পাতাটি ঝরে পড়ে না। পরে জানা যায়, ওটা আসলে পাতা ছিল না; জনসিকে বাঁচানোর জন্য বৃদ্ধ বেহরম্যান ঝড়ের রাতে দেয়ালে ওই পাতাটি এঁকেছিলেন এবং সেই ঠান্ডায় অসুস্থ হয়ে তিনি মারা যান। এটাই ছিল তার '<span class="eng-text">Masterpiece</span>' (<span class="terminology">মাস্টারপিস: একজন শিল্পীর শ্রেষ্ঠ শিল্পকর্ম</span>)।
+                            </li>
+                            <li><strong class="text-[#451A03]"><span class="eng-text">Theme</span>:</strong> আশা, আত্মত্যাগ এবং শিল্পের শক্তি।</li>
+                        </ul>
+                    </div>
+
+                    <!-- Other Famous Stories -->
+                    <div class="content-card border-l-4 border-l-[#451A03]">
+                        <h3 class="text-xl font-bold text-[#451A03] mb-4">গ. অন্যান্য বিখ্যাত গল্প</h3>
+                        <div class="space-y-4 text-black">
+                            <div class="border-b border-gray-200 pb-3">
+                                <strong class="eng-text text-[#D97706] text-lg">The Cop and the Anthem:</strong> 
+                                সোপি (<span class="eng-text">Soapy</span>) নামের এক ভবঘুরে শীতের হাত থেকে বাঁচতে জেলে যাওয়ার চেষ্টা করে, কিন্তু ব্যর্থ হয়। শেষে যখন সে ভালো হওয়ার সিদ্ধান্ত নেয়, তখন পুলিশ তাকে অ্যারেস্ট করে। (<span class="eng-text font-bold">Irony of Fate</span> - <span class="terminology">ভাগ্যের নির্মম পরিহাস</span>)।
+                            </div>
+                            <div class="border-b border-gray-200 pb-3">
+                                <strong class="eng-text text-[#D97706] text-lg">After Twenty Years:</strong> 
+                                দুই বন্ধুর ২০ বছর পর দেখা করার প্রতিশ্রুতি এবং তাদের ভিন্ন ভিন্ন পরিণতি (একজন পুলিশ, অন্যজন অপরাধী) নিয়ে লেখা।
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-2 pt-2">
+                                <p class="bg-amber-50 p-2 rounded text-center font-bold eng-text">A Service of Love</p>
+                                <p class="bg-amber-50 p-2 rounded text-center font-bold eng-text">The Ransom of Red Chief</p>
+                                <p class="bg-amber-50 p-2 rounded text-center font-bold eng-text">Hearts and Hands</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Collections and Novels -->
+                    <div class="content-card border-l-4 border-l-[#D97706]">
+                        <h3 class="text-xl font-bold text-[#451A03] mb-3">ঘ. গল্প সংকলন ও উপন্যাস</h3>
+                        <ul class="list-disc list-inside space-y-3 text-black">
+                            <li>
+                                <strong class="eng-text text-lg">Cabbages and Kings:</strong> এটি তার একমাত্র উপন্যাস (বা পরস্পর সংযুক্ত গল্পের সংকলন)। 
+                                <br><span class="ml-5 bg-yellow-100 px-2 py-1 text-sm border border-yellow-300 rounded"><strong class="text-[#451A03]">* বিসিএস অতিরিক্ত তথ্য:</strong> এই উপন্যাসে তিনি প্রথমবারের মতো বিখ্যাত রাজনৈতিক টার্ম <strong>'Banana Republic'</strong> (<span class="terminology">রাজনৈতিকভাবে অস্থিতিশীল ও দুর্নীতিগ্রস্ত দেশ</span>) শব্দটি ব্যবহার করেন।</span>
+                            </li>
+                            <li>
+                                <strong class="eng-text text-lg">The Four Million:</strong> বিখ্যাত গল্প সংকলন, যেখানে <span class="eng-text">The Gift of the Magi</span> গল্পটি রয়েছে।
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Quotes -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>) ও সাহিত্যিক অলঙ্কার</h2>
+                <p class="mb-6 text-lg text-black">বিসিএস ও অন্যান্য পরীক্ষার জন্য ও. হেনরির উক্তিগুলো অত্যন্ত গুরুত্বপূর্ণ:</p>
+                
+                <div class="grid grid-cols-1 gap-5">
+                    
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-2 text-[#451A03]">1. "Life is made up of sobs, sniffles, and smiles, with sniffles predominating."</p>
+                        <p class="text-black mb-3 text-lg">(জীবন হলো কান্না, ফুঁপানি এবং হাসির সমষ্টি, যেখানে ফুঁপানিরই প্রাধান্য বেশি)</p>
+                        <div class="bg-white/50 p-3 rounded-lg border border-amber-200">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">The Gift of the Magi</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Alliteration</span> (<span class="terminology">অ্যালিটারেশন বা অনুপ্রাস: একই ধ্বনির পুনরাবৃত্তি, যেমন এখানে 's' ধ্বনির ব্যবহার- sobs, sniffles, smiles</span>) এবং 
+                                <span class="eng-text font-bold">Metaphor</span> (<span class="terminology">মেটাফর: জীবনকে সরাসরি আবেগের মিশ্রণ হিসেবে দেখানো হয়েছে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-2 text-[#451A03]">2. "But in a last word to the wise of these days let it be said that of all who give gifts these two were the wisest."</p>
+                        <p class="text-black mb-3 text-lg">(আজকের দিনের জ্ঞানীদের উদ্দেশ্যে বলা যায়, যারা উপহার দেয় তাদের মধ্যে এরাই ছিল সবচেয়ে জ্ঞানী)</p>
+                        <div class="bg-white/50 p-3 rounded-lg border border-amber-200">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">The Gift of the Magi</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Paradox</span> (<span class="terminology">প্যারাডক্স: তারা দৃশ্যত বোকার মতো তাদের সবচেয়ে মূল্যবান সম্পদ হারিয়েছে, কিন্তু ভালোবাসার এবং ত্যাগের দৃষ্টিকোণ থেকে বিচার করলে তারাই ছিল সবচেয়ে জ্ঞানী</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-2">
+                        <div class="quote-container !mb-0">
+                            <p class="eng-text font-bold text-lg mb-2 text-[#451A03]">3. "Love and business and family and patriotism are nothing but shadows of words when a man's starving."</p>
+                            <p class="text-black text-sm">(মানুষ যখন ক্ষুধার্ত থাকে, তখন ভালোবাসা, ব্যবসা, পরিবার এবং দেশপ্রেম শব্দের ছায়া ছাড়া আর কিছুই নয়)</p>
+                        </div>
+                        
+                        <div class="quote-container !mb-0">
+                            <p class="eng-text font-bold text-lg mb-2 text-[#451A03]">4. "It is not the road we take; it is what's inside of us that makes us turn out the way we do."</p>
+                            <p class="text-black text-sm">(আমরা কোন পথ বেছে নিই তা বড় কথা নয়; বরং আমাদের ভেতরের সত্তাই নির্ধারণ করে আমরা ভবিষ্যতে কেমন হব)</p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Section 5: At a Glance -->
+            <section class="bg-gradient-to-br from-[#451A03] to-[#78350F] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#D97706] pb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-[#D97706]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    একনজরে মনে রাখার মতো তথ্য
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start">
+                        <span class="text-[#D97706] mr-3 font-bold text-xl">✔</span> 
+                        <p>তার আসল নাম <span class="eng-text font-bold">William Sydney Porter</span>।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#D97706] mr-3 font-bold text-xl">✔</span> 
+                        <p>তিনি <span class="eng-text font-bold">Master of Surprise Endings</span> (টুইস্ট এন্ডিংয়ের জাদুকর)।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#D97706] mr-3 font-bold text-xl">✔</span> 
+                        <p>তার বিখ্যাত ছোটগল্প <span class="eng-text">The Gift of the Magi</span> এবং <span class="eng-text">The Last Leaf</span>।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#D97706] mr-3 font-bold text-xl">✔</span> 
+                        <p><span class="eng-text">Cabbages and Kings</span> তার লেখা একমাত্র উপন্যাস।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#D97706] mr-3 font-bold text-xl">✔</span> 
+                        <p>তিনি তহবিল আত্মসাতের দায়ে জেলখানায় বসে ছদ্মনামে লেখালেখি শুরু করেন।</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ৯ জুন, ২০২৬</p>
+            
+            <!-- Creator Badge (Center Aligned) -->
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+
+            <!-- QR Code Bottom-Right Corner -->
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.src='https://placehold.co/65x65/451A03/FFF?text=QR'">
+            </a>
+        </footer>
+
+    </div>
+
+    <!-- Script to wrap Bangla numbers in a specific font -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            
+            // Find all text nodes containing Bangla numbers
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) {
+                        textNodes.push(n);
+                    }
+                }
+            }
+
+            // Replace text nodes, wrapping Bangla numbers in spans
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number';
+                        span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

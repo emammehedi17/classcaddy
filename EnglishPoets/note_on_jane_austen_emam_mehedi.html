@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on Jane Austen - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts: Hind Siliguri for Bangla -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme Configuration: Regency Romance & Soft Lavender */
+        :root {
+            --primary-color: #4C1D95; /* Violet 900 / Deep Purple */
+            --secondary-color: #BE185D; /* Rose 700 / Deep Pinkish Red */
+            --accent-color: #F3E8FF; /* Purple 50 / Very Light Lavender */
+            --bg-color: #FDF2F8; /* Pink 50 - Very soft romantic background */
+            --card-bg: #FFFFFF;
+            --text-main: #000000; /* STRICTLY FULL BLACK FOR NORMAL TEXT */
+            --border-color: #E9D5FF; /* Purple 200 */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            background-image: radial-gradient(circle at top right, #FCE7F3, transparent 400px);
+        }
+
+        /* English Font Class */
+        .eng-text {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1em;
+        }
+
+        /* Bangla Numbers Font Class */
+        .bn-number {
+            font-family: 'Kalpurush', 'Times New Roman', serif;
+            font-size: 1.05em;
+            font-weight: 500;
+        }
+
+        /* Custom Styles for Design Elements */
+        .regency-header {
+            background: linear-gradient(135deg, var(--primary-color), #701A75, var(--secondary-color));
+            color: white;
+            border-bottom: 6px solid #FBCFE8; /* Pink 200 */
+            position: relative;
+            box-shadow: 0 4px 20px rgba(76, 29, 149, 0.15);
+        }
+
+        .section-heading {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            display: inline-block;
+            position: relative;
+        }
+        
+        .section-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 30px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            margin-bottom: 1.25rem;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(76, 29, 149, 0.08);
+            border-color: #D8B4FE;
+        }
+
+        /* Quotes Styling */
+        .quote-container {
+            border-left: 5px solid var(--secondary-color);
+            background: linear-gradient(to right, #FDF2F8, #FFFFFF);
+            padding: 15px 20px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 1.2rem;
+            position: relative;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.03);
+        }
+
+        /* Terminology Styling - Highlight without changing text color */
+        .terminology {
+            background-color: #FCE7F3; /* Pink 100 */
+            padding: 0 6px;
+            border-radius: 4px;
+            font-weight: 500;
+            color: #000000; /* Keeping text strictly black */
+            border: 1px solid #FBCFE8; /* Pink 200 */
+            font-size: 0.95em;
+        }
+
+        /* Badge and Footer Specifics */
+        .qr-corner {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 65px;
+            height: 65px;
+            background: white;
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+        .qr-corner:hover {
+            transform: scale(1.1);
+        }
+        .qr-corner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .master-footer {
+            background: #ffffff;
+            border-top: 5px solid var(--primary-color);
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden relative border border-[#F3E8FF]">
+        
+        <!-- Header -->
+        <header class="regency-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">জেন অস্টিন (<span class="eng-text">Jane Austen</span>)</h1>
+            <p class="text-xl text-[#FBCFE8] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1775 - 1817</span></p>
+            
+            <p class="text-lg mb-6 text-white text-justify" style="color: #ffffff;">
+                জেন অস্টিন (<span class="eng-text">Jane Austen</span>) ইংরেজি সাহিত্যের রোমান্টিক যুগের (<span class="eng-text">Romantic Period</span>) একজন বিখ্যাত <span class="eng-text font-bold">Anti-romantic female novelist</span>। যদিও তিনি রোমান্টিক যুগে লেখালেখি করেছেন, তার লেখার ধরন ছিল বাস্তবতা ও সামাজিক রীতিনীতি নির্ভর, যা রোমান্টিকতার বিপরীত। তিনি তার উপন্যাসে তৎকালীন ইংল্যান্ডের মধ্যবিত্ত ও উচ্চ-মধ্যবিত্ত সমাজের জীবন, প্রেম, বিয়ে এবং সামাজিক জটিলতাগুলো অত্যন্ত নিপুণভাবে তুলে ধরেছেন।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <!-- Creator Badge -->
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                
+                <!-- Header QR Code -->
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" class="w-full h-full object-cover rounded" onerror="this.src='https://placehold.co/65x65/4C1D95/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="p-6 md:p-10">
+
+            <!-- Section 1: Biography -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#4C1D95]">
+                        <p><strong class="text-lg text-[#4C1D95]">জন্ম:</strong> ১৭৭৫ সালে ইংল্যান্ডের হ্যাম্পশায়ারে (<span class="eng-text">Hampshire</span>) এক খ্রিস্টান পাদ্রীর পরিবারে।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#BE185D]">
+                        <p><strong class="text-lg text-[#BE185D]">মৃত্যু:</strong> ১৮১৭ সালে (মাত্র ৪২ বছর বয়সে)।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#4C1D95]">
+                        <p><strong class="text-lg text-[#4C1D95]">পেশা ও জীবন:</strong> ঔপন্যাসিক। তিনি তার ঘটনাহীন জীবন ইংল্যান্ডের দক্ষিণ অংশের গ্রাম ও ছোট শহরগুলোতে কাটিয়েছেন। <br>
+                        <span class="inline-block mt-2 bg-purple-50 px-2 py-1 text-sm border border-purple-200 rounded"><strong class="text-[#4C1D95]">* বিসিএস অতিরিক্ত:</strong> প্রেম ও বিয়ে নিয়ে যুগান্তকারী সব উপন্যাস লিখলেও বাস্তবে জেন অস্টিন <strong>আজীবন কুমারী (অবিবাহিতা)</strong> ছিলেন। এছাড়া, জীবদ্দশায় তার বইগুলো নিজের নামে ছাপা হতো না, বরং <strong>'By a Lady'</strong> নামে বেনামে প্রকাশিত হতো।</span></p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#BE185D] bg-[#FDF2F8]">
+                        <p><strong class="text-lg text-[#BE185D]">বিষয়বস্তু (<span class="eng-text">Themes</span>):</strong> তার উপন্যাসের প্রধান বিষয়বস্তু ছিল প্রেম, বিয়ে এবং উপযুক্ত পাত্র-পাত্রী খুঁজে পাওয়া। প্রখ্যাত সাহিত্যিক ভার্জিনিয়া উলফ (<span class="eng-text">Virginia Woolf</span>) তার সম্পর্কে বলেছিলেন, <span class="eng-text italic font-bold">"একজন মধ্যবিত্তের ড্রয়িংরুমে যেসব কাহিনীর সূত্রপাত হয় তার বাইরে যেতে পারেননি জেন অস্টিন।"</span></p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#4C1D95]">
+                        <p><strong class="text-lg text-[#4C1D95]">খ্যাতি:</strong> মাত্র ২২ বছর বয়সে তিনি তার কালজয়ী উপন্যাস <span class="eng-text font-bold">Pride and Prejudice</span> লিখেছিলেন, যা অদ্যাবধি ২০ লক্ষ কপির বেশি বিক্রি হয়েছে। তবে বইটি প্রকাশ করতে তাকে দীর্ঘ এক যুগ অপেক্ষা করতে হয়েছিল।</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Titles -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="content-card bg-white">
+                    <ul class="space-y-4 text-lg">
+                        <li class="flex items-start">
+                            <span class="text-[#BE185D] text-2xl mr-3 leading-none">❧</span>
+                            <span><strong class="eng-text text-[#4C1D95]">Anti-romantic Novelist in Romantic Age:</strong> রোমান্টিক যুগের রোমান্টিকতা-বিরোধী ঔপন্যাসিক।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#BE185D] text-2xl mr-3 leading-none">❧</span>
+                            <span><strong class="eng-text text-[#4C1D95]">Novelist of Manners:</strong> তার উপন্যাসগুলোকে '<span class="eng-text font-bold">Novel of Manners</span>' বলা হয়, কারণ এতে তৎকালীন সমাজের আচার-আচরণ ও রীতিনীতি অত্যন্ত নিখুঁতভাবে প্রাধান্য পেয়েছে।</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3: Literary Works -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                <p class="mb-5 text-lg text-black">জেন অস্টিন তার জীবদ্দশায় ৬টি সম্পূর্ণ উপন্যাস লিখেছিলেন। তার উপন্যাসগুলো মূলত <span class="eng-text font-bold">Domestic Novel</span> (<span class="terminology">যে উপন্যাসে সমাজ ও রাষ্ট্রের চেয়ে পারিবারিক জীবন এবং প্রতিদিনের সাধারণ ঘটনা বেশি প্রাধান্য পায়</span>)।</p>
+
+                <div class="space-y-6">
+                    <!-- Pride and Prejudice -->
+                    <div class="content-card border-t-4 border-t-[#4C1D95] shadow-md relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-[#F3E8FF] text-[#4C1D95] px-4 py-1 rounded-bl-xl font-bold">Masterpiece</div>
+                        <h3 class="text-2xl font-bold text-[#4C1D95] mb-3">ক. প্রাইড অ্যান্ড প্রেজুডিস (<span class="eng-text">Pride and Prejudice - 1813</span>) ***</h3>
+                        <p class="text-black font-semibold mb-3">এটি তার সর্বশ্রেষ্ঠ এবং সবচেয়ে জনপ্রিয় উপন্যাস।</p>
+                        
+                        <ul class="list-none space-y-3 text-black">
+                            <li><strong class="text-[#4C1D95]">বিষয়বস্তু:</strong> এলিজাবেথ বেনেট (<span class="eng-text">Elizabeth Bennet</span>) এবং মিস্টার ডার্সি (<span class="eng-text">Fitzwilliam Darcy</span>)-এর মধ্যকার ভুল বোঝাবুঝি, অহংকার এবং সংস্কার (<span class="eng-text">Prejudice</span>) কাটিয়ে ভালোবাসার সম্পর্ক গড়ে ওঠার কাহিনী।</li>
+                            <li>
+                                <strong class="text-[#4C1D95] block mb-2 border-b border-[#E9D5FF] pb-1">চরিত্রসমূহ:</strong>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 ml-2">
+                                    <div class="bg-purple-50 p-3 rounded border border-purple-100">
+                                        <p><strong class="eng-text text-[#BE185D]">Elizabeth Bennet:</strong> উপন্যাসের বুদ্ধিমতী ও স্বাধীনচেতা নায়িকা।</p>
+                                    </div>
+                                    <div class="bg-purple-50 p-3 rounded border border-purple-100">
+                                        <p><strong class="eng-text text-[#BE185D]">Mr. Darcy:</strong> ধনী, সুদর্শন কিন্তু প্রথমদিকে চরম অহংকারী নায়ক।</p>
+                                    </div>
+                                    <div class="bg-purple-50 p-3 rounded border border-purple-100 md:col-span-2">
+                                        <p><strong class="eng-text text-[#BE185D]">Mr. Bennet & Mrs. Bennet:</strong> এলিজাবেথের বাবা-মা। মিসেস বেনেটের জীবনের একমাত্র লক্ষ্য তার পাঁচ মেয়েকে ধনী পাত্রের সাথে বিয়ে দেওয়া।</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="bg-[#FDF2F8] p-3 rounded"><strong class="text-[#4C1D95]"><span class="eng-text">Theme</span>:</strong> প্রেম, বিয়ে, সামাজিক মর্যাদা এবং ভুল ধারণা।</li>
+                        </ul>
+                    </div>
+
+                    <!-- Sense and Sensibility -->
+                    <div class="content-card border-t-4 border-t-[#BE185D] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#BE185D] mb-3">খ. সেন্স অ্যান্ড সেন্সিবিলিটি (<span class="eng-text">Sense and Sensibility - 1811</span>)</h3>
+                        <p class="text-black font-semibold mb-2">এটি তার <span class="font-bold border-b-2 border-pink-300">প্রথম প্রকাশিত</span> উপন্যাস (যদিও <span class="eng-text">Pride and Prejudice</span> আগে লেখা হয়েছিল)।</p>
+                        
+                        <ul class="list-disc list-inside space-y-3 text-black">
+                            <li><strong class="text-[#4C1D95]">বিষয়বস্তু:</strong> দুই বোন এলিনর (<span class="eng-text">Elinor</span>) এবং ম্যারিয়ান (<span class="eng-text">Marianne</span>)-এর ভিন্নধর্মী স্বভাব ও প্রেমের গল্প।</li>
+                            <li class="ml-5 list-none bg-white p-2 border border-gray-200 rounded">এলিনর হলো '<span class="eng-text font-bold">Sense</span>' বা <span class="terminology">যুক্তি ও বাস্তবতাবোধের প্রতীক</span>, আর ম্যারিয়ান হলো '<span class="eng-text font-bold">Sensibility</span>' বা <span class="terminology">তীব্র আবেগ ও সংবেদনশীলতার প্রতীক</span>।</li>
+                            <li><strong class="text-[#4C1D95]"><span class="eng-text">Theme</span>:</strong> যুক্তি বনাম আবেগ (<span class="eng-text">Reason vs Emotion</span>)।</li>
+                        </ul>
+                    </div>
+
+                    <!-- Other Novels -->
+                    <div class="content-card border-l-4 border-l-[#4C1D95]">
+                        <h3 class="text-xl font-bold text-[#4C1D95] mb-4">গ. অন্যান্য উপন্যাস</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
+                            <div class="border-b border-gray-200 pb-2 md:col-span-2">
+                                <strong class="eng-text text-lg text-[#BE185D]">Emma:</strong> 
+                                এটি এমন এক নায়িকার গল্প যে অন্যদের বিয়ে ঠিক করতে (<span class="eng-text font-bold">Match-making</span>) অত্যন্ত পছন্দ করে, কিন্তু নিজের ব্যাপারে চরম উদাসীন।
+                            </div>
+                            <div class="border-b border-gray-200 pb-2">
+                                <strong class="eng-text text-lg text-[#BE185D]">Mansfield Park:</strong> 
+                                একটি অন্যতম সামাজিক উপন্যাস।
+                            </div>
+                            <div class="border-b border-gray-200 pb-2">
+                                <strong class="eng-text text-lg text-[#BE185D]">Persuasion:</strong> 
+                                <span class="terminology">তার মৃত্যুর পর প্রকাশিত (Posthumous)</span> শেষ পূর্ণাঙ্গ উপন্যাস।
+                            </div>
+                            <div class="border-b border-gray-200 pb-2">
+                                <strong class="eng-text text-lg text-[#BE185D]">Northanger Abbey:</strong> 
+                                এটি মূলত একটি গথিক উপন্যাসের প্যারোডি (<span class="terminology">তৎকালীন প্রচলিত ভৌতিক বা রহস্য উপন্যাসের ব্যঙ্গ</span>)।
+                            </div>
+                            <div class="border-b border-gray-200 pb-2">
+                                <strong class="eng-text text-lg text-[#BE185D]">Sanditon:</strong> 
+                                এটি তার অসমাপ্ত (<span class="eng-text">Unfinished</span>) উপন্যাস।
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Quotes -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>) ও সাহিত্যিক অলঙ্কার</h2>
+                <p class="mb-6 text-lg text-black">বিসিএস ও অন্যান্য পরীক্ষার জন্য জেন অস্টিনের উক্তিগুলো অত্যন্ত গুরুত্বপূর্ণ:</p>
+                
+                <div class="grid grid-cols-1 gap-5">
+                    
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#4C1D95]">1. "A lady's imagination is very rapid; it jumps from admiration to love, from love to matrimony in a moment."</p>
+                        <p class="text-black mb-2 text-lg">(নারীদের কল্পনাশক্তি অত্যন্ত দ্রুতগামী; এটি প্রশংসা থেকে প্রেমে, এবং প্রেম থেকে মুহূর্তেই বিয়েতে পৌঁছে যায়)</p>
+                        <div class="bg-white/60 p-2 rounded border border-purple-100">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">Pride and Prejudice</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Climax</span> (<span class="terminology">ক্লাইম্যাক্স: ভাব বা আবেগের ক্রমউন্নতি দেখানো। যেমন এখানে ধাপে ধাপে Admiration -> Love -> Matrimony দেখানো হয়েছে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#4C1D95]">2. "It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife."</p>
+                        <p class="text-black mb-2 text-lg">(এটি একটি সর্বজনস্বীকৃত সত্য যে, প্রচুর বিত্ত-বৈভবের অধিকারী একজন অবিবাহিত পুরুষের অবশ্যই একজন স্ত্রীর প্রয়োজন)</p>
+                        <div class="bg-white/60 p-2 rounded border border-purple-100">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">Pride and Prejudice</span> <span class="text-[#BE185D] font-bold">(উপন্যাসের বিখ্যাত শুরুর লাইন)</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Irony</span> (<span class="terminology">আয়রনি: বাস্তবে দেখা যায় মেয়েরাই এবং মেয়েদের মা-বাবাই ধনী পাত্র খোঁজে, কিন্তু লেখিকা উল্টোভাবে বলে সমাজকে ব্যঙ্গ করেছেন</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container !mb-0">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#4C1D95]">3. "There is no charm equal to tenderness of heart."</p>
+                        <p class="text-black text-sm">(হৃদয়ের কোমলতার মতো কোনো আকর্ষণ নেই)</p>
+                        <p class="text-sm text-black mt-2"><strong>উৎস:</strong> <span class="eng-text">Emma</span></p>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#4C1D95]">4. "I could easily forgive his pride, if he had not mortified mine."</p>
+                        <p class="text-black mb-2 text-lg">(আমি সহজেই তার অহংকার ক্ষমা করতে পারতাম, যদি না সে আমার অহংকারে আঘাত করত)</p>
+                        <div class="bg-white/60 p-2 rounded border border-purple-100">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">Pride and Prejudice</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Antithesis</span> (<span class="terminology">অ্যান্টিথেসিস: দুটি বিপরীত বা বিরোধী ধারণাকে পাশাপাশি স্থাপন করা। এখানে His pride vs Mine - এর তুলনা</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Section 5: At a Glance -->
+            <section class="bg-gradient-to-br from-[#4C1D95] to-[#701A75] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8 border-t-4 border-[#FBCFE8]">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#9333EA] pb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-[#FBCFE8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    একনজরে মনে রাখার মতো তথ্য
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start">
+                        <span class="text-[#FBCFE8] mr-3 font-bold text-xl">♥</span> 
+                        <p>তিনি <span class="eng-text">Romantic Age</span>-এর একজন বিখ্যাত <span class="eng-text font-bold">Anti-romantic Novelist</span>।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FBCFE8] mr-3 font-bold text-xl">♥</span> 
+                        <p>তার শ্রেষ্ঠ উপন্যাস <span class="eng-text font-bold">Pride and Prejudice</span>।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FBCFE8] mr-3 font-bold text-xl">♥</span> 
+                        <p><span class="eng-text font-bold">Sense and Sensibility</span> তার প্রথম প্রকাশিত উপন্যাস।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FBCFE8] mr-3 font-bold text-xl">♥</span> 
+                        <p>তার উপন্যাসের প্রধান বিষয়বস্তু প্রেম ও বিয়ে (<span class="eng-text font-bold">Domestic Novel</span>)।</p>
+                    </div>
+                    <div class="flex items-start md:col-span-2">
+                        <span class="text-[#FBCFE8] mr-3 font-bold text-xl">♥</span> 
+                        <p>বিখ্যাত উক্তি: "<span class="eng-text">A lady's imagination is very rapid...</span>"</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            
+            <!-- Creator Badge (Center Aligned) -->
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+
+            <!-- QR Code Bottom-Right Corner -->
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.src='https://placehold.co/65x65/4C1D95/FFF?text=QR'">
+            </a>
+        </footer>
+
+    </div>
+
+    <!-- Script to wrap Bangla numbers in a specific font -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            
+            // Find all text nodes containing Bangla numbers
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) {
+                        textNodes.push(n);
+                    }
+                }
+            }
+
+            // Replace text nodes, wrapping Bangla numbers in spans
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number';
+                        span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on Ralph Waldo Emerson - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme: Transcendental Forest Green & Concord Autumn */
+        :root {
+            --primary-color: #14532D; /* Green 900 / Forest Green */
+            --secondary-color: #B45309; /* Amber 700 / Concord Autumn */
+            --accent-color: #FEFCE8; /* Yellow 50 */
+            --bg-color: #F8FAFC; 
+            --card-bg: #FFFFFF;
+            --text-main: #000000; 
+            --border-color: #A7F3D0; /* Emerald 200 */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-color);
+            color: var(--text-main); line-height: 1.6;
+            background-image: linear-gradient(135deg, #F0FDF4 0%, #FEFCE8 100%);
+        }
+
+        .eng-text { font-family: 'Times New Roman', Times, serif; font-size: 1.1em; }
+        .bn-number { font-family: 'Kalpurush', 'Times New Roman', serif; font-size: 1.05em; font-weight: 500; }
+
+        .theme-header {
+            background: linear-gradient(135deg, var(--primary-color), #064E3B, #422006);
+            color: white; border-bottom: 6px solid var(--secondary-color);
+            position: relative; box-shadow: 0 4px 20px rgba(20, 83, 45, 0.3);
+        }
+
+        .section-heading {
+            color: var(--primary-color); border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px; margin-bottom: 1.5rem; font-weight: 700;
+            display: inline-block; position: relative; text-transform: uppercase;
+        }
+        
+        .section-heading::after {
+            content: '🌲'; position: absolute; bottom: -15px; right: -35px;
+            color: var(--secondary-color); font-size: 1.5rem;
+        }
+
+        .content-card {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem; transition: all 0.3s ease; border-top: 3px solid transparent;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(180, 83, 9, 0.1); border-top: 3px solid var(--secondary-color);
+        }
+
+        .masterpiece-card {
+            background-color: #FFFAF0; border: 1px solid #FDE047; border-left: 5px solid var(--secondary-color);
+        }
+
+        .quote-container {
+            border-left: 5px solid var(--secondary-color); background: #F0FDF4;
+            padding: 15px 20px; border-radius: 0 10px 10px 0; margin-bottom: 1.2rem;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.04); border: 1px solid #DCFCE7; border-left: 5px solid var(--secondary-color);
+        }
+
+        .terminology {
+            background-color: #FEF08A; padding: 0 5px; border-radius: 4px;
+            font-weight: 500; color: #000000; border: 1px dashed #B45309; font-size: 0.95em;
+        }
+
+        .qr-corner { position: absolute; bottom: 15px; right: 15px; width: 65px; height: 65px; background: white; padding: 4px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;}
+        .qr-corner img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+        .master-footer { background: #ffffff; border-top: 5px solid var(--primary-color); padding: 30px 20px; text-align: center; position: relative; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-green-200">
+        
+        <header class="theme-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">রালফ ওয়াল্ডো এমারসন (<span class="eng-text">Ralph Waldo Emerson</span>)</h1>
+            <p class="text-xl text-[#FDE047] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1803 - 1882</span></p>
+            
+            <p class="text-lg mb-6 text-green-50 text-justify">
+                রালফ ওয়াল্ডো এমারসন (<span class="eng-text">Ralph Waldo Emerson</span>) ঊনবিংশ শতাব্দীর একজন প্রভাবশালী আমেরিকান প্রাবন্ধিক, কবি এবং দার্শনিক। তিনি আমেরিকায় '<span class="eng-text font-bold text-[#FDE047]">Transcendentalism</span>' বা অতীন্দ্রিয়বাদ (<span class="terminology">যেখানে বিশ্বাস করা হয় মানুষের আত্মা এবং প্রকৃতি গভীরভাবে সংযুক্ত এবং মানুষ তার অন্তরের ডাক শুনে সত্য উপলব্ধি করতে পারে</span>) আন্দোলনের নেতৃত্ব দেন। তার দর্শনের মূল কথা ছিল আত্মনির্ভরশীলতা (<span class="eng-text">Self-reliance</span>), স্বকীয়তা এবং প্রকৃতির সাথে আত্মার মিলন।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.src='https://placehold.co/65x65/14532D/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <main class="p-6 md:p-10">
+            <!-- Section 1 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#14532D]"><strong class="text-lg text-[#14532D]">জন্ম ও মৃত্যু:</strong> ১৮০৩ সালে আমেরিকার বোস্টনে জন্মগ্রহণ করেন এবং ১৮৮২ সালে মৃত্যুবরণ করেন।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#14532D]"><strong class="text-lg text-[#14532D]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">American Literature (The Transcendentalist Movement)</span>।</div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#B45309] bg-[#FFFAF0]">
+                        <strong class="text-lg text-[#B45309]">পেশা ও প্রভাব:</strong> তিনি তার কর্মজীবন শুরু করেছিলেন একজন যাজক (<span class="eng-text">Unitarian Minister</span>) হিসেবে, কিন্তু পরে তা ছেড়ে দিয়ে লেখালেখি ও বক্তৃতা দেওয়া শুরু করেন। <span class="bg-white p-2 rounded inline-block mt-2 border border-orange-200"><strong class="text-[#14532D]">* বিসিএস অতিরিক্ত:</strong> তিনি বিখ্যাত মার্কিন লেখক হেনরি ডেভিড থরো (<span class="eng-text">Henry David Thoreau</span>)-এর মেন্টর বা গুরু ছিলেন এবং বিখ্যাত <span class="eng-text font-bold">Transcendental Club</span> প্রতিষ্ঠা করেন।</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="content-card bg-white border-t-4 border-t-[#14532D]">
+                    <ul class="space-y-4 text-lg text-black">
+                        <li class="flex items-start">
+                            <span class="text-[#B45309] text-2xl mr-3 leading-none">🌲</span>
+                            <span><strong class="eng-text text-[#14532D]">The Sage of Concord:</strong> তিনি আমেরিকার ম্যাসাচুসেটসের কনকর্ড (<span class="eng-text">Concord</span>) শহরে বাস করতেন এবং তার অপরিসীম প্রজ্ঞার কারণে তাকে 'কনকর্ডের ঋষি' বলা হতো।</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                
+                <div class="space-y-6">
+                    <!-- Self-Reliance -->
+                    <div class="content-card masterpiece-card relative overflow-hidden shadow-md">
+                        <div class="absolute top-0 right-0 bg-[#FEFCE8] text-[#B45309] px-4 py-1 rounded-bl-xl font-bold border-l border-b border-[#FDE047]">Masterpiece</div>
+                        <h3 class="text-2xl font-bold text-[#14532D] mb-3">ক. সেলফ-রিলায়েন্স (<span class="eng-text">Self-Reliance</span>) ***</h3>
+                        <p class="text-black font-semibold mb-3">এটি তার সবচেয়ে বিখ্যাত এবং প্রভাবশালী প্রবন্ধ।</p>
+                        
+                        <ul class="list-none space-y-3 text-black">
+                            <li class="bg-white p-3 rounded border border-orange-200">
+                                <strong class="text-[#14532D]">মূল কথা:</strong> <span class="eng-text italic font-bold">"Trust thyself: every heart vibrates to that iron string."</span> (নিজের ওপর বিশ্বাস রাখো)। তিনি এই প্রবন্ধে সমাজের অন্ধ অনুকরণ না করে মানুষের নিজের অন্তরের ডাক শোনার এবং আত্মনির্ভরশীল হওয়ার জোরালো আহ্বান জানিয়েছেন।
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- The American Scholar -->
+                    <div class="content-card border-t-4 border-t-[#B45309] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#14532D] mb-3">খ. দ্য আমেরিকান স্কলার (<span class="eng-text">The American Scholar</span>)</h3>
+                        <ul class="list-disc list-inside space-y-2 text-black">
+                            <li><strong class="text-[#14532D]">গুরুত্ব:</strong> এটি হার্ভার্ড বিশ্ববিদ্যালয়ে দেওয়া একটি বিখ্যাত ভাষণ, যাকে আমেরিকার <span class="eng-text font-bold text-[#B45309]">'Intellectual Declaration of Independence'</span> (<span class="terminology">বুদ্ধিবৃত্তিক স্বাধীনতার ঘোষণাপত্র</span>) বলা হয়।</li>
+                            <li><strong class="text-[#14532D]">আহ্বান:</strong> এখানে তিনি আমেরিকানদের ইউরোপীয় প্রভাব ও সাহিত্য থেকে মুক্ত হয়ে সম্পূর্ণ নিজস্ব আমেরিকান চিন্তা ও সংস্কৃতি গড়ে তোলার আহ্বান জানান।</li>
+                        </ul>
+                    </div>
+
+                    <!-- Nature & Poems -->
+                    <div class="content-card border-l-4 border-l-[#14532D]">
+                        <h3 class="text-xl font-bold text-[#14532D] mb-4">গ. অন্যান্য প্রবন্ধ ও কবিতা</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
+                            <div class="bg-green-50 p-3 rounded md:col-span-2 border-b-2 border-green-200">
+                                <strong class="eng-text text-lg text-[#14532D]">Nature:</strong> এটি তার প্রথম প্রকাশিত বই, যেখানে আমেরিকার ট্রান্সেন্ডেন্টালিজমের মূল ভিত্তি স্থাপন করা হয়েছে। এখানে তিনি দেখিয়েছেন প্রকৃতির মাধ্যমেই মানুষ ঈশ্বরের সবচেয়ে কাছাকাছি যেতে পারে।
+                            </div>
+                            <div class="bg-amber-50 p-3 rounded">
+                                <strong class="eng-text text-lg text-[#14532D]">Brahma:</strong> এটি একটি কবিতা যা প্রাচীন হিন্দু দর্শন (উপনিষদ এবং ভগবদগীতা) দ্বারা গভীরভাবে প্রভাবিত হয়ে লেখা।
+                            </div>
+                            <div class="bg-amber-50 p-3 rounded">
+                                <strong class="eng-text text-lg text-[#14532D]">The Concord Hymn:</strong> আমেরিকার স্বাধীনতা যুদ্ধের স্মরণে লেখা বিখ্যাত দেশাত্মবোধক কবিতা।
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>)</h2>
+                
+                <div class="grid grid-cols-1 gap-4 mt-4">
+                    <div class="quote-container border-l-[6px] border-l-[#B45309] bg-[#FFFAF0]">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#14532D]">1. "Trust thyself: every heart vibrates to that iron string."</p>
+                        <p class="text-black mb-1">(নিজের ওপর বিশ্বাস রাখো: প্রতিটি হৃদয়ই সেই লোহার তারে অনুরণিত হয় - <span class="eng-text">Self-Reliance</span>)</p>
+                    </div>
+                    <div class="quote-container border-l-[6px] border-l-[#B45309] bg-[#FFFAF0]">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#14532D]">2. "To be great is to be misunderstood."</p>
+                        <p class="text-black mb-1">(মহান হওয়ার অর্থ হলো ভুলভাবে মূল্যায়িত হওয়া - <span class="eng-text">Self-Reliance</span>)</p>
+                        <p class="text-sm text-black"><strong>প্রসঙ্গ:</strong> সক্রেটিস, যিশু, গ্যালিলিওর মতো মহান ব্যক্তিরা তাদের সময়ে সমাজের দ্বারা ভুলভাবে মূল্যায়িত বা নিগৃহীত হয়েছিলেন।</p>
+                    </div>
+                    <div class="quote-container !mb-0 border-l-[#14532D] bg-green-50">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#14532D]">3. "Do not go where the path may lead, go instead where there is no path and leave a trail."</p>
+                        <p class="text-black text-sm">(যেখানে পথ গেছে সেখানে যেয়ো না, বরং সেখানে যাও যেখানে কোনো পথ নেই এবং নিজের একটি পদচিহ্ন রেখে যাও)</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5 -->
+            <section class="bg-gradient-to-br from-[#14532D] to-[#064E3B] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8 border-t-4 border-[#B45309]">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#047857] pb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-[#FDE047]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                    </svg>
+                    একনজরে মনে রাখার মতো তথ্য
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start"><span class="text-[#FDE047] mr-3 font-bold text-xl">🌲</span><p>তিনি আমেরিকার <span class="eng-text font-bold">Transcendentalism</span> আন্দোলনের প্রধান নেতা।</p></div>
+                    <div class="flex items-start"><span class="text-[#FDE047] mr-3 font-bold text-xl">🌲</span><p>তার মাস্টারপিস প্রবন্ধ <span class="eng-text font-bold">Self-Reliance</span>।</p></div>
+                    <div class="flex items-start"><span class="text-[#FDE047] mr-3 font-bold text-xl">🌲</span><p><span class="eng-text font-bold">The American Scholar</span>-কে আমেরিকার বুদ্ধিবৃত্তিক স্বাধীনতার ঘোষণাপত্র বলা হয়।</p></div>
+                    <div class="flex items-start"><span class="text-[#FDE047] mr-3 font-bold text-xl">🌲</span><p>তাকে <span class="eng-text font-bold">The Sage of Concord</span> বলা হয়।</p></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/14532D/FFF?text=QR'">
+            </a>
+        </footer>
+    </div>
+
+    <!-- Script for Bangla Numbers -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) { textNodes.push(n); }
+                }
+            }
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number'; span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

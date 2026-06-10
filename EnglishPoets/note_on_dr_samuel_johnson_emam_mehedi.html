@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on Dr. Samuel Johnson - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts: Hind Siliguri for Bangla -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme Configuration: Oxford Academic Blue & Antique Brass */
+        :root {
+            --primary-color: #1E3A8A; /* Blue 900 / Oxford Blue */
+            --secondary-color: #B45309; /* Amber 700 / Antique Brass */
+            --accent-color: #FEF9C3; /* Yellow 100 / Parchment light */
+            --bg-color: #F8FAFC; /* Slate 50 - Background */
+            --card-bg: #FFFFFF;
+            --text-main: #000000; /* STRICTLY FULL BLACK FOR NORMAL TEXT */
+            --border-color: #BFDBFE; /* Blue 200 */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            background-image: linear-gradient(to bottom right, #F8FAFC, #EFF6FF);
+        }
+
+        /* English Font Class */
+        .eng-text {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1em;
+        }
+
+        /* Bangla Numbers Font Class */
+        .bn-number {
+            font-family: 'Kalpurush', 'Times New Roman', serif;
+            font-size: 1.05em;
+            font-weight: 500;
+        }
+
+        /* Custom Styles for Design Elements */
+        .academic-header {
+            background: linear-gradient(135deg, var(--primary-color), #172554);
+            color: white;
+            border-bottom: 6px solid var(--secondary-color);
+            position: relative;
+            box-shadow: 0 4px 20px rgba(30, 58, 138, 0.2);
+        }
+
+        .section-heading {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            display: inline-block;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .section-heading::after {
+            content: '♦';
+            position: absolute;
+            bottom: -14px;
+            right: -25px;
+            color: var(--secondary-color);
+            font-size: 1.3rem;
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem;
+            color: var(--text-main);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(30, 58, 138, 0.08);
+            border-color: #93C5FD;
+        }
+
+        /* Definition/Highlight Box */
+        .dictionary-box {
+            background-color: #FDF8F6;
+            border: 1px solid #FED7AA;
+            border-left: 5px solid var(--secondary-color);
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+            box-shadow: inset 0 0 10px rgba(180, 83, 9, 0.05);
+        }
+
+        /* Quotes Styling */
+        .quote-container {
+            border-left: 4px solid var(--secondary-color);
+            background: #EFF6FF; /* Blue 50 */
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1.2rem;
+            position: relative;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.03);
+            border: 1px solid #DBEAFE;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        /* Terminology Styling - Highlight without changing text color */
+        .terminology {
+            background-color: #FEF08A; /* Soft yellow */
+            padding: 0 5px;
+            border-radius: 4px;
+            font-weight: 500;
+            color: #000000; /* Keeping text strictly black */
+            border: 1px dashed #B45309;
+            font-size: 0.95em;
+        }
+
+        /* Badge and Footer Specifics */
+        .qr-corner {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 65px;
+            height: 65px;
+            background: white;
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+        .qr-corner:hover {
+            transform: scale(1.1);
+        }
+        .qr-corner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .master-footer {
+            background: #ffffff;
+            border-top: 5px solid var(--primary-color);
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-blue-100">
+        
+        <!-- Header -->
+        <header class="academic-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">ড. স্যামুয়েল জনসন (<span class="eng-text">Dr. Samuel Johnson</span>)</h1>
+            <p class="text-xl text-[#FCD34D] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1709 - 1784</span></p>
+            
+            <p class="text-lg mb-6 text-slate-200 text-justify" style="color: #EFF6FF;">
+                ড. স্যামুয়েল জনসন (<span class="eng-text">Dr. Samuel Johnson</span>) ইংরেজি সাহিত্যের অষ্টাদশ শতাব্দীর অন্যতম শ্রেষ্ঠ পণ্ডিত, সমালোচক এবং অভিধান প্রণেতা। তাকে '<span class="eng-text">Age of Sensibility</span>' (১৭৪৫-১৭৮৫) বা জনসনের যুগের প্রধান সাহিত্যিক ব্যক্তিত্ব হিসেবে গণ্য করা হয়। তার পাণ্ডিত্য এতটাই গভীর ছিল যে অক্সফোর্ড ডিকশনারি অব ন্যাশনাল বায়োগ্রাফি তাকে ইংরেজি ইতিহাসের <span class="italic font-bold">"নিঃসন্দেহে সবচেয়ে বিখ্যাত পণ্ডিত"</span> হিসেবে উল্লেখ করেছে।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <!-- Creator Badge -->
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                
+                <!-- Header QR Code -->
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" class="w-full h-full object-cover rounded" onerror="this.src='https://placehold.co/65x65/1E3A8A/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="p-6 md:p-10">
+
+            <!-- Section 1: Biography -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#1E3A8A]">
+                        <p><strong class="text-lg text-[#1E3A8A]">জন্ম:</strong> ১৭০৯ সালে ইংল্যান্ডের লিচফিল্ডে (<span class="eng-text">Lichfield, England</span>)।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#1E3A8A]">
+                        <p><strong class="text-lg text-[#1E3A8A]">মৃত্যু:</strong> ১৭৮৪ সালে।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#B45309] bg-[#FDF8F6]">
+                        <p><strong class="text-lg text-[#B45309]">পেশা:</strong> তিনি একাধারে কবি, প্রাবন্ধিক, সাহিত্য সমালোচক, জীবনীকার, সম্পাদক এবং অভিধান রচয়িতা বা <span class="eng-text font-bold">Lexicographer</span> (<span class="terminology">লেক্সিকোগ্রাফার: যিনি অভিধান বা ডিকশনারি রচনা ও সম্পাদনা করেন</span>) ছিলেন।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#1E3A8A]">
+                        <p><strong class="text-lg text-[#1E3A8A]">শারীরিক অবস্থা:</strong> তিনি শৈশব থেকেই নানা শারীরিক ও মানসিক সমস্যায় ভুগতেন, বিশেষ করে <span class="eng-text font-bold">Tourette syndrome</span>-এ (<span class="terminology">টোরেট সিনড্রোম: এক ধরনের স্নায়বিক রোগ যাতে রোগীর শরীরে অনৈচ্ছিক নড়াচড়া বা মুখ দিয়ে অনৈচ্ছিক শব্দ তৈরি হয়</span>)। এতসব শারীরিক বাধা সত্ত্বেও তার মেধা ছিল অসামান্য।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#1E3A8A] bg-blue-50">
+                        <p><strong class="text-lg text-[#1E3A8A]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text font-bold">The Age of Sensibility (1745-1785)</span>, যা <span class="eng-text">Neoclassical Period</span>-এর শেষ ভাগ। এই যুগকে তার নামানুসারে '<span class="eng-text font-bold">Age of Johnson</span>'-ও বলা হয়।</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Titles -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="content-card bg-white border-t-4 border-t-[#1E3A8A]">
+                    <ul class="space-y-4 text-lg text-black">
+                        <li class="flex items-start">
+                            <span class="text-[#B45309] text-2xl mr-3 leading-none">♦</span>
+                            <span><strong class="eng-text text-[#1E3A8A]">Father of English Dictionary:</strong> ইংরেজি অভিধানের জনক। <span class="bg-slate-100 px-2 py-1 rounded text-sm block mt-1">(তিনি প্রথম অভিধান প্রণেতা নন, তবে তার রচিত অভিধানটিই প্রথম মানসম্মত ও পূর্ণাঙ্গ অভিধান হিসেবে স্বীকৃত)।</span></span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#B45309] text-2xl mr-3 leading-none">♦</span>
+                            <span><strong class="eng-text text-[#1E3A8A]">First Lexicographer in English:</strong> প্রথম ইংরেজি আভিধানিক বা অভিধান রচয়িতা।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#B45309] text-2xl mr-3 leading-none">♦</span>
+                            <span><strong class="eng-text text-[#1E3A8A]">Shakespeare's Critic:</strong> বিখ্যাত শেক্সপিয়র গবেষক বা সমালোচক।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#B45309] text-2xl mr-3 leading-none">♦</span>
+                            <span><strong class="eng-text text-[#1E3A8A]">The Great Cham of Literature:</strong> সাহিত্যের মহান সম্রাট (<span class="terminology">'Cham' মানে সম্রাট বা সর্বময় কর্তা; সাহিত্যিক স্মলেট তাকে এই উপাধি দিয়েছিলেন</span>)।</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3: Literary Works -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                <p class="mb-5 text-lg text-black">জনসনের সাহিত্যকর্মের পরিধি বিশাল। তবে তিনি তার অভিধান এবং সাহিত্য সমালোচনার জন্য সবচেয়ে বেশি স্মরণীয়।</p>
+
+                <div class="space-y-6">
+                    <!-- Dictionary -->
+                    <div class="content-card border-l-4 border-l-[#B45309] shadow-md relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-[#FEF9C3] text-[#B45309] px-4 py-1 rounded-bl-xl font-bold border-l border-b border-[#FDE047]">Masterpiece</div>
+                        <h3 class="text-2xl font-bold text-[#1E3A8A] mb-3">ক. আ ডিকশনারি অফ দি ইংলিশ ল্যাঙ্গুয়েজ (<span class="eng-text">A Dictionary of the English Language - 1755</span>) ***</h3>
+                        <p class="text-black font-semibold mb-3">এটি ড. স্যামুয়েল জনসনের সর্বশ্রেষ্ঠ কীর্তি।</p>
+                        
+                        <ul class="list-none space-y-3 text-black">
+                            <li class="bg-orange-50 p-3 rounded border border-orange-100">
+                                <strong class="text-[#B45309]">ইতিহাস:</strong> ১৭৫৫ সালে প্রকাশিত এই বিশাল অভিধানটি লিখতে তার দীর্ঘ <span class="font-bold text-red-600 text-xl bn-number">৯</span> বছর সময় লেগেছিল।
+                            </li>
+                            <li class="bg-blue-50 p-4 border border-blue-100 rounded-lg shadow-sm">
+                                <strong class="text-[#1E3A8A]">বৈশিষ্ট্য:</strong> এটিতে প্রায় ৪০,০০০ শব্দ ছিল। তিনিই সর্বপ্রথম শব্দের অর্থ বোঝাতে চিত্র এবং উদ্ধৃতির (<span class="eng-text">Quotations</span>) ব্যবহার করেন। ১৫০ বছর পর 'অক্সফোর্ড ইংলিশ ডিকশনারি' (<span class="eng-text">OED</span>) আসার আগ পর্যন্ত এটিই ছিল ইংরেজি ভাষার প্রধান এবং সবচেয়ে নির্ভরযোগ্য অভিধান।
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Preface to Shakespeare -->
+                    <div class="content-card border-t-4 border-t-[#1E3A8A] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#1E3A8A] mb-3">খ. আ প্রিফেস টু শেক্সপিয়র (<span class="eng-text">A Preface to Shakespeare - 1765</span>)</h3>
+                        <p class="text-black font-semibold mb-2">এটি একটি কালজয়ী সাহিত্য সমালোচনা গ্রন্থ (<span class="eng-text font-bold">Literary Criticism</span>)।</p>
+                        
+                        <ul class="list-disc list-inside space-y-3 text-black">
+                            <li><strong class="text-[#1E3A8A]">বিষয়বস্তু:</strong> এখানে তিনি শেক্সপিয়রের নাটকগুলোর গুণাগুণ (<span class="eng-text">Merits</span>) এবং দোষ-ত্রুটি (<span class="eng-text">Demerits</span>) নিয়ে অত্যন্ত নিরপেক্ষ ও পাণ্ডিত্যপূর্ণ আলোচনা করেছেন।</li>
+                            <li><strong class="text-[#1E3A8A]">মূল্যায়ন:</strong> তিনি শেক্সপিয়রকে "<span class="eng-text font-bold text-[#B45309]">Poet of Human Nature</span>" (মানব প্রকৃতির কবি) হিসেবে আখ্যায়িত করেছেন। তিনি বলেছিলেন, শেক্সপিয়রের চরিত্ররা কোনো নির্দিষ্ট দেশ বা কালের নয়, বরং তারা সর্বজনীন মানুষের প্রতিনিধি।</li>
+                        </ul>
+                    </div>
+
+                    <!-- Rasselas -->
+                    <div class="content-card border-t-4 border-t-[#1E3A8A] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#1E3A8A] mb-3">গ. রাসেলাস: প্রিন্স অফ আবিসিনিয়া (<span class="eng-text">Rasselas: Prince of Abissinia - 1759</span>)</h3>
+                        <p class="text-black font-semibold mb-2">এটি একটি দার্শনিক উপন্যাস (<span class="eng-text font-bold">Philosophical Novel/Romance</span>)।</p>
+                        
+                        <ul class="list-disc list-inside space-y-3 text-black">
+                            <li><strong class="text-[#1E3A8A]">বিষয়বস্তু:</strong> আবিসিনিয়ার (বর্তমান ইথিওপিয়া) রাজপুত্র রাসেলাস সুখের সন্ধানে তার '<span class="eng-text">Happy Valley</span>' বা সুখের উপত্যকা ত্যাগ করে বিশ্বে ভ্রমণ করেন। কিন্তু নানা অভিজ্ঞতার পর শেষ পর্যন্ত তিনি উপলব্ধি করেন যে, পৃথিবীতে কোথাও পূর্ণ সুখ নেই।</li>
+                            <li><strong class="text-[#1E3A8A]">বাংলা অনুবাদ:</strong> বিখ্যাত বাঙালি সাহিত্যিক তারাশঙ্কর তর্করত্ন এই উপন্যাসের বাংলা অনুবাদ করেছেন।</li>
+                        </ul>
+                    </div>
+
+                    <!-- Lives of the English Poets -->
+                    <div class="content-card border-t-4 border-t-[#1E3A8A] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#1E3A8A] mb-3">ঘ. লাইভস অফ দ্য ইংলিশ পোয়েটস (<span class="eng-text">Lives of the English Poets</span>)</h3>
+                        <p class="text-black mb-2">এটি ৫২ জন বিখ্যাত ইংরেজি কবির জীবনী ও সাহিত্যকর্মের সমালোচনামূলক সংকলন। এটি ইংরেজি সাহিত্যের অন্যতম শ্রেষ্ঠ জীবনীগ্রন্থ।</p>
+                        <p class="text-black bg-yellow-50 p-3 border-l-4 border-yellow-400 mt-2">
+                            <strong class="eng-text text-[#B45309]">Metaphysical Poets:</strong> এই বইয়ের '<span class="eng-text">Life of Cowley</span>' অধ্যায়ে তিনি জন ডান (<span class="eng-text">John Donne</span>) এবং তার অনুসারীদের প্রথম '<span class="eng-text font-bold">Metaphysical Poets</span>' হিসেবে আখ্যায়িত করেন (<span class="terminology">মেটাফিজিক্যাল পোয়েটস: ১৭শ শতাব্দীর একদল কবি যারা তাদের কবিতায় জটিল রূপক, বুদ্ধিবৃত্তিক যুক্তি এবং আধ্যাত্মিকতার সংমিশ্রণ ঘটিয়েছিলেন</span>)।
+                        </p>
+                    </div>
+
+                    <!-- Poems & Extra -->
+                    <div class="content-card border-l-4 border-l-[#1E3A8A]">
+                        <h3 class="text-xl font-bold text-[#1E3A8A] mb-4">ঙ. কবিতা ও অন্যান্য</h3>
+                        <div class="space-y-4 text-black">
+                            <div class="border-b border-gray-200 pb-2">
+                                <strong class="eng-text text-lg text-[#B45309]">The Vanity of Human Wishes:</strong> 
+                                এটি তার বিখ্যাত কবিতা। এখানে তিনি মানুষের জাগতিক আকাঙ্ক্ষার অসারতা তুলে ধরেছেন।
+                            </div>
+                            <div class="border-b border-gray-200 pb-2">
+                                <strong class="eng-text text-lg text-[#B45309]">London:</strong> 
+                                সমসাময়িক লন্ডনের দূর্নীতি ও অবক্ষয় নিয়ে লেখা একটি বিখ্যাত কবিতা।
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 mt-3">
+                                <p><strong class="text-[#1E3A8A]">* বিসিএস অতিরিক্ত তথ্য:</strong> ড. স্যামুয়েল জনসনের নিজের জীবনী <span class="eng-text font-bold">"The Life of Samuel Johnson"</span> লিখেছিলেন তার বন্ধু জেমস বসওয়েল (<span class="eng-text">James Boswell</span>)। এটিকে ইংরেজি সাহিত্যের সর্বকালের শ্রেষ্ঠ জীবনীগ্রন্থ বা বায়োগ্রাফি হিসেবে বিবেচনা করা হয়।</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Quotes -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>) ও সাহিত্যিক অলঙ্কার</h2>
+                <p class="mb-6 text-lg text-black">বিসিএস ও অন্যান্য পরীক্ষার জন্য জনসনের উক্তিগুলো অত্যন্ত গুরুত্বপূর্ণ:</p>
+                
+                <div class="grid grid-cols-1 gap-5">
+                    
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#1E3A8A]">1. "Shakespeare is the poet of nature; the poet that holds up to his readers a faithful mirror of manners and of life."</p>
+                        <p class="text-black mb-2 text-lg">(শেক্সপিয়র প্রকৃতির কবি; এমন এক কবি যিনি পাঠকের সামনে জীবন ও আচরণের এক বিশ্বস্ত দর্পণ বা আয়না তুলে ধরেন)</p>
+                        <div class="bg-white/80 p-2 rounded border border-blue-100 mt-2">
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Metaphor</span> (<span class="terminology">মেটাফর: শেক্সপিয়রের সৃষ্টিকর্মকে সমাজের একটি 'আয়না' বা Mirror-এর সাথে রূপক অর্থে তুলনা করা হয়েছে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#1E3A8A]">2. "Patriotism is the last refuge of a scoundrel."</p>
+                        <p class="text-black mb-2 text-lg">(দেশপ্রেম হলো বজ্জাতের শেষ আশ্রয়স্থল - অর্থাৎ যারা ভন্ড বা দুর্নীতিবাজ, তারা নিজেদের দোষ ঢাকতে সবার শেষে দেশপ্রেমের দোহাই দেয়)</p>
+                        <div class="bg-white/80 p-2 rounded border border-blue-100 mt-2">
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Metaphor</span> (<span class="terminology">দেশপ্রেমকে সরাসরি একটি 'আশ্রয়স্থল' বা Refuge বলা হয়েছে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container !mb-0">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#1E3A8A]">3. "Example is always more efficacious than precept."</p>
+                        <p class="text-black text-sm">(উপদেশের চেয়ে দৃষ্টান্ত বা উদাহরণ সবসময় বেশি কার্যকরী)</p>
+                    </div>
+
+                    <div class="quote-container !mb-0">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#1E3A8A]">4. "The true genius is a mind of large general powers, accidentally determined to some particular direction."</p>
+                        <p class="text-black text-sm">(প্রকৃত প্রতিভা হলো এক বিশাল সাধারণ ক্ষমতাসম্পন্ন মন, যা দুর্ঘটনাবশত বা কাকতালীয়ভাবে কোনো একটি নির্দিষ্ট লক্ষ্যের দিকে ধাবিত হয়)</p>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#1E3A8A]">5. "Integrity without knowledge is weak and useless, and knowledge without integrity is dangerous and dreadful."</p>
+                        <p class="text-black mb-2 text-lg">(জ্ঞান ছাড়া সততা দুর্বল ও অকেজো, আর সততা ছাড়া জ্ঞান বিপজ্জনক ও ভয়ংকর)</p>
+                        <div class="bg-white/80 p-2 rounded border border-blue-100 mt-2">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">Rasselas</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Antithesis</span> (<span class="terminology">অ্যান্টিথেসিস: Integrity vs Knowledge এবং তাদের ফলাফলের চমৎকার বৈপরীত্য এখানে তুলে ধরা হয়েছে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#1E3A8A]">6. "Nature never gives everything at once."</p>
+                        <p class="text-black mb-2 text-lg">(প্রকৃতি কখনোই সবকিছু একসাথে দেয় না)</p>
+                        <div class="bg-white/80 p-2 rounded border border-blue-100 mt-2">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">Rasselas</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Personification</span> (<span class="terminology">পারসনিফিকেশন বা ব্যক্তিসত্তারোপ: প্রাণহীন প্রকৃতিকে মানুষের মতো 'দেওয়া' বা দান করার গুণের অধিকারী করা হয়েছে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Section 5: At a Glance -->
+            <section class="bg-gradient-to-br from-[#1E3A8A] to-[#172554] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8 border-t-4 border-[#B45309]">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#3B82F6] pb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-[#B45309]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    একনজরে মনে রাখার মতো তথ্য
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start">
+                        <span class="text-[#B45309] mr-3 font-bold text-xl">►</span> 
+                        <p>তিনি <span class="eng-text font-bold">Father of English Dictionary</span>।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#B45309] mr-3 font-bold text-xl">►</span> 
+                        <p>তার বিখ্যাত অভিধান প্রকাশিত হয় ১৭৫৫ সালে।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#B45309] mr-3 font-bold text-xl">►</span> 
+                        <p>তিনি শেক্সপিয়রকে "<span class="eng-text font-bold">Poet of Human Nature</span>" বলেছেন।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#B45309] mr-3 font-bold text-xl">►</span> 
+                        <p>তিনি ১৭শ শতাব্দীর কবিদের '<span class="eng-text font-bold">Metaphysical Poets</span>' নাম দেন।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#B45309] mr-3 font-bold text-xl">►</span> 
+                        <p>তার বিখ্যাত দার্শনিক উপন্যাস <span class="eng-text font-bold">Rasselas</span>।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#B45309] mr-3 font-bold text-xl">►</span> 
+                        <p>তিনি <span class="eng-text font-bold">Age of Sensibility</span>-র প্রধান লেখক।</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            
+            <!-- Creator Badge (Center Aligned) -->
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+
+            <!-- QR Code Bottom-Right Corner -->
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.src='https://placehold.co/65x65/1E3A8A/FFF?text=QR'">
+            </a>
+        </footer>
+
+    </div>
+
+    <!-- Script to wrap Bangla numbers in a specific font -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            
+            // Find all text nodes containing Bangla numbers
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) {
+                        textNodes.push(n);
+                    }
+                }
+            }
+
+            // Replace text nodes, wrapping Bangla numbers in spans
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number';
+                        span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

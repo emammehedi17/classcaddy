@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on Christopher Marlowe - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme: Tragic Midnight & Blood Crimson */
+        :root {
+            --primary-color: #1E1B4B; /* Indigo 950 / Midnight Blue */
+            --secondary-color: #DC2626; /* Red 600 / Blood Crimson */
+            --accent-color: #FEF2F2; /* Red 50 */
+            --bg-color: #FAFAFA; 
+            --card-bg: #FFFFFF;
+            --text-main: #000000; 
+            --border-color: #FECACA; 
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-color);
+            color: var(--text-main); line-height: 1.6;
+            background-image: linear-gradient(135deg, #FAFAFA 0%, #EEF2FF 100%);
+        }
+
+        .eng-text { font-family: 'Times New Roman', Times, serif; font-size: 1.1em; }
+        .bn-number { font-family: 'Kalpurush', 'Times New Roman', serif; font-size: 1.05em; font-weight: 500; }
+
+        .theme-header {
+            background: linear-gradient(135deg, var(--primary-color), #09090B);
+            color: white; border-bottom: 6px solid var(--secondary-color);
+            position: relative; box-shadow: 0 4px 20px rgba(30, 27, 75, 0.3);
+        }
+
+        .section-heading {
+            color: var(--primary-color); border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px; margin-bottom: 1.5rem; font-weight: 700;
+            display: inline-block; position: relative; text-transform: uppercase;
+        }
+        
+        .section-heading::after {
+            content: '🗡️'; position: absolute; bottom: -15px; right: -30px;
+            color: var(--secondary-color); font-size: 1.5rem;
+        }
+
+        .content-card {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem; transition: all 0.3s ease; border-top: 3px solid transparent;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(220, 38, 38, 0.15); border-top: 3px solid var(--secondary-color);
+        }
+
+        .masterpiece-card {
+            background-color: #FFF5F5; border: 1px solid #FCA5A5; border-left: 5px solid var(--secondary-color);
+        }
+
+        .quote-container {
+            border-left: 5px solid var(--secondary-color); background: #EEF2FF;
+            padding: 15px 20px; border-radius: 0 10px 10px 0; margin-bottom: 1.2rem;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.04); border: 1px solid #E0E7FF; border-left: 5px solid var(--secondary-color);
+        }
+
+        .terminology {
+            background-color: #FEE2E2; padding: 0 5px; border-radius: 4px;
+            font-weight: 500; color: #000000; border: 1px dashed #DC2626; font-size: 0.95em;
+        }
+
+        .qr-corner { position: absolute; bottom: 15px; right: 15px; width: 65px; height: 65px; background: white; padding: 4px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;}
+        .qr-corner img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+        .master-footer { background: #ffffff; border-top: 5px solid var(--primary-color); padding: 30px 20px; text-align: center; position: relative; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-indigo-200">
+        
+        <header class="theme-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">ক্রিস্টোফার মার্লো (<span class="eng-text">Christopher Marlowe</span>)</h1>
+            <p class="text-xl text-[#FCA5A5] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1564 - 1593</span></p>
+            <p class="text-lg mb-6 text-indigo-50 text-justify">
+                ক্রিস্টোফার মার্লো ইংরেজি সাহিত্যের প্রথম যুগের অন্যতম শ্রেষ্ঠ ট্র্যাজেডি রচয়িতা এবং শেক্সপিয়রের সবচেয়ে বড় অনুপ্রেরণা। তিনি এলিজাবেথান যুগের '<span class="eng-text font-bold text-[#FCA5A5]">University Wits</span>' (<span class="terminology">অক্সফোর্ড ও ক্যামব্রিজ বিশ্ববিদ্যালয়ের একদল প্রতিভাবান নাট্যকার ও প্যামফ্লেটিয়ার</span>)-এর মধ্যে সবচেয়ে উজ্জ্বল নক্ষত্র ছিলেন।
+            </p>
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/1E1B4B/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <main class="p-6 md:p-10">
+            <!-- Section 1 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#1E1B4B]"><strong class="text-lg text-[#1E1B4B]">জন্ম:</strong> ১৫৬৪ সালে (শেক্সপিয়রের জন্মের ঠিক দুই মাস আগে কেন্টারের শহরতলি ক্যান্টারবারিতে)।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#DC2626] bg-[#FEF2F2]"><strong class="text-lg text-[#DC2626]">মৃত্যু:</strong> ১৫৯৩ সালে মাত্র ২৯ বছর বয়সে লন্ডনের ডেপ্টফোর্ডের একটি পানশালায় (<span class="eng-text">Tavern</span>) ইনগ্রাম ফ্রাইজার নামক এক ব্যক্তির ছুরিকাঘাতে তিনি নির্মমভাবে নিহত হন।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#1E1B4B]"><strong class="text-lg text-[#1E1B4B]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The Renaissance Period (Elizabethan Age)</span>।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#1E1B4B] bg-indigo-50"><strong class="text-lg text-[#1E1B4B]">বিশেষত্ব:</strong> তিনি নাটকে অমিত্রাক্ষর ছন্দ বা <span class="eng-text font-bold">Blank Verse</span>-এর প্রবর্তক। তার এই জাদুকরী ও শক্তিশালী লেখনী শৈলীকে নাট্যকার বেন জনসন <span class="eng-text font-bold text-[#DC2626]">"Marlowe's Mighty Line"</span> বলে আখ্যায়িত করেছেন।</div>
+                </div>
+            </section>
+
+            <!-- Section 2 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="content-card bg-white border-t-4 border-t-[#1E1B4B] text-black">
+                    <ul class="space-y-3 text-lg">
+                        <li><strong class="eng-text text-[#1E1B4B]">Father of English Tragedy:</strong> ইংরেজি ট্র্যাজেডির জনক। (শেক্সপিয়র নাটকের জনক হলেও, ট্র্যাজেডি ধারার মূল স্থপতি মার্লো)।</li>
+                        <li><strong class="eng-text text-[#1E1B4B]">The Greatest of the University Wits:</strong> ইউনিভার্সিটি উইটসদের মধ্যে শ্রেষ্ঠ।</li>
+                        <li><strong class="eng-text text-[#1E1B4B]">The Morning Star of Elizabethan Drama:</strong> এলিজাবেথান নাটকের ভোরের তারা।</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                <p class="mb-4 text-lg text-black">তার নাটকগুলো মূলত মানুষের অসীম ক্ষমতা, জ্ঞান এবং সম্পদের অদম্য লোভ (<span class="eng-text font-bold text-[#DC2626]">Machiavellian traits</span> - <span class="terminology">যে কোনো উপায়ে ক্ষমতা ও স্বার্থ হাসিলের প্রবণতা</span>) নিয়ে আবর্তিত হয়েছে।</p>
+                <div class="space-y-6">
+                    <div class="content-card masterpiece-card relative overflow-hidden shadow-md">
+                        <div class="absolute top-0 right-0 bg-[#FEF2F2] text-[#DC2626] px-4 py-1 rounded-bl-xl font-bold border-l border-b border-[#FECACA]">Masterpiece</div>
+                        <h3 class="text-2xl font-bold text-[#1E1B4B] mb-3">ক. ডক্টর ফস্টাস (<span class="eng-text">Doctor Faustus</span>) ***</h3>
+                        <p class="text-black font-semibold mb-2">এটি তার শ্রেষ্ঠ নাটক।</p>
+                        <ul class="list-disc list-inside space-y-2 text-black">
+                            <li><strong class="text-[#1E1B4B]">পুরো নাম:</strong> <span class="eng-text">The Tragical History of the Life and Death of Doctor Faustus.</span></li>
+                            <li><strong class="text-[#1E1B4B]">কাহিনী:</strong> ডক্টর ফস্টাস নামক এক জার্মান পণ্ডিত অসীম জ্ঞান ও জাদুর ক্ষমতার লোভে শয়তানের (<span class="eng-text">Lucifer</span>) প্রতিনিধি <span class="eng-text font-bold">Mephistopheles</span>-এর কাছে নিজের আত্মাকে ২৪ বছরের জন্য বিক্রি করে দেন (<span class="eng-text font-bold text-[#DC2626]">Blood Pact</span>)। অবশেষে সময় শেষ হলে শয়তানরা এসে তাকে নরকে টেনে নিয়ে যায়।</li>
+                        </ul>
+                    </div>
+
+                    <div class="content-card border-t-4 border-t-[#1E1B4B]">
+                        <h3 class="text-xl font-bold text-[#1E1B4B] mb-3">খ. অন্যান্য বিখ্যাত ট্র্যাজেডি</h3>
+                        <ul class="list-disc list-inside space-y-3 text-black">
+                            <li><strong class="eng-text font-bold text-[#DC2626]">The Jew of Malta:</strong> এক চরম সম্পদলোভী এবং ধুরন্ধর ইহুদি বণিক বারাবাস (<span class="eng-text">Barabas</span>)-এর কাহিনী, যা শেক্সপিয়রের <span class="eng-text">'The Merchant of Venice'</span> লিখতে বিশাল অনুপ্রেরণা জুগিয়েছিল।</li>
+                            <li><strong class="eng-text font-bold text-[#DC2626]">Tamburlaine the Great:</strong> বিশ্বজয়ের নেশায় মত্ত এক সাধারণ মেষপালক থেকে নিষ্ঠুর মঙ্গোলীয় বিজেতা তৈমুর লং-এর উত্থান ও পতনের কাহিনী।</li>
+                            <li><strong class="eng-text font-bold text-[#DC2626]">Edward II:</strong> এটি ইংরেজি সাহিত্যের অন্যতম শ্রেষ্ঠ ঐতিহাসিক ট্র্যাজেডি, যা সমকামিতা এবং রাজকীয় ক্ষমতার দ্বন্দ্ব নিয়ে রচিত।</li>
+                            <li class="list-none text-sm mt-2 text-gray-600">(অতিরিক্ত তথ্য): <span class="eng-text">Dido, Queen of Carthage</span> এবং <span class="eng-text">The Massacre at Paris</span> তাঁর অন্যান্য রচনা।</li>
+                        </ul>
+                    </div>
+
+                    <div class="content-card border-l-4 border-l-[#1E1B4B] bg-indigo-50">
+                        <h3 class="text-xl font-bold text-[#1E1B4B] mb-2">গ. বিখ্যাত কবিতা</h3>
+                        <p class="text-black"><strong class="eng-text text-lg text-[#DC2626]">The Passionate Shepherd to His Love:</strong> এটি একটি বিখ্যাত রোমান্টিক এবং প্যাস্টোরাল (গ্রাম্য) কবিতা, যেখানে এক মেষপালক তার প্রেমিকাকে গ্রামের সাধারণ জীবনে আসার আহ্বান জানায়।</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>)</h2>
+                <div class="grid grid-cols-1 gap-4 mt-4">
+                    <div class="quote-container border-l-[6px] border-l-[#DC2626] bg-[#FEF2F2]">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#1E1B4B]">1. "Was this the face that launched a thousand ships, / And burnt the top-less towers of Ilium?"</p>
+                        <p class="text-black mb-1">(এই কি সেই মুখ, যার জন্য হাজারো জাহাজ ভাসানো হয়েছিল এবং ট্রয় নগরী পুড়িয়ে দেওয়া হয়েছিল?)</p>
+                        <p class="text-sm text-black"><strong>উৎস:</strong> <span class="eng-text">Doctor Faustus</span> (মৃত্যুর আগে ফস্টাস জাদুর মাধ্যমে হেলেন অব ট্রয়কে সামনে এনে এই অমর উক্তিটি করেছিলেন)।</p>
+                    </div>
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#1E1B4B]">2. "Come live with me and be my love."</p>
+                        <p class="text-black mb-1">(এসো আমার সাথে থাকো এবং আমার ভালোবাসা হও)</p>
+                        <p class="text-sm text-black"><strong>উৎস:</strong> <span class="eng-text">The Passionate Shepherd to His Love.</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5 -->
+            <section class="bg-gradient-to-br from-[#1E1B4B] to-[#09090B] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8 border-t-4 border-[#DC2626]">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#312E81] pb-3">একনজরে মনে রাখার মতো তথ্য</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🗡️</span><p>তিনি <span class="eng-text font-bold">Father of English Tragedy</span>.</p></div>
+                    <div class="flex items-start"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🗡️</span><p>নাটকে <span class="eng-text font-bold">Blank Verse</span>-এর ব্যাপক ব্যবহারের জন্য তিনি বিখ্যাত ("Marlowe's Mighty Line")।</p></div>
+                    <div class="flex items-start"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🗡️</span><p>তার শ্রেষ্ঠ নাটক <span class="eng-text font-bold">Doctor Faustus</span>।</p></div>
+                    <div class="flex items-start"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🗡️</span><p>মাত্র ২৯ বছর বয়সে এক পানশালায় গুপ্তহত্যার শিকার হন।</p></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/1E1B4B/FFF?text=QR'">
+            </a>
+        </footer>
+    </div>
+
+    <!-- Script for Bangla Numbers -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) { textNodes.push(n); }
+                }
+            }
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number'; span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on Emily Dickinson - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme: Reclusive White & Sage Green */
+        :root {
+            --primary-color: #3F6212; /* Green 800 / Sage Green */
+            --secondary-color: #9D174D; /* Rose 800 / Vintage Floral */
+            --accent-color: #F8FAFC; /* Slate 50 / Reclusive White */
+            --bg-color: #FDFBF7; /* Warm White */
+            --card-bg: #FFFFFF;
+            --text-main: #000000; 
+            --border-color: #D1D5DB; /* Gray 300 */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-color);
+            color: var(--text-main); line-height: 1.6;
+            background-image: linear-gradient(135deg, #FDFBF7 0%, #F0FDF4 100%);
+        }
+
+        .eng-text { font-family: 'Times New Roman', Times, serif; font-size: 1.1em; }
+        .bn-number { font-family: 'Kalpurush', 'Times New Roman', serif; font-size: 1.05em; font-weight: 500; }
+
+        .theme-header {
+            background: linear-gradient(135deg, var(--primary-color), #14532D);
+            color: white; border-bottom: 6px solid var(--secondary-color);
+            position: relative; box-shadow: 0 4px 20px rgba(63, 98, 18, 0.2);
+        }
+
+        .section-heading {
+            color: var(--primary-color); border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px; margin-bottom: 1.5rem; font-weight: 700;
+            display: inline-block; position: relative; text-transform: uppercase;
+        }
+        
+        .section-heading::after {
+            content: '🌸'; position: absolute; bottom: -15px; right: -30px;
+            color: var(--secondary-color); font-size: 1.5rem;
+        }
+
+        .content-card {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem; transition: all 0.3s ease; border-top: 3px solid transparent;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(157, 23, 77, 0.1); border-top: 3px solid var(--secondary-color);
+        }
+
+        .poem-box {
+            background-color: #F8FAFC; border-left: 4px solid var(--primary-color);
+            border-radius: 0 8px 8px 0; margin-bottom: 1rem; padding: 1rem;
+        }
+
+        .terminology {
+            background-color: #FEF08A; padding: 0 5px; border-radius: 4px;
+            font-weight: 500; color: #000000; border: 1px dashed #9D174D; font-size: 0.95em;
+        }
+
+        .qr-corner { position: absolute; bottom: 15px; right: 15px; width: 65px; height: 65px; background: white; padding: 4px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;}
+        .qr-corner img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+        .master-footer { background: #ffffff; border-top: 5px solid var(--primary-color); padding: 30px 20px; text-align: center; position: relative; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-green-100">
+        
+        <header class="theme-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">এমিলি ডিকিনসন (<span class="eng-text">Emily Dickinson</span>)</h1>
+            <p class="text-xl text-[#FCA5A5] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1830 - 1886</span></p>
+            
+            <p class="text-lg mb-6 text-green-50 text-justify">
+                এমিলি ডিকিনসন (<span class="eng-text">Emily Dickinson</span>) ঊনবিংশ শতাব্দীর একজন অত্যন্ত বিখ্যাত এবং রহস্যময় আমেরিকান কবি। তিনি তার জীবদ্দশায় ছিলেন চরম নিভৃতচারী (<span class="eng-text font-bold text-[#FCA5A5]">Recluse</span>) এবং প্রায় লোকচক্ষুর অন্তরালে জীবন কাটিয়েছেন। ওয়াল্ট হুইটম্যানের (<span class="eng-text">Walt Whitman</span>) পাশাপাশি তাকে ১৯শ শতাব্দীর আমেরিকান কবিতার দ্বিতীয় মূল স্তম্ভ হিসেবে ধরা হয়। তার মৃত্যুর পর তার ছোট বোন ল্যাভিনিয়া তার লেখা প্রায় ১৮০০টি কবিতা আবিষ্কার করেন এবং প্রকাশ করেন। তার কবিতাগুলো আকারে সংক্ষিপ্ত হলেও গভীর আবেগ, মৃত্যুচিন্তা এবং আধ্যাত্মিকতায় পূর্ণ।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/3F6212/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <main class="p-6 md:p-10">
+            <!-- Section 1 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#3F6212]"><strong class="text-lg text-[#3F6212]">জন্ম ও মৃত্যু:</strong> ১৮৩০ সালে যুক্তরাষ্ট্রের ম্যাসাচুসেটসে জন্ম এবং ১৮৮৬ সালে মৃত্যু।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#3F6212]"><strong class="text-lg text-[#3F6212]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">American Literature (19th Century)</span>।</div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#9D174D] bg-[#FDF2F8]">
+                        <strong class="text-lg text-[#9D174D]">রহস্যময় জীবন (বিসিএস অতিরিক্ত):</strong> তিনি আমেরিকার ম্যাসাচুসেটসের অ্যামহার্স্ট (<span class="eng-text">Amherst</span>) শহরে বাস করতেন। জীবনের শেষ দিকে তিনি ঘর থেকে বের হতেন না এবং সবসময় <strong>সাদা পোশাক (White Dress)</strong> পরতেন। এজন্য তাকে <span class="eng-text font-bold">"The Myth of Amherst"</span> বা <span class="eng-text font-bold">"The Nun of Amherst"</span> বলা হতো। জীবদ্দশায় তার মাত্র ১০টি কবিতা (প্রায় বেনামে) প্রকাশিত হয়েছিল।
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. সাহিত্যকর্ম ও বৈশিষ্ট্য</h2>
+                
+                <div class="space-y-6">
+                    <div class="content-card border-t-4 border-t-[#3F6212] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#3F6212] mb-3">ক. লেখার মূল বৈশিষ্ট্য ও শৈলী (<span class="eng-text">Style</span>)</h3>
+                        <ul class="list-disc list-inside space-y-2 text-black">
+                            <li><strong class="text-[#3F6212]">বিষয়বস্তু (<span class="eng-text">Themes</span>):</strong> তার কবিতার প্রধান বিষয়বস্তু ছিল মৃত্যু (<span class="eng-text font-bold">Death</span>), অমরত্ব (<span class="eng-text font-bold">Immortality</span>), প্রকৃতি (<span class="eng-text font-bold">Nature</span>) এবং প্রেম (<span class="eng-text font-bold">Love</span>)।</li>
+                            <li><strong class="text-[#3F6212]">শৈলী:</strong> তিনি প্রথাগত ছন্দ বা ব্যাকরণের তোয়াক্কা না করে সম্পূর্ণ নিজস্ব শৈলীতে লিখতেন। তার কবিতায় যতিচিহ্ন হিসেবে প্রচুর <strong>ড্যাশ (—)</strong> এবং জোর বোঝানোর জন্য <strong>ক্যাপিটাল লেটারের (<span class="eng-text">Capital Letter</span>)</strong> অদ্ভুত ও অনিয়মিত ব্যবহার দেখা যায়।</li>
+                            <li><strong class="text-[#3F6212]">নামকরণ:</strong> তিনি তার কোনো কবিতারই শিরোনাম বা টাইটেল দেননি। পরবর্তীতে সম্পাদকরা তার <strong>কবিতার প্রথম লাইনটিকেই</strong> শিরোনাম হিসেবে ব্যবহার করেন।</li>
+                        </ul>
+                    </div>
+
+                    <div class="content-card border-l-4 border-l-[#9D174D]">
+                        <h3 class="text-xl font-bold text-[#9D174D] mb-4">খ. বিখ্যাত কবিতাসমূহ (<span class="eng-text">Famous Poems</span>)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
+                            <div class="poem-box">
+                                <strong class="eng-text text-lg text-[#3F6212]">"Because I could not stop for Death"</strong><br>
+                                <span class="text-sm">এটি তার সবচেয়ে বিখ্যাত কবিতা। এখানে তিনি মৃত্যুকে ভয়ংকর কিছু না ভেবে একজন শান্তশিষ্ট 'ভদ্রলোক' বা সুহৃদ হিসেবে রূপক অর্থে কল্পনা করেছেন যে তাকে রথে করে অনন্তকালের দিকে নিয়ে যায়।</span>
+                            </div>
+                            <div class="poem-box">
+                                <strong class="eng-text text-lg text-[#3F6212]">"Hope is the thing with feathers"</strong><br>
+                                <span class="text-sm">এই কবিতায় তিনি 'আশা'-কে একটি ছোট্ট পাখির সাথে তুলনা করেছেন, যে পাখিটি মানুষের আত্মার মাঝে বাসা বাঁধে এবং চরম ঝড়ের (কঠিন সময়ের) মধ্যেও নিঃস্বার্থভাবে গান গায়।</span>
+                            </div>
+                            <div class="poem-box">
+                                <strong class="eng-text text-lg text-[#3F6212]">"I taste a liquor never brewed"</strong><br>
+                                <span class="text-sm">প্রকৃতির সৌন্দর্যে এবং গ্রীষ্মের হাওয়ায় মাতাল হওয়ার এক অসাধারণ অনুভূতি এই কবিতায় প্রকাশ পেয়েছে।</span>
+                            </div>
+                            <div class="poem-box">
+                                <strong class="eng-text text-lg text-[#3F6212]">"I died for Beauty"</strong><br>
+                                <span class="text-sm">কবরে শুয়ে থাকা দুই ব্যক্তির কথোপকথন। এটি জন কিটসের <span class="eng-text italic">Ode on a Grecian Urn</span>-এর 'Beauty is Truth, Truth Beauty' দর্শনের সাথে গভীর মিল রাখে।</span>
+                            </div>
+                            <div class="poem-box md:col-span-2 text-center">
+                                <strong class="eng-text text-lg text-[#3F6212]">"A Bird came down the Walk"</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. একনজরে মনে রাখার মতো তথ্য</h2>
+                <div class="bg-gradient-to-br from-[#3F6212] to-[#14532D] text-white p-6 md:p-8 rounded-xl shadow-xl">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                        <div class="flex items-start"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🌸</span><p>তিনি আমেরিকার ১৯শ শতাব্দীর একজন <span class="eng-text font-bold">Reclusive</span> (নিভৃতচারী) কবি ছিলেন।</p></div>
+                        <div class="flex items-start"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🌸</span><p>তার কবিতায় প্রচুর ড্যাশ (—) ব্যবহৃত হয়েছে।</p></div>
+                        <div class="flex items-start"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🌸</span><p>তার কবিতায় <span class="eng-text font-bold">Death</span> এবং <span class="eng-text font-bold">Immortality</span> প্রধান বিষয়।</p></div>
+                        <div class="flex items-start"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🌸</span><p>তার বিখ্যাত কবিতা "<span class="eng-text font-bold">Because I could not stop for Death</span>"।</p></div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/3F6212/FFF?text=QR'">
+            </a>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) { textNodes.push(n); }
+                }
+            }
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number'; span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

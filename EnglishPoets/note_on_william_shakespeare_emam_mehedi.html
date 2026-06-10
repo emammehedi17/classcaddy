@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on William Shakespeare - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme: Royal Crimson & Crown Gold */
+        :root {
+            --primary-color: #7F1D1D; /* Red 900 / Royal Crimson */
+            --secondary-color: #D97706; /* Amber 600 / Crown Gold */
+            --accent-color: #FFFBEB; /* Amber 50 */
+            --bg-color: #FAFAF9; /* Stone 50 */
+            --card-bg: #FFFFFF;
+            --text-main: #000000; 
+            --border-color: #FDE68A; /* Amber 200 */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-color);
+            color: var(--text-main); line-height: 1.6;
+            background-image: linear-gradient(135deg, #FAFAF9 0%, #FEF2F2 100%);
+        }
+
+        .eng-text { font-family: 'Times New Roman', Times, serif; font-size: 1.1em; }
+        .bn-number { font-family: 'Kalpurush', 'Times New Roman', serif; font-size: 1.05em; font-weight: 500; }
+
+        .theme-header {
+            background: linear-gradient(135deg, var(--primary-color), #450A0A);
+            color: white; border-bottom: 6px solid var(--secondary-color);
+            position: relative; box-shadow: 0 4px 20px rgba(127, 29, 29, 0.3);
+        }
+
+        .section-heading {
+            color: var(--primary-color); border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px; margin-bottom: 1.5rem; font-weight: 700;
+            display: inline-block; position: relative; text-transform: uppercase;
+        }
+        
+        .section-heading::after {
+            content: '👑'; position: absolute; bottom: -15px; right: -35px;
+            color: var(--secondary-color); font-size: 1.5rem;
+        }
+
+        .content-card {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem; transition: all 0.3s ease; border-top: 3px solid transparent;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(217, 119, 6, 0.15); border-top: 3px solid var(--secondary-color);
+        }
+
+        .masterpiece-card {
+            background-color: #FFFBEB; border: 1px solid #FCD34D; border-left: 5px solid var(--secondary-color);
+        }
+
+        .quote-container {
+            border-left: 5px solid var(--secondary-color); background: #FEF2F2;
+            padding: 15px 20px; border-radius: 0 10px 10px 0; margin-bottom: 1.2rem;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.04); border: 1px solid #FEE2E2; border-left: 5px solid var(--secondary-color);
+        }
+
+        .terminology {
+            background-color: #FEF08A; padding: 0 5px; border-radius: 4px;
+            font-weight: 500; color: #000000; border: 1px dashed #D97706; font-size: 0.95em;
+        }
+
+        .qr-corner { position: absolute; bottom: 15px; right: 15px; width: 65px; height: 65px; background: white; padding: 4px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;}
+        .qr-corner img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+        .master-footer { background: #ffffff; border-top: 5px solid var(--primary-color); padding: 30px 20px; text-align: center; position: relative; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-red-200">
+        
+        <header class="theme-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">উইলিয়াম শেক্সপিয়র (<span class="eng-text">William Shakespeare</span>)</h1>
+            <p class="text-xl text-[#FDE68A] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1564 - 1616</span></p>
+            <p class="text-lg mb-6 text-red-50 text-justify">
+                উইলিয়াম শেক্সপিয়র (<span class="eng-text">William Shakespeare</span>) ইংরেজি সাহিত্যের সর্বকালের সর্বশ্রেষ্ঠ নাট্যকার (<span class="eng-text font-bold text-[#FDE68A]">Greatest Playwright</span>) এবং অন্যতম শ্রেষ্ঠ কবি। রেনেসাঁ যুগের (এলিজাবেথান এবং জ্যাকোবিয়ান পিরিয়ড) এই মহান সাহিত্যিক মানুষের মনস্তত্ত্ব, আবেগ এবং জীবনের অন্তর্নিহিত সত্যকে তাঁর লেখনীর মাধ্যমে এমনভাবে ফুটিয়ে তুলেছেন যা আজও সমাদৃত। তিনি মোট ৩৭টি নাটক, ১৫৪টি সনেট এবং ২টি দীর্ঘ আখ্যানমূলক কবিতা রচনা করেছেন।
+            </p>
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/7F1D1D/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <main class="p-6 md:p-10">
+            <!-- Section 1 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#7F1D1D]"><strong class="text-lg text-[#7F1D1D]">পুরো নাম:</strong> <span class="eng-text">William Shakespeare</span>।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#7F1D1D]"><strong class="text-lg text-[#7F1D1D]">জন্ম ও মৃত্যু:</strong> ১৫৬৪ সালের ২৩ এপ্রিল ইংল্যান্ডের ওয়ারউইকশায়ারের স্ট্র্যাটফোর্ড-আপন-অ্যাভন (<span class="eng-text">Stratford-upon-Avon</span>) শহরে জন্ম। ১৬১৬ সালের ২৩ এপ্রিল (নিজের ৫২তম জন্মদিনে) তিনি মারা যান।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#7F1D1D]"><strong class="text-lg text-[#7F1D1D]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The Renaissance Period</span> (মূলত <span class="eng-text">Elizabethan Age</span> এবং <span class="eng-text">Jacobean Age</span>)।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#7F1D1D]"><strong class="text-lg text-[#7F1D1D]">বিবাহ ও পরিবার:</strong> মাত্র ১৮ বছর বয়সে তিনি ২৬ বছর বয়সী অ্যান হ্যাথাওয়ে (<span class="eng-text">Anne Hathaway</span>)-কে বিয়ে করেন। তাদের তিন সন্তান ছিল।</div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#D97706] bg-[#FFFBEB]">
+                        <strong class="text-lg text-[#D97706]">থিয়েটার জীবন:</strong> তিনি লন্ডনের বিখ্যাত <span class="eng-text font-bold">'The Globe Theatre'</span>-এর অন্যতম মালিক, নাট্যকার ও অভিনেতা ছিলেন। ১৬১৩ সালে <span class="eng-text">'Henry VIII'</span> নাটক চলাকালীন গ্লোব থিয়েটারে আগুন লেগে এটি ধ্বংস হয়ে যায়। পরবর্তীতে এটি পুনর্নির্মাণ করা হয়।
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="content-card bg-white border-t-4 border-t-[#7F1D1D] text-black">
+                    <ul class="space-y-3 text-lg">
+                        <li><strong class="eng-text text-[#7F1D1D]">Bard of Avon:</strong> অ্যাভন নদীর তীরের চারণকবি।</li>
+                        <li><strong class="eng-text text-[#7F1D1D]">The Swan of Avon:</strong> অ্যাভনের রাজহাঁস (তাকে এই উপাধি দিয়েছিলেন তার সমসাময়িক নাট্যকার ও বন্ধু বেন জনসন)।</li>
+                        <li><strong class="eng-text text-[#7F1D1D]">Father of English Drama:</strong> ইংরেজি নাটকের জনক। <span class="terminology">(যদিও ইংরেজি নাটকের ভিত্তি অনেকেই তৈরি করেছেন, তবে শেক্সপিয়রকে তাঁর অসামান্য অবদানের জন্য প্রায়ই এই উপাধি দেওয়া হয়)</span>।</li>
+                        <li><strong class="eng-text text-[#7F1D1D]">The National Poet of England:</strong> ইংল্যান্ডের জাতীয় কবি।</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                <p class="mb-4 text-lg text-black">শেক্সপিয়রের সাহিত্যকর্মকে মূলত ট্র্যাজেডি, কমেডি, ঐতিহাসিক নাটক এবং সনেট—এই চার ভাগে ভাগ করা যায়।</p>
+                
+                <div class="space-y-6">
+                    <div class="content-card border-l-4 border-l-[#7F1D1D] shadow-md bg-[#FEF2F2]">
+                        <h3 class="text-2xl font-bold text-[#7F1D1D] mb-3">ক. বিখ্যাত ট্র্যাজেডি (<span class="eng-text">Tragedies</span>)</h3>
+                        <p class="text-black mb-3">মানুষের পতন, নিয়তি এবং চারিত্রিক দুর্বলতা (<span class="eng-text font-bold text-[#D97706]">Tragic Flaw</span>) নিয়ে লেখা তাঁর ট্র্যাজেডিগুলো বিশ্বসাহিত্যের অমূল্য রত্ন।</p>
+                        <ul class="list-disc list-inside space-y-3 text-black">
+                            <li><strong class="eng-text font-bold text-[#7F1D1D]">Hamlet:</strong> এটি শেক্সপিয়রের সর্ববৃহৎ নাটক (<span class="eng-text">Longest Play</span>)। ডেনমার্কের যুবরাজ হ্যামলেটের পিতৃ হত্যার প্রতিশোধ নেওয়ার গল্প এটি। এর মূল থিম হলো দ্বিধাদ্বন্দ্ব বা সিদ্ধান্তহীনতা (<span class="eng-text">Hesitation/Delay</span>)।</li>
+                            <li><strong class="eng-text font-bold text-[#7F1D1D]">Macbeth:</strong> এটি তাঁর সবচেয়ে ছোট (<span class="eng-text">Shortest Play</span>) এবং অন্যতম শ্রেষ্ঠ ট্র্যাজেডি। স্কটল্যান্ডের সেনাপতি ম্যাকবেথের অতিরিক্ত উচ্চাকাঙ্ক্ষা (<span class="eng-text">Over-vaulting ambition</span>) এবং তার স্ত্রী লেডি ম্যাকবেথের প্ররোচনায় রাজা ডানকানকে হত্যা ও মর্মান্তিক পতনের কাহিনী এখানে বর্ণিত হয়েছে।</li>
+                            <li><strong class="eng-text font-bold text-[#7F1D1D]">Othello:</strong> ভেনিসের সেনাপতি ওথেলো এবং তার স্ত্রী ডেসডিমোনার ভালোবাসার মর্মান্তিক পরিণতি নিয়ে লেখা। এই নাটকের মূল থিম হলো মারাত্মক সন্দেহ বা ঈর্ষা (<span class="eng-text">Fatal Jealousy</span>) এবং ভিলেন ইয়াগো (<span class="eng-text">Iago</span>)-এর চক্রান্ত।</li>
+                            <li><strong class="eng-text font-bold text-[#7F1D1D]">King Lear:</strong> রাজা লিয়র এবং তার তিন মেয়ে (গনেরিল, রিগান ও কর্ডেলিয়া)-এর গল্প। এর মূল থিম হলো চাটুকারিতার ফাঁদ এবং সন্তানদের অকৃতজ্ঞতা।</li>
+                            <li><strong class="eng-text font-bold text-[#7F1D1D]">Romeo and Juliet:</strong> ভেরোনা শহরের দুটি শত্রু পরিবার (মন্টেগু ও ক্যাপুলেট)-এর সন্তান রোমিও এবং জুলিয়েটের অমর প্রেমের করুণ পরিণতির গল্প।</li>
+                            <li><strong class="eng-text font-bold text-[#7F1D1D]">Julius Caesar:</strong> রোমান সম্রাট জুলিয়াস সিজারের হত্যাকাণ্ড এবং ব্রুটাসের বিশ্বাসঘাতকতা নিয়ে লেখা বিখ্যাত ঐতিহাসিক ট্র্যাজেডি।</li>
+                            <li class="list-none bg-white p-2 rounded mt-2"><strong>অন্যান্য ট্র্যাজেডি:</strong> <span class="eng-text">Antony and Cleopatra, Titus Andronicus, Timon of Athens, Coriolanus</span>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="content-card border-l-4 border-l-[#D97706] shadow-sm bg-[#FFFBEB]">
+                        <h3 class="text-2xl font-bold text-[#D97706] mb-3">খ. বিখ্যাত কমেডি (<span class="eng-text">Comedies</span>)</h3>
+                        <p class="text-black mb-3">তাঁর কমেডিগুলো হাস্যরস, ভুল বোঝাবুঝি, ছদ্মবেশ এবং মিলনের আনন্দে ভরপুর।</p>
+                        <ul class="list-disc list-inside space-y-2 text-black">
+                            <li><strong class="eng-text font-bold text-[#D97706]">As You Like It:</strong> এটি একটি বিখ্যাত প্যাসটোরাল কমেডি (<span class="eng-text">Pastoral Comedy</span> - <span class="terminology">বন বা গ্রামীণ পটভূমিতে লেখা</span>), যা ফরেস্ট অফ আর্ডেন-এর পটভূমিতে রচিত।</li>
+                            <li><strong class="eng-text font-bold text-[#D97706]">The Merchant of Venice:</strong> এটি একটি ট্রাজি-কমেডি। ইহুদি সুদখোর শাইলক (<span class="eng-text">Shylock</span>)-এর এক পাউন্ড মাংসের দাবি এবং এন্টোনিও, ব্যাসানিও ও বুদ্ধিমতী পোর্শিয়ার গল্প।</li>
+                            <li><strong class="eng-text font-bold text-[#D97706]">The Tempest:</strong> এটি শেক্সপিয়রের একা লেখা সর্বশেষ নাটক, তাই একে তাঁর '<span class="eng-text font-bold">Swan Song</span>' (<span class="terminology">শিল্পীর জীবনের শেষ শ্রেষ্ঠ রচনা</span>) বলা হয়। জাদুকর প্রসপেরো এবং তার মেয়ে মিরান্ডার গল্প।</li>
+                            <li><strong class="eng-text font-bold text-[#D97706]">Twelfth Night:</strong> যমজ ভাই-বোন ভায়োলা ও সেবাস্টিয়ানের সমুদ্রপথে বিচ্ছেদ এবং ছদ্মবেশ নিয়ে লেখা মজার নাটক।</li>
+                            <li><strong class="eng-text font-bold text-[#D97706]">Measure for Measure:</strong> একে '<span class="eng-text font-bold">Dark Comedy</span>' বা '<span class="eng-text font-bold">Problem Play</span>' বলা হয় (<span class="terminology">যেখানে হাসির আড়ালে সমাজের গম্ভীর সমস্যা তুলে ধরা হয়</span>)।</li>
+                            <li><strong class="eng-text font-bold text-[#D97706]">The Taming of the Shrew:</strong> বদমেজাজি নারী ক্যাথেরিনাকে বশে আনার হাস্যকর কাহিনী।</li>
+                            <li><strong class="eng-text font-bold text-[#D97706]">A Midsummer Night's Dream:</strong> জাদু, পরী এবং প্রেমের বিভ্রম নিয়ে লেখা রোমান্টিক কমেডি।</li>
+                            <li><strong class="eng-text font-bold text-[#D97706]">The Comedy of Errors:</strong> যমজ দুই জোড়া ভাই ও ভৃত্যের পরিচয় বিভ্রান্তি নিয়ে লেখা।</li>
+                            <li><strong class="eng-text font-bold text-[#D97706]">Much Ado About Nothing:</strong> গুজব ও প্রতারণা নিয়ে লেখা দারুণ কমেডি।</li>
+                        </ul>
+                    </div>
+
+                    <div class="content-card border-t-4 border-t-[#7F1D1D]">
+                        <h3 class="text-xl font-bold text-[#7F1D1D] mb-3">গ. ঐতিহাসিক নাটক (<span class="eng-text">Historical Plays</span>)</h3>
+                        <p class="text-black mb-2">ইংল্যান্ডের রাজাদের ইতিহাস নিয়ে লেখা নাটক।</p>
+                        <p class="text-black bg-slate-50 p-2 rounded border border-slate-200"><span class="eng-text">King John, Richard II, Richard III, Henry IV (Part 1 & 2), Henry V, Henry VI (Part 1, 2, 3), Henry VIII.</span></p>
+                    </div>
+
+                    <div class="content-card border-t-4 border-t-[#D97706]">
+                        <h3 class="text-xl font-bold text-[#D97706] mb-3">ঘ. সনেট ও কবিতা (<span class="eng-text">Sonnets & Poems</span>)</h3>
+                        <ul class="list-disc list-inside space-y-2 text-black">
+                            <li>তিনি মোট <strong>১৫৪টি সনেট</strong> লিখেছেন। এর মধ্যে ১-১২৬ নম্বর সনেটগুলো তার এক সুদর্শন বন্ধু '<span class="eng-text font-bold">Fair Youth</span>' (সম্ভবত Earl of Southampton বা Pembroke)-কে উৎসর্গ করা এবং ১২৭-১৫৪ নম্বর সনেটগুলো এক রহস্যময়ী '<span class="eng-text font-bold">Dark Lady</span>'-কে উৎসর্গ করা।</li>
+                            <li><strong>বিখ্যাত দীর্ঘ আখ্যানমূলক কবিতা (<span class="eng-text">Narrative Poems</span>):</strong> <span class="eng-text">Venus and Adonis</span> এবং <span class="eng-text">The Rape of Lucrece</span>। (অতিরিক্ত: <span class="eng-text">A Lover's Complaint</span>)।</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>) ও সাহিত্যিক অলঙ্কার</h2>
+                <div class="grid grid-cols-1 gap-4 mt-4">
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#7F1D1D]">1. "To be, or not to be, that is the question."</p>
+                        <p class="text-black mb-1">(বাঁচব নাকি মরব, সেটিই এখন বড় প্রশ্ন)</p>
+                        <p class="text-sm text-black"><strong>উৎস:</strong> <span class="eng-text">Hamlet</span>। <strong><span class="eng-text">Device:</span></strong> <span class="eng-text font-bold">Antithesis</span> (<span class="terminology">বিপরীতার্থক শব্দের ব্যবহার</span>)।</p>
+                    </div>
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#7F1D1D]">2. "All the world’s a stage, And all the men and women merely players."</p>
+                        <p class="text-black mb-1">(সমগ্র পৃথিবী একটি মঞ্চ, এবং সব নর-নারী কেবলই অভিনেতা-অভিনেত্রী)</p>
+                        <p class="text-sm text-black"><strong>উৎস:</strong> <span class="eng-text">As You Like It</span>। <strong><span class="eng-text">Device:</span></strong> <span class="eng-text font-bold">Metaphor</span>।</p>
+                    </div>
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#7F1D1D]">3. "Cowards die many times before their deaths; The valiant never taste of death but once."</p>
+                        <p class="text-black mb-1">(কাপুরুষেরা মৃত্যুর আগে বহুবার মরে, কিন্তু বীরেরা জীবনে একবারই মৃত্যুর স্বাদ গ্রহণ করে)</p>
+                        <p class="text-sm text-black"><strong>উৎস:</strong> <span class="eng-text">Julius Caesar</span>।</p>
+                    </div>
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#7F1D1D]">4. "Fair is foul, and foul is fair."</p>
+                        <p class="text-black mb-1">(ভালোই মন্দ, আর মন্দই ভালো)</p>
+                        <p class="text-sm text-black"><strong>উৎস:</strong> <span class="eng-text">Macbeth</span> (তিন ডাইনির উক্তি)। <strong><span class="eng-text">Device:</span></strong> <span class="eng-text font-bold">Paradox</span> (<span class="terminology">আপাত স্ববিরোধী কথা</span>)।</p>
+                    </div>
+                    <div class="quote-container !mb-0 border-l-[#7F1D1D] bg-red-50">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#7F1D1D]">5. "Frailty, thy name is woman."</p>
+                        <p class="text-black text-sm">(ভঙ্গুরতা বা দুর্বলতা, তোমারই নাম নারী - <span class="eng-text">Hamlet</span>)</p>
+                    </div>
+                    <div class="quote-container !mb-0 border-l-[#7F1D1D] bg-red-50">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#7F1D1D]">6. "Brevity is the soul of wit."</p>
+                        <p class="text-black text-sm">(সংক্ষিপ্ততাই হলো বুদ্ধিমত্তার প্রাণ - <span class="eng-text">Hamlet</span>)</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5 -->
+            <section class="bg-gradient-to-br from-[#7F1D1D] to-[#450A0A] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8 border-t-4 border-[#D97706]">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#991B1B] pb-3">একনজরে মনে রাখার মতো তথ্য</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start"><span class="text-[#FDE68A] mr-3 font-bold text-xl">👑</span><p>তিনি <span class="eng-text font-bold">Father of English Drama</span> এবং <span class="eng-text font-bold">National Poet of England</span>.</p></div>
+                    <div class="flex items-start"><span class="text-[#FDE68A] mr-3 font-bold text-xl">👑</span><p>সর্ববৃহৎ নাটক <span class="eng-text font-bold">Hamlet</span> এবং সবচেয়ে ছোট নাটক <span class="eng-text font-bold">Macbeth</span>.</p></div>
+                    <div class="flex items-start"><span class="text-[#FDE68A] mr-3 font-bold text-xl">👑</span><p><span class="eng-text font-bold">The Tempest</span> হলো তার '<span class="eng-text font-bold">Swan Song</span>' বা শেষ সাহিত্যকর্ম।</p></div>
+                    <div class="flex items-start"><span class="text-[#FDE68A] mr-3 font-bold text-xl">👑</span><p>তিনি মোট ১৫৪টি সনেট রচনা করেন।</p></div>
+                    <div class="flex items-start md:col-span-2"><span class="text-[#FDE68A] mr-3 font-bold text-xl">👑</span><p>গ্লোব থিয়েটার ১৬১৩ সালে আগুনে পুড়ে গিয়েছিল।</p></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/7F1D1D/FFF?text=QR'">
+            </a>
+        </footer>
+    </div>
+
+    <!-- Script for Bangla Numbers -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) { textNodes.push(n); }
+                }
+            }
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number'; span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

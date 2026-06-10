@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on Robert Browning - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts: Hind Siliguri for Bangla -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme Configuration: Victorian Midnight & Ruby Red */
+        :root {
+            --primary-color: #1E1B4B; /* Midnight Blue / Deep Indigo */
+            --secondary-color: #BE123C; /* Ruby Red / Crimson */
+            --accent-color: #E0E7FF; /* Light Indigo for highlights */
+            --bg-color: #F8FAFC; /* Slate 50 - Very light background */
+            --card-bg: #FFFFFF;
+            --text-main: #000000; /* STRICTLY FULL BLACK FOR NORMAL TEXT */
+            --border-color: #CBD5E1;
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* English Font Class */
+        .eng-text {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1em;
+        }
+
+        /* Bangla Numbers Font Class */
+        .bn-number {
+            font-family: 'Kalpurush', 'Times New Roman', serif;
+            font-size: 1.05em;
+            font-weight: 500;
+        }
+
+        /* Custom Styles for Design Elements */
+        .victorian-header {
+            background: linear-gradient(135deg, var(--primary-color), #312E81);
+            color: white;
+            border-bottom: 6px solid var(--secondary-color);
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .section-heading {
+            color: var(--primary-color);
+            border-left: 6px solid var(--secondary-color);
+            background: linear-gradient(to right, #f1f5f9, transparent);
+            padding: 8px 15px;
+            margin-bottom: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            font-weight: 700;
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 1.25rem;
+            color: var(--text-main);
+        }
+
+        /* Definition Box specifically for Dramatic Monologue */
+        .def-box {
+            background-color: #FFF1F2; /* Very light rose */
+            border: 2px dashed var(--secondary-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .def-box::before {
+            content: '?';
+            position: absolute;
+            top: -20px;
+            right: 20px;
+            background: var(--secondary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* Quotes Styling */
+        .quote-container {
+            border-left: 4px solid var(--primary-color);
+            background: var(--accent-color);
+            padding: 15px 20px;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 1.2rem;
+        }
+        
+        /* Terminology Styling - Highlight without changing text color */
+        .terminology {
+            background-color: #FEF08A; /* Soft yellow highlight */
+            padding: 0 5px;
+            border-radius: 4px;
+            font-weight: 500;
+            color: #000000; /* Keeping text strictly black */
+            border: 1px solid #FDE047;
+        }
+
+        /* Badge and Footer Specifics */
+        .qr-corner {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 65px;
+            height: 65px;
+            background: white;
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+        .qr-corner:hover {
+            transform: scale(1.1);
+        }
+        .qr-corner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .master-footer {
+            background: #ffffff;
+            border-top: 5px solid var(--primary-color);
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden relative border border-gray-200">
+        
+        <!-- Header -->
+        <header class="victorian-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">রবার্ট ব্রাউনিং (<span class="eng-text">Robert Browning</span>)</h1>
+            <p class="text-xl text-rose-300 font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1812 - 1889</span></p>
+            
+            <p class="text-lg mb-6 text-white text-justify" style="color: #ffffff;">
+                রবার্ট ব্রাউনিং (<span class="eng-text">Robert Browning</span>) ভিক্টোরিয়ান যুগের (<span class="eng-text">Victorian Period</span> - <span class="terminology">১৮৩২ থেকে ১৯০১ সাল পর্যন্ত রানী ভিক্টোরিয়ার শাসনামল</span>) অন্যতম শ্রেষ্ঠ এবং প্রভাবশালী ইংরেজ কবি। তিনি তার <span class="eng-text">Dramatic Monologue</span> বা নাটকীয় স্বগতোক্তির জন্য বিশ্ববিখ্যাত। তার কবিতাগুলো মনস্তাত্ত্বিক বিশ্লেষণ এবং মানুষের মনের গভীর জটিলতা নিয়ে রচিত। তিনি বিখ্যাত নারী কবি এলিজাবেথ ব্যারেট ব্রাউনিং (<span class="eng-text">Elizabeth Barrett Browning</span>)-এর স্বামী ছিলেন।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <!-- Creator Badge -->
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                
+                <!-- Header QR Code (Moved down, aligned with badge, block-issue fixed) -->
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" class="w-full h-full object-cover rounded" onerror="this.src='https://placehold.co/65x65/BE123C/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="p-6 md:p-10">
+
+            <!-- Section 1: Biography -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#1E1B4B]">
+                        <p><strong class="text-lg text-[#1E1B4B]">জন্ম:</strong> ১৮১২ সালে লন্ডনে (<span class="eng-text">London</span>)।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#1E1B4B]">
+                        <p><strong class="text-lg text-[#1E1B4B]">মৃত্যু:</strong> ১৮৮৯ সালে ইতালির ভেনিসে (<span class="eng-text">Venice, Italy</span>)।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#1E1B4B]">
+                        <p><strong class="text-lg text-[#1E1B4B]">পেশা:</strong> কবি, নাট্যকার এবং মনস্তাত্ত্বিক বিশ্লেষক (<span class="eng-text">Psycho-analyst</span> - <span class="terminology">যিনি মানুষের অবচেতন মন ও আচরণের বিশ্লেষণ করেন</span>)।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#1E1B4B]">
+                        <p><strong class="text-lg text-[#1E1B4B]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The Victorian Period (1832-1901)</span>।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#BE123C]">
+                        <p><strong class="text-lg text-[#BE123C]">স্ত্রী ও প্রেম:</strong> বিখ্যাত কবি <span class="eng-text">Elizabeth Barrett Browning</span>। তাদের প্রেম এবং পরিবারের অমতে গোপন বিয়ে ইংরেজি সাহিত্যের অন্যতম রোমান্টিক ঘটনা। এলিজাবেথ তার এই প্রেম নিয়ে বিখ্যাত সনেট সংকলন <span class="eng-text italic">Sonnets from the Portuguese</span> লিখেছিলেন।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 bg-indigo-50 border-l-4 border-l-[#1E1B4B]">
+                        <p><strong class="text-lg text-[#1E1B4B]">ইতালির প্রতি টান:</strong> ব্রাউনিং দীর্ঘদিন ইতালিতে বসবাস করেছিলেন এবং ইতালিকে খুব ভালোবাসতেন। তিনি বলেছিলেন, <span class="eng-text font-bold">"Italy was my university."</span> (ইতালি ছিল আমার বিশ্ববিদ্যালয়)।</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Titles -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="content-card bg-white">
+                    <ul class="space-y-4 text-lg">
+                        <li class="flex items-start">
+                            <span class="text-[#BE123C] text-2xl mr-3 leading-none">•</span>
+                            <span><strong class="eng-text text-[#1E1B4B]">Master of Dramatic Monologue:</strong> তিনি নাটকীয় স্বগতোক্তি কবিতার অবিসংবাদিত সম্রাট।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#BE123C] text-2xl mr-3 leading-none">•</span>
+                            <span><strong class="eng-text text-[#1E1B4B]">Optimistic Poet:</strong> তিনি একজন আশাবাদী কবি ছিলেন। তার কবিতায় জীবনের প্রতি ইতিবাচক দৃষ্টিভঙ্গি ফুটে ওঠে।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#BE123C] text-2xl mr-3 leading-none">•</span>
+                            <span><strong class="eng-text text-[#1E1B4B]">Philosopher Poet:</strong> দার্শনিক কবি।</span>
+                        </li>
+                        <li class="flex items-start bg-yellow-50 p-2 rounded">
+                            <span class="text-[#BE123C] text-2xl mr-3 leading-none">•</span>
+                            <span><strong class="text-[#1E1B4B]">* বিসিএস অতিরিক্ত তথ্য:</strong> তরুণ বয়সে তার কবিতাগুলো অতিরিক্ত পাণ্ডিত্য ও জটিলতার কারণে পাঠকদের কাছে দুর্বোধ্য (<span class="eng-text">Obscure</span>) বলে পরিচিত ছিল।</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3: Literary Works -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                <p class="mb-5 text-lg font-medium text-black">ব্রাউনিংয়ের সাহিত্যকর্মের প্রধান বৈশিষ্ট্য হলো <span class="eng-text font-bold">Dramatic Monologue</span>-এর ব্যবহার।</p>
+
+                <!-- Definition Box -->
+                <div class="def-box">
+                    <h3 class="text-xl font-bold text-[#BE123C] mb-2"><span class="eng-text">Dramatic Monologue</span> কী?</h3>
+                    <p class="text-lg text-black">এটি এমন এক ধরণের কবিতা যেখানে একজন বক্তা (<span class="eng-text">Speaker</span>) কোনো নীরব শ্রোতার (<span class="eng-text">Silent Listener</span>) উপস্থিতিতে নিজের মনের ভাব, অতীত ঘটনা বা গোপন কথা প্রকাশ করে। এর মাধ্যমে বক্তার চরিত্রের ভালো-মন্দ দিকগুলো পাঠকের সামনে উন্মোচিত হয়।</p>
+                    <p class="mt-2 text-black"><strong class="text-[#1E1B4B]">উদাহরণ:</strong> <span class="eng-text">My Last Duchess, Andrea del Sarto</span>.</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- My Last Duchess -->
+                    <div class="content-card border-t-4 border-t-[#BE123C] shadow-md">
+                        <h3 class="text-xl font-bold text-[#1E1B4B] mb-3">ক. মাই লাস্ট ডাচেস (<span class="eng-text">My Last Duchess</span>) ***</h3>
+                        <ul class="list-disc list-inside space-y-2 text-black">
+                            <li>এটি ব্রাউনিংয়ের সবচেয়ে বিখ্যাত <span class="eng-text">Dramatic Monologue</span>।</li>
+                            <li><strong>বক্তা:</strong> ইতালির ফেরারা শহরের ডিউক (<span class="eng-text">Duke of Ferrara</span>)।</li>
+                            <li><strong>চরিত্র:</strong> ডিউক (অহংকারী ও নিষ্ঠুর) এবং ডাচেস (সরল ও প্রাণবন্ত)।</li>
+                            <li><strong>বিষয়বস্তু:</strong> ডিউক তার মৃত স্ত্রী বা '<span class="eng-text">Last Duchess</span>'-এর একটি ছবির সামনে দাঁড়িয়ে বিয়ের ঘটকের (<span class="eng-text">Silent Listener</span>) কাছে তার স্ত্রীর "দোষ" বর্ণনা করছেন। ডিউকের অভিযোগ, তার স্ত্রী খুব সহজেই খুশি হতেন এবং সবার প্রতি সমানভাবে কৃতজ্ঞতা প্রকাশ করতেন, যা ডিউকের আভিজাত্যে আঘাত করত। তাই তিনি তাকে হত্যার নির্দেশ দেন।</li>
+                            <li class="ml-5 border-l-2 border-gray-300 pl-3 mt-2 text-gray-900 bg-gray-50 py-1"><span class="eng-text italic">"I gave commands; Then all smiles stopped together."</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- The Patriot & Andrea del Sarto -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="content-card border-t-4 border-t-[#1E1B4B]">
+                            <h3 class="text-xl font-bold text-[#1E1B4B] mb-2">খ. দ্য প্যাট্রিয়ট (<span class="eng-text">The Patriot</span>)</h3>
+                            <p class="text-black mb-2">এটি একটি বিখ্যাত <span class="eng-text">Dramatic Monologue</span>।</p>
+                            <p class="text-black mb-2"><strong>বিষয়বস্তু:</strong> একজন দেশপ্রেমিক নেতার উত্থান ও পতন। এক বছর আগে জনগণ তাকে ফুলের মালা দিয়ে বরণ করেছিল, আর আজ সেই জনগণই তাকে ভুল বুঝে পাথর ছুড়ছে এবং ফাঁসি দিচ্ছে।</p>
+                            <p class="text-black mb-2"><strong><span class="eng-text">Theme</span>:</strong> রাজনৈতিক জীবনের অস্থিরতা এবং জনমতের পরিবর্তনশীলতা।</p>
+                            <p class="text-black bg-gray-50 p-2 border-l-2 border-[#BE123C]"><strong>বিখ্যাত উক্তি:</strong> <span class="eng-text">"Thus I enter, and thus I go!"</span></p>
+                        </div>
+                        
+                        <div class="content-card border-t-4 border-t-[#1E1B4B]">
+                            <h3 class="text-xl font-bold text-[#1E1B4B] mb-2">গ. অ্যান্ড্রিয়া ডেল সার্তো (<span class="eng-text">Andrea del Sarto</span>)</h3>
+                            <p class="text-black mb-2"><strong>বিষয়বস্তু:</strong> ইতালীয় রেনেসাঁ যুগের বিখ্যাত চিত্রশিল্পী অ্যান্ড্রিয়া ডেল সার্তোকে নিয়ে লেখা।</p>
+                            <p class="text-black">তিনি নিজেকে '<span class="eng-text">The Faultless Painter</span>' (নিখুঁত চিত্রকর) দাবি করলেও তার আত্মবিশ্বাস ও উচ্চাকাঙ্ক্ষার অভাব ছিল, যার জন্য তিনি তার স্ত্রী লুক্রেজিয়াকে দায়ী করেন।</p>
+                        </div>
+                    </div>
+
+                    <!-- Other Poems -->
+                    <div class="content-card border-l-4 border-l-[#1E1B4B] bg-slate-50">
+                        <h3 class="text-xl font-bold text-[#1E1B4B] mb-4">ঘ. অন্যান্য বিখ্যাত কবিতা</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6 text-black">
+                            <p><strong class="eng-text text-[#BE123C]">Porphyria's Lover:</strong> এক উন্মাদ প্রেমিকের গল্প, যে তার প্রেমিকাকে চিরতরে নিজের করে রাখার জন্য তাকে শ্বাসরোধ করে হত্যা করে।</p>
+                            <p><strong class="eng-text text-[#BE123C]">The Pied Piper of Hamelin:</strong> হ্যামিলনের বাঁশিওয়ালার বিখ্যাত রূপকথা নিয়ে লেখা শিশুতোষ কবিতা।</p>
+                            <p><strong class="eng-text text-[#BE123C]">Rabbi Ben Ezra:</strong> একজন ইহুদি পণ্ডিতের জবানিতে লেখা দার্শনিক কবিতা, যেখানে বার্ধক্যকে স্বাগত জানানো হয়েছে।</p>
+                            <p><strong class="eng-text text-[#BE123C]">Fra Lippo Lippi:</strong> একজন মদ্যপ সন্ন্যাসী ও চিত্রশিল্পীর জীবন নিয়ে লেখা।</p>
+                            <p><strong class="eng-text text-[#BE123C]">A Grammarian's Funeral:</strong> জ্ঞানপিপাসু এক ব্যাকরণবিদের অন্ত্যেষ্টিক্রিয়া নিয়ে লেখা।</p>
+                            <p><strong class="eng-text text-[#BE123C]">Home Thoughts, from Abroad:</strong> বিদেশে বসে দেশের (ইংল্যান্ডের) বসন্তকালের স্মৃতিচারণ।</p>
+                        </div>
+                    </div>
+
+                    <!-- Books -->
+                    <div class="content-card border-l-4 border-l-[#BE123C]">
+                        <h3 class="text-xl font-bold text-[#1E1B4B] mb-3">ঙ. কাব্যগ্রন্থ ও দীর্ঘ কবিতা</h3>
+                        <ul class="list-disc list-inside space-y-2 text-black">
+                            <li><strong class="eng-text">The Ring and the Book:</strong> এটি তার দীর্ঘতম কবিতা (<span class="eng-text">Epic poem</span>), যা একটি রোমান হত্যা মামলার নথির ওপর ভিত্তি করে রচিত।</li>
+                            <li><strong class="eng-text">Men and Women:</strong> রবার্ট ব্রাউনিংয়ের সবচেয়ে বিখ্যাত কাব্য সংকলন।</li>
+                            <li><strong class="eng-text">Dramatic Lyrics:</strong> কবিতা সংকলন (এর ভেতরেই <span class="eng-text">My Last Duchess</span> প্রকাশিত হয়েছিল)।</li>
+                            <li><strong class="eng-text">Pippa Passes:</strong> <span class="text-sm font-bold text-red-600">(বিসিএস অতিরিক্ত)</span> এটি তার লেখা একটি বিখ্যাত কাব্যনাট্য (<span class="eng-text">Verse Drama</span>)।</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Quotes -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>) ও সাহিত্যিক অলঙ্কার</h2>
+                <p class="mb-6 text-lg text-black">বিসিএস ও অন্যান্য পরীক্ষার জন্য ব্রাউনিংয়ের উক্তিগুলো অত্যন্ত গুরুত্বপূর্ণ:</p>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#1E1B4B]">1. "Ignorance is not innocence but sin."</p>
+                        <p class="text-black mb-2">(অজ্ঞতা নির্দোষিতা নয়, বরং পাপ)</p>
+                        <p class="text-sm text-black border-t border-[#CBD5E1] pt-1"><strong>উৎস:</strong> <span class="eng-text">The Inn Album</span></p>
+                        <p class="text-sm text-black mt-1"><strong><span class="eng-text">Literary Device:</span></strong> <span class="eng-text font-bold">Paradox</span> (<span class="terminology">প্যারাডক্স: আপাতদৃষ্টিতে স্ববিরোধী কথা, কিন্তু এর গভীরে সত্য লুকিয়ে থাকে। অজ্ঞতাকে সাধারণত ক্ষমাযোগ্য ভাবা হয়, কিন্তু এখানে একে পাপ বলা হয়েছে</span>)।</p>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#1E1B4B]">2. "God is in His Heaven, All's right with the world!"</p>
+                        <p class="text-black mb-2">(ঈশ্বর স্বর্গে আছেন, তাই পৃথিবীতে সবকিছু ঠিকঠাক আছে)</p>
+                        <p class="text-sm text-black border-t border-[#CBD5E1] pt-1"><strong>উৎস:</strong> <span class="eng-text">Pippa Passes</span></p>
+                        <p class="text-sm text-black mt-1"><strong><span class="eng-text">Literary Device:</span></strong> <span class="eng-text font-bold">Optimism</span> (<span class="terminology">এটি ব্রাউনিংয়ের প্রবল আশাবাদী বা পজিটিভ দর্শনের প্রকাশ</span>)।</p>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#1E1B4B]">3. "I gave commands; Then all smiles stopped together."</p>
+                        <p class="text-black mb-2">(আমি আদেশ দিলাম; তারপর সব হাসি একসাথে থেমে গেল)</p>
+                        <p class="text-sm text-black border-t border-[#CBD5E1] pt-1"><strong>উৎস:</strong> <span class="eng-text">My Last Duchess</span></p>
+                        <p class="text-sm text-black mt-1"><strong><span class="eng-text">Literary Device:</span></strong> <span class="eng-text font-bold">Euphemism</span> (<span class="terminology">ইউফেমিজম: রূঢ় বা অপ্রীতিকর সত্যকে ভদ্রভাবে বলা। সরাসরি 'হত্যা করলাম' না বলে 'হাসি থেমে গেল' বলে মৃত্যুর কথা বলা হয়েছে</span>)।</p>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#1E1B4B]">4. "She had a heart—how shall I say?—too soon made glad."</p>
+                        <p class="text-black mb-2">(তার একটা হৃদয় ছিল—কীভাবে বলব?—খুব সহজেই খুশি হয়ে যেত)</p>
+                        <p class="text-sm text-black border-t border-[#CBD5E1] pt-1"><strong>উৎস:</strong> <span class="eng-text">My Last Duchess</span></p>
+                        <p class="text-sm text-black mt-1"><strong><span class="eng-text">Literary Device:</span></strong> <span class="eng-text font-bold">Rhetorical Question</span> (<span class="terminology">রেটোরিক্যাল কোয়েশ্চেন: এমন প্রশ্ন যার উত্তরের প্রয়োজন নেই, শুধু কথার ওপর জোর দেওয়ার জন্য করা হয়। যেমন- How shall I say?</span>)।</p>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#1E1B4B]">5. "Grow old along with me! The best is yet to be."</p>
+                        <p class="text-black mb-2">(আমার সাথে বুড়ো হও! সেরা সময়টা আসা এখনো বাকি)</p>
+                        <p class="text-sm text-black border-t border-[#CBD5E1] pt-1"><strong>উৎস:</strong> <span class="eng-text">Rabbi Ben Ezra</span></p>
+                        <p class="text-sm text-black mt-1"><strong><span class="eng-text">Literary Device:</span></strong> <span class="eng-text font-bold">Optimism</span> (<span class="terminology">বার্ধক্যকে নেতিবাচক না ভেবে জীবনের সেরা সময় ভাবা</span>)।</p>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#1E1B4B]">6. "Ah, but a man's reach should exceed his grasp, Or what's a heaven for?"</p>
+                        <p class="text-black mb-2">(মানুষের আকাঙ্ক্ষা তার প্রাপ্তির চেয়ে বেশি হওয়া উচিত, নতুবা স্বর্গের কী প্রয়োজন?)</p>
+                        <p class="text-sm text-black border-t border-[#CBD5E1] pt-1"><strong>উৎস:</strong> <span class="eng-text">Andrea del Sarto</span></p>
+                        <p class="text-sm text-black mt-1"><strong><span class="eng-text">Literary Device:</span></strong> <span class="eng-text font-bold">Metaphor</span> (<span class="terminology">মেটাফর বা রূপক: এখানে Heaven বা স্বর্গকে অসীম সম্ভাবনা বা অপূর্ণতা পূরণের প্রতীকরূপে তুলনা করা হয়েছে</span>)।</p>
+                    </div>
+
+                    <div class="quote-container md:col-span-2">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="eng-text font-bold text-lg mb-1 text-[#1E1B4B]">7. "So absolutely good is truth, truth never hurts the teller."</p>
+                                <p class="text-black text-sm">(সত্য এতটাই পরম যে, তা বক্তাকে কখনো আঘাত করে না)</p>
+                            </div>
+                            <div>
+                                <p class="eng-text font-bold text-lg mb-1 text-[#1E1B4B]">8. "Oppression makes the wise man mad."</p>
+                                <p class="text-black text-sm">(নিপীড়ন জ্ঞানী মানুষকেও পাগল করে তোলে)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Section 5: At a Glance -->
+            <section class="bg-[#1E1B4B] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#BE123C] pb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-[#BE123C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                    একনজরে মনে রাখার মতো তথ্য
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start">
+                        <span class="text-[#BE123C] mr-3 font-bold text-xl">►</span> 
+                        <p>তিনি <span class="eng-text font-bold">Dramatic Monologue</span>-এর শ্রেষ্ঠ কবি।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#BE123C] mr-3 font-bold text-xl">►</span> 
+                        <p>তার বিখ্যাত কবিতা <span class="eng-text">My Last Duchess</span> এবং <span class="eng-text">The Patriot</span>।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#BE123C] mr-3 font-bold text-xl">►</span> 
+                        <p>শিশুদের বিখ্যাত রূপকথা <span class="eng-text">The Pied Piper of Hamelin</span> তার লেখা।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#BE123C] mr-3 font-bold text-xl">►</span> 
+                        <p>তিনি <span class="eng-text">Optimistic Poet</span> (আশাবাদী কবি) হিসেবে পরিচিত।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#BE123C] mr-3 font-bold text-xl">►</span> 
+                        <p>তার স্ত্রী <span class="eng-text">Elizabeth Barrett Browning</span> একজন বিখ্যাত কবি।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#BE123C] mr-3 font-bold text-xl">►</span> 
+                        <p>বিখ্যাত উক্তি: "<span class="eng-text">I gave commands; Then all smiles stopped together.</span>"</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ৯ জুন, ২০২৬</p>
+            
+            <!-- Creator Badge (Center Aligned) -->
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+
+            <!-- QR Code Bottom-Right Corner -->
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.src='https://placehold.co/65x65/1E1B4B/FFF?text=QR'">
+            </a>
+        </footer>
+
+    </div>
+
+    <!-- Script to wrap Bangla numbers in a specific font -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            
+            // Find all text nodes containing Bangla numbers
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) {
+                        textNodes.push(n);
+                    }
+                }
+            }
+
+            // Replace text nodes, wrapping Bangla numbers in spans
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number';
+                        span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

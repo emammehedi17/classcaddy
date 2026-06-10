@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on Sir Philip Sidney - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme: Elizabethan Crimson & Courtier Gold */
+        :root {
+            --primary-color: #7F1D1D; /* Red 900 */
+            --secondary-color: #B45309; /* Amber 700 */
+            --accent-color: #FEF2F2; 
+            --bg-color: #FAFAFA; 
+            --card-bg: #FFFFFF;
+            --text-main: #000000; 
+            --border-color: #FECACA; 
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-color);
+            color: var(--text-main); line-height: 1.6;
+            background-image: linear-gradient(135deg, #FAFAFA 0%, #FEF2F2 100%);
+        }
+
+        .eng-text { font-family: 'Times New Roman', Times, serif; font-size: 1.1em; }
+        .bn-number { font-family: 'Kalpurush', 'Times New Roman', serif; font-size: 1.05em; font-weight: 500; }
+
+        .theme-header {
+            background: linear-gradient(135deg, var(--primary-color), #450A0A);
+            color: white; border-bottom: 6px solid var(--secondary-color);
+            position: relative; box-shadow: 0 4px 20px rgba(127, 29, 29, 0.3);
+        }
+
+        .section-heading {
+            color: var(--primary-color); border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px; margin-bottom: 1.5rem; font-weight: 700;
+            display: inline-block; position: relative; text-transform: uppercase;
+        }
+        
+        .section-heading::after {
+            content: '🛡️'; position: absolute; bottom: -15px; right: -35px;
+            color: var(--secondary-color); font-size: 1.5rem;
+        }
+
+        .content-card {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem; transition: all 0.3s ease; border-top: 3px solid transparent;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(180, 83, 9, 0.1); border-top: 3px solid var(--secondary-color);
+        }
+
+        .masterpiece-card {
+            background-color: #FFFBEB; border: 1px solid #FDE68A; border-left: 5px solid var(--secondary-color);
+        }
+
+        .quote-container {
+            border-left: 5px solid var(--secondary-color); background: #FEF2F2;
+            padding: 15px 20px; border-radius: 0 10px 10px 0; margin-bottom: 1.2rem;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.04); border: 1px solid #FEE2E2; border-left: 5px solid var(--secondary-color);
+        }
+
+        .terminology {
+            background-color: #FEF08A; padding: 0 5px; border-radius: 4px;
+            font-weight: 500; color: #000000; border: 1px dashed #B45309; font-size: 0.95em;
+        }
+
+        .qr-corner { position: absolute; bottom: 15px; right: 15px; width: 65px; height: 65px; background: white; padding: 4px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;}
+        .qr-corner img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+        .master-footer { background: #ffffff; border-top: 5px solid var(--primary-color); padding: 30px 20px; text-align: center; position: relative; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-red-200">
+        
+        <header class="theme-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">স্যার ফিলিপ সিডনি (<span class="eng-text">Sir Philip Sidney</span>)</h1>
+            <p class="text-xl text-[#FDE68A] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1554 - 1586</span></p>
+            
+            <p class="text-lg mb-6 text-red-50 text-justify">
+                স্যার ফিলিপ সিডনি (<span class="eng-text">Sir Philip Sidney</span>) এলিজাবেথান যুগের (<span class="eng-text font-bold text-[#FDE68A]">Elizabethan Period</span>) একজন আদর্শ দরবারী (<span class="eng-text font-bold text-[#FDE68A]">Courtier</span> - <span class="terminology">রাজসভার উচ্চপদস্থ সম্মানিত সদস্য</span>), কবি, সৈনিক এবং সাহিত্য সমালোচক ছিলেন। তিনি তার বহুমুখী প্রতিভার জন্য তৎকালীন সমাজে অত্যন্ত সম্মানিত ছিলেন। তাকে ইংরেজি সাহিত্যের প্রথম গুরুত্বপূর্ণ সাহিত্য সমালোচক হিসেবে গণ্য করা হয়।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/7F1D1D/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <main class="p-6 md:p-10">
+            <!-- Section 1 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#7F1D1D]"><strong class="text-lg text-[#7F1D1D]">জন্ম ও মৃত্যু:</strong> ১৫৫৪ সালে জন্ম এবং ১৫৮৬ সালে মৃত্যু। মাত্র ৩২ বছর বয়সে নেদারল্যান্ডসের জুটফেন যুদ্ধে (<span class="eng-text font-bold">Battle of Zutphen</span>) পায়ে গুলিবিদ্ধ হয়ে তার মর্মান্তিক মৃত্যু হয়।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#7F1D1D]"><strong class="text-lg text-[#7F1D1D]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The Elizabethan Period (1558-1603)</span>।</div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#B45309] bg-[#FFFBEB]">
+                        <strong class="text-lg text-[#B45309]">আভিজাত্য ও বিখ্যাত উক্তি (বিসিএস অতিরিক্ত):</strong> তিনি ইংল্যান্ডের বিখ্যাত ডিউক অফ লিসেস্টার (রবার্ট ডাডলি)-এর ভাগ্নে ছিলেন। যুদ্ধক্ষেত্রে নিজে তৃষ্ণার্ত থাকা সত্ত্বেও নিজের পানির পাত্রটি অন্য এক মুমূর্ষু সৈনিককে দিয়ে তিনি বলেছিলেন, <span class="eng-text font-bold text-[#7F1D1D]">"Thy necessity is yet greater than mine."</span> (তোমার প্রয়োজন আমার চেয়েও বেশি)। এই ঘটনাটি তাকে ইংল্যান্ডের জাতীয় হিরোতে পরিণত করে।
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                
+                <div class="space-y-6">
+                    <!-- Apology for Poetry -->
+                    <div class="content-card masterpiece-card relative overflow-hidden shadow-md">
+                        <div class="absolute top-0 right-0 bg-[#FEF3C7] text-[#B45309] px-4 py-1 rounded-bl-xl font-bold border-l border-b border-[#FDE68A]">Criticism Masterpiece</div>
+                        <h3 class="text-2xl font-bold text-[#7F1D1D] mb-3">ক. অ্যান অ্যাপোলজি ফর পোয়েট্রি (<span class="eng-text">An Apology for Poetry</span>) ***</h3>
+                        <p class="text-black font-semibold mb-3">এটি ইংরেজি সাহিত্যের প্রথম গুরুত্বপূর্ণ এবং তার সর্বশ্রেষ্ঠ সাহিত্য সমালোচনা গ্রন্থ (<span class="eng-text font-bold">Literary Criticism</span>)। এটি <span class="eng-text font-bold">The Defence of Poesy</span> নামেও পরিচিত।</p>
+                        
+                        <ul class="list-none space-y-3 text-black">
+                            <li class="bg-white p-3 rounded border border-amber-200">
+                                <strong class="text-[#7F1D1D]">প্রেক্ষাপট ও বিষয়বস্তু:</strong> স্টিফেন গসন (<span class="eng-text font-bold">Stephen Gosson</span>) নামক এক পিউরিটান লেখক তার <span class="eng-text font-bold">School of Abuse</span> বইয়ে কবিতাকে 'মিথ্যাবাদীদের জননী' (Mother of lies) এবং অনৈতিক বলে আক্রমণ করেছিলেন। সিডনি তার জবাবে এই বইটিতে কবিতার পক্ষে চমৎকার যুক্তি দেন এবং প্রমাণ করেন যে, কবিতা মানুষকে নৈতিক শিক্ষা দেয় এবং একই সাথে আনন্দ দান করে (<span class="eng-text">To teach and delight</span>)।
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Astrophel and Stella -->
+                    <div class="content-card border-t-4 border-t-[#7F1D1D] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#7F1D1D] mb-3">খ. অ্যাস্ট্রোফেল অ্যান্ড স্টেলা (<span class="eng-text">Astrophel and Stella - 1591</span>)</h3>
+                        <p class="text-black mb-2 bg-red-50 px-2 py-1 rounded inline-block font-bold">এটি ইংরেজি সাহিত্যের <strong>প্রথম সনেট সিকোয়েন্স</strong> (<span class="eng-text">Sonnet Sequence</span>)।</p>
+                        <ul class="list-disc list-inside space-y-2 text-black mt-2">
+                            <li><strong class="text-[#7F1D1D]">বিষয়বস্তু:</strong> এটি ১০৮টি সনেট এবং ১১টি গানের এক অসাধারণ সংকলন। এখানে প্রেমিক অ্যাস্ট্রোফেল (যার অর্থ 'তারকা-প্রেমিক' বা সিডনি নিজে) এবং প্রেমিকা স্টেলা (যার অর্থ 'তারকা' বা লেডি পেনেলোপি রিচ)-এর ব্যর্থ প্রেমের আকুলতা বর্ণিত হয়েছে।</li>
+                        </ul>
+                    </div>
+
+                    <!-- Arcadia -->
+                    <div class="content-card border-t-4 border-t-[#7F1D1D] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#7F1D1D] mb-3">গ. আর্কেডিয়া (<span class="eng-text">Arcadia / The Countess of Pembroke's Arcadia</span>)</h3>
+                        <ul class="list-disc list-inside space-y-2 text-black">
+                            <li><strong class="text-[#7F1D1D]">ধরন:</strong> এটি একটি বিখ্যাত <span class="eng-text font-bold text-[#B45309]">Pastoral Romance</span> (<span class="terminology">প্যাস্টোরাল রোমান্স: মেষপালক ও গ্রামীণ জীবন নিয়ে রচিত রোমান্টিক গদ্য ও পদ্যের মিশ্রণ</span>)।</li>
+                            <li><strong class="text-[#7F1D1D]">উৎসর্গ:</strong> তিনি এটি তার প্রিয় বোন মেরি সিডনিকে (<span class="eng-text">Countess of Pembroke</span>) উৎসর্গ করেছিলেন।</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. একনজরে মনে রাখার মতো তথ্য</h2>
+                <div class="bg-gradient-to-br from-[#7F1D1D] to-[#450A0A] text-white p-6 md:p-8 rounded-xl shadow-xl">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                        <div class="flex items-start"><span class="text-[#FDE68A] mr-3 font-bold text-xl">🛡️</span><p>তিনি ইংরেজি সাহিত্যের প্রথম গুরুত্বপূর্ণ <span class="eng-text font-bold">Literary Critic</span> (সমালোচক)।</p></div>
+                        <div class="flex items-start"><span class="text-[#FDE68A] mr-3 font-bold text-xl">🛡️</span><p>তার মাস্টারপিস সমালোচনা গ্রন্থ <span class="eng-text font-bold">An Apology for Poetry</span>।</p></div>
+                        <div class="flex items-start"><span class="text-[#FDE68A] mr-3 font-bold text-xl">🛡️</span><p><span class="eng-text font-bold">Astrophel and Stella</span> হলো ইংরেজি সাহিত্যের প্রথম সনেট সংকলন।</p></div>
+                        <div class="flex items-start"><span class="text-[#FDE68A] mr-3 font-bold text-xl">🛡️</span><p>তিনি যুদ্ধে আহত সৈনিককে নিজের পানি দিয়ে বলেছিলেন, <span class="eng-text italic">"Thy necessity is yet greater than mine."</span></p></div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/7F1D1D/FFF?text=QR'">
+            </a>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) { textNodes.push(n); }
+                }
+            }
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number'; span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

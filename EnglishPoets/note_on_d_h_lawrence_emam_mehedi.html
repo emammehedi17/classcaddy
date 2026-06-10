@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on D.H. Lawrence - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme: Earthy Terracotta & Passionate Ruby */
+        :root {
+            --primary-color: #7C2D12; /* Orange 900 / Earthy Terracotta */
+            --secondary-color: #BE123C; /* Rose 700 / Passionate Ruby */
+            --accent-color: #FFF7ED; /* Orange 50 */
+            --bg-color: #FAFAFA; 
+            --card-bg: #FFFFFF;
+            --text-main: #000000; 
+            --border-color: #FED7AA; /* Orange 200 */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-color);
+            color: var(--text-main); line-height: 1.6;
+            background-image: linear-gradient(135deg, #FFF7ED 0%, #FEF2F2 100%);
+        }
+
+        .eng-text { font-family: 'Times New Roman', Times, serif; font-size: 1.1em; }
+        .bn-number { font-family: 'Kalpurush', 'Times New Roman', serif; font-size: 1.05em; font-weight: 500; }
+
+        .theme-header {
+            background: linear-gradient(135deg, var(--primary-color), #450A0A);
+            color: white; border-bottom: 6px solid var(--secondary-color);
+            position: relative; box-shadow: 0 4px 20px rgba(124, 45, 18, 0.3);
+        }
+
+        .section-heading {
+            color: var(--primary-color); border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px; margin-bottom: 1.5rem; font-weight: 700;
+            display: inline-block; position: relative; text-transform: uppercase;
+        }
+        
+        .section-heading::after {
+            content: '🔥'; position: absolute; bottom: -15px; right: -30px;
+            color: var(--secondary-color); font-size: 1.5rem;
+        }
+
+        .content-card {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem; transition: all 0.3s ease; border-top: 3px solid transparent;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(190, 18, 60, 0.15); border-top: 3px solid var(--secondary-color);
+        }
+
+        .masterpiece-card {
+            background-color: #FFF1F2; border: 1px solid #FECDD3; border-left: 5px solid var(--secondary-color);
+        }
+
+        .quote-container {
+            border-left: 5px solid var(--secondary-color); background: #FFEDD5;
+            padding: 15px 20px; border-radius: 0 10px 10px 0; margin-bottom: 1.2rem;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.04); border: 1px solid #FED7AA; border-left: 5px solid var(--secondary-color);
+        }
+
+        .terminology {
+            background-color: #FEE2E2; padding: 0 5px; border-radius: 4px;
+            font-weight: 500; color: #000000; border: 1px dashed #BE123C; font-size: 0.95em;
+        }
+
+        .qr-corner { position: absolute; bottom: 15px; right: 15px; width: 65px; height: 65px; background: white; padding: 4px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;}
+        .qr-corner img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+        .master-footer { background: #ffffff; border-top: 5px solid var(--primary-color); padding: 30px 20px; text-align: center; position: relative; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-orange-200">
+        
+        <header class="theme-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">ডি. এইচ. লরেন্স (<span class="eng-text">D.H. Lawrence</span>)</h1>
+            <p class="text-xl text-[#FCA5A5] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1885 - 1930</span></p>
+            
+            <p class="text-lg mb-6 text-orange-50 text-justify">
+                ডেভিড হার্বার্ট লরেন্স (<span class="eng-text">David Herbert Lawrence</span>) আধুনিক যুগের অন্যতম সাহসী এবং বিতর্কিত লেখক। আধুনিক যান্ত্রিক সভ্যতায় মানুষের মনস্তত্ত্ব, প্রবৃত্তি (<span class="eng-text font-bold text-[#FCA5A5]">Instinct</span>) এবং আদিম আবেগের উপর জোর দিয়ে তিনি সাহিত্য রচনা করেছেন।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/7C2D12/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <main class="p-6 md:p-10">
+            <!-- Section 1 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#7C2D12]"><strong class="text-lg text-[#7C2D12]">পুরো নাম:</strong> <span class="eng-text">David Herbert Lawrence</span>।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#7C2D12]"><strong class="text-lg text-[#7C2D12]">জন্ম ও মৃত্যু:</strong> ১৮৮৫ সালে ইংল্যান্ডে জন্ম এবং ১৯৩০ সালে যক্ষ্মায় মারা যান।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#7C2D12]"><strong class="text-lg text-[#7C2D12]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The Modern Period</span>।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#BE123C] bg-[#FEF2F2]">
+                        <strong class="text-lg text-[#BE123C]">বিশেষত্ব ও বিতর্ক:</strong> তিনি মানুষের সম্পর্ক, মনস্তত্ত্ব এবং বিশেষ করে যৌনতাকে শিল্প ও জীবনের একটি গুরুত্বপূর্ণ অংশ হিসেবে সাহিত্যে প্রকাশ করেছিলেন, যা তৎকালীন রক্ষণশীল সমাজে চরম বিতর্কের জন্ম দেয়।
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="content-card bg-white border-t-4 border-t-[#7C2D12] text-black">
+                    <ul class="space-y-4 text-lg">
+                        <li class="flex items-start">
+                            <span class="text-[#BE123C] text-2xl mr-3 leading-none">🔥</span>
+                            <span><strong class="eng-text text-[#7C2D12]">Poet of Psychology:</strong> মনস্তত্ত্বের কবি।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#BE123C] text-2xl mr-3 leading-none">🔥</span>
+                            <span><strong class="eng-text text-[#7C2D12]">Writer of Instinct:</strong> প্রবৃত্তির লেখক।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#BE123C] text-2xl mr-3 leading-none">🔥</span>
+                            <span><strong class="eng-text text-[#7C2D12]">A Controversial Writer:</strong> একজন চরম বিতর্কিত লেখক।</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                
+                <div class="space-y-6">
+                    <!-- Sons and Lovers -->
+                    <div class="content-card masterpiece-card relative overflow-hidden shadow-md">
+                        <div class="absolute top-0 right-0 bg-[#FEE2E2] text-[#BE123C] px-4 py-1 rounded-bl-xl font-bold border-l border-b border-[#FECACA]">Masterpiece</div>
+                        <h3 class="text-2xl font-bold text-[#7C2D12] mb-3">ক. সন্স অ্যান্ড লাভার্স (<span class="eng-text">Sons and Lovers - 1913</span>) ***</h3>
+                        <p class="text-black font-semibold mb-3">এটি তার একটি আত্মজৈবনিক (<span class="eng-text font-bold text-[#BE123C]">Semi-autobiographical</span>) মাস্টারপিস।</p>
+                        
+                        <ul class="list-none space-y-3 text-black">
+                            <li class="bg-white p-3 rounded border border-rose-200">
+                                <strong class="text-[#7C2D12]">বিষয়বস্তু ও মনস্তত্ত্ব:</strong> পল মোরেল এবং তার মায়ের সম্পর্ক নিয়ে এই উপন্যাস রচিত। এখানে ফ্রয়েডীয় মনস্তত্ত্বের <span class="eng-text font-bold text-[#BE123C]">'Oedipus Complex'</span> (<span class="terminology">ইডিপাস কমপ্লেক্স: মায়ের প্রতি পুত্রের অবচেতন এবং অস্বাভাবিক প্রবল আকর্ষণ</span>)-এর বিষয়টি দারুণভাবে ফুটে উঠেছে।
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Lady Chatterley's Lover -->
+                    <div class="content-card border-t-4 border-t-[#BE123C] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#7C2D12] mb-3">খ. লেডি চ্যাটার্লিজ লাভার (<span class="eng-text">Lady Chatterley's Lover</span>)</h3>
+                        <ul class="list-disc list-inside space-y-2 text-black">
+                            <li><strong class="text-[#7C2D12]">বিষয়বস্তু:</strong> উচ্চবিত্ত শ্রেণীর এক নারী এবং তার শ্রমজীবী বিবাহিত প্রেমিকের সম্পর্ক নিয়ে লেখা উপন্যাস।</li>
+                            <li><strong class="text-[#7C2D12] text-red-600">বিতর্ক:</strong> অশ্লীলতার দায়ে এটি ইংল্যান্ডে দীর্ঘকাল নিষিদ্ধ (<span class="eng-text font-bold">Banned</span>) ছিল।</li>
+                        </ul>
+                    </div>
+
+                    <!-- Other Novels -->
+                    <div class="content-card border-t-4 border-t-[#7C2D12] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#7C2D12] mb-3">গ. অন্যান্য উপন্যাস</h3>
+                        <div class="space-y-2 text-black">
+                            <p><strong class="eng-text text-lg text-[#BE123C]">The Rainbow:</strong> একটি পরিবারের কয়েক প্রজন্মের কাহিনী নিয়ে লেখা উপন্যাস।</p>
+                            <p><strong class="eng-text text-lg text-[#BE123C]">Women in Love:</strong> এটি <span class="eng-text">'The Rainbow'</span> উপন্যাসের সিক্যুয়েল (<span class="eng-text">Sequel</span>)।</p>
+                        </div>
+                    </div>
+
+                    <!-- Poems -->
+                    <div class="content-card border-l-4 border-l-[#7C2D12] bg-[#FFF7ED]">
+                        <h3 class="text-xl font-bold text-[#7C2D12] mb-2">ঘ. বিখ্যাত কবিতা</h3>
+                        <p class="text-black"><strong class="eng-text text-lg text-[#BE123C]">Snake:</strong> এটি তার একটি অত্যন্ত বিখ্যাত কবিতা, যেখানে তিনি মানুষের শিক্ষালব্ধ ভয় এবং প্রকৃতির আদিম সৌন্দর্যের মধ্যে মনস্তাত্ত্বিক দ্বন্দ্ব তুলে ধরেছেন।</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>)</h2>
+                
+                <div class="grid grid-cols-1 gap-4 mt-4">
+                    <div class="quote-container border-l-[6px] border-l-[#BE123C] bg-[#FFEDD5]">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#7C2D12]">1. "Trust the tale, not the teller."</p>
+                        <p class="text-black mb-1">(গল্পকে বিশ্বাস করো, গল্পকারকে নয়)</p>
+                        <p class="text-sm text-black border-t border-orange-200 pt-1 mt-2"><strong>উৎস:</strong> <span class="eng-text">Studies in Classic American Literature.</span></p>
+                    </div>
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#7C2D12]">2. "Be a good animal, true to your animal instincts."</p>
+                        <p class="text-black mb-1">(একটি ভালো প্রাণী হও, নিজের প্রাণিজ প্রবৃত্তির প্রতি সৎ থাকো)</p>
+                    </div>
+                    <div class="quote-container !mb-0 border-l-[#7C2D12] bg-orange-50">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#7C2D12]">3. "Ethics and equity and the principles of justice do not change with the calendar."</p>
+                        <p class="text-black text-sm">(নীতিশাস্ত্র, সাম্য এবং ন্যায়বিচারের নীতিগুলো ক্যালেন্ডারের সাথে সাথে বদলে যায় না)</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5 -->
+            <section class="bg-gradient-to-br from-[#7C2D12] to-[#450A0A] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8 border-t-4 border-[#BE123C]">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#9F1239] pb-3">একনজরে মনে রাখার মতো তথ্য</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🔥</span><p>তিনি মনস্তত্ত্ব এবং প্রবৃত্তির (<span class="eng-text font-bold">Instinct</span>) লেখক হিসেবে পরিচিত।</p></div>
+                    <div class="flex items-start"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🔥</span><p><span class="eng-text font-bold">Sons and Lovers</span> উপন্যাসে <span class="eng-text font-bold">Oedipus Complex</span> ফুটিয়ে তোলা হয়েছে।</p></div>
+                    <div class="flex items-start md:col-span-2"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🔥</span><p><span class="eng-text font-bold">Lady Chatterley's Lover</span> অশ্লীলতার দায়ে নিষিদ্ধ ছিল।</p></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/7C2D12/FFF?text=QR'">
+            </a>
+        </footer>
+    </div>
+
+    <!-- Script for Bangla Numbers -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) { textNodes.push(n); }
+                }
+            }
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number'; span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

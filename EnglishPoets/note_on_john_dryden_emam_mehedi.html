@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on John Dryden - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme: Restoration Royal Purple & Gold */
+        :root {
+            --primary-color: #3B0764; /* Purple 950 / Royal Purple */
+            --secondary-color: #CA8A04; /* Yellow 600 / Royal Gold */
+            --accent-color: #FEFCE8; /* Yellow 50 */
+            --bg-color: #FAFAFA; /* Zinc 50 */
+            --card-bg: #FFFFFF;
+            --text-main: #000000; 
+            --border-color: #FDE047; /* Yellow 300 */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-color);
+            color: var(--text-main); line-height: 1.6;
+            background-image: linear-gradient(135deg, #FAF5FF 0%, #FEFCE8 100%);
+        }
+
+        .eng-text { font-family: 'Times New Roman', Times, serif; font-size: 1.1em; }
+        .bn-number { font-family: 'Kalpurush', 'Times New Roman', serif; font-size: 1.05em; font-weight: 500; }
+
+        .theme-header {
+            background: linear-gradient(135deg, var(--primary-color), #2E1065, #581C87);
+            color: white; border-bottom: 6px solid var(--secondary-color);
+            position: relative; box-shadow: 0 4px 20px rgba(59, 7, 100, 0.3);
+        }
+
+        .section-heading {
+            color: var(--primary-color); border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px; margin-bottom: 1.5rem; font-weight: 700;
+            display: inline-block; position: relative; text-transform: uppercase;
+        }
+        
+        .section-heading::after {
+            content: '👑'; position: absolute; bottom: -15px; right: -30px;
+            color: var(--secondary-color); font-size: 1.5rem;
+        }
+
+        .content-card {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem; transition: all 0.3s ease; border-top: 3px solid transparent;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(202, 138, 4, 0.15); border-top: 3px solid var(--secondary-color);
+        }
+
+        .masterpiece-card {
+            background-color: #FEFCE8; border: 1px solid #FCD34D; border-left: 5px solid var(--secondary-color);
+        }
+
+        .quote-container {
+            border-left: 5px solid var(--secondary-color); background: #FAF5FF;
+            padding: 15px 20px; border-radius: 0 10px 10px 0; margin-bottom: 1.2rem;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.04); border: 1px solid #F3E8FF; border-left: 5px solid var(--secondary-color);
+        }
+
+        .terminology {
+            background-color: #FEF08A; padding: 0 5px; border-radius: 4px;
+            font-weight: 500; color: #000000; border: 1px dashed #B45309; font-size: 0.95em;
+        }
+
+        .qr-corner { position: absolute; bottom: 15px; right: 15px; width: 65px; height: 65px; background: white; padding: 4px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;}
+        .qr-corner img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+        .master-footer { background: #ffffff; border-top: 5px solid var(--primary-color); padding: 30px 20px; text-align: center; position: relative; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-purple-200">
+        
+        <header class="theme-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">জন ড্রাইডেন (<span class="eng-text">John Dryden</span>)</h1>
+            <p class="text-xl text-[#FDE047] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1631 - 1700</span></p>
+            
+            <p class="text-lg mb-6 text-purple-50 text-justify">
+                জন ড্রাইডেন (<span class="eng-text">John Dryden</span>) ইংরেজি সাহিত্যের রেস্টোরেশন যুগের (<span class="eng-text font-bold text-[#FDE047]">Restoration Period</span>) প্রধান প্রতিনিধি এবং অবিসংবাদিত নেতা। তিনি একাধারে কবি, নাট্যকার, অনুবাদক এবং প্রাবন্ধিক ছিলেন। ইংরেজি গদ্য এবং <span class="eng-text font-bold text-[#FDE047]">Heroic Couplet</span> (<span class="terminology">হিরোয়িক কাপলেট: আইয়াম্বিক পেন্টামিটারে লেখা দুটি চরণের অন্ত্যমিলযুক্ত কবিতা</span>) ব্যবহারে তিনি অসামান্য দক্ষতা দেখিয়েছেন। তিনি ইংল্যান্ডের প্রথম সরকারি রাজকবি বা '<span class="eng-text font-bold text-[#FDE047]">First Official Poet Laureate</span>' ছিলেন।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/3B0764/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <main class="p-6 md:p-10">
+            <!-- Section 1 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#3B0764]"><strong class="text-lg text-[#3B0764]">জন্ম ও মৃত্যু:</strong> ১৬৩১ সালে ইংল্যান্ডে জন্মগ্রহণ করেন এবং ১৭০০ সালে মৃত্যুবরণ করেন।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#3B0764]"><strong class="text-lg text-[#3B0764]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text font-bold">The Restoration Period (1660-1700)</span>। এই যুগকে তার নামানুসারে '<span class="eng-text font-bold">Age of Dryden</span>' বলা হয়।</div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#CA8A04] bg-[#FEFCE8]">
+                        <strong class="text-lg text-[#CA8A04]">ধর্ম পরিবর্তন (বিসিএস অতিরিক্ত):</strong> তিনি ১৬৮৫ সালে চার্চ অফ ইংল্যান্ড ত্যাগ করে রোমান ক্যাথলিক ধর্মে দীক্ষিত হন। এর সপক্ষে যুক্তি দিতে তিনি <span class="eng-text font-bold">The Hind and the Panther</span> নামে একটি রূপক কবিতা লিখেন (যেখানে <span class="eng-text">Hind</span> বা হরিণ হলো ক্যাথলিক চার্চ এবং <span class="eng-text">Panther</span> বা চিতাবাঘ হলো চার্চ অফ ইংল্যান্ড)।
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="content-card bg-white border-t-4 border-t-[#3B0764]">
+                    <ul class="space-y-4 text-lg text-black">
+                        <li class="flex items-start">
+                            <span class="text-[#CA8A04] text-2xl mr-3 leading-none">👑</span>
+                            <span><strong class="eng-text text-[#3B0764]">Father of Modern English Criticism:</strong> আধুনিক ইংরেজি সমালোচনার জনক। (<span class="terminology">বিখ্যাত সমালোচক ড. স্যামুয়েল জনসন তাকে এই উপাধি দিয়েছিলেন</span>)।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#CA8A04] text-2xl mr-3 leading-none">👑</span>
+                            <span><strong class="eng-text text-[#3B0764]">First Official Poet Laureate:</strong> ১৬৬৮ সালে রাজা দ্বিতীয় চার্লস তাকে ইংল্যান্ডের প্রথম সরকারি রাজকবি নিযুক্ত করেন।</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                
+                <div class="space-y-6">
+                    <!-- All for Love -->
+                    <div class="content-card masterpiece-card relative overflow-hidden shadow-md">
+                        <div class="absolute top-0 right-0 bg-[#FEF08A] text-[#B45309] px-4 py-1 rounded-bl-xl font-bold border-l border-b border-[#FDE047]">Masterpiece</div>
+                        <h3 class="text-2xl font-bold text-[#3B0764] mb-3">ক. অল ফর লাভ (<span class="eng-text">All for Love - 1677</span>) ***</h3>
+                        <p class="text-black font-semibold mb-3">এটি তার শ্রেষ্ঠ ট্র্যাজেডি এবং সবচেয়ে জনপ্রিয় নাটক।</p>
+                        
+                        <ul class="list-none space-y-3 text-black">
+                            <li class="bg-white p-3 rounded border border-yellow-200">
+                                <strong class="text-[#3B0764]">বিষয়বস্তু:</strong> এটি মূলত শেক্সপিয়রের বিখ্যাত নাটক <span class="eng-text font-bold">Antony and Cleopatra</span>-র অনুকরণে লেখা। তবে ড্রাইডেন এতে ক্লাসিক্যাল ফরাসি নাটকের রীতিনীতি (সময়, স্থান ও ঘটনার ঐক্য) কঠোরভাবে মেনে চলেছেন, যা শেক্সপিয়র মানেননি।
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Absalom and Achitophel -->
+                    <div class="content-card border-t-4 border-t-[#3B0764] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#3B0764] mb-3">খ. অ্যাবসালোম অ্যান্ড আকিটফেল (<span class="eng-text">Absalom and Achitophel</span>)</h3>
+                        <p class="text-black mb-2">এটি ইংরেজি সাহিত্যের অন্যতম সেরা রাজনৈতিক স্যাটায়ার বা ব্যঙ্গ কবিতা (<span class="eng-text font-bold text-[#CA8A04]">Political Satire</span>)।</p>
+                        <p class="text-black"><strong class="text-[#3B0764]">বিষয়বস্তু:</strong> বাইবেলের একটি কাহিনীর (রাজা ডেভিডের বিরুদ্ধে তার ছেলে অ্যাবসালোমের বিদ্রোহ) আড়ালে ইংল্যান্ডের তৎকালীন সমসাময়িক রাজনীতির (বিশেষ করে রাজা দ্বিতীয় চার্লস এবং ডিউক অফ মনমাউথের দ্বন্দ্ব) তীব্র সমালোচনা করা হয়েছে।</p>
+                    </div>
+
+                    <!-- Mac Flecknoe -->
+                    <div class="content-card border-t-4 border-t-[#3B0764] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#3B0764] mb-3">গ. ম্যাকফ্লেকনয়ে (<span class="eng-text">Mac Flecknoe</span>)</h3>
+                        <p class="text-black mb-2">এটি একটি অত্যন্ত বিখ্যাত <span class="eng-text font-bold text-[#CA8A04]">Mock-heroic poem</span> (<span class="terminology">মক-হিরোয়িক: যেখানে অত্যন্ত তুচ্ছ বিষয়কে মহাকাব্যের মতো গম্ভীর ভঙ্গিতে বর্ণনা করে ব্যঙ্গ করা হয়</span>)।</p>
+                        <p class="text-black"><strong class="text-[#3B0764]">বিষয়বস্তু:</strong> এখানে তিনি তার সাহিত্যিক প্রতিদ্বন্দ্বী ও সহকর্মী নাট্যকার টমাস শ্যাডওয়েল (<span class="eng-text">Thomas Shadwell</span>)-কে 'বোকামির যুবরাজ' হিসেবে তীব্রভাবে ব্যঙ্গ করেছেন।</p>
+                    </div>
+
+                    <!-- Essay of Dramatic Poesy -->
+                    <div class="content-card border-l-4 border-l-[#3B0764]">
+                        <h3 class="text-xl font-bold text-[#3B0764] mb-4">ঘ. সাহিত্য সমালোচনা ও অনুবাদ</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
+                            <div class="bg-purple-50 p-3 rounded">
+                                <strong class="eng-text text-lg text-[#3B0764]">Essay of Dramatic Poesy:</strong> এটি তার সবচেয়ে বিখ্যাত সাহিত্য সমালোচনা গ্রন্থ। এখানে চারজন ব্যক্তির সংলাপের মাধ্যমে তিনি শেক্সপিয়র, বেন জনসন এবং ফরাসি নাটকের তুলনা করেছেন।
+                            </div>
+                            <div class="bg-purple-50 p-3 rounded">
+                                <strong class="eng-text text-lg text-[#3B0764]">Translation of Virgil:</strong> তিনি প্রাচীন রোমান কবি ভার্জিলের লেখা ইংরেজিতে অনুবাদ করেন, যা সে যুগে ব্যাপক প্রশংসিত হয়েছিল।
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>)</h2>
+                
+                <div class="grid grid-cols-1 gap-4 mt-4">
+                    <div class="quote-container border-l-[6px] border-l-[#CA8A04]">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#3B0764]">1. "They think too little who talk too much."</p>
+                        <p class="text-black mb-1">(যারা অতিরিক্ত কথা বলে, তারা চিন্তা করে খুব কম - <span class="eng-text">Absalom and Achitophel</span>)</p>
+                    </div>
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#3B0764]">2. "We first make our habits, and then our habits make us."</p>
+                        <p class="text-black mb-1">(আমরা প্রথমে আমাদের অভ্যাস তৈরি করি, তারপর আমাদের অভ্যাস আমাদের তৈরি করে)</p>
+                        <p class="text-sm text-black"><strong><span class="eng-text">Device:</span></strong> <span class="eng-text font-bold">Chiasmus</span> (<span class="terminology">বাক্যের গঠন উল্টে দেওয়া হয়েছে</span>)।</p>
+                    </div>
+                    <div class="quote-container border-l-[6px] border-l-[#CA8A04]">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#3B0764]">3. "Beware the fury of a patient man."</p>
+                        <p class="text-black mb-1">(একজন ধৈর্যশীল মানুষের ক্রোধ থেকে সাবধান থেকো - <span class="eng-text">Absalom and Achitophel</span>)</p>
+                    </div>
+                    <div class="quote-container !mb-0 border-l-[#3B0764] bg-zinc-50">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#3B0764]">4. "Errors, like straws, upon the surface flow; He who would search for pearls must dive below."</p>
+                        <p class="text-black text-sm">(ভুলত্রুটি খড়কুটোর মতো পানির ওপরে ভাসে; যে মুক্তা খুঁজতে চায় তাকে গভীরে ডুব দিতে হবে - <span class="eng-text">All for Love</span>)</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5 -->
+            <section class="bg-gradient-to-br from-[#3B0764] to-[#2E1065] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8 border-t-4 border-[#CA8A04]">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#581C87] pb-3">একনজরে মনে রাখার মতো তথ্য</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start"><span class="text-[#FDE047] mr-3 font-bold text-xl">👑</span><p>তিনি <span class="eng-text font-bold">Restoration Period</span>-এর প্রধান কবি।</p></div>
+                    <div class="flex items-start"><span class="text-[#FDE047] mr-3 font-bold text-xl">👑</span><p>তিনি ইংল্যান্ডের <span class="eng-text font-bold">First Official Poet Laureate</span>।</p></div>
+                    <div class="flex items-start"><span class="text-[#FDE047] mr-3 font-bold text-xl">👑</span><p>তার মাস্টারপিস ট্র্যাজেডি <span class="eng-text font-bold">All for Love</span>।</p></div>
+                    <div class="flex items-start"><span class="text-[#FDE047] mr-3 font-bold text-xl">👑</span><p>তিনি <span class="eng-text font-bold">Father of Modern English Criticism</span>।</p></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/3B0764/FFF?text=QR'">
+            </a>
+        </footer>
+    </div>
+
+    <!-- Script for Bangla Numbers -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) { textNodes.push(n); }
+                }
+            }
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number'; span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

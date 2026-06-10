@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ প্র্যাকটিস - জন মিল্টন (John Milton)</title>
+    
+    <!-- Google Fonts: Hind Siliguri for text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* CSS Variables for Navy Blue & Crimson Theme (Literature Vibe) */
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #f8fafc; /* Slate 50 */
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        strong, b {
+            font-family: 'Hind Siliguri', sans-serif;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* --- Header Styles --- */
+        .note-header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            color: white;
+            padding: 45px 35px;
+            border-radius: 16px;
+            margin-bottom: 35px;
+            position: relative;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            border: 1px solid #4338ca;
+        }
+
+        .note-header::before {
+            content: "\f5dc"; /* Brain/Literature Icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: -30px;
+            right: -20px;
+            font-size: 180px;
+            color: rgba(255, 255, 255, 0.05);
+            transform: rotate(-10deg);
+            z-index: 0;
+        }
+
+        .chapter-tag {
+            background-color: #be123c; /* Rose 700 / Crimson */
+            color: white;
+            padding: 6px 18px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .note-header h1 {
+            font-size: 2.8rem;
+            margin: 0 0 10px 0;
+            line-height: 1.3;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+            color: #f8fafc;
+        }
+
+        .note-header p {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Top Creator Badge Area */
+        .header-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .qr-corner img {
+            width: 65px;
+            height: 65px;
+            border-radius: 10px;
+            border: 3px solid #fda4af; /* Rose 300 */
+            transition: transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .qr-corner img:hover {
+            transform: scale(1.1);
+        }
+
+        /* --- MCQ Styles --- */
+        .mcq-block {
+            background-color: #1e293b; /* Slate 800 */
+            border: 1px solid #334155; /* Slate 700 */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .mcq-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            border-color: #fb7185; /* Rose 400 */
+        }
+        .option-bg {
+            background-color: #0f172a; /* Slate 900 */
+            border: 1px solid #334155;
+        }
+        .copy-btn {
+            background: linear-gradient(135deg, #be123c 0%, #881337 100%);
+            box-shadow: 0 4px 6px -1px rgba(190, 18, 60, 0.3);
+            transition: all 0.3s ease;
+            color: #ffffff;
+        }
+        .copy-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(190, 18, 60, 0.5);
+        }
+        .text-theme-title {
+            color: #fda4af; /* Rose 300 */
+        }
+        .text-answer {
+            color: #34d399; /* Emerald 400 */
+        }
+
+        /* --- Footer Styles --- */
+        .master-footer {
+            background: #1e293b;
+            padding: 35px;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: 60px;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid #334155;
+        }
+
+        .footer-creator-wrapper {
+            margin: 20px 0;
+        }
+
+        .qr-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px dashed #475569;
+        }
+
+        .qr-section h3 {
+            color: #fda4af;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+
+        .qr-section p {
+            color: #cbd5e1;
+            margin-top: 8px;
+        }
+
+        .qr-placeholder img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .qr-placeholder img:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .header-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .note-header h1 {
+                font-size: 2.2rem;
+            }
+        }
+        
+        /* Class applied by JavaScript for Bangla Numbers */
+        .number-kalpurush {
+            font-family: 'BanglaNumbers', sans-serif;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen">
+
+    <div class="container">
+
+        <!-- ==========================================
+             HEADER SECTION 
+             ========================================== -->
+        <header class="note-header">
+            <span class="chapter-tag"><i class="fas fa-book-open"></i> ইংরেজি সাহিত্য (English Literature)</span>
+            <h1>জন মিল্টন (John Milton)</h1>
+            <p style="font-size: 1.15rem; opacity: 0.95; margin: 0; font-weight: 500; color: #ffe4e6;">ইংরেজি সাহিত্যের অন্যতম শ্রেষ্ঠ মহাকবি (৩০টি মাস্টার MCQ)</p>
+            
+            <div class="header-meta">
+                <!-- Creator Badge -->
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: #fef08a; padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: #1e1b4b;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: #1e1b4b; text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                
+                <!-- QR Code (Header Corner) -->
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                    <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.style.display='none'">
+                </a>
+            </div>
+        </header>
+
+        <!-- ==========================================
+             ACTION BAR (STICKY)
+             ========================================== -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 sticky top-0 z-50 bg-[#0f172a]/95 backdrop-blur-md py-4 border-b border-[#334155] gap-4 px-2">
+            <div>
+                <h2 class="text-xl md:text-2xl font-bold text-theme-title"><i class="fas fa-list-ol mr-2"></i> MCQ প্র্যাকটিস নোট</h2>
+                <p class="text-slate-300 text-sm mt-1">৩০টি প্রশ্ন (A, B, C, D আনুপাতিক হারে বিন্যস্ত)</p>
+            </div>
+            <button id="copyBtn" onclick="copyAll()" class="copy-btn px-6 py-3 rounded-lg font-bold flex items-center gap-2 text-sm md:text-base">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                সব MCQ কপি করুন
+            </button>
+        </div>
+
+        <!-- ==========================================
+             MCQ CONTAINER 
+             ========================================== -->
+        <div id="mcqContainer"></div>
+
+        <!-- ==========================================
+             FOOTER SECTION 
+             ========================================== -->
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #f8fafc; font-weight: 500;">এই এমসিকিউ নোটটি বিসিএস (BCS) ও অন্যান্য প্রতিযোগিতামূলক পরীক্ষার প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে।</p>
+            
+            <!-- Creator Badge (Center Aligned) -->
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: #be123c; padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+
+            <!-- QR Code Section -->
+            <div class="qr-section">
+                <h3>এই নোটটি শেয়ার করুন</h3>
+                <div class="qr-placeholder" style="border: none; background: transparent;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" style="max-width: 100%; max-height: 100%; border-radius: 8px; border: 2px solid #fda4af;" onerror="this.style.display='none'">
+                </div>
+                <p><small>স্ক্যান করুন ডিজিটাল সংস্করণের জন্য</small></p>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- JS Scripts for MCQ Generation & Utilities -->
+    <script>
+        // [Question, Opt A, Opt B, Opt C, Opt D, Correct Opt, Note]
+        const mcqs = [
+            ["ইংরেজি সাহিত্যের অন্যতম শ্রেষ্ঠ মহাকবি জন মিল্টন কোন যুগের প্রধান কবি হিসেবে বিবেচিত হন?", "a. Puritan Period", "b. Elizabethan Period", "c. Romantic Period", "d. Victorian Period", "a", "Note: তিনি শেক্সপিয়রের পরবর্তী যুগের অর্থাৎ Puritan Period-এর প্রধান কবি ছিলেন।"],
+            ["জন মিল্টন ইংল্যান্ডের গৃহযুদ্ধের সময় কার একনিষ্ঠ সমর্থক ছিলেন?", "a. রাজা প্রথম চার্লস", "b. অলিভার ক্রমওয়েল", "c. রানী এলিজাবেথ", "d. ডিউক অব ওয়েলিংটন", "b", "Note: তিনি পিউরিটান মতাদর্শের অনুসারী এবং অলিভার ক্রমওয়েলের সমর্থক ছিলেন।"],
+            ["জন মিল্টনের জীবনের সবচেয়ে বিস্ময়কর দিক হিসেবে নিচের কোনটি বিবেচিত হয়?", "a. বধির অবস্থায় কবিতা লেখা", "b. নির্বাসিত জীবনে সাহিত্য রচনা", "c. সম্পূর্ণ অন্ধ অবস্থায় মহাকাব্য রচনা", "d. রাজপরিবারের সদস্য হওয়া", "c", "Note: তিনি তার কালজয়ী মহাকাব্যগুলো সম্পূর্ণ অন্ধ অবস্থায় মৌখিকভাবে বলে রচনা করিয়েছিলেন।"],
+            ["জন মিল্টন কত সালে জন্মগ্রহণ করেন?", "a. ১৫৬৪ সালে", "b. ১৬১৬ সালে", "c. ১৬৩২ সালে", "d. ১৬০৮ সালে", "d", "Note: তিনি ১৬০৮ সালে লন্ডনে জন্মগ্রহণ করেন।"],
+            ["জন মিল্টনের মৃত্যু হয় কোন রোগে আক্রান্ত হয়ে?", "a. গাউট বা বাতজনিত রোগে", "b. প্লেগ বা মহামারিতে", "c. যক্ষ্মা বা টিবি রোগে", "d. নিউমোনিয়ায়", "a", "Note: তিনি ১৬৭৪ সালে গাউট বা বাতজনিত রোগে মৃত্যুবরণ করেন।"],
+            ["জন মিল্টনের বিখ্যাত মহাকাব্যগুলো মূলত কোন যুগে প্রকাশিত হয়?", "a. Elizabethan Period-এ", "b. Restoration Period-এ", "c. Caroline Period-এ", "d. Augustan Period-এ", "b", "Note: ১৬৬০ সালে ইংল্যান্ডে রাজতন্ত্রের পুনরুদ্ধার বা Restoration Period-এর সময়কালে তার মহাকাব্যগুলো প্রকাশিত হয়।"],
+            ["অতিরিক্ত পড়াশোনা এবং চোখের ওপর চাপের কারণে জন মিল্টন কত বছর বয়সে পুরোপুরি অন্ধ হয়ে যান?", "a. ৪০ বছর বয়সে", "b. ৫০ বছর বয়সে", "c. ৪৪ বছর বয়সে", "d. ৫২ বছর বয়সে", "c", "Note: ১৬৫২ সালে, ৪৪ বছর বয়সে তিনি পুরোপুরি অন্ধ হয়ে যান।"],
+            ["১৬৬০ সালে রাজতন্ত্র পুনঃপ্রতিষ্ঠিত হলে মৃত্যুদণ্ডের হাত থেকে জন মিল্টনকে কে রক্ষা করেন?", "a. উইলিয়াম শেক্সপিয়র", "b. জন ড্রাইডেন", "c. আলেকজান্ডার পোপ", "d. অ্যান্ড্রু মার্ভেল", "d", "Note: তার বন্ধু ও বিখ্যাত কবি অ্যান্ড্রু মার্ভেলের সহায়তায় তিনি কারাগার থেকে মুক্তি পান।"],
+            ["কেমব্রিজ বিশ্ববিদ্যালয়ে পড়ার সময় ফর্সা ত্বক ও লম্বা চুলের জন্য জন মিল্টনকে কী উপাধি দেওয়া হয়েছিল?", "a. Lady of the Christ's College", "b. Prince of the Christ's College", "c. Duke of Cambridge", "d. Angel of Cambridge", "a", "Note: শারীরিক গঠন ও চেহারার জন্য তাকে 'Lady of the Christ's College' বলা হতো।"],
+            ["'The Last Great Poet of the Renaissance' বা রেনেসাঁ যুগের সর্বশেষ মহান কবি কাকে বলা হয়?", "a. উইলিয়াম শেক্সপিয়র", "b. জন মিল্টন", "c. এডমন্ড স্পেন্সার", "d. ক্রিস্টোফার মার্লো", "b", "Note: জন মিল্টনকে রেনেসাঁ বা নবজাগরণের যুগের সর্বশেষ মহান কবি হিসেবে আখ্যায়িত করা হয়।"],
+            ["জন মিল্টনের রচিত 'Paradise Lost' মূলত কী ধরনের সাহিত্যকর্ম?", "a. গীতিনাট্য", "b. শোকগাঁথা", "c. মহাকাব্য", "d. প্রবন্ধ", "c", "Note: 'Paradise Lost' হলো ইংরেজি সাহিত্যের সর্বশ্রেষ্ঠ মহাকাব্য বা Epic।"],
+            ["ইংরেজি সাহিত্যের সর্বশ্রেষ্ঠ মহাকাব্য 'Paradise Lost' প্রথম সংস্করণে (১৬৬৭) কত খণ্ডে প্রকাশিত হয়েছিল?", "a. ৮ খণ্ডে", "b. ১২ খণ্ডে", "c. ১৪ খণ্ডে", "d. ১০ খণ্ডে", "d", "Note: এটি প্রথম সংস্করণে ১০ খণ্ডে প্রকাশিত হয়। পরে ১৬৭৪ সালে ২য় সংস্করণে ১২ খণ্ডে বিন্যস্ত হয়।"],
+            ["'Paradise Lost' মহাকাব্যটি কোন ছন্দে রচিত হয়েছে?", "a. Blank Verse", "b. Free Verse", "c. Heroic Couplet", "d. Sonnet Form", "a", "Note: এটি Blank Verse বা অমিত্রাক্ষর ছন্দে রচিত।"],
+            ["'Paradise Lost' মহাকাব্যের মূল থিম বা বিষয়বস্তু কী ছিল?", "a. To show the power of Satan", "b. To justify the ways of God to man", "c. To describe the creation of earth", "d. To justify the fall of angels", "b", "Note: এর মূল থিম ছিল মানুষের প্রতি ঈশ্বরের বিচার বা আচরণের ন্যায্যতা প্রতিপাদন করা।"],
+            ["আদম ও হাওয়ার স্বর্গ থেকে পতন এবং শয়তানের বিদ্রোহের কাহিনী জন মিল্টনের কোন গ্রন্থে বর্ণিত হয়েছে?", "a. Paradise Regained", "b. Samson Agonistes", "c. Paradise Lost", "d. Lycidas", "c", "Note: মানুষের পাপ ও তার ফলে স্বর্গ হারানোর করুণ কাহিনী 'Paradise Lost'-এ বর্ণিত হয়েছে।"],
+            ["'Paradise Regained' গ্রন্থটি মূলত কোন গ্রন্থের সিক্যুয়েল বা পরবর্তী অংশ?", "a. The Divine Comedy", "b. The Faerie Queene", "c. Samson Agonistes", "d. Paradise Lost", "d", "Note: এটি Paradise Lost-এর মূল কাহিনীর ধারাবাহিকতায় রচিত পরবর্তী রচনা।"],
+            ["যিশুখ্রিস্টের মাধ্যমে হারানো স্বর্গের পুনরুদ্ধারের কাহিনী জন মিল্টনের কোন গ্রন্থে বর্ণিত হয়েছে?", "a. Paradise Regained", "b. Comus", "c. Lycidas", "d. Areopagitica", "a", "Note: যিশুখ্রিস্টের মাধ্যমে স্বর্গের পুনরুদ্ধার 'Paradise Regained'-এ বর্ণিত হয়েছে।"],
+            ["'Samson Agonistes' সাহিত্যকর্মটি মূলত কী ধরনের রচনা?", "a. মহাকাব্য বা Epic", "b. কাব্যনাট্য বা Poetic Drama", "c. গদ্য বা Prose", "d. শোকগাঁথা বা Elegy", "b", "Note: এটি গ্রিক ট্র্যাজেডির আদলে লেখা একটি কাব্যনাট্য বা Poetic Drama।"],
+            ["নিজের অন্ধত্বের যন্ত্রণার ছায়া জন মিল্টন তার কোন সাহিত্যকর্মে ফুটিয়ে তুলেছেন?", "a. Paradise Regained", "b. Areopagitica", "c. Samson Agonistes", "d. Comus", "c", "Note: এই নাটকে বীর স্যামসনের অন্ধত্ব ও বন্দিত্বের মাধ্যমে মিল্টন নিজের অন্ধত্বের যন্ত্রণা ফুটিয়ে তুলেছেন।"],
+            ["জন মিল্টন তার বন্ধু এডওয়ার্ড কিং-এর মৃত্যুতে কোন বিখ্যাত শোকগাঁথা (Pastoral Elegy) রচনা করেন?", "a. Adonais", "b. In Memoriam", "c. Thyrsis", "d. Lycidas", "d", "Note: তিনি তার বন্ধু এডওয়ার্ড কিং-এর মৃত্যুতে বিখ্যাত প্যাস্টোরাল এলিজি 'Lycidas' রচনা করেন।"],
+            ["সংবাদপত্রের স্বাধীনতা (Freedom of Press) এবং বাক-স্বাধীনতার পক্ষে জন মিল্টনের লেখা বিখ্যাত গদ্যগ্রন্থ কোনটি?", "a. Areopagitica", "b. Of Education", "c. The Tenure of Kings", "d. Leviathan", "a", "Note: সংবাদপত্রের স্বাধীনতার পক্ষে লেখা এটি একটি বিশ্ববিখ্যাত গদ্যগ্রন্থ।"],
+            ["'শিক্ষা হলো শরীর, মন ও আত্মার সুষম বিকাশ।'— উক্তিটি জন মিল্টনের কোন প্রবন্ধে রয়েছে?", "a. Areopagitica", "b. Of Education", "c. On His Blindness", "d. Comus", "b", "Note: তার শিক্ষা বিষয়ক বিখ্যাত প্রবন্ধ 'Of Education'-এ এই উক্তিটি রয়েছে।"],
+            ["রাজদরবারে প্রদর্শিত নৃত্য, গীত ও অভিনয়ের সমন্বয়ে রচিত জন মিল্টনের গীতিনাট্য (Masque) কোনটি?", "a. Lycidas", "b. Samson Agonistes", "c. Comus", "d. Areopagitica", "c", "Note: 'Comus' হলো মিল্টনের রচিত এক ধরনের নাটকীয় বিনোদন বা গীতিনাট্য।"],
+            ["জন মিল্টনের নিজের অন্ধত্ব নিয়ে ঈশ্বরের কাছে ফরিয়াদ এবং সান্ত্বনা খুঁজে পাওয়ার কথা কোন সনেটে বর্ণিত হয়েছে?", "a. On the Late Massacre in Piedmont", "b. On Shakespeare", "c. To the Lord General Cromwell", "d. On His Blindness", "d", "Note: এটি তার একটি অত্যন্ত বিখ্যাত সনেট।"],
+            ["'Better to reign in hell, than serve in heaven.'— উক্তিটি 'Paradise Lost' মহাকাব্যে কে করেছে?", "a. Satan", "b. Adam", "c. Eve", "d. God", "a", "Note: শয়তান (Satan) তার বিদ্রোহ প্রকাশ করতে এই বিখ্যাত উক্তিটি করেছিল।"],
+            ["'Better to reign in hell, than serve in heaven.'— বাক্যটিতে কোন সাহিত্যিক অলঙ্কার (Literary Device) ব্যবহৃত হয়েছে?", "a. Simile", "b. Antithesis", "c. Metaphor", "d. Personification", "b", "Note: Reign vs Serve, Hell vs Heaven—দুটি বিপরীত ধারণা পাশাপাশি স্থাপন করায় এটি Antithesis।"],
+            ["'Childhood shows the man, as morning shows the day.'— বাক্যটিতে কোন Literary Device ব্যবহৃত হয়েছে?", "a. Metaphor", "b. Hyperbole", "c. Simile", "d. Oxymoron", "c", "Note: 'as' ব্যবহার করে শৈশবকে সকালের সাথে সরাসরি তুলনা করায় এটি একটি Simile।"],
+            ["'Death is the golden key that opens the place of eternity.'— এই বিখ্যাত উক্তিতে মৃত্যুকে কিসের সাথে তুলনা করা হয়েছে (Metaphor)?", "a. অন্ধকারের সাথে", "b. অনন্তকালের সাথে", "c. স্বর্গের দরজার সাথে", "d. সোনালি চাবির সাথে", "d", "Note: মৃত্যুকে সরাসরি সোনালি চাবির সাথে তুলনা করে Metaphor ব্যবহার করা হয়েছে।"],
+            ["'Awake, arise, or be for ever fallen.'— শয়তান এই উক্তিটি কাদের উদ্দেশ্য করে করেছিল?", "a. তার অনুসারীদের বা Fallen Angels-দের", "b. মানবজাতিকে", "c. ঈশ্বরের অনুসারীদের", "d. আদম ও হাওয়াকে", "a", "Note: শয়তান নরকে পতিত হওয়ার পর তার অনুসারীদের উদ্দীপ্ত করতে এই উক্তি করেছিল।"],
+            ["'They also serve who only stand and wait.'— এই বিখ্যাত লাইনটি জন মিল্টনের কোন কবিতার অংশ?", "a. Paradise Lost", "b. On His Blindness", "c. Lycidas", "d. Paradise Regained", "b", "Note: এটি 'On His Blindness' কবিতার একটি অত্যন্ত জনপ্রিয় পঙ্‌ক্তি।"]
+        ];
+
+        // Function to render MCQs dynamically
+        function renderMCQs() {
+            const container = document.getElementById('mcqContainer');
+            let htmlContent = '';
+
+            mcqs.forEach((mcq, index) => {
+                const [q, a, b, c, d, ans, note] = mcq;
+                htmlContent += `
+                <div class="mcq-block p-6 rounded-xl mb-6">
+                    <div class="copy-line text-lg font-semibold text-theme-title mb-4">${index + 1}. ${q}</div>
+                    <div class="flex flex-col gap-2 text-slate-300 ml-2">
+                        <div class="copy-line option-bg p-2 rounded">${a}</div>
+                        <div class="copy-line option-bg p-2 rounded">${b}</div>
+                        <div class="copy-line option-bg p-2 rounded">${c}</div>
+                        <div class="copy-line option-bg p-2 rounded">${d}</div>
+                    </div>
+                    <div class="copy-line mt-4 font-bold text-answer">Correct answer: ${ans}</div>
+                    <div class="copy-line mt-2 text-slate-400 text-sm leading-relaxed">${note}</div>
+                </div>`;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // Initialize rendering
+        renderMCQs();
+
+        // Copy functionality
+        function copyAll() {
+            let result = '';
+            const blocks = document.querySelectorAll('.mcq-block');
+            
+            blocks.forEach((block) => {
+                const lines = block.querySelectorAll('.copy-line');
+                lines.forEach(line => {
+                    result += line.innerText.trim() + '\n';
+                });
+                result += '\n'; // Add an extra newline between blocks
+            });
+            
+            navigator.clipboard.writeText(result.trim()).then(() => {
+                const btn = document.getElementById('copyBtn');
+                const originalContent = btn.innerHTML;
+                
+                // Change button style on success
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> কপি সম্পন্ন!`;
+                btn.classList.replace('text-white', 'text-slate-900');
+                btn.style.background = '#34d399'; // Emerald 400 for success
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.classList.replace('text-slate-900', 'text-white');
+                    btn.style.background = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Copy failed: ', err);
+                alert('কপি করতে সমস্যা হয়েছে, অনুগ্রহ করে আবার চেষ্টা করুন।');
+            });
+        }
+    </script>
+    
+    <!-- JavaScript to Automatically Wrap Bangla Numbers -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function wrapBanglaNumbers(node) {
+                // Text node checking
+                if (node.nodeType === 3) { 
+                    const text = node.nodeValue;
+                    // If text contains Bangla numbers (০-৯)
+                    if (/[০-৯]/.test(text)) {
+                        const tempDiv = document.createElement('div');
+                        // Replace numbers with the span class
+                        tempDiv.innerHTML = text.replace(/([০-৯]+)/g, '<span class="number-kalpurush">$1</span>');
+                        
+                        // Insert the new elements and remove the old text node
+                        while (tempDiv.firstChild) {
+                            node.parentNode.insertBefore(tempDiv.firstChild, node);
+                        }
+                        node.parentNode.removeChild(node);
+                    }
+                } 
+                // Element node checking (Skip scripts, styles, and already formatted spans)
+                else if (node.nodeType === 1 && !['SCRIPT', 'STYLE'].includes(node.nodeName) && !node.classList.contains('number-kalpurush')) {
+                    // Iterate backwards to prevent index issues during replacement
+                    for (let i = node.childNodes.length - 1; i >= 0; i--) {
+                        wrapBanglaNumbers(node.childNodes[i]);
+                    }
+                }
+            }
+            
+            // Start from the body
+            wrapBanglaNumbers(document.body);
+        });
+    </script>
+
+</body>
+</html>

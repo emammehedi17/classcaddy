@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ on W.B. Yeats - Emam Mehedi</title>
+    
+    <!-- Google Fonts: Hind Siliguri for text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* CSS Variables for Celtic Indigo & Sage Green Theme */
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: #0b132b; /* Dark Celtic Indigo */
+            color: #f1f5f9; /* Slate 100 */
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        strong, b {
+            font-family: 'Hind Siliguri', sans-serif;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* --- Header Styles (Celtic/Modern Vibe) --- */
+        .note-header {
+            background: linear-gradient(135deg, #1c2541 0%, #0b132b 100%);
+            color: white;
+            padding: 45px 35px;
+            border-radius: 16px;
+            margin-bottom: 35px;
+            position: relative;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            border: 1px solid #3b82f6;
+        }
+
+        .note-header::before {
+            content: "\f501"; /* Feather/Poem Icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: -30px;
+            right: -20px;
+            font-size: 180px;
+            color: rgba(255, 255, 255, 0.05);
+            transform: rotate(-10deg);
+            z-index: 0;
+        }
+
+        .chapter-tag {
+            background-color: #059669; /* Sage Green */
+            color: white;
+            padding: 6px 18px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .note-header h1 {
+            font-size: 2.8rem;
+            margin: 0 0 10px 0;
+            line-height: 1.3;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+            color: #f8fafc;
+        }
+
+        .note-header p {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Top Creator Badge Area */
+        .header-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .qr-corner img {
+            width: 65px;
+            height: 65px;
+            border-radius: 10px;
+            border: 3px solid #34d399; /* Emerald 400 */
+            transition: transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .qr-corner img:hover {
+            transform: scale(1.1);
+        }
+
+        /* --- MCQ Styles --- */
+        .mcq-block {
+            background-color: #1c2541; /* Deep Slate Blue */
+            border: 1px solid #3b82f6; /* Blue 500 */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .mcq-block:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            border-color: #10b981; /* Emerald 500 */
+        }
+        .option-bg {
+            background-color: #0b132b; /* Match body bg */
+            border: 1px solid #3b82f6;
+        }
+        .copy-btn {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%); /* Sage Green Gradient */
+            box-shadow: 0 4px 6px -1px rgba(5, 150, 105, 0.3);
+            transition: all 0.3s ease;
+            color: #ffffff;
+        }
+        .copy-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.5);
+        }
+        .text-theme-title {
+            color: #6ee7b7; /* Emerald 300 */
+        }
+        .text-answer {
+            color: #34d399; /* Emerald 400 */
+        }
+
+        /* --- Footer Styles --- */
+        .master-footer {
+            background: #1c2541;
+            padding: 35px;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: 60px;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid #3b82f6;
+        }
+
+        .footer-creator-wrapper {
+            margin: 20px 0;
+        }
+
+        .qr-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px dashed #3b82f6;
+        }
+
+        .qr-section h3 {
+            color: #34d399;
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+
+        .qr-section p {
+            color: #a7f3d0;
+            margin-top: 8px;
+        }
+
+        .qr-placeholder img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .qr-placeholder img:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .header-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .note-header h1 {
+                font-size: 2.2rem;
+            }
+        }
+        
+        /* Class applied by JavaScript for Bangla Numbers */
+        .number-kalpurush {
+            font-family: 'BanglaNumbers', sans-serif;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen">
+
+    <div class="container">
+
+        <!-- ==========================================
+             HEADER SECTION 
+             ========================================== -->
+        <header class="note-header">
+            <span class="chapter-tag"><i class="fas fa-book-open"></i> ইংরেজি সাহিত্য (English Literature)</span>
+            <h1>ডব্লিউ. বি. ইয়েটস (W.B. Yeats)</h1>
+            <p style="font-size: 1.15rem; opacity: 0.95; margin: 0; font-weight: 500; color: #a7f3d0;">ইংরেজি সাহিত্যের অন্যতম শ্রেষ্ঠ এবং প্রভাবশালী আইরিশ কবি (৫০টি মাস্টার MCQ)</p>
+            
+            <div class="header-meta">
+                <!-- Creator Badge -->
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: #fef08a; padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: #0b132b;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: #0b132b; text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                
+                <!-- QR Code (Header Corner) -->
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                    <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.style.display='none'">
+                </a>
+            </div>
+        </header>
+
+        <!-- ==========================================
+             ACTION BAR (STICKY)
+             ========================================== -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 sticky top-0 z-50 bg-[#0b132b]/95 backdrop-blur-md py-4 border-b border-[#3b82f6] gap-4 px-2">
+            <div>
+                <h2 class="text-xl md:text-2xl font-bold text-theme-title"><i class="fas fa-list-ol mr-2"></i> MCQ প্র্যাকটিস নোট</h2>
+                <p class="text-slate-300 text-sm mt-1">৫০টি প্রশ্ন (A, B, C, D আনুপাতিক হারে বিন্যস্ত)</p>
+            </div>
+            <button id="copyBtn" onclick="copyAll()" class="copy-btn px-6 py-3 rounded-lg font-bold flex items-center gap-2 text-sm md:text-base">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                সব MCQ কপি করুন
+            </button>
+        </div>
+
+        <!-- ==========================================
+             MCQ CONTAINER 
+             ========================================== -->
+        <div id="mcqContainer"></div>
+
+        <!-- ==========================================
+             FOOTER SECTION 
+             ========================================== -->
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #f8fafc; font-weight: 500;">এই এমসিকিউ নোটটি বিসিএস (BCS) ও অন্যান্য প্রতিযোগিতামূলক পরীক্ষার প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে।</p>
+            
+            <!-- Creator Badge (Center Aligned) -->
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: #059669; padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+
+            <!-- QR Code Section -->
+            <div class="qr-section">
+                <h3>এই নোটটি শেয়ার করুন</h3>
+                <div class="qr-placeholder" style="border: none; background: transparent;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" style="max-width: 100%; max-height: 100%; border-radius: 8px; border: 2px solid #3b82f6;" onerror="this.style.display='none'">
+                </div>
+                <p><small>স্ক্যান করুন ডিজিটাল সংস্করণের জন্য</small></p>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- JS Scripts for MCQ Generation & Utilities -->
+    <script>
+        // [Question, Opt A, Opt B, Opt C, Opt D, Correct Opt, Note]
+        const mcqs = [
+            ["উইলিয়াম বাটলার ইয়েটস (W.B. Yeats)-এর জীবনকাল কোনটি?", "a. ১৮৫৬ - ১৯২৯", "b. ১৮৬৫ - ১৯৩৯", "c. ১৮৭৫ - ১৯৪৯", "d. ১৮৪৯ - ১৯১৯", "b", "Note: উইলিয়াম বাটলার ইয়েটসের জীবনকাল ১৮৬৫ থেকে ১৯৩৯ সাল পর্যন্ত।"],
+            ["উইলিয়াম বাটলার ইয়েটস ইংরেজি সাহিত্যের কোন যুগের অন্যতম শ্রেষ্ঠ কবি?", "a. Romantic Period", "b. Modern Period", "c. Victorian Period", "d. Neoclassical Period", "b", "Note: ইয়েটস ইংরেজি সাহিত্যের আধুনিক যুগের (Modern Period) অন্যতম শ্রেষ্ঠ কবি।"],
+            ["ইংরেজি সাহিত্যে 'Modern Period' বা আধুনিক যুগের সময়কাল কোনটি?", "a. ১৭৯৮ - ১৮৩২", "b. ১৯০১ - ১৯৩৯", "c. ১৮৩২ - ১৯০১", "d. ১৬৬০ - ১৭৯৮", "b", "Note: ইংরেজি সাহিত্যে ১৯০১ থেকে ১৯৩৯ সাল পর্যন্ত সময়কালকে Modern Period বলা হয়।"],
+            ["ডব্লিউ. বি. ইয়েটস কোন দেশের জাতীয় কবি?", "a. ইংল্যান্ড", "b. আয়ারল্যান্ড", "c. স্কটল্যান্ড", "d. আমেরিকা", "b", "Note: ইয়েটস আয়ারল্যান্ডের জাতীয় কবি (National Poet of Ireland)।"],
+            ["রবীন্দ্রনাথ ঠাকুরের 'গীতাঞ্জলি' কাব্যের ইংরেজি অনুবাদ 'Song Offerings'-এর ভূমিকা (Introduction) কে লিখেছিলেন?", "a. টি. এস. এলিয়ট", "b. ডব্লিউ. বি. ইয়েটস", "c. এজরা পাউন্ড", "d. রবার্ট ফ্রস্ট", "b", "Note: ডব্লিউ. বি. ইয়েটস রবীন্দ্রনাথের গীতাঞ্জলির ইংরেজি অনুবাদের ভূমিকা লিখেছিলেন।"],
+            ["গীতাঞ্জলি কাব্যের ভূমিকা লেখার মাধ্যমে ইয়েটস রবীন্দ্রনাথকে কত সালে নোবেল পুরস্কার পেতে অসামান্য সাহায্য করেছিলেন?", "a. ১৯১১ সালে", "b. ১৯১৩ সালে", "c. ১৯১২ সালে", "d. ১৯১৪ সালে", "b", "Note: ১৯১৩ সালে রবীন্দ্রনাথ ঠাকুর সাহিত্যে নোবেল পুরস্কার লাভ করেন।"],
+            ["ডব্লিউ. বি. ইয়েটস ১৮৬৫ সালে আয়ারল্যান্ডের কোন শহরে জন্মগ্রহণ করেন?", "a. লন্ডন", "b. ডাবলিন", "c. প্যারিস", "d. এডিনবরা", "b", "Note: ইয়েটস ১৮৬৫ সালে আয়ারল্যান্ডের ডাবলিনে জন্মগ্রহণ করেন।"],
+            ["কবি ইয়েটস আয়ারল্যান্ডের আইনসভায় কোন পদে দায়িত্ব পালন করেছিলেন?", "a. প্রধানমন্ত্রী", "b. সিনেট সদস্য", "c. প্রেসিডেন্ট", "d. স্পিকার", "b", "Note: তিনি কবি ও নাট্যকারের পাশাপাশি আইরিশ সিনেটের সদস্য (সিনেটর) ছিলেন।"],
+            ["ডব্লিউ. বি. ইয়েটস কোন দেশে মৃত্যুবরণ করেন?", "a. আয়ারল্যান্ড", "b. ফ্রান্স", "c. ইংল্যান্ড", "d. ইতালি", "b", "Note: ১৯৩৯ সালে ফ্রান্সে তিনি মৃত্যুবরণ করেন এবং পরে তাঁকে আয়ারল্যান্ডে সমাহিত করা হয়।"],
+            ["প্রেমের ব্যর্থতার বেদনা ও মড গানের বিপ্লবী সত্তা তাঁর অনেক কবিতার উৎস। মড গান (Maud Gonne) কে ছিলেন?", "a. আইরিশ রানী", "b. ফরাসি actress", "c. আইরিশ বিপ্লবী", "d. ব্রিটিশ লেখিকা", "c", "Note: মড গান ছিলেন একজন আইরিশ বিপ্লবী নারী, যাকে ইয়েটস গভীরভাবে ভালোবাসতেন।"],
+            ["রবীন্দ্রনাথ ঠাকুরের সাথে ডব্লিউ. বি. ইয়েটসের প্রথম সাক্ষাৎ কত সালে লন্ডনে হয়েছিল?", "a. ১৯১০ সালে", "b. ১৯১২ সালে", "c. ১৯১১ সালে", "d. ১৯১৩ সালে", "b", "Note: ১৯১২ সালে লন্ডনে রবীন্দ্রনাথ ঠাকুরের সাথে ইয়েটসের ঐতিহাসিক সাক্ষাৎ হয়।"],
+            ["আয়ারল্যান্ডের জাতীয় কবি ডব্লিউ. বি. ইয়েটস কত সালে সাহিত্যে নোবেল পুরস্কার লাভ করেন?", "a. ১৯১৩ সালে", "b. ১৯২৫ সালে", "c. ১৯৩০ সালে", "d. ১৯২৩ সালে", "d", "Note: ১৯২৩ সালে তিনি সাহিত্যে নোবেল পুরস্কার লাভ করেন।"],
+            ["প্রাচীন আইরিশ রূপকথা, লোককথা ও রহস্যময় ঐতিহ্য নিয়ে আইরিশ সাহিত্যের পুনর্জাগরণকে কী বলা হয়?", "a. Irish Renaissance", "b. Romantic Revival", "c. Celtic Twilight", "d. Modern Mysticism", "c", "Note: প্রাচীন আইরিশ রূপকথা ও রহস্যময় ঐতিহ্যকে 'Celtic Twilight' বলা হয়।"],
+            ["আইরিশ রূপকথা ও লোকগাথা নিয়ে কাজ করার জন্য ইয়েটসকে নিচের কোন উপাধিতে ভূষিত করা হয়?", "a. Poet of Nature", "b. Poet of Beauty", "c. Poet of Liberty", "d. Poet of Celtic Twilight", "d", "Note: সেল্টিক লোকগাথা ও রহস্যময়তা নিয়ে কাজ করার জন্য তাঁকে 'Poet of Celtic Twilight' বলা হয়।"],
+            ["ইয়েটসের জনপ্রিয় কবিতা 'The Lake Isle of Innisfree' মূলত কী ধরনের কবিতা?", "a. Lyric", "b. Epic", "c. Ballad", "d. Sonnet", "a", "Note: এটি ব্যক্তিগত আবেগ ও অনুভূতি মিশ্রিত একটি চমৎকার লিরিক (Lyric) বা গীতি কবিতা।"],
+            ["যান্ত্রিক কোলাহল থেকে মুক্তি পেতে কবি কোন নির্জন দ্বীপে গিয়ে শান্তি খুঁজে পেতে চান?", "a. বাইজান্টিয়াম", "b. ট্রয়", "c. ইন্নিসফ্রি", "d. ইশলি", "c", "Note: কবি 'Innisfree' দ্বীপে গিয়ে প্রকৃতির মাঝে শান্তি পাওয়ার আকুলতা প্রকাশ করেছেন।"],
+            ["'I will arise and go now, and go to Innisfree.' — এই বিখ্যাত লাইনটি কোন কবিতার?", "a. Sailing to Byzantium", "b. The Second Coming", "c. Easter 1916", "d. The Lake Isle of Innisfree", "d", "Note: এটি 'The Lake Isle of Innisfree' কবিতার প্রথম লাইন।"],
+            ["'I will arise and go now' — এই চরণে বাইবেলের পরোক্ষ উল্লেখ রয়েছে। সাহিত্যে এই অলঙ্কারকে কী বলা হয়?", "a. Metaphor", "b. Simile", "c. Personification", "d. Allusion", "d", "Note: অন্য কোনো বিখ্যাত সাহিত্য বা ধর্মগ্রন্থের পরোক্ষ উল্লেখকে 'Allusion' বলা হয়।"],
+            ["'I hear lake water lapping with low sounds...' — এখানে 'l' ধ্বনির পুনরাবৃত্তিকে কী বলে?", "a. Alliteration", "b. Oxymoron", "c. Assonance", "d. Metaphor", "a", "Note: একই ব্যঞ্জনবর্ণের বা ধ্বনির পুনরাবৃত্তিকে 'Alliteration' (অ্যালিটারেশন) বা অনুপ্রাস বলা হয়।"],
+            ["প্রথম বিশ্বযুদ্ধ পরবর্তী আধুনিক সভ্যতার পতন এবং এক অরাজক ভবিষ্যতের ভবিষ্যদ্বাণী রয়েছে কোন কবিতায়?", "a. Sailing to Byzantium", "b. Easter 1916", "c. No Second Troy", "d. The Second Coming", "d", "Note: ১৯১৯ সালে প্রথম বিশ্বযুদ্ধের ভয়াবহতা দেখে তিনি 'The Second Coming' কবিতাটি লেখেন।"],
+            ["ইয়েটসের মতে, ইতিহাসের চাকা বা ঘূর্ণায়মান চক্রকে কী বলা হয়?", "a. Gyre", "b. Cycle", "c. Sphere", "d. Spiral", "a", "Note: ইয়েটসের নিজস্ব ইতিহাস দর্শনে ইতিহাসের ঘূর্ণায়মান চক্রকে 'Gyre' (গাইর) বলা হয়।"],
+            ["'Things fall apart; the centre cannot hold.' — এই কালজয়ী উক্তিটি কোন কবিতার অংশ?", "a. The Lake Isle of Innisfree", "b. Sailing to Byzantium", "c. The Second Coming", "d. Easter 1916", "c", "Note: এটি 'The Second Coming' কবিতার একটি অত্যন্ত জনপ্রিয় লাইন, যা আধুনিক সমাজের বিশৃঙ্খলা প্রকাশ করে।"],
+            ["'Things fall apart; the centre cannot hold.' — এখানে বিশৃঙ্খলা বোঝাতে কবি কোন অলঙ্কারের সাহায্য নিয়েছেন?", "a. Simile", "b. Metaphor", "c. Oxymoron", "d. Alliteration", "b", "Note: এটি বিশৃঙ্খলা প্রকাশের জন্য একটি সার্থক মেটাফর বা রূপক।"],
+            ["'The best lack all conviction, while the worst / Are full of passionate intensity.' — উক্তিটি কার?", "a. জন মিল্টন", "b. টি. এস. এলিয়ট", "c. উইলিয়াম ওয়ার্ডসওয়ার্থ", "d. ডব্লিউ. বি. ইয়েটস", "d", "Note: এটি ডব্লিউ. বি. ইয়েটসের 'The Second Coming' কবিতার বিখ্যাত উক্তি।"],
+            ["বার্ধক্যের বিষাদ এবং শিল্পের অমরত্ব নিয়ে লেখা ইয়েটসের বিখ্যাত কবিতা কোনটি?", "a. Sailing to Byzantium", "b. No Second Troy", "c. Leda and the Swan", "d. Easter 1916", "a", "Note: এই কবিতায় কবি বার্ধক্যকে জয় করে শিল্পের চিরন্তন জগতে প্রবেশ করার আকাঙ্ক্ষা প্রকাশ করেছেন।"],
+            ["'Sailing to Byzantium' কবিতায় 'Byzantium' শহরটি বর্তমানে কী নামে পরিচিত?", "a. রোম", "b. অ্যাথেন্স", "c. কায়রো", "d. ইস্তাম্বুল", "d", "Note: প্রাচীন গ্রিক শহর বাইজান্টিয়াম বর্তমানে তুরস্কের 'ইস্তাম্বুল' নামে পরিচিত।"],
+            ["'That is no country for old men.' — এই বিখ্যাত লাইনটি কোন কবিতার সূচনা ঘটায়?", "a. The Lake Isle of Innisfree", "b. No Second Troy", "c. A Prayer for My Daughter", "d. Sailing to Byzantium", "d", "Note: এটি 'Sailing to Byzantium' কবিতার প্রথম লাইন।"],
+            ["'An aged man is but a paltry thing, / A tattered coat upon a stick.' — এখানে কোন অলঙ্কার ব্যবহৃত হয়েছে?", "a. Simile", "b. Oxymoron", "c. Allusion", "d. Metaphor", "d", "Note: চাক্ষুষ কোনো শব্দ (যেমন- like, as) ছাড়াই সরাসরি তুলনা করায় এটি Metaphor।"],
+            ["১৯১৬ সালের ব্রিটিশ শাসনের বিরুদ্ধে আইরিশদের সশস্ত্র বিদ্রোহের পটভূমিতে কোন কবিতাটি রচিত?", "a. Easter 1916", "b. No Second Troy", "c. The Second Coming", "d. Sailing to Byzantium", "a", "Note: ১৯১৬ সালের আইরিশদের ইস্টার বিদ্রোহের শহীদের প্রতি শ্রদ্ধা জানিয়ে 'Easter 1916' রচিত হয়।"],
+            ["'All changed, changed utterly: / A terrible beauty is born.' — এই লাইনে কোন অলঙ্কারটি ব্যবহৃত হয়েছে?", "a. Oxymoron", "b. Personification", "c. Simile", "d. Alliteration", "a", "Note: 'Terrible' (ভীষণ) এবং 'Beauty' (সুন্দর) — দুটি সম্পূর্ণ বিপরীত শব্দ পাশাপাশি বসে নতুন অর্থ তৈরি করায় এটি Oxymoron।"],
+            ["মড গানের ধ্বংসাত্মক বিপ্লবী রূপ দেখে কবি তাকে গ্রিক পুরাণের কার সাথে তুলনা করেছেন?", "a. লেডা", "b. ক্লিওপেট্রা", "c. ডায়ানা", "d. হেলেন অব ট্রয়", "d", "Note: 'No Second Troy' কবিতায় কবি তার প্রেমিকাকে হেলেন অব ট্রয়ের সাথে তুলনা করেছেন।"],
+            ["মড গানকে গ্রিক পুরাণের হেলেনের সাথে তুলনা করে ইয়েটস কোন কবিতাটি রচনা করেন?", "a. Leda and the Swan", "b. Easter 1916", "c. No Second Troy", "d. A Prayer for My Daughter", "c", "Note: মড গানের বিপ্লবী ও ধ্বংসাত্মক রূপের পটভূমিতে 'No Second Troy' রচিত।"],
+            ["ইয়েটস তার মেয়ে অ্যানি (Anne)-র মঙ্গলের জন্য ঈশ্বরের কাছে প্রার্থনা করে কোন কবিতাটি লেখেন?", "a. A Prayer for My Daughter", "b. Leda and the Swan", "c. The Wild Swans at Coole", "d. No Second Troy", "a", "Note: মেয়ের সুন্দর ও শান্ত ভবিষ্যৎ কামনায় তিনি 'A Prayer for My Daughter' লেখেন।"],
+            ["দেবরাজ জিউস রাজহাঁসের রূপ ধরে লেডাকে ধর্ষণের গ্রিক পুরাণনির্ভর কাহিনী নিয়ে রচিত কবিতা কোনটি?", "a. Leda and the Swan", "b. No Second Troy", "c. Sailing to Byzantium", "d. The Green Helmet", "a", "Note: 'Leda and the Swan' ইয়েটসের একটি বিখ্যাত সনেট যা গ্রিক মিথলজি বা পুরাণের উপর ভিত্তি করে লেখা।"],
+            ["গ্রিক পুরাণে রাজহাঁসের রূপধারী দেবরাজ কে ছিলেন?", "a. অ্যাপোলো", "b. পসাইডন", "c. জিউস", "d. হারকিউলিস", "c", "Note: গ্রিক পুরাণের প্রধান দেবতা জিউস (Zeus) রাজহাঁসের রূপ ধারণ করেছিলেন।"],
+            ["নিচের কোনটি ডব্লিউ. বি. ইয়েটস রচিত একটি বিখ্যাত কাব্যগ্রন্থ (Poetry Collection)?", "a. The Tower", "b. The Waste Land", "c. Lyrical Ballads", "d. Gitanjali", "a", "Note: 'The Tower' ডব্লিউ. বি. ইয়েটসের একটি অত্যন্ত বিখ্যাত কাব্যগ্রন্থ।"],
+            ["'The Winding Stair' কাব্যগ্রন্থটি কার রচনা?", "a. টি. এস. এলিয়ট", "b. ডব্লিউ. বি. ইয়েটস", "c. রবার্ট ফ্রস্ট", "d. জন কিটস", "b", "Note: 'The Winding Stair' ইয়েটসের একটি অন্যতম বিখ্যাত কাব্যগ্রন্থ।"],
+            ["নিচের কোনটি ইয়েটস রচিত একটি বিখ্যাত কাব্যগ্রন্থ?", "a. The Green Helmet", "b. Ode to the West Wind", "c. Kubla Khan", "d. Adonais", "a", "Note: 'The Green Helmet' ডব্লিউ. বি. ইয়েটসের একটি অনন্য কাব্যগ্রন্থ।"],
+            ["'The Wild Swans at Coole' কাব্যগ্রন্থের রচয়িতা কে?", "a. উইলিয়াম ওয়ার্ডসওয়ার্ড", "b. পার্সি বিশি শেলি", "c. ডব্লিউ. বি. ইয়েটস", "d. স্যামুয়েল কোলরিজ", "c", "Note: 'The Wild Swans at Coole' ইয়েটসের একটি বিখ্যাত কাব্যগ্রন্থ।"],
+            ["ডব্লিউ. বি. ইয়েটস আয়ারল্যান্ডের ডাবলিনে কোন বিখ্যাত থিয়েটারটি প্রতিষ্ঠা করেন?", "a. Globe Theatre", "b. Royal Theatre", "c. National Theatre", "d. Abbey Theatre", "d", "Note: ইয়েটস আয়ারল্যান্ডের নাট্য আন্দোলনের অংশ হিসেবে বিখ্যাত 'Abbey Theatre' প্রতিষ্ঠা করেন।"],
+            ["নিচের কোনটি ডব্লিউ. বি. ইয়েটস রচিত একটি বিখ্যাত নাটক (Drama)?", "a. Hamlet", "b. Doctor Faustus", "c. Macbeth", "d. Cathleen ni Houlihan", "d", "Note: 'Cathleen ni Houlihan' ইয়েটস রচিত আয়ারল্যান্ডের জাতীয়তাবাদী চেতনার একটি বিখ্যাত নাটক।"],
+            ["'The Countess Cathleen' নাটকটি কার রচনা?", "a. জর্জ বার্নার্ড শ", "b. উইলিয়াম শেক্সপিয়র", "c. ডব্লিউ. বি. ইয়েটস", "d. হেনরিক ইবসেন", "c", "Note: 'The Countess Cathleen' ইয়েটসের একটি বিখ্যাত প্রতীকী নাটক।"],
+            ["নিচের কোনটি ডব্লিউ. বি. ইয়েটসের একটি নাটক?", "a. The Land of Heart's Desire", "b. Arms and the Man", "c. Justice", "d. Pygmalion", "a", "Note: 'The Land of Heart's Desire' ইয়েটসের প্রথম মঞ্চস্থ নাটকগুলোর একটি।"],
+            ["'How can we know the dancer from the dance?' — এই বিখ্যাত উক্তিটি কোন কবিতার?", "a. Sailing to Byzantium", "b. The Second Coming", "c. Easter 1916", "d. Among School Children", "d", "Note: এটি 'Among School Children' কবিতার শেষ পঙ্‌ক্তি, যা শিল্প ও শিল্পীর একাত্মতা প্রকাশ করে।"],
+            ["ইয়েটস তাঁর প্রেমিকাকে গ্রিক পুরাণের হেলেনের সাথে তুলনা করেছিলেন কেন?", "a. তাঁর বিপ্লবী ও ধ্বংসাত্মক সত্তার কারণে", "b. তাঁর সৌন্দর্যের কারণে", "c. তাঁর অভিনয়ের কারণে", "d. তাঁর রহস্যময় স্বভাবের কারণে", "a", "Note: মড গানের বিপ্লবী কাজকর্মে ট্রয় নগরীর মতো আয়ারল্যান্ড ধ্বংস হতে পারে ভেবে কবি হেলেনের সাথে তুলনা করেন।"],
+            ["'I will arise and go now' — এই উক্তিটি দ্বারা কবি কী বোঝাতে চেয়েছেন?", "a. যুদ্ধক্ষেত্রে যাওয়া", "b. আয়ারল্যান্ডের রাজনীতিতে ফেরা", "c. প্রকৃতির মাঝে শান্তি খোঁজা", "d. নতুন নাটকের মঞ্চায়ন", "c", "Note: কবি যান্ত্রিক শহরের কোলাহল ছেড়ে নির্জন দ্বীপ ইন্নিসফ্রির শান্ত প্রকৃতির কাছে ফিরে যেতে চেয়েছেন।"],
+            ["ডব্লিউ. বি. ইয়েটস প্রধানত আয়ারল্যান্ডের কোন আন্দোলনের অন্যতম পুরোধা ছিলেন?", "a. আইরিশ নাট্য আন্দোলন", "b. ফরাসি বিপ্লব আন্দোলন", "c. রোমান্টিক আন্দোলন", "d. উত্তর-আধুনিক গদ্য আন্দোলন", "a", "Note: তিনি আইরিশ নাট্য আন্দোলনের অন্যতম প্রধান পুরোধা ব্যক্তিত্ব ছিলেন এবং অ্যাবে থিয়েটার গড়েন।"],
+            ["'The best lack all conviction...' — এই চরণে কবি সমাজের কোন অবস্থাকে নির্দেশ করেছেন?", "a. চরম অর্থনৈতিক মন্দা", "b. বৈজ্ঞানিক অগ্রগতি", "c. নৈতিক অবক্ষয় ও নৈরাজ্য", "d. সাম্রাজ্যবাদী শক্তির বিজয়", "c", "Note: প্রথম বিশ্বযুদ্ধোত্তর সমাজের নৈতিক অবক্ষয়, যেখানে ভালো মানুষরা নিষ্ক্রিয় আর খারাপরা সক্রিয়।"],
+            ["Gitanjali (Song Offerings)-এর ইংরেজি অনুবাদের ভূমিকা লেখার কাজটি ইয়েটস কত সালে করেন?", "a. ১৯১১ সালে", "b. ১৯১২ সালে", "c. ১৯১৩ সালে", "d. ১৯১৪ সালে", "b", "Note: ১৯১২ সালে লন্ডনে রবীন্দ্রনাথের সাথে সাক্ষাতের পর ইয়েটস ভূমিকাটি লেখেন এবং ১৯১৩ সালে বইটি নোবেল পায়।"],
+            ["ইয়েটসের মৃত্যুর পর তাঁর মৃতদেহ কোন দেশে সমাহিত করা হয়?", "a. ফ্রান্স", "b. ইংল্যান্ড", "c. আয়ারল্যান্ড", "d. ইতালি", "c", "Note: ফ্রান্সে মারা গেলেও তাঁর অন্তিম ইচ্ছা অনুযায়ী পরবর্তীতে মৃতদেহ আয়ারল্যান্ডে এনে সমাহিত করা হয়।"]
+        ];
+
+        // Function to render MCQs dynamically
+        function renderMCQs() {
+            const container = document.getElementById('mcqContainer');
+            let htmlContent = '';
+
+            mcqs.forEach((mcq, index) => {
+                const [q, a, b, c, d, ans, note] = mcq;
+                htmlContent += `
+                <div class="mcq-block p-6 rounded-xl mb-6">
+                    <div class="copy-line text-lg font-semibold text-theme-title mb-4">${index + 1}. ${q}</div>
+                    <div class="flex flex-col gap-2 text-slate-300 ml-2">
+                        <div class="copy-line option-bg p-2 rounded">${a}</div>
+                        <div class="copy-line option-bg p-2 rounded">${b}</div>
+                        <div class="copy-line option-bg p-2 rounded">${c}</div>
+                        <div class="copy-line option-bg p-2 rounded">${d}</div>
+                    </div>
+                    <div class="copy-line mt-4 font-bold text-answer">Correct answer: ${ans}</div>
+                    <div class="copy-line mt-2 text-slate-400 text-sm leading-relaxed">${note}</div>
+                </div>`;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // Initialize rendering
+        renderMCQs();
+
+        // Copy functionality
+        function copyAll() {
+            let result = '';
+            const blocks = document.querySelectorAll('.mcq-block');
+            
+            blocks.forEach((block) => {
+                const lines = block.querySelectorAll('.copy-line');
+                lines.forEach(line => {
+                    result += line.innerText.trim() + '\n';
+                });
+                result += '\n'; // Add an extra newline between blocks
+            });
+            
+            navigator.clipboard.writeText(result.trim()).then(() => {
+                const btn = document.getElementById('copyBtn');
+                const originalContent = btn.innerHTML;
+                
+                // Change button style on success
+                btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> কপি সম্পন্ন!`;
+                btn.classList.replace('text-white', 'text-slate-900');
+                btn.style.background = '#34d399'; // Emerald 400 for success
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.classList.replace('text-slate-900', 'text-white');
+                    btn.style.background = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Copy failed: ', err);
+                alert('কপি করতে সমস্যা হয়েছে, অনুগ্রহ করে আবার চেষ্টা করুন।');
+            });
+        }
+    </script>
+    
+    <!-- JavaScript to Automatically Wrap Bangla Numbers -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            function wrapBanglaNumbers(node) {
+                // Text node checking
+                if (node.nodeType === 3) { 
+                    const text = node.nodeValue;
+                    // If text contains Bangla numbers (০-৯)
+                    if (/[০-৯]/.test(text)) {
+                        const tempDiv = document.createElement('div');
+                        // Replace numbers with the span class
+                        tempDiv.innerHTML = text.replace(/([০-৯]+)/g, '<span class="number-kalpurush">$1</span>');
+                        
+                        // Insert the new elements and remove the old text node
+                        while (tempDiv.firstChild) {
+                            node.parentNode.insertBefore(tempDiv.firstChild, node);
+                        }
+                        node.parentNode.removeChild(node);
+                    }
+                } 
+                // Element node checking (Skip scripts, styles, and already formatted spans)
+                else if (node.nodeType === 1 && !['SCRIPT', 'STYLE'].includes(node.nodeName) && !node.classList.contains('number-kalpurush')) {
+                    // Iterate backwards to prevent index issues during replacement
+                    for (let i = node.childNodes.length - 1; i >= 0; i--) {
+                        wrapBanglaNumbers(node.childNodes[i]);
+                    }
+                }
+            }
+            
+            // Start from the body
+            wrapBanglaNumbers(document.body);
+        });
+    </script>
+
+</body>
+</html>

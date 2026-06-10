@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on Herman Melville - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts: Hind Siliguri for Bangla -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme Configuration: Deep Ocean Navy & Nautical Brass */
+        :root {
+            --primary-color: #083344; /* Cyan 950 / Deep Ocean Navy */
+            --secondary-color: #B45309; /* Amber 700 / Nautical Brass */
+            --accent-color: #FEF3C7; /* Amber 50 / Warm Light */
+            --bg-color: #F8FAFC; /* Slate 50 - Background */
+            --card-bg: #FFFFFF;
+            --text-main: #000000; /* STRICTLY FULL BLACK FOR NORMAL TEXT */
+            --border-color: #BAE6FD; /* Sky 200 */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            background-image: linear-gradient(180deg, #F0F9FF 0%, #F8FAFC 100%);
+        }
+
+        /* English Font Class */
+        .eng-text {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1em;
+        }
+
+        /* Bangla Numbers Font Class */
+        .bn-number {
+            font-family: 'Kalpurush', 'Times New Roman', serif;
+            font-size: 1.05em;
+            font-weight: 500;
+        }
+
+        /* Custom Styles for Design Elements */
+        .nautical-header {
+            background: linear-gradient(135deg, var(--primary-color), #164E63, #022C22);
+            color: white;
+            border-bottom: 6px solid var(--secondary-color);
+            position: relative;
+            box-shadow: 0 4px 20px rgba(8, 51, 68, 0.3);
+        }
+
+        .section-heading {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            display: inline-block;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .section-heading::after {
+            content: '⚓'; /* Anchor Symbol */
+            position: absolute;
+            bottom: -15px;
+            right: -30px;
+            color: var(--secondary-color);
+            font-size: 1.3rem;
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem;
+            color: var(--text-main);
+            position: relative;
+            transition: all 0.3s ease;
+            border-top: 3px solid transparent;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(8, 51, 68, 0.1);
+            border-top: 3px solid var(--secondary-color);
+        }
+
+        /* Masterpiece glowing effect */
+        .masterpiece-card {
+            background-color: #F0F9FF; /* Sky 50 */
+            border: 1px solid #7DD3FC; /* Sky 300 */
+            border-left: 5px solid var(--primary-color);
+        }
+
+        /* Quotes Styling */
+        .quote-container {
+            border-left: 5px solid var(--secondary-color);
+            background: #FFFBEB; /* Amber 50 */
+            padding: 15px 20px;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 1.2rem;
+            position: relative;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.04);
+            border-top: 1px solid #FEF08A;
+            border-right: 1px solid #FEF08A;
+            border-bottom: 1px solid #FEF08A;
+        }
+
+        /* Terminology Styling - Highlight without changing text color */
+        .terminology {
+            background-color: #E0F2FE; /* Sky 100 */
+            padding: 0 5px;
+            border-radius: 4px;
+            font-weight: 500;
+            color: #000000; /* Keeping text strictly black */
+            border: 1px dashed #0284C7; /* Sky 600 */
+            font-size: 0.95em;
+        }
+
+        /* Badge and Footer Specifics */
+        .qr-corner {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 65px;
+            height: 65px;
+            background: white;
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+        .qr-corner:hover {
+            transform: scale(1.1);
+        }
+        .qr-corner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .master-footer {
+            background: #ffffff;
+            border-top: 5px solid var(--primary-color);
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-sky-200">
+        
+        <!-- Header -->
+        <header class="nautical-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">হারম্যান মেলভিল (<span class="eng-text">Herman Melville</span>)</h1>
+            <p class="text-xl text-[#FDE68A] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1819 - 1891</span></p>
+            
+            <p class="text-lg mb-6 text-sky-50 text-justify" style="color: #E0F2FE;">
+                হারম্যান মেলভিল (<span class="eng-text">Herman Melville</span>) ছিলেন একজন বিখ্যাত আমেরিকান ঔপন্যাসিক, ছোটগল্পকার এবং কবি। তিনি আমেরিকান রেনেসাঁ (<span class="eng-text font-bold text-[#FDE68A]">American Renaissance</span>) যুগের অন্যতম প্রধান সাহিত্যিক ব্যক্তিত্ব। সমুদ্রের বিচিত্র অভিজ্ঞতা এবং মানব জীবনের গভীর দার্শনিক সংকট তার লেখনীর মূল উপজীব্য। জীবদ্দশায় তিনি খুব বেশি জনপ্রিয়তা না পেলেও, মৃত্যুর পর বিংশ শতাব্দীতে তাকে বিশ্বসাহিত্যের অন্যতম শ্রেষ্ঠ ঔপন্যাসিক হিসেবে স্বীকৃতি দেওয়া হয়।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <!-- Creator Badge -->
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                
+                <!-- Header QR Code -->
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" class="w-full h-full object-cover rounded" onerror="this.src='https://placehold.co/65x65/083344/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="p-6 md:p-10">
+
+            <!-- Section 1: Biography -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#083344]">
+                        <p><strong class="text-lg text-[#083344]">পুরো নাম:</strong> <span class="eng-text">Herman Melville</span> (হারম্যান মেলভিল)।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#083344]">
+                        <p><strong class="text-lg text-[#083344]">জন্ম:</strong> ১৮১৯ সালের ১ আগস্ট, নিউইয়র্ক সিটি, যুক্তরাষ্ট্র (<span class="eng-text">New York, USA</span>)।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#083344]">
+                        <p><strong class="text-lg text-[#083344]">মৃত্যু:</strong> ১৮৯১ সালে নিউইয়র্কে।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#083344]">
+                        <p><strong class="text-lg text-[#083344]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The American Renaissance (Romantic Period in America)</span>।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#B45309] bg-[#FEF3C7]">
+                        <p><strong class="text-lg text-[#B45309]">পেশা ও অভিজ্ঞতা:</strong> ঔপন্যাসিক, নাবিক এবং কাস্টমস ইন্সপেক্টর। তরুণ বয়সে তিনি তিমি শিকারি জাহাজে (<span class="eng-text font-bold">Whaling Ship</span>) নাবিক হিসেবে কাজ করেছিলেন। এই ভয়ংকর ও রোমাঞ্চকর সমুদ্রযাত্রার অভিজ্ঞতাই তার বিখ্যাত সব উপন্যাসের রসদ যুগিয়েছে।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#083344] bg-sky-50">
+                        <p><strong class="text-lg text-[#083344]">* বিসিএস অতিরিক্ত তথ্য:</strong> তার শ্রেষ্ঠ উপন্যাস <span class="eng-text">Moby-Dick</span> প্রকাশের পর তা চরমভাবে ব্যর্থ হয় এবং তিনি প্রায় বিস্মৃতির অতলে হারিয়ে যান। কিন্তু ১৯২০-এর দশকে রেয়মন্ড উইভার (<span class="eng-text">Raymond Weaver</span>) তার প্রথম জীবনী প্রকাশ করার পর বিশ্বব্যাপী <span class="eng-text font-bold">"Melville Revival"</span> (<span class="terminology">মেলভিলের সাহিত্যকর্মের পুনর্জাগরণ</span>) শুরু হয় এবং তিনি আধুনিক সাহিত্যের অন্যতম স্তম্ভ হিসেবে স্বীকৃতি পান।</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Titles -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="content-card bg-white border-t-4 border-t-[#083344]">
+                    <ul class="space-y-4 text-lg text-black">
+                        <li class="flex items-start">
+                            <span class="text-[#B45309] text-2xl mr-3 leading-none">⚓</span>
+                            <span><strong class="eng-text text-[#083344]">Master of the Sea:</strong> সমুদ্র ও নাবিক জীবনের নিখুঁত এবং রোমাঞ্চকর বর্ণনার জন্য তাকে এই বিশেষণে ভূষিত করা হয়।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#B45309] text-2xl mr-3 leading-none">⚓</span>
+                            <span><strong class="eng-text text-[#083344]">The American Shakespeare:</strong> মহাকাব্যিক ব্যাপ্তি এবং ট্র্যাজিক গভীরতার জন্য অনেক সমালোচক তাকে আমেরিকার শেক্সপিয়রের সাথে তুলনা করেন।</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3: Literary Works -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                <p class="mb-4 text-lg text-black">হারম্যান মেলভিল মূলত তার সমুদ্র-অভিযান বিষয়ক উপন্যাস এবং গভীর মনস্তাত্ত্বিক কাহিনীর জন্য পরিচিত।</p>
+
+                <div class="space-y-6">
+                    <!-- Moby-Dick -->
+                    <div class="content-card masterpiece-card relative overflow-hidden shadow-md">
+                        <div class="absolute top-0 right-0 bg-[#E0F2FE] text-[#083344] px-4 py-1 rounded-bl-xl font-bold border-l border-b border-[#7DD3FC]">Masterpiece</div>
+                        <h3 class="text-2xl font-bold text-[#083344] mb-3">ক. মবি-ডিক (<span class="eng-text">Moby-Dick; or, The Whale - 1851</span>) ***</h3>
+                        <p class="text-black font-semibold mb-3">এটি হারম্যান মেলভিলের সর্বশ্রেষ্ঠ উপন্যাস এবং বিশ্বসাহিত্যের এক কালজয়ী সৃষ্টি।</p>
+                        
+                        <ul class="list-none space-y-3 text-black">
+                            <li><strong class="text-[#083344]">উৎসর্গ:</strong> তিনি এই উপন্যাসটি তার বন্ধু ও বিখ্যাত আমেরিকান লেখক নাথানিয়েল হথর্ন (<span class="eng-text font-bold">Nathaniel Hawthorne</span>)-কে উৎসর্গ করেছিলেন।</li>
+                            <li class="bg-white p-3 rounded border border-sky-200">
+                                <strong class="text-[#083344]">কাহিনী সংক্ষেপ:</strong> ইসমায়েল (<span class="eng-text">Ishmael</span>) নামের এক নাবিকের জবানবন্দিতে এই কাহিনী বর্ণিত হয়েছে। 'পিকুওড' (<span class="eng-text font-bold text-[#B45309]">Pequod</span>) জাহাজের ক্যাপ্টেন আহাব (<span class="eng-text">Captain Ahab</span>) তার একটি পা হারিয়েছিলেন 'মবি ডিক' নামক এক বিশাল সাদা তিমির আক্রমণে। প্রতিশোধপরায়ণ ক্যাপ্টেন আহাব সেই সাদা তিমিকে হত্যা করার জন্য পাগলপারা হয়ে ওঠেন এবং পুরো জাহাজ ও নাবিকদের নিয়ে এক ধ্বংসাত্মক অভিযানে নামেন। শেষ পর্যন্ত মবি ডিক জাহাজটিকে ডুবিয়ে দেয় এবং ইসমায়েল ছাড়া সবাই মারা যায়।
+                            </li>
+                            <li>
+                                <strong class="text-[#083344] block mb-2 border-b border-sky-300 pb-1">প্রধান চরিত্রসমূহ:</strong>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-2 mt-2">
+                                    <div class="bg-white p-2 border border-slate-200 rounded">
+                                        <p><strong class="eng-text text-[#B45309]">Captain Ahab:</strong> উপন্যাসের ট্র্যাজিক হিরো, যার মধ্যে চরম প্রতিহিংসা ও পাগলামি (<span class="eng-text font-bold">Monomania</span> - <span class="terminology">কোনো একটি নির্দিষ্ট বিষয়ে চরম অবসাদ বা বাতিক</span>) কাজ করে।</p>
+                                    </div>
+                                    <div class="bg-white p-2 border border-slate-200 rounded">
+                                        <p><strong class="eng-text text-[#B45309]">Ishmael:</strong> গল্পের কথক (<span class="eng-text">Narrator</span>) এবং জাহাজডুবির পর একমাত্র জীবিত ব্যক্তি।</p>
+                                    </div>
+                                    <div class="bg-white p-2 border border-slate-200 rounded">
+                                        <p><strong class="eng-text text-[#B45309]">Moby Dick:</strong> বিশাল সাদা তিমি (<span class="terminology">প্রকৃতির অদম্য শক্তি এবং ঈশ্বরের রহস্যময়তার প্রতীক</span>)।</p>
+                                    </div>
+                                    <div class="bg-white p-2 border border-slate-200 rounded">
+                                        <p><strong class="eng-text text-[#B45309]">Starbuck:</strong> জাহাজের ফার্স্ট মেট বা সহকারী, যে চরম যুক্তিবাদী এবং ধর্মভীরু।</p>
+                                    </div>
+                                    <div class="bg-white p-2 border border-slate-200 rounded sm:col-span-2">
+                                        <p><strong class="eng-text text-[#B45309]">Queequeg:</strong> উল্কি আঁকা এক উপজাতীয় হারপুনার (<span class="eng-text font-bold">Harpooner</span> - <span class="terminology">তিমি শিকারের বল্লম নিক্ষেপকারী</span>)।</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="bg-[#F8FAFC] p-2 rounded border border-slate-200 inline-block mt-2">
+                                <strong class="text-[#083344]"><span class="eng-text">Theme</span>:</strong> মানুষ বনাম প্রকৃতি (<span class="eng-text font-bold">Man vs Nature</span>), অন্ধ প্রতিশোধ এবং অমোঘ নিয়তি।
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Typee & Omoo -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="content-card border-t-4 border-t-[#083344] shadow-sm !mb-0">
+                            <h3 class="text-xl font-bold text-[#083344] mb-3">খ. টাইপি (<span class="eng-text">Typee - 1846</span>)</h3>
+                            <p class="text-black mb-2">এটি হারম্যান মেলভিলের রচিত <strong>প্রথম বই</strong>।</p>
+                            <p class="text-black">পলিনেশিয়ার নুকু হিভা (<span class="eng-text">Nuku Hiva</span>) দ্বীপে নরখাদক টাইপি উপজাতির সাথে তার বসবাসের বাস্তব অভিজ্ঞতার আলোকে এটি লেখা। এটি জীবদ্দশায় তার সবচেয়ে জনপ্রিয় ও সফল বই ছিল।</p>
+                        </div>
+                        
+                        <div class="content-card border-t-4 border-t-[#083344] shadow-sm !mb-0">
+                            <h3 class="text-xl font-bold text-[#083344] mb-3">গ. ওমু (<span class="eng-text">Omoo - 1847</span>)</h3>
+                            <p class="text-black">এটি <span class="eng-text">Typee</span> উপন্যাসের সিক্যুয়েল বা পরবর্তী অংশ। তাহিতি (<span class="eng-text">Tahiti</span>) দ্বীপের পটভূমিতে নাবিকদের জীবনের গল্প নিয়ে এটি রচিত।</p>
+                        </div>
+                    </div>
+
+                    <!-- Billy Budd -->
+                    <div class="content-card border-t-4 border-t-[#B45309] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#083344] mb-3">ঘ. বিলি বাড (<span class="eng-text">Billy Budd, Sailor</span>)</h3>
+                        <p class="text-black mb-2">এটি তার মৃত্যুর পর (১৯২৪ সালে) প্রকাশিত একটি অসমাপ্ত কিন্তু কালজয়ী কাজ।</p>
+                        <p class="text-black"><strong>বিষয়বস্তু:</strong> একজন সুদর্শন, নিরপরাধ ও সহজ-সরল নাবিক বিলি বাড এবং তার প্রতি ঈর্ষান্বিত কুটিল মাস্টার-এট-আর্মস জন ক্ল্যাগার্ট (<span class="eng-text">John Claggart</span>)-এর দ্বন্দ্ব এবং চরম ট্র্যাজিক কাহিনী।</p>
+                    </div>
+
+                    <!-- Bartleby, the Scrivener -->
+                    <div class="content-card border-l-4 border-l-[#083344] bg-[#F8FAFC]">
+                        <h3 class="text-xl font-bold text-[#083344] mb-3">ঙ. বার্টলবি, দ্য স্ক্রিভেনার (<span class="eng-text">Bartleby, the Scrivener</span>)</h3>
+                        <p class="text-black font-semibold mb-2">এটি একটি বিখ্যাত বড়গল্প বা <span class="eng-text font-bold text-[#B45309]">Novella</span> (<span class="terminology">নভেলা: ছোটগল্পের চেয়ে বড় কিন্তু উপন্যাসের চেয়ে ছোট কাহিনী</span>)।</p>
+                        <p class="text-black"><strong>বিষয়বস্তু:</strong> ওয়াল স্ট্রিটের এক করণিক বা নকলনবিশ (<span class="eng-text">Scrivener</span>) বার্টলবিকে নিয়ে এটি লেখা, যে যেকোনো কাজ করতে বললে তার একটি বিখ্যাত উক্তি করত: <span class="eng-text font-bold italic text-[#B45309]">"I would prefer not to"</span> (আমি বরং এটা না করতেই পছন্দ করব)। এটি আধুনিক জীবনের চরম বিচ্ছিন্নতাবোধ (<span class="eng-text font-bold">Alienation</span>) ও নিষ্ক্রিয় প্রতিরোধের এক অসাধারণ প্রতীক।</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Quotes -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>) ও সাহিত্যিক অলঙ্কার</h2>
+                <p class="mb-6 text-lg text-black">বিসিএস ও অন্যান্য পরীক্ষার জন্য হারম্যান মেলভিলের উক্তিগুলো অত্যন্ত গুরুত্বপূর্ণ:</p>
+                
+                <div class="grid grid-cols-1 gap-5">
+                    
+                    <div class="quote-container border-l-[6px] border-l-[#B45309] bg-[#FFFBEB]">
+                        <p class="eng-text font-bold text-2xl mb-1 text-[#083344]">1. "Call me Ishmael."</p>
+                        <p class="text-black mb-2 text-lg">(আমাকে ইসমায়েল বলে ডেকো)</p>
+                        <div class="bg-white/80 p-2 rounded border border-amber-200 mt-2">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">Moby-Dick</span> <span class="text-[#B45309] font-bold">(ইংরেজি সাহিত্যের অন্যতম বিখ্যাত শুরুর লাইন বা Opening Line)</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Allusion</span> (<span class="terminology">অ্যালুশন বা পরোক্ষ উল্লেখ: বাইবেলের চরিত্র ইসমায়েলের প্রতি ইঙ্গিত করা হয়েছে, যে ছিল এক সমাজচ্যুত ও ভবঘুরে ব্যক্তি। উপন্যাসের কথকও নিজেকে সমাজ থেকে বিচ্ছিন্ন মনে করতেন বলে এই নাম ব্যবহার করেছেন</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container border-l-[6px] border-l-[#B45309] bg-[#FFFBEB]">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#083344]">2. "I know not all that may be coming, but be it what it will, I'll go to it laughing."</p>
+                        <p class="text-black mb-2 text-lg">(আমি জানি না সামনে কী আসছে, কিন্তু যা-ই আসুক, আমি হাসিমুখে তার মুখোমুখি হব)</p>
+                        <div class="bg-white/80 p-2 rounded border border-amber-200 mt-2">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">Moby-Dick</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Metaphor</span> (<span class="terminology">মেটাফর: এখানে 'Laughing' বা হাসিকে অদম্য সাহসিকতা এবং নিয়তিকে হাসিমুখে বরণ করার প্রতীক হিসেবে রূপক অর্থে ব্যবহার করা হয়েছে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container border-l-[6px] border-l-[#B45309] bg-[#FFFBEB]">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#083344]">3. "I would prefer not to."</p>
+                        <p class="text-black mb-2 text-lg">(আমি বরং এটি না করতেই পছন্দ করব)</p>
+                        <div class="bg-white/80 p-2 rounded border border-amber-200 mt-2">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">Bartleby, the Scrivener</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Refrain</span> (<span class="terminology">রিফ্রেইন: এই বাক্যটি গল্পে বারবার ফিরে এসেছে</span>) এবং <span class="eng-text font-bold">Understatement</span> (<span class="terminology">আন্ডারস্টেটমেন্ট: সরাসরি 'না' বা তীব্র বিদ্রোহ না করে অত্যন্ত বিনয়ের সাথে প্রত্যাখান করে পরিস্থিতিকে লঘু করে দেখানো</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container bg-[#F0F9FF] border-l-[#083344]">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#083344]">4. "God help thee, old man, thy thoughts have created a creature in thee; and he whose intense thinking thus makes him a Prometheus; a vulture feeds upon that heart for ever; that vulture the very creature he creates."</p>
+                        <p class="text-black mb-2 text-md">(ঈশ্বর তোমাকে রক্ষা করুন, বৃদ্ধ; তোমার চিন্তা তোমার ভেতরে এক দানব তৈরি করেছে...)</p>
+                        <div class="bg-white/80 p-2 rounded border border-sky-200 mt-2">
+                            <p class="text-sm text-black mb-1"><strong>প্রসঙ্গ:</strong> <span class="eng-text">Moby-Dick</span> উপন্যাসে ক্যাপ্টেন আহাবের ভয়ংকর মানসিক অবস্থা সম্পর্কে বলা হয়েছে।</p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Allusion</span> (<span class="terminology">গ্রিক মিথলজির প্রমিথিউসের উল্লেখ</span>) এবং <span class="eng-text font-bold">Metaphor</span> (<span class="terminology">মানুষের ধ্বংসাত্মক চিন্তাকেই তাকে ভক্ষণকারী শকুনের সাথে তুলনা করা হয়েছে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container !mb-0 border-l-[#083344] bg-[#F8FAFC]">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#083344]">5. "It is better to fail in originality than to succeed in imitation."</p>
+                        <p class="text-black mb-2 text-sm">(অনুকরণ করে সফল হওয়ার চেয়ে মৌলিকত্বে ব্যর্থ হওয়া শ্রেয়)</p>
+                        <p class="text-sm text-black border-t border-slate-200 pt-1 mt-1"><strong><span class="eng-text">Device:</span></strong> <span class="eng-text font-bold">Antithesis</span> (<span class="terminology">Fail in originality vs Succeed in imitation — দুটি বৈপরীত্য</span>)।</p>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Section 5: At a Glance -->
+            <section class="bg-gradient-to-br from-[#083344] to-[#164E63] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8 border-t-4 border-[#B45309]">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#0E7490] pb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-[#FDE68A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                    একনজরে মনে রাখার মতো তথ্য
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start">
+                        <span class="text-[#FDE68A] mr-3 font-bold text-xl">⚓</span> 
+                        <p>তিনি <span class="eng-text font-bold">American Renaissance</span> যুগের অন্যতম প্রধান লেখক।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FDE68A] mr-3 font-bold text-xl">⚓</span> 
+                        <p>তার মাস্টারপিস <span class="eng-text font-bold">Moby-Dick</span> (বিশাল সাদা তিমি নিয়ে লেখা)।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FDE68A] mr-3 font-bold text-xl">⚓</span> 
+                        <p><span class="eng-text font-bold">Ishmael</span> এবং <span class="eng-text font-bold">Captain Ahab</span> তার সৃষ্ট বিশ্ববিখ্যাত চরিত্র।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FDE68A] mr-3 font-bold text-xl">⚓</span> 
+                        <p>"<span class="eng-text font-bold">Call me Ishmael</span>" তার উপন্যাসের অত্যন্ত বিখ্যাত শুরুর লাইন।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FDE68A] mr-3 font-bold text-xl">⚓</span> 
+                        <p>তিনি তার সেরা বইটি <span class="eng-text font-bold">Nathaniel Hawthorne</span>-কে উৎসর্গ করেছিলেন।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FDE68A] mr-3 font-bold text-xl">⚓</span> 
+                        <p><span class="eng-text font-bold">Typee</span> হলো তার রচিত প্রথম বই।</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            
+            <!-- Creator Badge (Center Aligned) -->
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+
+            <!-- QR Code Bottom-Right Corner -->
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.src='https://placehold.co/65x65/083344/FFF?text=QR'">
+            </a>
+        </footer>
+
+    </div>
+
+    <!-- Script to wrap Bangla numbers in a specific font -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            
+            // Find all text nodes containing Bangla numbers
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) {
+                        textNodes.push(n);
+                    }
+                }
+            }
+
+            // Replace text nodes, wrapping Bangla numbers in spans
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number';
+                        span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

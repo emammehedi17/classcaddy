@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Literature Authors - Archive</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: #F3F4F6;
+            color: #1F2937;
+        }
+        .eng-text {
+            font-family: 'Times New Roman', Times, serif;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+        
+        .author-card {
+            transition: all 0.3s ease;
+        }
+        .author-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            border-color: #818CF8;
+        }
+        
+        /* Modal Transitions */
+        #reader-modal {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal-minimized {
+            bottom: 20px !important;
+            right: 20px !important;
+            width: 400px !important;
+            height: 500px !important;
+            top: auto !important;
+            left: auto !important;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 2px solid #4F46E5;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen pb-12">
+
+    <!-- Navbar -->
+    <nav class="bg-gradient-to-r from-indigo-900 to-blue-800 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center py-4 gap-4">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-book-open text-3xl text-yellow-400"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold tracking-wide">সাহিত্যিকদের আর্কাইভ</h1>
+                        <p class="text-xs text-indigo-200">BCS Preparation Note Hub</p>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/3 relative">
+                    <input type="text" id="searchInput" onkeyup="filterAuthors()" placeholder="লেখকের নাম দিয়ে খুঁজুন..." 
+                        class="w-full pl-10 pr-4 py-2 rounded-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400 shadow-inner">
+                    <i class="fas fa-search absolute left-4 top-3 text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="mb-6 flex justify-between items-end">
+            <h2 class="text-xl font-bold text-gray-800 border-l-4 border-indigo-600 pl-3">সকল লেখক (<span id="count" class="eng-text"></span>)</h2>
+        </div>
+
+        <!-- Author Grid -->
+        <div id="author-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Cards will be injected here by JS -->
+        </div>
+    </div>
+
+    <!-- Reader Modal -->
+    <div id="reader-modal" class="fixed inset-0 z-50 flex-col bg-white hidden">
+        <!-- Modal Toolbar -->
+        <div class="h-16 bg-slate-900 text-white flex justify-between items-center px-4 shadow-md select-none rounded-t-xl" id="modal-header">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <i class="fas fa-file-alt text-indigo-400"></i>
+                <h2 id="modal-title" class="text-lg font-bold truncate eng-text">Document Title</h2>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="changeZoom(0.1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-full transition-colors" title="Increase Font">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+                <button onclick="changeZoom(-0.1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-full transition-colors" title="Decrease Font">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+                <div class="w-px h-6 bg-slate-600 mx-1"></div>
+                <button onclick="toggleMinimize()" class="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded-full transition-colors" title="Minimize/Maximize" id="minimize-btn">
+                    <i class="fas fa-compress-arrows-alt"></i>
+                </button>
+                <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center bg-red-600 hover:bg-red-700 rounded-full transition-colors ml-1" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Iframe Container -->
+        <div class="flex-grow relative overflow-hidden bg-gray-100 rounded-b-xl" id="iframe-wrapper">
+            <!-- Using transform scale on iframe for perfect zooming -->
+            <iframe id="doc-iframe" class="absolute top-0 left-0 border-none origin-top-left transition-transform duration-200" style="width: 100%; height: 100%;"></iframe>
+        </div>
+    </div>
+
+    <script>
+        // Database of all authors with their exact file names
+        const authorsData = [
+            { name: "Geoffrey Chaucer", life: "1340 - 1400", era: "The Middle English Period", years: "1066-1500", works: "The Canterbury Tales, Troilus and Criseyde", file: "note on geofrey chaucher Emam Mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/a/ab/Geoffrey_Chaucer_%2817th_century%29.jpg" },
+            { name: "William Shakespeare", life: "1564 - 1616", era: "The Renaissance Period", years: "1500-1660", works: "Hamlet, Macbeth, Othello, King Lear, The Tempest", file: "note_on_william_shakespeare_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/a/a2/Shakespeare.jpg" },
+            { name: "Christopher Marlowe", life: "1564 - 1593", era: "The Renaissance (Elizabethan)", years: "1558-1603", works: "Doctor Faustus, The Jew of Malta, Edward II", file: "note_on_christopher_marlowe_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Christopher_Marlowe.jpg" },
+            { name: "John Milton", life: "1608 - 1674", era: "The Puritan Period", years: "1620-1660", works: "Paradise Lost, Paradise Regained, Samson Agonistes", file: "John Milton.html", img: "https://upload.wikimedia.org/wikipedia/commons/9/91/John_Milton_by_William_Faithorne.jpg" },
+            { name: "John Webster", life: "1580 - 1632", era: "The Jacobean Period", years: "1603-1625", works: "The Duchess of Malfi, The White Devil", file: "note on John Webster Emam Mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/8/82/John_Webster.jpg" },
+            { name: "John Donne", life: "1572 - 1631", era: "The Jacobean Period", years: "1603-1625", works: "The Sun Rising, The Good Morrow, The Canonization", file: "note_on_john_donne_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/e/ee/John_Donne_by_Isaac_Oliver.jpg" },
+            { name: "John Dryden", life: "1631 - 1700", era: "The Restoration Period", years: "1660-1700", works: "All for Love, Absalom and Achitophel, Mac Flecknoe", file: "note_on_john_dryden_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/4/4c/John_Dryden_by_Sir_Godfrey_Kneller%2C_Bt.jpg" },
+            { name: "William Congreve", life: "1670 - 1729", era: "The Restoration Period", years: "1660-1700", works: "The Way of the World, Love for Love, The Mourning Bride", file: "note_on_william_congreve_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/9/9f/William_Congreve_by_Sir_Godfrey_Kneller%2C_Bt.jpg" },
+            { name: "Alexander Pope", life: "1688 - 1744", era: "Neoclassical (Augustan Age)", years: "1700-1745", works: "The Rape of the Lock, An Essay on Criticism", file: "note_on_alexander_pope_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/c/cb/Alexander_Pope_by_Michael_Dahl.jpg" },
+            { name: "Jonathan Swift", life: "1667 - 1745", era: "Neoclassical (Augustan Age)", years: "1700-1745", works: "Gulliver's Travels, A Tale of a Tub, A Modest Proposal", file: "note_on_jonathan_swift_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/3/3b/Jonathan_swift.jpg" },
+            { name: "Daniel Defoe", life: "1660 - 1731", era: "Neoclassical (Augustan Age)", years: "1700-1745", works: "Robinson Crusoe, Moll Flanders, Colonel Jack", file: "note_on_daniel_defoe_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/1/1a/Daniel_Defoe_Kneller_Style.jpg" },
+            { name: "Henry Fielding", life: "1707 - 1754", era: "Neoclassical (Augustan Age)", years: "1700-1745", works: "Tom Jones, Joseph Andrews, Amelia", file: "note_on_henry_fielding_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Henry_Fielding.jpg" },
+            { name: "Dr. Samuel Johnson", life: "1709 - 1784", era: "Age of Sensibility", years: "1745-1785", works: "A Dictionary of the English Language, Rasselas", file: "note_on_dr_samuel_johnson_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/c/c5/Samuel_Johnson_by_Joshua_Reynolds_2.png" },
+            { name: "Thomas Gray", life: "1716 - 1771", era: "Age of Sensibility", years: "1745-1785", works: "Elegy Written in a Country Churchyard", file: "note_on_thomas_gray_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/9/90/Thomas_Gray_by_John_Giles_Eccardt.jpg" },
+            { name: "Edmund Burke", life: "1729 - 1797", era: "Age of Sensibility", years: "1745-1785", works: "Reflections on the Revolution in France", file: "note_on_edmund_burke_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/b/ba/Edmund_Burke_from_NPG.jpg" },
+            { name: "William Wordsworth", life: "1770 - 1850", era: "The Romantic Period", years: "1798-1832", works: "The Prelude, Lyrical Ballads, Tintern Abbey", file: "william_wordsworth_note.html", img: "https://upload.wikimedia.org/wikipedia/commons/a/a4/William_Wordsworth_by_Benjamin_Robert_Haydon.jpg" },
+            { name: "P.B. Shelley", life: "1792 - 1822", era: "The Romantic Period", years: "1798-1832", works: "Ode to the West Wind, To a Skylark, Ozymandias", file: "note_on_p_b_shelley_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/1/10/Percy_Bysshe_Shelley_by_Alfred_Clint.jpg" },
+            { name: "John Keats", life: "1795 - 1821", era: "The Romantic Period", years: "1798-1832", works: "Ode to a Nightingale, Ode on a Grecian Urn, Endymion", file: "note_on_john_keats_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/1/1a/John_Keats_by_William_Hilton.jpg" },
+            { name: "Jane Austen", life: "1775 - 1817", era: "The Romantic Period", years: "1798-1832", works: "Pride and Prejudice, Sense and Sensibility, Emma", file: "note_on_jane_austen_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/c/c5/Jane_Austen_coloured_version.jpg" },
+            { name: "Alfred Lord Tennyson", life: "1809 - 1892", era: "The Victorian Period", years: "1832-1901", works: "In Memoriam, Ulysses, The Lady of Shalott", file: "note_on_alfred_lord_tennyson_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/0/07/Alfred_Lord_Tennyson.jpg" },
+            { name: "Robert Browning", life: "1812 - 1889", era: "The Victorian Period", years: "1832-1901", works: "My Last Duchess, The Patriot, Andrea del Sarto", file: "Robert Browning.html", img: "https://upload.wikimedia.org/wikipedia/commons/d/da/Robert_Browning_1859.jpg" },
+            { name: "Matthew Arnold", life: "1822 - 1888", era: "The Victorian Period", years: "1832-1901", works: "Dover Beach, The Scholar Gipsy, Culture and Anarchy", file: "note_on_matthew_arnold_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Matthew_Arnold_1883_PtoI.jpg" },
+            { name: "Charles Dickens", life: "1812 - 1870", era: "The Victorian Period", years: "1832-1901", works: "David Copperfield, A Tale of Two Cities, Oliver Twist", file: "note_on_charles_dickens_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/a/aa/Dickens_Gurney_head.jpg" },
+            { name: "George Eliot", life: "1819 - 1880", era: "The Victorian Period", years: "1832-1901", works: "Middlemarch, Silas Marner, The Mill on the Floss", file: "note_on_george_eliot_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/6/6f/George_Eliot_by_François_D%27Albert_Durcade.jpg" },
+            { name: "Thomas Hardy", life: "1840 - 1928", era: "The Victorian Period", years: "1832-1901", works: "Tess of the d'Urbervilles, The Mayor of Casterbridge", file: "note_on_thomas_hardy_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/1/14/Thomas_Hardy_by_William_Strang_1893.jpg" },
+            { name: "Oscar Wilde", life: "1854 - 1900", era: "The Victorian Period", years: "1832-1901", works: "The Picture of Dorian Gray, The Importance of Being Earnest", file: "note_on_oscar_wilde_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/a/a7/Oscar_Wilde_Sarony.jpg" },
+            { name: "W.B. Yeats", life: "1865 - 1939", era: "The Modern Period", years: "1901-1939", works: "The Second Coming, Sailing to Byzantium", file: "W.B. Yeats.html", img: "https://upload.wikimedia.org/wikipedia/commons/b/b3/William_Butler_Yeats_by_George_Charles_Beresford.jpg" },
+            { name: "G.B. Shaw", life: "1856 - 1950", era: "The Modern Period", years: "1901-1939", works: "Arms and the Man, Pygmalion, Man and Superman", file: "note_on_g_b_shaw_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/4/4c/George_Bernard_Shaw_1914_colorized.jpg" },
+            { name: "T.S. Eliot", life: "1888 - 1965", era: "The Modern Period", years: "1901-1939", works: "The Waste Land, The Hollow Men, Four Quartets", file: "note_on_t_s_eliot_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/2/25/TS_Eliot_1923.jpg" },
+            { name: "James Joyce", life: "1882 - 1941", era: "The Modern Period", years: "1901-1939", works: "Ulysses, Dubliners, A Portrait of the Artist", file: "note_on_james_joyce_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/e/ee/James_Joyce_by_Alex_Ehrenzweig%2C_1915.jpg" },
+            { name: "Virginia Woolf", life: "1882 - 1941", era: "The Modern Period", years: "1901-1939", works: "To the Lighthouse, Mrs. Dalloway, A Room of One's Own", file: "note_on_virginia_woolf_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/0/0b/George_Charles_Beresford_-_Virginia_Woolf_in_1902_-_Restoration.jpg" },
+            { name: "Joseph Conrad", life: "1857 - 1924", era: "The Modern Period", years: "1901-1939", works: "Heart of Darkness, Lord Jim, The Secret Agent", file: "note_on_joseph_conrad_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/d/db/Joseph_Conrad_c_1904.jpg" },
+            { name: "D.H. Lawrence", life: "1885 - 1930", era: "The Modern Period", years: "1901-1939", works: "Sons and Lovers, Lady Chatterley's Lover, The Rainbow", file: "note_on_d_h_lawrence_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/9/91/D_H_Lawrence_1906.jpg" },
+            { name: "E.M. Forster", life: "1879 - 1970", era: "The Modern Period", years: "1901-1939", works: "A Passage to India, Howards End, A Room with a View", file: "note_on_e_m_forster_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/f/ff/EM_Forster.jpg" },
+            { name: "W. Somerset Maugham", life: "1874 - 1965", era: "The Modern Period", years: "1901-1939", works: "Of Human Bondage, The Moon and Sixpence, The Luncheon", file: "note_on_w_somerset_maugham_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/c/cb/W_Somerset_Maugham.jpg" },
+            { name: "George Orwell", life: "1903 - 1950", era: "The Modern Period", years: "1901-1939", works: "1984, Animal Farm, Shooting an Elephant", file: "note_on_george_orwell_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/7/7e/George_Orwell_press_photo.jpg" },
+            { name: "H.G. Wells", life: "1866 - 1946", era: "The Modern Period", years: "1901-1939", works: "The Time Machine, The War of the Worlds", file: "note_on_h_g_wells_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/c/cc/HG_Wells_by_Beresford.jpg" },
+            { name: "Samuel Beckett", life: "1906 - 1989", era: "Post-Modern Period", years: "1939-Present", works: "Waiting for Godot, Endgame", file: "note_on_samuel_beckett_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/b/ba/Samuel_Beckett%2C_pic_1.jpg" },
+            { name: "William Golding", life: "1911 - 1993", era: "Post-Modern Period", years: "1939-Present", works: "Lord of the Flies, Rites of Passage", file: "note_on_william_golding_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/en/e/eb/William_Golding_1983.jpg" },
+            { name: "Seamus Heaney", life: "1939 - 2013", era: "Post-Modern Period", years: "1939-Present", works: "Death of a Naturalist, Digging, Beowulf (Translation)", file: "note_on_seamus_heaney_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/8/87/Seamus_Heaney_1996.jpg" },
+            { name: "Chinua Achebe", life: "1930 - 2013", era: "African Lit (Post-colonial)", years: "1939-Present", works: "Things Fall Apart, No Longer at Ease, Arrow of God", file: "note_on_chinua_achebe_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/3/30/Chinua_Achebe_-_Buffalo_University_2008.jpg" },
+            { name: "Arundhati Roy", life: "1961 - Present", era: "Post-Modern Period", years: "Contemporary", works: "The God of Small Things, The Ministry of Utmost Happiness", file: "note_on_arundhati_roy_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/c/ce/Arundhati_Roy_2014.jpg" },
+            { name: "A.P.J. Abdul Kalam", life: "1931 - 2015", era: "Post-Modern Period", years: "Contemporary", works: "Wings of Fire, Ignited Minds, India 2020", file: "note_on_a_p_j_abdul_kalam_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/b/b0/A.P.J._Abdul_Kalam.jpg" },
+            { name: "Jean-Paul Sartre", life: "1905 - 1980", era: "Modern / Post-Modern Period", years: "1901-Present", works: "Nausea, Being and Nothingness, No Exit", file: "note_on_jean_paul_sartre_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/e/ef/Sartre_1967_crop.jpg" },
+            { name: "Leo Tolstoy", life: "1828 - 1910", era: "Russian Literature", years: "19th Century", works: "War and Peace, Anna Karenina, The Death of Ivan Ilyich", file: "note_on_leo_tolstoy_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/c/c6/L.N.Tolstoy_Prokudin-Gorsky.jpg" },
+            { name: "Victor Hugo", life: "1802 - 1885", era: "French Literature", years: "19th Century", works: "Les Misérables, The Hunchback of Notre-Dame", file: "note_on_victor_hugo_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/b/b2/Victor_Hugo_by_Étienne_Carjat_1876.jpg" },
+            { name: "Ralph Waldo Emerson", life: "1803 - 1882", era: "American Literature", years: "Transcendentalism", works: "Self-Reliance, The American Scholar, Nature", file: "note_on_ralph_waldo_emerson_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/4/4b/Ralph_Waldo_Emerson_by_Josiah_Johnson_Hawes_1857.jpg" },
+            { name: "Walt Whitman", life: "1819 - 1892", era: "American Literature", years: "19th Century", works: "Leaves of Grass, Song of Myself, O Captain! My Captain!", file: "note_on_walt_whitman_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/1/1c/Walt_Whitman_campbell.jpg" },
+            { name: "Emily Dickinson", life: "1830 - 1886", era: "American Literature", years: "19th Century", works: "Because I could not stop for Death, Hope is the thing with feathers", file: "note_on_emily_dickinson_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/5/56/Black-white_photograph_of_Emily_Dickinson2.png" },
+            { name: "Mark Twain", life: "1835 - 1910", era: "American Literature", years: "Realism", works: "The Adventures of Huckleberry Finn, The Adventures of Tom Sawyer", file: "note_on_mark_twain_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/2/25/Mark_Twain%2C_Brady-Handy_photo_portrait%2C_Feb_7%2C_1871%2C_cropped.jpg" },
+            { name: "O. Henry", life: "1862 - 1910", era: "American Literature", years: "Modern Period", works: "The Gift of the Magi, The Last Leaf", file: "note_on_o_henry_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/7/75/O._Henry.jpg" },
+            { name: "Robert Frost", life: "1874 - 1963", era: "American Literature", years: "Modern Period", works: "The Road Not Taken, Stopping by Woods on a Snowy Evening", file: "note_on_robert_frost_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/4/45/Robert_Frost_NYWTS_1.jpg" },
+            { name: "Pearl S. Buck", life: "1892 - 1973", era: "American Literature", years: "Modern Period", works: "The Good Earth, Sons, A House Divided", file: "note_on_pearl_s_buck_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/c/c5/Pearl_Buck_1932.jpg" },
+            { name: "Ernest Hemingway", life: "1899 - 1961", era: "American Literature", years: "Lost Generation", works: "The Old Man and the Sea, A Farewell to Arms", file: "note_on_ernest_hemingway_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/2/28/ErnestHemingway.jpg" },
+            { name: "Arthur Miller", life: "1915 - 2005", era: "American Literature", years: "Post-Modern", works: "Death of a Salesman, The Crucible, All My Sons", file: "note_on_arthur_miller_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/8/82/Arthur_Miller_1966.jpg" },
+            { name: "Robert Louis Stevenson", life: "1850 - 1894", era: "The Victorian Period", years: "1832-1901", works: "Treasure Island, Dr. Jekyll and Mr. Hyde", file: "note_on_robert_louis_stevenson_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/1/1b/Robert_Louis_Stevenson_knox_portrait.jpg" },
+            { name: "Rudyard Kipling", life: "1865 - 1936", era: "The Modern Period", years: "1901-1939", works: "The Jungle Book, Kim, Just So Stories", file: "note_on_rudyard_kipling_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Rudyard_Kipling_1912.jpg" },
+            { name: "Bertrand Russell", life: "1872 - 1970", era: "The Modern Period", years: "1901-Present", works: "A History of Western Philosophy, The Conquest of Happiness", file: "note_on_bertrand_russell_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/1/14/Bertrand_Russell_1950.jpg" },
+            { name: "William Makepeace Thackeray", life: "1811 - 1863", era: "The Victorian Period", years: "1832-1901", works: "Vanity Fair, The Newcomes", file: "note_on_william_makepeace_thackeray_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/6/69/William_Makepeace_Thackeray_by_Jesse_Harrison_Whitehurst.jpg" },
+            { name: "William Langland", life: "1332 - 1386", era: "The Middle English Period", years: "1066-1500", works: "Piers Plowman", file: "note_on_william_langland_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/5/5a/Piers_Plowman.jpg" },
+            { name: "Thomas Kyd", life: "1558 - 1594", era: "The Renaissance (Elizabethan)", years: "1558-1603", works: "The Spanish Tragedy", file: "note_on_thomas_kyd_emam_mehedi.html", img: "https://ui-avatars.com/api/?name=Thomas+Kyd&background=18181B&color=fff&bold=true&size=128" },
+            { name: "Sir Philip Sidney", life: "1554 - 1586", era: "The Renaissance (Elizabethan)", years: "1558-1603", works: "An Apology for Poetry, Astrophel and Stella", file: "note_on_sir_philip_sidney_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/1/13/Philip_Sidney.jpg" },
+            { name: "Edmund Spenser", life: "1552 - 1599", era: "The Renaissance (Elizabethan)", years: "1558-1603", works: "The Faerie Queene, Amoretti, The Shepheardes Calender", file: "note_on_edmund_spenser_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/6/6d/Edmund_Spenser_oil_painting.jpg" },
+            { name: "John Bunyan", life: "1628 - 1688", era: "The Restoration Period", years: "1660-1700", works: "The Pilgrim's Progress, The Life and Death of Mr. Badman", file: "note_on_john_bunyan_emam_mehedi.html", img: "https://upload.wikimedia.org/wikipedia/commons/2/25/John_Bunyan_by_Thomas_Sadler.jpg" },
+        ];
+
+        // Sort authors alphabetically
+        authorsData.sort((a, b) => a.name.localeCompare(b.name));
+
+        const grid = document.getElementById('author-grid');
+        const countSpan = document.getElementById('count');
+
+        function renderAuthors(authors) {
+            grid.innerHTML = '';
+            countSpan.innerText = authors.length;
+
+            authors.forEach(author => {
+                // Determine fallback image via UI Avatars if original fails
+                const fallbackImg = `https://ui-avatars.com/api/?name=${encodeURIComponent(author.name)}&background=random&color=fff&bold=true&size=128`;
+                
+                const card = document.createElement('div');
+                card.className = "author-card bg-white rounded-xl shadow-md overflow-hidden flex flex-row h-48 border border-gray-200 group";
+                card.innerHTML = `
+                    <!-- Left Image Section -->
+                    <div class="w-1/3 bg-indigo-50 flex flex-col items-center justify-center p-3 relative border-r border-gray-100">
+                        <img src="${author.img}" 
+                             onerror="this.onerror=null; this.src='${fallbackImg}';" 
+                             alt="${author.name}" 
+                             class="w-24 h-24 rounded-full border-4 border-white shadow-md object-cover mb-2 group-hover:scale-105 transition-transform duration-300">
+                    </div>
+                    
+                    <!-- Right Content Section -->
+                    <div class="w-2/3 p-4 flex flex-col justify-between relative">
+                        <!-- Top Info -->
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 truncate eng-text" title="${author.name}">${author.name}</h3>
+                            <p class="text-xs text-gray-500 font-semibold mb-1 eng-text"><i class="fas fa-calendar-alt mr-1"></i> ${author.life}</p>
+                            <span class="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full w-max mb-1 eng-text font-medium">
+                                ${author.era} <span class="text-gray-500">(${author.years})</span>
+                            </span>
+                        </div>
+                        
+                        <!-- Middle Info (Works) -->
+                        <div class="mb-8">
+                            <p class="text-sm text-gray-600 line-clamp-2 italic eng-text">
+                                <span class="text-gray-400 not-italic mr-1"><i class="fas fa-book"></i></span>
+                                ${author.works}
+                            </p>
+                        </div>
+                        
+                        <!-- Bottom Button (Left Aligned under text) -->
+                        <div class="absolute bottom-4 left-4">
+                            <button onclick="openModal('${author.file}', '${author.name}')" class="bg-gradient-to-r from-indigo-600 to-blue-500 text-white px-5 py-1.5 rounded-lg text-sm font-semibold hover:shadow-lg hover:from-indigo-700 hover:to-blue-600 transition-all flex items-center gap-2">
+                                <i class="fas fa-external-link-alt"></i> বিস্তারিত
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Search Function
+        function filterAuthors() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = authorsData.filter(author => 
+                author.name.toLowerCase().includes(query) || 
+                author.works.toLowerCase().includes(query)
+            );
+            renderAuthors(filtered);
+        }
+
+        // Modal Variables & Functions
+        const modal = document.getElementById('reader-modal');
+        const iframe = document.getElementById('doc-iframe');
+        const titleEl = document.getElementById('modal-title');
+        const iconBtn = document.getElementById('minimize-btn');
+        let isMinimized = false;
+        let currentZoom = 1;
+
+        function openModal(file, name) {
+            titleEl.innerText = name + " - Notes";
+            iframe.src = file;
+            currentZoom = 1;
+            updateZoom();
+            
+            // Reset to full screen mode if minimized
+            if(isMinimized) toggleMinimize();
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden'; // Stop background scrolling
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            iframe.src = '';
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+
+        function toggleMinimize() {
+            if(!isMinimized) {
+                // Minimize
+                modal.classList.add('modal-minimized');
+                iconBtn.innerHTML = '<i class="fas fa-expand-arrows-alt"></i>';
+                iconBtn.title = "Maximize";
+                isMinimized = true;
+                document.body.style.overflow = 'auto';
+            } else {
+                // Maximize
+                modal.classList.remove('modal-minimized');
+                iconBtn.innerHTML = '<i class="fas fa-compress-arrows-alt"></i>';
+                iconBtn.title = "Minimize";
+                isMinimized = false;
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function changeZoom(step) {
+            currentZoom += step;
+            if(currentZoom < 0.5) currentZoom = 0.5;
+            if(currentZoom > 2.5) currentZoom = 2.5;
+            updateZoom();
+        }
+
+        function updateZoom() {
+            // Apply CSS transform to the iframe for cross-origin safe zooming
+            iframe.style.transform = `scale(${currentZoom})`;
+            iframe.style.width = `${100 / currentZoom}%`;
+            iframe.style.height = `${100 / currentZoom}%`;
+        }
+
+        // Initial Render
+        renderAuthors(authorsData);
+    </script>
+</body>
+</html>

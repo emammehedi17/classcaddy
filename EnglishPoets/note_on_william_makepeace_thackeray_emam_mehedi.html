@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on William Makepeace Thackeray - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts: Hind Siliguri for Bangla -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme Configuration: Calcutta Jade & Vanity Gold */
+        :root {
+            --primary-color: #064E3B; /* Emerald 900 / Deep Jade */
+            --secondary-color: #D97706; /* Amber 600 / Vanity Gold */
+            --accent-color: #FEF3C7; /* Amber 50 / Light Gold */
+            --bg-color: #F8FAFC; /* Slate 50 - Background */
+            --card-bg: #FFFFFF;
+            --text-main: #000000; /* STRICTLY FULL BLACK FOR NORMAL TEXT */
+            --border-color: #A7F3D0; /* Emerald 200 */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            background-image: linear-gradient(135deg, #F0FDF4 0%, #FEFCE8 100%);
+        }
+
+        /* English Font Class */
+        .eng-text {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1em;
+        }
+
+        /* Bangla Numbers Font Class */
+        .bn-number {
+            font-family: 'Kalpurush', 'Times New Roman', serif;
+            font-size: 1.05em;
+            font-weight: 500;
+        }
+
+        /* Custom Styles for Design Elements */
+        .jade-header {
+            background: linear-gradient(135deg, var(--primary-color), #047857, #022C22);
+            color: white;
+            border-bottom: 6px solid var(--secondary-color);
+            position: relative;
+            box-shadow: 0 4px 20px rgba(6, 78, 59, 0.25);
+        }
+
+        .section-heading {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            display: inline-block;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .section-heading::after {
+            content: '🪞';
+            position: absolute;
+            bottom: -15px;
+            right: -30px;
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem;
+            color: var(--text-main);
+            position: relative;
+            transition: all 0.3s ease;
+            border-top: 3px solid transparent;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(217, 119, 6, 0.1);
+            border-top: 3px solid var(--secondary-color);
+        }
+
+        /* Masterpiece glowing effect */
+        .masterpiece-card {
+            background-color: #FFFAF0;
+            border: 1px solid #FCD34D;
+            border-left: 5px solid var(--secondary-color);
+        }
+
+        /* Quotes Styling */
+        .quote-container {
+            border-left: 5px solid var(--secondary-color);
+            background: #ECFDF5; /* Emerald 50 */
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1.2rem;
+            position: relative;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.04);
+            border-top: 1px solid #A7F3D0;
+            border-right: 1px solid #A7F3D0;
+            border-bottom: 1px solid #A7F3D0;
+        }
+
+        /* Terminology Styling - Highlight without changing text color */
+        .terminology {
+            background-color: #FEF08A; /* Soft yellow */
+            padding: 0 5px;
+            border-radius: 4px;
+            font-weight: 500;
+            color: #000000; /* Keeping text strictly black */
+            border: 1px dashed #D97706; /* Gold */
+            font-size: 0.95em;
+        }
+
+        /* Badge and Footer Specifics */
+        .qr-corner {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 65px;
+            height: 65px;
+            background: white;
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+        .qr-corner:hover {
+            transform: scale(1.1);
+        }
+        .qr-corner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .master-footer {
+            background: #ffffff;
+            border-top: 5px solid var(--primary-color);
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-emerald-200">
+        
+        <!-- Header -->
+        <header class="jade-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">উইলিয়াম মেকপিস থ্যাকারি (<span class="eng-text">William Makepeace Thackeray</span>)</h1>
+            <p class="text-xl text-[#FDE68A] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1811 - 1863</span></p>
+            
+            <p class="text-lg mb-6 text-emerald-50 text-justify" style="color: #ECFDF5;">
+                উইলিয়াম মেকপিস থ্যাকারি (<span class="eng-text">William Makepeace Thackeray</span>) ভিক্টোরিয়ান যুগের (<span class="eng-text font-bold text-[#FCD34D]">Victorian Period</span>) অন্যতম প্রধান এবং প্রভাবশালী ব্রিটিশ ঔপন্যাসিক। তিনি চার্লস ডিকেন্সের (<span class="eng-text">Charles Dickens</span>) সমসাময়িক ছিলেন এবং তাদের মধ্যে একধরণের সুস্থ সাহিত্যিক প্রতিদ্বন্দ্বিতা ছিল। থ্যাকারি তার ব্যঙ্গাত্মক বা <span class="eng-text font-bold text-[#FCD34D]">Satirical</span> (<span class="terminology">স্যাটায়ারিক্যাল: সমাজ সমালোচনামূলক বা ব্যঙ্গাত্মক</span>) রচনার জন্য বিখ্যাত, যেখানে তিনি তৎকালীন সমাজের ভণ্ডামি, স্নবারি (<span class="eng-text font-bold text-[#FCD34D]">Snobbery</span> - <span class="terminology">নিজেদের অন্যের চেয়ে শ্রেষ্ঠ ভাবার মিথ্যা অহংকার</span>) এবং নৈতিক অবক্ষয়কে কঠোরভাবে সমালোচনা করেছেন।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <!-- Creator Badge -->
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                
+                <!-- Header QR Code -->
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" class="w-full h-full object-cover rounded" onerror="this.src='https://placehold.co/65x65/064E3B/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="p-6 md:p-10">
+
+            <!-- Section 1: Biography -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#064E3B]">
+                        <p><strong class="text-lg text-[#064E3B]">পুরো নাম:</strong> <span class="eng-text">William Makepeace Thackeray</span> (উইলিয়াম মেকপিস থ্যাকারি)।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#064E3B]">
+                        <p><strong class="text-lg text-[#064E3B]">জন্ম:</strong> ১৮১১ সালের ১৮ জুলাই, <strong>কলকাতা, ব্রিটিশ ভারত</strong> (<span class="eng-text">Calcutta, British India</span>)। তার বাবা রিচমন্ড থ্যাকারি ব্রিটিশ ইস্ট ইন্ডিয়া কোম্পানির একজন উচ্চপদস্থ কর্মকর্তা ছিলেন। মাত্র ৫ বছর বয়সে তিনি তার বাবাকে হারান।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#064E3B]">
+                        <p><strong class="text-lg text-[#064E3B]">মৃত্যু:</strong> ১৮৬৩ সালে লন্ডনে।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#064E3B]">
+                        <p><strong class="text-lg text-[#064E3B]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The Victorian Period (1832-1901)</span>।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#D97706] bg-[#FEF3C7]">
+                        <p><strong class="text-lg text-[#D97706]">পেশা ও প্রতিভা:</strong> ঔপন্যাসিক, সাংবাদিক এবং চিত্রশিল্পী। তিনি প্রথমে চিত্রশিল্পী হতে চেয়েছিলেন এবং প্যারিসে আর্ট নিয়ে পড়াশোনাও করেছিলেন, কিন্তু পরে তিনি লেখালেখিকে পেশা হিসেবে বেছে নেন। তিনি তার নিজের অনেক বইয়ের অলংকরণ বা <span class="eng-text font-bold">Illustration</span> (<span class="terminology">ইলাস্ট্রেশন: বইয়ের ভেতরের হাতে আঁকা ছবি</span>) নিজেই করতেন।</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Titles -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="content-card bg-white border-t-4 border-t-[#064E3B]">
+                    <ul class="space-y-4 text-lg text-black">
+                        <li class="flex items-start">
+                            <span class="text-[#D97706] text-2xl mr-3 leading-none">🪞</span>
+                            <span><strong class="eng-text text-[#064E3B]">The Great Satirist of Victorian Age:</strong> ভিক্টোরিয়ান যুগের অন্যতম শ্রেষ্ঠ ব্যঙ্গ রচয়িতা।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#D97706] text-2xl mr-3 leading-none">🪞</span>
+                            <span><strong class="eng-text text-[#064E3B]">Indian-born British Novelist:</strong> ভারতে জন্মগ্রহণকারী ব্রিটিশ ঔপন্যাসিক। <span class="bg-slate-100 px-2 py-1 rounded text-sm mt-1 inline-block">(বিখ্যাত লেখক জর্জ অরওয়েল এবং রুডইয়ার্ড কিপলিং-এর মতো তিনিও ব্রিটিশ ভারতে জন্মেছিলেন)।</span></span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3: Literary Works -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                <p class="mb-4 text-lg text-black">উইলিয়াম মেকপিস থ্যাকারি তার উপন্যাসে সমাজের উঁচুতলার মানুষের ভণ্ডামি এবং নীচতাকে তুলে ধরতেন। তার বিখ্যাত '<span class="eng-text font-bold text-[#064E3B]">Novel without a Hero</span>' ধারণাটি তার সাহিত্যকর্মের এক অনন্য বৈশিষ্ট্য।</p>
+
+                <div class="space-y-6">
+                    <!-- Vanity Fair -->
+                    <div class="content-card masterpiece-card relative overflow-hidden shadow-md">
+                        <div class="absolute top-0 right-0 bg-[#FEF3C7] text-[#D97706] px-4 py-1 rounded-bl-xl font-bold border-l border-b border-[#FDE68A]">Masterpiece</div>
+                        <h3 class="text-2xl font-bold text-[#064E3B] mb-3">ক. ভ্যানিটি ফেয়ার (<span class="eng-text">Vanity Fair - 1848</span>) ***</h3>
+                        <p class="text-black font-semibold mb-2">এটি উইলিয়াম মেকপিস থ্যাকারির সর্বশ্রেষ্ঠ উপন্যাস।</p>
+                        
+                        <ul class="list-none space-y-3 text-black">
+                            <li><strong class="text-[#064E3B]">সাব-টাইটেল:</strong> <span class="eng-text font-bold text-red-600 bg-red-50 px-2 py-1 rounded">A Novel Without a Hero</span> (নায়কবিহীন উপন্যাস)।</li>
+                            <li><strong class="text-[#064E3B]">বিষয়বস্তু:</strong> নেপোলিয়নিক যুদ্ধের (<span class="eng-text">Napoleonic Wars</span>) সময়কার ইংল্যান্ডের সমাজচিত্র। উপন্যাসের মূল থিম হলো মানুষের অহংকার, লোভ, সামাজিক মর্যাদা লাভের আকাঙ্ক্ষা এবং জাগতিক সুখের প্রতি অন্ধ মোহ (<span class="eng-text">Vanity</span>)।</li>
+                            <li>
+                                <strong class="text-[#064E3B] block mb-2 border-b border-emerald-200 pb-1">চরিত্রসমূহ (দুই বিপরীতধর্মী নারী চরিত্র):</strong>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-2 mt-2">
+                                    <div class="bg-white p-3 border border-slate-200 rounded shadow-sm">
+                                        <p><strong class="eng-text text-[#D97706]">Amelia Sedley</strong> (অ্যামেলিয়া সেডলি): সরল, শান্ত, পরনির্ভরশীল এবং অত্যন্ত আবেগপ্রবণ একজন সাধারণ নারী।</p>
+                                    </div>
+                                    <div class="bg-white p-3 border border-emerald-300 rounded shadow-sm bg-[#F0FDF4]">
+                                        <p><strong class="eng-text text-[#D97706]">Becky Sharp</strong> (বেকি শার্প): ধূর্ত, উচ্চাকাঙ্ক্ষী, বুদ্ধিমতী এবং সুবিধাবাদী নারী। সে এতিম এবং দরিদ্র হলেও নিজের রূপ ও চাতুর্য দিয়ে সমাজের উঁচুতলায় উঠতে চায়। বেকি শার্প ইংরেজি সাহিত্যের অন্যতম স্মরণীয় '<span class="eng-text font-bold">Anti-heroine</span>' (<span class="terminology">অ্যান্টি-হিরোইন: এমন নায়িকা যার মধ্যে প্রথাগত ভালো গুণের বদলে স্বার্থপরতা বা ধূর্ততা থাকে</span>)।</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="bg-amber-50 p-3 rounded border border-amber-200 mt-2">
+                                <strong class="text-[#064E3B]">নামকরণ:</strong> প্রখ্যাত লেখক জন বানিয়ানের (<span class="eng-text">John Bunyan</span>) বিখ্যাত বই <span class="eng-text italic">The Pilgrim's Progress</span>-এর '<span class="eng-text font-bold">Vanity Fair</span>' নামক স্থান থেকে এই উপন্যাসের নাম নেওয়া হয়েছে, যেখানে মানুষের পাপ, অহংকার এবং জাগতিক মোহের এক বিশাল মেলা বসে।
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- The Newcomes -->
+                    <div class="content-card border-l-4 border-l-[#064E3B] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#064E3B] mb-2">খ. দ্য নিউকামস (<span class="eng-text">The Newcomes - 1855</span>)</h3>
+                        <p class="text-black mb-2">এটি একটি পারিবারিক সাগা বা দীর্ঘ বংশানুক্রমিক কাহিনী।</p>
+                        <p class="text-black bg-[#F8FAFC] p-2 rounded border border-slate-200">এখানে <span class="eng-text font-bold text-[#D97706]">Colonel Newcome</span> (কর্নেল নিউকাম) চরিত্রটি অত্যন্ত জনপ্রিয়, যিনি একজন আদর্শ ভদ্রলোক এবং নিঃস্বার্থ মানুষের শ্রেষ্ঠ প্রতীক।</p>
+                    </div>
+
+                    <!-- The History of Henry Esmond -->
+                    <div class="content-card border-l-4 border-l-[#064E3B] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#064E3B] mb-2">গ. দ্য হিস্ট্রি অফ হেনরি ইসমন্ড (<span class="eng-text">The History of Henry Esmond - 1852</span>)</h3>
+                        <p class="text-black">এটি একটি চমৎকার ঐতিহাসিক উপন্যাস (<span class="eng-text font-bold">Historical Novel</span>), যা রানী অ্যানের (<span class="eng-text">Queen Anne</span>) সময়কার পটভূমিতে লেখা। অনেক সাহিত্য সমালোচক এটিকে উইলিয়াম মেকপিস থ্যাকারির সবচেয়ে নিখুঁত এবং শৈল্পিক উপন্যাস মনে করেন।</p>
+                    </div>
+
+                    <!-- The Virginians -->
+                    <div class="content-card border-l-4 border-l-[#064E3B] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#064E3B] mb-2">ঘ. দ্য ভার্জিনিয়ানস (<span class="eng-text">The Virginians - 1857</span>)</h3>
+                        <p class="text-black">এটি <span class="eng-text">Henry Esmond</span> উপন্যাসের সিক্যুয়েল বা পরবর্তী অংশ। এখানে হেনরি ইসমন্ডের দুই নাতি—জর্জ এবং হ্যারির গল্প বলা হয়েছে যারা আমেরিকায় (ভার্জিনিয়া অঙ্গরাজ্যে) চলে যায় এবং আমেরিকান বিপ্লবের সময় দুই ভিন্ন পক্ষে (ব্রিটিশ এবং আমেরিকান) অবস্থান নেয়।</p>
+                    </div>
+
+                    <!-- Barry Lyndon -->
+                    <div class="content-card border-l-4 border-l-[#064E3B] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#064E3B] mb-2">ঙ. ব্যারি লিন্ডন (<span class="eng-text">Barry Lyndon - 1844</span>)</h3>
+                        <p class="text-black">এটি একটি <span class="eng-text font-bold text-[#D97706]">Picaresque Novel</span> (<span class="terminology">পিকারেস্ক উপন্যাস: সমাজের নিচুতলার এক ধূর্ত কিন্তু বুদ্ধিমান নায়কের রোমাঞ্চকর ভ্রমণ কাহিনী</span>)। এতে একজন আইরিশ ভাগ্যান্বেষী ব্যক্তি রেডমন্ড ব্যারি (<span class="eng-text">Redmond Barry</span>)-র উত্থান-পতনের কাহিনী বর্ণিত হয়েছে, যে এক ধনী বিধবাকে বিয়ের মাধ্যমে ব্যারি লিন্ডন নাম ধারণ করে।</p>
+                    </div>
+
+                    <!-- Other Works -->
+                    <div class="content-card border-t-4 border-t-[#D97706]">
+                        <h3 class="text-xl font-bold text-[#064E3B] mb-3">চ. অন্যান্য রচনা</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
+                            <div class="bg-emerald-50 p-3 rounded">
+                                <strong class="eng-text text-lg text-[#064E3B]">Catherine:</strong><br> এটি তার লেখা প্রথম উপন্যাস, যা অপরাধীদের অন্ধকার জীবন নিয়ে লেখা।
+                            </div>
+                            <div class="bg-emerald-50 p-3 rounded">
+                                <strong class="eng-text text-lg text-[#064E3B]">The Book of Snobs:</strong><br> বিখ্যাত পাঞ্চ (<span class="eng-text">Punch</span>) পত্রিকায় প্রকাশিত একটি ধারাবাহিক ব্যঙ্গাত্মক রচনা, যেখানে তিনি সমাজের তথাকথিত 'স্নব' বা নাকউঁচু মানুষদের ব্যঙ্গ করেছেন।
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Quotes -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>) ও সাহিত্যিক অলঙ্কার</h2>
+                <p class="mb-6 text-lg text-black">বিসিএস ও অন্যান্য পরীক্ষার জন্য উইলিয়াম মেকপিস থ্যাকারির উক্তিগুলো গুরুত্বপূর্ণ:</p>
+                
+                <div class="grid grid-cols-1 gap-5">
+                    
+                    <div class="quote-container border-l-[6px] border-l-[#D97706]">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#064E3B]">1. "The world is a looking-glass, and gives back to every man the reflection of his own face."</p>
+                        <p class="text-black mb-2 text-lg">(পৃথিবীটা হলো একটা আয়না, যা প্রত্যেক মানুষকে তার নিজের মুখের প্রতিচ্ছবিই ফেরত দেয়)</p>
+                        <div class="bg-white/80 p-2 rounded border border-emerald-200 mt-2">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">Vanity Fair</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Metaphor</span> (<span class="terminology">পৃথিবীকে একটি আয়নার সাথে তুলনা করা হয়েছে। এর অন্তর্নিহিত অর্থ হলো, আমরা জগতকে যেমন দেখি বা অন্যের সাথে যেমন আচরণ করি, জগতও আমাদের সাথে ঠিক তেমনই আচরণ করে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container border-l-[6px] border-l-[#D97706]">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#064E3B]">2. "Love makes us fools, ranks us with the critics, but makes us happy."</p>
+                        <p class="text-black mb-2 text-lg">(ভালোবাসা আমাদের বোকা বানায়, সমালোচকদের কাতারে ফেলে দেয়, কিন্তু আমাদের সুখী করে)</p>
+                        <div class="bg-white/80 p-2 rounded border border-emerald-200 mt-2">
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Paradox</span> (<span class="terminology">প্যারাডক্স: ভালোবাসা বোকা বানালেও সুখী করে—এই চমৎকার আপাতবিরোধী সত্য প্রকাশ করা হয়েছে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container border-l-[6px] border-l-[#D97706]">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#064E3B]">3. "A good laugh is sunshine in the house."</p>
+                        <p class="text-black mb-2 text-lg">(একটি ভালো হাসি হলো ঘরের ভেতরে সূর্যের আলো)</p>
+                        <div class="bg-white/80 p-2 rounded border border-emerald-200 mt-2">
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Metaphor</span> (<span class="terminology">বিশুদ্ধ হাসিকে সূর্যের আলোর সাথে তুলনা করা হয়েছে, যা জীবনে উষ্ণতা ও আনন্দ দেয়</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container border-l-[6px] border-l-[#D97706]">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#064E3B]">4. "Which of us is happy in this world? Which of us has his desire? or, having it, is satisfied?"</p>
+                        <p class="text-black mb-2 text-lg">(এই পৃথিবীতে আমাদের মধ্যে কে সুখী? কার আশা পূর্ণ হয়েছে? অথবা আশা পূর্ণ হলেও কে সন্তুষ্ট হয়েছে?)</p>
+                        <div class="bg-white/80 p-2 rounded border border-emerald-200 mt-2">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">Vanity Fair</span> <span class="text-[#D97706] font-bold">(উপন্যাসের মর্মস্পর্শী শেষ লাইন)</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Rhetorical Question</span> (<span class="terminology">রেটোরিক্যাল কোয়েশ্চেন: লেখক এখানে উত্তরের আশা না করে পাঠকদের বিবেকের কাছে প্রশ্ন রেখেছেন, যা মানুষের জাগতিক জীবনের চরম অতৃপ্তিকে নির্দেশ করে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Warning Box for Jane Austen Quote confusion -->
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mt-4 shadow-sm">
+                        <h4 class="text-red-700 font-bold text-lg mb-1">⚠ সতর্কতা (পরীক্ষার্থীদের জন্য):</h4>
+                        <p class="eng-text font-bold text-black mb-1">"It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife."</p>
+                        <p class="text-black text-sm">এটি আসলে <strong class="eng-text text-red-600">Jane Austen</strong>-এর <span class="eng-text font-bold">Pride and Prejudice</span> উপন্যাসের বিখ্যাত শুরুর লাইন। কিন্তু উইলিয়াম মেকপিস থ্যাকারির সমাজচিত্রের সাথে এর মিল থাকায় পরীক্ষার্থীরা মাঝে মাঝে গুলিয়ে ফেলেন। মনে রাখবেন, থ্যাকারির উক্তিগুলো সাধারণত আরও বেশি তিক্ত এবং ব্যঙ্গাত্মক হয়।</p>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Section 5: At a Glance -->
+            <section class="bg-gradient-to-br from-[#064E3B] to-[#022C22] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8 border-t-4 border-[#D97706]">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#047857] pb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-[#FDE68A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    একনজরে মনে রাখার মতো তথ্য
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start">
+                        <span class="text-[#FDE68A] mr-3 font-bold text-xl">🪞</span> 
+                        <p>তিনি ব্রিটিশ ভারতের <span class="eng-text font-bold">Calcutta</span>-তে (কলকাতায়) জন্মগ্রহণ করেন।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FDE68A] mr-3 font-bold text-xl">🪞</span> 
+                        <p>তার মাস্টারপিস <span class="eng-text font-bold">Vanity Fair</span> (যার সাব-টাইটেল: <span class="eng-text font-bold text-red-300">A Novel Without a Hero</span>)।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FDE68A] mr-3 font-bold text-xl">🪞</span> 
+                        <p><span class="eng-text font-bold">Becky Sharp</span> তার সৃষ্টি করা বিখ্যাত ধূর্ত নারী চরিত্র (অ্যান্টি-হিরোইন)।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FDE68A] mr-3 font-bold text-xl">🪞</span> 
+                        <p><span class="eng-text font-bold">The Virginians</span> তার একটি ঐতিহাসিক উপন্যাস।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FDE68A] mr-3 font-bold text-xl">🪞</span> 
+                        <p>তিনি প্রথমে চিত্রশিল্পী হতে চেয়েছিলেন এবং নিজের বইয়ের ইলাস্ট্রেশন নিজেই করতেন।</p>
+                    </div>
+                    <div class="flex items-start md:col-span-2">
+                        <span class="text-[#FDE68A] mr-3 font-bold text-xl">🪞</span> 
+                        <p>বিখ্যাত উক্তি: "<span class="eng-text font-bold">The world is a looking-glass.</span>"</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            
+            <!-- Creator Badge (Center Aligned) -->
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+
+            <!-- QR Code Bottom-Right Corner -->
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.src='https://placehold.co/65x65/064E3B/FFF?text=QR'">
+            </a>
+        </footer>
+
+    </div>
+
+    <!-- Script to wrap Bangla numbers in a specific font -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            
+            // Find all text nodes containing Bangla numbers
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) {
+                        textNodes.push(n);
+                    }
+                }
+            }
+
+            // Replace text nodes, wrapping Bangla numbers in spans
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number';
+                        span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on John Webster - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme: Jacobean Obsidian & Crimson Blood */
+        :root {
+            --primary-color: #18181B; /* Zinc 900 / Obsidian Black */
+            --secondary-color: #991B1B; /* Red 800 / Deep Blood Crimson */
+            --accent-color: #FEF2F2; /* Red 50 */
+            --bg-color: #FAFAFA; /* Zinc 50 */
+            --card-bg: #FFFFFF;
+            --text-main: #000000; 
+            --border-color: #E4E4E7; /* Zinc 200 */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-color);
+            color: var(--text-main); line-height: 1.6;
+            background-image: linear-gradient(135deg, #FAFAFA 0%, #FEF2F2 100%);
+        }
+
+        .eng-text { font-family: 'Times New Roman', Times, serif; font-size: 1.1em; }
+        .bn-number { font-family: 'Kalpurush', 'Times New Roman', serif; font-size: 1.05em; font-weight: 500; }
+
+        .theme-header {
+            background: linear-gradient(135deg, var(--primary-color), #09090B, #450A0A);
+            color: white; border-bottom: 6px solid var(--secondary-color);
+            position: relative; box-shadow: 0 4px 20px rgba(24, 24, 27, 0.4);
+        }
+
+        .section-heading {
+            color: var(--primary-color); border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px; margin-bottom: 1.5rem; font-weight: 700;
+            display: inline-block; position: relative; text-transform: uppercase;
+        }
+        
+        .section-heading::after {
+            content: '🗡'; position: absolute; bottom: -15px; right: -25px;
+            color: var(--secondary-color); font-size: 1.4rem;
+        }
+
+        .content-card {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem; transition: all 0.3s ease; border-top: 3px solid transparent;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(153, 27, 27, 0.15); border-top: 3px solid var(--secondary-color);
+        }
+
+        .masterpiece-card {
+            background-color: #FFF5F5; border: 1px solid #FECACA; border-left: 5px solid var(--secondary-color);
+        }
+
+        .quote-container {
+            border-left: 5px solid var(--secondary-color); background: #F4F4F5;
+            padding: 15px 20px; border-radius: 0 10px 10px 0; margin-bottom: 1.2rem;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.04); border: 1px solid #E4E4E7; border-left: 5px solid var(--secondary-color);
+        }
+
+        .terminology {
+            background-color: #FEE2E2; padding: 0 5px; border-radius: 4px;
+            font-weight: 500; color: #000000; border: 1px dashed #991B1B; font-size: 0.95em;
+        }
+
+        .qr-corner { position: absolute; bottom: 15px; right: 15px; width: 65px; height: 65px; background: white; padding: 4px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;}
+        .qr-corner img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+        .master-footer { background: #ffffff; border-top: 5px solid var(--primary-color); padding: 30px 20px; text-align: center; position: relative; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-red-100">
+        
+        <header class="theme-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">জন ওয়েবস্টার (<span class="eng-text">John Webster</span>)</h1>
+            <p class="text-xl text-[#FCA5A5] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1580 - 1632</span> (আনুমানিক)</p>
+            
+            <p class="text-lg mb-6 text-zinc-100 text-justify">
+                জন ওয়েবস্টার (<span class="eng-text">John Webster</span>) জ্যাকোবিয়ান যুগের (<span class="eng-text font-bold text-[#FCA5A5]">Jacobean Period</span>) অন্যতম শ্রেষ্ঠ ট্র্যাজেডি নাট্যকার। তার নাটকগুলো অন্ধকার, প্রতিহিংসা, ষড়যন্ত্র এবং ভয়াবহতায় পূর্ণ। শেক্সপিয়রের পরবর্তী সময়ে ট্র্যাজেডি রচনায় তিনিই ছিলেন সবচেয়ে শক্তিশালী ও দাপুটে লেখক। তার নাটকে মৃত্যুর উপস্থিতি এতই প্রবল যে, আধুনিক যুগের বিখ্যাত কবি টি.এস. এলিয়ট (<span class="eng-text">T.S. Eliot</span>) তার সম্পর্কে বলেছিলেন, <span class="eng-text font-bold italic text-[#FCA5A5]">"Webster was much possessed by death."</span> (ওয়েবস্টার আক্ষরিক অর্থেই মৃত্যুর দ্বারা আবিষ্ট ছিলেন)।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/18181B/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <main class="p-6 md:p-10">
+            <!-- Section 1 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#18181B]"><strong class="text-lg text-[#18181B]">পুরো নাম:</strong> <span class="eng-text">John Webster</span>।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#18181B]"><strong class="text-lg text-[#18181B]">জন্ম ও মৃত্যু:</strong> তার ব্যক্তিগত জীবন সম্পর্কে খুব কমই জানা যায়। ধারণা করা হয় তিনি ১৫৮০ সালের দিকে জন্মগ্রহণ করেন এবং ১৬৩২ সালের দিকে মৃত্যুবরণ করেন।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#18181B]"><strong class="text-lg text-[#18181B]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The Jacobean Period (1603-1625)</span>।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#18181B] bg-zinc-50">
+                        <strong class="text-lg text-[#991B1B]">পেশা:</strong> মূলত নাট্যকার। তিনি থমাস ডেকার (<span class="eng-text">Thomas Dekker</span>) এবং থমাস মিডলটনের (<span class="eng-text">Thomas Middleton</span>) মতো অন্যান্য সমসাময়িক নাট্যকারদের সাথে মিলে অনেক নাটক লিখেছেন।
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                <p class="mb-4 text-lg text-black">জন ওয়েবস্টার মূলত তার লেখা দুটি <span class="eng-text font-bold text-[#991B1B]">Revenge Tragedy</span> বা প্রতিহিংসাপরায়ণ ট্র্যাজেডির জন্য অমর হয়ে আছেন।</p>
+                
+                <div class="space-y-6">
+                    <!-- The Duchess of Malfi -->
+                    <div class="content-card masterpiece-card relative overflow-hidden shadow-md">
+                        <div class="absolute top-0 right-0 bg-[#FEE2E2] text-[#991B1B] px-4 py-1 rounded-bl-xl font-bold border-l border-b border-[#FCA5A5]">Masterpiece</div>
+                        <h3 class="text-2xl font-bold text-[#18181B] mb-3">ক. দ্য ডাচেস অফ মালফি (<span class="eng-text">The Duchess of Malfi - 1614</span>) ***</h3>
+                        <p class="text-black font-semibold mb-3">এটি তার সর্বশ্রেষ্ঠ মাস্টারপিস ট্র্যাজেডি এবং ইংরেজি সাহিত্যের অন্যতম সেরা নাটক।</p>
+                        
+                        <ul class="list-none space-y-3 text-black">
+                            <li class="bg-white p-3 rounded border border-red-200">
+                                <strong class="text-[#18181B]">কাহিনী সংক্ষেপ:</strong> মালফির এক তরুণ বিধবা ডাচেস তার দুই ক্ষমতাবান ভাইয়ের (একজন কার্ডিনাল বা যাজক এবং অন্যজন ডিউক) অমতে এক সাধারণ ও সৎ স্টুয়ার্ড (<span class="eng-text">Steward</span>) অ্যান্টোনিওকে গোপনে বিয়ে করেন। এতে চরম ক্ষিপ্ত হয়ে তার ভাইয়েরা বসোলা (<span class="eng-text font-bold text-[#991B1B]">Bosola</span>) নামের এক গুপ্তঘাতককে লেলিয়ে দেয় এবং ডাচেসকে তার সন্তানসহ অত্যন্ত নির্মমভাবে নির্যাতন করে হত্যা করে।
+                            </li>
+                            <li class="bg-[#FEF2F2] p-2 rounded border-l-4 border-red-500 inline-block mt-2">
+                                <strong class="text-[#18181B]"><span class="eng-text">Theme</span>:</strong> প্রেম, অন্ধ প্রতিহিংসা, ক্ষমতা এবং নারীর প্রতি তৎকালীন পুরুষশাসিত সমাজের চরম নিষ্ঠুরতা।
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- The White Devil -->
+                    <div class="content-card border-t-4 border-t-[#991B1B] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#18181B] mb-3">খ. দ্য হোয়াইট ডেভিল (<span class="eng-text">The White Devil - 1612</span>)</h3>
+                        
+                        <ul class="list-disc list-inside space-y-2 text-black">
+                            <li><strong class="text-[#18181B]">বিষয়বস্তু:</strong> এটিও একটি মারাত্মক <span class="eng-text font-bold text-[#991B1B]">Revenge Tragedy</span>। ইতালির পটভূমিতে লেখা এই নাটকে চরম ব্যভিচার, খুন এবং রাজপ্রাসাদের অন্ধকার ষড়যন্ত্রের নিখুঁত চিত্র ফুটে উঠেছে।</li>
+                            <li class="list-none bg-zinc-50 p-2 rounded border border-zinc-200 mt-2">
+                                <strong class="text-[#18181B]">* বিসিএস অতিরিক্ত:</strong> এই নাটকটি রোমান দার্শনিক ও নাট্যকার সেনেকা (<span class="eng-text">Seneca</span>)-র রক্তক্ষয়ী ট্র্যাজেডির রীতির (<span class="eng-text font-bold">Senecan Tragedy</span> - <span class="terminology">যেখানে ভূত, হত্যা, প্রতিশোধ এবং বীভৎসতা থাকে</span>) এক আধুনিক ও সার্থক রূপায়ণ।
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>)</h2>
+                
+                <div class="grid grid-cols-1 gap-4 mt-4">
+                    <div class="quote-container border-l-[6px] border-l-[#991B1B] bg-[#FEF2F2]">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#18181B]">1. "I am Duchess of Malfi still."</p>
+                        <p class="text-black mb-1">(আমি এখনও মালফির ডাচেস!)</p>
+                        <p class="text-sm text-black"><strong>প্রসঙ্গ:</strong> <span class="eng-text">The Duchess of Malfi</span> নাটকে মৃত্যুর ঠিক আগমুহূর্তে ডাচেসের অকুতোভয় এবং আত্মমর্যাদাপূর্ণ বিখ্যাত উক্তি।</p>
+                    </div>
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#18181B]">2. "We are merely the stars' tennis-balls, struck and bandied Which way please them."</p>
+                        <p class="text-black mb-1">(আমরা কেবল তারাদের বা নিয়তির টেনিস বল, তারা যেভাবে খুশি আমাদের মারে এবং আছড়ে ফেলে)</p>
+                        <p class="text-sm text-black"><strong><span class="eng-text">Device:</span></strong> <span class="eng-text font-bold">Metaphor</span> (<span class="terminology">মানুষের চরম অসহায়ত্ব এবং নিয়তিকে টেনিস খেলার সাথে তুলনা করা হয়েছে</span>)।</p>
+                    </div>
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#18181B]">3. "Glories, like glow-worms, afar off shine bright, But looked to near have neither heat nor light."</p>
+                        <p class="text-black mb-1">(গৌরব হলো জোনাকি পোকার মতো, দূর থেকে উজ্জ্বল দেখায়, কিন্তু কাছে গেলে তার তাপও নেই, আলোও নেই - <span class="eng-text">The Duchess of Malfi</span>)</p>
+                        <p class="text-sm text-black"><strong><span class="eng-text">Device:</span></strong> <span class="eng-text font-bold">Simile</span> (<span class="terminology">'like' ব্যবহার করে জাগতিক গৌরবকে জোনাকির ক্ষণস্থায়ী আলোর সাথে তুলনা করা হয়েছে</span>)।</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4 -->
+            <section class="bg-gradient-to-br from-[#18181B] to-[#450A0A] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8 border-t-4 border-[#991B1B]">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#7F1D1D] pb-3">একনজরে মনে রাখার মতো তথ্য</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🗡</span><p>তিনি <span class="eng-text font-bold">Jacobean Period</span>-এর শ্রেষ্ঠ ট্র্যাজেডি রচয়িতা।</p></div>
+                    <div class="flex items-start"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🗡</span><p>তার মাস্টারপিস <span class="eng-text font-bold">The Duchess of Malfi</span>।</p></div>
+                    <div class="flex items-start"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🗡</span><p><span class="eng-text font-bold">The White Devil</span> তার আরেকটি বিখ্যাত নাটক।</p></div>
+                    <div class="flex items-start"><span class="text-[#FCA5A5] mr-3 font-bold text-xl">🗡</span><p>তার নাটকে <span class="eng-text font-bold">Revenge</span> বা মৃত্যু ও রক্তের আধিক্য দেখা যায়।</p></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/18181B/FFF?text=QR'">
+            </a>
+        </footer>
+    </div>
+
+    <!-- Script for Bangla Numbers -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) { textNodes.push(n); }
+                }
+            }
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number'; span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

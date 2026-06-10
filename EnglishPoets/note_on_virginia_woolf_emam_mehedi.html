@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on Virginia Woolf - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts: Hind Siliguri for Bangla -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme Configuration: Oceanic Teal & Coral Rose */
+        :root {
+            --primary-color: #0F766E; /* Teal 700 / Oceanic Teal */
+            --secondary-color: #E11D48; /* Rose 600 / Coral Rose (Feminist accent) */
+            --accent-color: #ECFEFF; /* Cyan 50 / Light water hue */
+            --bg-color: #F8FAFC; /* Slate 50 - Background */
+            --card-bg: #FFFFFF;
+            --text-main: #000000; /* STRICTLY FULL BLACK FOR NORMAL TEXT */
+            --border-color: #99F6E4; /* Teal 200 */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            background-image: linear-gradient(120deg, #F0FDF4 0%, #ECFEFF 100%);
+        }
+
+        /* English Font Class */
+        .eng-text {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1em;
+        }
+
+        /* Bangla Numbers Font Class */
+        .bn-number {
+            font-family: 'Kalpurush', 'Times New Roman', serif;
+            font-size: 1.05em;
+            font-weight: 500;
+        }
+
+        /* Custom Styles for Design Elements */
+        .oceanic-header {
+            background: linear-gradient(135deg, var(--primary-color), #042F2E);
+            color: white;
+            border-bottom: 6px solid var(--secondary-color);
+            position: relative;
+            box-shadow: 0 4px 20px rgba(15, 118, 110, 0.2);
+        }
+
+        .section-heading {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            display: inline-block;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .section-heading::after {
+            content: '〰';
+            position: absolute;
+            bottom: -15px;
+            right: -25px;
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem;
+            color: var(--text-main);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(15, 118, 110, 0.08);
+            border-color: #5EEAD4;
+        }
+
+        /* Definition/Highlight Box */
+        .stream-box {
+            background-color: #FFF1F2; /* Rose 50 */
+            border: 1px solid #FECDD3; /* Rose 200 */
+            border-left: 5px solid var(--secondary-color);
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+
+        /* Quotes Styling */
+        .quote-container {
+            border-left: 4px solid var(--secondary-color);
+            background: #F0FDFA; /* Teal 50 */
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1.2rem;
+            position: relative;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.03);
+            border: 1px solid #CCFBF1;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        /* Terminology Styling - Highlight without changing text color */
+        .terminology {
+            background-color: #FEF08A; /* Soft yellow */
+            padding: 0 5px;
+            border-radius: 4px;
+            font-weight: 500;
+            color: #000000; /* Keeping text strictly black */
+            border: 1px dashed #E11D48;
+            font-size: 0.95em;
+        }
+
+        /* Badge and Footer Specifics */
+        .qr-corner {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 65px;
+            height: 65px;
+            background: white;
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+        .qr-corner:hover {
+            transform: scale(1.1);
+        }
+        .qr-corner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .master-footer {
+            background: #ffffff;
+            border-top: 5px solid var(--primary-color);
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-teal-100">
+        
+        <!-- Header -->
+        <header class="oceanic-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">ভার্জিনিয়া উলফ (<span class="eng-text">Virginia Woolf</span>)</h1>
+            <p class="text-xl text-[#FDA4AF] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1882 - 1941</span></p>
+            
+            <p class="text-lg mb-6 text-teal-50 text-justify" style="color: #F0FDFA;">
+                ভার্জিনিয়া উলফ (<span class="eng-text">Virginia Woolf</span>) বিংশ শতাব্দীর অন্যতম শ্রেষ্ঠ আধুনিকতাবাদী লেখক এবং নারীবাদী চিন্তাবিদ। তিনি ইংরেজি সাহিত্যে '<span class="eng-text font-bold">Stream of Consciousness</span>' (চেতনা প্রবাহ) কৌশলের সার্থক প্রয়োগের জন্য বিখ্যাত। তার লেখায় নারীর অধিকার, মানসিক জটিলতা এবং আধুনিক জীবনের মনস্তাত্ত্বিক দিকগুলো ফুটে উঠেছে। তিনি আজীবন মানসিক বিষণ্নতায় ভুগতেন এবং শেষ পর্যন্ত নদীতে ডুবে আত্মহত্যা করেন।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <!-- Creator Badge -->
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                
+                <!-- Header QR Code -->
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" class="w-full h-full object-cover rounded" onerror="this.src='https://placehold.co/65x65/0F766E/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="p-6 md:p-10">
+
+            <!-- Section 1: Biography -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#0F766E]">
+                        <p><strong class="text-lg text-[#0F766E]">পুরো নাম:</strong> <span class="eng-text">Adeline Virginia Woolf</span> (অ্যাডেলাইন ভার্জিনিয়া উলফ)।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#0F766E]">
+                        <p><strong class="text-lg text-[#0F766E]">পরিবার:</strong> তার বাবা ছিলেন বিখ্যাত সাহিত্যিক ও সমালোচক স্যার লেসলি স্টিফেন (<span class="eng-text">Sir Leslie Stephen</span>)।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#0F766E]">
+                        <p><strong class="text-lg text-[#0F766E]">জন্ম:</strong> ১৮৮২ সালে লন্ডনে (<span class="eng-text">London</span>)।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#0F766E]">
+                        <p><strong class="text-lg text-[#0F766E]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The Modern Period (1901-1939)</span>।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#E11D48] bg-rose-50">
+                        <p><strong class="text-lg text-[#E11D48]">মৃত্যু ও মানসিক স্বাস্থ্য:</strong> তিনি <span class="eng-text font-bold">Bipolar Disorder</span>-এ (<span class="terminology">বাইপোলার ডিসঅর্ডার: এক ধরনের মানসিক রোগ যেখানে রোগীর মেজাজ চরম বিষণ্নতা এবং অস্বাভাবিক উত্তেজনার মধ্যে ওঠানামা করে</span>) ভুগতেন। ১৯৪১ সালে দ্বিতীয় বিশ্বযুদ্ধের সময় তার মানসিক অবস্থার চরম অবনতি হলে তিনি কোটের পকেটে পাথর ভরে বাড়ির কাছের ওজ (<span class="eng-text font-bold">River Ouse</span>) নদীতে ঝাঁপ দিয়ে আত্মহত্যা করেন।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#0F766E] bg-teal-50">
+                        <p><strong class="text-lg text-[#0F766E]">* বিসিএস অতিরিক্ত তথ্য:</strong> তিনি এবং তার স্বামী লিওনার্দ উলফ মিলে বিখ্যাত প্রকাশনা সংস্থা <span class="eng-text font-bold">"Hogarth Press"</span> প্রতিষ্ঠা করেন। এছাড়া তিনি তৎকালীন ইংল্যান্ডের বুদ্ধিজীবীদের আড্ডাখানা <span class="eng-text font-bold">"Bloomsbury Group"</span>-এর অন্যতম প্রধান প্রতিষ্ঠাতাসদস্য ছিলেন।</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Titles -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                
+                <div class="stream-box">
+                    <p class="text-black mb-1"><strong class="eng-text text-xl text-[#E11D48]">Pioneer of Stream of Consciousness:</strong></p>
+                    <p class="text-black">আইরিশ সাহিত্যিক জেমস জয়েসের মতো তিনিও উপন্যাসে এই মনস্তাত্ত্বিক কৌশলের ব্যবহার জনপ্রিয় করেন। (<span class="terminology">চেতনা প্রবাহ বা Stream of Consciousness: মানুষের মনের অবচেতন স্তরে অতীত, বর্তমান ও ভবিষ্যৎ নিয়ে পর্যায়ক্রমহীনভাবে যেসব এলোমেলো চিন্তা ও অনুভূতির আনাগোনা চলে, তা কোনো বাধা ছাড়াই হুবহু সাহিত্যে তুলে ধরার একটি আধুনিক কৌশল</span>)।</p>
+                </div>
+
+                <div class="content-card bg-white border-t-4 border-t-[#0F766E]">
+                    <ul class="space-y-4 text-lg text-black">
+                        <li class="flex items-start">
+                            <span class="text-[#E11D48] text-2xl mr-3 leading-none">〰</span>
+                            <span><strong class="eng-text text-[#0F766E]">Leading Feminist Writer:</strong> আধুনিক নারীবাদী সাহিত্যের অন্যতম পুরোধা ব্যক্তিত্ব। (<span class="terminology">নারীবাদী লেখক: যিনি সাহিত্য বা লেখনীর মাধ্যমে সমাজের সর্বস্তরে নারী-পুরুষের সমান অধিকার এবং নারীর ক্ষমতায়নের পক্ষে কথা বলেন</span>)।</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3: Literary Works -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                <p class="mb-5 text-lg text-black">ভার্জিনিয়া উলফ তার মনস্তাত্ত্বিক উপন্যাস এবং নারীবাদী প্রবন্ধের জন্য বিখ্যাত।</p>
+
+                <div class="space-y-6">
+                    <!-- To the Lighthouse -->
+                    <div class="content-card border-l-4 border-l-[#E11D48] shadow-md relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-[#FFF1F2] text-[#E11D48] px-4 py-1 rounded-bl-xl font-bold border-l border-b border-[#FECDD3]">Masterpiece</div>
+                        <h3 class="text-2xl font-bold text-[#0F766E] mb-3">ক. টু দ্য লাইটহাউস (<span class="eng-text">To the Lighthouse - 1927</span>) ***</h3>
+                        <p class="text-black font-semibold mb-3">এটি তার অন্যতম শ্রেষ্ঠ এবং সর্বাধিক পঠিত উপন্যাস।</p>
+                        
+                        <ul class="list-none space-y-3 text-black">
+                            <li class="bg-teal-50 p-3 rounded border border-teal-100">
+                                <strong class="text-[#0F766E]">বিষয়বস্তু:</strong> রামসে (<span class="eng-text">Ramsay</span>) পরিবারের দুই দিনের কাহিনী, যা ১০ বছরের ব্যবধানে বর্ণিত হয়েছে। স্কটল্যান্ডের আইল অফ স্কাই (<span class="eng-text">Isle of Skye</span>)-তে তাদের গ্রীষ্মকালীন অবকাশ যাপনের চিত্র।
+                            </li>
+                            <li>
+                                <strong class="text-[#0F766E]">টেকনিক:</strong> এখানে প্রথাগত কাহিনীর চেয়ে চরিত্রদের মনের ভাবনা বা '<span class="eng-text font-bold">Stream of Consciousness</span>' বেশি গুরুত্ব পেয়েছে।
+                            </li>
+                            <li>
+                                <strong class="text-[#0F766E] block mb-2 border-b border-[#99F6E4] pb-1">চরিত্রসমূহ:</strong>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 ml-2">
+                                    <div class="bg-white p-3 rounded border border-slate-200">
+                                        <p><strong class="eng-text text-[#E11D48]">Mrs. Ramsay:</strong> উপন্যাসের কেন্দ্রবিন্দু। তিনি পরিবারের ঐক্য ধরে রাখেন।</p>
+                                    </div>
+                                    <div class="bg-white p-3 rounded border border-slate-200">
+                                        <p><strong class="eng-text text-[#E11D48]">Mr. Ramsay:</strong> একজন দার্শনিক কিন্তু আত্মকেন্দ্রিক স্বামী।</p>
+                                    </div>
+                                    <div class="bg-white p-3 rounded border border-slate-200 md:col-span-2">
+                                        <p><strong class="eng-text text-[#E11D48]">Lily Briscoe:</strong> একজন চিত্রশিল্পী, যে উপন্যাসের শেষে তার ছবি আঁকা শেষ করে এবং গভীর দার্শনিক দৃষ্টিভঙ্গি বা '<span class="eng-text">Vision</span>' লাভ করে।</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="bg-[#FFF1F2] p-3 rounded mt-2"><strong class="text-[#E11D48]"><span class="eng-text">Theme</span>:</strong> জীবনের ক্ষণস্থায়ীত্ব (<span class="eng-text">Transience of life</span>) এবং শিল্পের অমরত্ব।</li>
+                        </ul>
+                    </div>
+
+                    <!-- Mrs. Dalloway -->
+                    <div class="content-card border-t-4 border-t-[#0F766E] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#0F766E] mb-3">খ. মিসেস ড্যালোওয়ে (<span class="eng-text">Mrs. Dalloway - 1925</span>)</h3>
+                        
+                        <ul class="list-disc list-inside space-y-3 text-black">
+                            <li><strong class="text-[#0F766E]">বিষয়বস্তু:</strong> ক্লারিসা ড্যালোওয়ে (<span class="eng-text">Clarissa Dalloway</span>) নামের এক উচ্চবিত্ত নারীর একদিনের কাহিনী। তিনি একটি পার্টির আয়োজন করছেন। সমান্তরালভাবে সেপ্টিমাস ওয়ারেন স্মিথ (<span class="eng-text">Septimus Warren Smith</span>) নামের এক শেল-শকড (<span class="eng-text">Shell-shocked</span>) বা যুদ্ধফেরত মানসিক রোগীর কাহিনীও চলে।</li>
+                            <li><strong class="text-[#0F766E]">টেকনিক:</strong> পুরো উপন্যাসটি চরিত্রদের মনের ভাবনার প্রবাহ (<span class="eng-text">Stream of consciousness</span>) দিয়ে লেখা। অতীত এবং বর্তমান এখানে অদ্ভুতভাবে মিশে গেছে।</li>
+                        </ul>
+                    </div>
+
+                    <!-- A Room of One's Own -->
+                    <div class="content-card border-t-4 border-t-[#E11D48] shadow-md bg-[#FFF1F2]">
+                        <h3 class="text-xl font-bold text-[#E11D48] mb-3">গ. আ রুম অফ ওয়ানস ওন (<span class="eng-text">A Room of One's Own - 1929</span>)</h3>
+                        <p class="text-black font-semibold mb-2">এটি সাহিত্য ও নারী অধিকার নিয়ে লেখা একটি বিখ্যাত নারীবাদী প্রবন্ধ (<span class="eng-text font-bold">Feminist Essay</span>)।</p>
+                        
+                        <ul class="list-none space-y-3 text-black">
+                            <li><strong class="text-[#E11D48]">মূল বক্তব্য:</strong> নারীর মেধার বিকাশের জন্য প্রয়োজন অর্থনৈতিক স্বাধীনতা এবং স্বাধীনভাবে কাজ করার মতো নিজস্ব একটি ঘর।</li>
+                            <li class="bg-white p-3 border-l-4 border-[#E11D48] rounded">
+                                <strong class="text-[#E11D48]">বিখ্যাত উক্তি:</strong> <span class="eng-text font-bold">"A woman must have money and a room of her own if she is to write fiction."</span> (নারীর যদি ফিকশন লিখতে হয়, তবে তার অবশ্যই টাকা এবং নিজের একটি ঘর থাকতে হবে)।
+                            </li>
+                            <li class="bg-white p-3 border border-[#FECDD3] rounded shadow-sm mt-2">
+                                <strong class="eng-text text-[#E11D48] text-lg">Judith Shakespeare (শেক্সপিয়রের বোন):</strong> এখানে তিনি একটি কাল্পনিক চরিত্র 'জুডিথ শেক্সপিয়র'-এর উদাহরণ দিয়ে দেখিয়েছেন যে, শেক্সপিয়রের মতো সমান মেধা থাকলেও কেবল নারী হওয়ার কারণে এবং সুযোগের অভাবে জুডিথ হারিয়ে যেত বা আত্মহত্যা করত।
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Other Novels -->
+                    <div class="content-card border-l-4 border-l-[#0F766E]">
+                        <h3 class="text-xl font-bold text-[#0F766E] mb-4">ঘ. অন্যান্য উপন্যাস</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
+                            <div class="border-b border-gray-200 pb-3">
+                                <strong class="eng-text text-lg text-[#0F766E]">The Waves:</strong><br> এটি তার সবচেয়ে পরীক্ষামূলক (<span class="eng-text">Experimental</span>) বা প্রথাভাঙা উপন্যাস।
+                            </div>
+                            <div class="border-b border-gray-200 pb-3">
+                                <strong class="eng-text text-lg text-[#0F766E]">Orlando:</strong><br> লিঙ্গ পরিবর্তন (<span class="eng-text">Gender transformation</span>) নিয়ে লেখা এক অদ্ভুত জীবনীমূলক উপন্যাস।
+                            </div>
+                            <div class="border-b border-gray-200 pb-3 md:col-span-2">
+                                <strong class="eng-text text-lg text-[#0F766E]">The Voyage Out:</strong><br> এটি তার রচিত প্রথম উপন্যাস।
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Quotes -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>) ও সাহিত্যিক অলঙ্কার</h2>
+                <p class="mb-6 text-lg text-black">বিসিএস ও অন্যান্য পরীক্ষার জন্য ভার্জিনিয়া উলফের উক্তিগুলো অত্যন্ত গুরুত্বপূর্ণ:</p>
+                
+                <div class="grid grid-cols-1 gap-5">
+                    
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#0F766E]">1. "A woman must have money and a room of her own if she is to write fiction."</p>
+                        <p class="text-black mb-2 text-lg">(নারীর ফিকশন লেখার জন্য টাকা এবং নিজস্ব ঘর অত্যাবশ্যক)</p>
+                        <div class="bg-white/80 p-2 rounded border border-teal-100 mt-2">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">A Room of One's Own</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Metonymy</span> (<span class="terminology">মেটোনিমি: কোনো কিছুর নাম সরাসরি না বলে তার সাথে সংশ্লিষ্ট কিছুর নাম বলা। এখানে 'Room of her own' দিয়ে শুধু একটি চার দেয়ালের ঘর নয়, বরং বৃহত্তর অর্থে নারীর স্বাধীনতা ও ব্যক্তিগত গোপনীয়তাকে বোঝানো হয়েছে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#0F766E]">2. "As a woman I have no country. As a woman I want no country. As a woman my country is the whole world."</p>
+                        <p class="text-black mb-2 text-lg">(নারী হিসেবে আমার কোনো দেশ নেই... আমার দেশ হলো সমগ্র বিশ্ব)</p>
+                        <div class="bg-white/80 p-2 rounded border border-teal-100 mt-2">
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Anaphora</span> (<span class="terminology">অ্যানাফোরা: একাধিক বাক্যের শুরুতে একই শব্দ বা শব্দগুচ্ছের বারবার ব্যবহার। এখানে 'As a woman' শব্দগুচ্ছটি বারবার ব্যবহৃত হয়েছে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#0F766E]">3. "One cannot think well, love well, sleep well, if one has not dined well."</p>
+                        <p class="text-black mb-2 text-lg">(কেউ যদি ভালো না খায়, তবে সে ভালো চিন্তা করতে, ভালোবাসতে বা ঘুমাতে পারে না)</p>
+                        <div class="bg-white/80 p-2 rounded border border-teal-100 mt-2">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">A Room of One's Own</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Climax</span> বা <span class="eng-text font-bold">Parallelism</span> (<span class="terminology">Think, Love, Sleep - পর্যায়ক্রমে মানুষের জীবনের মৌলিক চাহিদাগুলোর উল্লেখ করা হয়েছে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#0F766E]">4. "Lock up your libraries if you like; but there is no gate, no lock, no bolt that you can set upon the freedom of my mind."</p>
+                        <p class="text-black mb-2 text-lg">(তুমি চাইলে তোমার লাইব্রেরি তালাবদ্ধ করতে পারো; কিন্তু এমন কোনো ফটক, তালা বা ছিটকিনি নেই যা তুমি আমার মনের স্বাধীনতার ওপর চাপাতে পারো)</p>
+                        <div class="bg-white/80 p-2 rounded border border-teal-100 mt-2">
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Metaphor</span> (<span class="terminology">মানুষের মনকে এক মুক্ত বিহঙ্গ বা অবারিত স্থান হিসেবে রূপক অর্থে কল্পনা করা হয়েছে, যাকে শেকল পরানো যায় না</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#0F766E]">5. "Life is not a series of gig lamps symmetrically arranged; life is a luminous halo, a semi-transparent envelope surrounding us from the beginning of consciousness to the end."</p>
+                        <p class="text-black mb-2 text-lg">(জীবন সুশৃঙ্খলভাবে সাজানো কোনো বাতি নয়; জীবন হলো এক উজ্জ্বল আভা...)</p>
+                        <div class="bg-white/80 p-2 rounded border border-teal-100 mt-2">
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Metaphor</span> (<span class="terminology">জীবনকে যান্ত্রিক নিয়মের বদলে একটি 'Luminous Halo' বা উজ্জ্বল আভার সাথে তুলনা করা হয়েছে</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Section 5: At a Glance -->
+            <section class="bg-gradient-to-br from-[#0F766E] to-[#042F2E] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8 border-t-4 border-[#E11D48]">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#115E59] pb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-[#FDA4AF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    একনজরে মনে রাখার মতো তথ্য
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start">
+                        <span class="text-[#FDA4AF] mr-3 font-bold text-xl">〰</span> 
+                        <p>তিনি <span class="eng-text font-bold">Stream of Consciousness</span> উপন্যাসের জন্য বিখ্যাত।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FDA4AF] mr-3 font-bold text-xl">〰</span> 
+                        <p><span class="eng-text font-bold">A Room of One's Own</span> তার বিখ্যাত নারীবাদী প্রবন্ধ।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FDA4AF] mr-3 font-bold text-xl">〰</span> 
+                        <p>তার বিখ্যাত উপন্যাস <span class="eng-text font-bold">To the Lighthouse</span> এবং <span class="eng-text font-bold">Mrs. Dalloway</span>।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#FDA4AF] mr-3 font-bold text-xl">〰</span> 
+                        <p>মানসিক বিষণ্নতার কারণে তিনি নদীতে ডুবে আত্মহত্যা করেন।</p>
+                    </div>
+                    <div class="flex items-start md:col-span-2">
+                        <span class="text-[#FDA4AF] mr-3 font-bold text-xl">〰</span> 
+                        <p>তার অমর উক্তি: "<span class="eng-text font-bold">A woman must have money and a room of her own...</span>"</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            
+            <!-- Creator Badge (Center Aligned) -->
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+
+            <!-- QR Code Bottom-Right Corner -->
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.src='https://placehold.co/65x65/0F766E/FFF?text=QR'">
+            </a>
+        </footer>
+
+    </div>
+
+    <!-- Script to wrap Bangla numbers in a specific font -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            
+            // Find all text nodes containing Bangla numbers
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) {
+                        textNodes.push(n);
+                    }
+                }
+            }
+
+            // Replace text nodes, wrapping Bangla numbers in spans
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number';
+                        span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

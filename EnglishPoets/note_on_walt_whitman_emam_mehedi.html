@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on Walt Whitman - Emam Mehedi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #14532D; /* Leaves of Grass Green */
+            --secondary-color: #1E40AF; /* Democracy Blue */
+            --accent-color: #F0FDF4; 
+            --bg-color: #FAFAFA; 
+            --card-bg: #FFFFFF;
+            --text-main: #000000; 
+            --border-color: #86EFAC; 
+        }
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; background-image: linear-gradient(135deg, #F0FDF4 0%, #EFF6FF 100%); }
+        .eng-text { font-family: 'Times New Roman', Times, serif; font-size: 1.1em; }
+        .bn-number { font-family: 'Kalpurush', 'Times New Roman', serif; font-size: 1.05em; font-weight: 500; }
+        .theme-header { background: linear-gradient(135deg, var(--primary-color), #064E3B); color: white; border-bottom: 6px solid var(--secondary-color); position: relative; box-shadow: 0 4px 20px rgba(20, 83, 45, 0.3); }
+        .section-heading { color: var(--primary-color); border-bottom: 3px solid var(--secondary-color); padding-bottom: 8px; margin-bottom: 1.5rem; font-weight: 700; display: inline-block; position: relative; text-transform: uppercase; }
+        .section-heading::after { content: '🍃'; position: absolute; bottom: -15px; right: -35px; color: var(--secondary-color); font-size: 1.5rem; }
+        .content-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03); margin-bottom: 1.25rem; transition: all 0.3s ease; border-top: 3px solid transparent; }
+        .content-card:hover { box-shadow: 0 8px 15px rgba(30, 64, 175, 0.15); border-top: 3px solid var(--secondary-color); }
+        .masterpiece-card { background-color: #F0FDF4; border: 1px solid #86EFAC; border-left: 5px solid var(--secondary-color); }
+        .quote-container { border-left: 5px solid var(--secondary-color); background: #EFF6FF; padding: 15px 20px; border-radius: 0 10px 10px 0; margin-bottom: 1.2rem; box-shadow: 2px 2px 6px rgba(0,0,0,0.04); border: 1px solid #BFDBFE; }
+        .terminology { background-color: #DBEAFE; padding: 0 5px; border-radius: 4px; font-weight: 500; color: #000000; border: 1px dashed #1E40AF; font-size: 0.95em; }
+        .qr-corner { position: absolute; bottom: 15px; right: 15px; width: 65px; height: 65px; background: white; padding: 4px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;}
+        .qr-corner img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+        .master-footer { background: #ffffff; border-top: 5px solid var(--primary-color); padding: 30px 20px; text-align: center; position: relative; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-green-200">
+        <header class="theme-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">ওয়াল্ট হুইটম্যান (<span class="eng-text">Walt Whitman</span>)</h1>
+            <p class="text-xl text-[#93C5FD] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1819 - 1892</span></p>
+            <p class="text-lg mb-6 text-green-50 text-justify">
+                ওয়াল্ট হুইটম্যান আমেরিকান সাহিত্যের অন্যতম প্রভাবশালী এবং যুগান্তকারী কবি। তিনি কবিতায় প্রথাগত ছন্দ ভেঙে 'মুক্তক ছন্দ' (<span class="eng-text font-bold text-[#93C5FD]">Free verse</span>) এর ব্যবহার জনপ্রিয় করেন। তার কবিতায় আমেরিকার গণতন্ত্র, ব্যক্তিস্বাধীনতা এবং মানবতাবাদের জয়গান গাওয়া হয়েছে।
+            </p>
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="QR Code" onerror="this.src='https://placehold.co/65x65/14532D/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <main class="p-6 md:p-10">
+            <!-- Section 1 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#14532D]"><strong class="text-lg text-[#14532D]">পুরো নাম:</strong> <span class="eng-text">Walter Whitman</span>।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#14532D]"><strong class="text-lg text-[#14532D]">জন্ম ও মৃত্যু:</strong> ১৮১৯ সালে আমেরিকার নিউইয়র্কে জন্ম এবং ১৮৯২ সালে মৃত্যু।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#14532D]"><strong class="text-lg text-[#14532D]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">American Literature</span> (উনিশ শতক / Transition between Transcendentalism and Realism)।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#1E40AF] bg-[#EFF6FF]">
+                        <strong class="text-lg text-[#1E40AF]">পেশা ও অভিজ্ঞতা:</strong> জীবনে তিনি সাংবাদিক, শিক্ষক, সরকারি কেরানি এবং আমেরিকান গৃহযুদ্ধের সময় একজন <strong>স্বেচ্ছাসেবক নার্স</strong> হিসেবে কাজ করেছেন। এই অভিজ্ঞতা তার কবিতায় গভীরভাবে প্রভাব ফেলে।
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section

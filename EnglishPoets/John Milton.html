@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>John Milton - BCS Preparation Note</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts: Hind Siliguri for Bangla -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme Configuration: Classical Royal Elegance */
+        :root {
+            --primary-color: #4A0E17; /* Deep Maroon */
+            --secondary-color: #B8860B; /* Dark Goldenrod */
+            --accent-highlight: #FDF5E6; /* Old Lace / Light Cream */
+            --bg-color: #FAF9F6;
+            --text-main: #000000; /* Updated: Full Black for normal texts */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* English Font Class */
+        .eng-text {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.05em; /* Slight adjustment to match Bangla font visual weight */
+        }
+
+        /* Custom Styles for Design Elements */
+        .glass-header {
+            background: linear-gradient(135deg, var(--primary-color), #2c080d);
+            color: white;
+            border-bottom: 5px solid var(--secondary-color);
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            border-bottom: 2px dashed var(--secondary-color);
+            display: inline-block;
+            margin-bottom: 1rem;
+            padding-bottom: 0.2rem;
+        }
+
+        .info-card {
+            background: white;
+            border-left: 4px solid var(--secondary-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .quote-box {
+            background: var(--accent-highlight);
+            border-left: 5px solid var(--primary-color);
+            position: relative;
+        }
+
+        .quote-box::before {
+            content: '"';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 4rem;
+            color: rgba(184, 134, 11, 0.2);
+            line-height: 1;
+        }
+
+        /* Badge and Footer Specifics provided by user */
+        .qr-corner {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 60px;
+            height: 60px;
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .qr-corner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .master-footer {
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            border-top: 3px solid var(--primary-color);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative">
+        
+        <!-- Header -->
+        <header class="glass-header p-8 text-center relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">জন মিল্টন (<span class="eng-text">John Milton</span>)</h1>
+            <p class="text-xl text-yellow-500 font-semibold mb-4">জীবনকাল: <span class="eng-text">1608 - 1674</span></p>
+            
+            <p class="text-lg mb-6 max-w-3xl mx-auto text-white">
+                জন মিল্টন ইংরেজি সাহিত্যের অন্যতম শ্রেষ্ঠ মহাকবি (<span class="eng-text">Epic Poet</span>)। তিনি শেক্সপিয়রের (<span class="eng-text">Shakespeare</span>) পরবর্তী যুগের প্রধান কবি হিসেবে বিবেচিত হন। তিনি ছিলেন পিউরিটান (<span class="eng-text">Puritan</span> - ইংল্যান্ডের একদল কঠোর ধর্মীয় সংস্কারপন্থী যারা ধর্মীয় ও নৈতিক শুদ্ধতার ওপর জোর দিতেন) মতাদর্শের একজন একনিষ্ঠ অনুসারী এবং ইংল্যান্ডের গৃহযুদ্ধের সময় অলিভার ক্রমওয়েলের (<span class="eng-text">Oliver Cromwell</span>) সমর্থক। তার জীবনের সবচেয়ে বিস্ময়কর দিক হলো, তিনি তার কালজয়ী মহাকাব্যগুলো সম্পূর্ণ অন্ধ অবস্থায় রচনা করেছিলেন।
+            </p>
+
+            <!-- Creator Badge (Top) -->
+            <div class="creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-highlight); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+            
+            <!-- QR Code (Top) -->
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner" style="top: 15px; bottom: auto;">
+                <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.src='https://placehold.co/60x60/B8860B/FFF?text=QR'">
+            </a>
+        </header>
+
+        <!-- Main Content -->
+        <main class="p-6 md:p-10 space-y-8">
+
+            <section>
+                <h2 class="text-2xl font-bold section-title">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="info-card p-4 rounded shadow-sm">
+                        <strong class="text-[#4A0E17]">পুরো নাম:</strong> <span class="eng-text">John Milton</span>.
+                    </div>
+                    <div class="info-card p-4 rounded shadow-sm">
+                        <strong class="text-[#4A0E17]">জন্ম:</strong> ১৬০৮ সালে লন্ডনে (<span class="eng-text">London</span>)।
+                    </div>
+                    <div class="info-card p-4 rounded shadow-sm">
+                        <strong class="text-[#4A0E17]">মৃত্যু:</strong> ১৬৭৪ সালে (গাউট বা বাতজনিত রোগে)।
+                    </div>
+                    <div class="info-card p-4 rounded shadow-sm">
+                        <strong class="text-[#4A0E17]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The Puritan Period</span> (যদিও তার মহাকাব্যগুলো প্রকাশিত হয় <span class="eng-text">Restoration Period</span> বা ১৬৬০ সালে ইংল্যান্ডে রাজতন্ত্রের পুনরুদ্ধারের সময়কালে, তিনি মূলত পিউরিটান ভাবধারার শেষ মহান কবি)।
+                    </div>
+                    <div class="info-card p-4 rounded shadow-sm md:col-span-2">
+                        <strong class="text-[#4A0E17]">অন্ধত্ব:</strong> অতিরিক্ত পড়াশোনা এবং চোখের ওপর চাপের কারণে মধ্যবয়সে (৪৪ বছর বয়সে, ১৬৫২ সালে) তিনি পুরোপুরি অন্ধ হয়ে যান। তবে কিছু বইটিতে উল্লেখ আছে, "৮ বছর বয়সে তিনি দৃষ্টি শক্তি হারাতে শুরু করেন" (সম্ভবত এটি চোখের সমস্যার শুরুর ইঙ্গিত)।
+                    </div>
+                    <div class="info-card p-4 rounded shadow-sm md:col-span-2">
+                        <strong class="text-[#4A0E17]">কারাবরণ:</strong> ১৬৬০ সালে রাজতন্ত্র পুনঃপ্রতিষ্ঠিত (<span class="eng-text">Restoration</span>) হলে ক্রমওয়েলের সমর্থক হওয়ায় জন মিল্টনকে কারাগারে পাঠানো হয় এবং মৃত্যুদণ্ডের ঝুঁকি দেখা দেয়। তবে তার বন্ধু ও তৎকালীন বিখ্যাত কবি অ্যান্ড্রু মার্ভেল (<span class="eng-text">Andrew Marvell</span>)-এর সহায়তায় তিনি মুক্তি পান। (অ্যান্ড্রু মার্ভেল একসময় মিল্টনের সহকারী বা <span class="eng-text">Secretary</span> হিসেবেও কাজ করেছিলেন)।
+                    </div>
+                    <!-- Extra Info for BCS -->
+                    <div class="info-card p-4 rounded shadow-sm md:col-span-2 bg-yellow-50">
+                        <strong class="text-[#4A0E17]">* অতিরিক্ত তথ্য (বিসিএস স্পেশাল):</strong> কেমব্রিজ বিশ্ববিদ্যালয়ে পড়ার সময় তার ফর্সা ত্বক ও লম্বা চুলের জন্য তাকে <strong>"<span class="eng-text">Lady of the Christ's College</span>"</strong> বলা হতো। তিনি ইংরেজি ছাড়াও ল্যাটিন, গ্রিক ও ইতালীয় ভাষায় দক্ষ ছিলেন।
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-bold section-title">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <ul class="list-disc list-inside space-y-3 ml-2 text-lg">
+                    <li><span class="eng-text font-bold">Epic Poet:</span> মহাকাব্যের কবি। (বাংলা সাহিত্যে মহাকাব্যের কবি বলা হয় হেমচন্দ্র বন্দ্যোপাধ্যায়কে, আর মহাকবি বলা হয় মাইকেল মধুসূদন দত্তকে)।</li>
+                    <li><span class="eng-text font-bold">A Great Master of Verse in the Puritan Period.</span></li>
+                    <li><span class="eng-text font-bold">The Last Great Poet of the Renaissance:</span> তাকে রেনেসাঁ (<span class="eng-text">Renaissance</span> - শিল্প, সাহিত্য ও জ্ঞানের পুনর্জাগরণ বা নবজাগরণের যুগ) যুগের সর্বশেষ মহান কবি বলা হয়।</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-bold section-title">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                <p class="mb-4 text-lg">জন মিল্টন তার মহাকাব্য, সনেট এবং গদ্য রচনার জন্য বিখ্যাত।</p>
+
+                <div class="space-y-6">
+                    <!-- Paradise Lost -->
+                    <div class="bg-red-50 p-5 rounded-lg border border-red-100">
+                        <h3 class="text-xl font-bold text-[#4A0E17] mb-2">ক. প্যারাডাইস লস্ট (<span class="eng-text">Paradise Lost</span>) ***</h3>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li>এটি ইংরেজি সাহিত্যের সর্বশ্রেষ্ঠ মহাকাব্য (<span class="eng-text">Epic</span>)।</li>
+                            <li><strong class="text-black">প্রকাশকাল:</strong> ১৬৬৭ সালে এটি ১০ খণ্ডে প্রকাশিত হয়। পরে ১৬৭৪ সালে ২য় সংস্করণে এটি ১২ খণ্ডে বিন্যস্ত হয়।</li>
+                            <li><strong class="text-black">ছন্দ:</strong> এটি <span class="eng-text">Blank Verse</span> (অমিত্রাক্ষর ছন্দ, যেখানে চরণের শেষে মিল থাকে না কিন্তু নির্দিষ্ট মাত্রা বা তাল থাকে)-এ রচিত।</li>
+                            <li><strong class="text-black">বিষয়বস্তু:</strong> বাইবেলের কাহিনী অবলম্বনে আদম ও হাওয়া (<span class="eng-text">Adam and Eve</span>)-এর স্বর্গ থেকে পতন এবং শয়তানের (<span class="eng-text">Satan</span>) বিদ্রোহ। মানুষের পাপ ও তার ফলে স্বর্গ হারানোর করুণ কাহিনী।</li>
+                            <li><strong class="text-black">Theme:</strong> "<span class="eng-text italic">To justify the ways of God to man.</span>" (মানুষের প্রতি ঈশ্বরের বিচার বা আচরণের ন্যায্যতা প্রতিপাদন করা)।</li>
+                            <li><strong class="text-black">রচনাকাল:</strong> ১৬৫৮-১৬৬৪ (তিনি এই মহাকাব্যটি সম্পূর্ণ অন্ধ অবস্থায় মৌখিকভাবে বলে মেয়েদের দিয়ে লিখিয়েছিলেন)।</li>
+                        </ul>
+                    </div>
+
+                    <!-- Paradise Regained & Samson Agonistes -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                            <h3 class="text-xl font-bold text-[#4A0E17] mb-2">খ. প্যারাডাইস রিগেইনড (<span class="eng-text">Paradise Regained</span>)</h3>
+                            <p>এটি <span class="eng-text">Paradise Lost</span>-এর পরবর্তী অংশ (<span class="eng-text">Sequel</span> - মূল কাহিনীর ধারাবাহিকতায় রচিত পরবর্তী রচনা)। এখানে যিশুখ্রিস্টের মাধ্যমে হারানো স্বর্গের পুনরুদ্ধারের কথা বলা হয়েছে। এটিও তিনি অন্ধ অবস্থায় রচনা করেন।</p>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                            <h3 class="text-xl font-bold text-[#4A0E17] mb-2">গ. স্যামসন অ্যাগনিস্টেস (<span class="eng-text">Samson Agonistes</span>)</h3>
+                            <p>এটি একটি <span class="eng-text">Poetic Drama</span> (কাব্যনাট্য) বা ট্র্যাজেডি।</p>
+                            <p class="mt-2"><strong class="text-black">বিষয়বস্তু:</strong> গ্রিক ট্র্যাজেডির আদলে লেখা এই নাটকে বীর স্যামসনের শক্তি, অন্ধত্ব এবং ফিলিস্তিনিদের হাতে তার বন্দিত্ব ও বীরত্বপূর্ণ মৃত্যুর কাহিনী বর্ণিত হয়েছে। মিল্টন নিজের অন্ধত্বের যন্ত্রণার ছায়া এই নাটকে ফেলেছেন।</p>
+                        </div>
+                    </div>
+
+                    <!-- Elegies, Prose, Others -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="info-card p-4 rounded">
+                            <h3 class="text-lg font-bold text-[#4A0E17] mb-1">ঘ. বিখ্যাত শোকগাঁথা (<span class="eng-text">Elegy</span>)</h3>
+                            <p><strong class="eng-text text-lg">Lycidas:</strong> কবি তার বন্ধু এডওয়ার্ড কিং (<span class="eng-text">Edward King</span>)-এর মৃত্যুতে এই বিখ্যাত প্যাস্টোরাল এলিজিটি (<span class="eng-text">Pastoral Elegy</span> - গ্রাম্য বা রাখালী জীবনের পটভূমিতে রচিত শোকগাঁথা) রচনা করেন।</p>
+                        </div>
+
+                        <div class="info-card p-4 rounded">
+                            <h3 class="text-lg font-bold text-[#4A0E17] mb-1">ঙ. বিখ্যাত গদ্য ও প্রবন্ধ (<span class="eng-text">Prose</span>)</h3>
+                            <p><strong class="eng-text text-lg">Areopagitica:</strong> এটি সংবাদপত্রের স্বাধীনতা (<span class="eng-text">Freedom of Press</span>) এবং বাক-স্বাধীনতার পক্ষে লেখা একটি বিখ্যাত গদ্যগ্রন্থ।</p>
+                            <p class="mt-2"><strong class="eng-text text-lg">Of Education:</strong> শিক্ষা বিষয়ক প্রবন্ধ। এখানে তিনি বলেন, শিক্ষা হলো শরীর, মন ও আত্মার সুষম বিকাশ।</p>
+                        </div>
+
+                        <div class="info-card p-4 rounded">
+                            <h3 class="text-lg font-bold text-[#4A0E17] mb-1">চ. অন্যান্য কবিতা</h3>
+                            <ul class="list-disc list-inside space-y-1 text-sm md:text-base">
+                                <li><strong class="eng-text">Comus:</strong> একটি গীতিনাট্য (<span class="eng-text">Masque</span> - রাজদরবারে প্রদর্শিত নৃত্য, গীত ও অভিনয়ের সমন্বয়ে এক ধরনের নাটকীয় বিনোদন)।</li>
+                                <li><strong class="eng-text">On His Blindness:</strong> তার বিখ্যাত সনেট, যেখানে তিনি নিজের অন্ধত্ব নিয়ে ঈশ্বরের কাছে ফরিয়াদ এবং পরে সান্ত্বনা খুঁজে পাওয়ার কথা বলেছেন।</li>
+                                <li><strong class="eng-text">On the Late Massacre in Piedmont:</strong> একটি রাজনৈতিক সনেট।</li>
+                                <li><strong class="eng-text">On Shakespeare:</strong> (অতিরিক্ত তথ্য) এটি মিল্টনের প্রকাশিত প্রথম ইংরেজি কবিতা।</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-bold section-title">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>) ও সাহিত্যিক অলঙ্কার</h2>
+                <p class="mb-4 text-lg text-black">বিসিএস ও অন্যান্য পরীক্ষার জন্য জন মিল্টনের উক্তিগুলো অত্যন্ত গুরুত্বপূর্ণ:</p>
+                
+                <div class="space-y-4">
+                    <div class="quote-box p-5 rounded-lg shadow-sm">
+                        <p class="eng-text text-xl font-bold mb-1">1. "Better to reign in hell, than serve in heaven."</p>
+                        <p class="text-black mb-1">(স্বর্গে দাসত্ব করার চেয়ে নরকে রাজত্ব করা শ্রেয়)</p>
+                        <p class="text-sm"><strong class="text-[#4A0E17]">বক্তা:</strong> <span class="eng-text">Satan</span> (শয়তান)।</p>
+                        <p class="text-sm"><strong class="text-[#4A0E17]"><span class="eng-text">Literary Device:</span></strong> <span class="eng-text">Antithesis (Reign vs Serve, Hell vs Heaven</span>—দুটি বিপরীত ধারণা পাশাপাশি স্থাপন করা হয়েছে)।</p>
+                    </div>
+
+                    <div class="quote-box p-5 rounded-lg shadow-sm">
+                        <p class="eng-text text-xl font-bold mb-1">2. "Childhood shows the man, as morning shows the day."</p>
+                        <p class="text-black mb-1">(সকাল যেমন দিনের পূর্বাভাস দেয়, তেমনি শৈশবও মানুষের ভবিষ্যতের ইঙ্গিত দেয়)</p>
+                        <p class="text-sm"><strong class="text-[#4A0E17]"><span class="eng-text">Literary Device:</span></strong> <span class="eng-text">Simile</span> ('<span class="eng-text">as</span>' ব্যবহার করে শৈশবকে সকালের সাথে তুলনা করা হয়েছে)।</p>
+                    </div>
+
+                    <div class="quote-box p-5 rounded-lg shadow-sm">
+                        <p class="eng-text text-xl font-bold mb-1">3. "Death is the golden key that opens the place of eternity."</p>
+                        <p class="text-black mb-1">(মৃত্যু হলো সেই সোনালি চাবি যা অনন্তকালের দরজা খুলে দেয়)</p>
+                        <p class="text-sm"><strong class="text-[#4A0E17]"><span class="eng-text">Literary Device:</span></strong> <span class="eng-text">Metaphor</span> (মৃত্যুকে সরাসরি চাবির সাথে তুলনা করা হয়েছে)।</p>
+                    </div>
+
+                    <div class="quote-box p-5 rounded-lg shadow-sm">
+                        <p class="eng-text text-xl font-bold mb-1">4. "Education is the harmonious development of body, mind and soul."</p>
+                        <p class="text-black">(শিক্ষা হলো দেহ, মন ও আত্মার সুষম বিকাশ)</p>
+                    </div>
+
+                    <div class="quote-box p-5 rounded-lg shadow-sm">
+                        <p class="eng-text text-xl font-bold mb-1">5. "Awake, arise, or be for ever fallen."</p>
+                        <p class="text-black mb-1">(জাগো, ওঠো, নতুবা চিরতরে পতিত হও)</p>
+                        <p class="text-sm"><strong class="text-[#4A0E17]">প্রসঙ্গ:</strong> শয়তান তার অনুসারীদের (<span class="eng-text">Fallen Angels</span>) উদ্দেশ্য করে এটি বলেছিল।</p>
+                    </div>
+                    
+                    <div class="quote-box p-5 rounded-lg shadow-sm border-l-yellow-500">
+                        <p class="eng-text text-xl font-bold mb-1">6. "They also serve who only stand and wait." <span class="text-sm text-red-500 font-normal">(অতিরিক্ত তথ্য)</span></p>
+                        <p class="text-black mb-1">(তারাও ঈশ্বরের সেবা করে, যারা কেবল দাঁড়িয়ে থাকে এবং অপেক্ষা করে)</p>
+                        <p class="text-sm"><strong class="text-[#4A0E17]">উৎস:</strong> <span class="eng-text">On His Blindness</span> কবিতা থেকে নেওয়া অত্যন্ত বিখ্যাত লাইন।</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-[#4A0E17] text-white p-6 rounded-xl mt-8">
+                <h2 class="text-2xl font-bold mb-4 border-b border-yellow-600 pb-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    একনজরে মনে রাখার মতো তথ্য
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                    <div class="flex items-start">
+                        <span class="text-yellow-500 mr-2">✔</span> 
+                        <p>তিনি <span class="eng-text">Epic Poet</span>।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-yellow-500 mr-2">✔</span> 
+                        <p>তিনি অন্ধ অবস্থায় <span class="eng-text">Paradise Lost</span> ও <span class="eng-text">Paradise Regained</span> লিখেছেন।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-yellow-500 mr-2">✔</span> 
+                        <p><span class="eng-text">Paradise Lost</span>-এর থিম: <span class="eng-text">Justify the ways of God to man.</span></p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-yellow-500 mr-2">✔</span> 
+                        <p>তার বিখ্যাত গদ্য <span class="eng-text">Areopagitica</span> (সংবাদপত্রের স্বাধীনতার পক্ষে)।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-yellow-500 mr-2">✔</span> 
+                        <p><span class="eng-text">Samson Agonistes</span> তার বিখ্যাত ট্র্যাজেডি বা কাব্যনাট্য।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-yellow-500 mr-2">✔</span> 
+                        <p>বিখ্যাত উক্তি: "<span class="eng-text">Better to reign in hell, than serve in heaven.</span>"</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-yellow-500 mr-2">✔</span> 
+                        <p>উপাধি: <span class="eng-text">Lady of the Christ's College</span>.</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="master-footer">
+            <p style="margin-bottom: 10px; color: #000000; font-weight: 600; font-size: 1.1em;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ৯ জুন, ২০২৬</p>
+            
+            <!-- Creator Badge (Center Aligned) -->
+            <div class="footer-creator-wrapper" style="margin-bottom: 20px;">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 25px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+
+            <!-- QR Code Bottom-Right Corner -->
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.src='https://placehold.co/60x60/4A0E17/FFF?text=QR'">
+            </a>
+        </footer>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on William Congreve - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts: Hind Siliguri for Bangla -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme Configuration: Restoration Plum & Aristocratic Gold */
+        :root {
+            --primary-color: #4A044E; /* Fuchsia 900 / Deep Plum */
+            --secondary-color: #CA8A04; /* Yellow 600 / Aristocratic Gold */
+            --accent-color: #FEFCE8; /* Yellow 50 / Light Gold */
+            --bg-color: #FAFAFA; /* Zinc 50 - Background */
+            --card-bg: #FFFFFF;
+            --text-main: #000000; /* STRICTLY FULL BLACK FOR NORMAL TEXT */
+            --border-color: #FDE047; /* Yellow 300 */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            background-image: linear-gradient(135deg, #FAFAFA 0%, #FDF4FF 100%);
+        }
+
+        /* English Font Class */
+        .eng-text {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1em;
+        }
+
+        /* Bangla Numbers Font Class */
+        .bn-number {
+            font-family: 'Kalpurush', 'Times New Roman', serif;
+            font-size: 1.05em;
+            font-weight: 500;
+        }
+
+        /* Custom Styles for Design Elements */
+        .restoration-header {
+            background: linear-gradient(135deg, var(--primary-color), #701A75, #2E1065);
+            color: white;
+            border-bottom: 6px solid var(--secondary-color);
+            position: relative;
+            box-shadow: 0 4px 20px rgba(74, 4, 78, 0.25);
+        }
+
+        .section-heading {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            display: inline-block;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .section-heading::after {
+            content: '✧';
+            position: absolute;
+            bottom: -18px;
+            right: -25px;
+            color: var(--secondary-color);
+            font-size: 1.8rem;
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border: 1px solid #E879F9; /* Fuchsia 300 */
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem;
+            color: var(--text-main);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(202, 138, 4, 0.1);
+            border-color: var(--secondary-color);
+        }
+
+        /* Definition/Highlight Box for Comedy of Manners */
+        .manners-box {
+            background-color: #FEFCE8; /* Yellow 50 */
+            border: 1px solid #FDE047; /* Yellow 300 */
+            border-left: 5px solid var(--secondary-color);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 6px;
+            box-shadow: inset 0 0 20px rgba(202, 138, 4, 0.05);
+        }
+
+        /* Quotes Styling */
+        .quote-container {
+            border-left: 5px solid var(--secondary-color);
+            background: #FDF4FF; /* Fuchsia 50 */
+            padding: 15px 20px;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 1.2rem;
+            position: relative;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.04);
+            border-top: 1px solid #FBCFE8;
+            border-right: 1px solid #FBCFE8;
+            border-bottom: 1px solid #FBCFE8;
+        }
+
+        /* Terminology Styling - Highlight without changing text color */
+        .terminology {
+            background-color: #FEF08A; /* Soft yellow */
+            padding: 0 5px;
+            border-radius: 4px;
+            font-weight: 500;
+            color: #000000; /* Keeping text strictly black */
+            border: 1px dashed #CA8A04; /* Gold */
+            font-size: 0.95em;
+        }
+
+        /* Badge and Footer Specifics */
+        .qr-corner {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 65px;
+            height: 65px;
+            background: white;
+            padding: 4px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+        .qr-corner:hover {
+            transform: scale(1.1);
+        }
+        .qr-corner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .master-footer {
+            background: #ffffff;
+            border-top: 5px solid var(--primary-color);
+            padding: 30px 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-fuchsia-100">
+        
+        <!-- Header -->
+        <header class="restoration-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">উইলিয়াম কনগ্রিভ (<span class="eng-text">William Congreve</span>)</h1>
+            <p class="text-xl text-[#FDE047] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1670 - 1729</span></p>
+            
+            <p class="text-lg mb-6 text-fuchsia-50 text-justify" style="color: #FDF4FF;">
+                উইলিয়াম কনগ্রিভ (<span class="eng-text">William Congreve</span>) ইংরেজি সাহিত্যের রেস্টোরেশন যুগের (<span class="eng-text font-bold text-[#FDE047]">Restoration Period</span> - <span class="terminology">১৬৬০ সালে ইংল্যান্ডে রাজতন্ত্র পুনঃপ্রতিষ্ঠার কাল</span>) অন্যতম শ্রেষ্ঠ নাট্যকার। তিনি মূলত '<span class="eng-text font-bold text-[#FDE047]">Comedy of Manners</span>'-এর জন্য বিখ্যাত। তার নাটকগুলো তৎকালীন উচ্চবিত্ত সমাজের কৃত্রিমতা, ভণ্ডামি, এবং নর-নারীর চাতুর্যপূর্ণ প্রেমের সম্পর্ককে হাস্যরসের মাধ্যমে তুলে ধরে। তিনি বিখ্যাত আইরিশ লেখক জোনাথন সুইফটের (<span class="eng-text">Jonathan Swift</span>) ঘনিষ্ঠ বন্ধু ছিলেন।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <!-- Creator Badge -->
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                
+                <!-- Header QR Code -->
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" class="w-full h-full object-cover rounded" onerror="this.src='https://placehold.co/65x65/4A044E/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="p-6 md:p-10">
+
+            <!-- Section 1: Biography -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#4A044E]">
+                        <p><strong class="text-lg text-[#4A044E]">জন্ম:</strong> ১৬৭০ সালে ইংল্যান্ডের ইয়র্কশায়ারে (<span class="eng-text">Yorkshire</span>)।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#4A044E]">
+                        <p><strong class="text-lg text-[#4A044E]">মৃত্যু:</strong> ১৭২৯ সালে।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#4A044E]">
+                        <p><strong class="text-lg text-[#4A044E]">শিক্ষা:</strong> তিনি আয়ারল্যান্ডের ট্রিনিটি কলেজে (<span class="eng-text">Trinity College, Dublin</span>) পড়াশোনা করেন, যেখানে জোনাথন সুইফট তার সহপাঠী ছিলেন।</p>
+                    </div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#4A044E]">
+                        <p><strong class="text-lg text-[#4A044E]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The Restoration Period (1660-1700)</span>।</p>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#CA8A04] bg-[#FEFCE8]">
+                        <p><strong class="text-lg text-[#CA8A04]">পেশা:</strong> নাট্যকার, কবি এবং সরকারি কর্মকর্তা। তিনি খুব অল্প বয়সে লেখালেখি শুরু করেন এবং মাত্র ৩০ বছর বয়সের আগেই তার সেরা নাটকগুলো লিখে ফেলেন। <br>
+                        <span class="inline-block mt-2 bg-white px-2 py-1 text-sm border border-yellow-200 rounded"><strong class="text-[#4A044E]">* বিসিএস অতিরিক্ত:</strong> ১৬৯৮ সালে জেরেমি কলিয়ার (<span class="eng-text">Jeremy Collier</span>) নামের এক যাজক ইংরেজি থিয়েটারের অশ্লীলতা নিয়ে তীব্র আক্রমণ করে একটি প্যামফ্লেট প্রকাশ করেন। এই আক্রমণের পর এবং তার শ্রেষ্ঠ নাটক <span class="eng-text">The Way of the World</span> মঞ্চে খুব একটা সফলতা না পাওয়ায় তিনি মাত্র ৩০ বছর বয়সেই হতাশ হয়ে নাটক লেখা ছেড়ে দেন।</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Titles -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="content-card bg-white border-t-4 border-t-[#4A044E]">
+                    <ul class="space-y-4 text-lg text-black">
+                        <li class="flex items-start">
+                            <span class="text-[#CA8A04] text-2xl mr-3 leading-none">✧</span>
+                            <span><strong class="eng-text text-[#4A044E]">Master of Comedy of Manners:</strong> কমেডি অফ ম্যানার্স-এর ওস্তাদ বা শ্রেষ্ঠ রচয়িতা।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#CA8A04] text-2xl mr-3 leading-none">✧</span>
+                            <span><strong class="eng-text text-[#4A044E]">The Greatest Restoration Comedy Writer:</strong> রেস্টোরেশন যুগের শ্রেষ্ঠ কমেডি লেখক।</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3: Literary Works -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                <p class="mb-4 text-lg text-black">কনগ্রিভ মাত্র ৫টি নাটক লিখেছিলেন, যার মধ্যে ৪টি কমেডি এবং ১টি ট্র্যাজেডি।</p>
+                
+                <!-- Definition Box for Comedy of Manners -->
+                <div class="manners-box">
+                    <h3 class="text-xl font-bold text-[#4A044E] mb-2"><span class="eng-text">Comedy of Manners</span> কী?</h3>
+                    <p class="text-black">এটি এমন এক ধরণের কমেডি বা হাস্যরসাত্মক নাটক যা তৎকালীন অভিজাত সমাজের (<span class="eng-text font-bold">Aristocratic Society</span>) আচার-আচরণ, কৃত্রিমতা এবং নৈতিকতার শিথিলতাকে তীব্রভাবে ব্যঙ্গ করে। এর সংলাপগুলো হয় অত্যন্ত চাতুর্যপূর্ণ (<span class="eng-text font-bold">Witty</span>) এবং বুদ্ধিদীপ্ত।</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- The Way of the World -->
+                    <div class="content-card border-l-4 border-l-[#CA8A04] relative overflow-hidden shadow-md">
+                        <div class="absolute top-0 right-0 bg-[#FEFCE8] text-[#CA8A04] px-4 py-1 rounded-bl-xl font-bold border-l border-b border-[#FDE047]">Masterpiece</div>
+                        <h3 class="text-2xl font-bold text-[#4A044E] mb-3">ক. দ্য ওয়ে অফ দ্য ওয়ার্ল্ড (<span class="eng-text">The Way of the World - 1700</span>) ***</h3>
+                        <p class="text-black font-semibold mb-3">এটি কনগ্রিভের সর্বশ্রেষ্ঠ কমেডি এবং ইংরেজি সাহিত্যের অন্যতম সেরা <span class="eng-text">Comedy of Manners</span>।</p>
+                        
+                        <ul class="list-none space-y-3 text-black">
+                            <li class="bg-fuchsia-50 p-3 rounded border border-fuchsia-100">
+                                <strong class="text-[#4A044E]">বিষয়বস্তু:</strong> মীরাবেল (<span class="eng-text">Mirabell</span>) এবং মিলাম্যান্ট (<span class="eng-text">Millamant</span>)-এর প্রেম ও বিয়ের পথে বাধা, এবং লেডি উইশফোর্ট (<span class="eng-text">Lady Wishfort</span>)-এর বিশাল সম্পত্তির উত্তরাধিকার নিয়ে চক্রান্ত।
+                            </li>
+                            <li>
+                                <strong class="text-[#4A044E]">কাহিনী সংক্ষেপ:</strong> মীরাবেল মিলাম্যান্টকে ভালোবাসে, কিন্তু মিলাম্যান্টের অভিভাবক লেডি উইশফোর্ট মীরাবেলকে ঘৃণা করেন। সম্পত্তির লোভে ফেইনল (<span class="eng-text">Fainall</span>) নামের এক ধূর্ত ব্যক্তি নানা চক্রান্ত করে। শেষ পর্যন্ত মীরাবেলের বুদ্ধিমত্তায় সব সমস্যার সমাধান হয়।
+                            </li>
+                            <li>
+                                <strong class="text-[#4A044E] block mb-2 border-b border-fuchsia-200 pb-1">প্রধান চরিত্রসমূহ:</strong>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-2 mt-2">
+                                    <div class="bg-white p-2 border border-slate-200 rounded">
+                                        <p><strong class="eng-text text-[#CA8A04]">Mirabell:</strong> নায়ক (বুদ্ধিমান, চতুর ও বাস্তববাদী)।</p>
+                                    </div>
+                                    <div class="bg-white p-2 border border-slate-200 rounded">
+                                        <p><strong class="eng-text text-[#CA8A04]">Millamant:</strong> নায়িকা (স্বাধীনচেতা, রূপবতী ও ফ্যাশন সচেতন)।</p>
+                                    </div>
+                                    <div class="bg-white p-2 border border-slate-200 rounded sm:col-span-2">
+                                        <p><strong class="eng-text text-[#CA8A04]">Lady Wishfort:</strong> মিলাম্যান্টের বয়স্ক ফুফু, যিনি এখনো বিয়ের স্বপ্ন দেখেন এবং অতিরিক্ত মেকআপের আড়ালে নিজের বয়স লুকাতে চান (<span class="terminology">তৎকালীন সমাজের কৃত্রিমতার প্রতীক</span>)।</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="bg-[#FEFCE8] p-3 rounded border border-[#FDE047] inline-block mt-2">
+                                <strong class="text-[#4A044E]">বিখ্যাত দৃশ্য:</strong> '<span class="eng-text font-bold">Proviso Scene</span>' - যেখানে মীরাবেল ও মিলাম্যান্ট বিয়ের পর একে অপরের স্বাধীনতা ও অধিকারের শর্তগুলো নিয়ে অত্যন্ত মজার এবং বুদ্ধিদীপ্ত আলোচনা করে।
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Love for Love -->
+                    <div class="content-card border-t-4 border-t-[#4A044E] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#4A044E] mb-3">খ. লাভ ফর লাভ (<span class="eng-text">Love for Love - 1695</span>)</h3>
+                        <p class="text-black font-semibold mb-2">এটি তার সবচেয়ে জনপ্রিয় কমেডি (মঞ্চে সবচেয়ে বেশি সফল হয়েছিল)।</p>
+                        
+                        <ul class="list-disc list-inside space-y-2 text-black">
+                            <li><strong class="text-[#4A044E]">বিষয়বস্তু:</strong> ভ্যালেন্টাইন (<span class="eng-text">Valentine</span>) নামের এক যুবক ঋণের দায়ে জর্জরিত। সে তার বাবার কাছ থেকে বিশাল সম্পত্তি পাওয়ার জন্য উন্মাদ বা পাগল হওয়ার ভান করে। শেষ পর্যন্ত নানা চাতুর্যের পর সে তার প্রেমিকা অ্যাঞ্জেলিকা (<span class="eng-text">Angelica</span>)-কে জয় করে।</li>
+                        </ul>
+                    </div>
+
+                    <!-- The Mourning Bride -->
+                    <div class="content-card border-t-4 border-t-[#4A044E] shadow-sm">
+                        <h3 class="text-xl font-bold text-[#4A044E] mb-3">গ. দ্য মোর্নিং ব্রাইড (<span class="eng-text">The Mourning Bride - 1697</span>)</h3>
+                        <p class="text-black font-semibold mb-2 bg-red-50 text-red-700 px-2 py-1 rounded inline-block">এটি কনগ্রিভের লেখা একমাত্র ট্র্যাজেডি নাটক।</p>
+                        
+                        <ul class="list-disc list-inside space-y-2 text-black mt-2">
+                            <li><strong class="text-[#4A044E]">বিষয়বস্তু:</strong> আলমেরিয়া (<span class="eng-text">Almeria</span>) এবং আলফোনসো (<span class="eng-text">Alphonso</span>)-এর গোপন বিয়ে এবং রাজপ্রাসাদের ষড়যন্ত্র।</li>
+                            <li><strong class="text-[#4A044E]">গুরুত্ব:</strong> এই নাটকটি আজ আর তেমন মঞ্চস্থ হয় না, কিন্তু এর দুটি লাইন ইংরেজি ভাষায় সর্বকালের সেরা প্রবাদতুল্য উক্তি হয়ে গেছে।</li>
+                        </ul>
+                    </div>
+
+                    <!-- Other Plays -->
+                    <div class="content-card border-l-4 border-l-[#4A044E]">
+                        <h3 class="text-xl font-bold text-[#4A044E] mb-4">ঘ. অন্যান্য নাটক</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
+                            <div class="bg-fuchsia-50 p-3 rounded">
+                                <strong class="eng-text text-lg text-[#4A044E]">The Double Dealer:</strong><br> এটি তার লেখা একটি কমেডি।
+                            </div>
+                            <div class="bg-fuchsia-50 p-3 rounded">
+                                <strong class="eng-text text-lg text-[#4A044E]">The Old Bachelor:</strong><br> এটি তার লেখা প্রথম নাটক, যা তাকে রাতারাতি বিখ্যাত করেছিল।
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Quotes -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>) ও সাহিত্যিক অলঙ্কার</h2>
+                <p class="mb-6 text-lg text-black">বিসিএস ও অন্যান্য পরীক্ষার জন্য কনগ্রিভের <span class="eng-text font-bold text-[#4A044E]">The Mourning Bride</span> নাটকের উক্তিগুলো সবচেয়ে বেশি গুরুত্বপূর্ণ:</p>
+                
+                <div class="grid grid-cols-1 gap-5">
+                    
+                    <div class="quote-container border-l-[6px] border-l-[#CA8A04] bg-[#FEFCE8]">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#4A044E]">1. "Music has charms to soothe a savage breast."</p>
+                        <p class="text-black mb-2 text-lg">(সংগীতের এমন জাদুকরী শক্তি আছে যা বন্য বা পাষাণ হৃদয়কেও শান্ত করতে পারে)</p>
+                        <div class="bg-white/80 p-2 rounded border border-yellow-200 mt-2">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">The Mourning Bride</span> <span class="text-red-600 font-bold">(বি.দ্র: অনেকেই ভুল করে ভাবেন এটি শেক্সপিয়রের উক্তি, কিন্তু এটি মূলত উইলিয়াম কনগ্রিভের)</span>।</p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Personification</span> (<span class="terminology">সংগীতকে জাদুকরী বা মানুষের মতো শান্ত করার ক্ষমতার অধিকারী হিসেবে দেখানো হয়েছে</span>) এবং <span class="eng-text font-bold">Alliteration</span> (<span class="terminology">অনুপ্রাস: 's' ধ্বনির বারবার ব্যবহার- soothe, savage, breast</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container border-l-[6px] border-l-[#CA8A04] bg-[#FEFCE8]">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#4A044E]">2. "Heaven has no rage like love to hatred turned, Nor hell a fury like a woman scorned."</p>
+                        <p class="text-black mb-2 text-lg">(ভালোবাসা ঘৃণায় পরিণত হলে স্বর্গেও তার মতো ক্রোধ দেখা যায় না, আর প্রেমে প্রত্যাখ্যাত নারীর আক্রোশের মতো ভয়ানক কিছু নরকেও নেই)</p>
+                        <div class="bg-white/80 p-2 rounded border border-yellow-200 mt-2">
+                            <p class="text-sm text-black mb-1"><strong>উৎস:</strong> <span class="eng-text">The Mourning Bride</span></p>
+                            <p class="text-sm text-black"><strong><span class="eng-text">Literary Device:</span></strong> 
+                                <span class="eng-text font-bold">Simile</span> (<span class="terminology">সিমিলি: 'like' ব্যবহার করে ভালোবাসার ঘৃণাকে স্বর্গের ক্রোধের সাথে এবং নারীর আক্রোশকে নরকের সাথে তুলনা করা হয়েছে</span>) এবং <span class="eng-text font-bold">Hyperbole</span> (<span class="terminology">অতিরঞ্জন</span>)।
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-xl mb-1 text-[#4A044E]">3. "Love's but a frailty of the mind, When 'tis not with ambition joined."</p>
+                        <p class="text-black mb-2 text-lg">(ভালোবাসা মনের দুর্বলতা ছাড়া আর কিছু নয়, যদি না তার সাথে উচ্চাকাঙ্ক্ষা যুক্ত থাকে)</p>
+                        <div class="bg-white/80 p-2 rounded border border-fuchsia-100 mt-2">
+                            <p class="text-sm text-black"><strong>উৎস:</strong> <span class="eng-text">The Way of the World</span></p>
+                        </div>
+                    </div>
+
+                    <div class="quote-container !mb-0 border-l-[#4A044E]">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#4A044E]">4. "Beauty is the lover's gift."</p>
+                        <p class="text-black text-sm">(সৌন্দর্য হলো প্রেমিকের দেওয়া উপহার - অর্থাৎ প্রেমিক তার ভালোবাসার চোখ দিয়ে দেখলেই কেবল প্রিয়া সুন্দর হয়)</p>
+                        <p class="text-sm text-black border-t border-fuchsia-100 pt-1 mt-1"><strong>উৎস:</strong> <span class="eng-text">The Way of the World</span></p>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Section 5: At a Glance -->
+            <section class="bg-gradient-to-br from-[#4A044E] to-[#2E1065] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8 border-t-4 border-[#CA8A04]">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#701A75] pb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-[#CA8A04]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    </svg>
+                    একনজরে মনে রাখার মতো তথ্য
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start">
+                        <span class="text-[#CA8A04] mr-3 font-bold text-xl">✧</span> 
+                        <p>তিনি <span class="eng-text font-bold">Comedy of Manners</span>-এর শ্রেষ্ঠ লেখক।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#CA8A04] mr-3 font-bold text-xl">✧</span> 
+                        <p>তার মাস্টারপিস <span class="eng-text font-bold">The Way of the World</span>।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-[#CA8A04] mr-3 font-bold text-xl">✧</span> 
+                        <p><span class="eng-text font-bold">The Mourning Bride</span> তার রচিত একমাত্র ট্র্যাজেডি।</p>
+                    </div>
+                    <div class="flex items-start md:col-span-2">
+                        <span class="text-[#CA8A04] mr-3 font-bold text-xl">✧</span> 
+                        <p>বিখ্যাত উক্তি: "<span class="eng-text font-bold">Music has charms to soothe a savage breast.</span>"</p>
+                    </div>
+                    <div class="flex items-start md:col-span-2">
+                        <span class="text-[#CA8A04] mr-3 font-bold text-xl">✧</span> 
+                        <p>বিখ্যাত উক্তি: "<span class="eng-text font-bold">Hell has no fury like a woman scorned.</span>"</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            
+            <!-- Creator Badge (Center Aligned) -->
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+
+            <!-- QR Code Bottom-Right Corner -->
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.src='https://placehold.co/65x65/4A044E/FFF?text=QR'">
+            </a>
+        </footer>
+
+    </div>
+
+    <!-- Script to wrap Bangla numbers in a specific font -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            
+            // Find all text nodes containing Bangla numbers
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) {
+                        textNodes.push(n);
+                    }
+                }
+            }
+
+            // Replace text nodes, wrapping Bangla numbers in spans
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number';
+                        span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

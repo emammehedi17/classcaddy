@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note on Jean-Paul Sartre - Emam Mehedi</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts: Hind Siliguri for Bangla -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme: Existential Charcoal & Parisian Orange */
+        :root {
+            --primary-color: #27272A; /* Zinc 800 / Charcoal */
+            --secondary-color: #EA580C; /* Orange 600 / Parisian Orange */
+            --accent-color: #FFF7ED; /* Orange 50 */
+            --bg-color: #FAFAFA; /* Zinc 50 */
+            --card-bg: #FFFFFF;
+            --text-main: #000000; /* STRICTLY FULL BLACK */
+            --border-color: #E4E4E7; /* Zinc 200 */
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif; background-color: var(--bg-color);
+            color: var(--text-main); line-height: 1.6;
+            background-image: linear-gradient(135deg, #FAFAFA 0%, #F4F4F5 100%);
+        }
+
+        .eng-text { font-family: 'Times New Roman', Times, serif; font-size: 1.1em; }
+        .bn-number { font-family: 'Kalpurush', 'Times New Roman', serif; font-size: 1.05em; font-weight: 500; }
+
+        .theme-header {
+            background: linear-gradient(135deg, var(--primary-color), #09090B);
+            color: white; border-bottom: 6px solid var(--secondary-color);
+            position: relative; box-shadow: 0 4px 20px rgba(39, 39, 42, 0.3);
+        }
+
+        .section-heading {
+            color: var(--primary-color); border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 8px; margin-bottom: 1.5rem; font-weight: 700;
+            display: inline-block; position: relative; text-transform: uppercase;
+        }
+        
+        .section-heading::after {
+            content: '✒'; position: absolute; bottom: -15px; right: -30px;
+            color: var(--secondary-color); font-size: 1.5rem;
+        }
+
+        .content-card {
+            background-color: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            margin-bottom: 1.25rem; transition: all 0.3s ease; border-top: 3px solid transparent;
+        }
+        
+        .content-card:hover {
+            box-shadow: 0 8px 15px rgba(234, 88, 12, 0.1); border-top: 3px solid var(--secondary-color);
+        }
+
+        .masterpiece-card {
+            background-color: #FFF7ED; border: 1px solid #FDBA74; border-left: 5px solid var(--secondary-color);
+        }
+
+        .quote-container {
+            border-left: 5px solid var(--secondary-color); background: #F4F4F5;
+            padding: 15px 20px; border-radius: 0 10px 10px 0; margin-bottom: 1.2rem;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.04); border: 1px solid #E4E4E7; border-left: 5px solid var(--secondary-color);
+        }
+
+        .terminology {
+            background-color: #FEF08A; padding: 0 5px; border-radius: 4px;
+            font-weight: 500; color: #000000; border: 1px dashed #EA580C; font-size: 0.95em;
+        }
+
+        .qr-corner { position: absolute; bottom: 15px; right: 15px; width: 65px; height: 65px; background: white; padding: 4px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 10;}
+        .qr-corner img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+        .master-footer { background: #ffffff; border-top: 5px solid var(--primary-color); padding: 30px 20px; text-align: center; position: relative; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="p-3 md:p-6 lg:p-10">
+
+    <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative border border-zinc-200">
+        
+        <header class="theme-header p-8 text-center md:text-left flex flex-col relative">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">জাঁ-পল সার্ত্রে (<span class="eng-text">Jean-Paul Sartre</span>)</h1>
+            <p class="text-xl text-[#FDBA74] font-semibold mb-4 tracking-wide">জীবনকাল: <span class="eng-text">1905 - 1980</span></p>
+            
+            <p class="text-lg mb-6 text-zinc-50 text-justify">
+                জাঁ-পল সার্ত্রে (<span class="eng-text">Jean-Paul Sartre</span>) ছিলেন বিংশ শতাব্দীর একজন প্রখ্যাত ফরাসি দার্শনিক, নাট্যকার, ঔপন্যাসিক, চিত্রনাট্যকার এবং রাজনৈতিক কর্মী। তিনি মূলত অস্তিত্ববাদ (<span class="eng-text font-bold text-[#FDBA74]">Existentialism</span> - <span class="terminology">যে দার্শনিক মতবাদ মনে করে মানুষের জীবনের কোনো পূর্বনির্ধারিত অর্থ নেই, বরং মানুষ স্বাধীন ইচ্ছার মাধ্যমে নিজের অর্থ নিজে তৈরি করে</span>) নামক দার্শনিক মতবাদের জন্য বিশ্বব্যাপী পরিচিত। তিনি একজন কট্টর মার্কসবাদী ছিলেন এবং আধুনিক পশ্চিমা দর্শনের অন্যতম প্রধান ব্যক্তিত্ব হিসেবে গণ্য হন। ১৯৬৪ সালে তাকে সাহিত্যে নোবেল পুরস্কার দেওয়া হয়েছিল, কিন্তু তিনি তা প্রত্যাখ্যান করেন। তিনি বিশ্বাস করতেন যে কোনো লেখককে প্রাতিষ্ঠানিক পুরস্কার গ্রহণ করে নিজেকে 'প্রতিষ্ঠানে' পরিণত করা উচিত নয়।
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center sm:items-end justify-between mt-2 gap-6 sm:gap-4">
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="bg-white p-1 rounded-lg shadow-md hover:scale-110 transition-transform flex-shrink-0" style="width: 65px; height: 65px; z-index: 10;">
+                    <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/27272A/FFF?text=QR'">
+                </a>
+            </div>
+        </header>
+
+        <main class="p-6 md:p-10">
+            <!-- Section 1 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="content-card !mb-0 border-l-4 border-l-[#27272A]"><strong class="text-lg text-[#27272A]">পুরো নাম:</strong> <span class="eng-text">Jean-Paul Charles Aymard Sartre</span>।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#27272A]"><strong class="text-lg text-[#27272A]">জন্ম:</strong> ১৯০৫ সালের ২১ জুন, ফ্রান্সের প্যারিসে।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#27272A]"><strong class="text-lg text-[#27272A]">মৃত্যু:</strong> ১৫ এপ্রিল ১৯৮০ সালে প্যারিসে (<span class="terminology">ফুসফুসের জটিলতায়</span>)।</div>
+                    <div class="content-card !mb-0 border-l-4 border-l-[#27272A]"><strong class="text-lg text-[#27272A]">পেশা:</strong> দার্শনিক, লেখক এবং শিক্ষক।</div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#EA580C] bg-[#FFF7ED]">
+                        <strong class="text-lg text-[#EA580C]">সঙ্গিনী ও ব্যক্তিগত জীবন:</strong> বিখ্যাত ফরাসি নারীবাদী লেখিকা সিমোন দ্য বোভোয়ার (<span class="eng-text font-bold">Simone de Beauvoir</span>) ছিলেন তার আজীবনের সঙ্গী। তারা কখনো প্রথাগত বিয়ে করেননি, কিন্তু তাদের বুদ্ধিবৃত্তিক ও রোমান্টিক সম্পর্ক (Open relationship) ছিল কিংবদন্তিতুল্য। <span class="bg-white px-2 py-1 rounded text-sm mt-1 inline-block border border-orange-200"><strong class="text-[#27272A]">* বিসিএস অতিরিক্ত:</strong> তিনি ১৯৬৮ সালে ফ্রান্সে ছাত্রদের বিখ্যাত মে বিপ্লবে (May 68) সক্রিয় ভূমিকা পালন করেছিলেন।</span>
+                    </div>
+                    <div class="content-card !mb-0 md:col-span-2 border-l-4 border-l-[#27272A]"><strong class="text-lg text-[#27272A]">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The Modern Period (1901-1939) & Post-modernist era</span>।</div>
+                </div>
+            </section>
+
+            <!-- Section 2 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="content-card bg-white border-t-4 border-t-[#27272A]">
+                    <ul class="space-y-4 text-lg">
+                        <li class="flex items-start">
+                            <span class="text-[#EA580C] text-2xl mr-3 leading-none">✒</span>
+                            <span><strong class="eng-text text-[#27272A]">Father of Modern Existentialism:</strong> তাকে আধুনিক অস্তিত্ববাদের জনক বা অন্যতম প্রধান প্রবক্তা বলা হয়।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[#EA580C] text-2xl mr-3 leading-none">✒</span>
+                            <span><strong class="eng-text text-[#27272A]">Nobel Prize Refusal:</strong> তিনি ১৯৬৪ সালে সাহিত্যে নোবেল পুরস্কার প্রত্যাখ্যানকারী প্রথম ব্যক্তি (স্বেচ্ছায়)।</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৩. সাহিত্যকর্ম ও দর্শন (<span class="eng-text">Literary Works & Philosophy</span>)</h2>
+                <p class="mb-4 text-lg text-black">সার্ত্রে তার লেখায় মানুষের অস্তিত্ব, স্বাধীনতা এবং দায়িত্ববোধ নিয়ে গভীর আলোচনা করেছেন।</p>
+                <div class="space-y-6">
+                    <div class="content-card masterpiece-card relative overflow-hidden shadow-md">
+                        <div class="absolute top-0 right-0 bg-[#FFEDD5] text-[#EA580C] px-4 py-1 rounded-bl-xl font-bold border-l border-b border-[#FDBA74]">Famous Novel</div>
+                        <h3 class="text-2xl font-bold text-[#27272A] mb-3">ক. নসিয়া (<span class="eng-text">Nausea / La Nausée - 1938</span>) ***</h3>
+                        <p class="text-black font-semibold mb-2">এটি তার প্রথম এবং অন্যতম বিখ্যাত উপন্যাস।</p>
+                        <ul class="list-disc list-inside space-y-2 text-black">
+                            <li><strong class="text-[#27272A]">বিষয়বস্তু:</strong> আঁতোয়ান রোকেঁতা (<span class="eng-text">Antoine Roquentin</span>) নামের এক ঐতিহাসিকের ডায়েরির আকারে এটি লেখা। সে তার অস্তিত্বের অর্থহীনতা অনুভব করে এক ধরণের শারীরিক ও মানসিক বমিভাব বা '<span class="eng-text font-bold text-[#EA580C]">Nausea</span>' অনুভব করে। সে বুঝতে পারে যে জড়বস্তু বা প্রকৃতির নিজস্ব কোনো অর্থ নেই, মানুষকেই তার জীবনের অর্থ তৈরি করে নিতে হয়।</li>
+                            <li class="list-none bg-white p-2 rounded border border-orange-200 mt-2"><strong class="text-[#27272A]"><span class="eng-text">Theme</span>:</strong> অস্তিত্বের সংকট (<span class="eng-text font-bold">Existential Crisis</span>) এবং অর্থহীনতা (<span class="eng-text font-bold">Absurdity</span> - <span class="terminology">পৃথিবী ও মানুষের জীবনের অন্তর্নিহিত কোনো অর্থ বা উদ্দেশ্য না থাকা</span>)।</li>
+                        </ul>
+                    </div>
+
+                    <div class="content-card border-t-4 border-t-[#27272A]">
+                        <h3 class="text-xl font-bold text-[#27272A] mb-3">খ. বিয়িং অ্যান্ড নাথিংনেস (<span class="eng-text">Being and Nothingness - 1943</span>)</h3>
+                        <p class="text-black mb-2">এটি তার রচিত প্রধান দার্শনিক গ্রন্থ।</p>
+                        <ul class="list-none space-y-3 text-black">
+                            <li class="bg-zinc-50 p-3 rounded border border-zinc-200">
+                                <strong class="text-[#27272A]">মূল দর্শন:</strong> <span class="eng-text font-bold text-[#EA580C]">"Existence precedes essence."</span> (সত্তার আগে অস্তিত্ব)। অর্থাৎ, মানুষের কোনো পূর্বনির্ধারিত উদ্দেশ্য বা প্রকৃতি নেই। মানুষ আগে জন্মগ্রহণ করে (অস্তিত্ব লাভ করে), তারপর নিজের কর্ম ও পছন্দের মাধ্যমে নিজের পরিচয় (সত্তা) তৈরি করে।
+                            </li>
+                            <li class="bg-zinc-50 p-3 rounded border border-zinc-200">
+                                <strong class="eng-text text-[#EA580C]">Bad Faith (Mauvaise Foi):</strong> মানুষ যখন নিজের স্বাধীন সত্তাকে অস্বীকার করে সমাজের চাপিয়ে দেওয়া ভূমিকায় অভিনয় করে, তখন তাকে '<span class="eng-text font-bold">Bad Faith</span>' বা আত্মপ্রবঞ্চনা বলা হয়।
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="content-card border-t-4 border-t-[#EA580C] bg-[#FFF7ED]">
+                        <h3 class="text-xl font-bold text-[#27272A] mb-3">গ. নো এক্সিট (<span class="eng-text">No Exit / Huis Clos - 1944</span>) ***</h3>
+                        <p class="text-black mb-2">এটি একটি বিখ্যাত অস্তিত্ববাদী নাটক (<span class="eng-text font-bold">Existentialist Play</span>)।</p>
+                        <ul class="list-disc list-inside space-y-2 text-black">
+                            <li><strong class="text-[#27272A]">কাহিনী:</strong> গারসিন, ইনেজ এবং এস্টেল—এই তিনজন মৃত ব্যক্তি একটি বদ্ধ ঘরে (নরকে) আটকা পড়ে। তারা আশা করেছিল নরকে আগুন বা কোনো জল্লাদ থাকবে, কিন্তু তারা দেখে তাদের একে অপরের উপস্থিতিই সবচেয়ে বড় যন্ত্রণা।</li>
+                            <li class="list-none bg-white p-3 rounded border border-orange-200 mt-2">
+                                <strong class="text-[#27272A]">বিখ্যাত উক্তি:</strong> <span class="eng-text font-bold">"Hell is other people."</span> (নরক হলো অন্যেরা)। অর্থাৎ, অন্যের বিচার বা দৃষ্টির মাধ্যমেই আমরা নিজেদের বিচার করি, যা আমাদের স্বাধীন সত্তার জন্য যন্ত্রণাদায়ক।
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="content-card border-l-4 border-l-[#27272A]">
+                        <h3 class="text-xl font-bold text-[#27272A] mb-3">ঘ. অন্যান্য রচনা</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-black">
+                            <div class="bg-zinc-50 p-3 rounded">
+                                <strong class="eng-text text-lg text-[#27272A]">The Flies (Les Mouches):</strong> গ্রিক মিথলজির ওরেস্টেস কাহিনীর আধুনিক রূপান্তর নিয়ে লেখা নাটক।
+                            </div>
+                            <div class="bg-zinc-50 p-3 rounded">
+                                <strong class="eng-text text-lg text-[#27272A]">The Wall (Le Mur):</strong> বিখ্যাত ছোটগল্প সংকলন।
+                            </div>
+                            <div class="bg-zinc-50 p-3 rounded">
+                                <strong class="eng-text text-lg text-[#27272A]">The Roads to Freedom:</strong> এটি একটি উপন্যাস ট্রিলজি (The Age of Reason, The Reprieve, Troubled Sleep)।
+                            </div>
+                            <div class="bg-zinc-50 p-3 rounded">
+                                <strong class="eng-text text-lg text-[#27272A]">The Words (Les Mots):</strong> এটি তার লেখা আত্মজীবনীমূলক গ্রন্থ।
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4 -->
+            <section class="mb-12">
+                <h2 class="text-2xl section-heading">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>) ও সাহিত্যিক অলঙ্কার</h2>
+                <div class="grid grid-cols-1 gap-4 mt-4">
+                    <div class="quote-container border-l-[6px] border-l-[#EA580C]">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#27272A]">1. "Man is condemned to be free."</p>
+                        <p class="text-black mb-1">(মানুষ স্বাধীন হতে দণ্ডপ্রাপ্ত বা বাধ্য)</p>
+                        <p class="text-sm text-black"><strong><span class="eng-text">Device:</span></strong> <span class="eng-text font-bold">Paradox</span> (<span class="terminology">স্বাধীনতা সাধারণত আশীর্বাদ, কিন্তু এখানে একে 'দণ্ড' বা Condemned বলা হয়েছে। কারণ স্বাধীনতার সাথে সাথে বিশাল দায়িত্বও আসে, যা মানুষ এড়াতে পারে না</span>)।</p>
+                    </div>
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#27272A]">2. "Hell is other people."</p>
+                        <p class="text-black mb-1">(নরক হলো অন্যেরা - <span class="eng-text">No Exit</span>)</p>
+                        <p class="text-sm text-black"><strong><span class="eng-text">Device:</span></strong> <span class="eng-text font-bold">Metaphor</span> (<span class="terminology">অন্য মানুষের উপস্থিতি বা তাদের নেতিবাচক বিচারকে নরকের সাথে তুলনা করা হয়েছে</span>)।</p>
+                    </div>
+                    <div class="quote-container border-l-[6px] border-l-[#EA580C]">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#27272A]">3. "Existence precedes essence."</p>
+                        <p class="text-black mb-1">(সত্তার আগে অস্তিত্ব)</p>
+                        <p class="text-sm text-black font-bold text-[#EA580C]">এটি অস্তিত্ববাদ বা Existentialism-এর মূল মন্ত্র বা স্লোগান।</p>
+                    </div>
+                    <div class="quote-container">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#27272A]">4. "If you are lonely when you're alone, you are in bad company."</p>
+                        <p class="text-black mb-1">(যদি তুমি একা থাকার সময় একাকীত্ব বোধ করো, তবে তুমি খারাপ সঙ্গের সাথে আছ - অর্থাৎ তুমি নিজেই নিজের ভালো বন্ধু নও)</p>
+                        <p class="text-sm text-black"><strong><span class="eng-text">Device:</span></strong> <span class="eng-text font-bold">Epigram</span> (<span class="terminology">সংক্ষিপ্ত, চতুর এবং স্মরণীয় উক্তি</span>)।</p>
+                    </div>
+                    <div class="quote-container !mb-0 border-l-[#27272A]">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#27272A]">5. "Life begins on the other side of despair."</p>
+                        <p class="text-black text-sm">(হতাশার অপর প্রান্তেই জীবনের শুরু)</p>
+                    </div>
+                    <div class="quote-container !mb-0 border-l-[#27272A]">
+                        <p class="eng-text font-bold text-lg mb-1 text-[#27272A]">6. "We are our choices."</p>
+                        <p class="text-black text-sm">(আমরা আমাদের পছন্দের সমষ্টি)</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5 -->
+            <section class="bg-gradient-to-br from-[#27272A] to-[#09090B] text-white p-6 md:p-8 rounded-xl shadow-xl mt-8 border-t-4 border-[#EA580C]">
+                <h2 class="text-2xl font-bold mb-6 border-b border-[#3F3F46] pb-3">একনজরে মনে রাখার মতো তথ্য</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-lg">
+                    <div class="flex items-start"><span class="text-[#EA580C] mr-3 font-bold text-xl">✒</span><p>তিনি <span class="eng-text font-bold">Existentialism</span> বা আধুনিক অস্তিত্ববাদের জনক।</p></div>
+                    <div class="flex items-start"><span class="text-[#EA580C] mr-3 font-bold text-xl">✒</span><p>তিনি ১৯৬৪ সালে <span class="eng-text font-bold">Nobel Prize</span> স্বেচ্ছায় প্রত্যাখ্যান করেন।</p></div>
+                    <div class="flex items-start"><span class="text-[#EA580C] mr-3 font-bold text-xl">✒</span><p>তার বিখ্যাত উপন্যাস <span class="eng-text font-bold">Nausea</span>।</p></div>
+                    <div class="flex items-start"><span class="text-[#EA580C] mr-3 font-bold text-xl">✒</span><p>তার বিখ্যাত নাটক <span class="eng-text font-bold">No Exit</span>।</p></div>
+                    <div class="flex items-start md:col-span-2"><span class="text-[#EA580C] mr-3 font-bold text-xl">✒</span><p>বিখ্যাত উক্তি: "<span class="eng-text font-bold">Hell is other people.</span>"</p></div>
+                    <div class="flex items-start md:col-span-2"><span class="text-[#EA580C] mr-3 font-bold text-xl">✒</span><p>বিখ্যাত উক্তি: "<span class="eng-text font-bold">Man is condemned to be free.</span>"</p></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="master-footer">
+            <p style="margin-bottom: 5px; color: #000000; font-weight: 500;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ১০ জুন, ২০২৬</p>
+            <div class="footer-creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" onerror="this.src='https://placehold.co/65x65/27272A/FFF?text=QR'">
+            </a>
+        </footer>
+    </div>
+
+    <!-- Script for Bangla Numbers -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            const textNodes = [];
+            let n;
+            while(n = walk.nextNode()) {
+                if(n.parentElement && !['SCRIPT', 'STYLE'].includes(n.parentElement.tagName)) {
+                    if (/[০-৯]/.test(n.nodeValue)) { textNodes.push(n); }
+                }
+            }
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([০-৯]+)/);
+                parts.forEach(part => {
+                    if (/[০-৯]+/.test(part)) {
+                        const span = document.createElement('span');
+                        span.className = 'bn-number'; span.textContent = part;
+                        fragment.appendChild(span);
+                    } else if (part.length > 0) {
+                        fragment.appendChild(document.createTextNode(part));
+                    }
+                });
+                node.parentNode.replaceChild(fragment, node);
+            });
+        });
+    </script>
+</body>
+</html>

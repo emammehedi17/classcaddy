@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>W.B. Yeats - BCS Preparation Note</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts: Hind Siliguri for Bangla -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Theme Configuration: Irish Emerald & Celtic Gold */
+        :root {
+            --primary-color: #064E3B; /* Emerald Green */
+            --secondary-color: #D97706; /* Amber / Celtic Gold */
+            --bg-color: #F0FDF4; /* Very Light Mint Green */
+            --card-bg: #FFFFFF;
+            --text-main: #000000; /* Strictly Full Black */
+            --accent-light: #D1FAE5;
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        /* English Font Class */
+        .eng-text {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 1.1em;
+        }
+
+        /* Custom Styles for Design Elements */
+        .emerald-header {
+            background: linear-gradient(135deg, var(--primary-color), #022c22);
+            color: white;
+            border-bottom: 6px solid var(--secondary-color);
+            position: relative;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            border-left: 5px solid var(--secondary-color);
+            padding-left: 10px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .data-card {
+            background-color: var(--card-bg);
+            border: 1px solid #e5e7eb;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+            color: var(--text-main);
+        }
+
+        .data-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .poem-box {
+            background-color: #f8fafc;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .quote-box {
+            background: var(--accent-light);
+            border-radius: 10px;
+            padding: 1.5rem;
+            position: relative;
+            color: var(--text-main);
+            border: 1px dashed var(--primary-color);
+        }
+
+        .quote-icon {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: var(--secondary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        /* Badge and Footer Specifics */
+        .qr-corner {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            width: 60px;
+            height: 60px;
+            background: white;
+            padding: 4px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        .qr-corner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .master-footer {
+            background: #ffffff;
+            border-top: 4px solid var(--primary-color);
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        
+        .terminology {
+            color: #000000;
+            background-color: #fef3c7; /* light amber */
+            padding: 0 4px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden relative">
+        
+        <!-- Header -->
+        <header class="emerald-header p-8 text-center md:text-left flex flex-col md:flex-row items-center md:items-start justify-between">
+            <div class="md:w-3/4">
+                <h1 class="text-4xl md:text-5xl font-bold mb-2">ডব্লিউ. বি. ইয়েটস (<span class="eng-text">W.B. Yeats</span>)</h1>
+                <p class="text-xl text-amber-500 font-semibold mb-4">জীবনকাল: <span class="eng-text">1865 - 1939</span></p>
+                
+                <p class="text-lg mb-6 text-white text-justify md:pr-4" style="color: #ffffff;">
+                    উইলিয়াম বাটলার ইয়েটস (<span class="eng-text">William Butler Yeats</span>) ইংরেজি সাহিত্যের আধুনিক যুগের (<span class="eng-text">Modern Period</span> - <span class="terminology">বিংশ শতাব্দীর শুরু থেকে দ্বিতীয় বিশ্বযুদ্ধ পর্যন্ত সময়কাল, যখন প্রথাগত নিয়ম ভেঙে সাহিত্যে নতুন আঙ্গিক ও জটিলতা তৈরি হয়</span>) অন্যতম শ্রেষ্ঠ এবং প্রভাবশালী আইরিশ (<span class="eng-text">Irish</span>) কবি। তিনি একই সাথে আয়ারল্যান্ডের জাতীয় কবি। ১৯১৩ সালে রবীন্দ্রনাথ ঠাকুরকে নোবেল পুরস্কার পেতে তিনি অসামান্য সাহায্য করেছিলেন; তিনি <span class="eng-text">Gitanjali</span>-র ইংরেজি অনুবাদের ভূমিকা (<span class="eng-text">Introduction</span>) লিখে দিয়েছিলেন।
+                </p>
+
+                <!-- Creator Badge (Top) -->
+                <div class="creator-wrapper">
+                    <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-light); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <span style="color: var(--primary-color);">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: var(--primary-color); text-decoration: none;">ইমাম মেহেদি</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- QR Code (Top) -->
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner md:top-8 md:right-8" style="top: 15px; bottom: auto;">
+                <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.src='https://placehold.co/60x60/064E3B/FFF?text=QR'">
+            </a>
+        </header>
+
+        <!-- Main Content -->
+        <main class="p-6 md:p-10 space-y-10">
+
+            <!-- Section 1: Biography -->
+            <section>
+                <h2 class="text-2xl font-bold section-title">১. ব্যক্তিগত পরিচিতি ও জীবনী</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="data-card">
+                        <strong class="text-[#064E3B] text-lg">পুরো নাম:</strong> <span class="eng-text">William Butler Yeats</span>.
+                    </div>
+                    <div class="data-card">
+                        <strong class="text-[#064E3B] text-lg">জন্ম ও মৃত্যু:</strong> জন্ম ১৮৬৫ সালে আয়ারল্যান্ডের ডাবলিনে (<span class="eng-text">Dublin, Ireland</span>)। মৃত্যু ১৯৩৯ সালে (ফ্রান্সে, পরে আয়ারল্যান্ডে সমাহিত করা হয়)।
+                    </div>
+                    <div class="data-card">
+                        <strong class="text-[#064E3B] text-lg">পেশা:</strong> কবি, নাট্যকার এবং রাজনীতিবিদ (তিনি আইরিশ সিনেটের সদস্য বা <span class="terminology">আইনপ্রণেতা</span> ছিলেন)। তার জাতীয়তা আইরিশ (<span class="eng-text">Irish</span>)।
+                    </div>
+                    <div class="data-card">
+                        <strong class="text-[#064E3B] text-lg">যুগ (<span class="eng-text">Age</span>):</strong> <span class="eng-text">The Modern Period</span> (১৯০১-১৯৩৯) এবং <span class="eng-text">Post-modernist</span>।
+                    </div>
+                    <div class="data-card md:col-span-2">
+                        <strong class="text-[#064E3B] text-lg">প্রেম ও ব্যর্থতা:</strong> তিনি আইরিশ বিপ্লবী নারী মড গান (<span class="eng-text">Maud Gonne</span>)-কে গভীরভাবে ভালোবাসতেন এবং একাধিকবার বিয়ের প্রস্তাব দিয়ে প্রত্যাখ্যাত হন। এই ব্যর্থ প্রেমের বেদনা ও মড গানের বিপ্লবী সত্তা তার অনেক বিখ্যাত কবিতার প্রধান উৎস।
+                    </div>
+                    <div class="data-card md:col-span-2 bg-green-50">
+                        <strong class="text-[#064E3B] text-lg">রবীন্দ্রনাথের সাথে সম্পর্ক:</strong> ১৯১২ সালে লন্ডনে রবীন্দ্রনাথ ঠাকুরের সাথে তার সাক্ষাৎ হয়। তিনি <span class="eng-text">Gitanjali</span>-র ইংরেজি অনুবাদ <span class="eng-text">Song Offerings</span>-এর ভূমিকা (<span class="eng-text">Introduction</span>) লিখে দেন, যা পাশ্চাত্যে রবীন্দ্রনাথকে পরিচিত করতে সাহায্য করে।
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Titles -->
+            <section>
+                <h2 class="text-2xl font-bold section-title">২. উপাধি ও সম্মাননা (<span class="eng-text">Titles</span>)</h2>
+                <div class="bg-white border border-green-200 rounded-lg p-6 shadow-sm">
+                    <ul class="space-y-4 text-lg">
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-amber-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span><strong class="eng-text text-[#064E3B]">National Poet of Ireland:</strong> আয়ারল্যান্ডের জাতীয় কবি।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-amber-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span><strong class="eng-text text-[#064E3B]">Poet of Celtic Twilight:</strong> সেল্টিক লোকগাঁথা ও রহস্যময়তার কবি (<span class="terminology">Celtic Twilight বলতে প্রাচীন আইরিশ রূপকথা, লোককথা ও রহস্যময় ঐতিহ্য নিয়ে আইরিশ সাহিত্যের পুনর্জাগরণকে বোঝায়</span>)।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-amber-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span><strong class="eng-text text-[#064E3B]">Representative Poet of Modern Age:</strong> আধুনিক যুগের প্রতিনিধিত্বকারী কবি।</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="h-6 w-6 text-amber-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                            <span><strong class="eng-text text-[#064E3B]">Nobel Prize:</strong> ১৯২৩ সালে তিনি সাহিত্যে নোবেল পুরস্কার লাভ করেন।</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3: Literary Works -->
+            <section>
+                <h2 class="text-2xl font-bold section-title">৩. সাহিত্যকর্ম (<span class="eng-text">Literary Works</span>)</h2>
+                <p class="mb-5 text-lg font-medium">তার কবিতায় আইরিশ লোকগাঁথা, দেশপ্রেম, আধ্যাত্মিকতা এবং আধুনিক সভ্যতার সংকট গভীরভাবে ফুটে উঠেছে।</p>
+
+                <!-- Sub-section: Poems -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-[#064E3B] mb-4 border-b-2 border-amber-500 inline-block">ক. বিখ্যাত কবিতা (<span class="eng-text">Famous Poems</span>)</h3>
+                    
+                    <div class="space-y-4">
+                        <!-- Poem 1 -->
+                        <div class="poem-box p-5">
+                            <h4 class="text-lg font-bold mb-2">১. <span class="eng-text">The Lake Isle of Innisfree</span></h4>
+                            <p><strong>বিষয়বস্তু:</strong> এটি তার অন্যতম জনপ্রিয় লিরিক কবিতা (<span class="eng-text">Lyric</span> - <span class="terminology">ব্যক্তিগত আবেগ ও অনুভূতি মিশ্রিত ছোট গীতি কবিতা</span>)। শহরের যান্ত্রিক কোলাহল থেকে মুক্তি পেতে কবি নির্জন দ্বীপ '<span class="eng-text">Innisfree</span>'-তে গিয়ে শান্তি খুঁজে পেতে চান।</p>
+                            <div class="mt-2 pl-4 border-l-2 border-gray-300">
+                                <p><strong>বিখ্যাত লাইন:</strong> <span class="eng-text">"I will arise and go now, and go to Innisfree."</span> (আমি এখনই উঠব এবং ইন্নিসফ্রিতে যাব)। এখানে বাইবেলের একটি লাইনের <span class="eng-text font-bold">Allusion</span> (<span class="terminology">অ্যাল্যুশন - অন্য কোনো বিখ্যাত সাহিত্য বা ঘটনার পরোক্ষ উল্লেখ</span>) রয়েছে।</p>
+                                <p><strong><span class="eng-text">Literary Device:</span></strong> <span class="eng-text font-bold">Alliteration</span> (<span class="terminology">অ্যালিটারেশন - একই ব্যঞ্জনবর্ণের বা ধ্বনির পুনরাবৃত্তি</span>)। উদাহরণ: "<span class="eng-text">I hear <span class="text-green-700 font-bold">l</span>ake water <span class="text-green-700 font-bold">l</span>apping with <span class="text-green-700 font-bold">l</span>ow sounds...</span>"</p>
+                            </div>
+                        </div>
+
+                        <!-- Poem 2 -->
+                        <div class="poem-box p-5">
+                            <h4 class="text-lg font-bold mb-2">২. <span class="eng-text">The Second Coming</span></h4>
+                            <p><strong>বিষয়বস্তু:</strong> প্রথম বিশ্বযুদ্ধ পরবর্তী আধুনিক সভ্যতার পতন এবং এক অরাজক ভবিষ্যতের ভীতিপ্রদ ভবিষ্যদ্বাণী। কবি মনে করেন, ইতিহাসের চাকা বা <span class="eng-text font-bold">Gyre</span> (<span class="terminology">গাইর - ইতিহাসের ঘূর্ণায়মান চক্র বা সর্পিল গতি</span>) ঘুরে আবার নতুন এক বর্বর যুগ বা '<span class="eng-text">Second Coming</span>' আসছে।</p>
+                            <div class="mt-2 pl-4 border-l-2 border-gray-300">
+                                <p><strong>বিখ্যাত উক্তি:</strong></p>
+                                <ul class="list-disc list-inside ml-2">
+                                    <li><span class="eng-text">"Things fall apart; the centre cannot hold."</span> (সবকিছু ভেঙে পড়ছে; কেন্দ্র আর ধরে রাখতে পারছে না - এটি বিশৃঙ্খলার একটি <span class="eng-text font-bold">Metaphor</span> বা <span class="terminology">রূপক, যেখানে দুটি ভিন্ন জিনিসের সরাসরি তুলনা করা হয়</span>)।</li>
+                                    <li><span class="eng-text">"The best lack all conviction, while the worst / Are full of passionate intensity."</span> (ভালো মানুষদের কোনো দৃঢ় বিশ্বাস নেই, আর খারাপরা তীব্র আবেগে মত্ত)।</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Poem 3 -->
+                        <div class="poem-box p-5">
+                            <h4 class="text-lg font-bold mb-2">৩. <span class="eng-text">Sailing to Byzantium</span></h4>
+                            <p><strong>বিষয়বস্তু:</strong> বার্ধক্য এবং শিল্পের অমরত্ব। কবি আয়ারল্যান্ড ছেড়ে বাইজান্টিয়াম (<span class="eng-text">Byzantium</span> - <span class="terminology">প্রাচীন গ্রিক শহর যা বর্তমানে ইস্তাম্বুল, এটি কাব্যে শিল্পকলার অমর প্রতীক হিসেবে ব্যবহৃত</span>) শহরে যেতে চান, যেখানে শিল্পকলা অমর।</p>
+                            <div class="mt-2 pl-4 border-l-2 border-gray-300">
+                                <p><strong>বিখ্যাত উক্তি:</strong></p>
+                                <ul class="list-disc list-inside ml-2">
+                                    <li><span class="eng-text">"That is no country for old men."</span> (ওটা বৃদ্ধদের জন্য কোনো দেশ নয়)।</li>
+                                    <li><span class="eng-text">"An aged man is but a paltry thing, / A tattered coat upon a stick."</span> (একজন বৃদ্ধ মানুষ তুচ্ছ ছাড়া কিছু নয়, যেন লাঠিতে ঝোলানো ছেঁড়া কোট - এটি একটি <span class="eng-text font-bold">Metaphor</span>)।</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Poem 4 -->
+                        <div class="poem-box p-5">
+                            <h4 class="text-lg font-bold mb-2">৪. <span class="eng-text">Easter 1916</span></h4>
+                            <p><strong>বিষয়বস্তু:</strong> ১৯১৬ সালের ইস্টার বিদ্রোহে (<span class="eng-text">Easter Rising</span> - <span class="terminology">ব্রিটিশ শাসনের বিরুদ্ধে আইরিশদের সশস্ত্র বিদ্রোহ</span>) আইরিশ বিপ্লবীদের আত্মত্যাগ এবং তাদের মৃত্যুতে সাধারণ মানুষ থেকে শহীদে রূপান্তরের কাহিনী।</p>
+                            <div class="mt-2 pl-4 border-l-2 border-gray-300">
+                                <p><strong>বিখ্যাত উক্তি:</strong> <span class="eng-text">"All changed, changed utterly: / A terrible beauty is born."</span> (সব বদলে গেছে... এক ভয়ঙ্কর সুন্দর জন্ম নিয়েছে)।</p>
+                                <p><strong><span class="eng-text">Literary Device:</span></strong> <span class="eng-text font-bold">Oxymoron</span> (<span class="terminology">অক্সিমোরন বা বিরোধালঙ্কার - যেখানে 'Terrible' বা ভয়ঙ্কর এবং 'Beauty' বা সুন্দর, এমন দুটি বিপরীত অর্থের শব্দ পাশাপাশি বসে নতুন অর্থ তৈরি করে</span>)।</p>
+                            </div>
+                        </div>
+
+                        <!-- Other Poems Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                            <div class="data-card p-4 border-t-0 border-l-4 border-[#064E3B]">
+                                <h4 class="font-bold mb-1">৫. <span class="eng-text">No Second Troy</span></h4>
+                                <p class="text-sm">প্রেমিকা মড গান-এর বিপ্লবী সত্তার কারণে ধ্বংসের আশঙ্কায় লেখা। কবি তাকে গ্রিক পুরাণের হেলেন অফ ট্রয়ের (<span class="eng-text">Helen of Troy</span>) সাথে তুলনা করেছেন।</p>
+                            </div>
+                            <div class="data-card p-4 border-t-0 border-l-4 border-[#064E3B]">
+                                <h4 class="font-bold mb-1">৬. <span class="eng-text">A Prayer for My Daughter</span></h4>
+                                <p class="text-sm">মেয়ে অ্যানির (<span class="eng-text">Anne</span>) ভবিষ্যৎ মঙ্গলের জন্য ঈশ্বরের কাছে প্রার্থনা। তিনি চান তার মেয়ে সুন্দরী হোক, কিন্তু তা যেন ধ্বংসাত্মক না হয়।</p>
+                            </div>
+                            <div class="data-card p-4 border-t-0 border-l-4 border-[#064E3B]">
+                                <h4 class="font-bold mb-1">৭. <span class="eng-text">Leda and the Swan</span></h4>
+                                <p class="text-sm">গ্রিক মিথলজি (<span class="eng-text">Greek Mythology</span> - <span class="terminology">গ্রিক পুরাণ</span>) নির্ভর কবিতা। দেবরাজ জিউস (<span class="eng-text">Zeus</span>) রাজহাঁসের রূপ ধরে লেডাকে ধর্ষণ করার কাহিনী।</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub-section: Poetry Collections & Drama -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-amber-50 p-5 rounded-lg border border-amber-200">
+                        <h3 class="text-xl font-bold text-[#064E3B] mb-2 border-b border-amber-300 pb-1">খ. কাব্যগ্রন্থ (<span class="eng-text">Poetry Collections</span>)</h3>
+                        <ul class="list-disc list-inside space-y-1 eng-text text-black">
+                            <li>The Tower</li>
+                            <li>The Winding Stair</li>
+                            <li>The Green Helmet</li>
+                            <li>The Wild Swans at Coole <span class="text-sm text-red-600 font-sans">(অতিরিক্ত তথ্য)</span></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-amber-50 p-5 rounded-lg border border-amber-200">
+                        <h3 class="text-xl font-bold text-[#064E3B] mb-2 border-b border-amber-300 pb-1">গ. নাটক (<span class="eng-text">Dramas / Plays</span>) *</h3>
+                        <p class="text-sm mb-2 font-medium text-black">তিনি আইরিশ নাট্য আন্দোলনের অন্যতম পথিকৃৎ এবং ডাবলিনে বিখ্যাত <span class="eng-text font-bold">Abbey Theatre</span> প্রতিষ্ঠা করেন।</p>
+                        <ul class="list-disc list-inside space-y-1 eng-text text-black">
+                            <li>Cathleen ni Houlihan</li>
+                            <li>The Countess Cathleen</li>
+                            <li>The Land of Heart's Desire</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Quotes -->
+            <section>
+                <h2 class="text-2xl font-bold section-title">৪. বিখ্যাত উক্তি (<span class="eng-text">Famous Quotes</span>)</h2>
+                <p class="mb-4 text-lg">বিসিএস ও অন্যান্য পরীক্ষার জন্য অত্যন্ত গুরুত্বপূর্ণ উক্তিগুলো নিচে দেওয়া হলো:</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div class="quote-box">
+                        <div class="quote-icon">"</div>
+                        <p class="eng-text text-lg font-bold mb-1">"I will arise and go now, and go to Innisfree."</p>
+                        <p class="text-sm mb-2">(আমি এখনই উঠব এবং ইন্নিসফ্রিতে যাব)</p>
+                        <p class="text-sm font-bold text-[#064E3B] border-t border-gray-300 pt-2">উৎস: <span class="eng-text font-normal">The Lake Isle of Innisfree</span></p>
+                    </div>
+
+                    <div class="quote-box">
+                        <div class="quote-icon">"</div>
+                        <p class="eng-text text-lg font-bold mb-1">"Things fall apart; the centre cannot hold."</p>
+                        <p class="text-sm mb-2">(সবকিছু ভেঙে চুরে যাচ্ছে, কেন্দ্র আর ধরে রাখতে পারছে না)</p>
+                        <p class="text-sm font-bold text-[#064E3B] border-t border-gray-300 pt-2">উৎস: <span class="eng-text font-normal">The Second Coming</span></p>
+                    </div>
+
+                    <div class="quote-box">
+                        <div class="quote-icon">"</div>
+                        <p class="eng-text text-lg font-bold mb-1">"A terrible beauty is born."</p>
+                        <p class="text-sm mb-2">(এক ভয়ঙ্কর সুন্দরের জন্ম হয়েছে)</p>
+                        <p class="text-sm font-bold text-[#064E3B] border-t border-gray-300 pt-2">উৎস: <span class="eng-text font-normal">Easter 1916</span> | অলঙ্কার: <span class="eng-text font-normal">Oxymoron</span></p>
+                    </div>
+
+                    <div class="quote-box">
+                        <div class="quote-icon">"</div>
+                        <p class="eng-text text-lg font-bold mb-1">"That is no country for old men."</p>
+                        <p class="text-sm mb-2">(ওটা বৃদ্ধদের দেশ নয়)</p>
+                        <p class="text-sm font-bold text-[#064E3B] border-t border-gray-300 pt-2">উৎস: <span class="eng-text font-normal">Sailing to Byzantium</span></p>
+                    </div>
+
+                    <div class="quote-box">
+                        <div class="quote-icon">"</div>
+                        <p class="eng-text text-lg font-bold mb-1">"An aged man is but a paltry thing, A tattered coat upon a stick."</p>
+                        <p class="text-sm mb-2">(বৃদ্ধ মানুষ লাঠিতে ঝোলানো ছেঁড়া কোটের মতো তুচ্ছ)</p>
+                        <p class="text-sm font-bold text-[#064E3B] border-t border-gray-300 pt-2">উৎস: <span class="eng-text font-normal">Sailing to Byzantium</span> | অলঙ্কার: <span class="eng-text font-normal">Metaphor</span></p>
+                    </div>
+
+                    <div class="quote-box">
+                        <div class="quote-icon">"</div>
+                        <p class="eng-text text-lg font-bold mb-1">"How can we know the dancer from the dance?"</p>
+                        <p class="text-sm mb-2">(নাচ থেকে নাচিয়ে কে কীভাবে আলাদা করব?)</p>
+                        <p class="text-sm font-bold text-[#064E3B] border-t border-gray-300 pt-2">উৎস: <span class="eng-text font-normal">Among School Children</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: At a Glance -->
+            <section class="bg-[#064E3B] text-white p-6 rounded-xl mt-8 shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 border-b border-amber-500 pb-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    একনজরে মনে রাখার মতো তথ্য
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                    <div class="flex items-start">
+                        <span class="text-amber-500 mr-2 text-xl font-bold">✓</span> 
+                        <p>তিনি আয়ারল্যান্ডের <span class="eng-text">National Poet</span>।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-amber-500 mr-2 text-xl font-bold">✓</span> 
+                        <p>তিনি ১৯২৩ সালে সাহিত্যে <span class="eng-text">Nobel Prize</span> পান।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-amber-500 mr-2 text-xl font-bold">✓</span> 
+                        <p>তিনি রবীন্দ্রনাথের <span class="eng-text">Gitanjali</span>-র ভূমিকা বা <span class="eng-text">Introduction</span> লিখেছিলেন।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-amber-500 mr-2 text-xl font-bold">✓</span> 
+                        <p>তার প্রেমিকা ছিলেন আইরিশ বিপ্লবী <span class="eng-text">Maud Gonne</span>।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-amber-500 mr-2 text-xl font-bold">✓</span> 
+                        <p>বিখ্যাত কবিতা: <span class="eng-text">The Lake Isle of Innisfree, The Second Coming, Sailing to Byzantium</span>।</p>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="text-amber-500 mr-2 text-xl font-bold">✓</span> 
+                        <p>বিখ্যাত উক্তি: "<span class="eng-text">Things fall apart; the centre cannot hold</span>".</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="master-footer">
+            <p style="margin-bottom: 10px; color: #000000; font-weight: 600; font-size: 1.1em;">এই নোটটি বিসিএস (<span class="eng-text">BCS</span>) প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ৯ জুন, ২০২৬</p>
+            
+            <!-- Creator Badge (Center Aligned) -->
+            <div class="footer-creator-wrapper" style="margin-bottom: 20px;">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 25px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+
+            <!-- QR Code Bottom-Right Corner -->
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.src='https://placehold.co/60x60/064E3B/FFF?text=QR'">
+            </a>
+        </footer>
+
+    </div>
+</body>
+</html>
