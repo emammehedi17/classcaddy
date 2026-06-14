@@ -1,5 +1,4 @@
-
-        /* --- Light Theme & Motivational Styles --- */
+/* --- Light Theme & Motivational Styles --- */
         html { scroll-behavior: smooth; }
         /* --- Force Inter for English, Kalpurush for Bangla globally --- */
         html, body, input, textarea, select, button {
@@ -587,6 +586,28 @@
             
             border-bottom: 1px solid #e5e7eb; transition: top 0.3s ease-in-out;
         }
+
+        /* --- Sticky Day Progress & Timer Row (stack under weekly sticky bar) --- */
+        .day-section.is-expanded .sticky-day-row,
+        .day-section:not(.is-collapsed) .sticky-day-row {
+            position: sticky;
+            z-index: 9;
+            transition: top 0.3s ease-in-out;
+        }
+        .day-section-header.sticky-day-row {
+            background-color: inherit;
+            box-shadow: 0 2px 4px -2px rgba(0,0,0,0.08);
+        }
+        .day-timer-row.sticky-day-row {
+            background-color: inherit;
+            padding-top: 6px;
+            box-shadow: 0 2px 4px -2px rgba(0,0,0,0.06);
+        }
+        body.dark-mode .day-section-header.sticky-day-row,
+        body.dark-mode .day-timer-row.sticky-day-row {
+            background-color: #374151;
+        }
+
         .progress-bar-container { background-color: #e5e7eb; border-radius: 9999px; height: 10px; } /* Slimmer bar */
         .progress-bar-fill { 
             

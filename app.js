@@ -298,9 +298,46 @@
         
 
         // --- Header Navigation & Scroll Logic (from script.js) ---
+        function updateStickyOffsets(effectiveHeaderHeight) {
+            // Update sticky progress bars
+            const headerTopPx = `${effectiveHeaderHeight}px`;
+            document.querySelectorAll('.sticky-progress-wrapper').forEach(bar => {
+                bar.style.top = headerTopPx;
+            });
+
+            // Update sticky day progress headers & timer rows, stacking below the weekly bar
+            document.querySelectorAll('.week-section').forEach(weekSection => {
+                const weeklyBar = weekSection.querySelector('.sticky-progress-wrapper');
+                const weeklyBarHeight = weeklyBar ? weeklyBar.offsetHeight : 0;
+                const dayHeaderTop = effectiveHeaderHeight + weeklyBarHeight;
+
+                weekSection.querySelectorAll('.day-section-header.sticky-day-row').forEach(dayHeader => {
+                    dayHeader.style.top = `${dayHeaderTop}px`;
+
+                    const daySection = dayHeader.closest('.day-section');
+                    const timerRow = daySection ? daySection.querySelector('.day-timer-row.sticky-day-row') : null;
+                    if (timerRow) {
+                        timerRow.style.top = `${dayHeaderTop + dayHeader.offsetHeight}px`;
+                    }
+                });
+            });
+        }
+        window.updateStickyOffsets = updateStickyOffsets;
+
         if (pageHeader) {
             let lastScrollY = window.scrollY;
             // const headerHeight = pageHeader.offsetHeight; // <-- REMOVED FROM HERE
+
+            const recalcSticky = () => {
+                const headerHeight = pageHeader.offsetHeight || 65;
+                const isHeaderHidden = pageHeader.classList.contains('header-hidden');
+                const effectiveHeaderHeight = isHeaderHidden ? 0 : headerHeight;
+                updateStickyOffsets(effectiveHeaderHeight);
+            };
+            window.recalcSticky = recalcSticky;
+            window.addEventListener('resize', recalcSticky);
+            // Initial calculation after render
+            setTimeout(recalcSticky, 0);
 
             window.addEventListener('scroll', () => {
                 const headerHeight = pageHeader.offsetHeight || 65; // <-- ADDED HERE, INSIDE
@@ -320,11 +357,9 @@
                 
                 lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
 
-                // Update sticky progress bars
-                const newTop = isHeaderHidden ? '0px' : `${headerHeight}px`;
-                document.querySelectorAll('.sticky-progress-wrapper').forEach(bar => {
-                    bar.style.top = newTop;
-                });
+                const effectiveHeaderHeight = isHeaderHidden ? 0 : headerHeight;
+                updateStickyOffsets(effectiveHeaderHeight);
+
             });
         }
 
@@ -915,6 +950,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          currentMonthPlanDisplay.innerHTML = '';
                          // Pass BOTH data objects to the renderer
                          currentMonthPlanDisplay.appendChild(createMonthElement(monthId, monthData, weeksData));
+                         if (window.recalcSticky) setTimeout(window.recalcSticky, 50);
 
                          if (shouldRestoreScroll) {
                              window.scrollTo({ top: scrollY, behavior: 'auto' });
@@ -1326,7 +1362,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
              return `
                  <div class="day-section is-collapsed" id="day-${monthId}-${weekId}-${dayIndex}" data-day-index="${dayIndex}"> 
                      
-                     <div class="day-section-header">
+                     <div class="day-section-header sticky-day-row">
                          
                          <div class="day-header-title">
                              <h4 class="font-semibold text-gray-700">Day ${dayData.dayNumber}</h4>
@@ -1351,7 +1387,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      
                      <div class="day-section-body">
                          
-                         <div class="flex justify-between items-center flex-wrap gap-2 mb-4 mt-3">
+                         <div class="flex justify-between items-center flex-wrap gap-2 mb-4 mt-3 day-timer-row sticky-day-row">
                              <div class="day-main-timer-widget timer-widget" data-timer-scope="day" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}">
                                  <i class="fas fa-stopwatch timer-icon"></i>
                                  <span class="timer-display" data-role="session">00:00:00</span>
@@ -2347,6 +2383,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         }
                         
                         // --- END: NEW ACCORDION LOGIC ---
+                        if (window.recalcSticky) setTimeout(window.recalcSticky, 50);
                     }
                     return; // টগল করার পর আর কিছু করার দরকার নেই
                  }
