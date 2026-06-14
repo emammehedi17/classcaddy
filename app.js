@@ -1,4 +1,5 @@
-// Import necessary functions from Firebase SDK
+
+        // Import necessary functions from Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, signInWithCustomToken, signInAnonymously, getRedirectResult, signInWithRedirect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, setDoc, doc, getDoc, collection, query, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -1370,10 +1371,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
                              <thead class="text-xs text-gray-500 uppercase">
                                  <tr>
                                      <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Subject</th>
-                                     <th scope="col" class="px-3 py-2 md:w-[38%] text-center">Topic / Vocab</th>
+                                     <th scope="col" class="px-3 py-2 md:w-[28%] text-center">Topic / Vocab</th>
                                      <th scope="col" class="px-3 py-2 questions-col text-center">Questions</th>
                                      <th scope="col" class="px-3 py-2 test-col text-center">Test</th>
-                                     <th scope="col" class="px-3 py-2 md:w-[12%] text-center">Timer</th>
+                                     <th scope="col" class="px-3 py-2 md:w-[20%] text-center">Timer</th>
                                      <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell text-center">Done</th>
                                      <th scope="col" class="px-3 py-2 w-[10%] md:w-[5%] center-cell completion-perc-header hidden text-center">out of 100%</th>
                                      <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell actions-header hidden text-center"></th> 
@@ -1581,16 +1582,20 @@ function updateMonthUI(monthId, monthData, weeksData) {
         }
 
         function getDefaultTimerObj() {
-            return { totalSeconds: 0, isRunning: false, startedAt: null };
+            return { sessionSeconds: 0, totalSeconds: 0, isRunning: false, startedAt: null };
         }
 
-        function getTimerLiveTotalSeconds(timerObj) {
-            if (!timerObj) return 0;
+        // Returns { session, total } live seconds, accounting for an in-progress run
+        function getTimerLiveValues(timerObj) {
+            if (!timerObj) return { session: 0, total: 0 };
+            let session = timerObj.sessionSeconds || 0;
             let total = timerObj.totalSeconds || 0;
             if (timerObj.isRunning && timerObj.startedAt) {
-                total += Math.max(0, (Date.now() - timerObj.startedAt) / 1000);
+                const elapsed = Math.max(0, (Date.now() - timerObj.startedAt) / 1000);
+                session += elapsed;
+                total += elapsed;
             }
-            return total;
+            return { session, total };
         }
 
         function getDaySectionTimerObjects(monthId, weekId, dayIndex) {
@@ -1615,24 +1620,23 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 const startPauseBtn = widget.querySelector('.timer-startpause-btn i');
 
                 if (widget.dataset.timerScope === 'row') {
-                    const rowIndex = parseInt(widget.dataset.rowIndex);
-                    const rowTimer = dayData.rows?.[rowIndex]?.timer || getDefaultTimerObj();
-                    const liveTotal = getTimerLiveTotalSeconds(rowTimer);
-                    if (sessionEl) sessionEl.textContent = formatTimerHMS(liveTotal);
-                    if (totalEl) totalEl.textContent = formatTimerHMS(liveTotal);
+                    const rowTimer = dayData.rows?.[parseInt(widget.dataset.rowIndex)]?.timer || getDefaultTimerObj();
+                    const { session, total } = getTimerLiveValues(rowTimer);
+                    if (sessionEl) sessionEl.textContent = formatTimerHMS(session);
+                    if (totalEl) totalEl.textContent = formatTimerHMS(total);
                     if (startPauseBtn) startPauseBtn.className = rowTimer.isRunning ? 'fas fa-pause' : 'fas fa-play';
                     widget.classList.toggle('timer-running', !!rowTimer.isRunning);
                 } else {
                     const dayTimer = dayData.dayTimer || getDefaultTimerObj();
-                    const liveDayMainTotal = getTimerLiveTotalSeconds(dayTimer);
-                    if (sessionEl) sessionEl.textContent = formatTimerHMS(liveDayMainTotal);
+                    const { session: daySession, total: dayTotal } = getTimerLiveValues(dayTimer);
+                    if (sessionEl) sessionEl.textContent = formatTimerHMS(daySession);
                     if (startPauseBtn) startPauseBtn.className = dayTimer.isRunning ? 'fas fa-pause' : 'fas fa-play';
                     widget.classList.toggle('timer-running', !!dayTimer.isRunning);
 
                     // Day's overall total = sum of all row totals + day main timer total
-                    let grandTotal = liveDayMainTotal;
+                    let grandTotal = dayTotal;
                     (dayData.rows || []).forEach(row => {
-                        grandTotal += getTimerLiveTotalSeconds(row.timer);
+                        grandTotal += getTimerLiveValues(row.timer).total;
                     });
                     if (totalEl) totalEl.textContent = formatTimerHMS(grandTotal);
                 }
@@ -1668,20 +1672,27 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     timerObj = dayData.rows[rowIndex].timer;
                 }
 
+                // Normalize older data that may not have sessionSeconds
+                if (typeof timerObj.sessionSeconds !== 'number') timerObj.sessionSeconds = timerObj.totalSeconds || 0;
+
                 if (action === 'startpause') {
                     if (timerObj.isRunning) {
-                        // Pause: fold elapsed time into totalSeconds
-                        timerObj.totalSeconds = getTimerLiveTotalSeconds(timerObj);
+                        // Pause: fold elapsed time into both session and total
+                        const { session, total } = getTimerLiveValues(timerObj);
+                        timerObj.sessionSeconds = session;
+                        timerObj.totalSeconds = total;
                         timerObj.isRunning = false;
                         timerObj.startedAt = null;
                     } else {
-                        // Start
+                        // Start (resume)
                         timerObj.isRunning = true;
                         timerObj.startedAt = Date.now();
                     }
                 } else if (action === 'end') {
-                    // Reset session timer to 00:00:00 without affecting accumulated total elsewhere
-                    timerObj.totalSeconds = 0;
+                    // Reset only the running session timer to 00:00:00; main total is preserved
+                    const { total } = getTimerLiveValues(timerObj);
+                    timerObj.totalSeconds = total;
+                    timerObj.sessionSeconds = 0;
                     timerObj.isRunning = false;
                     timerObj.startedAt = null;
                 }
@@ -1712,13 +1723,113 @@ function updateMonthUI(monthId, monthData, weeksData) {
             const rowIndex = widget.dataset.timerScope === 'row' ? parseInt(widget.dataset.rowIndex) : null;
 
             if (action === 'end') {
-                showConfirmationModal('Reset Timer', 'Reset this timer to 00:00:00?', () => {
+                showConfirmationModal('Reset Timer', 'Reset the running timer to 00:00:00? The total time will not be affected.', () => {
                     updateTimerState(monthId, weekId, dayIndex, rowIndex, 'end');
                 });
             } else {
                 updateTimerState(monthId, weekId, dayIndex, rowIndex, action);
             }
         });
+
+        // Double-click handler: open fullscreen timer modal
+        document.addEventListener('dblclick', function(e) {
+            const widget = e.target.closest('.timer-widget');
+            if (!widget) return;
+            if (e.target.closest('button')) return;
+            openFullscreenTimerModal(widget);
+        });
+
+        function openFullscreenTimerModal(widget) {
+            const monthId = widget.dataset.monthId;
+            const weekId = widget.dataset.weekId;
+            const dayIndex = parseInt(widget.dataset.dayIndex);
+            const dayData = getDaySectionTimerObjects(monthId, weekId, dayIndex);
+            if (!dayData) return;
+
+            let subjectText = '';
+            let topicText = '';
+
+            if (widget.dataset.timerScope === 'row') {
+                const rowIndex = parseInt(widget.dataset.rowIndex);
+                const rowData = dayData.rows?.[rowIndex];
+                if (!rowData) return;
+                subjectText = rowData.subject || '-';
+                if (rowData.subject?.toLowerCase() === 'vocabulary') {
+                    topicText = `${(rowData.vocabData || []).length} words`;
+                } else {
+                    topicText = rowData.topic || '-';
+                }
+            } else {
+                subjectText = `Day ${dayData.dayNumber}`;
+                topicText = 'Overall Study Timer';
+            }
+
+            const modal = document.getElementById('fullscreen-timer-modal');
+            modal.dataset.monthId = monthId;
+            modal.dataset.weekId = weekId;
+            modal.dataset.dayIndex = dayIndex;
+            modal.dataset.timerScope = widget.dataset.timerScope;
+            if (widget.dataset.timerScope === 'row') {
+                modal.dataset.rowIndex = widget.dataset.rowIndex;
+            } else {
+                delete modal.dataset.rowIndex;
+            }
+
+            document.getElementById('fullscreen-timer-subject').textContent = subjectText;
+            document.getElementById('fullscreen-timer-topic').textContent = topicText;
+
+            modal.style.display = 'flex';
+            tickFullscreenTimer();
+        }
+
+        function tickFullscreenTimer() {
+            const modal = document.getElementById('fullscreen-timer-modal');
+            if (!modal || modal.style.display !== 'flex') return;
+
+            const monthId = modal.dataset.monthId;
+            const weekId = modal.dataset.weekId;
+            const dayIndex = parseInt(modal.dataset.dayIndex);
+            const dayData = getDaySectionTimerObjects(monthId, weekId, dayIndex);
+            if (!dayData) return;
+
+            let timerObj;
+            if (modal.dataset.timerScope === 'row') {
+                timerObj = dayData.rows?.[parseInt(modal.dataset.rowIndex)]?.timer || getDefaultTimerObj();
+            } else {
+                timerObj = dayData.dayTimer || getDefaultTimerObj();
+            }
+
+            const { session, total } = getTimerLiveValues(timerObj);
+            document.getElementById('fullscreen-timer-session').textContent = formatTimerHMS(session);
+            document.getElementById('fullscreen-timer-total').textContent = formatTimerHMS(total);
+
+            const playPauseIcon = document.getElementById('fullscreen-timer-startpause-icon');
+            if (playPauseIcon) playPauseIcon.className = timerObj.isRunning ? 'fas fa-pause' : 'fas fa-play';
+            modal.classList.toggle('timer-running', !!timerObj.isRunning);
+        }
+
+        document.getElementById('fullscreen-timer-startpause-btn')?.addEventListener('click', () => {
+            const modal = document.getElementById('fullscreen-timer-modal');
+            const rowIndex = modal.dataset.timerScope === 'row' ? parseInt(modal.dataset.rowIndex) : null;
+            updateTimerState(modal.dataset.monthId, modal.dataset.weekId, parseInt(modal.dataset.dayIndex), rowIndex, 'startpause')
+                .then(tickFullscreenTimer);
+        });
+
+        document.getElementById('fullscreen-timer-end-btn')?.addEventListener('click', () => {
+            const modal = document.getElementById('fullscreen-timer-modal');
+            const rowIndex = modal.dataset.timerScope === 'row' ? parseInt(modal.dataset.rowIndex) : null;
+            showConfirmationModal('Reset Timer', 'Reset the running timer to 00:00:00? The total time will not be affected.', () => {
+                updateTimerState(modal.dataset.monthId, modal.dataset.weekId, parseInt(modal.dataset.dayIndex), rowIndex, 'end')
+                    .then(tickFullscreenTimer);
+            });
+        });
+
+        document.getElementById('fullscreen-timer-close-btn')?.addEventListener('click', () => {
+            document.getElementById('fullscreen-timer-modal').style.display = 'none';
+        });
+
+        // Tick the fullscreen modal display every second too
+        setInterval(tickFullscreenTimer, 1000);
         // --- END TIMER FEATURE: HELPERS ---
 
 
@@ -1846,9 +1957,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 let weekGrandTotal = 0;
 
                 daysData.forEach(day => {
-                    let dayTotal = getTimerLiveTotalSeconds(day.dayTimer);
+                    let dayTotal = getTimerLiveValues(day.dayTimer).total;
                     (day.rows || []).forEach(row => {
-                        const rowSeconds = getTimerLiveTotalSeconds(row.timer);
+                        const rowSeconds = getTimerLiveValues(row.timer).total;
                         dayTotal += rowSeconds;
                         if (rowSeconds > 0) {
                             const subjKey = row.subject || 'Other';

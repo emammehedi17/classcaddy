@@ -92,54 +92,77 @@
         .timer-widget {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             flex-wrap: wrap;
             font-family: monospace;
-            font-size: 0.75rem;
+            font-size: 0.95rem;
             color: #000000;
+            cursor: pointer;
         }
         .timer-widget .timer-display {
             background-color: #f3f4f6;
-            border: 1px solid #e5e7eb;
-            border-radius: 4px;
-            padding: 2px 6px;
-            min-width: 64px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 6px 12px;
+            min-width: 88px;
             text-align: center;
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 1.05rem;
             color: #000000;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
         }
         .timer-widget .timer-total {
             background-color: #ecfdf5;
-            border-color: #a7f3d0;
+            border-color: #6ee7b7;
             color: #047857;
         }
         .timer-widget.timer-running .timer-display[data-role="session"] {
             background-color: #fef3c7;
-            border-color: #fcd34d;
+            border-color: #fbbf24;
             color: #92400e;
+            animation: timer-pulse 2s infinite;
+        }
+        @keyframes timer-pulse {
+            0%, 100% { box-shadow: inset 0 1px 2px rgba(0,0,0,0.05), 0 0 0 0 rgba(251,191,36,0.4); }
+            50% { box-shadow: inset 0 1px 2px rgba(0,0,0,0.05), 0 0 0 4px rgba(251,191,36,0.15); }
+        }
+        .timer-widget .timer-startpause-btn,
+        .timer-widget .timer-end-btn {
+            font-size: 1.15rem;
+            padding: 6px;
         }
         .timer-widget .timer-startpause-btn:hover { color: #10b981; }
         .timer-widget .timer-end-btn:hover { color: #ef4444; }
         .timer-widget.timer-running .timer-startpause-btn i { color: #f59e0b; }
         .timer-widget .timer-total-label {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: #6b7280;
-            font-family: inherit;
+            font-family: 'Inter', sans-serif;
             margin-left: 4px;
+            font-weight: 600;
         }
         .day-main-timer-widget {
-            background-color: rgba(255,255,255,0.5);
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 4px 10px;
+            background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(255,255,255,0.6));
+            border: 1px solid #a7f3d0;
+            border-radius: 10px;
+            padding: 8px 16px;
+            font-size: 1.05rem;
         }
         .day-main-timer-widget .timer-icon {
             color: #10b981;
-            margin-right: 2px;
+            margin-right: 4px;
+            font-size: 1.2rem;
+        }
+        .day-main-timer-widget .timer-display {
+            min-width: 100px;
+            font-size: 1.15rem;
+            padding: 7px 14px;
         }
         .row-timer-widget {
             justify-content: center;
+            padding: 4px 0;
         }
+
         body.dark-mode .timer-widget .timer-display {
             background-color: #374151;
             border-color: #4b5563;
