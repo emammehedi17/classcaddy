@@ -330,7 +330,7 @@
 
         if (pageHeader) {
             let lastScrollY = window.scrollY;
-            // const headerHeight = pageHeader.offsetHeight; // <-- REMOVED FROM HERE
+            window._isProgrammaticScroll = false; // Suppress header logic during scroll restoration
 
             const recalcSticky = () => {
                 const headerHeight = pageHeader.offsetHeight || 65;
@@ -344,10 +344,16 @@
             setTimeout(recalcSticky, 0);
 
             window.addEventListener('scroll', () => {
-                const headerHeight = pageHeader.offsetHeight || 65; // <-- ADDED HERE, INSIDE
+                // Skip header show/hide for programmatic scrolls (e.g. scroll restoration after checkbox save)
+                if (window._isProgrammaticScroll) {
+                    lastScrollY = window.scrollY <= 0 ? 0 : window.scrollY;
+                    return;
+                }
+
+                const headerHeight = pageHeader.offsetHeight || 65;
                 
                 const currentScrollY = window.scrollY;
-                let isHeaderHidden = pageHeader.classList.contains('header-hidden'); // Get current state
+                let isHeaderHidden = pageHeader.classList.contains('header-hidden');
 
                 if (currentScrollY > lastScrollY && currentScrollY > 100) {
                     // Scrolling DOWN: Hide header
@@ -363,7 +369,6 @@
 
                 const effectiveHeaderHeight = isHeaderHidden ? 0 : headerHeight;
                 updateStickyOffsets(effectiveHeaderHeight);
-
             });
         }
 
@@ -969,11 +974,22 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      } else {
                          // --- CASE 2: TARGETED UPDATE ---
                          console.log("Data change detected. Performing targeted UI update.");
-                         // Preserve scroll position across any layout shifts caused by the update
+                         // Preserve scroll position and suppress header show/hide during restoration
                          const savedScrollY = window.scrollY;
+                         const wasHeaderHidden = pageHeader && pageHeader.classList.contains('header-hidden');
                          updateMonthUI(monthId, monthData, weeksData);
+                         // Restore scroll silently (flag prevents the scroll listener from showing the header)
+                         window._isProgrammaticScroll = true;
                          window.scrollTo({ top: savedScrollY, behavior: 'instant' });
-                         requestAnimationFrame(() => window.scrollTo({ top: savedScrollY, behavior: 'instant' }));
+                         requestAnimationFrame(() => {
+                             window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+                             // Re-apply header state in case any reflow changed it
+                             if (pageHeader) {
+                                 if (wasHeaderHidden) pageHeader.classList.add('header-hidden');
+                                 else pageHeader.classList.remove('header-hidden');
+                             }
+                             window._isProgrammaticScroll = false;
+                         });
                      }
                  });
              } catch (error) {
