@@ -157,14 +157,33 @@
             font-size: 1.15rem;
             padding: 7px 14px;
         }
+        .timer-display-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+        }
+        .timer-title {
+            font-size: 0.6rem;
+            line-height: 1;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            font-family: inherit;
+        }
+        body.dark-mode .timer-title {
+            color: #6b7280;
+        }
         .row-timer-widget {
             justify-content: center;
-            padding: 4px 0;
+            align-items: center;
+            padding: 2px 0;
             flex-wrap: nowrap;
             gap: 4px;
         }
         .row-timer-widget .timer-display {
-            padding: 4px 8px;
+            padding: 2px 8px;
             min-width: 70px;
             font-size: 0.9rem;
         }

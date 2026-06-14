@@ -231,16 +231,23 @@
         const displayTotal = document.getElementById('display-total-time');
         
         // Calculate total time based on currently loaded questions
-        // If questions aren't loaded yet, default to 0 or waiting
-        const qCount = currentQuizQuestions ? currentQuizQuestions.length : 0;
-        const totalSeconds = qCount * quizSettings.timePerQuestion;
+        // If a specific pending count/seconds-per-question was set by the quiz loader, use it
+        const qCount = (typeof window._pendingQuizQuestionCount === 'number')
+            ? window._pendingQuizQuestionCount
+            : (currentQuizQuestions ? currentQuizQuestions.length : 0);
+
+        const secondsPerQuestion = (typeof window._pendingQuizSecondsPerQuestion === 'number')
+            ? window._pendingQuizSecondsPerQuestion
+            : quizSettings.timePerQuestion;
+
+        const totalSeconds = qCount * secondsPerQuestion;
         
         // Format Time (MM:SS)
         const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
         const s = (totalSeconds % 60).toString().padStart(2, '0');
 
         if(displayNeg) displayNeg.textContent = quizSettings.negativeMark;
-        if(displayTimeQ) displayTimeQ.textContent = quizSettings.timePerQuestion + 's';
+        if(displayTimeQ) displayTimeQ.textContent = secondsPerQuestion + 's';
         if(displayTotal) displayTotal.textContent = `${m}:${s}`;
     }
 	
@@ -1388,11 +1395,17 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      <div class="flex justify-between items-center flex-wrap gap-2 mb-4 mt-3 day-timer-row sticky-day-row">
                          <div class="day-main-timer-widget timer-widget" data-timer-scope="day" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}">
                              <i class="fas fa-stopwatch timer-icon"></i>
-                             <span class="timer-display" data-role="session">00:00:00</span>
+                             <div class="timer-display-group">
+                                 <span class="timer-title">Current</span>
+                                 <span class="timer-display" data-role="session">00:00:00</span>
+                             </div>
                              <button class="icon-button timer-startpause-btn" title="Start/Pause" data-action="startpause"><i class="fas fa-play"></i></button>
                              <button class="icon-button timer-end-btn" title="Reset" data-action="end"><i class="fas fa-stop"></i></button>
                              <span class="timer-total-label">Total Today:</span>
-                             <span class="timer-display timer-total" data-role="total">00:00:00</span>
+                             <div class="timer-display-group">
+                                 <span class="timer-title">Total</span>
+                                 <span class="timer-display timer-total" data-role="total">00:00:00</span>
+                             </div>
                          </div>
                          <div class="flex justify-end items-center gap-2 flex-wrap">
                          ${allMcqButtonsNormalMode}
@@ -1531,8 +1544,14 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      </td>
                      <td class="px-3 py-2 align-middle" data-label="Timer">
                         <div class="row-timer-widget timer-widget" data-timer-scope="row" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}" data-row-index="${rowIndex}">
-                            <span class="timer-display timer-total" data-role="total">00:00:00</span>
-                            <span class="timer-display" data-role="session">00:00:00</span>
+                            <div class="timer-display-group">
+                                <span class="timer-title">Total</span>
+                                <span class="timer-display timer-total" data-role="total">00:00:00</span>
+                            </div>
+                            <div class="timer-display-group">
+                                <span class="timer-title">Current</span>
+                                <span class="timer-display" data-role="session">00:00:00</span>
+                            </div>
                             <button class="icon-button timer-startpause-btn" title="Start/Pause" data-action="startpause"><i class="fas fa-play"></i></button>
                             <button class="icon-button timer-end-btn" title="Reset" data-action="end"><i class="fas fa-stop"></i></button>
                         </div>
@@ -5126,6 +5145,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 warningP.style.display = 'block';
 
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
+				window._pendingQuizSecondsPerQuestion = 15;
 				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
@@ -5738,6 +5758,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
+				window._pendingQuizSecondsPerQuestion = 15;
 				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
@@ -5838,6 +5859,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
+				window._pendingQuizSecondsPerQuestion = 15;
 				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
@@ -6086,6 +6108,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
+				window._pendingQuizSecondsPerQuestion = 15;
 				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
@@ -8460,6 +8483,8 @@ const warningP = document.getElementById('quiz-total-time-warning');
     warningP.style.display = 'block';
     
     quizStartMessage.textContent = `Ready to test yourself on ${totalQuestions} MCQs from: ${title}?`;
+	window._pendingQuizQuestionCount = totalQuestions;
+	window._pendingQuizSecondsPerQuestion = 40;
 	updateQuizStartScreenUI(); // <--- Add this
     
     // 8. Attach Start Button
@@ -8644,10 +8669,12 @@ if (viewMcqTestBtn) {
 				
         const totalTime = currentQuizQuestions.length * 40;
         const warningP = document.getElementById('quiz-total-time-warning');
-        document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
+        document.getElementById('display-total-time').textContent = formatTime(totalTime);
         warningP.style.display = 'block';
         
         quizStartMessage.textContent = `Ready to test yourself on ${currentQuizQuestions.length} MCQs?`;
+		window._pendingQuizQuestionCount = currentQuizQuestions.length;
+		window._pendingQuizSecondsPerQuestion = 40;
 		updateQuizStartScreenUI(); // <--- Add this
         quizStartBtn.classList.remove('hidden');
         
