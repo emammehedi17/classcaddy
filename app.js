@@ -233,7 +233,7 @@
         
         // Calculate total time based on currently loaded questions
         // If questions aren't loaded yet, default to 0 or waiting
-        const qCount = currentQuizQuestions ? currentQuizQuestions.length : 0;
+        const qCount = (currentQuizQuestions && currentQuizQuestions.length) ? currentQuizQuestions.length : (window._pendingQuizQuestionCount || 0);
         const totalSeconds = qCount * quizSettings.timePerQuestion;
         
         // Format Time (MM:SS)
