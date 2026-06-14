@@ -5141,7 +5141,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
 
-                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
+                quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week's vocab?`;
 				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
@@ -5753,7 +5753,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
                 
-                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
+                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's vocab?`;
 				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
@@ -5853,7 +5853,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
                 
-                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
+                quizStartMessage.textContent = `Ready to test yourself on ${totalQuestions} MCQs from this row?`;
 				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
@@ -6101,7 +6101,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
                 
-                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
+                quizStartMessage.textContent = `Ready to test yourself on ${totalQuestions} MCQs?`;
 				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
