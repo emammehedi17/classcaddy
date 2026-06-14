@@ -610,7 +610,7 @@
             position: sticky; z-index: 10; background-color: rgba(255, 255, 255, 0.85); /* Slightly transparent */
             backdrop-filter: blur(4px); padding: 10px 0; /* Reduced padding */
             
-            border-bottom: 1px solid #e5e7eb; transition: top 0.3s ease-in-out;
+            border-bottom: 1px solid #e5e7eb;
         }
 
         /* --- Sticky Day Progress & Timer Row (stack under weekly sticky bar) --- */
@@ -618,7 +618,6 @@
         .day-section:not(.is-collapsed) .sticky-day-row {
             position: sticky;
             z-index: 9;
-            transition: top 0.3s ease-in-out;
         }
         .day-section-header.sticky-day-row {
             background-color: inherit;
