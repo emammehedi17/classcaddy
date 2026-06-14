@@ -4537,7 +4537,8 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
 
-                quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week?`;
+                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
+				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
                 
@@ -5149,6 +5150,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
+				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
                 
@@ -5247,7 +5249,8 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
                 
-                quizStartMessage.textContent = `Ready to test yourself on ${mcqData.length} MCQs?`;
+                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
+				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
                 
@@ -5494,7 +5497,8 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
                 
-                quizStartMessage.textContent = `Ready to test yourself on ${aggregatedMcqs.length} MCQs from: ${quizTitle}?`;
+                quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
+				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
                 
