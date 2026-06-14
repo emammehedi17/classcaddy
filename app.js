@@ -1385,22 +1385,22 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                      </div>
                      
-                     <div class="day-section-body">
-                         
-                         <div class="flex justify-between items-center flex-wrap gap-2 mb-4 mt-3 day-timer-row sticky-day-row">
-                             <div class="day-main-timer-widget timer-widget" data-timer-scope="day" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}">
-                                 <i class="fas fa-stopwatch timer-icon"></i>
-                                 <span class="timer-display" data-role="session">00:00:00</span>
-                                 <button class="icon-button timer-startpause-btn" title="Start/Pause" data-action="startpause"><i class="fas fa-play"></i></button>
-                                 <button class="icon-button timer-end-btn" title="Reset" data-action="end"><i class="fas fa-stop"></i></button>
-                                 <span class="timer-total-label">Total Today:</span>
-                                 <span class="timer-display timer-total" data-role="total">00:00:00</span>
-                             </div>
-                             <div class="flex justify-end items-center gap-2 flex-wrap">
-                             ${allMcqButtonsNormalMode}
-                             ${isGuestMode ? '' : '<button class="action-button action-button-secondary text-xs edit-day-btn"><i class="fas fa-pencil-alt mr-1"></i> Edit</button>'}
-                             </div>
+                     <div class="flex justify-between items-center flex-wrap gap-2 mb-4 mt-3 day-timer-row sticky-day-row">
+                         <div class="day-main-timer-widget timer-widget" data-timer-scope="day" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}">
+                             <i class="fas fa-stopwatch timer-icon"></i>
+                             <span class="timer-display" data-role="session">00:00:00</span>
+                             <button class="icon-button timer-startpause-btn" title="Start/Pause" data-action="startpause"><i class="fas fa-play"></i></button>
+                             <button class="icon-button timer-end-btn" title="Reset" data-action="end"><i class="fas fa-stop"></i></button>
+                             <span class="timer-total-label">Total Today:</span>
+                             <span class="timer-display timer-total" data-role="total">00:00:00</span>
                          </div>
+                         <div class="flex justify-end items-center gap-2 flex-wrap">
+                         ${allMcqButtonsNormalMode}
+                         ${isGuestMode ? '' : '<button class="action-button action-button-secondary text-xs edit-day-btn"><i class="fas fa-pencil-alt mr-1"></i> Edit</button>'}
+                         </div>
+                     </div>
+                     
+                     <div class="day-section-body">
                          
                          <table class="w-full text-sm text-left text-gray-600 study-table" id="${tableId}">
                              <thead class="text-xs text-gray-500 uppercase">

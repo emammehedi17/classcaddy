@@ -1687,6 +1687,9 @@
     padding-top: 0;
     padding-bottom: 0;
 }
+.day-section.is-collapsed .day-timer-row {
+    display: none;
+}
 
 /* এডিট মোডে গেলে বডিটি ভিন্ন দেখাবে */
 .day-section.editing .day-section-body {
