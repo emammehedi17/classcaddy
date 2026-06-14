@@ -57,7 +57,7 @@
 		
 		// --- Quiz Settings Defaults ---
 			let quizSettings = {
-				timePerQuestion: 60, // seconds
+				timePerQuestion: 30, // seconds
 				negativeMark: 0.25,
 				showAnswersInstantly: true // <-- NEW
 			};
@@ -205,7 +205,7 @@
         });
 
         quizSaveBtn.addEventListener('click', () => {
-            const newTime = parseInt(settingTimeInput.value) || 60;
+            const newTime = parseInt(settingTimeInput.value) || 30;
             const newNeg = parseFloat(settingNegInput.value) || 0;
 
             quizSettings.timePerQuestion = newTime;
@@ -230,15 +230,12 @@
         const displayTimeQ = document.getElementById('display-time-per-q');
         const displayTotal = document.getElementById('display-total-time');
         
-        // Calculate total time based on currently loaded questions
-        // If a specific pending count/seconds-per-question was set by the quiz loader, use it
+        // Calculate total time based on currently loaded (or pending) questions
         const qCount = (typeof window._pendingQuizQuestionCount === 'number')
             ? window._pendingQuizQuestionCount
             : (currentQuizQuestions ? currentQuizQuestions.length : 0);
 
-        const secondsPerQuestion = (typeof window._pendingQuizSecondsPerQuestion === 'number')
-            ? window._pendingQuizSecondsPerQuestion
-            : quizSettings.timePerQuestion;
+        const secondsPerQuestion = quizSettings.timePerQuestion;
 
         const totalSeconds = qCount * secondsPerQuestion;
         
@@ -5138,14 +5135,13 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 currentQuizQuestions = []; 
                 
                 const totalQuestions = questionList.length + questionList.filter(v => v.synonym).length;
-                const totalTimeInSeconds = totalQuestions * 15;
+                const totalTimeInSeconds = totalQuestions * quizSettings.timePerQuestion;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
                 document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
 
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
-				window._pendingQuizSecondsPerQuestion = 15;
 				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
@@ -5751,14 +5747,13 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 currentQuizQuestions = []; 
                 
                 const totalQuestions = questionList.length + questionList.filter(v => v.synonym).length;
-                const totalTimeInSeconds = totalQuestions * 15;
+                const totalTimeInSeconds = totalQuestions * quizSettings.timePerQuestion;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
                 document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
-				window._pendingQuizSecondsPerQuestion = 15;
 				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
@@ -5852,14 +5847,13 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 				})));
                 
                 const totalQuestions = currentQuizQuestions.length;
-                const totalTimeInSeconds = totalQuestions * 40;
+                const totalTimeInSeconds = totalQuestions * quizSettings.timePerQuestion;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
                 document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
-				window._pendingQuizSecondsPerQuestion = 15;
 				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
@@ -6101,14 +6095,13 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 				})));
                 
                 const totalQuestions = currentQuizQuestions.length;
-                const totalTimeInSeconds = totalQuestions * 40;
+                const totalTimeInSeconds = totalQuestions * quizSettings.timePerQuestion;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
                 document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
-				window._pendingQuizSecondsPerQuestion = 15;
 				window._pendingQuizQuestionCount = totalQuestions;
 				updateQuizStartScreenUI(); // <--- Add this
                 quizStartBtn.classList.remove('hidden');
@@ -8475,7 +8468,7 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
 
     // 6. Calculate Time
     const totalQuestions = currentQuizQuestions.length;
-    const totalTimeInSeconds = totalQuestions * 40;
+    const totalTimeInSeconds = totalQuestions * quizSettings.timePerQuestion;
 
     // 7. Update Start Screen Text
 const warningP = document.getElementById('quiz-total-time-warning');
@@ -8484,7 +8477,6 @@ const warningP = document.getElementById('quiz-total-time-warning');
     
     quizStartMessage.textContent = `Ready to test yourself on ${totalQuestions} MCQs from: ${title}?`;
 	window._pendingQuizQuestionCount = totalQuestions;
-	window._pendingQuizSecondsPerQuestion = 40;
 	updateQuizStartScreenUI(); // <--- Add this
     
     // 8. Attach Start Button
@@ -8667,14 +8659,13 @@ if (viewMcqTestBtn) {
 			isCorrect: null 
 		})));
 				
-        const totalTime = currentQuizQuestions.length * 40;
+        const totalTime = currentQuizQuestions.length * quizSettings.timePerQuestion;
         const warningP = document.getElementById('quiz-total-time-warning');
         document.getElementById('display-total-time').textContent = formatTime(totalTime);
         warningP.style.display = 'block';
         
         quizStartMessage.textContent = `Ready to test yourself on ${currentQuizQuestions.length} MCQs?`;
 		window._pendingQuizQuestionCount = currentQuizQuestions.length;
-		window._pendingQuizSecondsPerQuestion = 40;
 		updateQuizStartScreenUI(); // <--- Add this
         quizStartBtn.classList.remove('hidden');
         
