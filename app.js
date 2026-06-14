@@ -4227,6 +4227,12 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
          * Resets state and starts the quiz game.
          */
         function runQuizGame() {
+            // --- FIX: Generate vocab questions if not yet built ---
+            if ((!currentQuizQuestions || currentQuizQuestions.length === 0) && currentVocabData && currentVocabData.length > 0 && currentOptionPool) {
+                currentQuizQuestions = generateQuizData(currentVocabData, currentOptionPool);
+            }
+            // -----------------------------------------------------
+
             // --- FIX: Reset & Shuffle Questions AND Options for Retry ---
             if (currentQuizQuestions && currentQuizQuestions.length > 0) {
                 currentQuizQuestions.forEach(q => {
