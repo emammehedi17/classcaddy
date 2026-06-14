@@ -969,8 +969,11 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      } else {
                          // --- CASE 2: TARGETED UPDATE ---
                          console.log("Data change detected. Performing targeted UI update.");
-                         // Pass BOTH data objects to the updater
+                         // Preserve scroll position across any layout shifts caused by the update
+                         const savedScrollY = window.scrollY;
                          updateMonthUI(monthId, monthData, weeksData);
+                         window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+                         requestAnimationFrame(() => window.scrollTo({ top: savedScrollY, behavior: 'instant' }));
                      }
                  });
              } catch (error) {
@@ -2398,11 +2401,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             // 3. Expand the target day
                             dayToToggle.classList.remove('is-collapsed');
 
-                            // 4. FIX: Scroll the newly opened day to the center
-                            // We use a small timeout to let the DOM update (collapse the old one) first.
-                            setTimeout(() => {
-                                dayToToggle.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            }, 200);
+                            // No auto-scroll on expand; keep the user's current scroll position.
                         }
                         
                         // --- END: NEW ACCORDION LOGIC ---
@@ -2697,7 +2696,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  saveButton.innerHTML = `<i class="fas fa-save mr-1"></i> Save`;
                  saveButton.disabled = false;
                  
-                 daySection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                 // Scroll position preserved intentionally after save.
 
                  // 5. Send to Firebase in BACKGROUND (No await)
                  // This allows the user to continue working while we upload silently
