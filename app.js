@@ -330,7 +330,7 @@
 
         if (pageHeader) {
             let lastScrollY = window.scrollY;
-            window._isProgrammaticScroll = false; // Suppress header logic during scroll restoration
+            // const headerHeight = pageHeader.offsetHeight; // <-- REMOVED FROM HERE
 
             const recalcSticky = () => {
                 const headerHeight = pageHeader.offsetHeight || 65;
@@ -344,16 +344,10 @@
             setTimeout(recalcSticky, 0);
 
             window.addEventListener('scroll', () => {
-                // Skip header show/hide for programmatic scrolls (e.g. scroll restoration after checkbox save)
-                if (window._isProgrammaticScroll) {
-                    lastScrollY = window.scrollY <= 0 ? 0 : window.scrollY;
-                    return;
-                }
-
-                const headerHeight = pageHeader.offsetHeight || 65;
+                const headerHeight = pageHeader.offsetHeight || 65; // <-- ADDED HERE, INSIDE
                 
                 const currentScrollY = window.scrollY;
-                let isHeaderHidden = pageHeader.classList.contains('header-hidden');
+                let isHeaderHidden = pageHeader.classList.contains('header-hidden'); // Get current state
 
                 if (currentScrollY > lastScrollY && currentScrollY > 100) {
                     // Scrolling DOWN: Hide header
@@ -369,6 +363,7 @@
 
                 const effectiveHeaderHeight = isHeaderHidden ? 0 : headerHeight;
                 updateStickyOffsets(effectiveHeaderHeight);
+
             });
         }
 
@@ -893,7 +888,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  unsubscribeActiveMonth = onSnapshot(monthDocRef, async (monthDocSnap) => {
                      
                      // 1. Check if we should ignore this update
-                     // Skip if a checkbox just wrote lastCompletedDay (we handle UI ourselves)
+                     // Skip snapshot re-render triggered by checkbox writing lastCompletedDay
                      if (window._suppressMonthSnapshot) {
                          console.log("Skipping snapshot: suppressed during checkbox save.");
                          return;
@@ -979,22 +974,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      } else {
                          // --- CASE 2: TARGETED UPDATE ---
                          console.log("Data change detected. Performing targeted UI update.");
-                         // Preserve scroll position and suppress header show/hide during restoration
-                         const savedScrollY = window.scrollY;
-                         const wasHeaderHidden = pageHeader && pageHeader.classList.contains('header-hidden');
+                         // Pass BOTH data objects to the updater
                          updateMonthUI(monthId, monthData, weeksData);
-                         // Restore scroll silently (flag prevents the scroll listener from showing the header)
-                         window._isProgrammaticScroll = true;
-                         window.scrollTo({ top: savedScrollY, behavior: 'instant' });
-                         requestAnimationFrame(() => {
-                             window.scrollTo({ top: savedScrollY, behavior: 'instant' });
-                             // Re-apply header state in case any reflow changed it
-                             if (pageHeader) {
-                                 if (wasHeaderHidden) pageHeader.classList.add('header-hidden');
-                                 else pageHeader.classList.remove('header-hidden');
-                             }
-                             window._isProgrammaticScroll = false;
-                         });
                      }
                  });
              } catch (error) {
@@ -2894,14 +2875,13 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             dayIndex: dayIndexForTimestamp 
                         } 
                     };
-                    // Suppress the month snapshot listener so it doesn't re-render
-                    // and shift the page when we write lastCompletedDay
+                    // Suppress the month snapshot so it doesn't re-render and shift the page
                     window._suppressMonthSnapshot = true;
                     savePromises.push( updateDoc(monthDocRef, monthUpdatePayload) );
                 }
 
                 await Promise.all(savePromises);
-                // Clear suppression flag after a short delay (enough for snapshot to fire and be ignored)
+                // Clear flag after snapshot has had time to fire and be ignored
                 if (wasCheckboxClick) {
                     setTimeout(() => { window._suppressMonthSnapshot = false; }, 2000);
                 }

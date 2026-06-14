@@ -633,7 +633,7 @@
             background-color: #374151;
         }
 
-        .progress-bar-container { background-color: #e5e7eb; border-radius: 9999px; height: 10px; } /* Slimmer bar */
+        .progress-bar-container { background-color: #e5e7eb; border-radius: 9999px; height: 10px; overflow: hidden; } /* Slimmer bar */
         .progress-bar-fill { 
             
             height: 100%; 
