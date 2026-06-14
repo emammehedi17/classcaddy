@@ -1397,6 +1397,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          <div class="flex justify-end items-center gap-2 flex-wrap">
                          ${allMcqButtonsNormalMode}
                          ${isGuestMode ? '' : '<button class="action-button action-button-secondary text-xs edit-day-btn"><i class="fas fa-pencil-alt mr-1"></i> Edit</button>'}
+                         ${isGuestMode ? '' : '<button class="action-button text-xs save-day-btn hidden"><i class="fas fa-save mr-1"></i> Save</button>'}
                          </div>
                      </div>
                      
@@ -1423,7 +1424,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                                  <button class="action-button action-button-secondary text-xs add-normal-row-btn"><i class="fas fa-plus mr-1"></i> Add Row</button>
                                  <button class="action-button action-button-secondary text-xs add-vocab-row-btn"><i class="fas fa-book mr-1"></i> Add Vocabulary</button>
                              </div>
-                             <button class="action-button text-xs save-day-btn"><i class="fas fa-save mr-1"></i> Save</button>
                          </div>
                          
                      </div>
@@ -2594,6 +2594,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  daySection.classList.add('editing');
 				 daySection.classList.remove('is-collapsed'); 
                  editButton.classList.add('hidden'); 
+                 saveButton.classList.remove('hidden');
                  editModeControls.classList.remove('hidden'); 
                  deleteDayButton.classList.remove('hidden');
                  actionsHeader.classList.remove('hidden');
@@ -2653,6 +2654,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  daySection.classList.remove('is-collapsed'); 
                  
                  editButton.classList.remove('hidden'); 
+                 saveButton.classList.add('hidden');
                  editModeControls.classList.add('hidden');
                  deleteDayButton.classList.add('hidden');
                  actionsHeader.classList.add('hidden');
