@@ -1564,7 +1564,7 @@
 .day-section {
     border: none; /* No default border */
     border-radius: 0.75rem; /* rounded-xl */
-    overflow: hidden; /* অ্যানিমেশনের জন্য জরুরি */
+    /* overflow: hidden removed — it breaks position:sticky on children (day header/timer row) */
     /* Add the border-left here, but transparent for now */
     border-left: 4px solid transparent; 
 }
@@ -1576,6 +1576,8 @@
     gap: 1rem; /* 16px */
     padding: 0.25rem 1rem; /* 4px 16px - Height further reduced */
     cursor: pointer;
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
     
     /* We add borders and radius back to the header */
     border: none;
