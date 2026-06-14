@@ -7863,8 +7863,8 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
     const totalTimeInSeconds = totalQuestions * 40;
 
     // 7. Update Start Screen Text
-    const warningP = document.getElementById('quiz-total-time-warning');
-    warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+const warningP = document.getElementById('quiz-total-time-warning');
+                document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
     warningP.style.display = 'block';
     
     quizStartMessage.textContent = `Ready to test yourself on ${totalQuestions} MCQs from: ${title}?`;
@@ -8052,7 +8052,7 @@ if (viewMcqTestBtn) {
 				
         const totalTime = currentQuizQuestions.length * 40;
         const warningP = document.getElementById('quiz-total-time-warning');
-        warningP.querySelector('span').textContent = formatTime(totalTime);
+        document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
         warningP.style.display = 'block';
         
         quizStartMessage.textContent = `Ready to test yourself on ${currentQuizQuestions.length} MCQs?`;
