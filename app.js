@@ -893,6 +893,11 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  unsubscribeActiveMonth = onSnapshot(monthDocRef, async (monthDocSnap) => {
                      
                      // 1. Check if we should ignore this update
+                     // Skip if a checkbox just wrote lastCompletedDay (we handle UI ourselves)
+                     if (window._suppressMonthSnapshot) {
+                         console.log("Skipping snapshot: suppressed during checkbox save.");
+                         return;
+                     }
                      const activeBtn = monthNavButtonsContainer.querySelector('button.active-month');
                      if (!activeBtn || activeBtn.dataset.monthId !== monthId) {
                          console.log("Snapshot received for non-active month. Ignoring render.");
@@ -2889,10 +2894,17 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             dayIndex: dayIndexForTimestamp 
                         } 
                     };
+                    // Suppress the month snapshot listener so it doesn't re-render
+                    // and shift the page when we write lastCompletedDay
+                    window._suppressMonthSnapshot = true;
                     savePromises.push( updateDoc(monthDocRef, monthUpdatePayload) );
                 }
 
                 await Promise.all(savePromises);
+                // Clear suppression flag after a short delay (enough for snapshot to fire and be ignored)
+                if (wasCheckboxClick) {
+                    setTimeout(() => { window._suppressMonthSnapshot = false; }, 2000);
+                }
                 
                 // Update Cache
 				if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
