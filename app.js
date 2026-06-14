@@ -1,5 +1,4 @@
-
-        // Import necessary functions from Firebase SDK
+// Import necessary functions from Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, signInWithCustomToken, signInAnonymously, getRedirectResult, signInWithRedirect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, setDoc, doc, getDoc, collection, query, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -1675,6 +1674,57 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 // Normalize older data that may not have sessionSeconds
                 if (typeof timerObj.sessionSeconds !== 'number') timerObj.sessionSeconds = timerObj.totalSeconds || 0;
 
+                // Collect other week documents that need updating (if a different running timer gets paused)
+                const otherWeeksToSave = {}; // weekId -> daysArray
+
+                if (action === 'startpause' && !timerObj.isRunning) {
+                    // About to START this timer: pause any other timer that's currently running (across the whole cache)
+                    if (activeWeeksDataCache) {
+                        for (const otherWeekId in activeWeeksDataCache) {
+                            const otherDays = activeWeeksDataCache[otherWeekId]?.days;
+                            if (!otherDays) continue;
+
+                            // Use the freshly-cloned array for the current week; clone others as needed
+                            const daysRef = (otherWeekId === weekId) ? daysArray : JSON.parse(JSON.stringify(otherDays));
+                            let changed = false;
+
+                            daysRef.forEach((d, dIdx) => {
+                                // Day main timer
+                                if (d.dayTimer && d.dayTimer.isRunning) {
+                                    if (!(otherWeekId === weekId && dIdx === dayIndex && (rowIndex === null || rowIndex === undefined))) {
+                                        const { session, total } = getTimerLiveValues(d.dayTimer);
+                                        d.dayTimer.sessionSeconds = session;
+                                        d.dayTimer.totalSeconds = total;
+                                        d.dayTimer.isRunning = false;
+                                        d.dayTimer.startedAt = null;
+                                        changed = true;
+                                    }
+                                }
+                                // Row timers
+                                (d.rows || []).forEach((r, rIdx) => {
+                                    if (r.timer && r.timer.isRunning) {
+                                        if (!(otherWeekId === weekId && dIdx === dayIndex && rIdx === rowIndex)) {
+                                            const { session, total } = getTimerLiveValues(r.timer);
+                                            r.timer.sessionSeconds = session;
+                                            r.timer.totalSeconds = total;
+                                            r.timer.isRunning = false;
+                                            r.timer.startedAt = null;
+                                            changed = true;
+                                        }
+                                    }
+                                });
+                            });
+
+                            if (otherWeekId === weekId) {
+                                daysArray = daysRef;
+                            } else if (changed) {
+                                otherWeeksToSave[otherWeekId] = daysRef;
+                                activeWeeksDataCache[otherWeekId].days = daysRef;
+                            }
+                        }
+                    }
+                }
+
                 if (action === 'startpause') {
                     if (timerObj.isRunning) {
                         // Pause: fold elapsed time into both session and total
@@ -1704,7 +1754,12 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                 tickAllTimers();
 
-                await updateDoc(weekDocRef, { days: daysArray });
+                const savePromises = [updateDoc(weekDocRef, { days: daysArray })];
+                for (const otherWeekId in otherWeeksToSave) {
+                    const otherWeekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', otherWeekId);
+                    savePromises.push(updateDoc(otherWeekDocRef, { days: otherWeeksToSave[otherWeekId] }));
+                }
+                await Promise.all(savePromises);
             } catch (error) {
                 console.error("Error updating timer state:", error);
                 showCustomAlert("Error updating timer.", "error");
@@ -1722,13 +1777,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
             const dayIndex = parseInt(widget.dataset.dayIndex);
             const rowIndex = widget.dataset.timerScope === 'row' ? parseInt(widget.dataset.rowIndex) : null;
 
-            if (action === 'end') {
-                showConfirmationModal('Reset Timer', 'Reset the running timer to 00:00:00? The total time will not be affected.', () => {
-                    updateTimerState(monthId, weekId, dayIndex, rowIndex, 'end');
-                });
-            } else {
-                updateTimerState(monthId, weekId, dayIndex, rowIndex, action);
-            }
+            updateTimerState(monthId, weekId, dayIndex, rowIndex, action);
         });
 
         // Double-click handler: open fullscreen timer modal
@@ -1818,10 +1867,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
         document.getElementById('fullscreen-timer-end-btn')?.addEventListener('click', () => {
             const modal = document.getElementById('fullscreen-timer-modal');
             const rowIndex = modal.dataset.timerScope === 'row' ? parseInt(modal.dataset.rowIndex) : null;
-            showConfirmationModal('Reset Timer', 'Reset the running timer to 00:00:00? The total time will not be affected.', () => {
-                updateTimerState(modal.dataset.monthId, modal.dataset.weekId, parseInt(modal.dataset.dayIndex), rowIndex, 'end')
-                    .then(tickFullscreenTimer);
-            });
+            updateTimerState(modal.dataset.monthId, modal.dataset.weekId, parseInt(modal.dataset.dayIndex), rowIndex, 'end')
+                .then(tickFullscreenTimer);
         });
 
         document.getElementById('fullscreen-timer-close-btn')?.addEventListener('click', () => {
