@@ -1,5 +1,4 @@
-
-        // Import necessary functions from Firebase SDK
+// Import necessary functions from Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, signInWithCustomToken, signInAnonymously, getRedirectResult, signInWithRedirect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, setDoc, doc, getDoc, collection, query, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -233,7 +232,7 @@
         
         // Calculate total time based on currently loaded questions
         // If questions aren't loaded yet, default to 0 or waiting
-        const qCount = (currentQuizQuestions && currentQuizQuestions.length) ? currentQuizQuestions.length : (window._pendingQuizQuestionCount || 0);
+        const qCount = currentQuizQuestions ? currentQuizQuestions.length : 0;
         const totalSeconds = qCount * quizSettings.timePerQuestion;
         
         // Format Time (MM:SS)
@@ -247,6 +246,8 @@
 	
         
         let progressChart = null; // Holds the chart instance
+        let studyTimeDailyChart = null;
+        let studyTimeSubjectChart = null;
 		let currentQuizResultData = null; // <-- ADD THIS
 		let savedResultsCache = null; // <-- ADD THIS, for caching results
 		let isQuizResultSaved = false;
@@ -1254,6 +1255,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
              animateTrackers(monthDiv);
              
+             setTimeout(tickAllTimers, 0);
+             
              return monthDiv;
         }
 
@@ -1288,6 +1291,11 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         <div class="progress-bar-container w-full"> 
                             <div id="week-bar-${monthId}-${weekId}" class="progress-bar-fill progress-bar-weekly" style="width: ${initialProgress}%;"></div> 
                         </div>
+                    </div>
+                    <div class="flex justify-end mt-2">
+                        <button class="action-button action-button-secondary text-xs study-time-report-btn" data-week-id="${weekId}">
+                            <i class="fas fa-chart-bar mr-1"></i> Study Time Report
+                        </button>
                     </div>
                     <div class="days-container space-y-6 mt-4"> ${daysHtml} </div>
                      ${isGuestMode ? '' : (totalDays < 7 ? (totalDays > 0 ? `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>` : `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`) : '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>')}
@@ -1343,10 +1351,20 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      
                      <div class="day-section-body">
                          
-                         <div class="flex justify-end items-center gap-2 flex-wrap mb-4 mt-3">
+                         <div class="flex justify-between items-center flex-wrap gap-2 mb-4 mt-3">
+                             <div class="day-main-timer-widget timer-widget" data-timer-scope="day" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}">
+                                 <i class="fas fa-stopwatch timer-icon"></i>
+                                 <span class="timer-display" data-role="session">00:00:00</span>
+                                 <button class="icon-button timer-startpause-btn" title="Start/Pause" data-action="startpause"><i class="fas fa-play"></i></button>
+                                 <button class="icon-button timer-end-btn" title="Reset" data-action="end"><i class="fas fa-stop"></i></button>
+                                 <span class="timer-total-label">Total Today:</span>
+                                 <span class="timer-display timer-total" data-role="total">00:00:00</span>
+                             </div>
+                             <div class="flex justify-end items-center gap-2 flex-wrap">
                              ${allMcqButtonsNormalMode}
                              ${isGuestMode ? '' : '<button class="action-button action-button-secondary text-xs edit-day-btn"><i class="fas fa-pencil-alt mr-1"></i> Edit</button>'}
                              </div>
+                         </div>
                          
                          <table class="w-full text-sm text-left text-gray-600 study-table" id="${tableId}">
                              <thead class="text-xs text-gray-500 uppercase">
@@ -1355,7 +1373,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                                      <th scope="col" class="px-3 py-2 md:w-[38%] text-center">Topic / Vocab</th>
                                      <th scope="col" class="px-3 py-2 questions-col text-center">Questions</th>
                                      <th scope="col" class="px-3 py-2 test-col text-center">Test</th>
-                                     <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Comment</th>
+                                     <th scope="col" class="px-3 py-2 md:w-[12%] text-center">Timer</th>
                                      <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell text-center">Done</th>
                                      <th scope="col" class="px-3 py-2 w-[10%] md:w-[5%] center-cell completion-perc-header hidden text-center">out of 100%</th>
                                      <th scope="col" class="px-3 py-2 w-[5%] md:w-[5%] center-cell actions-header hidden text-center"></th> 
@@ -1475,7 +1493,13 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      <td class="px-3 py-2 align-middle test-col" data-label="Test">
                         ${testCellHtml}
                      </td>
-                     <td class="px-3 py-2 align-top" data-label="Comment"> ${isEditing ? `<textarea class="editable-input comment-input text-xs" rows="2" placeholder="Comment...">${escapeHtml(rowData.comment || '')}</textarea>` : `<span class="comment-display text-xs text-gray-500">${escapeHtml(rowData.comment || '-')}</span>`}
+                     <td class="px-3 py-2 align-middle" data-label="Timer">
+                        <div class="row-timer-widget timer-widget" data-timer-scope="row" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}" data-row-index="${rowIndex}">
+                            <span class="timer-display" data-role="session">00:00:00</span>
+                            <button class="icon-button timer-startpause-btn" title="Start/Pause" data-action="startpause"><i class="fas fa-play"></i></button>
+                            <button class="icon-button timer-end-btn" title="Reset" data-action="end"><i class="fas fa-stop"></i></button>
+                            <span class="timer-display timer-total" data-role="total">00:00:00</span>
+                        </div>
                      </td>
                      <td class="px-3 py-2 align-middle center-cell" data-label="Done"> <input type="checkbox" class="form-checkbox h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 completion-checkbox" ${rowData.completed ? 'checked' : ''} ${isEditing || isGuestMode ? 'disabled' : ''}>
                      </td>
@@ -1545,6 +1569,157 @@ function updateMonthUI(monthId, monthData, weeksData) {
             if (unsafe === null || unsafe === undefined) return '';
              return unsafe.toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
         }
+
+        // --- TIMER FEATURE: HELPERS ---
+        function formatTimerHMS(totalSeconds) {
+            totalSeconds = Math.max(0, Math.floor(totalSeconds || 0));
+            const h = Math.floor(totalSeconds / 3600);
+            const m = Math.floor((totalSeconds % 3600) / 60);
+            const s = totalSeconds % 60;
+            const pad = (n) => String(n).padStart(2, '0');
+            return `${pad(h)}:${pad(m)}:${pad(s)}`;
+        }
+
+        function getDefaultTimerObj() {
+            return { totalSeconds: 0, isRunning: false, startedAt: null };
+        }
+
+        function getTimerLiveTotalSeconds(timerObj) {
+            if (!timerObj) return 0;
+            let total = timerObj.totalSeconds || 0;
+            if (timerObj.isRunning && timerObj.startedAt) {
+                total += Math.max(0, (Date.now() - timerObj.startedAt) / 1000);
+            }
+            return total;
+        }
+
+        function getDaySectionTimerObjects(monthId, weekId, dayIndex) {
+            let dayData = null;
+            if (activeWeeksDataCache && activeWeeksDataCache[weekId] && activeWeeksDataCache[weekId].days) {
+                dayData = activeWeeksDataCache[weekId].days[dayIndex];
+            }
+            return dayData || null;
+        }
+
+        // Renders/refreshes the live display of every timer widget currently on screen
+        function tickAllTimers() {
+            document.querySelectorAll('.timer-widget').forEach(widget => {
+                const monthId = widget.dataset.monthId;
+                const weekId = widget.dataset.weekId;
+                const dayIndex = parseInt(widget.dataset.dayIndex);
+                const dayData = getDaySectionTimerObjects(monthId, weekId, dayIndex);
+                if (!dayData) return;
+
+                const sessionEl = widget.querySelector('[data-role="session"]');
+                const totalEl = widget.querySelector('[data-role="total"]');
+                const startPauseBtn = widget.querySelector('.timer-startpause-btn i');
+
+                if (widget.dataset.timerScope === 'row') {
+                    const rowIndex = parseInt(widget.dataset.rowIndex);
+                    const rowTimer = dayData.rows?.[rowIndex]?.timer || getDefaultTimerObj();
+                    const liveTotal = getTimerLiveTotalSeconds(rowTimer);
+                    if (sessionEl) sessionEl.textContent = formatTimerHMS(liveTotal);
+                    if (totalEl) totalEl.textContent = formatTimerHMS(liveTotal);
+                    if (startPauseBtn) startPauseBtn.className = rowTimer.isRunning ? 'fas fa-pause' : 'fas fa-play';
+                    widget.classList.toggle('timer-running', !!rowTimer.isRunning);
+                } else {
+                    const dayTimer = dayData.dayTimer || getDefaultTimerObj();
+                    const liveDayMainTotal = getTimerLiveTotalSeconds(dayTimer);
+                    if (sessionEl) sessionEl.textContent = formatTimerHMS(liveDayMainTotal);
+                    if (startPauseBtn) startPauseBtn.className = dayTimer.isRunning ? 'fas fa-pause' : 'fas fa-play';
+                    widget.classList.toggle('timer-running', !!dayTimer.isRunning);
+
+                    // Day's overall total = sum of all row totals + day main timer total
+                    let grandTotal = liveDayMainTotal;
+                    (dayData.rows || []).forEach(row => {
+                        grandTotal += getTimerLiveTotalSeconds(row.timer);
+                    });
+                    if (totalEl) totalEl.textContent = formatTimerHMS(grandTotal);
+                }
+            });
+        }
+
+        // Tick every second for live-updating displays
+        setInterval(tickAllTimers, 1000);
+
+        // Persist a timer state change (start/pause/reset) to Firestore and update cache
+        async function updateTimerState(monthId, weekId, dayIndex, rowIndex, action) {
+            try {
+                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+
+                let daysArray;
+                if (activeWeeksDataCache && activeWeeksDataCache[weekId] && activeWeeksDataCache[weekId].days) {
+                    daysArray = JSON.parse(JSON.stringify(activeWeeksDataCache[weekId].days));
+                } else {
+                    const weekDocSnap = await getDoc(weekDocRef);
+                    if (!weekDocSnap.exists()) throw new Error("Week document not found.");
+                    daysArray = weekDocSnap.data().days || [];
+                }
+
+                const dayData = daysArray[dayIndex];
+                if (!dayData) throw new Error("Day data not found.");
+
+                let timerObj;
+                if (rowIndex === null || rowIndex === undefined) {
+                    if (!dayData.dayTimer) dayData.dayTimer = getDefaultTimerObj();
+                    timerObj = dayData.dayTimer;
+                } else {
+                    if (!dayData.rows[rowIndex].timer) dayData.rows[rowIndex].timer = getDefaultTimerObj();
+                    timerObj = dayData.rows[rowIndex].timer;
+                }
+
+                if (action === 'startpause') {
+                    if (timerObj.isRunning) {
+                        // Pause: fold elapsed time into totalSeconds
+                        timerObj.totalSeconds = getTimerLiveTotalSeconds(timerObj);
+                        timerObj.isRunning = false;
+                        timerObj.startedAt = null;
+                    } else {
+                        // Start
+                        timerObj.isRunning = true;
+                        timerObj.startedAt = Date.now();
+                    }
+                } else if (action === 'end') {
+                    // Reset session timer to 00:00:00 without affecting accumulated total elsewhere
+                    timerObj.totalSeconds = 0;
+                    timerObj.isRunning = false;
+                    timerObj.startedAt = null;
+                }
+
+                // Update cache
+                if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
+                    activeWeeksDataCache[weekId].days = daysArray;
+                }
+
+                tickAllTimers();
+
+                await updateDoc(weekDocRef, { days: daysArray });
+            } catch (error) {
+                console.error("Error updating timer state:", error);
+                showCustomAlert("Error updating timer.", "error");
+            }
+        }
+
+        // Click handler for timer widget buttons (delegated)
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.timer-widget button');
+            if (!btn) return;
+            const widget = btn.closest('.timer-widget');
+            const action = btn.dataset.action;
+            const monthId = widget.dataset.monthId;
+            const weekId = widget.dataset.weekId;
+            const dayIndex = parseInt(widget.dataset.dayIndex);
+            const rowIndex = widget.dataset.timerScope === 'row' ? parseInt(widget.dataset.rowIndex) : null;
+
+            if (action === 'end') {
+                showConfirmationModal('Reset Timer', 'Reset this timer to 00:00:00?', () => {
+                    updateTimerState(monthId, weekId, dayIndex, rowIndex, 'end');
+                });
+            } else {
+                updateTimerState(monthId, weekId, dayIndex, rowIndex, action);
+            }
+        });
+        // --- END TIMER FEATURE: HELPERS ---
 
 
         // --- Event Listeners ---
@@ -1637,6 +1812,218 @@ function updateMonthUI(monthId, monthData, weeksData) {
             }
         }
         // --- END: WEEK SUMMARY FEATURE ---
+	
+	// --- START: STUDY TIME REPORT FEATURE ---
+        const studyTimeReportModal = document.getElementById('study-time-report-modal');
+        const studyTimeReportContent = document.getElementById('study-time-report-content');
+
+        async function openStudyTimeReportModal(monthId, weekId) {
+            studyTimeReportModal.style.display = "block";
+
+            const printBtn = document.getElementById('print-study-time-report-btn');
+            if (printBtn) {
+                printBtn.dataset.monthId = monthId;
+                printBtn.dataset.weekId = weekId;
+            }
+
+            studyTimeReportContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">Loading report...</p>';
+
+            try {
+                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                const weekDocSnap = await getDoc(weekDocRef);
+
+                if (!weekDocSnap.exists() || !weekDocSnap.data().days || weekDocSnap.data().days.length === 0) {
+                    studyTimeReportContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">No data found for this week.</p>';
+                    return;
+                }
+
+                const daysData = weekDocSnap.data().days;
+
+                // --- Aggregate Data ---
+                const dayLabels = [];
+                const dayTotals = [];
+                const subjectTotals = {}; // subject -> seconds
+                let weekGrandTotal = 0;
+
+                daysData.forEach(day => {
+                    let dayTotal = getTimerLiveTotalSeconds(day.dayTimer);
+                    (day.rows || []).forEach(row => {
+                        const rowSeconds = getTimerLiveTotalSeconds(row.timer);
+                        dayTotal += rowSeconds;
+                        if (rowSeconds > 0) {
+                            const subjKey = row.subject || 'Other';
+                            subjectTotals[subjKey] = (subjectTotals[subjKey] || 0) + rowSeconds;
+                        }
+                    });
+                    dayLabels.push(`Day ${day.dayNumber}`);
+                    dayTotals.push(Math.round((dayTotal / 60) * 100) / 100); // minutes, 2 decimals
+                    weekGrandTotal += dayTotal;
+                });
+
+                const subjectLabels = Object.keys(subjectTotals);
+                const subjectMinutes = subjectLabels.map(s => Math.round((subjectTotals[s] / 60) * 100) / 100);
+
+                // --- Build HTML ---
+                let html = `
+                    <div class="mb-4 text-center">
+                        <p class="text-sm text-gray-500">Total Study Time This Week</p>
+                        <p class="text-3xl font-bold text-emerald-600">${formatTimerHMS(weekGrandTotal)}</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h4 class="text-center font-semibold text-gray-700 mb-2">Daily Study Time (minutes)</h4>
+                            <div style="width: 100%; height: 300px;">
+                                <canvas id="study-time-daily-canvas"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-center font-semibold text-gray-700 mb-2">Study Time by Subject (minutes)</h4>
+                            <div style="width: 100%; height: 300px;">
+                                <canvas id="study-time-subject-canvas"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="results-table-container">
+                    <table class="w-full text-sm text-left text-gray-600 study-table">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 border text-center bg-gray-100">Day</th>
+                                <th class="px-4 py-3 border text-center bg-gray-100">Total Study Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                daysData.forEach((day, idx) => {
+                    const totalSecondsForDay = dayTotals[idx] * 60;
+                    html += `<tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 border font-medium text-gray-900 text-center">Day ${day.dayNumber}</td>
+                        <td class="px-4 py-3 border text-center">${formatTimerHMS(totalSecondsForDay)}</td>
+                    </tr>`;
+                });
+
+                html += `</tbody></table></div>`;
+
+                if (subjectLabels.length > 0) {
+                    html += `
+                        <div class="results-table-container mt-4">
+                        <table class="w-full text-sm text-left text-gray-600 study-table">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 border text-center bg-gray-100">Subject</th>
+                                    <th class="px-4 py-3 border text-center bg-gray-100">Total Study Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    subjectLabels.forEach((subj, idx) => {
+                        html += `<tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3 border font-medium text-gray-900 text-center">${escapeHtml(subj)}</td>
+                            <td class="px-4 py-3 border text-center">${formatTimerHMS(subjectMinutes[idx] * 60)}</td>
+                        </tr>`;
+                    });
+                    html += `</tbody></table></div>`;
+                }
+
+                studyTimeReportContent.innerHTML = html;
+
+                // --- Render Charts ---
+                if (studyTimeDailyChart) { studyTimeDailyChart.destroy(); }
+                if (studyTimeSubjectChart) { studyTimeSubjectChart.destroy(); }
+
+                const dailyCtx = document.getElementById('study-time-daily-canvas').getContext('2d');
+                studyTimeDailyChart = new Chart(dailyCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: dayLabels,
+                        datasets: [{
+                            label: 'Minutes',
+                            data: dayTotals,
+                            backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                            borderColor: '#10b981',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true } },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+
+                if (subjectLabels.length > 0) {
+                    const subjectCtx = document.getElementById('study-time-subject-canvas').getContext('2d');
+                    const colors = ['#10b981', '#0ea5e9', '#f59e0b', '#ef4444', '#a855f7', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#f97316'];
+                    studyTimeSubjectChart = new Chart(subjectCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: subjectLabels,
+                            datasets: [{
+                                data: subjectMinutes,
+                                backgroundColor: subjectLabels.map((_, i) => colors[i % colors.length])
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { position: 'bottom' } }
+                        }
+                    });
+                } else {
+                    document.getElementById('study-time-subject-canvas').parentElement.innerHTML = '<p class="text-center text-gray-400 italic py-10">No subject-wise data yet.</p>';
+                }
+
+            } catch (error) {
+                console.error("Error generating study time report:", error);
+                studyTimeReportContent.innerHTML = '<p class="text-center text-red-500 py-10">Could not load report.</p>';
+            }
+        }
+
+        document.getElementById('print-study-time-report-btn')?.addEventListener('click', () => {
+            const dailyCanvas = document.getElementById('study-time-daily-canvas');
+            const subjectCanvas = document.getElementById('study-time-subject-canvas');
+            const dailyImg = dailyCanvas ? dailyCanvas.toDataURL('image/png') : '';
+            const subjectImg = subjectCanvas ? subjectCanvas.toDataURL('image/png') : '';
+
+            const tablesHtml = studyTimeReportContent.querySelectorAll('.results-table-container');
+            let tablesOuterHtml = '';
+            tablesHtml.forEach(t => { tablesOuterHtml += t.outerHTML; });
+
+            const totalHtml = studyTimeReportContent.querySelector('.mb-4.text-center')?.outerHTML || '';
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Study Time Report</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; color: #000; }
+                        h2 { text-align: center; color: #059669; }
+                        img { max-width: 100%; margin: 10px 0; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+                        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+                        th { background-color: #f3f4f6; }
+                        .charts-row { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+                        .charts-row > div { flex: 1; min-width: 300px; }
+                    </style>
+                </head>
+                <body>
+                    <h2>Study Time Report</h2>
+                    ${totalHtml}
+                    <div class="charts-row">
+                        <div>${dailyImg ? `<img src="${dailyImg}">` : ''}</div>
+                        ${subjectImg ? `<div><img src="${subjectImg}"></div>` : ''}
+                    </div>
+                    ${tablesOuterHtml}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            setTimeout(() => { printWindow.print(); }, 300);
+        });
+        // --- END: STUDY TIME REPORT FEATURE ---
 		
 		// --- START: MONTH SUMMARY FEATURE ---
         const monthSummaryModal = document.getElementById('month-summary-modal');
@@ -1976,6 +2363,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      openWeekSummaryModal(monthId, weekId);
                  }
                  // --- END: NEW SUMMARY BUTTON LISTENER ---
+                 else if (button.classList.contains('study-time-report-btn')) {
+                     openStudyTimeReportModal(monthId, weekId);
+                 }
                  // Add Day Button / Add First Day
                  else if (button.classList.contains('add-day-btn') || button.classList.contains('add-first-day-btn')) {
                      addNewDay(monthId, weekId, weekSection);
@@ -2078,6 +2468,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, false)
                  ).join('');
                  
+                 tickAllTimers();
                  // Update progress bars
                  const dayDataForProgress = { rows: updatedRows };
                  updateDailyProgressUI(monthId, weekId, dayIndex, dayDataForProgress);
@@ -2191,7 +2582,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          mcqData = existingRowData.mcqData; 
                      }
                      
-                     updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null, mcqData: mcqData || null });
+                     updatedRows.push({ subject: subject || '', topic: topic || null, comment: comment || '', completed: completed || false, completionPercentage: completionPercentage ?? null, vocabData: vocabData || null, story: story || null, mcqData: mcqData || null, timer: existingRowData.timer || null });
                 });
                 
                 freshDaysArray[dayIndex].rows = updatedRows;
@@ -2953,11 +3344,6 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                          
                          // Update the WEEK document
                          await updateDoc(weekDocRef, { days: daysArray });
-                         
-                         // --- Update local cache so the UI reflects the new story ---
-                         if (activeWeeksDataCache && activeWeeksDataCache[targetToSave.weekId]) {
-                             activeWeeksDataCache[targetToSave.weekId].days = daysArray;
-                         }
                          
                          console.log("Story saved successfully in background for row:", targetToSave.rowIndex);
                          setSyncStatus("Synced", "green");

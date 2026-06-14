@@ -88,6 +88,76 @@
              color: #10b981; /* emerald-500 for add */
          }
 
+        /* --- TIMER WIDGET STYLES --- */
+        .timer-widget {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #000000;
+        }
+        .timer-widget .timer-display {
+            background-color: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 2px 6px;
+            min-width: 64px;
+            text-align: center;
+            font-weight: 600;
+            color: #000000;
+        }
+        .timer-widget .timer-total {
+            background-color: #ecfdf5;
+            border-color: #a7f3d0;
+            color: #047857;
+        }
+        .timer-widget.timer-running .timer-display[data-role="session"] {
+            background-color: #fef3c7;
+            border-color: #fcd34d;
+            color: #92400e;
+        }
+        .timer-widget .timer-startpause-btn:hover { color: #10b981; }
+        .timer-widget .timer-end-btn:hover { color: #ef4444; }
+        .timer-widget.timer-running .timer-startpause-btn i { color: #f59e0b; }
+        .timer-widget .timer-total-label {
+            font-size: 0.7rem;
+            color: #6b7280;
+            font-family: inherit;
+            margin-left: 4px;
+        }
+        .day-main-timer-widget {
+            background-color: rgba(255,255,255,0.5);
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 4px 10px;
+        }
+        .day-main-timer-widget .timer-icon {
+            color: #10b981;
+            margin-right: 2px;
+        }
+        .row-timer-widget {
+            justify-content: center;
+        }
+        body.dark-mode .timer-widget .timer-display {
+            background-color: #374151;
+            border-color: #4b5563;
+            color: #f9fafb;
+        }
+        body.dark-mode .timer-widget .timer-total {
+            background-color: #064e3b;
+            border-color: #047857;
+            color: #d1fae5;
+        }
+        body.dark-mode .day-main-timer-widget {
+            background-color: rgba(0,0,0,0.2);
+            border-color: #4b5563;
+        }
+        body.dark-mode .timer-widget .timer-total-label {
+            color: #9ca3af;
+        }
+
         /* --- Card Styles --- */
         .card {
             background-color: white;

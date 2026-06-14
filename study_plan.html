@@ -897,6 +897,22 @@
       </div>
     </div>
 	
+	<div id="study-time-report-modal" class="modal">
+      <div class="modal-content" style="max-width: 900px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header-sticky flex justify-between items-center border-b pb-3 mb-4">
+          <h3 class="text-2xl font-semibold text-emerald-600">Study Time Report</h3>
+          <div class="flex items-center gap-3">
+              <button id="print-study-time-report-btn" class="action-button action-button-secondary text-sm">
+                  <i class="fas fa-print mr-1.5"></i> Print
+              </button>
+              <span class="modal-close static text-3xl leading-none cursor-pointer hover:text-gray-800 text-gray-400" onclick="closeModal('study-time-report-modal')">&times;</span>
+          </div>
+        </div>
+        <div id="study-time-report-content" style="overflow-y: auto; flex-grow: 1; padding-top: 0.5rem;">
+            </div>
+      </div>
+    </div>
+	
 	
 	
 	<button id="scroll-toggle-btn" class="fixed bottom-32 right-5 z-[100] w-12 h-12 bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-gray-900 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100" title="Scroll">
