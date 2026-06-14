@@ -1894,15 +1894,22 @@ function updateMonthUI(monthId, monthData, weeksData) {
             if (!dayData) return;
 
             let timerObj;
+            let totalToShow;
             if (modal.dataset.timerScope === 'row') {
                 timerObj = dayData.rows?.[parseInt(modal.dataset.rowIndex)]?.timer || getDefaultTimerObj();
+                totalToShow = getTimerLiveValues(timerObj).total;
             } else {
                 timerObj = dayData.dayTimer || getDefaultTimerObj();
+                // Day's overall total = sum of all row totals + day main timer total (matches header display)
+                totalToShow = getTimerLiveValues(timerObj).total;
+                (dayData.rows || []).forEach(row => {
+                    totalToShow += getTimerLiveValues(row.timer).total;
+                });
             }
 
-            const { session, total } = getTimerLiveValues(timerObj);
+            const { session } = getTimerLiveValues(timerObj);
             document.getElementById('fullscreen-timer-session').textContent = formatTimerHMS(session);
-            document.getElementById('fullscreen-timer-total').textContent = formatTimerHMS(total);
+            document.getElementById('fullscreen-timer-total').textContent = formatTimerHMS(totalToShow);
 
             const playPauseIcon = document.getElementById('fullscreen-timer-startpause-icon');
             if (playPauseIcon) playPauseIcon.className = timerObj.isRunning ? 'fas fa-pause' : 'fas fa-play';
