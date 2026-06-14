@@ -1531,10 +1531,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      </td>
                      <td class="px-3 py-2 align-middle" data-label="Timer">
                         <div class="row-timer-widget timer-widget" data-timer-scope="row" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}" data-row-index="${rowIndex}">
+                            <span class="timer-display timer-total" data-role="total">00:00:00</span>
                             <span class="timer-display" data-role="session">00:00:00</span>
                             <button class="icon-button timer-startpause-btn" title="Start/Pause" data-action="startpause"><i class="fas fa-play"></i></button>
                             <button class="icon-button timer-end-btn" title="Reset" data-action="end"><i class="fas fa-stop"></i></button>
-                            <span class="timer-display timer-total" data-role="total">00:00:00</span>
                         </div>
                      </td>
                      <td class="px-3 py-2 align-middle center-cell" data-label="Done"> <input type="checkbox" class="form-checkbox h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 completion-checkbox" ${rowData.completed ? 'checked' : ''} ${isEditing || isGuestMode ? 'disabled' : ''}>

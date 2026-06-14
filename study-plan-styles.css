@@ -160,6 +160,13 @@
         .row-timer-widget {
             justify-content: center;
             padding: 4px 0;
+            flex-wrap: nowrap;
+            gap: 4px;
+        }
+        .row-timer-widget .timer-display {
+            padding: 4px 8px;
+            min-width: 70px;
+            font-size: 0.9rem;
         }
 
         body.dark-mode .timer-widget .timer-display {
