@@ -4534,7 +4534,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 const totalTimeInSeconds = totalQuestions * 15;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
-                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
 
                 quizStartMessage.textContent = `Ready to test yourself on ${allWeekVocab.length} words from this week?`;
@@ -5145,7 +5145,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 const totalTimeInSeconds = totalQuestions * 15;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
-                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${vocabData.length} words from this day's voacb?`;
@@ -5244,7 +5244,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 const totalTimeInSeconds = totalQuestions * 40;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
-                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${mcqData.length} MCQs?`;
@@ -5491,7 +5491,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 const totalTimeInSeconds = totalQuestions * 40;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
-                warningP.querySelector('span').textContent = formatTime(totalTimeInSeconds);
+                document.getElementById('display-total-time').textContent = formatTime(totalTimeInSeconds);
                 warningP.style.display = 'block';
                 
                 quizStartMessage.textContent = `Ready to test yourself on ${aggregatedMcqs.length} MCQs from: ${quizTitle}?`;
