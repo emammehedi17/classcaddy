@@ -2954,6 +2954,11 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                          // Update the WEEK document
                          await updateDoc(weekDocRef, { days: daysArray });
                          
+                         // --- Update local cache so the UI reflects the new story ---
+                         if (activeWeeksDataCache && activeWeeksDataCache[targetToSave.weekId]) {
+                             activeWeeksDataCache[targetToSave.weekId].days = daysArray;
+                         }
+                         
                          console.log("Story saved successfully in background for row:", targetToSave.rowIndex);
                          setSyncStatus("Synced", "green");
                          showCustomAlert("Story saved!", "success");
