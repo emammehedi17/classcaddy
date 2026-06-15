@@ -303,6 +303,11 @@
 
         // --- Header Navigation & Scroll Logic (from script.js) ---
         function updateStickyOffsets(effectiveHeaderHeight) {
+            // Skip during checkbox saves — the header state isn't changing, so sticky
+            // top values don't need to change either. Recalculating them forces layout
+            // reads (offsetHeight) and style writes that visibly jump the day section.
+            if (window._suppressHeaderScroll) return;
+
             // Update sticky progress bars
             const headerTopPx = `${effectiveHeaderHeight}px`;
             document.querySelectorAll('.sticky-progress-wrapper').forEach(bar => {
@@ -345,25 +350,23 @@
 
             window.addEventListener('scroll', () => {
                 const headerHeight = pageHeader.offsetHeight || 65;
-                
                 const currentScrollY = window.scrollY;
                 let isHeaderHidden = pageHeader.classList.contains('header-hidden');
 
-                // While a checkbox save is in progress, layout shifts from the progress bar
-                // animation cause spurious scroll events. We freeze lastScrollY AND skip
-                // header toggling entirely so the header stays in whatever state it was in.
-                if (!window._suppressHeaderScroll) {
-                    if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                        pageHeader.classList.add('header-hidden');
-                        isHeaderHidden = true;
-                    } else if (currentScrollY < lastScrollY || currentScrollY <= 0) {
-                        pageHeader.classList.remove('header-hidden');
-                        isHeaderHidden = false;
-                    }
-                    lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+                // During checkbox saves, layout shifts from scaleX animation fire spurious
+                // scroll events. Freeze everything — no header toggling, no sticky recalc,
+                // no lastScrollY update — so state is exactly preserved for real scrolls after.
+                if (window._suppressHeaderScroll) return;
+
+                if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                    pageHeader.classList.add('header-hidden');
+                    isHeaderHidden = true;
+                } else if (currentScrollY < lastScrollY || currentScrollY <= 0) {
+                    pageHeader.classList.remove('header-hidden');
+                    isHeaderHidden = false;
                 }
-                // When suppressed: do NOT update lastScrollY — keeps baseline accurate for
-                // real scrolls after the flag lifts.
+
+                lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
 
                 const effectiveHeaderHeight = isHeaderHidden ? 0 : headerHeight;
                 updateStickyOffsets(effectiveHeaderHeight);
@@ -2432,11 +2435,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          row?.classList.toggle('row-completed', target.checked);
                          
                          (async () => {
-                            // Suppress header show/hide for the duration of the save + CSS animation.
-                            // Progress bar animation (and the Firestore snapshot it triggers) cause
-                            // layout shifts that fire spurious scroll events. Freezing lastScrollY in
-                            // the scroll listener (done above) means the baseline stays correct, so
-                            // when the flag clears the header behaves exactly as if nothing happened.
+                            // Freeze scroll listener + sticky recalc for the duration of this
+                            // save. Must be set BEFORE any await so it's in place before the
+                            // progress bar scaleX animation fires spurious scroll events.
                             window._suppressHeaderScroll = true;
 
                             setSyncStatus("Syncing...", "yellow");
@@ -2476,8 +2477,14 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             await saveDataToFirebase(monthDocRef, updatePayload, true); 
                             
                             setSyncStatus("Synced", "green");
-                            // Release after CSS transition (0.4s) + Firestore snapshot settle buffer
-                            setTimeout(() => { window._suppressHeaderScroll = false; }, 700);
+
+                            // Release after CSS transition (0.4s) + Firestore snapshot settle.
+                            // Then immediately run recalcSticky once to restore correct positions
+                            // in case anything legitimately changed (e.g. progress bar height).
+                            setTimeout(() => {
+                                window._suppressHeaderScroll = false;
+                                if (window.recalcSticky) window.recalcSticky();
+                            }, 700);
                          })();
 
                      } else {

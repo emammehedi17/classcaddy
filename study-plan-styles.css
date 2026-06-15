@@ -638,14 +638,14 @@
             height: 100%;
             width: 100%;
             transform-origin: left center;
-            /* scaleX instead of width: runs on compositor thread, zero layout reflow */
+            /* scaleX instead of width: GPU compositor only, zero layout reflow */
             transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out; 
             border-radius: 9999px; 
             position: relative;
         }
 		
 		.progress-bar-fill::after {
-            display: none; /* cap removed: incompatible with scaleX animation on parent */
+            display: none; /* removed: scaleX on parent squishes this circle and it can't be counter-scaled in CSS */
         }
 		
 		/* --- Gradient for Weekly Bar (Green -> Purple) --- */
