@@ -3594,13 +3594,25 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                          // Update the WEEK document
                          await updateDoc(weekDocRef, { days: daysArray });
                          
+                         // --- Update local cache so subsequent saves don't overwrite the story ---
+                         if (activeWeeksDataCache && activeWeeksDataCache[targetToSave.weekId]) {
+                             activeWeeksDataCache[targetToSave.weekId].days = daysArray;
+                         }
+                         
                          console.log("Story saved successfully in background for row:", targetToSave.rowIndex);
                          setSyncStatus("Synced", "green");
                          showCustomAlert("Story saved!", "success");
 
                          const daySection = document.querySelector(`[data-month-id="${targetToSave.monthId}"] [data-week-id="${targetToSave.weekId}"] [data-day-index="${targetToSave.dayIndex}"]`);
                          if (daySection && !daySection.classList.contains('editing')) {
-                             toggleDayEditMode(targetToSave.monthId, targetToSave.weekId, daySection, true);
+                             const tableBody = daySection.querySelector('tbody');
+                             if (tableBody) {
+                                 const updatedRows = daysArray[targetToSave.dayIndex].rows;
+                                 tableBody.innerHTML = updatedRows.map((rowData, rowIndex) =>
+                                    createTableRow(targetToSave.monthId, targetToSave.weekId, targetToSave.dayIndex, rowIndex, rowData, false)
+                                 ).join('');
+                                 tickAllTimers();
+                             }
                          }
 
                      } else { 
