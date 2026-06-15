@@ -427,6 +427,74 @@
 }
 
 
+/* --- Done / Undone Button --- */
+.done-btn {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    border: 1.5px solid;
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+    line-height: 1.4;
+}
+.done-btn-pending {
+    background-color: transparent;
+    border-color: #d1d5db;
+    color: #6b7280;
+}
+.done-btn-pending:hover {
+    background-color: #f0fdf4;
+    border-color: #6ee7b7;
+    color: #059669;
+}
+.done-btn-completed {
+    background-color: #ecfdf5;
+    border-color: #6ee7b7;
+    color: #065f46;
+}
+.done-btn-completed:hover {
+    background-color: #fee2e2;
+    border-color: #fca5a5;
+    color: #b91c1c;
+}
+.done-btn-completed:hover i {
+    display: none;
+}
+.done-btn-completed:hover::after {
+    content: '✕  Undone';
+    font-size: 0.75rem;
+}
+.done-btn-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    border-color: #d1d5db;
+    color: #9ca3af;
+    background: transparent;
+}
+body.dark-mode .done-btn-pending {
+    border-color: #4b5563;
+    color: #9ca3af;
+}
+body.dark-mode .done-btn-pending:hover {
+    background-color: #064e3b;
+    border-color: #34d399;
+    color: #6ee7b7;
+}
+body.dark-mode .done-btn-completed {
+    background-color: #064e3b;
+    border-color: #34d399;
+    color: #6ee7b7;
+}
+body.dark-mode .done-btn-completed:hover {
+    background-color: #450a0a;
+    border-color: #f87171;
+    color: #fca5a5;
+}
+
 /* --- স্টাইল ২: কমপ্লিটেড (Completed) সারি --- */
 
 .study-table tbody tr.row-completed td {
@@ -607,17 +675,10 @@
 
         /* --- Sticky Progress Bar --- */
         .sticky-progress-wrapper {
-            position: sticky; z-index: 10; background-color: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(4px); padding: 10px 0;
+            position: sticky; z-index: 10; background-color: rgba(255, 255, 255, 0.85); /* Slightly transparent */
+            backdrop-filter: blur(4px); padding: 10px 0; /* Reduced padding */
+            
             border-bottom: 1px solid #e5e7eb;
-            /* top = header height when visible, 0 when hidden.
-               --header-h is set once on load via JS and never touched again. */
-            top: var(--header-h, 65px);
-            transition: top 0.3s ease-in-out;
-        }
-        /* When header is hidden, body gets .header-is-hidden — sticky bars slide up */
-        body.header-is-hidden .sticky-progress-wrapper {
-            top: 0;
         }
 
         /* --- Sticky Day Progress & Timer Row (stack under weekly sticky bar) --- */
@@ -625,22 +686,6 @@
         .day-section:not(.is-collapsed) .sticky-day-row {
             position: sticky;
             z-index: 9;
-            /* top = header + weekly bar height. Both vars set once on load, never during interaction. */
-            top: calc(var(--header-h, 65px) + var(--weekly-bar-h, 44px));
-            transition: top 0.3s ease-in-out;
-        }
-        body.header-is-hidden .day-section.is-expanded .sticky-day-row,
-        body.header-is-hidden .day-section:not(.is-collapsed) .sticky-day-row {
-            top: var(--weekly-bar-h, 44px);
-        }
-        /* Timer row stacks below day header — its offset is handled by natural document flow
-           since it immediately follows the day header in the DOM, so no extra top needed. */
-        .day-timer-row.sticky-day-row {
-            top: calc(var(--header-h, 65px) + var(--weekly-bar-h, 44px) + var(--day-header-h, 48px));
-            transition: top 0.3s ease-in-out;
-        }
-        body.header-is-hidden .day-timer-row.sticky-day-row {
-            top: calc(var(--weekly-bar-h, 44px) + var(--day-header-h, 48px));
         }
         .day-section-header.sticky-day-row {
             background-color: inherit;
