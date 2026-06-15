@@ -1635,6 +1635,12 @@ body.dark-mode .done-btn-completed {
     border-left: 4px solid transparent; 
 }
 
+.day-header-sentinel {
+    height: 0;
+    margin: 0;
+    padding: 0;
+}
+
 .day-section-header {
     display: flex;
     /* justify-content: space-between; <-- REMOVED THIS LINE */
@@ -1680,6 +1686,52 @@ body.dark-mode .done-btn-completed {
 }
 .day-header-title h4 {
     font-size: 0.9rem; /* 1rem (16px) থেকে কমানো হলো */
+}
+
+/* When the header is "stuck" and the timer row has no remaining visible content
+   (no MCQ buttons, not in edit mode), collapse it so it doesn't leave empty space. */
+.day-header-stuck .day-timer-row:not(:has(.view-all-mcq-btn)):not(:has(.save-day-btn:not(.hidden))) {
+    display: none;
+}
+
+.day-header-timer-slot,
+.day-header-edit-slot {
+    display: contents;
+}
+.day-header-stuck .day-header-timer-slot .day-main-timer-widget {
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    gap: 3px;
+    border-radius: 8px;
+}
+.day-header-stuck .day-header-timer-slot .day-main-timer-widget .timer-icon {
+    font-size: 0.9rem;
+    margin-right: 2px;
+}
+.day-header-stuck .day-header-timer-slot .day-main-timer-widget .timer-display {
+    padding: 2px 6px;
+    min-width: 56px;
+    font-size: 0.75rem;
+}
+.day-header-stuck .day-header-timer-slot .day-main-timer-widget .timer-startpause-btn,
+.day-header-stuck .day-header-timer-slot .day-main-timer-widget .timer-end-btn {
+    font-size: 0.85rem;
+    padding: 3px;
+}
+.day-header-stuck .day-header-timer-slot .day-main-timer-widget .timer-display-group,
+.day-header-stuck .day-header-timer-slot .day-main-timer-widget .timer-total-label,
+.day-header-stuck .day-header-timer-slot .day-main-timer-widget .timer-title {
+    display: none;
+}
+.day-header-stuck .day-header-timer-slot .day-main-timer-widget .timer-display.timer-total {
+    display: none;
+}
+.day-header-stuck .day-header-timer-slot .day-main-timer-widget .timer-display[data-role="session"] {
+    display: inline-block;
+}
+.day-header-stuck .day-header-edit-slot .edit-day-btn {
+    padding: 2px 8px;
+    font-size: 0.7rem;
 }
 
 /* Apply Day-specific colors to Header, Body, and Border */
