@@ -328,63 +328,6 @@
         }
         window.updateStickyOffsets = updateStickyOffsets;
 
-        // --- Day Header "Stuck" State: move timer & Edit button into the header when sticky ---
-        function applyStuckLayout(daySection, isStuck) {
-            const header = daySection.querySelector('.day-section-header');
-            const timerWidget = daySection.querySelector('.day-main-timer-widget');
-            const editBtn = daySection.querySelector('.edit-day-btn');
-            const timerSlot = header?.querySelector('.day-header-timer-slot');
-            const editSlot = header?.querySelector('.day-header-edit-slot');
-            const timerRow = daySection.querySelector('.day-timer-row');
-            if (!header || !timerWidget || !timerSlot || !editSlot) return;
-
-            const alreadyStuck = daySection.classList.contains('day-header-stuck');
-            if (isStuck === alreadyStuck) return;
-
-            if (isStuck) {
-                timerSlot.appendChild(timerWidget);
-                if (editBtn) editSlot.appendChild(editBtn);
-                daySection.classList.add('day-header-stuck');
-            } else {
-                // Restore original positions: timer widget first, then the trailing actions wrapper
-                if (timerRow) {
-                    timerRow.insertBefore(timerWidget, timerRow.firstChild);
-                    const actionsWrapper = timerRow.querySelector('.flex.justify-end');
-                    if (editBtn && actionsWrapper) {
-                        // Place Edit button before the Save button if present, else append
-                        const saveBtn = actionsWrapper.querySelector('.save-day-btn');
-                        if (saveBtn) {
-                            actionsWrapper.insertBefore(editBtn, saveBtn);
-                        } else {
-                            actionsWrapper.appendChild(editBtn);
-                        }
-                    }
-                }
-                daySection.classList.remove('day-header-stuck');
-            }
-        }
-
-        window.applyStuckLayout = applyStuckLayout;
-
-        // Checks every expanded day's sentinel against the header's sticky `top` offset
-        // to determine whether its sticky header is currently "stuck".
-        function updateDayStuckStates(effectiveHeaderHeight) {
-            document.querySelectorAll('.week-section').forEach(weekSection => {
-                const weeklyBar = weekSection.querySelector('.sticky-progress-wrapper');
-                const weeklyBarHeight = weeklyBar ? weeklyBar.offsetHeight : 0;
-                const stickyTop = effectiveHeaderHeight + weeklyBarHeight;
-
-                weekSection.querySelectorAll('.day-section:not(.is-collapsed)').forEach(daySection => {
-                    const sentinel = daySection.querySelector('.day-header-sentinel');
-                    if (!sentinel) return;
-                    const rect = sentinel.getBoundingClientRect();
-                    const isStuck = rect.top < stickyTop;
-                    applyStuckLayout(daySection, isStuck);
-                });
-            });
-        }
-        window.updateDayStuckStates = updateDayStuckStates;
-
         if (pageHeader) {
             let lastScrollY = window.scrollY;
             // const headerHeight = pageHeader.offsetHeight; // <-- REMOVED FROM HERE
@@ -394,7 +337,6 @@
                 const isHeaderHidden = pageHeader.classList.contains('header-hidden');
                 const effectiveHeaderHeight = isHeaderHidden ? 0 : headerHeight;
                 updateStickyOffsets(effectiveHeaderHeight);
-                updateDayStuckStates(effectiveHeaderHeight);
             };
             window.recalcSticky = recalcSticky;
             window.addEventListener('resize', recalcSticky);
@@ -421,7 +363,6 @@
 
                 const effectiveHeaderHeight = isHeaderHidden ? 0 : headerHeight;
                 updateStickyOffsets(effectiveHeaderHeight);
-                updateDayStuckStates(effectiveHeaderHeight);
 
             });
         }
@@ -1441,22 +1382,17 @@ function updateMonthUI(monthId, monthData, weeksData) {
              return `
                  <div class="day-section is-collapsed" id="day-${monthId}-${weekId}-${dayIndex}" data-day-index="${dayIndex}"> 
                      
-                     <div class="day-header-sentinel"></div>
                      <div class="day-section-header sticky-day-row">
                          
                          <div class="day-header-title">
                              <h4 class="font-semibold text-gray-700">Day ${dayData.dayNumber}</h4>
                              ${isGuestMode ? '' : '<button class="icon-button delete-day-btn hidden" title="Delete Day"><i class="fas fa-calendar-times text-red-500"></i></button>'}
-                             <span class="day-header-timer-slot"></span>
                              </div>
                          
                          <div class="day-header-progress day-progress-wrapper" data-day-index="${dayIndex}">
                              <div class="flex justify-between text-xs text-gray-500">
                                  <span>Day Progress</span>
-                                 <span class="flex items-center gap-2">
-                                     <span class="day-header-edit-slot"></span>
-                                     <span id="day-perc-${monthId}-${weekId}-${dayIndex}" class="progress-percentage font-medium">${initialDayProgress}%</span>
-                                 </span>
+                                 <span id="day-perc-${monthId}-${weekId}-${dayIndex}" class="progress-percentage font-medium">${initialDayProgress}%</span>
                              </div>
                              <div class="progress-bar-container w-full"> 
                                  <div id="day-bar-${monthId}-${weekId}-${dayIndex}" class="progress-bar-fill progress-bar-daily" style="width: ${Math.min(initialDayProgress, 100)}%;"></div> 
@@ -2470,7 +2406,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         
                         if (!isExpanding) {
                             // The user is clicking an already-open day to collapse it.
-                            if (window.applyStuckLayout) window.applyStuckLayout(dayToToggle, false);
                             dayToToggle.classList.add('is-collapsed');
                         } else {
                             // The user is clicking a collapsed day to expand it.
@@ -2481,7 +2416,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                             // 2. Collapse all other open days within this month
                             monthElement.querySelectorAll('.day-section:not(.is-collapsed)').forEach(openDay => {
-                                if (window.applyStuckLayout) window.applyStuckLayout(openDay, false);
                                 openDay.classList.add('is-collapsed');
                             });
 
