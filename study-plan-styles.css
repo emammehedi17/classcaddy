@@ -637,8 +637,10 @@
         .progress-bar-fill { 
             
             height: 100%; 
-            /* MODIFIED: Added opacity */
-            transition: width 0.4s ease-in-out, opacity 0.4s ease-in-out; 
+            /* Use transform instead of width to animate — avoids layout reflow that shifts scrollY */
+            width: 100%;
+            transform-origin: left center;
+            transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out; 
             border-radius: 9999px; 
             position: relative; /* ADDED */
         }
@@ -648,15 +650,11 @@
             position: absolute;
             top: 50%;
             right: 0;
-            /* This centers the cap on the end of the bar */
-            transform: translate(50%, -50%); 
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background-color: white;
-            /* Matches the bar color and style */
-             
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            /* Centers the cap on the end of the bar.
+               scaleX on the parent would squish this circle, so we counter-scale it
+               using a CSS variable set to 1/scaleX. Since we can't do that in CSS alone,
+               we simply hide the cap — it's decorative and causes its own reflow issues. */
+            display: none;
         }
 		
 		/* --- Gradient for Weekly Bar (Green -> Purple) --- */

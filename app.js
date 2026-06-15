@@ -349,14 +349,17 @@
                 const currentScrollY = window.scrollY;
                 let isHeaderHidden = pageHeader.classList.contains('header-hidden'); // Get current state
 
-                if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                    // Scrolling DOWN: Hide header
-                    pageHeader.classList.add('header-hidden');
-                    isHeaderHidden = true;
-                } else if (currentScrollY < lastScrollY || currentScrollY <= 0) {
-                    // Scrolling UP (or at the top): Show header
-                    pageHeader.classList.remove('header-hidden');
-                    isHeaderHidden = false;
+                // Suppress header show/hide during checkbox saves to prevent layout-shift feedback loops
+                if (!window._suppressHeaderScroll) {
+                    if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                        // Scrolling DOWN: Hide header
+                        pageHeader.classList.add('header-hidden');
+                        isHeaderHidden = true;
+                    } else if (currentScrollY < lastScrollY || currentScrollY <= 0) {
+                        // Scrolling UP (or at the top): Show header
+                        pageHeader.classList.remove('header-hidden');
+                        isHeaderHidden = false;
+                    }
                 }
                 
                 lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
@@ -780,7 +783,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
             const weekBar = monthElement.querySelector(`#week-bar-${monthId}-${weekId}`);
             const weekPercText = monthElement.querySelector(`#week-perc-${monthId}-${weekId}`);
             if (weekBar && weekPercText) {
-                weekBar.style.width = `${weekPerc}%`;
+                weekBar.style.transform = `scaleX(${weekPerc / 100})`;
                 weekBar.style.opacity = weekPerc > 0 ? '1' : '0';
                 weekPercText.textContent = `${weekPerc}%`;
             }
@@ -791,7 +794,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 const dayBar = monthElement.querySelector(`#day-bar-${monthId}-${weekId}-${dayIndex}`);
                 const dayPercText = monthElement.querySelector(`#day-perc-${monthId}-${weekId}-${dayIndex}`);
                 if (dayBar && dayPercText) {
-                    dayBar.style.width = `${Math.min(dayPerc, 100)}%`;
+                    dayBar.style.transform = `scaleX(${Math.min(dayPerc, 100) / 100})`;
                     dayBar.style.opacity = dayPerc > 0 ? '1' : '0';
                     dayPercText.textContent = `${dayPerc}%`;
                 }
@@ -1334,7 +1337,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         </div>
                         
                         <div class="progress-bar-container w-full"> 
-                            <div id="week-bar-${monthId}-${weekId}" class="progress-bar-fill progress-bar-weekly" style="width: ${initialProgress}%;"></div> 
+                            <div id="week-bar-${monthId}-${weekId}" class="progress-bar-fill progress-bar-weekly" style="transform: scaleX(${initialProgress / 100});"></div> 
                         </div>
                     </div>
                     <div class="flex justify-end mt-2">
@@ -1384,7 +1387,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                                  <span id="day-perc-${monthId}-${weekId}-${dayIndex}" class="progress-percentage font-medium">${initialDayProgress}%</span>
                              </div>
                              <div class="progress-bar-container w-full"> 
-                                 <div id="day-bar-${monthId}-${weekId}-${dayIndex}" class="progress-bar-fill progress-bar-daily" style="width: ${Math.min(initialDayProgress, 100)}%;"></div> 
+                                 <div id="day-bar-${monthId}-${weekId}-${dayIndex}" class="progress-bar-fill progress-bar-daily" style="transform: scaleX(${Math.min(initialDayProgress, 100) / 100});"></div> 
                              </div>
                          </div>
                          
@@ -2430,6 +2433,12 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          
                          (async () => {
                             setSyncStatus("Syncing...", "yellow");
+
+                            // Suppress header show/hide during the entire save + animation sequence.
+                            // Progress bar width animation causes micro layout shifts that nudge
+                            // window.scrollY, which the scroll listener misreads as an upward scroll,
+                            // causing the header to reappear. We block that for 600ms (animation is 400ms).
+                            window._suppressHeaderScroll = true;
                             
                             const dayIndex = parseInt(daySection.dataset.dayIndex);
                             const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
@@ -2443,6 +2452,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             if (parseResult === null) {
                                 setSyncStatus("Error", "red");
                                 target.checked = !target.checked; // Revert on error
+                                window._suppressHeaderScroll = false;
                                 return;
                             }
                             
@@ -2465,6 +2475,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             await saveDataToFirebase(monthDocRef, updatePayload, true); 
                             
                             setSyncStatus("Synced", "green");
+                            // Release after animation (0.4s) + buffer
+                            setTimeout(() => { window._suppressHeaderScroll = false; }, 600);
                          })();
 
                      } else {
@@ -3909,7 +3921,7 @@ async function updateDailyProgressUI(monthId, weekId, dayIndex, dayData) {
 
                  if (dataToUse) {
                     const progress = calculateDailyProgress(dataToUse);
-                    progressBarFill.style.width = `${Math.min(progress, 100)}%`;
+                    progressBarFill.style.transform = `scaleX(${Math.min(progress, 100) / 100})`;
                     // --- THIS IS THE CHANGE ---
                     // Hide the bar (and cap) if progress is 0
                     progressBarFill.style.opacity = progress > 0 ? '1' : '0';
@@ -3943,7 +3955,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
                  if (dataToUse) {
                     const progress = calculateWeeklyProgress(dataToUse);
-                    progressBarFill.style.width = `${progress}%`;
+                    progressBarFill.style.transform = `scaleX(${progress / 100})`;
                     progressBarFill.style.opacity = progress > 0 ? '1' : '0';
                     progressPercentageSpan.textContent = `${progress}%`;
                  }
