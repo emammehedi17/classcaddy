@@ -252,6 +252,7 @@
         let progressChart = null; // Holds the chart instance
         let studyTimeDailyChart = null;
         let studyTimeSubjectChart = null;
+        let studyTimeStackedChart = null;
 		let currentQuizResultData = null; // <-- ADD THIS
 		let savedResultsCache = null; // <-- ADD THIS, for caching results
 		let isQuizResultSaved = false;
@@ -2248,10 +2249,12 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 // --- Aggregate Data ---
                 const dayLabels = [];
                 const dayTotals = [];
-                const subjectTotals = {}; // subject -> seconds
+                const subjectTotals = {}; // subject -> seconds (week total)
+                // subjectDaySeconds[subject][dayIndex] = seconds
+                const subjectDaySeconds = {};
                 let weekGrandTotal = 0;
 
-                daysData.forEach(day => {
+                daysData.forEach((day, dayIdx) => {
                     let dayTotal = getTimerLiveValues(day.dayTimer).total;
                     (day.rows || []).forEach(row => {
                         const rowSeconds = getTimerLiveValues(row.timer).total;
@@ -2259,6 +2262,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         if (rowSeconds > 0) {
                             const subjKey = row.subject || 'Other';
                             subjectTotals[subjKey] = (subjectTotals[subjKey] || 0) + rowSeconds;
+                            if (!subjectDaySeconds[subjKey]) {
+                                subjectDaySeconds[subjKey] = new Array(daysData.length).fill(0);
+                            }
+                            subjectDaySeconds[subjKey][dayIdx] += rowSeconds;
                         }
                     });
                     dayLabels.push(`Day ${day.dayNumber}`);
@@ -2268,6 +2275,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                 const subjectLabels = Object.keys(subjectTotals);
                 const subjectMinutes = subjectLabels.map(s => Math.round((subjectTotals[s] / 60) * 100) / 100);
+                const numDays = daysData.length;
+                const subjectColors = ['#10b981', '#0ea5e9', '#f59e0b', '#ef4444', '#a855f7', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#14b8a6', '#6366f1'];
 
                 // --- Build HTML ---
                 let html = `
@@ -2289,53 +2298,81 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             </div>
                         </div>
                     </div>
-                    <div class="results-table-container">
-                    <table class="w-full text-sm text-left text-gray-600 study-table">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 border text-center bg-gray-100">Day</th>
-                                <th class="px-4 py-3 border text-center bg-gray-100">Total Study Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
                 `;
 
-                daysData.forEach((day, idx) => {
-                    const totalSecondsForDay = dayTotals[idx] * 60;
-                    html += `<tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 border font-medium text-gray-900 text-center">Day ${day.dayNumber}</td>
-                        <td class="px-4 py-3 border text-center">${formatTimerHMS(totalSecondsForDay)}</td>
-                    </tr>`;
-                });
-
-                html += `</tbody></table></div>`;
-
+                // --- Total Study Time Table: Subjects as rows, Days as columns ---
                 if (subjectLabels.length > 0) {
                     html += `
-                        <div class="results-table-container mt-4">
+                        <h4 class="text-center font-semibold text-gray-700 mb-2 mt-6">Total Study Time</h4>
+                        <div class="results-table-container overflow-x-auto">
                         <table class="w-full text-sm text-left text-gray-600 study-table">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                                 <tr>
                                     <th class="px-4 py-3 border text-center bg-gray-100">Subject</th>
-                                    <th class="px-4 py-3 border text-center bg-gray-100">Total Study Time</th>
+                    `;
+                    dayLabels.forEach(label => {
+                        html += `<th class="px-4 py-3 border text-center bg-gray-100">${label}</th>`;
+                    });
+                    html += `<th class="px-4 py-3 border text-center bg-gray-100">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                     `;
-                    subjectLabels.forEach((subj, idx) => {
+
+                    // One row per subject
+                    subjectLabels.forEach((subj, sIdx) => {
                         html += `<tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 border font-medium text-gray-900 text-center">${escapeHtml(subj)}</td>
-                            <td class="px-4 py-3 border text-center">${formatTimerHMS(subjectMinutes[idx] * 60)}</td>
+                            <td class="px-4 py-3 border font-medium text-gray-900 text-center">${escapeHtml(subj)}</td>`;
+                        for (let d = 0; d < numDays; d++) {
+                            const secs = (subjectDaySeconds[subj] && subjectDaySeconds[subj][d]) || 0;
+                            html += `<td class="px-4 py-3 border text-center">${secs > 0 ? formatTimerHMS(secs) : '-'}</td>`;
+                        }
+                        html += `<td class="px-4 py-3 border text-center font-semibold">${formatTimerHMS(subjectTotals[subj])}</td>
                         </tr>`;
                     });
+
+                    // Average row (per-day average across subjects)
+                    html += `<tr class="bg-amber-50">
+                        <td class="px-4 py-3 border font-semibold text-gray-900 text-center">Average</td>`;
+                    for (let d = 0; d < numDays; d++) {
+                        const avgSecs = subjectLabels.length > 0
+                            ? (dayTotals[d] * 60) / subjectLabels.length
+                            : 0;
+                        html += `<td class="px-4 py-3 border text-center font-semibold">${formatTimerHMS(avgSecs)}</td>`;
+                    }
+                    const avgWeekTotal = subjectLabels.length > 0 ? weekGrandTotal / subjectLabels.length : 0;
+                    html += `<td class="px-4 py-3 border text-center font-semibold">${formatTimerHMS(avgWeekTotal)}</td>
+                    </tr>`;
+
+                    // Total Time row (sum across subjects per day == day total)
+                    html += `<tr class="bg-emerald-50">
+                        <td class="px-4 py-3 border font-bold text-gray-900 text-center">Total Time</td>`;
+                    for (let d = 0; d < numDays; d++) {
+                        html += `<td class="px-4 py-3 border text-center font-bold text-emerald-700">${formatTimerHMS(dayTotals[d] * 60)}</td>`;
+                    }
+                    html += `<td class="px-4 py-3 border text-center font-bold text-emerald-700">${formatTimerHMS(weekGrandTotal)}</td>
+                    </tr>`;
+
                     html += `</tbody></table></div>`;
                 }
+
+                // --- Detailed Colorful Bar Graph: one bar per day, stacked by subject ---
+                if (subjectLabels.length > 0) {
+                    html += `
+                        <h4 class="text-center font-semibold text-gray-700 mb-2 mt-8">Daily Study Time by Subject (minutes)</h4>
+                        <div style="width: 100%; height: 380px;">
+                            <canvas id="study-time-stacked-canvas"></canvas>
+                        </div>
+                    `;
+                }
+
 
                 studyTimeReportContent.innerHTML = html;
 
                 // --- Render Charts ---
                 if (studyTimeDailyChart) { studyTimeDailyChart.destroy(); }
                 if (studyTimeSubjectChart) { studyTimeSubjectChart.destroy(); }
+                if (studyTimeStackedChart) { studyTimeStackedChart.destroy(); }
 
                 const dailyCtx = document.getElementById('study-time-daily-canvas').getContext('2d');
                 studyTimeDailyChart = new Chart(dailyCtx, {
@@ -2361,19 +2398,45 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                 if (subjectLabels.length > 0) {
                     const subjectCtx = document.getElementById('study-time-subject-canvas').getContext('2d');
-                    const colors = ['#10b981', '#0ea5e9', '#f59e0b', '#ef4444', '#a855f7', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#f97316'];
                     studyTimeSubjectChart = new Chart(subjectCtx, {
                         type: 'pie',
                         data: {
                             labels: subjectLabels,
                             datasets: [{
                                 data: subjectMinutes,
-                                backgroundColor: subjectLabels.map((_, i) => colors[i % colors.length])
+                                backgroundColor: subjectLabels.map((_, i) => subjectColors[i % subjectColors.length])
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            plugins: { legend: { position: 'bottom' } }
+                        }
+                    });
+
+                    // Stacked bar chart: one bar per day, segments per subject
+                    const stackedCtx = document.getElementById('study-time-stacked-canvas').getContext('2d');
+                    const stackedDatasets = subjectLabels.map((subj, i) => ({
+                        label: subj,
+                        data: subjectDaySeconds[subj].map(secs => Math.round((secs / 60) * 100) / 100),
+                        backgroundColor: subjectColors[i % subjectColors.length],
+                        borderColor: subjectColors[i % subjectColors.length],
+                        borderWidth: 1,
+                        borderRadius: 3
+                    }));
+                    studyTimeStackedChart = new Chart(stackedCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: dayLabels,
+                            datasets: stackedDatasets
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { stacked: true },
+                                y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Minutes' } }
+                            },
                             plugins: { legend: { position: 'bottom' } }
                         }
                     });
@@ -2390,8 +2453,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
         document.getElementById('print-study-time-report-btn')?.addEventListener('click', () => {
             const dailyCanvas = document.getElementById('study-time-daily-canvas');
             const subjectCanvas = document.getElementById('study-time-subject-canvas');
+            const stackedCanvas = document.getElementById('study-time-stacked-canvas');
             const dailyImg = dailyCanvas ? dailyCanvas.toDataURL('image/png') : '';
             const subjectImg = subjectCanvas ? subjectCanvas.toDataURL('image/png') : '';
+            const stackedImg = stackedCanvas ? stackedCanvas.toDataURL('image/png') : '';
 
             const tablesHtml = studyTimeReportContent.querySelectorAll('.results-table-container');
             let tablesOuterHtml = '';
@@ -2407,6 +2472,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     <style>
                         body { font-family: Arial, sans-serif; padding: 20px; color: #000; }
                         h2 { text-align: center; color: #059669; }
+                        h4 { text-align: center; color: #374151; margin-top: 20px; }
                         img { max-width: 100%; margin: 10px 0; }
                         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
                         th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
@@ -2423,6 +2489,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         ${subjectImg ? `<div><img src="${subjectImg}"></div>` : ''}
                     </div>
                     ${tablesOuterHtml}
+                    ${stackedImg ? `<h4>Daily Study Time by Subject</h4><img src="${stackedImg}">` : ''}
                 </body>
                 </html>
             `);
