@@ -1566,8 +1566,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      </td>
                      <td class="px-3 py-2 align-middle center-cell" data-label="Done">
                         ${isEditing || isGuestMode
-                            ? `<button class="done-btn done-btn-disabled" disabled>${rowData.completed ? '<i class="fas fa-check-circle mr-1"></i> Done' : '<i class="far fa-circle mr-1"></i> Done'}</button>`
-                            : `<button class="done-btn ${rowData.completed ? 'done-btn-completed' : 'done-btn-pending'}" data-row-index="${rowIndex}">
+                            ? `<button type="button" class="done-btn done-btn-disabled" disabled>${rowData.completed ? '<i class="fas fa-check-circle mr-1"></i> Done' : '<i class="far fa-circle mr-1"></i> Done'}</button>`
+                            : `<button type="button" class="done-btn ${rowData.completed ? 'done-btn-completed' : 'done-btn-pending'}" data-row-index="${rowIndex}">
                                 ${rowData.completed
                                     ? '<i class="fas fa-check-circle mr-1"></i> Done'
                                     : '<i class="far fa-circle mr-1"></i> Done'}
@@ -2438,7 +2438,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                  // Handle Done/Undone button click
                  if (target.closest('.done-btn') && !target.closest('.done-btn').disabled) {
+                     e.preventDefault();
                      const doneBtn = target.closest('.done-btn');
+                     doneBtn.blur();
                      if (!daySection?.classList.contains('editing')) {
                          // 1. Instant visual feedback — toggle button state and row style
                          const nowCompleted = !doneBtn.classList.contains('done-btn-completed');

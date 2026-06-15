@@ -446,27 +446,10 @@
     border-color: #d1d5db;
     color: #6b7280;
 }
-.done-btn-pending:hover {
-    background-color: #f0fdf4;
-    border-color: #6ee7b7;
-    color: #059669;
-}
 .done-btn-completed {
     background-color: #ecfdf5;
     border-color: #6ee7b7;
     color: #065f46;
-}
-.done-btn-completed:hover {
-    background-color: #fee2e2;
-    border-color: #fca5a5;
-    color: #b91c1c;
-}
-.done-btn-completed:hover i {
-    display: none;
-}
-.done-btn-completed:hover::after {
-    content: '✕  Undone';
-    font-size: 0.75rem;
 }
 .done-btn-disabled {
     opacity: 0.4;
@@ -479,20 +462,10 @@ body.dark-mode .done-btn-pending {
     border-color: #4b5563;
     color: #9ca3af;
 }
-body.dark-mode .done-btn-pending:hover {
-    background-color: #064e3b;
-    border-color: #34d399;
-    color: #6ee7b7;
-}
 body.dark-mode .done-btn-completed {
     background-color: #064e3b;
     border-color: #34d399;
     color: #6ee7b7;
-}
-body.dark-mode .done-btn-completed:hover {
-    background-color: #450a0a;
-    border-color: #f87171;
-    color: #fca5a5;
 }
 
 /* --- স্টাইল ২: কমপ্লিটেড (Completed) সারি --- */
