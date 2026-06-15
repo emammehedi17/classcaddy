@@ -1698,7 +1698,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     const rowTimer = dayData.rows?.[parseInt(widget.dataset.rowIndex)]?.timer || getDefaultTimerObj();
                     const { session, total } = getTimerLiveValues(rowTimer);
                     if (sessionEl) sessionEl.textContent = formatTimerHMS(session);
-                    if (totalEl) totalEl.textContent = formatTimerHMS(total);
+                    if (totalEl && !totalEl.classList.contains('editing')) totalEl.textContent = formatTimerHMS(total);
                     if (startPauseBtn) startPauseBtn.className = rowTimer.isRunning ? 'fas fa-pause' : 'fas fa-play';
                     widget.classList.toggle('timer-running', !!rowTimer.isRunning);
                 } else {
@@ -1713,7 +1713,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     (dayData.rows || []).forEach(row => {
                         grandTotal += getTimerLiveValues(row.timer).total;
                     });
-                    if (totalEl) totalEl.textContent = formatTimerHMS(grandTotal);
+                    if (totalEl && !totalEl.classList.contains('editing')) totalEl.textContent = formatTimerHMS(grandTotal);
                 }
             });
         }
@@ -1856,13 +1856,178 @@ function updateMonthUI(monthId, monthData, weeksData) {
             updateTimerState(monthId, weekId, dayIndex, rowIndex, action);
         });
 
-        // Double-click handler: open fullscreen timer modal
+        // Double-click handler: open fullscreen timer modal (Current) or edit total time (Total)
         document.addEventListener('dblclick', function(e) {
             const widget = e.target.closest('.timer-widget');
             if (!widget) return;
             if (e.target.closest('button')) return;
+
+            const totalEl = e.target.closest('.timer-total[data-role="total"]');
+            if (totalEl) {
+                enterTimerTotalEditMode(totalEl, widget);
+                return;
+            }
+
+            // Don't open fullscreen if a total edit is currently active in this widget
+            if (widget.querySelector('.timer-edit-wrap')) return;
+
             openFullscreenTimerModal(widget);
         });
+
+        // --- TOTAL TIME INLINE EDIT ---
+        function enterTimerTotalEditMode(totalEl, widget) {
+            // Already editing
+            if (totalEl.querySelector('.timer-edit-wrap')) return;
+
+            const currentText = totalEl.textContent.trim(); // HH:MM:SS
+            const parts = currentText.split(':');
+            const h = parts[0] || '00';
+            const m = parts[1] || '00';
+            const s = parts[2] || '00';
+
+            totalEl.classList.add('editing');
+            totalEl.dataset.originalText = currentText;
+            totalEl.innerHTML = `<span class="timer-edit-wrap">` +
+                `<input type="number" class="timer-edit-input" data-unit="h" min="0" max="99" value="${parseInt(h, 10)}">` +
+                `<span class="timer-edit-colon">:</span>` +
+                `<input type="number" class="timer-edit-input" data-unit="m" min="0" max="59" value="${parseInt(m, 10)}">` +
+                `<span class="timer-edit-colon">:</span>` +
+                `<input type="number" class="timer-edit-input" data-unit="s" min="0" max="59" value="${parseInt(s, 10)}">` +
+                `</span>`;
+
+            const inputs = totalEl.querySelectorAll('.timer-edit-input');
+
+            // Pad to 2 digits on blur of each field, and auto-advance when 2 digits typed
+            inputs.forEach((inp, idx) => {
+                inp.addEventListener('input', () => {
+                    let v = inp.value.replace(/\D/g, '').slice(0, 2);
+                    inp.value = v;
+                    if (v.length === 2 && idx < inputs.length - 1) {
+                        inputs[idx + 1].focus();
+                        inputs[idx + 1].select();
+                    }
+                });
+                inp.addEventListener('keydown', (ev) => {
+                    if (ev.key === 'Enter') {
+                        ev.preventDefault();
+                        finishTimerTotalEdit(totalEl, widget, true);
+                    } else if (ev.key === 'Escape') {
+                        ev.preventDefault();
+                        finishTimerTotalEdit(totalEl, widget, false);
+                    }
+                });
+                inp.addEventListener('click', (ev) => ev.stopPropagation());
+                inp.addEventListener('dblclick', (ev) => ev.stopPropagation());
+            });
+
+            // Save when focus leaves the whole edit group (click outside)
+            totalEl.addEventListener('focusout', (ev) => {
+                // If focus moved to another input within the same edit group, do nothing
+                if (totalEl.contains(ev.relatedTarget)) return;
+                setTimeout(() => finishTimerTotalEdit(totalEl, widget, true), 0);
+            });
+
+            inputs[0].focus();
+            inputs[0].select();
+        }
+
+        function finishTimerTotalEdit(totalEl, widget, shouldSave) {
+            if (!totalEl.classList.contains('editing')) return; // already finished
+            const inputs = totalEl.querySelectorAll('.timer-edit-input');
+            if (!inputs.length) return;
+
+            let newTotalSeconds = null;
+            if (shouldSave) {
+                const h = parseInt(inputs[0].value || '0', 10) || 0;
+                const m = Math.min(59, parseInt(inputs[1].value || '0', 10) || 0);
+                const s = Math.min(59, parseInt(inputs[2].value || '0', 10) || 0);
+                newTotalSeconds = (h * 3600) + (m * 60) + s;
+            }
+
+            totalEl.classList.remove('editing');
+
+            const monthId = widget.dataset.monthId;
+            const weekId = widget.dataset.weekId;
+            const dayIndex = parseInt(widget.dataset.dayIndex);
+            const rowIndex = widget.dataset.timerScope === 'row' ? parseInt(widget.dataset.rowIndex) : null;
+
+            if (newTotalSeconds === null) {
+                // Cancelled - restore display via tick
+                totalEl.textContent = totalEl.dataset.originalText || '00:00:00';
+                delete totalEl.dataset.originalText;
+                return;
+            }
+
+            delete totalEl.dataset.originalText;
+            totalEl.textContent = formatTimerHMS(newTotalSeconds);
+            updateTimerTotal(monthId, weekId, dayIndex, rowIndex, newTotalSeconds);
+        }
+
+        // Persist an edited "Total" value.
+        // For a row, sets row.timer.totalSeconds directly.
+        // For the day's overall total (sum of all row totals + day main timer total),
+        // the difference is applied to dayTimer.totalSeconds so the new sum matches the entered value.
+        async function updateTimerTotal(monthId, weekId, dayIndex, rowIndex, newTotalSeconds) {
+            try {
+                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+
+                let daysArray;
+                if (activeWeeksDataCache && activeWeeksDataCache[weekId] && activeWeeksDataCache[weekId].days) {
+                    daysArray = JSON.parse(JSON.stringify(activeWeeksDataCache[weekId].days));
+                } else {
+                    const weekDocSnap = await getDoc(weekDocRef);
+                    if (!weekDocSnap.exists()) throw new Error("Week document not found.");
+                    daysArray = weekDocSnap.data().days || [];
+                }
+
+                const dayData = daysArray[dayIndex];
+                if (!dayData) throw new Error("Day data not found.");
+
+                if (rowIndex === null || rowIndex === undefined) {
+                    // Editing the day's overall "Total Today" widget.
+                    if (!dayData.dayTimer) dayData.dayTimer = getDefaultTimerObj();
+                    const dayTimer = dayData.dayTimer;
+                    if (typeof dayTimer.sessionSeconds !== 'number') dayTimer.sessionSeconds = dayTimer.totalSeconds || 0;
+
+                    // Current grand total = day timer total + sum of all row totals (live values)
+                    let rowsTotal = 0;
+                    (dayData.rows || []).forEach(row => {
+                        if (!row.timer) row.timer = getDefaultTimerObj();
+                        rowsTotal += getTimerLiveValues(row.timer).total;
+                    });
+
+                    const currentDayTimerTotal = getTimerLiveValues(dayTimer).total;
+                    const currentGrandTotal = currentDayTimerTotal + rowsTotal;
+                    const diff = newTotalSeconds - currentGrandTotal;
+
+                    let newDayTimerTotal = currentDayTimerTotal + diff;
+                    if (newDayTimerTotal < 0) newDayTimerTotal = 0;
+
+                    dayTimer.totalSeconds = newDayTimerTotal;
+                    // If currently running, keep startedAt as-is; totalSeconds is the accumulated baseline
+                    // and getTimerLiveValues will continue to add elapsed time on top of it.
+                } else {
+                    if (!dayData.rows[rowIndex].timer) dayData.rows[rowIndex].timer = getDefaultTimerObj();
+                    const timerObj = dayData.rows[rowIndex].timer;
+                    if (typeof timerObj.sessionSeconds !== 'number') timerObj.sessionSeconds = timerObj.totalSeconds || 0;
+                    timerObj.totalSeconds = Math.max(0, newTotalSeconds);
+                }
+
+                // Update cache
+                if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
+                    activeWeeksDataCache[weekId].days = daysArray;
+                }
+
+                tickAllTimers();
+                tickFullscreenTimer();
+
+                await updateDoc(weekDocRef, { days: daysArray });
+            } catch (error) {
+                console.error("Error updating timer total:", error);
+                showCustomAlert("Error updating total time.", "error");
+                tickAllTimers();
+            }
+        }
 
         function openFullscreenTimerModal(widget) {
             const monthId = widget.dataset.monthId;

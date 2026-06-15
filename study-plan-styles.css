@@ -114,6 +114,55 @@
             background-color: #ecfdf5;
             border-color: #6ee7b7;
             color: #047857;
+            cursor: pointer;
+        }
+        .timer-widget .timer-total.editing {
+            cursor: text;
+            padding-left: 6px;
+            padding-right: 6px;
+        }
+        .timer-edit-wrap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1px;
+            font-family: monospace;
+            font-weight: 700;
+            font-size: inherit;
+            color: inherit;
+        }
+        .timer-edit-wrap .timer-edit-input {
+            width: 1.6em;
+            text-align: center;
+            border: none;
+            background: rgba(255,255,255,0.6);
+            border-radius: 3px;
+            font-family: monospace;
+            font-weight: 700;
+            font-size: inherit;
+            color: inherit;
+            padding: 0;
+            outline: none;
+            -moz-appearance: textfield;
+        }
+        .timer-edit-wrap .timer-edit-input::-webkit-outer-spin-button,
+        .timer-edit-wrap .timer-edit-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .timer-edit-wrap .timer-edit-input:focus {
+            background: #ffffff;
+            box-shadow: 0 0 0 1px #10b981;
+        }
+        body.dark-mode .timer-edit-wrap .timer-edit-input {
+            background: rgba(0,0,0,0.3);
+            color: #d1fae5;
+        }
+        body.dark-mode .timer-edit-wrap .timer-edit-input:focus {
+            background: #064e3b;
+        }
+        .timer-edit-colon {
+            padding: 0 1px;
         }
         .timer-widget.timer-running .timer-display[data-role="session"] {
             background-color: #fef3c7;
