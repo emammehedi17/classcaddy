@@ -2360,7 +2360,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 if (subjectLabels.length > 0) {
                     html += `
                         <h4 class="text-center font-semibold text-gray-700 mb-2 mt-8">Daily Study Time by Subject (minutes)</h4>
-                        <div style="width: 100%; height: 380px;">
+                        <div style="width: 100%; height: 1140px;">
                             <canvas id="study-time-stacked-canvas"></canvas>
                         </div>
                     `;
