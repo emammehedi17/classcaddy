@@ -302,74 +302,54 @@
         
 
         // --- Header Navigation & Scroll Logic (from script.js) ---
-        function updateStickyOffsets(effectiveHeaderHeight) {
-            // Skip during checkbox saves — the header state isn't changing, so sticky
-            // top values don't need to change either. Recalculating them forces layout
-            // reads (offsetHeight) and style writes that visibly jump the day section.
-            if (window._suppressHeaderScroll) return;
-
-            // Update sticky progress bars
-            const headerTopPx = `${effectiveHeaderHeight}px`;
-            document.querySelectorAll('.sticky-progress-wrapper').forEach(bar => {
-                bar.style.top = headerTopPx;
-            });
-
-            // Update sticky day progress headers & timer rows, stacking below the weekly bar
-            document.querySelectorAll('.week-section').forEach(weekSection => {
-                const weeklyBar = weekSection.querySelector('.sticky-progress-wrapper');
-                const weeklyBarHeight = weeklyBar ? weeklyBar.offsetHeight : 0;
-                const dayHeaderTop = effectiveHeaderHeight + weeklyBarHeight;
-
-                weekSection.querySelectorAll('.day-section-header.sticky-day-row').forEach(dayHeader => {
-                    dayHeader.style.top = `${dayHeaderTop}px`;
-
-                    const daySection = dayHeader.closest('.day-section');
-                    const timerRow = daySection ? daySection.querySelector('.day-timer-row.sticky-day-row') : null;
-                    if (timerRow) {
-                        timerRow.style.top = `${dayHeaderTop + dayHeader.offsetHeight}px`;
-                    }
-                });
-            });
+        // --- STICKY POSITIONING: CSS-variable approach ---
+        // We set --header-h, --weekly-bar-h, --day-header-h ONCE on load.
+        // The scroll listener only toggles body.header-is-hidden — no style.top writes,
+        // no offsetHeight reads, no layout thrashing during checkbox interactions.
+        function updateStickyOffsets() {
+            // No-op: sticky tops are now handled entirely by CSS calc() + CSS variables.
+            // This stub exists so existing callers (recalcSticky, resize handler) don't error.
         }
         window.updateStickyOffsets = updateStickyOffsets;
 
         if (pageHeader) {
             let lastScrollY = window.scrollY;
-            // const headerHeight = pageHeader.offsetHeight; // <-- REMOVED FROM HERE
 
-            const recalcSticky = () => {
-                const headerHeight = pageHeader.offsetHeight || 65;
-                const isHeaderHidden = pageHeader.classList.contains('header-hidden');
-                const effectiveHeaderHeight = isHeaderHidden ? 0 : headerHeight;
-                updateStickyOffsets(effectiveHeaderHeight);
+            // Measure once and set CSS variables on <html> so they're globally available.
+            const initStickyVars = () => {
+                const headerH = pageHeader.offsetHeight || 65;
+                document.documentElement.style.setProperty('--header-h', `${headerH}px`);
+
+                // Measure the weekly bar height from the first one found (they're all the same).
+                const sampleWeeklyBar = document.querySelector('.sticky-progress-wrapper');
+                const weeklyBarH = sampleWeeklyBar ? sampleWeeklyBar.offsetHeight : 44;
+                document.documentElement.style.setProperty('--weekly-bar-h', `${weeklyBarH}px`);
+
+                // Measure day header height from the first one found.
+                const sampleDayHeader = document.querySelector('.day-section-header.sticky-day-row');
+                const dayHeaderH = sampleDayHeader ? sampleDayHeader.offsetHeight : 48;
+                document.documentElement.style.setProperty('--day-header-h', `${dayHeaderH}px`);
             };
+
+            const recalcSticky = () => initStickyVars();
             window.recalcSticky = recalcSticky;
             window.addEventListener('resize', recalcSticky);
-            // Initial calculation after render
-            setTimeout(recalcSticky, 0);
+            setTimeout(initStickyVars, 100); // after first render
 
             window.addEventListener('scroll', () => {
-                const headerHeight = pageHeader.offsetHeight || 65;
                 const currentScrollY = window.scrollY;
-                let isHeaderHidden = pageHeader.classList.contains('header-hidden');
-
-                // During checkbox saves, layout shifts from scaleX animation fire spurious
-                // scroll events. Freeze everything — no header toggling, no sticky recalc,
-                // no lastScrollY update — so state is exactly preserved for real scrolls after.
-                if (window._suppressHeaderScroll) return;
 
                 if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                    // Scrolling DOWN: hide header, sticky bars slide up via CSS transition
                     pageHeader.classList.add('header-hidden');
-                    isHeaderHidden = true;
+                    document.body.classList.add('header-is-hidden');
                 } else if (currentScrollY < lastScrollY || currentScrollY <= 0) {
+                    // Scrolling UP: show header, sticky bars slide down via CSS transition
                     pageHeader.classList.remove('header-hidden');
-                    isHeaderHidden = false;
+                    document.body.classList.remove('header-is-hidden');
                 }
 
                 lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
-
-                const effectiveHeaderHeight = isHeaderHidden ? 0 : headerHeight;
-                updateStickyOffsets(effectiveHeaderHeight);
             });
         }
 
@@ -786,7 +766,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
             const weekBar = monthElement.querySelector(`#week-bar-${monthId}-${weekId}`);
             const weekPercText = monthElement.querySelector(`#week-perc-${monthId}-${weekId}`);
             if (weekBar && weekPercText) {
-                weekBar.style.transform = `scaleX(${weekPerc / 100})`;
+                weekBar.style.width = `${weekPerc}%`;
                 weekBar.style.opacity = weekPerc > 0 ? '1' : '0';
                 weekPercText.textContent = `${weekPerc}%`;
             }
@@ -797,7 +777,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 const dayBar = monthElement.querySelector(`#day-bar-${monthId}-${weekId}-${dayIndex}`);
                 const dayPercText = monthElement.querySelector(`#day-perc-${monthId}-${weekId}-${dayIndex}`);
                 if (dayBar && dayPercText) {
-                    dayBar.style.transform = `scaleX(${Math.min(dayPerc, 100) / 100})`;
+                    dayBar.style.width = `${Math.min(dayPerc, 100)}%`;
                     dayBar.style.opacity = dayPerc > 0 ? '1' : '0';
                     dayPercText.textContent = `${dayPerc}%`;
                 }
@@ -1319,7 +1299,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
             const totalDays = weekData?.days?.length || 0;
             
             const initialProgress = calculateWeeklyProgress(weekData);
-            const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px';
             
             const targetHtml = `<p class="week-target-text" id="target-text-${monthId}-${weekId}">${escapeHtml(targetText)}</p>`;
 
@@ -1333,14 +1312,14 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     </div>
                     ${targetHtml}
                     
-                    <div class="sticky-progress-wrapper" style="top: ${headerHeight};">
+                    <div class="sticky-progress-wrapper">
                         <div class="flex justify-between text-xs text-gray-500">
                             <span>Weekly Progress</span>
                             <span id="week-perc-${monthId}-${weekId}" class="progress-percentage font-medium">${initialProgress}%</span>
                         </div>
                         
                         <div class="progress-bar-container w-full"> 
-                            <div id="week-bar-${monthId}-${weekId}" class="progress-bar-fill progress-bar-weekly" style="transform: scaleX(${initialProgress / 100}); opacity: ${initialProgress > 0 ? 1 : 0};"></div> 
+                            <div id="week-bar-${monthId}-${weekId}" class="progress-bar-fill progress-bar-weekly" style="width: ${initialProgress}%;"></div> 
                         </div>
                     </div>
                     <div class="flex justify-end mt-2">
@@ -1390,7 +1369,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                                  <span id="day-perc-${monthId}-${weekId}-${dayIndex}" class="progress-percentage font-medium">${initialDayProgress}%</span>
                              </div>
                              <div class="progress-bar-container w-full"> 
-                                 <div id="day-bar-${monthId}-${weekId}-${dayIndex}" class="progress-bar-fill progress-bar-daily" style="transform: scaleX(${Math.min(initialDayProgress, 100) / 100}); opacity: ${initialDayProgress > 0 ? 1 : 0};"></div> 
+                                 <div id="day-bar-${monthId}-${weekId}-${dayIndex}" class="progress-bar-fill progress-bar-daily" style="width: ${Math.min(initialDayProgress, 100)}%;"></div> 
                              </div>
                          </div>
                          
@@ -2435,11 +2414,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          row?.classList.toggle('row-completed', target.checked);
                          
                          (async () => {
-                            // Freeze scroll listener + sticky recalc for the duration of this
-                            // save. Must be set BEFORE any await so it's in place before the
-                            // progress bar scaleX animation fires spurious scroll events.
-                            window._suppressHeaderScroll = true;
-
                             setSyncStatus("Syncing...", "yellow");
                             
                             const dayIndex = parseInt(daySection.dataset.dayIndex);
@@ -2454,7 +2428,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             if (parseResult === null) {
                                 setSyncStatus("Error", "red");
                                 target.checked = !target.checked; // Revert on error
-                                window._suppressHeaderScroll = false;
                                 return;
                             }
                             
@@ -2477,14 +2450,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             await saveDataToFirebase(monthDocRef, updatePayload, true); 
                             
                             setSyncStatus("Synced", "green");
-
-                            // Release after CSS transition (0.4s) + Firestore snapshot settle.
-                            // Then immediately run recalcSticky once to restore correct positions
-                            // in case anything legitimately changed (e.g. progress bar height).
-                            setTimeout(() => {
-                                window._suppressHeaderScroll = false;
-                                if (window.recalcSticky) window.recalcSticky();
-                            }, 700);
                          })();
 
                      } else {
@@ -3929,7 +3894,9 @@ async function updateDailyProgressUI(monthId, weekId, dayIndex, dayData) {
 
                  if (dataToUse) {
                     const progress = calculateDailyProgress(dataToUse);
-                    progressBarFill.style.transform = `scaleX(${Math.min(progress, 100) / 100})`;
+                    progressBarFill.style.width = `${Math.min(progress, 100)}%`;
+                    // --- THIS IS THE CHANGE ---
+                    // Hide the bar (and cap) if progress is 0
                     progressBarFill.style.opacity = progress > 0 ? '1' : '0';
                     progressPercentageSpan.textContent = `${progress}%`;
                  }
@@ -3961,7 +3928,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
                  if (dataToUse) {
                     const progress = calculateWeeklyProgress(dataToUse);
-                    progressBarFill.style.transform = `scaleX(${progress / 100})`;
+                    progressBarFill.style.width = `${progress}%`;
                     progressBarFill.style.opacity = progress > 0 ? '1' : '0';
                     progressPercentageSpan.textContent = `${progress}%`;
                  }

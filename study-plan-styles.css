@@ -607,10 +607,17 @@
 
         /* --- Sticky Progress Bar --- */
         .sticky-progress-wrapper {
-            position: sticky; z-index: 10; background-color: rgba(255, 255, 255, 0.85); /* Slightly transparent */
-            backdrop-filter: blur(4px); padding: 10px 0; /* Reduced padding */
-            
+            position: sticky; z-index: 10; background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px); padding: 10px 0;
             border-bottom: 1px solid #e5e7eb;
+            /* top = header height when visible, 0 when hidden.
+               --header-h is set once on load via JS and never touched again. */
+            top: var(--header-h, 65px);
+            transition: top 0.3s ease-in-out;
+        }
+        /* When header is hidden, body gets .header-is-hidden — sticky bars slide up */
+        body.header-is-hidden .sticky-progress-wrapper {
+            top: 0;
         }
 
         /* --- Sticky Day Progress & Timer Row (stack under weekly sticky bar) --- */
@@ -618,6 +625,22 @@
         .day-section:not(.is-collapsed) .sticky-day-row {
             position: sticky;
             z-index: 9;
+            /* top = header + weekly bar height. Both vars set once on load, never during interaction. */
+            top: calc(var(--header-h, 65px) + var(--weekly-bar-h, 44px));
+            transition: top 0.3s ease-in-out;
+        }
+        body.header-is-hidden .day-section.is-expanded .sticky-day-row,
+        body.header-is-hidden .day-section:not(.is-collapsed) .sticky-day-row {
+            top: var(--weekly-bar-h, 44px);
+        }
+        /* Timer row stacks below day header — its offset is handled by natural document flow
+           since it immediately follows the day header in the DOM, so no extra top needed. */
+        .day-timer-row.sticky-day-row {
+            top: calc(var(--header-h, 65px) + var(--weekly-bar-h, 44px) + var(--day-header-h, 48px));
+            transition: top 0.3s ease-in-out;
+        }
+        body.header-is-hidden .day-timer-row.sticky-day-row {
+            top: calc(var(--weekly-bar-h, 44px) + var(--day-header-h, 48px));
         }
         .day-section-header.sticky-day-row {
             background-color: inherit;
@@ -635,17 +658,28 @@
 
         .progress-bar-container { background-color: #e5e7eb; border-radius: 9999px; height: 10px; overflow: hidden; } /* Slimmer bar */
         .progress-bar-fill { 
-            height: 100%;
-            width: 100%;
-            transform-origin: left center;
-            /* scaleX instead of width: GPU compositor only, zero layout reflow */
-            transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out; 
+            
+            height: 100%; 
+            /* MODIFIED: Added opacity */
+            transition: width 0.4s ease-in-out, opacity 0.4s ease-in-out; 
             border-radius: 9999px; 
-            position: relative;
+            position: relative; /* ADDED */
         }
 		
 		.progress-bar-fill::after {
-            display: none; /* removed: scaleX on parent squishes this circle and it can't be counter-scaled in CSS */
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 0;
+            /* This centers the cap on the end of the bar */
+            transform: translate(50%, -50%); 
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: white;
+            /* Matches the bar color and style */
+             
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
         }
 		
 		/* --- Gradient for Weekly Bar (Green -> Purple) --- */
