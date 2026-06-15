@@ -344,29 +344,29 @@
             setTimeout(recalcSticky, 0);
 
             window.addEventListener('scroll', () => {
-                const headerHeight = pageHeader.offsetHeight || 65; // <-- ADDED HERE, INSIDE
+                const headerHeight = pageHeader.offsetHeight || 65;
                 
                 const currentScrollY = window.scrollY;
-                let isHeaderHidden = pageHeader.classList.contains('header-hidden'); // Get current state
+                let isHeaderHidden = pageHeader.classList.contains('header-hidden');
 
-                // Suppress header show/hide during checkbox saves to prevent layout-shift feedback loops
+                // While a checkbox save is in progress, layout shifts from the progress bar
+                // animation cause spurious scroll events. We freeze lastScrollY AND skip
+                // header toggling entirely so the header stays in whatever state it was in.
                 if (!window._suppressHeaderScroll) {
                     if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                        // Scrolling DOWN: Hide header
                         pageHeader.classList.add('header-hidden');
                         isHeaderHidden = true;
                     } else if (currentScrollY < lastScrollY || currentScrollY <= 0) {
-                        // Scrolling UP (or at the top): Show header
                         pageHeader.classList.remove('header-hidden');
                         isHeaderHidden = false;
                     }
+                    lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
                 }
-                
-                lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+                // When suppressed: do NOT update lastScrollY — keeps baseline accurate for
+                // real scrolls after the flag lifts.
 
                 const effectiveHeaderHeight = isHeaderHidden ? 0 : headerHeight;
                 updateStickyOffsets(effectiveHeaderHeight);
-
             });
         }
 
@@ -1337,7 +1337,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         </div>
                         
                         <div class="progress-bar-container w-full"> 
-                            <div id="week-bar-${monthId}-${weekId}" class="progress-bar-fill progress-bar-weekly" style="transform: scaleX(${initialProgress / 100});"></div> 
+                            <div id="week-bar-${monthId}-${weekId}" class="progress-bar-fill progress-bar-weekly" style="transform: scaleX(${initialProgress / 100}); opacity: ${initialProgress > 0 ? 1 : 0};"></div> 
                         </div>
                     </div>
                     <div class="flex justify-end mt-2">
@@ -1387,7 +1387,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                                  <span id="day-perc-${monthId}-${weekId}-${dayIndex}" class="progress-percentage font-medium">${initialDayProgress}%</span>
                              </div>
                              <div class="progress-bar-container w-full"> 
-                                 <div id="day-bar-${monthId}-${weekId}-${dayIndex}" class="progress-bar-fill progress-bar-daily" style="transform: scaleX(${Math.min(initialDayProgress, 100) / 100});"></div> 
+                                 <div id="day-bar-${monthId}-${weekId}-${dayIndex}" class="progress-bar-fill progress-bar-daily" style="transform: scaleX(${Math.min(initialDayProgress, 100) / 100}); opacity: ${initialDayProgress > 0 ? 1 : 0};"></div> 
                              </div>
                          </div>
                          
@@ -2432,13 +2432,14 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          row?.classList.toggle('row-completed', target.checked);
                          
                          (async () => {
-                            setSyncStatus("Syncing...", "yellow");
-
-                            // Suppress header show/hide during the entire save + animation sequence.
-                            // Progress bar width animation causes micro layout shifts that nudge
-                            // window.scrollY, which the scroll listener misreads as an upward scroll,
-                            // causing the header to reappear. We block that for 600ms (animation is 400ms).
+                            // Suppress header show/hide for the duration of the save + CSS animation.
+                            // Progress bar animation (and the Firestore snapshot it triggers) cause
+                            // layout shifts that fire spurious scroll events. Freezing lastScrollY in
+                            // the scroll listener (done above) means the baseline stays correct, so
+                            // when the flag clears the header behaves exactly as if nothing happened.
                             window._suppressHeaderScroll = true;
+
+                            setSyncStatus("Syncing...", "yellow");
                             
                             const dayIndex = parseInt(daySection.dataset.dayIndex);
                             const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
@@ -2475,8 +2476,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             await saveDataToFirebase(monthDocRef, updatePayload, true); 
                             
                             setSyncStatus("Synced", "green");
-                            // Release after animation (0.4s) + buffer
-                            setTimeout(() => { window._suppressHeaderScroll = false; }, 600);
+                            // Release after CSS transition (0.4s) + Firestore snapshot settle buffer
+                            setTimeout(() => { window._suppressHeaderScroll = false; }, 700);
                          })();
 
                      } else {
@@ -3922,8 +3923,6 @@ async function updateDailyProgressUI(monthId, weekId, dayIndex, dayData) {
                  if (dataToUse) {
                     const progress = calculateDailyProgress(dataToUse);
                     progressBarFill.style.transform = `scaleX(${Math.min(progress, 100) / 100})`;
-                    // --- THIS IS THE CHANGE ---
-                    // Hide the bar (and cap) if progress is 0
                     progressBarFill.style.opacity = progress > 0 ? '1' : '0';
                     progressPercentageSpan.textContent = `${progress}%`;
                  }
