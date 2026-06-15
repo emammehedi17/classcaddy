@@ -302,54 +302,68 @@
         
 
         // --- Header Navigation & Scroll Logic (from script.js) ---
-        // --- STICKY POSITIONING: CSS-variable approach ---
-        // We set --header-h, --weekly-bar-h, --day-header-h ONCE on load.
-        // The scroll listener only toggles body.header-is-hidden — no style.top writes,
-        // no offsetHeight reads, no layout thrashing during checkbox interactions.
-        function updateStickyOffsets() {
-            // No-op: sticky tops are now handled entirely by CSS calc() + CSS variables.
-            // This stub exists so existing callers (recalcSticky, resize handler) don't error.
+        function updateStickyOffsets(effectiveHeaderHeight) {
+            // Update sticky progress bars
+            const headerTopPx = `${effectiveHeaderHeight}px`;
+            document.querySelectorAll('.sticky-progress-wrapper').forEach(bar => {
+                bar.style.top = headerTopPx;
+            });
+
+            // Update sticky day progress headers & timer rows, stacking below the weekly bar
+            document.querySelectorAll('.week-section').forEach(weekSection => {
+                const weeklyBar = weekSection.querySelector('.sticky-progress-wrapper');
+                const weeklyBarHeight = weeklyBar ? weeklyBar.offsetHeight : 0;
+                const dayHeaderTop = effectiveHeaderHeight + weeklyBarHeight;
+
+                weekSection.querySelectorAll('.day-section-header.sticky-day-row').forEach(dayHeader => {
+                    dayHeader.style.top = `${dayHeaderTop}px`;
+
+                    const daySection = dayHeader.closest('.day-section');
+                    const timerRow = daySection ? daySection.querySelector('.day-timer-row.sticky-day-row') : null;
+                    if (timerRow) {
+                        timerRow.style.top = `${dayHeaderTop + dayHeader.offsetHeight}px`;
+                    }
+                });
+            });
         }
         window.updateStickyOffsets = updateStickyOffsets;
 
         if (pageHeader) {
             let lastScrollY = window.scrollY;
+            // const headerHeight = pageHeader.offsetHeight; // <-- REMOVED FROM HERE
 
-            // Measure once and set CSS variables on <html> so they're globally available.
-            const initStickyVars = () => {
-                const headerH = pageHeader.offsetHeight || 65;
-                document.documentElement.style.setProperty('--header-h', `${headerH}px`);
-
-                // Measure the weekly bar height from the first one found (they're all the same).
-                const sampleWeeklyBar = document.querySelector('.sticky-progress-wrapper');
-                const weeklyBarH = sampleWeeklyBar ? sampleWeeklyBar.offsetHeight : 44;
-                document.documentElement.style.setProperty('--weekly-bar-h', `${weeklyBarH}px`);
-
-                // Measure day header height from the first one found.
-                const sampleDayHeader = document.querySelector('.day-section-header.sticky-day-row');
-                const dayHeaderH = sampleDayHeader ? sampleDayHeader.offsetHeight : 48;
-                document.documentElement.style.setProperty('--day-header-h', `${dayHeaderH}px`);
+            const recalcSticky = () => {
+                const headerHeight = pageHeader.offsetHeight || 65;
+                const isHeaderHidden = pageHeader.classList.contains('header-hidden');
+                const effectiveHeaderHeight = isHeaderHidden ? 0 : headerHeight;
+                updateStickyOffsets(effectiveHeaderHeight);
             };
-
-            const recalcSticky = () => initStickyVars();
             window.recalcSticky = recalcSticky;
             window.addEventListener('resize', recalcSticky);
-            setTimeout(initStickyVars, 100); // after first render
+            // Initial calculation after render
+            setTimeout(recalcSticky, 0);
 
             window.addEventListener('scroll', () => {
+                const headerHeight = pageHeader.offsetHeight || 65; // <-- ADDED HERE, INSIDE
+                
                 const currentScrollY = window.scrollY;
+                let isHeaderHidden = pageHeader.classList.contains('header-hidden'); // Get current state
 
                 if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                    // Scrolling DOWN: hide header, sticky bars slide up via CSS transition
+                    // Scrolling DOWN: Hide header
                     pageHeader.classList.add('header-hidden');
-                    document.body.classList.add('header-is-hidden');
+                    isHeaderHidden = true;
                 } else if (currentScrollY < lastScrollY || currentScrollY <= 0) {
-                    // Scrolling UP: show header, sticky bars slide down via CSS transition
+                    // Scrolling UP (or at the top): Show header
                     pageHeader.classList.remove('header-hidden');
-                    document.body.classList.remove('header-is-hidden');
+                    isHeaderHidden = false;
                 }
-
+                
                 lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+
+                const effectiveHeaderHeight = isHeaderHidden ? 0 : headerHeight;
+                updateStickyOffsets(effectiveHeaderHeight);
+
             });
         }
 
@@ -788,8 +802,14 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     dayData.rows?.forEach((rowData, rowIndex) => {
                         const row = daySection.querySelector(`tr[data-row-index="${rowIndex}"]`);
                         if (row) {
-                            const checkbox = row.querySelector('.completion-checkbox');
-                            if (checkbox) checkbox.checked = rowData.completed;
+                            const doneBtn = row.querySelector('.done-btn');
+                            if (doneBtn) {
+                                doneBtn.classList.toggle('done-btn-completed', rowData.completed);
+                                doneBtn.classList.toggle('done-btn-pending', !rowData.completed);
+                                doneBtn.innerHTML = rowData.completed
+                                    ? '<i class="fas fa-check-circle mr-1"></i> Done'
+                                    : '<i class="far fa-circle mr-1"></i> Done';
+                            }
                             row.classList.toggle('row-completed', rowData.completed);
                         }
                     });
@@ -1299,6 +1319,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
             const totalDays = weekData?.days?.length || 0;
             
             const initialProgress = calculateWeeklyProgress(weekData);
+            const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px';
             
             const targetHtml = `<p class="week-target-text" id="target-text-${monthId}-${weekId}">${escapeHtml(targetText)}</p>`;
 
@@ -1312,7 +1333,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     </div>
                     ${targetHtml}
                     
-                    <div class="sticky-progress-wrapper">
+                    <div class="sticky-progress-wrapper" style="top: ${headerHeight};">
                         <div class="flex justify-between text-xs text-gray-500">
                             <span>Weekly Progress</span>
                             <span id="week-perc-${monthId}-${weekId}" class="progress-percentage font-medium">${initialProgress}%</span>
@@ -1543,7 +1564,15 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             <button class="icon-button timer-end-btn" title="Reset" data-action="end"><i class="fas fa-stop"></i></button>
                         </div>
                      </td>
-                     <td class="px-3 py-2 align-middle center-cell" data-label="Done"> <input type="checkbox" class="form-checkbox h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500 completion-checkbox" ${rowData.completed ? 'checked' : ''} ${isEditing || isGuestMode ? 'disabled' : ''}>
+                     <td class="px-3 py-2 align-middle center-cell" data-label="Done">
+                        ${isEditing || isGuestMode
+                            ? `<button class="done-btn done-btn-disabled" disabled>${rowData.completed ? '<i class="fas fa-check-circle mr-1"></i> Done' : '<i class="far fa-circle mr-1"></i> Done'}</button>`
+                            : `<button class="done-btn ${rowData.completed ? 'done-btn-completed' : 'done-btn-pending'}" data-row-index="${rowIndex}">
+                                ${rowData.completed
+                                    ? '<i class="fas fa-check-circle mr-1"></i> Done'
+                                    : '<i class="far fa-circle mr-1"></i> Done'}
+                               </button>`
+                        }
                      </td>
                       <td class="px-3 py-2 align-middle center-cell completion-perc-cell ${isEditing ? '' : 'hidden'}" data-label="%"> ${isEditing ? `<input type="text" inputmode="decimal" class="editable-input completion-perc-input w-16 text-center text-xs" placeholder="%" value="${rowData.completionPercentage ?? ''}">` : ''}
                       </td>
@@ -2407,55 +2436,57 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  }
 
 
-                 // Handle checkbox click (OPTIMIZED: Instant Sync)
-                 if (target.classList.contains('completion-checkbox')) {
+                 // Handle Done/Undone button click
+                 if (target.closest('.done-btn') && !target.closest('.done-btn').disabled) {
+                     const doneBtn = target.closest('.done-btn');
                      if (!daySection?.classList.contains('editing')) {
-                         // 1. Instant Visual Feedback (Toggle Class)
-                         row?.classList.toggle('row-completed', target.checked);
-                         
+                         // 1. Instant visual feedback — toggle button state and row style
+                         const nowCompleted = !doneBtn.classList.contains('done-btn-completed');
+                         doneBtn.classList.toggle('done-btn-completed', nowCompleted);
+                         doneBtn.classList.toggle('done-btn-pending', !nowCompleted);
+                         doneBtn.innerHTML = nowCompleted
+                             ? '<i class="fas fa-check-circle mr-1"></i> Done'
+                             : '<i class="far fa-circle mr-1"></i> Done';
+                         row?.classList.toggle('row-completed', nowCompleted);
+
                          (async () => {
                             setSyncStatus("Syncing...", "yellow");
-                            
+
                             const dayIndex = parseInt(daySection.dataset.dayIndex);
                             const monthDocRef = doc(db, getUserPlansCollectionPath(), monthId);
 
-                            // 2. Prepare Data (Read from DOM/Cache - Instant)
-                            // Set global flag so saveDataToFirebase knows the context
-                            isCheckboxClickGlobal = { weekId: weekId, dayIndex: dayIndex }; 
-                            
-                            const parseResult = await parseAndPrepareSaveData(daySection, weekId, true); 
-                            
+                            isCheckboxClickGlobal = { weekId: weekId, dayIndex: dayIndex };
+
+                            const parseResult = await parseAndPrepareSaveData(daySection, weekId, true);
+
                             if (parseResult === null) {
                                 setSyncStatus("Error", "red");
-                                target.checked = !target.checked; // Revert on error
+                                // Revert button and row on error
+                                doneBtn.classList.toggle('done-btn-completed', !nowCompleted);
+                                doneBtn.classList.toggle('done-btn-pending', nowCompleted);
+                                doneBtn.innerHTML = !nowCompleted
+                                    ? '<i class="fas fa-check-circle mr-1"></i> Done'
+                                    : '<i class="far fa-circle mr-1"></i> Done';
+                                row?.classList.toggle('row-completed', !nowCompleted);
                                 return;
                             }
-                            
+
                             const { updatedRows, updatePayload } = parseResult;
-                            
-                            // 3. Update Cache Instantly
+
                             if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
                                 activeWeeksDataCache[weekId].days = updatePayload.days;
                             }
 
-                            // 4. Update UI Progress Bars (Pass data to avoid re-fetching)
-                            // updatePayload contains { days: [...] }, which fits the structure needed
-                            updateWeeklyProgressUI(monthId, weekId, updatePayload); 
-                            
+                            updateWeeklyProgressUI(monthId, weekId, updatePayload);
                             const dayDataForProgress = { rows: updatedRows };
                             updateDailyProgressUI(monthId, weekId, dayIndex, dayDataForProgress);
-                            
-                            // 5. Save to Firebase (Background Process)
-                            // We use 'true' for isAutosave to avoid blocking, but handle status manually
-                            await saveDataToFirebase(monthDocRef, updatePayload, true); 
-                            
+
+                            await saveDataToFirebase(monthDocRef, updatePayload, true);
+
                             setSyncStatus("Synced", "green");
                          })();
-
-                     } else {
-                         e.preventDefault();
                      }
-                     return; 
+                     return;
                  }
 				 
 				 
@@ -2628,7 +2659,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     createTableRow(monthId, weekId, dayIndex, rowIndex, rowData, true) 
                  ).join('');
                  
-                daySection.querySelectorAll('.completion-checkbox').forEach(cb => cb.disabled = true);
                  setSyncStatus("Editing...", "blue");
              }
 
@@ -2778,7 +2808,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                              vocabData = null;
                          }
                     } else { 
-                         completed = row.querySelector('.completion-checkbox')?.checked || false;
+                         completed = row.querySelector('.done-btn')?.classList.contains('done-btn-completed') || false;
                          subject = existingRowData.subject; 
                          topic = existingRowData.topic; 
                          comment = existingRowData.comment;
