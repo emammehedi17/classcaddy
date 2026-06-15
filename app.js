@@ -309,7 +309,7 @@
                 bar.style.top = headerTopPx;
             });
 
-            // Update sticky day progress headers & timer rows, stacking below the weekly bar
+            // Update sticky day progress headers, stacking below the weekly bar
             document.querySelectorAll('.week-section').forEach(weekSection => {
                 const weeklyBar = weekSection.querySelector('.sticky-progress-wrapper');
                 const weeklyBarHeight = weeklyBar ? weeklyBar.offsetHeight : 0;
@@ -317,12 +317,6 @@
 
                 weekSection.querySelectorAll('.day-section-header.sticky-day-row').forEach(dayHeader => {
                     dayHeader.style.top = `${dayHeaderTop}px`;
-
-                    const daySection = dayHeader.closest('.day-section');
-                    const timerRow = daySection ? daySection.querySelector('.day-timer-row.sticky-day-row') : null;
-                    if (timerRow) {
-                        timerRow.style.top = `${dayHeaderTop + dayHeader.offsetHeight}px`;
-                    }
                 });
             });
         }
@@ -1398,33 +1392,25 @@ function updateMonthUI(monthId, monthData, weeksData) {
                                  <div id="day-bar-${monthId}-${weekId}-${dayIndex}" class="progress-bar-fill progress-bar-daily" style="width: ${Math.min(initialDayProgress, 100)}%;"></div> 
                              </div>
                          </div>
+
+                         <div class="day-main-timer-widget timer-widget day-header-timer" data-timer-scope="day" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}">
+                             <i class="fas fa-stopwatch timer-icon"></i>
+                             <span class="timer-display" data-role="session">00:00:00</span>
+                             <button class="icon-button timer-startpause-btn" title="Start/Pause" data-action="startpause"><i class="fas fa-play"></i></button>
+                             <button class="icon-button timer-end-btn" title="Reset" data-action="end"><i class="fas fa-stop"></i></button>
+                             <span class="timer-display timer-total" data-role="total">00:00:00</span>
+                         </div>
+
+                         <div class="day-header-actions">
+                         ${allMcqButtonsNormalMode}
+                         ${isGuestMode ? '' : '<button class="action-button action-button-secondary text-xs edit-day-btn"><i class="fas fa-pencil-alt mr-1"></i> Edit</button>'}
+                         ${isGuestMode ? '' : '<button class="action-button text-xs save-day-btn hidden"><i class="fas fa-save mr-1"></i> Save</button>'}
+                         </div>
                          
                          <button class="day-toggle-btn" title="Expand/Collapse">
                              <i class="fas fa-chevron-down fa-lg"></i>
                          </button>
 
-                     </div>
-                     
-                     <div class="flex justify-between items-center flex-wrap gap-2 mb-4 mt-3 day-timer-row sticky-day-row">
-                         <div class="day-main-timer-widget timer-widget" data-timer-scope="day" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}">
-                             <i class="fas fa-stopwatch timer-icon"></i>
-                             <div class="timer-display-group">
-                                 <span class="timer-title">Current</span>
-                                 <span class="timer-display" data-role="session">00:00:00</span>
-                             </div>
-                             <button class="icon-button timer-startpause-btn" title="Start/Pause" data-action="startpause"><i class="fas fa-play"></i></button>
-                             <button class="icon-button timer-end-btn" title="Reset" data-action="end"><i class="fas fa-stop"></i></button>
-                             <span class="timer-total-label">Total Today:</span>
-                             <div class="timer-display-group">
-                                 <span class="timer-title">Total</span>
-                                 <span class="timer-display timer-total" data-role="total">00:00:00</span>
-                             </div>
-                         </div>
-                         <div class="flex justify-end items-center gap-2 flex-wrap">
-                         ${allMcqButtonsNormalMode}
-                         ${isGuestMode ? '' : '<button class="action-button action-button-secondary text-xs edit-day-btn"><i class="fas fa-pencil-alt mr-1"></i> Edit</button>'}
-                         ${isGuestMode ? '' : '<button class="action-button text-xs save-day-btn hidden"><i class="fas fa-save mr-1"></i> Save</button>'}
-                         </div>
                      </div>
                      
                      <div class="day-section-body">
@@ -2385,7 +2371,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
 				
 				
 				// --- START: NEW COLLAPSE/EXPAND LOGIC ---
-                 if (target.closest('.day-toggle-btn') || target.closest('.day-section-header')) {
+                 if ((target.closest('.day-toggle-btn') || target.closest('.day-section-header')) && !target.closest('.timer-widget') && !target.closest('.day-header-actions')) {
                     // বাটন বা হেডারের যেকোনো জায়গায় ক্লিক করলে
                     if (button && button.classList.contains('delete-day-btn')) {
                         // --- START: FIX ---
