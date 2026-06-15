@@ -657,6 +657,11 @@
             if (unsubscribePlans) unsubscribePlans();
 
             unsubscribePlans = onSnapshot(q, (querySnapshot) => {
+                // Skip nav-bar rebuild triggered by a Done/Undone click writing lastCompletedDay,
+                // to avoid a brief layout shift that causes the page to jump and the header to reappear.
+                if (window._suppressMonthSnapshot) {
+                    return;
+                }
                 console.log("Received plans snapshot. Number of plans:", querySnapshot.size);
                 monthNavButtonsContainer.innerHTML = '';
                 // --- START: ADD THIS LINE ---
