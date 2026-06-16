@@ -2241,6 +2241,24 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                 const daysData = weekDocSnap.data().days;
 
+                // --- Compute calendar dates from monthId (YYYY-MM) + weekId (week1..4) + dayIdx ---
+                // week1 = days 1–7 of month, week2 = days 8–14, week3 = days 15–21, week4 = days 22–28
+                function getDayCalendarDate(monthId, weekId, dayIdx) {
+                    try {
+                        const [yearStr, monthStr] = monthId.split('-');
+                        const year = parseInt(yearStr);
+                        const month = parseInt(monthStr) - 1; // 0-based for Date
+                        const weekNum = parseInt(weekId.replace('week', '')); // 1–4
+                        // Day-of-month: (weekNum-1)*7 + dayIdx + 1
+                        const dayOfMonth = (weekNum - 1) * 7 + dayIdx + 1;
+                        const d = new Date(year, month, dayOfMonth);
+                        if (isNaN(d.getTime())) return '';
+                        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                    } catch(e) {
+                        return '';
+                    }
+                }
+
                 // --- Aggregate Data ---
                 const dayLabels = [];
                 const dayDateLabels = [];
@@ -2273,16 +2291,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             }
                         }
                     });
-                    // Format date label
-                    let dateLabel = '';
-                    if (day.date) {
-                        try {
-                            const d = new Date(day.date);
-                            if (!isNaN(d)) {
-                                dateLabel = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-                            }
-                        } catch(e) {}
-                    }
+                    // Compute calendar date from monthId + weekId + dayIdx
+                    const dateLabel = getDayCalendarDate(monthId, weekId, dayIdx);
                     dayLabels.push(`Day ${day.dayNumber}`);
                     dayDateLabels.push(dateLabel);
                     dayTotals.push(Math.round((dayTotal / 60) * 100) / 100); // minutes, 2 decimals
@@ -2336,16 +2346,21 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     html += `
                         <h4 class="text-center font-semibold text-gray-700 mb-3 mt-6" style="font-size:1.1rem;">📊 Total Study Time</h4>
                         <div class="results-table-container overflow-x-auto" style="border-radius:14px; box-shadow:0 4px 24px rgba(0,0,0,0.10); border:1.5px solid #e5e7eb; background:#fff;">
-                        <table class="w-full text-sm text-left text-gray-600 study-table" style="border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px;">
+                        <table class="w-full text-sm text-left text-gray-600 study-table" style="border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px; table-layout:fixed;">
+                            <colgroup>
+                                <col style="width:10%;">
+                                ${dayLabels.map(() => `<col style="width:${Math.floor(78/numDays)}%;">`).join('')}
+                                <col style="width:12%;">
+                            </colgroup>
                             <thead>
                                 <tr style="background: linear-gradient(90deg,#10b981 0%,#0ea5e9 60%,#a855f7 100%); color:#fff;">
-                                    <th class="px-4 py-3 border-b border-white/20 text-center" style="font-size:0.85rem; letter-spacing:0.05em;">Subject</th>
+                                    <th class="px-2 py-3 border-b border-white/20 text-center" style="font-size:0.82rem; letter-spacing:0.03em;">Subject</th>
                     `;
                     dayLabels.forEach((label, i) => {
                         const dateStr = dayDateLabels[i] ? `<br><span style="font-size:0.72rem; font-weight:400; opacity:0.85;">(${dayDateLabels[i]})</span>` : '';
-                        html += `<th class="px-4 py-3 border-b border-white/20 text-center" style="font-size:0.85rem; letter-spacing:0.05em;">${label}${dateStr}</th>`;
+                        html += `<th class="px-2 py-3 border-b border-white/20 text-center" style="font-size:0.82rem; letter-spacing:0.03em;">${label}${dateStr}</th>`;
                     });
-                    html += `<th class="px-4 py-3 border-b border-white/20 text-center" style="font-size:0.85rem; letter-spacing:0.05em;">Total</th>
+                    html += `<th class="px-2 py-3 border-b border-white/20 text-center" style="font-size:0.82rem; letter-spacing:0.03em;">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -2355,44 +2370,44 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     subjectLabels.forEach((subj, sIdx) => {
                         const rc = subjectRowColors[sIdx % subjectRowColors.length];
                         html += `<tr style="background:${rc.bg};">
-                            <td class="px-4 py-3 border-b border-gray-100 font-bold text-center" style="color:${rc.text}; border-left:4px solid ${rc.badge}; white-space:nowrap;">
-                                <span style="display:inline-flex; align-items:center; gap:6px;">
-                                    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${rc.badge};"></span>
+                            <td class="px-2 py-3 border-b border-gray-100 font-bold text-center" style="color:${rc.text}; border-left:4px solid ${rc.badge}; white-space:nowrap; font-size:0.78rem;">
+                                <span style="display:inline-flex; align-items:center; gap:4px; flex-wrap:wrap; justify-content:center;">
+                                    <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:${rc.badge}; flex-shrink:0;"></span>
                                     ${escapeHtml(subj)}
                                 </span>
                             </td>`;
                         for (let d = 0; d < numDays; d++) {
                             const secs = (subjectDaySeconds[subj] && subjectDaySeconds[subj][d]) || 0;
                             const topic = (subjectDayTopics[subj] && subjectDayTopics[subj][d]) || '';
-                            const timeHtml = secs > 0 ? `<span style="font-weight:700; color:${rc.text};">${formatTimerHMS(secs)}</span>` : `<span style="color:#d1d5db;">—</span>`;
-                            const topicHtml = topic ? `<br><span style="font-size:0.68rem; color:#6b7280; font-weight:400; display:block; margin-top:2px; max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(topic)}">${escapeHtml(topic)}</span>` : '';
-                            html += `<td class="px-3 py-2 border-b border-gray-100 text-center" style="vertical-align:top;">${timeHtml}${topicHtml}</td>`;
+                            const timeHtml = secs > 0 ? `<span style="font-weight:700; color:${rc.text}; font-size:0.82rem;">${formatTimerHMS(secs)}</span>` : `<span style="color:#d1d5db;">—</span>`;
+                            const topicHtml = topic ? `<br><span style="font-size:0.65rem; color:#6b7280; font-weight:400; display:block; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(topic)}">${escapeHtml(topic)}</span>` : '';
+                            html += `<td class="px-2 py-2 border-b border-gray-100 text-center" style="vertical-align:top;">${timeHtml}${topicHtml}</td>`;
                         }
                         const totalSecs = subjectTotals[subj];
-                        html += `<td class="px-4 py-3 border-b border-gray-100 text-center font-bold" style="color:${rc.badge}; background:${rc.bg}; border-right:3px solid ${rc.badge};">${formatTimerHMS(totalSecs)}</td>
+                        html += `<td class="px-2 py-3 border-b border-gray-100 text-center font-bold" style="color:${rc.badge}; background:${rc.bg}; border-right:3px solid ${rc.badge}; font-size:0.82rem;">${formatTimerHMS(totalSecs)}</td>
                         </tr>`;
                     });
 
                     // Average row
                     html += `<tr style="background: #f8fafc;">
-                        <td class="px-4 py-3 border-b border-gray-200 font-semibold text-gray-600 text-center" style="border-left:4px solid #94a3b8;">Avg / Subject</td>`;
+                        <td class="px-2 py-3 border-b border-gray-200 font-semibold text-gray-600 text-center" style="border-left:4px solid #94a3b8; font-size:0.78rem;">Avg / Subject</td>`;
                     for (let d = 0; d < numDays; d++) {
                         const avgSecs = subjectLabels.length > 0
                             ? (dayTotals[d] * 60) / subjectLabels.length
                             : 0;
-                        html += `<td class="px-4 py-3 border-b border-gray-200 text-center font-semibold text-gray-500">${formatTimerHMS(avgSecs)}</td>`;
+                        html += `<td class="px-2 py-3 border-b border-gray-200 text-center font-semibold text-gray-500" style="font-size:0.82rem;">${formatTimerHMS(avgSecs)}</td>`;
                     }
                     const avgWeekTotal = subjectLabels.length > 0 ? weekGrandTotal / subjectLabels.length : 0;
-                    html += `<td class="px-4 py-3 border-b border-gray-200 text-center font-semibold text-gray-500">${formatTimerHMS(avgWeekTotal)}</td>
+                    html += `<td class="px-2 py-3 border-b border-gray-200 text-center font-semibold text-gray-500" style="font-size:0.82rem;">${formatTimerHMS(avgWeekTotal)}</td>
                     </tr>`;
 
                     // Total Time row
                     html += `<tr style="background: linear-gradient(90deg,#ecfdf5 0%,#d1fae5 100%);">
-                        <td class="px-4 py-3 font-bold text-emerald-800 text-center" style="border-left:4px solid #10b981; border-radius:0 0 0 14px;">Total Time</td>`;
+                        <td class="px-2 py-3 font-bold text-emerald-800 text-center" style="border-left:4px solid #10b981; border-radius:0 0 0 14px; font-size:0.82rem;">Total Time</td>`;
                     for (let d = 0; d < numDays; d++) {
-                        html += `<td class="px-4 py-3 text-center font-bold" style="color:#065f46; font-size:1rem;">${formatTimerHMS(dayTotals[d] * 60)}</td>`;
+                        html += `<td class="px-2 py-3 text-center font-bold" style="color:#065f46; font-size:0.92rem;">${formatTimerHMS(dayTotals[d] * 60)}</td>`;
                     }
-                    html += `<td class="px-4 py-3 text-center font-bold" style="color:#059669; font-size:1.1rem; border-right:3px solid #10b981; border-radius:0 0 14px 0;">${formatTimerHMS(weekGrandTotal)}</td>
+                    html += `<td class="px-2 py-3 text-center font-bold" style="color:#059669; font-size:1rem; border-right:3px solid #10b981; border-radius:0 0 14px 0;">${formatTimerHMS(weekGrandTotal)}</td>
                     </tr>`;
 
                     html += `</tbody></table></div>`;
