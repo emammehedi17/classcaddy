@@ -2241,32 +2241,13 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                 const daysData = weekDocSnap.data().days;
 
-                // --- Compute calendar dates from monthId (YYYY-MM) + weekId (week1..4) + dayIdx ---
-                // week1 = days 1–7 of month, week2 = days 8–14, week3 = days 15–21, week4 = days 22–28
-                function getDayCalendarDate(monthId, weekId, dayIdx) {
-                    try {
-                        const [yearStr, monthStr] = monthId.split('-');
-                        const year = parseInt(yearStr);
-                        const month = parseInt(monthStr) - 1; // 0-based for Date
-                        const weekNum = parseInt(weekId.replace('week', '')); // 1–4
-                        // Day-of-month: (weekNum-1)*7 + dayIdx + 1
-                        const dayOfMonth = (weekNum - 1) * 7 + dayIdx + 1;
-                        const d = new Date(year, month, dayOfMonth);
-                        if (isNaN(d.getTime())) return '';
-                        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-                    } catch(e) {
-                        return '';
-                    }
-                }
-
                 // --- Aggregate Data ---
                 const dayLabels = [];
                 const dayDateLabels = [];
                 const dayTotals = [];
-                const subjectTotals = {}; // subject -> seconds (week total)
-                // subjectDaySeconds[subject][dayIndex] = seconds
+                const subjectTotals = {};
                 const subjectDaySeconds = {};
-                const subjectDayTopics = {}; // subject -> [topic per day]
+                const subjectDayTopics = {};
                 let weekGrandTotal = 0;
 
                 daysData.forEach((day, dayIdx) => {
@@ -2281,7 +2262,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                                 subjectDaySeconds[subjKey] = new Array(daysData.length).fill(0);
                             }
                             subjectDaySeconds[subjKey][dayIdx] += rowSeconds;
-                            // Track topics per subject per day
                             if (!subjectDayTopics[subjKey]) subjectDayTopics[subjKey] = new Array(daysData.length).fill('');
                             const topicName = row.topic || '';
                             if (topicName) {
@@ -2291,11 +2271,21 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             }
                         }
                     });
-                    // Compute calendar date from monthId + weekId + dayIdx
-                    const dateLabel = getDayCalendarDate(monthId, weekId, dayIdx);
+
+                    // Read the saved date (YYYY-MM-DD) stored when the user clicked "Add Day"
+                    let dateLabel = '';
+                    if (day.date) {
+                        try {
+                            // Parse as local date to avoid UTC-offset shifting the day
+                            const [y, m, d] = day.date.split('-').map(Number);
+                            const dateObj = new Date(y, m - 1, d);
+                            dateLabel = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                        } catch(e) {}
+                    }
+
                     dayLabels.push(`Day ${day.dayNumber}`);
                     dayDateLabels.push(dateLabel);
-                    dayTotals.push(Math.round((dayTotal / 60) * 100) / 100); // minutes, 2 decimals
+                    dayTotals.push(Math.round((dayTotal / 60) * 100) / 100);
                     weekGrandTotal += dayTotal;
                 });
 
@@ -3644,9 +3634,10 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  }
 
                  const newDayIndex = daysArray.length;
+                 const todayISO = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
                  const newDayData = { 
                      dayNumber: newDayIndex + 1, 
-                     date: '', 
+                     date: todayISO, 
                      rows: sourceRows.map(row => ({ 
                          subject: row.subject || '', 
                          topic: (row.subject?.toLowerCase() === 'vocabulary') ? null : (row.topic || ''), 
