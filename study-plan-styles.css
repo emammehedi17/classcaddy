@@ -3867,3 +3867,1009 @@ body.dark-mode .skeleton {
     border: 1.5px solid #e5e7eb;
     overflow: hidden;
 }
+
+
+/* =============================================
+   CLASS CADDY — MOBILE RESPONSIVE OVERRIDES
+   All fixes scoped to max-width: 767px
+   Add this AFTER study-plan-styles.css
+   ============================================= */
+
+/* ─────────────────────────────────────────────
+   GLOBAL MOBILE BASE
+   ───────────────────────────────────────────── */
+@media (max-width: 767px) {
+
+    /* Prevent any horizontal overflow on the page */
+    html, body {
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+
+    /* Tighten main container padding */
+    main.container {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        padding-top: 5rem !important;
+    }
+
+    /* Slightly smaller page title */
+    main > h1.text-3xl {
+        font-size: 1.5rem !important;
+        margin-bottom: 1.25rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       HEADER
+       ───────────────────────────────────────── */
+    header.main-website-ui .container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: 0.6rem !important;
+        padding-bottom: 0.6rem !important;
+    }
+
+    /* Mobile menu panel — full width, proper spacing */
+    #mobile-menu {
+        margin: 0 -1rem !important;
+        margin-top: 0.5rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       AUTH SECTION CARD
+       ───────────────────────────────────────── */
+    #auth-section {
+        padding: 1.25rem !important;
+    }
+
+    /* Login buttons stack vertically and fill width */
+    #login-prompt button,
+    #google-login-btn,
+    #guest-login-btn {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 0.9rem !important;
+        box-sizing: border-box !important;
+    }
+
+    /* User info bar — stack on mobile */
+    #user-info {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+    }
+
+    #user-info > div {
+        width: 100% !important;
+    }
+
+    /* Logout / backup links area */
+    #user-info .flex.items-center.gap-3 {
+        justify-content: space-between !important;
+        width: 100% !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       MONTH NAV + TOP ACTION BUTTONS
+       ───────────────────────────────────────── */
+
+    /* Wrap the whole bar */
+    .mb-8.flex.flex-wrap.items-center.gap-2 {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.6rem !important;
+    }
+
+    /* "Months:" label */
+    .mb-8 > span.text-sm {
+        margin-bottom: 0.1rem !important;
+    }
+
+    /* Month buttons row — horizontal scroll instead of wrapping */
+    #month-nav-buttons {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        gap: 0.4rem !important;
+        padding-bottom: 4px !important;
+        /* hide scrollbar visually */
+        scrollbar-width: none !important;
+    }
+    #month-nav-buttons::-webkit-scrollbar { display: none !important; }
+
+    #month-nav-buttons button {
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+        font-size: 0.75rem !important;
+        padding: 0.35rem 0.75rem !important;
+    }
+
+    /* Top-right action buttons — 2-column grid */
+    .mb-8 > div.ml-auto {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+
+    .mb-8 > div.ml-auto .action-button,
+    .mb-8 > div.ml-auto button {
+        width: 100% !important;
+        justify-content: center !important;
+        font-size: 0.75rem !important;
+        padding: 0.5rem 0.5rem !important;
+        white-space: nowrap !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       ALL MODALS — BASE MOBILE RESET
+       ───────────────────────────────────────── */
+    .modal-content {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        max-height: 88vh !important;
+        padding: 1rem !important;
+        box-sizing: border-box !important;
+        /* Always push from top-center, so modal isn't partially off-screen */
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        overflow-y: auto !important;
+    }
+
+    /* Close button — always visible, not clipped */
+    .modal-close {
+        top: 8px !important;
+        right: 10px !important;
+        font-size: 1.5rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       QUIZ MODAL
+       ───────────────────────────────────────── */
+    #quiz-modal .modal-content {
+        padding-top: 2.5rem !important;
+        padding-right: 1rem !important;
+        padding-left: 1rem !important;
+        padding-bottom: 0.75rem !important;
+        max-height: 92vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+    }
+
+    /* Quiz start screen — constrain and scroll */
+    .quiz-start-container {
+        margin: -1rem !important;
+        max-height: calc(92vh - 2.5rem) !important;
+        min-height: unset !important;
+    }
+
+    .quiz-start-content {
+        padding: 1.25rem 1rem !important;
+    }
+
+    .quiz-start-footer {
+        padding: 0.75rem 1rem 1rem 1rem !important;
+    }
+
+    /* Settings form inside quiz start — stack fields */
+    #quiz-settings-form .flex.gap-4 {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+
+    #quiz-settings-form .w-1\/2 {
+        width: 100% !important;
+    }
+
+    /* --- Quiz Main Screen --- */
+    #quiz-main-screen {
+        height: calc(92vh - 3rem) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+    }
+
+    /* Timer + progress bar row */
+    #quiz-main-screen > .flex.items-center.gap-3.mb-2 {
+        gap: 0.5rem !important;
+        margin-bottom: 0.4rem !important;
+    }
+
+    #quiz-timer {
+        font-size: 0.95rem !important;
+        width: 3.2rem !important;
+    }
+
+    /* Score badges row — smaller, no wrap */
+    #quiz-main-screen .flex.justify-between.items-center.mb-4 {
+        margin-bottom: 0.5rem !important;
+        flex-wrap: nowrap !important;
+        gap: 0.25rem !important;
+    }
+
+    #quiz-topic-name {
+        font-size: 0.7rem !important;
+        max-width: 25% !important;
+    }
+
+    #quiz-score {
+        font-size: 0.7rem !important;
+        padding: 0.3rem 0.5rem !important;
+    }
+
+    /* Correct/Wrong/Skip badges */
+    #badge-correct, #badge-wrong, #badge-answered,
+    #quiz-main-screen .flex.items-center.gap-2 > div {
+        font-size: 0.65rem !important;
+        padding: 0.2rem 0.35rem !important;
+    }
+
+    /* Question text */
+    #quiz-question-text {
+        font-size: 0.95rem !important;
+        margin-bottom: 0.75rem !important;
+        line-height: 1.5 !important;
+    }
+
+    /* Options — single column on mobile */
+    #quiz-options-container {
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+
+    /* Option buttons — larger tap targets */
+    .quiz-option-btn {
+        padding: 0.65rem 0.75rem !important;
+        font-size: 0.875rem !important;
+        text-align: left !important;
+        min-height: 44px !important;
+    }
+
+    /* Nav buttons row */
+    #quiz-main-screen > div.flex.items-center.w-full.mt-3 {
+        padding-top: 0.4rem !important;
+        margin-top: 0.4rem !important;
+        gap: 0.25rem !important;
+    }
+
+    #quiz-prev-btn, #quiz-skip-btn, #quiz-next-btn {
+        font-size: 0.75rem !important;
+        padding: 0.5rem 0.6rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       QUIZ RESULTS SCREEN
+       ───────────────────────────────────────── */
+    #quiz-results-screen {
+        padding: 1.5rem 0.25rem !important;
+    }
+
+    #quiz-results-screen h2 {
+        font-size: 1.4rem !important;
+        margin-bottom: 1rem !important;
+    }
+
+    /* Results action buttons — 2-col grid */
+    #quiz-results-screen .flex.justify-center.gap-4 {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.5rem !important;
+        margin-top: 1.25rem !important;
+    }
+
+    #quiz-results-screen .flex.justify-center.gap-4 button {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 0.6rem 0.5rem !important;
+        font-size: 0.75rem !important;
+    }
+
+    /* Skipped prompt screen */
+    #quiz-skipped-prompt-screen {
+        padding: 1rem !important;
+        min-height: unset !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       RESULT SHEET MODAL
+       ───────────────────────────────────────── */
+    #result-sheet-modal .modal-content {
+        max-height: 88vh !important;
+    }
+
+    /* Tab buttons — horizontal scroll */
+    #result-sheet-modal .flex.border-b {
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+    }
+    #result-sheet-modal .flex.border-b::-webkit-scrollbar { display: none !important; }
+
+    .result-tab-btn {
+        white-space: nowrap !important;
+        font-size: 0.75rem !important;
+        padding: 0.5rem 0.75rem !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Subject sub-tabs — horizontal scroll */
+    #subject-sub-tabs-nav {
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+    }
+    #subject-sub-tabs-nav::-webkit-scrollbar { display: none !important; }
+
+    /* Review wrong answers list */
+    #review-wrong-ans-content {
+        max-height: 55vh !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       VOCAB MODAL
+       ───────────────────────────────────────── */
+    #all-vocab-modal .modal-content,
+    #vocab-modal .modal-content {
+        max-height: 88vh !important;
+    }
+
+    /* Vocab modal top action bar */
+    #all-vocab-modal .modal-header-sticky > div,
+    #all-vocab-modal .flex.items-center.gap-3 {
+        flex-wrap: wrap !important;
+        gap: 0.4rem !important;
+    }
+
+    #all-vocab-modal .modal-header-sticky button,
+    #show-quiz-center-btn {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.6rem !important;
+    }
+
+    /* Vocab table: make it scrollable horizontally */
+    .all-vocab-modal-content {
+        overflow-x: auto !important;
+    }
+
+    .all-vocab-modal-content table {
+        min-width: 400px !important;
+        font-size: 0.8rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       MCQ MODALS
+       ───────────────────────────────────────── */
+    /* Master MCQ modal */
+    #master-mcq-modal .modal-content {
+        max-height: 88vh !important;
+    }
+
+    /* MCQ study modal — full-screen on mobile */
+    #mcq-study-modal .modal-content {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* MCQ study modal header — stack buttons */
+    #mcq-study-modal .flex.justify-between.items-center.p-4 {
+        padding: 0.75rem !important;
+        flex-wrap: wrap !important;
+        gap: 0.4rem !important;
+    }
+
+    #mcq-study-modal .flex.items-center.gap-3 {
+        gap: 0.35rem !important;
+        flex-wrap: wrap !important;
+    }
+
+    #copy-study-mcq-btn, #test-study-mcq-btn, #print-study-mcq-btn {
+        font-size: 0.7rem !important;
+        padding: 0.4rem 0.5rem !important;
+    }
+
+    #mcq-study-content {
+        padding: 1rem !important;
+        font-size: 0.875rem !important;
+    }
+
+    /* Add MCQ modal */
+    #add-mcq-modal .modal-content {
+        max-height: 88vh !important;
+    }
+
+    #mcq-paste-textarea {
+        font-size: 0.85rem !important;
+        rows: 8 !important;
+    }
+
+    /* MCQ Quiz Center */
+    #mcq-quiz-center-modal .modal-content,
+    #quiz-center-modal .modal-content {
+        max-height: 88vh !important;
+    }
+
+    /* MCQ study card font sizes */
+    .study-card {
+        font-size: 0.875rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       WEEK / MONTH SUMMARY MODALS
+       ───────────────────────────────────────── */
+    #week-summary-modal .modal-content,
+    #month-summary-modal .modal-content {
+        max-height: 88vh !important;
+        width: 96vw !important;
+        max-width: 96vw !important;
+    }
+
+    /* Summary modal header buttons */
+    #week-summary-modal .modal-header-sticky,
+    #month-summary-modal .modal-header-sticky {
+        flex-wrap: wrap !important;
+        gap: 0.4rem !important;
+    }
+
+    #print-week-summary-btn, #print-month-summary-btn {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.6rem !important;
+    }
+
+    /* Weekly summary table — horizontal scroll */
+    #week-summary-content,
+    #month-summary-content {
+        overflow-x: auto !important;
+    }
+
+    #week-summary-content table,
+    #month-summary-content table {
+        min-width: 550px !important;
+        font-size: 0.8rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       CHART MODAL
+       ───────────────────────────────────────── */
+    #chart-modal .modal-content {
+        max-height: 88vh !important;
+        padding: 1rem !important;
+    }
+
+    #chart-modal > .modal-content > div[style*="height: 400px"] {
+        height: 260px !important;
+    }
+
+    #progress-chart-canvas {
+        max-height: 250px !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       BACKUP / RESTORE MODAL
+       ───────────────────────────────────────── */
+    #backup-restore-modal .modal-content {
+        max-height: 88vh !important;
+    }
+
+    #cloud-backup-list {
+        max-height: 200px !important;
+    }
+
+    /* Tab buttons */
+    #backup-restore-modal .flex.border-b button {
+        font-size: 0.8rem !important;
+        padding: 0.5rem 0.5rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       CONFIRM / ALERT MODALS
+       ───────────────────────────────────────── */
+    #confirm-modal .modal-content,
+    #quiz-confirm-modal .modal-content {
+        width: 90vw !important;
+        max-width: 90vw !important;
+    }
+
+    /* Confirm modal buttons */
+    #confirm-modal .flex.justify-between,
+    #quiz-confirm-modal .flex.justify-between {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+
+    #confirm-modal .flex.justify-between button,
+    #quiz-confirm-modal .flex.justify-between button,
+    #quiz-confirm-modal .flex.gap-3 button {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    /* The inner flex row in quiz-confirm-modal */
+    #quiz-confirm-modal .flex.items-center.gap-3 {
+        flex-direction: column !important;
+        width: 100% !important;
+    }
+
+    #quiz-confirm-modal .flex.gap-3 {
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 0.5rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       ADD MONTH MODAL
+       ───────────────────────────────────────── */
+    #add-month-modal .modal-content {
+        max-height: 88vh !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       STORY / EDIT STORY MODALS
+       ───────────────────────────────────────── */
+    #story-modal .modal-content,
+    #edit-story-modal .modal-content {
+        max-height: 88vh !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       DAY SECTIONS (MAIN STUDY PLAN CARDS)
+       ───────────────────────────────────────── */
+    .day-section {
+        margin-bottom: 0.75rem !important;
+        border-radius: 0.75rem !important;
+    }
+
+    .day-section-header {
+        padding: 0.6rem 0.75rem !important;
+    }
+
+    .day-header-title h4 {
+        font-size: 0.9rem !important;
+    }
+
+    /* Week headers */
+    .week-section {
+        margin-bottom: 1.25rem !important;
+    }
+
+    /* Progress rings row — horizontal scroll */
+    .flex.gap-6.mb-10.overflow-hidden {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        gap: 0.75rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+    .flex.gap-6.mb-10.overflow-hidden::-webkit-scrollbar { display: none !important; }
+
+    /* Progress circles — consistent smaller size */
+    .flex.gap-6.mb-10.overflow-hidden .h-32.w-32 {
+        flex-shrink: 0 !important;
+        width: 6rem !important;
+        height: 6rem !important;
+    }
+
+    /* Edit mode controls — wrap on mobile */
+    .edit-mode-controls {
+        flex-wrap: wrap !important;
+        gap: 0.4rem !important;
+    }
+
+    .edit-mode-controls button {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.6rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       FULLSCREEN TIMER MODAL
+       ───────────────────────────────────────── */
+    #fullscreen-timer-modal {
+        padding: 1rem !important;
+    }
+
+    #fullscreen-timer-subject {
+        font-size: 1.25rem !important;
+        margin-bottom: 4px !important;
+    }
+
+    #fullscreen-timer-topic {
+        font-size: 0.9rem !important;
+        margin-bottom: 1.25rem !important;
+    }
+
+    /* Large clock — smaller on mobile */
+    #fullscreen-timer-session {
+        font-size: 3.5rem !important;
+        letter-spacing: 0.03em !important;
+        margin-bottom: 6px !important;
+    }
+
+    #fullscreen-timer-total {
+        font-size: 1.6rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    /* Control buttons — slightly smaller */
+    #fullscreen-timer-startpause-btn,
+    #fullscreen-timer-end-btn {
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 1.4rem !important;
+    }
+
+    /* Close button */
+    #fullscreen-timer-close-btn {
+        top: 12px !important;
+        right: 16px !important;
+        font-size: 1.8rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       FLOATING BUTTONS — RIGHT SIDE STACK
+       ───────────────────────────────────────── */
+
+    /* Dark mode toggle */
+    #global-dark-mode-btn {
+        bottom: 1rem !important;
+        right: 1rem !important;
+        width: 48px !important;
+        height: 48px !important;
+    }
+
+    #global-dark-mode-btn i {
+        font-size: 1.2rem !important;
+    }
+
+    /* Scroll toggle — sits above dark mode button */
+    #scroll-toggle-btn {
+        bottom: 4.5rem !important;
+        right: 1rem !important;
+        width: 42px !important;
+        height: 42px !important;
+    }
+
+    /* Pomodoro widget — compact on mobile */
+    .pomodoro-widget {
+        width: calc(100vw - 2rem) !important;
+        max-width: 280px !important;
+        bottom: 5rem !important;
+        right: 0.75rem !important;
+    }
+
+    /* Pomodoro minimized icon — moves left to not stack with other buttons */
+    .pomodoro-icon {
+        bottom: 1rem !important;
+        right: 4rem !important;
+        width: 46px !important;
+        height: 46px !important;
+    }
+
+    /* BCS Countdown pill — left side, compact */
+    .floating-countdown-pill {
+        bottom: 1rem !important;
+        left: 0.75rem !important;
+        padding: 4px 8px 4px 4px !important;
+        gap: 6px !important;
+    }
+
+    .countdown-icon {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .countdown-label {
+        font-size: 0.55rem !important;
+    }
+
+    #bcs-timer-display {
+        font-size: 0.7rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       MCQ SETTINGS FLOATING PANEL (inside mcq-study-modal)
+       ───────────────────────────────────────── */
+    .floating-settings-btn {
+        bottom: 1rem !important;
+        right: 4rem !important; /* doesn't overlap fullscreen btn */
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    #mcq-fullscreen-btn {
+        bottom: 1rem !important;
+        right: 1rem !important;
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    .settings-panel {
+        bottom: 3.5rem !important;
+        right: 0.5rem !important;
+        width: calc(100vw - 1.5rem) !important;
+        max-width: 280px !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       STUDY TIME REPORT MODAL (already full-screen)
+       ensure it works on mobile too
+       ───────────────────────────────────────── */
+    #study-time-report-modal .modal-content {
+        padding: 1rem !important;
+    }
+
+    #study-time-report-modal .modal-header-sticky {
+        flex-wrap: wrap !important;
+        gap: 0.4rem !important;
+    }
+
+    #print-study-time-report-btn {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.6rem !important;
+    }
+
+    /* Study time report table — horizontal scroll */
+    .study-time-report-table-wrapper {
+        overflow-x: auto !important;
+    }
+
+    .study-time-report-table-wrapper table {
+        min-width: 500px !important;
+        font-size: 0.8rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       VIEW SAVED RESULT MODAL
+       ───────────────────────────────────────── */
+    #view-saved-result-modal .modal-content {
+        max-height: 88vh !important;
+        overflow-y: auto !important;
+    }
+
+    #saved-result-content h2 {
+        font-size: 1.4rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       RESULT SUMMARY LIST (inside quiz results + saved result)
+       ───────────────────────────────────────── */
+    .result-summary-list {
+        padding: 0 0.25rem !important;
+    }
+
+    .result-summary-row {
+        font-size: 0.85rem !important;
+        padding: 0.4rem 0.5rem !important;
+    }
+
+    .result-count,
+    .result-score-impact {
+        font-size: 0.95rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       QUIZ REVIEW SCREEN
+       ───────────────────────────────────────── */
+    #quiz-review-screen h2 {
+        font-size: 1.2rem !important;
+    }
+
+    #quiz-review-content {
+        max-height: 55vh !important;
+    }
+
+    #quiz-review-screen .flex.justify-end.gap-2 {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+
+    #quiz-review-screen .flex.justify-end.gap-2 button {
+        width: 100% !important;
+        justify-content: center !important;
+        font-size: 0.8rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       GENERAL TABLE FIX — PREVENT OVERFLOW
+       ───────────────────────────────────────── */
+    .results-table-container {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .results-table-container table {
+        min-width: 480px !important;
+        font-size: 0.8rem !important;
+    }
+
+
+    /* ─────────────────────────────────────────
+       GENERAL UTILITY
+       ───────────────────────────────────────── */
+
+    /* Any 2-col grid that breaks on mobile */
+    .grid.grid-cols-2 {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Don't let any button overflow its container */
+    button {
+        max-width: 100%;
+    }
+
+    /* Ensure inline-flex buttons don't cause overflow */
+    .action-button {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Skeleton loader adjustments */
+    .flex.gap-6.mb-10 .skeleton.h-32.w-32 {
+        flex-shrink: 0 !important;
+        width: 6rem !important;
+        height: 6rem !important;
+    }
+
+} /* END @media (max-width: 767px) */
+
+
+/* ─────────────────────────────────────────────
+   SMALL PHONES (max-width: 390px)
+   Extra tightening for very narrow screens
+   ───────────────────────────────────────────── */
+@media (max-width: 390px) {
+
+    main.container {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    .modal-content {
+        width: 98vw !important;
+        max-width: 98vw !important;
+        padding: 0.75rem !important;
+    }
+
+    /* Month nav buttons smaller */
+    #month-nav-buttons button {
+        font-size: 0.7rem !important;
+        padding: 0.3rem 0.6rem !important;
+    }
+
+    /* Quiz question text */
+    #quiz-question-text {
+        font-size: 0.875rem !important;
+    }
+
+    /* Option buttons */
+    .quiz-option-btn {
+        font-size: 0.8rem !important;
+        padding: 0.55rem 0.65rem !important;
+    }
+
+    /* Quiz timer */
+    #quiz-timer {
+        font-size: 0.85rem !important;
+        width: 2.8rem !important;
+    }
+
+    /* Large clock */
+    #fullscreen-timer-session {
+        font-size: 2.8rem !important;
+    }
+
+    /* Score display */
+    #quiz-score {
+        font-size: 0.65rem !important;
+        padding: 0.25rem 0.4rem !important;
+    }
+
+    /* Badges */
+    #badge-correct, #badge-wrong,
+    #quiz-main-screen .flex.items-center.gap-2 > div {
+        font-size: 0.6rem !important;
+        padding: 0.15rem 0.25rem !important;
+    }
+
+    /* MCQ study modal header — single column */
+    #mcq-study-modal .flex.items-center.gap-3 {
+        gap: 0.25rem !important;
+    }
+
+    #copy-study-mcq-btn, #test-study-mcq-btn, #print-study-mcq-btn {
+        font-size: 0.65rem !important;
+        padding: 0.35rem 0.4rem !important;
+    }
+
+    /* Action buttons grid — single column on tiny screens */
+    .mb-8 > div.ml-auto {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* BCS countdown — hide text, keep icon only */
+    .countdown-text {
+        display: none !important;
+    }
+
+    .floating-countdown-pill {
+        padding: 4px !important;
+    }
+
+} /* END @media (max-width: 390px) */
+
+
+/* ─────────────────────────────────────────────
+   TOUCH / SCROLL IMPROVEMENTS (all screen sizes)
+   ───────────────────────────────────────────── */
+
+/* Smooth momentum scroll for all scrollable areas on iOS */
+.modal-content,
+#quiz-question-area,
+#quiz-review-content,
+#review-wrong-ans-content,
+#master-mcq-menu-content,
+#mcq-study-content,
+#week-summary-content,
+#month-summary-content,
+#study-time-report-content,
+.results-table-container,
+#cloud-backup-list,
+.custom-scrollbar,
+.all-vocab-modal-content {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent text selection during quiz (reduces accidental highlight on tap) */
+#quiz-options-container .quiz-option-btn {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Ensure modals are always above header */
+.modal {
+    z-index: 200 !important;
+}
+
+/* study-time-report and quiz-confirm need even higher */
+#study-time-report-modal { z-index: 210 !important; }
+#quiz-confirm-modal      { z-index: 220 !important; }
