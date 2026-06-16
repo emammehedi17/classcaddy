@@ -90,6 +90,9 @@
                 <h2 id="modal-title" class="text-base font-bold truncate eng-text">Document Title</h2>
             </div>
             <div class="flex items-center gap-2">
+                <button onclick="printModal()" class="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded transition-colors" title="প্রিন্ট করুন">
+                    <i class="fas fa-print"></i>
+                </button>
                 <button onclick="changeZoom(0.1)" class="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded transition-colors" title="ফন্ট বড় করুন">
                     <i class="fas fa-search-plus"></i>
                 </button>
@@ -312,6 +315,14 @@
                 iconBtn.title = "মিনিমাইজ করুন";
                 isMinimized = false;
                 document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function printModal() {
+            const iframeDoc = iframe.contentWindow;
+            if (iframeDoc) {
+                iframeDoc.focus();
+                iframeDoc.print();
             }
         }
 
