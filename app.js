@@ -1333,8 +1333,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 <div id="${sectionId}" class="bg-white/60 border border-gray-200 p-4 rounded-lg shadow week-section" data-week-id="${weekId}">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-semibold text-emerald-700 capitalize">${weekId.replace('week', 'Week ')} Plan</h3>
-                        <button class="action-button action-button-secondary text-xs view-week-summary-btn" data-week-id="${weekId}">
-                            <i class="fas fa-table mr-1"></i> View Summary
+                        <button class="action-button action-button-secondary text-xs study-time-report-btn" data-week-id="${weekId}">
+                            <i class="fas fa-chart-bar mr-1"></i> Study Time Report
                         </button>
                     </div>
                     ${targetHtml}
@@ -1348,11 +1348,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         <div class="progress-bar-container w-full"> 
                             <div id="week-bar-${monthId}-${weekId}" class="progress-bar-fill progress-bar-weekly" style="width: ${initialProgress}%;"></div> 
                         </div>
-                    </div>
-                    <div class="flex justify-end mt-2">
-                        <button class="action-button action-button-secondary text-xs study-time-report-btn" data-week-id="${weekId}">
-                            <i class="fas fa-chart-bar mr-1"></i> Study Time Report
-                        </button>
                     </div>
                     <div class="days-container space-y-6 mt-4"> ${daysHtml} </div>
                      ${isGuestMode ? '' : (totalDays < 7 ? (totalDays > 0 ? `<button class="add-day-btn w-full mt-4" data-week-id="${weekId}"><i class="fas fa-plus"></i> Add New Day</button>` : `<button class="action-button mt-4 add-first-day-btn" data-week-id="${weekId}"><i class="fas fa-calendar-plus mr-2"></i> Add First Day</button>`) : '<p class="text-center text-xs text-gray-400 mt-4">Maximum 7 days reached for this week.</p>')}
@@ -2248,10 +2243,12 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                 // --- Aggregate Data ---
                 const dayLabels = [];
+                const dayDateLabels = [];
                 const dayTotals = [];
                 const subjectTotals = {}; // subject -> seconds (week total)
                 // subjectDaySeconds[subject][dayIndex] = seconds
                 const subjectDaySeconds = {};
+                const subjectDayTopics = {}; // subject -> [topic per day]
                 let weekGrandTotal = 0;
 
                 daysData.forEach((day, dayIdx) => {
@@ -2266,9 +2263,28 @@ function updateMonthUI(monthId, monthData, weeksData) {
                                 subjectDaySeconds[subjKey] = new Array(daysData.length).fill(0);
                             }
                             subjectDaySeconds[subjKey][dayIdx] += rowSeconds;
+                            // Track topics per subject per day
+                            if (!subjectDayTopics[subjKey]) subjectDayTopics[subjKey] = new Array(daysData.length).fill('');
+                            const topicName = row.topic || '';
+                            if (topicName) {
+                                subjectDayTopics[subjKey][dayIdx] = subjectDayTopics[subjKey][dayIdx]
+                                    ? subjectDayTopics[subjKey][dayIdx] + ', ' + topicName
+                                    : topicName;
+                            }
                         }
                     });
+                    // Format date label
+                    let dateLabel = '';
+                    if (day.date) {
+                        try {
+                            const d = new Date(day.date);
+                            if (!isNaN(d)) {
+                                dateLabel = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                            }
+                        } catch(e) {}
+                    }
                     dayLabels.push(`Day ${day.dayNumber}`);
+                    dayDateLabels.push(dateLabel);
                     dayTotals.push(Math.round((dayTotal / 60) * 100) / 100); // minutes, 2 decimals
                     weekGrandTotal += dayTotal;
                 });
@@ -2277,6 +2293,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 const subjectMinutes = subjectLabels.map(s => Math.round((subjectTotals[s] / 60) * 100) / 100);
                 const numDays = daysData.length;
                 const subjectColors = ['#10b981', '#0ea5e9', '#f59e0b', '#ef4444', '#a855f7', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#14b8a6', '#6366f1'];
+
+                // Build chart labels with dates
+                const chartDayLabels = dayLabels.map((label, i) => dayDateLabels[i] ? `${label}\n(${dayDateLabels[i]})` : label);
 
                 // --- Build HTML ---
                 let html = `
@@ -2302,18 +2321,31 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                 // --- Total Study Time Table: Subjects as rows, Days as columns ---
                 if (subjectLabels.length > 0) {
+                    const tableHeaderColors = ['#f0fdf4','#eff6ff','#fefce8','#fdf4ff','#fff7ed','#f0fdfa','#fff1f2','#f8fafc'];
+                    const subjectRowColors = [
+                        { bg: '#ecfdf5', border: '#6ee7b7', text: '#065f46', badge: '#10b981' },
+                        { bg: '#eff6ff', border: '#93c5fd', text: '#1e3a8a', badge: '#3b82f6' },
+                        { bg: '#fefce8', border: '#fde047', text: '#713f12', badge: '#eab308' },
+                        { bg: '#fdf4ff', border: '#e879f9', text: '#701a75', badge: '#a855f7' },
+                        { bg: '#fff7ed', border: '#fb923c', text: '#7c2d12', badge: '#f97316' },
+                        { bg: '#f0fdfa', border: '#2dd4bf', text: '#134e4a', badge: '#14b8a6' },
+                        { bg: '#fff1f2', border: '#fb7185', text: '#881337', badge: '#f43f5e' },
+                        { bg: '#f8fafc', border: '#94a3b8', text: '#1e293b', badge: '#64748b' },
+                    ];
+
                     html += `
-                        <h4 class="text-center font-semibold text-gray-700 mb-2 mt-6">Total Study Time</h4>
-                        <div class="results-table-container overflow-x-auto">
-                        <table class="w-full text-sm text-left text-gray-600 study-table">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-3 border text-center bg-gray-100">Subject</th>
+                        <h4 class="text-center font-semibold text-gray-700 mb-3 mt-6" style="font-size:1.1rem;">📊 Total Study Time</h4>
+                        <div class="results-table-container overflow-x-auto" style="border-radius:14px; box-shadow:0 4px 24px rgba(0,0,0,0.10); border:1.5px solid #e5e7eb; background:#fff;">
+                        <table class="w-full text-sm text-left text-gray-600 study-table" style="border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px;">
+                            <thead>
+                                <tr style="background: linear-gradient(90deg,#10b981 0%,#0ea5e9 60%,#a855f7 100%); color:#fff;">
+                                    <th class="px-4 py-3 border-b border-white/20 text-center" style="font-size:0.85rem; letter-spacing:0.05em;">Subject</th>
                     `;
-                    dayLabels.forEach(label => {
-                        html += `<th class="px-4 py-3 border text-center bg-gray-100">${label}</th>`;
+                    dayLabels.forEach((label, i) => {
+                        const dateStr = dayDateLabels[i] ? `<br><span style="font-size:0.72rem; font-weight:400; opacity:0.85;">(${dayDateLabels[i]})</span>` : '';
+                        html += `<th class="px-4 py-3 border-b border-white/20 text-center" style="font-size:0.85rem; letter-spacing:0.05em;">${label}${dateStr}</th>`;
                     });
-                    html += `<th class="px-4 py-3 border text-center bg-gray-100">Total</th>
+                    html += `<th class="px-4 py-3 border-b border-white/20 text-center" style="font-size:0.85rem; letter-spacing:0.05em;">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -2321,36 +2353,46 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                     // One row per subject
                     subjectLabels.forEach((subj, sIdx) => {
-                        html += `<tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 border font-medium text-gray-900 text-center">${escapeHtml(subj)}</td>`;
+                        const rc = subjectRowColors[sIdx % subjectRowColors.length];
+                        html += `<tr style="background:${rc.bg};">
+                            <td class="px-4 py-3 border-b border-gray-100 font-bold text-center" style="color:${rc.text}; border-left:4px solid ${rc.badge}; white-space:nowrap;">
+                                <span style="display:inline-flex; align-items:center; gap:6px;">
+                                    <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${rc.badge};"></span>
+                                    ${escapeHtml(subj)}
+                                </span>
+                            </td>`;
                         for (let d = 0; d < numDays; d++) {
                             const secs = (subjectDaySeconds[subj] && subjectDaySeconds[subj][d]) || 0;
-                            html += `<td class="px-4 py-3 border text-center">${secs > 0 ? formatTimerHMS(secs) : '-'}</td>`;
+                            const topic = (subjectDayTopics[subj] && subjectDayTopics[subj][d]) || '';
+                            const timeHtml = secs > 0 ? `<span style="font-weight:700; color:${rc.text};">${formatTimerHMS(secs)}</span>` : `<span style="color:#d1d5db;">—</span>`;
+                            const topicHtml = topic ? `<br><span style="font-size:0.68rem; color:#6b7280; font-weight:400; display:block; margin-top:2px; max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(topic)}">${escapeHtml(topic)}</span>` : '';
+                            html += `<td class="px-3 py-2 border-b border-gray-100 text-center" style="vertical-align:top;">${timeHtml}${topicHtml}</td>`;
                         }
-                        html += `<td class="px-4 py-3 border text-center font-semibold">${formatTimerHMS(subjectTotals[subj])}</td>
+                        const totalSecs = subjectTotals[subj];
+                        html += `<td class="px-4 py-3 border-b border-gray-100 text-center font-bold" style="color:${rc.badge}; background:${rc.bg}; border-right:3px solid ${rc.badge};">${formatTimerHMS(totalSecs)}</td>
                         </tr>`;
                     });
 
-                    // Average row (per-day average across subjects)
-                    html += `<tr class="bg-amber-50">
-                        <td class="px-4 py-3 border font-semibold text-gray-900 text-center">Average</td>`;
+                    // Average row
+                    html += `<tr style="background: #f8fafc;">
+                        <td class="px-4 py-3 border-b border-gray-200 font-semibold text-gray-600 text-center" style="border-left:4px solid #94a3b8;">Avg / Subject</td>`;
                     for (let d = 0; d < numDays; d++) {
                         const avgSecs = subjectLabels.length > 0
                             ? (dayTotals[d] * 60) / subjectLabels.length
                             : 0;
-                        html += `<td class="px-4 py-3 border text-center font-semibold">${formatTimerHMS(avgSecs)}</td>`;
+                        html += `<td class="px-4 py-3 border-b border-gray-200 text-center font-semibold text-gray-500">${formatTimerHMS(avgSecs)}</td>`;
                     }
                     const avgWeekTotal = subjectLabels.length > 0 ? weekGrandTotal / subjectLabels.length : 0;
-                    html += `<td class="px-4 py-3 border text-center font-semibold">${formatTimerHMS(avgWeekTotal)}</td>
+                    html += `<td class="px-4 py-3 border-b border-gray-200 text-center font-semibold text-gray-500">${formatTimerHMS(avgWeekTotal)}</td>
                     </tr>`;
 
-                    // Total Time row (sum across subjects per day == day total)
-                    html += `<tr class="bg-emerald-50">
-                        <td class="px-4 py-3 border font-bold text-gray-900 text-center">Total Time</td>`;
+                    // Total Time row
+                    html += `<tr style="background: linear-gradient(90deg,#ecfdf5 0%,#d1fae5 100%);">
+                        <td class="px-4 py-3 font-bold text-emerald-800 text-center" style="border-left:4px solid #10b981; border-radius:0 0 0 14px;">Total Time</td>`;
                     for (let d = 0; d < numDays; d++) {
-                        html += `<td class="px-4 py-3 border text-center font-bold text-emerald-700">${formatTimerHMS(dayTotals[d] * 60)}</td>`;
+                        html += `<td class="px-4 py-3 text-center font-bold" style="color:#065f46; font-size:1rem;">${formatTimerHMS(dayTotals[d] * 60)}</td>`;
                     }
-                    html += `<td class="px-4 py-3 border text-center font-bold text-emerald-700">${formatTimerHMS(weekGrandTotal)}</td>
+                    html += `<td class="px-4 py-3 text-center font-bold" style="color:#059669; font-size:1.1rem; border-right:3px solid #10b981; border-radius:0 0 14px 0;">${formatTimerHMS(weekGrandTotal)}</td>
                     </tr>`;
 
                     html += `</tbody></table></div>`;
@@ -2366,10 +2408,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     `;
                 }
 
-
+                // --- Render Charts ---
                 studyTimeReportContent.innerHTML = html;
 
-                // --- Render Charts ---
                 if (studyTimeDailyChart) { studyTimeDailyChart.destroy(); }
                 if (studyTimeSubjectChart) { studyTimeSubjectChart.destroy(); }
                 if (studyTimeStackedChart) { studyTimeStackedChart.destroy(); }
@@ -2378,7 +2419,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 studyTimeDailyChart = new Chart(dailyCtx, {
                     type: 'bar',
                     data: {
-                        labels: dayLabels,
+                        labels: chartDayLabels,
                         datasets: [{
                             label: 'Minutes',
                             data: dayTotals,
@@ -2427,7 +2468,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     studyTimeStackedChart = new Chart(stackedCtx, {
                         type: 'bar',
                         data: {
-                            labels: dayLabels,
+                            labels: chartDayLabels,
                             datasets: stackedDatasets
                         },
                         options: {
@@ -2832,11 +2873,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      startMcqQuiz(monthId, weekId, dayIndex, null); // null signifies "All MCQs"
                  }
                  // --- END: NEW MCQ BUTTON HANDLERS ---
-				// --- START: NEW SUMMARY BUTTON LISTENER ---
-                 else if (button.classList.contains('view-week-summary-btn')) {
-                     openWeekSummaryModal(monthId, weekId);
-                 }
-                 // --- END: NEW SUMMARY BUTTON LISTENER ---
                  else if (button.classList.contains('study-time-report-btn')) {
                      openStudyTimeReportModal(monthId, weekId);
                  }
