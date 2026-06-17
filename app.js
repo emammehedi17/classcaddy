@@ -703,18 +703,20 @@
             const tbody = daySection.querySelector('tbody');
             if (!tbody) return;
 
-            // Make each row draggable only from drag-handle-cell
+            // Make each row draggable only when mousedown on the grip icon
             function setupDraggable() {
                 tbody.querySelectorAll('tr').forEach(tr => {
                     tr.setAttribute('draggable', 'false');
-                    const handle = tr.querySelector('.drag-handle-cell');
-                    if (handle) {
-                        handle.addEventListener('mousedown', () => { tr.setAttribute('draggable', 'true'); }, { once: false });
-                        handle.addEventListener('mouseleave', () => {
-                            // Only remove draggable if not currently dragging
-                            if (!tr.classList.contains('dragging-row')) tr.setAttribute('draggable', 'false');
-                        });
-                    }
+                });
+                tbody.querySelectorAll('.drag-handle-icon').forEach(icon => {
+                    icon.addEventListener('mousedown', (e) => {
+                        const tr = icon.closest('tr');
+                        if (tr) tr.setAttribute('draggable', 'true');
+                    });
+                    icon.addEventListener('mouseup', () => {
+                        const tr = icon.closest('tr');
+                        if (tr && !tr.classList.contains('dragging-row')) tr.setAttribute('draggable', 'false');
+                    });
                 });
             }
             setupDraggable();
@@ -1557,7 +1559,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          
                          <div class="day-header-progress day-progress-wrapper" data-day-index="${dayIndex}">
                              <div class="flex justify-between text-xs text-gray-500">
-                                 <span class="day-date-label" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}" title="Double-click to edit date" style="cursor:pointer; font-weight:600; color:#6b7280;">${dayData.date ? (() => { try { const [y,m,d] = dayData.date.split('-').map(Number); return new Date(y,m-1,d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); } catch(e) { return dayData.date; } })() : '<span style=\'color:#d1d5db;font-style:italic;\'>Set date</span>'}</span>
+                                 <span class="day-date-label" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}" title="Double-click to edit date" style="cursor:pointer; font-weight:600; color:#6b7280;">${dayData.date ? (() => { try { const [y,m,d] = dayData.date.split('-').map(Number); const dd=String(d).padStart(2,'0');const mm=String(m).padStart(2,'0');return `${dd}/${mm}/${y}`; } catch(e) { return dayData.date; } })() : '<span style=\'color:#d1d5db;font-style:italic;\'>Set date</span>'}</span>
                                  <span id="day-perc-${monthId}-${weekId}-${dayIndex}" class="progress-percentage font-medium">${initialDayProgress}%</span>
                              </div>
                              <div class="progress-bar-container w-full"> 
@@ -1598,7 +1600,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          <table class="w-full text-sm text-left text-gray-600 study-table" id="${tableId}">
                              <thead class="text-xs text-gray-500 uppercase">
                                  <tr>
-                                     <th scope="col" class="px-1 py-2" style="width:20px;"></th>
                                      <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Subject</th>
                                      <th scope="col" class="px-3 py-2 md:w-[28%] text-center">Topic / Vocab</th>
                                      <th scope="col" class="px-3 py-2 questions-col text-center">Questions</th>
@@ -1713,13 +1714,12 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
              return `
                  <tr id="${uniqueRowId}" data-row-index="${rowIndex}" class="${isEditing ? 'editing-mode' : ''} ${isVocabRow ? 'vocab-row' : 'normal-row'} ${completedClass}" ${hasVocabItems && !isEditing ? 'data-vocab-collapsed="true" style="cursor:pointer;"' : ''}>
-                     <td class="drag-handle-cell px-1 py-2 align-middle" style="cursor:grab; color:#9ca3af; user-select:none; width:20px; text-align:center;" title="Drag to reorder">
-                        <i class="fas fa-grip-vertical"></i>
-                     </td>
-                     <td class="px-3 py-2 align-top" data-label="Subject">
-                        <div style="display:flex;align-items:center;gap:4px;">
+                     <td class="px-3 py-2 align-top subject-cell" data-label="Subject" style="position:relative;">
+                        <span class="drag-handle-icon" title="Drag to reorder" style="position:absolute;left:4px;top:50%;transform:translateY(-50%);cursor:grab;color:#d1d5db;font-size:0.7rem;line-height:1;user-select:none;z-index:1;" onmouseenter="this.style.color='#9ca3af'" onmouseleave="this.style.color='#d1d5db'">
+                            <i class="fas fa-grip-vertical"></i>
+                        </span>
+                        <div style="padding-left:14px;">
                         ${isEditing ? `<input type="text" class="editable-input subject-input" placeholder="Subject" value="${escapeHtml(rowData.subject || '')}" ${isVocabRow ? 'readonly style="background-color:#e5e7eb;"' : ''}>` : `<span class="subject-display font-medium text-gray-700">${escapeHtml(rowData.subject || '-')}</span>`}
-
                         </div>
                      </td>
                      <td class="px-3 py-2 align-top vocab-topic-cell" data-label="Topic / Vocab"> 
@@ -2065,7 +2065,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 if (val) {
                     try {
                         const [y, m, d] = val.split('-').map(Number);
-                        displayText = new Date(y, m-1, d).toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+                        const dd=String(d).padStart(2,'0');const mm=String(m).padStart(2,'0');displayText=`${dd}/${mm}/${y}`;
                     } catch(ex) { displayText = val; }
                     labelEl.innerHTML = displayText;
                     labelEl.style.color = '#6b7280';
@@ -2539,7 +2539,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             // Parse as local date to avoid UTC-offset shifting the day
                             const [y, m, d] = day.date.split('-').map(Number);
                             const dateObj = new Date(y, m - 1, d);
-                            dateLabel = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                            const dd=String(dateObj.getDate()).padStart(2,'0'); const mm=String(dateObj.getMonth()+1).padStart(2,'0'); dateLabel=`${dd}/${mm}`;
                         } catch(e) {}
                     }
 
