@@ -2054,24 +2054,58 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 }
             }
             const prevHTML = labelEl.innerHTML;
-            labelEl.innerHTML = `<input type="date" class="day-date-input" value="${currentISO}" style="font-size:0.75rem;border:1px solid #d1d5db;border-radius:4px;padding:1px 4px;color:#374151;background:#fff;cursor:pointer;">`;
+            // Convert stored YYYY-MM-DD to dd/mm/yyyy for display in input
+            let initialDisplay = '';
+            if (currentISO) {
+                try {
+                    const [y, m, d] = currentISO.split('-').map(Number);
+                    initialDisplay = `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`;
+                } catch(e) { initialDisplay = ''; }
+            }
+            labelEl.innerHTML = `<input type="text" class="day-date-input" value="${initialDisplay}" placeholder="dd/mm/yyyy" maxlength="10" style="font-size:0.75rem;border:1px solid #6366f1;border-radius:4px;padding:2px 6px;color:#374151;background:#fff;cursor:text;width:100px;outline:none;letter-spacing:0.05em;">`;
             const inp = labelEl.querySelector('input');
             inp.focus();
+            inp.select();
             inp.addEventListener('click', ev => ev.stopPropagation());
             inp.addEventListener('dblclick', ev => ev.stopPropagation());
+
+            // Auto-format dd/mm/yyyy as the user types
+            inp.addEventListener('input', (ev) => {
+                let raw = inp.value.replace(/\D/g, ''); // digits only
+                let formatted = '';
+                if (raw.length >= 1) formatted = raw.substring(0, 2);
+                if (raw.length >= 3) formatted += '/' + raw.substring(2, 4);
+                if (raw.length >= 5) formatted += '/' + raw.substring(4, 8);
+                inp.value = formatted;
+            });
+
+            // Parse dd/mm/yyyy → YYYY-MM-DD for storage
+            function parseDisplayToISO(display) {
+                const parts = display.trim().split('/');
+                if (parts.length !== 3) return '';
+                const [dd, mm, yyyy] = parts;
+                if (dd.length !== 2 || mm.length !== 2 || yyyy.length !== 4) return '';
+                const d = parseInt(dd), m = parseInt(mm), y = parseInt(yyyy);
+                if (isNaN(d) || isNaN(m) || isNaN(y)) return '';
+                if (m < 1 || m > 12 || d < 1 || d > 31 || y < 1900 || y > 2100) return '';
+                return `${y}-${mm}-${dd}`;
+            }
+
             const saveDateEdit = async () => {
-                const val = inp.value; // YYYY-MM-DD or ""
+                const display = inp.value.trim();
+                const val = display ? parseDisplayToISO(display) : ''; // YYYY-MM-DD or ""
                 let displayText = '';
                 if (val) {
-                    try {
-                        const [y, m, d] = val.split('-').map(Number);
-                        const dd=String(d).padStart(2,'0');const mm=String(m).padStart(2,'0');displayText=`${dd}/${mm}/${y}`;
-                    } catch(ex) { displayText = val; }
+                    displayText = display; // already in dd/mm/yyyy
                     labelEl.innerHTML = displayText;
                     labelEl.style.color = '#6b7280';
                     labelEl.style.fontStyle = '';
-                } else {
+                } else if (!display) {
                     labelEl.innerHTML = '<span style="color:#d1d5db;font-style:italic;">Set date</span>';
+                } else {
+                    // Invalid input — restore previous
+                    labelEl.innerHTML = prevHTML;
+                    return;
                 }
                 // Save to Firestore
                 if (!val && !currentISO) return; // nothing changed
@@ -2095,7 +2129,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     setSyncStatus('Error', 'red');
                 }
             };
-            inp.addEventListener('change', saveDateEdit);
             inp.addEventListener('blur', () => {
                 setTimeout(() => {
                     if (labelEl.querySelector('input')) {
@@ -3917,7 +3950,7 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  }
 
                  const newDayIndex = daysArray.length;
-                 const todayISO = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+                 const _now = new Date(); const todayISO = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,"0")}-${String(_now.getDate()).padStart(2,"0")}`;
                  const newDayData = { 
                      dayNumber: newDayIndex + 1, 
                      date: todayISO, 
