@@ -338,59 +338,6 @@
             height: 18px;
         }
 
-        /* --- Target Card Link Styles --- */
-        a.target-card-link {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-            border-radius: 0.75rem;
-            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease-out;
-            cursor: pointer;
-        }
-        a.target-card-link:hover {
-            background-color: #6ee7b7; /* emerald-300 */
-            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1), 0 4px 6px -4px rgba(16, 185, 129, 0.1);
-            transform: translateY(-3px);
-        }
-        .target-card {
-            background-color: white;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 10px -3px rgba(0,0,0,0.07), 0 2px 6px -2px rgba(0,0,0,0.04);
-            border: 1px solid #f3f4f6;
-            transition: background-color 0.2s ease-out;
-        }
-        a.target-card-link:hover .target-card {
-            background-color: transparent;
-            box-shadow: none;
-            border-color: transparent;
-        }
-        .target-textarea {
-            font-family: 'Inter', 'Poppins', sans-serif;
-            background-color: transparent;
-            border: none; padding: 0; margin: 0;
-            width: 100%;
-            /* --- MODIFIED --- */
-            height: auto; /* Allow it to grow */
-            overflow: hidden; /* Hide scrollbar */
-            /* --- END MODIFIED --- */
-            resize: none; color: #4b5563;
-            font-size: 0.95rem; line-height: 1.5;
-            outline: none; box-shadow: none;
-        }
-        .target-textarea:disabled {
-            background-color: transparent;
-            cursor: default;
-            /* --- THIS IS THE FIX --- */
-            pointer-events: none;
-        }
-         .target-textarea:not(:disabled) {
-             background-color: #f9fafb;
-             border: 1px dashed #34d399;
-             padding: 8px; border-radius: 4px;
-         }
-         a.target-card-link:hover .target-textarea:disabled { color: #4b5563; }
-         a.target-card-link:hover .target-card h3 { color: #065f46; }
 
         /* --- Day Card Styles --- */
         .day-section {
@@ -1013,16 +960,6 @@ body.dark-mode .done-btn-completed {
             color: #4b5563; /* gray-600 */
         }
 		
-		.week-target-text {
-            font-size: 0.8rem; /* text-xs */
-            font-style: italic;
-            color: #4b5563; /* gray-600 */
-            padding: 0.25rem 0.1rem; /* 4px 1px */
-            white-space: pre-wrap;
-            word-break: break-word;
-            line-height: 1.4;
-            margin-top: 4px; /* Add space below the progress bar title */
-        }
 		
 		}
 
@@ -2502,7 +2439,6 @@ body.dark-mode .card,
 body.dark-mode .modal-content,
 body.dark-mode .week-section,
 body.dark-mode .day-section-body,
-body.dark-mode .target-card,
 body.dark-mode header.main-website-ui, 
 body.dark-mode #mobile-menu,
 body.dark-mode .dropdown-menu,
@@ -2772,16 +2708,6 @@ body.dark-mode .tracker-label-small {
     border: 1px solid #4b5563;
 }
 
-/* 5. Fix Monthly Target Boxes (The textareas) */
-body.dark-mode .target-textarea {
-    background-color: #1f2937 !important; /* Dark Gray */
-    color: #e5e7eb !important;
-    border-color: #374151 !important;
-}
-/* Fix the specific "Weekly Targets" header text */
-body.dark-mode .monthly-targets h3 {
-    color: #e5e7eb !important;
-}
 
 /* 6. FIX QUIZ OPTIONS FEEDBACK (Green/Red) in Dark Mode */
 /* When Correct: Green Background, White Text */

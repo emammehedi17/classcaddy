@@ -946,12 +946,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
         const weekData = weeksData[weekId]; // Get week data from the new object
         // --- END: MODIFIED ---
         
-        // Update weekly target text
-        const targetTextElement = monthElement.querySelector(`#target-text-${monthId}-${weekId}`);
-        if (targetTextElement) {
-            targetTextElement.textContent = monthData.weeklyTargets?.[weekId] || '';
-        }
-
         if (weekData) {
             // Update weekly progress bar
             const weekPerc = calculateWeeklyProgress(weekData);
@@ -1247,8 +1241,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
             // 5. Create the new data object
             const newPlanData = {
                monthName: monthName,
-               createdAt: Timestamp.now(),
-               weeklyTargets: { week1: '', week2: '', week3: '', week4: '' }
+               createdAt: Timestamp.now()
             };
 
             // --- START: NEW OPTIMISTIC FLOW ---
@@ -1393,9 +1386,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
             monthDiv.className = 'mb-12 p-6 card';
             monthDiv.dataset.monthId = monthId;
 
-            const targetColors = { week1: 'text-indigo-700', week2: 'text-teal-700', week3: 'text-amber-700', week4: 'text-rose-700' };
-            const targetHoverBgColors = { week1: 'hover:bg-indigo-50', week2: 'hover:bg-teal-50', week3: 'hover:bg-amber-50', week4: 'hover:bg-rose-50' };
-
             const monthlyPercent = calculateOverallMonthlyProgress(weeksData);
             const { 
                 weekly: lastWeekPercent, 
@@ -1440,27 +1430,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     )}
                  </div>
 
-                 <div class="mb-8">
-                    <div class="flex justify-between items-center mb-4">
-                         <h3 class="text-2xl font-semibold text-gray-700">Monthly Targets</h3>
-                         ${isGuestMode ? '' : '<button class="action-button action-button-secondary text-xs edit-targets-btn" data-editing="false"><i class="fas fa-pencil-alt mr-1"></i> Edit Targets</button>'}
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 monthly-targets">
-						${[1, 2, 3, 4].map(weekNum => `
-							<a href="#week-${monthId}-week${weekNum}" class="target-card-link ${targetHoverBgColors[`week${weekNum}`] || ''}">
-								<div class="target-card">
-									<h3 class="font-semibold text-lg ${targetColors[`week${weekNum}`] || 'text-gray-700'} mb-2">Week ${weekNum}</h3>
-									<textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" class="target-textarea w-full" placeholder="Enter target..." disabled>${escapeHtml(monthData.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
-								</div>
-							</a>
-						`).join('')}
-					</div>
-                </div>
                  <div class="space-y-8 weekly-plans-container">
                     ${[1, 2, 3, 4].map(weekNum => {
                         const weekId = `week${weekNum}`;
-                        const targetText = monthData.weeklyTargets?.[weekId] || '';
-                        return createWeekElement(monthId, weekId, weeksData[weekId], `week-${monthId}-${weekId}`, targetText);
+                        return createWeekElement(monthId, weekId, weeksData[weekId], `week-${monthId}-${weekId}`);
                     }).join('')}
                 </div>`;
 
@@ -1471,16 +1444,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
              // --- END: ADD LISTENER FOR NEW BUTTON ---
 
              if (!isGuestMode) {
-                 monthDiv.querySelector('.edit-targets-btn').addEventListener('click', (e) => handleEditTargets(e.currentTarget, monthId));
                  monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId, monthData.monthName || monthId));
              }
              
              attachWeekEventListeners(monthDiv, monthId);
-             
-             const targetGroup = monthDiv.querySelector('.monthly-targets');
-             setTimeout(() => {
-                syncTextareaHeights(targetGroup);
-             }, 0); 
 
              animateTrackers(monthDiv);
              
@@ -1489,7 +1456,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
              return monthDiv;
         }
 
-        function createWeekElement(monthId, weekId, weekData, sectionId, targetText) {
+        function createWeekElement(monthId, weekId, weekData, sectionId) {
             // weekData is now the doc { days: [...] } or undefined if it doesn't exist
             const daysHtml = weekData?.days?.length > 0
                 ? weekData.days.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('')
@@ -1498,8 +1465,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
             
             const initialProgress = calculateWeeklyProgress(weekData);
             const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px';
-            
-            const targetHtml = `<p class="week-target-text" id="target-text-${monthId}-${weekId}">${escapeHtml(targetText)}</p>`;
 
             return `
                 <div id="${sectionId}" class="bg-white/60 border border-gray-200 p-4 rounded-lg shadow week-section" data-week-id="${weekId}">
@@ -1509,7 +1474,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             <i class="fas fa-chart-bar mr-1"></i> Study Time Report
                         </button>
                     </div>
-                    ${targetHtml}
                     
                     <div class="sticky-progress-wrapper" style="top: ${headerHeight};">
                         <div class="flex justify-between text-xs text-gray-500">
@@ -4029,91 +3993,6 @@ function addVocabPairInputs(container, word = '', meaning = '') {
         }
 		
 		
-        // --- Monthly Target Edit ---
-        function handleEditTargets(button, monthId) {
-            const isEditing = button.dataset.editing === 'true';
-            
-            // --- THIS IS THE FIX ---
-            // We go back to finding the main parent container
-            const targetsParent = button.closest('.mb-8'); 
-            // Find the grid *inside* the parent
-            const targetsGrid = targetsParent.querySelector('.monthly-targets'); 
-            // Find the links *inside* the parent
-            const links = targetsParent.querySelectorAll('.target-card-link'); 
-            // Find the textareas *inside* the parent
-            const textareas = targetsParent.querySelectorAll('.target-textarea'); 
-            
-            // Define the input handler to use the grid
-            const onInput = () => syncTextareaHeights(targetsGrid);
-
-            if (isEditing) {
-                // --- SAVING ---
-                saveMonthlyTargets(monthId, targetsGrid); // Pass the grid
-                button.innerHTML = '<i class="fas fa-pencil-alt mr-1"></i> Edit Targets';
-                button.dataset.editing = 'false';
-                button.classList.add('action-button-secondary');
-                
-                textareas.forEach(ta => {
-                    ta.disabled = true;
-                    ta.removeEventListener('input', onInput);
-                });
-                
-                syncTextareaHeights(targetsGrid); // Pass the grid
-                
-                // This will work now because 'links' is found correctly
-                links.forEach(link => { 
-                    if (link.dataset.href) { 
-                        link.setAttribute('href', link.dataset.href); 
-                    } 
-                });
-            } else {
-                // --- EDITING ---
-                button.innerHTML = '<i class="fas fa-save mr-1"></i> Save Targets';
-                button.dataset.editing = 'true';
-                button.classList.remove('action-button-secondary');
-                
-                // This will work now because 'links' is found correctly
-                links.forEach(link => { 
-                    link.dataset.href = link.getAttribute('href'); 
-                    link.removeAttribute('href'); 
-                });
-                
-                textareas.forEach(ta => {
-                    ta.disabled = false;
-                    ta.addEventListener('input', onInput);
-                });
-                
-                syncTextareaHeights(targetsGrid); // Pass the grid
-                
-                textareas[0].focus();
-            }
-        }
-        async function saveMonthlyTargets(monthId, targetsContainer) {
-             if (!currentUser || !userId) return;
-             console.log("Saving targets for month:", monthId);
-             setSyncStatus("Syncing...", "yellow");
-             const targets = {};
-             targetsContainer.querySelectorAll('.target-textarea').forEach(textarea => { targets[textarea.dataset.week] = textarea.value.trim(); });
-             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-             try { 
-                 await updateDoc(docRef, { weeklyTargets: targets }); 
-                 console.log("Monthly targets saved."); 
-                 showCustomAlert("Monthly targets saved!", "success"); 
-                 setSyncStatus("Synced", "green");
-                 
-                 // --- NEW AUTO-UPDATE LOGIC ---
-                 // Manually update the text in the week sections
-                 for (const weekId in targets) {
-                     const targetTextElement = document.getElementById(`target-text-${monthId}-${weekId}`);
-                     if (targetTextElement) {
-                         targetTextElement.innerHTML = escapeHtml(targets[weekId]);
-                     }
-                 }
-                 // --- END NEW LOGIC ---
-                 
-             }
-             catch (error) { console.error("Error saving targets:", error); showCustomAlert("Error saving targets."); setSyncStatus("Error", "red"); }
-        }
 
         // --- Story Modals ---
          async function openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex) {
@@ -4671,33 +4550,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
              setTimeout(() => { alertBox.remove(); }, 3000);
          }
 		
-		function syncTextareaHeights(groupElement) {
-            if (!groupElement) return;
 
-            const textareas = groupElement.querySelectorAll('.target-textarea');
-            if (textareas.length === 0) return;
-
-            // 1. Reset all heights to auto to get the new natural scrollHeight
-            textareas.forEach(ta => {
-                ta.style.height = 'auto';
-            });
-
-            // 2. Find the maximum scrollHeight from the group
-            let maxHeight = 0;
-            textareas.forEach(ta => {
-                maxHeight = Math.max(maxHeight, ta.scrollHeight);
-            });
-            
-            // 3. Apply the new max height to all textareas in the group
-            textareas.forEach(ta => {
-                // Use a 60px min-height as a fallback
-                ta.style.height = (maxHeight > 60 ? maxHeight : 60) + 'px'; 
-            });
-         }
-		
-		
-		
-		
         // --- START: REFACTORED QUIZ FUNCTIONS ---
 
         /**
