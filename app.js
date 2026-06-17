@@ -702,75 +702,108 @@
         function initRowDragDrop(monthId, weekId, dayIndex, daySection) {
             const tbody = daySection.querySelector('tbody');
             if (!tbody) return;
-            let dragSrcOriginalIndex = -1;
 
-            tbody.querySelectorAll('tr').forEach(tr => tr.setAttribute('draggable', 'true'));
+            // Make each row draggable only from drag-handle-cell
+            function setupDraggable() {
+                tbody.querySelectorAll('tr').forEach(tr => {
+                    tr.setAttribute('draggable', 'false');
+                    const handle = tr.querySelector('.drag-handle-cell');
+                    if (handle) {
+                        handle.addEventListener('mousedown', () => { tr.setAttribute('draggable', 'true'); }, { once: false });
+                        handle.addEventListener('mouseleave', () => {
+                            // Only remove draggable if not currently dragging
+                            if (!tr.classList.contains('dragging-row')) tr.setAttribute('draggable', 'false');
+                        });
+                    }
+                });
+            }
+            setupDraggable();
+
+            let dragSrcId = null; // store the tr id
 
             tbody.addEventListener('dragstart', (e) => {
-                const tr = e.target.closest('tr');
-                if (!tr) return;
-                dragSrcOriginalIndex = parseInt(tr.dataset.rowIndex);
+                const tr = e.target.closest('tr[data-row-index]');
+                if (!tr) { e.preventDefault(); return; }
+                dragSrcId = tr.id;
                 tr.classList.add('dragging-row');
                 e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData('text/plain', dragSrcOriginalIndex);
+                e.dataTransfer.setData('text/plain', tr.dataset.rowIndex);
             });
+
             tbody.addEventListener('dragend', () => {
                 tbody.querySelectorAll('tr').forEach(r => {
                     r.classList.remove('dragging-row', 'drag-over');
-                    r.style.opacity = '';
+                    r.setAttribute('draggable', 'false');
                 });
+                dragSrcId = null;
             });
+
             tbody.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 e.dataTransfer.dropEffect = 'move';
-                const tr = e.target.closest('tr');
-                if (tr && parseInt(tr.dataset.rowIndex) !== dragSrcOriginalIndex) {
+                const tr = e.target.closest('tr[data-row-index]');
+                if (tr && tr.id !== dragSrcId) {
                     tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drag-over'));
                     tr.classList.add('drag-over');
                 }
             });
+
             tbody.addEventListener('dragleave', (e) => {
-                const tr = e.target.closest('tr');
-                if (tr) tr.classList.remove('drag-over');
+                if (!e.relatedTarget || !tbody.contains(e.relatedTarget)) {
+                    tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drag-over'));
+                }
             });
+
             tbody.addEventListener('drop', async (e) => {
                 e.preventDefault();
-                const targetTr = e.target.closest('tr');
-                if (!targetTr) return;
-                const targetIndex = parseInt(targetTr.dataset.rowIndex);
-                if (targetIndex === dragSrcOriginalIndex || isNaN(targetIndex)) return;
+                const targetTr = e.target.closest('tr[data-row-index]');
+                if (!targetTr || !dragSrcId || targetTr.id === dragSrcId) return;
+
                 tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drag-over', 'dragging-row'));
 
-                // Reorder rows in DOM
-                const rows = Array.from(tbody.querySelectorAll('tr'));
-                const srcTr = rows[dragSrcOriginalIndex];
+                const srcTr = document.getElementById(dragSrcId);
                 if (!srcTr) return;
-                if (dragSrcOriginalIndex < targetIndex) {
+
+                const srcOriginalIdx = parseInt(srcTr.dataset.rowIndex);
+                const tgtOriginalIdx = parseInt(targetTr.dataset.rowIndex);
+
+                // DOM reorder
+                const allRows = Array.from(tbody.querySelectorAll('tr'));
+                const srcPos = allRows.indexOf(srcTr);
+                const tgtPos = allRows.indexOf(targetTr);
+
+                if (srcPos < tgtPos) {
                     tbody.insertBefore(srcTr, targetTr.nextSibling);
                 } else {
                     tbody.insertBefore(srcTr, targetTr);
                 }
-                // Update row indices in DOM
+
+                // Update data-row-index attributes
                 Array.from(tbody.querySelectorAll('tr')).forEach((r, i) => { r.dataset.rowIndex = i; });
 
-                // Save to Firestore with original indices
-                await saveRowOrderToFirestore(monthId, weekId, dayIndex, daySection, dragSrcOriginalIndex, targetIndex);
-                dragSrcOriginalIndex = -1;
+                // Re-setup draggable handles on the reordered rows
+                setupDraggable();
+
+                // Save to Firestore
+                await saveRowOrderToFirestore(monthId, weekId, dayIndex, srcOriginalIdx, tgtOriginalIdx);
             });
         }
 
-        async function saveRowOrderToFirestore(monthId, weekId, dayIndex, daySection, srcIdx, tgtIdx) {
+        async function saveRowOrderToFirestore(monthId, weekId, dayIndex, srcIdx, tgtIdx) {
             setSyncStatus('Syncing...', 'yellow');
             const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
             try {
                 const weekSnap = await getDoc(weekDocRef);
                 if (!weekSnap.exists()) return;
-                const days = weekSnap.data().days ? [...weekSnap.data().days] : [];
+                const days = [...(weekSnap.data().days || [])];
                 const day = days[dayIndex];
                 if (!day || !day.rows) return;
                 const newRows = [...day.rows];
+                // Remove from source
                 const [moved] = newRows.splice(srcIdx, 1);
-                newRows.splice(tgtIdx > srcIdx ? tgtIdx - 0 : tgtIdx, 0, moved);
+                // After removal, if target was after source, its index shifts by -1
+                const insertAt = tgtIdx > srcIdx ? tgtIdx - 1 : tgtIdx;
+                newRows.splice(insertAt, 0, moved);
                 days[dayIndex] = { ...day, rows: newRows };
                 await updateDoc(weekDocRef, { days });
                 if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
@@ -1524,7 +1557,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          
                          <div class="day-header-progress day-progress-wrapper" data-day-index="${dayIndex}">
                              <div class="flex justify-between text-xs text-gray-500">
-                                 <span>Day Progress</span>
+                                 <span class="day-date-label" data-month-id="${monthId}" data-week-id="${weekId}" data-day-index="${dayIndex}" title="Double-click to edit date" style="cursor:pointer; font-weight:600; color:#6b7280;">${dayData.date ? (() => { try { const [y,m,d] = dayData.date.split('-').map(Number); return new Date(y,m-1,d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); } catch(e) { return dayData.date; } })() : '<span style=\'color:#d1d5db;font-style:italic;\'>Set date</span>'}</span>
                                  <span id="day-perc-${monthId}-${weekId}-${dayIndex}" class="progress-percentage font-medium">${initialDayProgress}%</span>
                              </div>
                              <div class="progress-bar-container w-full"> 
@@ -1679,21 +1712,22 @@ function updateMonthUI(monthId, monthData, weeksData) {
              const vocabToggleAttr = hasVocabItems ? '' : 'style="display:none"';
 
              return `
-                 <tr id="${uniqueRowId}" data-row-index="${rowIndex}" class="${isEditing ? 'editing-mode' : ''} ${isVocabRow ? 'vocab-row' : 'normal-row'} ${completedClass}">
+                 <tr id="${uniqueRowId}" data-row-index="${rowIndex}" class="${isEditing ? 'editing-mode' : ''} ${isVocabRow ? 'vocab-row' : 'normal-row'} ${completedClass}" ${hasVocabItems && !isEditing ? 'data-vocab-collapsed="true" style="cursor:pointer;"' : ''}>
                      <td class="drag-handle-cell px-1 py-2 align-middle" style="cursor:grab; color:#9ca3af; user-select:none; width:20px; text-align:center;" title="Drag to reorder">
                         <i class="fas fa-grip-vertical"></i>
                      </td>
                      <td class="px-3 py-2 align-top" data-label="Subject">
                         <div style="display:flex;align-items:center;gap:4px;">
                         ${isEditing ? `<input type="text" class="editable-input subject-input" placeholder="Subject" value="${escapeHtml(rowData.subject || '')}" ${isVocabRow ? 'readonly style="background-color:#e5e7eb;"' : ''}>` : `<span class="subject-display font-medium text-gray-700">${escapeHtml(rowData.subject || '-')}</span>`}
-                        ${hasVocabItems ? `<button type="button" class="icon-button vocab-toggle-btn" title="Expand/Collapse" style="padding:2px 5px;font-size:0.75rem;flex-shrink:0;"><i class="fas fa-chevron-up"></i></button>` : ''}
+
                         </div>
                      </td>
                      <td class="px-3 py-2 align-top vocab-topic-cell" data-label="Topic / Vocab"> 
-                        <div class="vocab-expandable-content">
+                        <div class="vocab-expandable-content" ${hasVocabItems && !isEditing ? 'style="display:none"' : ''}>
                         ${topicContent}
                         ${buttonsHtml ? `<div class="flex gap-2 mt-2 flex-wrap">${buttonsHtml}</div>` : ''}
                         </div>
+                        ${hasVocabItems && !isEditing ? `<span class="vocab-collapsed-hint" style="font-size:0.7rem;color:#9ca3af;font-style:italic;">${(rowData.vocabData||[]).length} words — click to expand</span>` : ''}
                      </td>
                      <td class="px-3 py-2 align-middle questions-col" data-label="Questions">
                         ${questionsCellHtml}
@@ -2003,7 +2037,83 @@ function updateMonthUI(monthId, monthData, weeksData) {
         });
 
         // Double-click handler: open fullscreen timer modal (Current) or edit total time (Total)
+        // ---- Day date label dblclick edit ----
+        function openDayDateEdit(labelEl) {
+            if (labelEl.querySelector('input')) return; // already editing
+            const monthId = labelEl.dataset.monthId;
+            const weekId = labelEl.dataset.weekId;
+            const dayIndex = parseInt(labelEl.dataset.dayIndex);
+            // Get current stored YYYY-MM-DD
+            const daySection = document.getElementById(`day-${monthId}-${weekId}-${dayIndex}`);
+            let currentISO = '';
+            if (daySection) {
+                // Try to find it from cache
+                const weekCache = activeWeeksDataCache && activeWeeksDataCache[weekId];
+                if (weekCache && weekCache.days && weekCache.days[dayIndex]) {
+                    currentISO = weekCache.days[dayIndex].date || '';
+                }
+            }
+            const prevHTML = labelEl.innerHTML;
+            labelEl.innerHTML = `<input type="date" class="day-date-input" value="${currentISO}" style="font-size:0.75rem;border:1px solid #d1d5db;border-radius:4px;padding:1px 4px;color:#374151;background:#fff;cursor:pointer;">`;
+            const inp = labelEl.querySelector('input');
+            inp.focus();
+            inp.addEventListener('click', ev => ev.stopPropagation());
+            inp.addEventListener('dblclick', ev => ev.stopPropagation());
+            const saveDateEdit = async () => {
+                const val = inp.value; // YYYY-MM-DD or ""
+                let displayText = '';
+                if (val) {
+                    try {
+                        const [y, m, d] = val.split('-').map(Number);
+                        displayText = new Date(y, m-1, d).toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+                    } catch(ex) { displayText = val; }
+                    labelEl.innerHTML = displayText;
+                    labelEl.style.color = '#6b7280';
+                    labelEl.style.fontStyle = '';
+                } else {
+                    labelEl.innerHTML = '<span style="color:#d1d5db;font-style:italic;">Set date</span>';
+                }
+                // Save to Firestore
+                if (!val && !currentISO) return; // nothing changed
+                try {
+                    setSyncStatus('Syncing...', 'yellow');
+                    const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                    const weekSnap = await getDoc(weekDocRef);
+                    if (weekSnap.exists()) {
+                        const days = [...(weekSnap.data().days || [])];
+                        if (days[dayIndex]) {
+                            days[dayIndex] = { ...days[dayIndex], date: val };
+                            await updateDoc(weekDocRef, { days });
+                            if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
+                                activeWeeksDataCache[weekId].days = days;
+                            }
+                        }
+                    }
+                    setSyncStatus('Synced', 'green');
+                } catch(err) {
+                    console.error('Error saving date:', err);
+                    setSyncStatus('Error', 'red');
+                }
+            };
+            inp.addEventListener('change', saveDateEdit);
+            inp.addEventListener('blur', () => {
+                setTimeout(() => {
+                    if (labelEl.querySelector('input')) {
+                        saveDateEdit();
+                    }
+                }, 200);
+            });
+            inp.addEventListener('keydown', ev => {
+                if (ev.key === 'Enter') { ev.preventDefault(); inp.blur(); }
+                if (ev.key === 'Escape') { labelEl.innerHTML = prevHTML; }
+            });
+        }
+
         document.addEventListener('dblclick', function(e) {
+            // Handle day-date-label double-click to edit
+            const dateLabel = e.target.closest('.day-date-label');
+            if (dateLabel) { e.preventDefault(); e.stopPropagation(); openDayDateEdit(dateLabel); return; }
+
             const widget = e.target.closest('.timer-widget');
             if (!widget) return;
             if (e.target.closest('button')) return;
@@ -2868,6 +2978,25 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      return;
                  }
 
+                 // Handle vocab row expand/collapse — click anywhere on the row
+                 const vocabRowEl = target.closest('tr[data-vocab-collapsed]');
+                 if (vocabRowEl && !daySection?.classList.contains('editing') && !button) {
+                     e.preventDefault();
+                     const expandable = vocabRowEl.querySelector('.vocab-expandable-content');
+                     const hint = vocabRowEl.querySelector('.vocab-collapsed-hint');
+                     const isCollapsed = vocabRowEl.dataset.vocabCollapsed === 'true';
+                     if (isCollapsed) {
+                         if (expandable) expandable.style.display = '';
+                         if (hint) hint.style.display = 'none';
+                         vocabRowEl.dataset.vocabCollapsed = 'false';
+                     } else {
+                         if (expandable) expandable.style.display = 'none';
+                         if (hint) hint.style.display = '';
+                         vocabRowEl.dataset.vocabCollapsed = 'true';
+                     }
+                     return;
+                 }
+
 
                  // Handle Done/Undone button click
                  if (target.closest('.done-btn') && !target.closest('.done-btn').disabled) {
@@ -3017,24 +3146,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  }
                  // --- END: QUIZ BUTTON HANDLER ---
 
-                 // Vocab expand/collapse toggle
-                 else if (button.classList.contains('vocab-toggle-btn')) {
-                     const expandable = row.querySelector('.vocab-expandable-content');
-                     const icon = button.querySelector('i');
-                     if (!expandable) return;
-                     const isCollapsed = expandable.dataset.collapsed === 'true';
-                     if (isCollapsed) {
-                         expandable.style.display = '';
-                         expandable.dataset.collapsed = 'false';
-                         icon.className = 'fas fa-chevron-up';
-                         button.title = 'Collapse Vocab';
-                     } else {
-                         expandable.style.display = 'none';
-                         expandable.dataset.collapsed = 'true';
-                         icon.className = 'fas fa-chevron-down';
-                         button.title = 'Expand Vocab';
-                     }
-                 }
+
 
                  // --- START: NEW MCQ BUTTON HANDLERS ---
 				 
