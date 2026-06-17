@@ -329,6 +329,161 @@
         }
         window.updateStickyOffsets = updateStickyOffsets;
 
+        // =============================================
+        // COMPACT TIMER MERGE INTO PROGRESS BAR
+        // When the day-timer-row scrolls behind the sticky header,
+        // a compact timer + edit button appear inside the progress bar row.
+        // =============================================
+        const _mergeObservers = new Map(); // daySection -> IntersectionObserver
+
+        function buildCompactTimerHTML(monthId, weekId, dayIndex) {
+            return `
+                <div class="progress-bar-compact-timer" data-compact-timer="${monthId}-${weekId}-${dayIndex}">
+                    <div class="compact-timer-inner">
+                        <i class="fas fa-stopwatch compact-timer-stopwatch"></i>
+                        <span class="compact-timer-display" data-compact-display="${monthId}-${weekId}-${dayIndex}">00:00:00</span>
+                        <button class="compact-timer-btn start-btn" title="Start/Pause" data-compact-startpause="${monthId}-${weekId}-${dayIndex}"><i class="fas fa-play"></i></button>
+                        <button class="compact-timer-btn stop-btn" title="Stop" data-compact-stop="${monthId}-${weekId}-${dayIndex}"><i class="fas fa-stop"></i></button>
+                    </div>
+                </div>
+                <button class="compact-edit-btn-el" data-compact-edit="${monthId}-${weekId}-${dayIndex}" style="display:none;">
+                    <i class="fas fa-pencil-alt"></i> Edit
+                </button>`;
+        }
+
+        function initDayCompactTimer(daySection) {
+            if (_mergeObservers.has(daySection)) return; // already set up
+
+            const parts    = daySection.id.split('-'); // "day-MONTHID-weekN-INDEX" but MONTHID has dashes too
+            // id format: day-{monthId}-{weekId}-{dayIndex} e.g. day-2025-06-week1-0
+            // Safer: use data attributes
+            const dayIndex  = parseInt(daySection.dataset.dayIndex);
+            const dayHeader = daySection.querySelector('.day-section-header');
+            // Extract monthId and weekId from child elements
+            const dateLabel = daySection.querySelector('.day-date-label');
+            if (!dateLabel) return;
+            const monthId  = dateLabel.dataset.monthId;
+            const weekId   = dateLabel.dataset.weekId;
+
+            const timerRow        = daySection.querySelector('.day-timer-row');
+            const progressWrapper = daySection.querySelector('.day-header-progress');
+
+            if (!dayHeader || !timerRow || !progressWrapper) return;
+
+            // Inject compact controls into progress wrapper (once)
+            if (!progressWrapper.querySelector('.progress-bar-compact-timer')) {
+                const barCont = progressWrapper.querySelector('.progress-bar-container');
+                if (barCont) {
+                    const compactHTML = buildCompactTimerHTML(monthId, weekId, dayIndex);
+                    barCont.insertAdjacentHTML('beforebegin', compactHTML);
+
+                    // Wire compact start/pause button -> mirrors the real timer widget
+                    const realStartBtn  = timerRow.querySelector('.timer-startpause-btn');
+                    const compactStart  = progressWrapper.querySelector(`[data-compact-startpause="${monthId}-${weekId}-${dayIndex}"]`);
+                    if (compactStart && realStartBtn) {
+                        compactStart.addEventListener('click', (e) => { e.stopPropagation(); realStartBtn.click(); });
+                    }
+
+                    // Wire compact stop button
+                    const realStopBtn = timerRow.querySelector('.timer-end-btn');
+                    const compactStop = progressWrapper.querySelector(`[data-compact-stop="${monthId}-${weekId}-${dayIndex}"]`);
+                    if (compactStop && realStopBtn) {
+                        compactStop.addEventListener('click', (e) => { e.stopPropagation(); realStopBtn.click(); });
+                    }
+
+                    // Wire compact edit button -> mirrors the real Edit button
+                    const realEditBtn  = daySection.querySelector('.edit-day-btn');
+                    const compactEdit  = progressWrapper.querySelector(`[data-compact-edit="${monthId}-${weekId}-${dayIndex}"]`);
+                    if (compactEdit && realEditBtn) {
+                        compactEdit.addEventListener('click', (e) => { e.stopPropagation(); realEditBtn.click(); });
+                    }
+                }
+            }
+
+            // Sync compact display from real timer total
+            function syncCompactDisplay() {
+                const realTotal  = timerRow.querySelector('.timer-display[data-role="total"]');
+                const compactDisp = progressWrapper.querySelector(`[data-compact-display="${monthId}-${weekId}-${dayIndex}"]`);
+                if (compactDisp && realTotal) compactDisp.textContent = realTotal.textContent;
+
+                // Sync running state icon on play button
+                const realStartIcon    = timerRow.querySelector('.timer-startpause-btn i');
+                const compactStartIcon = progressWrapper.querySelector(`[data-compact-startpause="${monthId}-${weekId}-${dayIndex}"] i`);
+                if (realStartIcon && compactStartIcon) compactStartIcon.className = realStartIcon.className;
+
+                // Sync running pulse style on compact display
+                const compactDispEl = progressWrapper.querySelector(`[data-compact-display="${monthId}-${weekId}-${dayIndex}"]`);
+                const timerWidget   = timerRow.querySelector('.timer-widget');
+                if (compactDispEl && timerWidget) {
+                    if (timerWidget.classList.contains('timer-running')) {
+                        compactDispEl.style.background    = '#fef3c7';
+                        compactDispEl.style.borderColor   = '#fbbf24';
+                        compactDispEl.style.color         = '#92400e';
+                    } else {
+                        compactDispEl.style.background    = '';
+                        compactDispEl.style.borderColor   = '';
+                        compactDispEl.style.color         = '';
+                    }
+                }
+            }
+
+            // IntersectionObserver: watches if timerRow is hidden behind sticky header
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const isHidden   = !entry.isIntersecting;
+                    const isExpanded = !daySection.classList.contains('is-collapsed');
+
+                    if (isHidden && isExpanded) {
+                        // Merge: add class, show compact controls
+                        dayHeader.classList.add('timer-merged');
+                        const compactTimer = progressWrapper.querySelector('.progress-bar-compact-timer');
+                        const compactEdit  = progressWrapper.querySelector(`[data-compact-edit="${monthId}-${weekId}-${dayIndex}"]`);
+                        if (compactTimer) {
+                            syncCompactDisplay();
+                            requestAnimationFrame(() => compactTimer.classList.add('visible'));
+                        }
+                        if (compactEdit) compactEdit.style.display = 'flex';
+
+                        // Keep display synced while merged
+                        clearInterval(daySection._compactSyncInterval);
+                        daySection._compactSyncInterval = setInterval(syncCompactDisplay, 400);
+                    } else {
+                        // Unmerge
+                        dayHeader.classList.remove('timer-merged');
+                        const compactTimer = progressWrapper.querySelector('.progress-bar-compact-timer');
+                        const compactEdit  = progressWrapper.querySelector(`[data-compact-edit="${monthId}-${weekId}-${dayIndex}"]`);
+                        if (compactTimer) compactTimer.classList.remove('visible');
+                        if (compactEdit) compactEdit.style.display = 'none';
+                        clearInterval(daySection._compactSyncInterval);
+                    }
+                });
+            }, {
+                threshold: 0,
+                rootMargin: '-1px 0px 0px 0px'
+            });
+
+            obs.observe(timerRow);
+            _mergeObservers.set(daySection, obs);
+        }
+
+        // Call this after any day elements are rendered into the DOM
+        function initAllDayCompactTimers() {
+            document.querySelectorAll('.day-section:not(.is-collapsed)').forEach(initDayCompactTimer);
+        }
+        window.initAllDayCompactTimers = initAllDayCompactTimers;
+
+        // Re-init when a day expands (click on header)
+        document.addEventListener('click', (e) => {
+            const hdr = e.target.closest('.day-section-header');
+            if (!hdr) return;
+            const ds = hdr.closest('.day-section');
+            if (!ds) return;
+            setTimeout(() => {
+                if (!ds.classList.contains('is-collapsed')) initDayCompactTimer(ds);
+            }, 80);
+        });
+
+
         if (pageHeader) {
             let lastScrollY = window.scrollY;
             // const headerHeight = pageHeader.offsetHeight; // <-- REMOVED FROM HERE
@@ -1144,6 +1299,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          // Pass BOTH data objects to the renderer
                          currentMonthPlanDisplay.appendChild(createMonthElement(monthId, monthData, weeksData));
                          if (window.recalcSticky) setTimeout(window.recalcSticky, 50);
+                         setTimeout(() => { if (window.initAllDayCompactTimers) window.initAllDayCompactTimers(); }, 150);
 
                          if (shouldRestoreScroll) {
                              window.scrollTo({ top: scrollY, behavior: 'auto' });
@@ -2054,58 +2210,24 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 }
             }
             const prevHTML = labelEl.innerHTML;
-            // Convert stored YYYY-MM-DD to dd/mm/yyyy for display in input
-            let initialDisplay = '';
-            if (currentISO) {
-                try {
-                    const [y, m, d] = currentISO.split('-').map(Number);
-                    initialDisplay = `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`;
-                } catch(e) { initialDisplay = ''; }
-            }
-            labelEl.innerHTML = `<input type="text" class="day-date-input" value="${initialDisplay}" placeholder="dd/mm/yyyy" maxlength="10" style="font-size:0.75rem;border:1px solid #6366f1;border-radius:4px;padding:2px 6px;color:#374151;background:#fff;cursor:text;width:100px;outline:none;letter-spacing:0.05em;">`;
+            labelEl.innerHTML = `<input type="date" class="day-date-input" value="${currentISO}" style="font-size:0.75rem;border:1px solid #d1d5db;border-radius:4px;padding:1px 4px;color:#374151;background:#fff;cursor:pointer;">`;
             const inp = labelEl.querySelector('input');
             inp.focus();
-            inp.select();
             inp.addEventListener('click', ev => ev.stopPropagation());
             inp.addEventListener('dblclick', ev => ev.stopPropagation());
-
-            // Auto-format dd/mm/yyyy as the user types
-            inp.addEventListener('input', (ev) => {
-                let raw = inp.value.replace(/\D/g, ''); // digits only
-                let formatted = '';
-                if (raw.length >= 1) formatted = raw.substring(0, 2);
-                if (raw.length >= 3) formatted += '/' + raw.substring(2, 4);
-                if (raw.length >= 5) formatted += '/' + raw.substring(4, 8);
-                inp.value = formatted;
-            });
-
-            // Parse dd/mm/yyyy → YYYY-MM-DD for storage
-            function parseDisplayToISO(display) {
-                const parts = display.trim().split('/');
-                if (parts.length !== 3) return '';
-                const [dd, mm, yyyy] = parts;
-                if (dd.length !== 2 || mm.length !== 2 || yyyy.length !== 4) return '';
-                const d = parseInt(dd), m = parseInt(mm), y = parseInt(yyyy);
-                if (isNaN(d) || isNaN(m) || isNaN(y)) return '';
-                if (m < 1 || m > 12 || d < 1 || d > 31 || y < 1900 || y > 2100) return '';
-                return `${y}-${mm}-${dd}`;
-            }
-
             const saveDateEdit = async () => {
-                const display = inp.value.trim();
-                const val = display ? parseDisplayToISO(display) : ''; // YYYY-MM-DD or ""
+                const val = inp.value; // YYYY-MM-DD or ""
                 let displayText = '';
                 if (val) {
-                    displayText = display; // already in dd/mm/yyyy
+                    try {
+                        const [y, m, d] = val.split('-').map(Number);
+                        const dd=String(d).padStart(2,'0');const mm=String(m).padStart(2,'0');displayText=`${dd}/${mm}/${y}`;
+                    } catch(ex) { displayText = val; }
                     labelEl.innerHTML = displayText;
                     labelEl.style.color = '#6b7280';
                     labelEl.style.fontStyle = '';
-                } else if (!display) {
-                    labelEl.innerHTML = '<span style="color:#d1d5db;font-style:italic;">Set date</span>';
                 } else {
-                    // Invalid input — restore previous
-                    labelEl.innerHTML = prevHTML;
-                    return;
+                    labelEl.innerHTML = '<span style="color:#d1d5db;font-style:italic;">Set date</span>';
                 }
                 // Save to Firestore
                 if (!val && !currentISO) return; // nothing changed
@@ -2129,6 +2251,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     setSyncStatus('Error', 'red');
                 }
             };
+            inp.addEventListener('change', saveDateEdit);
             inp.addEventListener('blur', () => {
                 setTimeout(() => {
                     if (labelEl.querySelector('input')) {
@@ -3950,7 +4073,7 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  }
 
                  const newDayIndex = daysArray.length;
-                 const _now = new Date(); const todayISO = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,"0")}-${String(_now.getDate()).padStart(2,"0")}`;
+                 const todayISO = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
                  const newDayData = { 
                      dayNumber: newDayIndex + 1, 
                      date: todayISO, 
@@ -3994,6 +4117,7 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  daysContainer.insertAdjacentHTML('beforeend', newDayHtml);
                  const newDaySectionForDrag = daysContainer.querySelector(`[data-day-index="${newDayIndex}"]`);
                  if (newDaySectionForDrag) initRowDragDrop(monthId, weekId, newDayIndex, newDaySectionForDrag);
+                 setTimeout(() => { const newDs = daysContainer.querySelector(`[data-day-index="${newDayIndex}"]`); if (newDs && window.initAllDayCompactTimers) window.initAllDayCompactTimers(); }, 100);
 
                  const totalDays = newDayIndex + 1;
                  const buttonContainer = weekSection.querySelector('.days-container').nextElementSibling;
