@@ -649,6 +649,140 @@
 			return `artifacts/${appId}/users/${userId}/quizResults`;
 		}
 
+        // --- MONTH NAV RESTRUCTURE: keep last 3 visible, rest in dropdown ---
+        function restructureMonthNav(container, querySnapshot) {
+            const allMonthBtns = Array.from(container.querySelectorAll('button[data-month-id]'));
+            if (allMonthBtns.length <= 3) return;
+            const visibleBtns = allMonthBtns.slice(-3);
+            const hiddenBtns = allMonthBtns.slice(0, allMonthBtns.length - 3);
+            const existingDropdown = container.querySelector('.month-prev-dropdown-wrapper');
+            if (existingDropdown) existingDropdown.remove();
+            const wrapper = document.createElement('div');
+            wrapper.className = 'month-prev-dropdown-wrapper';
+            wrapper.style.cssText = 'position:relative; display:inline-block;';
+            const dropBtn = document.createElement('button');
+            dropBtn.className = 'action-button action-button-secondary text-xs';
+            dropBtn.innerHTML = '<i class="fas fa-history mr-1"></i> Previous Months <i class="fas fa-caret-down ml-1"></i>';
+            dropBtn.style.cssText = 'white-space:nowrap;';
+            const dropMenu = document.createElement('div');
+            dropMenu.style.cssText = 'position:absolute; top:100%; left:0; z-index:9999; background:#fff; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.12); min-width:160px; display:none; flex-direction:column; padding:4px 0;';
+            hiddenBtns.forEach(btn => {
+                const item = document.createElement('button');
+                item.textContent = btn.textContent;
+                item.dataset.monthId = btn.dataset.monthId;
+                item.style.cssText = 'display:block; width:100%; text-align:left; border:none; padding:8px 16px; background:none; font-size:0.75rem; cursor:pointer; color:#374151;';
+                if (btn.classList.contains('active-month')) {
+                    item.style.background = '#d1fae5';
+                    item.style.fontWeight = '700';
+                }
+                item.addEventListener('mouseenter', () => { item.style.background = '#f3f4f6'; });
+                item.addEventListener('mouseleave', () => { item.style.background = btn.classList.contains('active-month') ? '#d1fae5' : 'none'; });
+                item.addEventListener('click', () => {
+                    dropMenu.style.display = 'none';
+                    displayMonthPlan(btn.dataset.monthId);
+                });
+                dropMenu.appendChild(item);
+                btn.remove();
+            });
+            dropBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropMenu.style.display = dropMenu.style.display === 'none' ? 'flex' : 'none';
+            });
+            document.addEventListener('click', () => { dropMenu.style.display = 'none'; });
+            wrapper.appendChild(dropBtn);
+            wrapper.appendChild(dropMenu);
+            if (visibleBtns[0]) {
+                container.insertBefore(wrapper, visibleBtns[0]);
+            } else {
+                container.insertBefore(wrapper, container.firstChild);
+            }
+        }
+
+        // --- ROW DRAG AND DROP ---
+        function initRowDragDrop(monthId, weekId, dayIndex, daySection) {
+            const tbody = daySection.querySelector('tbody');
+            if (!tbody) return;
+            let dragSrcOriginalIndex = -1;
+
+            tbody.querySelectorAll('tr').forEach(tr => tr.setAttribute('draggable', 'true'));
+
+            tbody.addEventListener('dragstart', (e) => {
+                const tr = e.target.closest('tr');
+                if (!tr) return;
+                dragSrcOriginalIndex = parseInt(tr.dataset.rowIndex);
+                tr.classList.add('dragging-row');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', dragSrcOriginalIndex);
+            });
+            tbody.addEventListener('dragend', () => {
+                tbody.querySelectorAll('tr').forEach(r => {
+                    r.classList.remove('dragging-row', 'drag-over');
+                    r.style.opacity = '';
+                });
+            });
+            tbody.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                const tr = e.target.closest('tr');
+                if (tr && parseInt(tr.dataset.rowIndex) !== dragSrcOriginalIndex) {
+                    tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drag-over'));
+                    tr.classList.add('drag-over');
+                }
+            });
+            tbody.addEventListener('dragleave', (e) => {
+                const tr = e.target.closest('tr');
+                if (tr) tr.classList.remove('drag-over');
+            });
+            tbody.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                const targetTr = e.target.closest('tr');
+                if (!targetTr) return;
+                const targetIndex = parseInt(targetTr.dataset.rowIndex);
+                if (targetIndex === dragSrcOriginalIndex || isNaN(targetIndex)) return;
+                tbody.querySelectorAll('tr').forEach(r => r.classList.remove('drag-over', 'dragging-row'));
+
+                // Reorder rows in DOM
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const srcTr = rows[dragSrcOriginalIndex];
+                if (!srcTr) return;
+                if (dragSrcOriginalIndex < targetIndex) {
+                    tbody.insertBefore(srcTr, targetTr.nextSibling);
+                } else {
+                    tbody.insertBefore(srcTr, targetTr);
+                }
+                // Update row indices in DOM
+                Array.from(tbody.querySelectorAll('tr')).forEach((r, i) => { r.dataset.rowIndex = i; });
+
+                // Save to Firestore with original indices
+                await saveRowOrderToFirestore(monthId, weekId, dayIndex, daySection, dragSrcOriginalIndex, targetIndex);
+                dragSrcOriginalIndex = -1;
+            });
+        }
+
+        async function saveRowOrderToFirestore(monthId, weekId, dayIndex, daySection, srcIdx, tgtIdx) {
+            setSyncStatus('Syncing...', 'yellow');
+            const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+            try {
+                const weekSnap = await getDoc(weekDocRef);
+                if (!weekSnap.exists()) return;
+                const days = weekSnap.data().days ? [...weekSnap.data().days] : [];
+                const day = days[dayIndex];
+                if (!day || !day.rows) return;
+                const newRows = [...day.rows];
+                const [moved] = newRows.splice(srcIdx, 1);
+                newRows.splice(tgtIdx > srcIdx ? tgtIdx - 0 : tgtIdx, 0, moved);
+                days[dayIndex] = { ...day, rows: newRows };
+                await updateDoc(weekDocRef, { days });
+                if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
+                    activeWeeksDataCache[weekId].days = days;
+                }
+                setSyncStatus('Synced', 'green');
+            } catch(err) {
+                console.error('Error saving row order:', err);
+                setSyncStatus('Error', 'red');
+            }
+        }
+
         // Load plans AND setup month navigation
         async function loadStudyPlans() {
             if (!currentUser || !userId) return;
@@ -706,6 +840,9 @@
 						
                     });
 						
+
+                    // Restructure month nav: keep last 3, rest in dropdown
+                    restructureMonthNav(monthNavButtonsContainer, querySnapshot);
 
                     // --- MODIFIED BLOCK START ---
                     if (currentMonthId && !monthExists) {
@@ -1428,6 +1565,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          <table class="w-full text-sm text-left text-gray-600 study-table" id="${tableId}">
                              <thead class="text-xs text-gray-500 uppercase">
                                  <tr>
+                                     <th scope="col" class="px-1 py-2" style="width:20px;"></th>
                                      <th scope="col" class="px-3 py-2 md:w-[10%] text-center">Subject</th>
                                      <th scope="col" class="px-3 py-2 md:w-[28%] text-center">Topic / Vocab</th>
                                      <th scope="col" class="px-3 py-2 questions-col text-center">Questions</th>
@@ -1537,13 +1675,25 @@ function updateMonthUI(monthId, monthData, weeksData) {
              }
              // --- END: Req 1 ---
 
+             const hasVocabItems = isVocabRow && rowData.vocabData && rowData.vocabData.length > 0;
+             const vocabToggleAttr = hasVocabItems ? '' : 'style="display:none"';
+
              return `
                  <tr id="${uniqueRowId}" data-row-index="${rowIndex}" class="${isEditing ? 'editing-mode' : ''} ${isVocabRow ? 'vocab-row' : 'normal-row'} ${completedClass}">
-                     <td class="px-3 py-2 align-top" data-label="Subject"> ${isEditing ? `<input type="text" class="editable-input subject-input" placeholder="Subject" value="${escapeHtml(rowData.subject || '')}" ${isVocabRow ? 'readonly style="background-color:#e5e7eb;"' : ''}>` : `<span class="subject-display font-medium text-gray-700">${escapeHtml(rowData.subject || '-')}</span>`}
+                     <td class="drag-handle-cell px-1 py-2 align-middle" style="cursor:grab; color:#9ca3af; user-select:none; width:20px; text-align:center;" title="Drag to reorder">
+                        <i class="fas fa-grip-vertical"></i>
+                     </td>
+                     <td class="px-3 py-2 align-top" data-label="Subject">
+                        <div style="display:flex;align-items:center;gap:4px;">
+                        ${isEditing ? `<input type="text" class="editable-input subject-input" placeholder="Subject" value="${escapeHtml(rowData.subject || '')}" ${isVocabRow ? 'readonly style="background-color:#e5e7eb;"' : ''}>` : `<span class="subject-display font-medium text-gray-700">${escapeHtml(rowData.subject || '-')}</span>`}
+                        ${hasVocabItems ? `<button type="button" class="icon-button vocab-toggle-btn" title="Expand/Collapse" style="padding:2px 5px;font-size:0.75rem;flex-shrink:0;"><i class="fas fa-chevron-up"></i></button>` : ''}
+                        </div>
                      </td>
                      <td class="px-3 py-2 align-top vocab-topic-cell" data-label="Topic / Vocab"> 
+                        <div class="vocab-expandable-content">
                         ${topicContent}
                         ${buttonsHtml ? `<div class="flex gap-2 mt-2 flex-wrap">${buttonsHtml}</div>` : ''}
+                        </div>
                      </td>
                      <td class="px-3 py-2 align-middle questions-col" data-label="Questions">
                         ${questionsCellHtml}
@@ -2867,6 +3017,25 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  }
                  // --- END: QUIZ BUTTON HANDLER ---
 
+                 // Vocab expand/collapse toggle
+                 else if (button.classList.contains('vocab-toggle-btn')) {
+                     const expandable = row.querySelector('.vocab-expandable-content');
+                     const icon = button.querySelector('i');
+                     if (!expandable) return;
+                     const isCollapsed = expandable.dataset.collapsed === 'true';
+                     if (isCollapsed) {
+                         expandable.style.display = '';
+                         expandable.dataset.collapsed = 'false';
+                         icon.className = 'fas fa-chevron-up';
+                         button.title = 'Collapse Vocab';
+                     } else {
+                         expandable.style.display = 'none';
+                         expandable.dataset.collapsed = 'true';
+                         icon.className = 'fas fa-chevron-down';
+                         button.title = 'Expand Vocab';
+                     }
+                 }
+
                  // --- START: NEW MCQ BUTTON HANDLERS ---
 				 
                  else if (button.classList.contains('view-all-mcq-btn')) {
@@ -3440,6 +3609,8 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                     } else {
                         daysArray.forEach((dayData, idx) => {
                             daysContainer.insertAdjacentHTML('beforeend', createDayElement(monthId, weekId, idx, dayData));
+                            const daySection = daysContainer.querySelector(`[data-day-index="${idx}"]`);
+                            if (daySection) initRowDragDrop(monthId, weekId, idx, daySection);
                         });
                     }
                 }
@@ -3644,7 +3815,7 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                          completed: false, 
                          comment: row.comment || '', 
                          completionPercentage: row.completionPercentage ?? null, 
-                         vocabData: (row.subject?.toLowerCase() === 'vocabulary') ? (row.vocabData || null) : null, 
+                         vocabData: null, 
                          story: null 
                      })) 
                  };
@@ -3676,6 +3847,8 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                  }
                  
                  daysContainer.insertAdjacentHTML('beforeend', newDayHtml);
+                 const newDaySectionForDrag = daysContainer.querySelector(`[data-day-index="${newDayIndex}"]`);
+                 if (newDaySectionForDrag) initRowDragDrop(monthId, weekId, newDayIndex, newDaySectionForDrag);
 
                  const totalDays = newDayIndex + 1;
                  const buttonContainer = weekSection.querySelector('.days-container').nextElementSibling;
@@ -9904,6 +10077,16 @@ function getCardSkeleton() {
     `;
 }
 
+// --- FULLSCREEN TIMER: SPACEBAR START/PAUSE ---
+document.addEventListener('keydown', (e) => {
+    if (e.key !== ' ') return;
+    const fsModal = document.getElementById('fullscreen-timer-modal');
+    if (!fsModal || fsModal.style.display === 'none' || fsModal.style.display === '') return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    e.preventDefault();
+    document.getElementById('fullscreen-timer-startpause-btn')?.click();
+});
+
 // --- NEW: KEYBOARD SHORTCUTS FOR QUIZZES ---
 document.addEventListener('keydown', (e) => {
     // 1. Only run if the live quiz screen is actually active and visible
@@ -9911,6 +10094,10 @@ document.addEventListener('keydown', (e) => {
     if (!quizMainScreen || quizMainScreen.classList.contains('hidden') || quizMainScreen.style.display === 'none') {
         return;
     }
+
+    // Skip if fullscreen timer is open
+    const fsModal = document.getElementById('fullscreen-timer-modal');
+    if (fsModal && fsModal.style.display !== 'none' && fsModal.style.display !== '') return;
 
     // 2. Prevent triggering if the user happens to be typing in an input field somewhere
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;

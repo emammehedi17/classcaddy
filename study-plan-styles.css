@@ -4873,3 +4873,18 @@ body.dark-mode .skeleton {
 /* study-time-report and quiz-confirm need even higher */
 #study-time-report-modal { z-index: 210 !important; }
 #quiz-confirm-modal      { z-index: 220 !important; }
+/* =============================================
+   ROW DRAG & DROP + VOCAB TOGGLE
+   ============================================= */
+tr.dragging-row { opacity: 0.4; }
+tr.drag-over td { background-color: #d1fae5 !important; border-top: 2px solid #10b981; }
+.drag-handle-cell { cursor: grab !important; color: #d1d5db; transition: color 0.15s; }
+.drag-handle-cell:hover { color: #6b7280; }
+tr:active .drag-handle-cell { cursor: grabbing !important; }
+
+/* Vocab expandable content */
+.vocab-expandable-content { transition: none; }
+
+/* Month nav dropdown */
+.month-prev-dropdown-wrapper { display: inline-block; }
+.month-prev-dropdown-wrapper > div button:hover { background-color: #f3f4f6 !important; }
