@@ -1,0 +1,558 @@
+/* ============================================================
+   CLASS CADDY — FEATURE UPGRADES  (cc-upgrades.css)
+   ============================================================
+   Add this line in <head>, after study-plan-styles.css:
+     <link rel="stylesheet" href="cc-upgrades.css">
+   ============================================================ */
+
+/* ── 1. DARK MODE ─────────────────────────────────────────── */
+:root {
+  --cc-bg:         #f3f4f6;
+  --cc-surface:    #ffffff;
+  --cc-border:     #e5e7eb;
+  --cc-text:       #111827;
+  --cc-text-muted: #6b7280;
+  --cc-accent:     #059669;
+  --cc-accent-hov: #047857;
+  --cc-input-bg:   #ffffff;
+}
+
+html.cc-dark {
+  --cc-bg:         #111827;
+  --cc-surface:    #1f2937;
+  --cc-border:     #374151;
+  --cc-text:       #f9fafb;
+  --cc-text-muted: #9ca3af;
+  --cc-accent:     #10b981;
+  --cc-accent-hov: #059669;
+  --cc-input-bg:   #374151;
+}
+
+html.cc-dark body {
+  background-color: var(--cc-bg) !important;
+  color: var(--cc-text) !important;
+}
+
+html.cc-dark .card,
+html.cc-dark .modal-content,
+html.cc-dark .study-card {
+  background-color: var(--cc-surface) !important;
+  border-color: var(--cc-border) !important;
+  color: var(--cc-text) !important;
+}
+
+html.cc-dark header.main-website-ui {
+  background: rgba(31,41,55,0.95) !important;
+  border-bottom-color: var(--cc-border) !important;
+}
+
+html.cc-dark header.main-website-ui a,
+html.cc-dark header.main-website-ui button,
+html.cc-dark header.main-website-ui span,
+html.cc-dark header.main-website-ui h1 {
+  color: var(--cc-text) !important;
+}
+
+html.cc-dark table {
+  background: transparent !important;
+}
+
+html.cc-dark th,
+html.cc-dark td {
+  border-color: var(--cc-border) !important;
+  color: var(--cc-text) !important;
+}
+
+html.cc-dark tbody tr:hover {
+  background: rgba(55,65,81,0.5) !important;
+}
+
+html.cc-dark input,
+html.cc-dark textarea,
+html.cc-dark select {
+  background-color: var(--cc-input-bg) !important;
+  color: var(--cc-text) !important;
+  border-color: var(--cc-border) !important;
+}
+
+html.cc-dark .action-button-secondary {
+  background: var(--cc-surface) !important;
+  color: var(--cc-text) !important;
+  border-color: var(--cc-border) !important;
+}
+
+html.cc-dark .bg-gray-50,
+html.cc-dark .bg-gray-100 {
+  background-color: #1f2937 !important;
+}
+
+html.cc-dark .text-gray-600,
+html.cc-dark .text-gray-700,
+html.cc-dark .text-gray-800 {
+  color: var(--cc-text-muted) !important;
+}
+
+html.cc-dark .skeleton {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%) !important;
+  background-size: 200% 100% !important;
+}
+
+html.cc-dark .modal {
+  background: rgba(0,0,0,0.7) !important;
+}
+
+html.cc-dark .modal-close {
+  color: var(--cc-text-muted) !important;
+}
+
+html.cc-dark #cc-streak-widget,
+html.cc-dark #cc-notif-widget {
+  background: var(--cc-surface);
+  border-color: var(--cc-border);
+}
+
+html.cc-dark .cc-pomo-phase,
+html.cc-dark .cc-pomo-display {
+  color: var(--cc-text) !important;
+}
+
+/* ── 2. STREAK WIDGET ─────────────────────────────────────── */
+#cc-streak-widget {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.cc-streak-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cc-streak-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #374151;
+}
+
+.cc-streak-icon { font-size: 1.2rem; }
+
+.cc-streak-item strong {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f97316;
+}
+
+.cc-streak-label { color: #6b7280; font-size: 0.78rem; }
+
+.cc-streak-divider {
+  width: 1px;
+  height: 24px;
+  background: #e5e7eb;
+}
+
+.cc-goal-area { flex-grow: 1; flex-wrap: wrap; }
+
+.cc-goal-bar-wrap {
+  flex: 1;
+  min-width: 80px;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cc-goal-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #059669, #10b981);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.cc-goal-edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 0.7rem;
+  padding: 2px;
+  transition: color 0.2s;
+}
+.cc-goal-edit-btn:hover { color: #059669; }
+
+/* Celebration toast */
+.cc-celebration-toast {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  z-index: 99999;
+  box-shadow: 0 4px 20px rgba(5,150,105,0.4);
+  animation: cc-toast-in .3s ease, cc-toast-out .4s ease 3.5s forwards;
+}
+
+@keyframes cc-toast-in  { from { opacity:0; transform:translateX(-50%) translateY(-12px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }
+@keyframes cc-toast-out { from { opacity:1; } to { opacity:0; } }
+
+
+/* ── 3. NOTIFICATION WIDGET ───────────────────────────────── */
+#cc-notif-widget {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.cc-notif-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cc-notif-icon { color: #f59e0b; font-size: 1rem; }
+.cc-notif-label { font-size: 0.85rem; color: #374151; }
+
+.cc-notif-time-input {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 0.8rem;
+  color: #374151;
+  background: #f9fafb;
+}
+
+/* Toggle switch */
+.cc-toggle-switch { position: relative; display: inline-block; width: 38px; height: 20px; }
+.cc-toggle-switch input { opacity: 0; width: 0; height: 0; }
+.cc-toggle-slider {
+  position: absolute; cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #d1d5db; border-radius: 20px;
+  transition: .3s;
+}
+.cc-toggle-slider::before {
+  content: '';
+  position: absolute;
+  height: 14px; width: 14px;
+  left: 3px; bottom: 3px;
+  background: white; border-radius: 50%;
+  transition: .3s;
+}
+.cc-toggle-switch input:checked + .cc-toggle-slider { background: #059669; }
+.cc-toggle-switch input:checked + .cc-toggle-slider::before { transform: translateX(18px); }
+
+
+/* ── 4. POMODORO PANEL ────────────────────────────────────── */
+.cc-pomodoro-panel {
+  position: fixed;
+  bottom: 124px;
+  right: 16px;
+  width: 220px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.16);
+  padding: 16px;
+  z-index: 9988;
+  font-size: 0.85rem;
+}
+.cc-pomodoro-panel.hidden { display: none !important; }
+
+html.cc-dark .cc-pomodoro-panel {
+  background: #1f2937;
+  border-color: #374151;
+  color: #f9fafb;
+}
+
+.cc-pomo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #374151;
+}
+html.cc-dark .cc-pomo-header { color: #f9fafb; }
+
+.cc-pomo-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+.cc-pomo-close-btn:hover { color: #374151; }
+
+.cc-pomo-display {
+  font-size: 2.4rem;
+  font-weight: 800;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1px;
+  color: #111827;
+  line-height: 1;
+  margin-bottom: 4px;
+  transition: color 0.3s;
+}
+
+.cc-pomo-phase {
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  margin-bottom: 14px;
+}
+
+.cc-pomo-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.cc-pomo-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.cc-pomo-start-btn {
+  background: #059669;
+  color: #fff;
+  flex: 1;
+}
+.cc-pomo-start-btn:hover { background: #047857; }
+.cc-pomo-reset-btn {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 7px 10px;
+}
+.cc-pomo-reset-btn:hover { background: #e5e7eb; }
+
+html.cc-dark .cc-pomo-reset-btn {
+  background: #374151;
+  color: #f9fafb;
+}
+
+.cc-pomo-settings {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+.cc-pomo-settings label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.cc-pomo-settings input {
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  text-align: center;
+  padding: 2px 4px;
+  font-size: 0.78rem;
+  color: #374151;
+  background: #f9fafb;
+}
+html.cc-dark .cc-pomo-settings input {
+  background: #374151;
+  color: #f9fafb;
+  border-color: #4b5563;
+}
+
+.cc-pomo-cycles {
+  text-align: center;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  min-height: 1.2rem;
+}
+
+
+/* ── 5. TASK PROGRESS BAR ─────────────────────────────────── */
+.cc-day-progress {
+  margin-bottom: 8px;
+  padding: 0 2px;
+}
+
+.cc-day-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: #6b7280;
+  margin-bottom: 3px;
+}
+
+.cc-day-progress-track {
+  height: 5px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.cc-day-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #059669, #10b981);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+
+/* ── 6. SUBJECT COLOR LEGEND ──────────────────────────────── */
+.cc-subject-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 0.78rem;
+}
+html.cc-dark .cc-subject-legend {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.cc-legend-label {
+  font-weight: 600;
+  color: #6b7280;
+  margin-right: 4px;
+}
+
+.cc-legend-chip {
+  padding: 2px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: capitalize;
+}
+
+
+/* ── 7. QUIZ HISTORY CHART ────────────────────────────────── */
+.cc-quiz-chart-wrapper {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+html.cc-dark .cc-quiz-chart-wrapper {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+
+/* ── 8. PWA INSTALL BANNER ────────────────────────────────── */
+.cc-install-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #1f2937;
+  color: #f9fafb;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  z-index: 99998;
+  box-shadow: 0 -2px 16px rgba(0,0,0,0.2);
+  flex-wrap: wrap;
+}
+
+.cc-install-btn {
+  background: #059669;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+.cc-install-btn:hover { background: #047857; }
+
+.cc-install-dismiss {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-left: auto;
+  padding: 4px;
+}
+.cc-install-dismiss:hover { color: #f9fafb; }
+
+
+/* ── GENERAL DARK MODE POLISH ─────────────────────────────── */
+html.cc-dark .result-tab-btn {
+  background: #1f2937;
+  color: #9ca3af;
+}
+html.cc-dark .result-tab-btn.active-tab {
+  color: #10b981;
+  border-bottom-color: #10b981;
+}
+html.cc-dark .dropdown-menu,
+html.cc-dark #mobile-menu {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+html.cc-dark .dropdown-menu a,
+html.cc-dark #mobile-menu a {
+  color: #e5e7eb !important;
+}
+html.cc-dark .dropdown-menu a:hover,
+html.cc-dark #mobile-menu a:hover {
+  background: #374151 !important;
+}
+html.cc-dark .quiz-option-btn {
+  background: #374151 !important;
+  color: #f9fafb !important;
+  border-color: #4b5563 !important;
+}
+html.cc-dark .quiz-option-btn:hover:not(:disabled) {
+  background: #4b5563 !important;
+}
+html.cc-dark .sticky-progress-wrapper {
+  background: rgba(31,41,55,0.95) !important;
+}
+html.cc-dark .progress-ring-text { fill: #f9fafb !important; }
+html.cc-dark hr { border-color: #374151 !important; }
+html.cc-dark .day-header {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+html.cc-dark .cc-notif-time-input {
+  background: #374151 !important;
+  color: #f9fafb !important;
+  border-color: #4b5563 !important;
+}
