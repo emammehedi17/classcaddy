@@ -9742,47 +9742,53 @@ function saveHistory(hist) {
 // Called on load and every second via tickAllTimers().
 // ---------------------------------------------------------------
 function checkAndUpdateStreak() {
-    const today = getTodayDateStr();
     const goalHours = loadGoal();
     const goalMinutes = Math.round(goalHours * 60);
-    const studiedMinutes = getTodayStudiedMinutes();
-    const goalMet = studiedMinutes >= goalMinutes && goalMinutes > 0;
+    const goalSeconds = Math.round(goalHours * 3600);
+    const _tlv = (typeof window !== 'undefined' && window._getTimerLiveValues) ? window._getTimerLiveValues : () => ({ session: 0, total: 0 });
+    const _cache = (typeof window !== 'undefined' && window._weeksCache) ? window._weeksCache : {};
 
-    // Update history for today
-    const hist = loadHistory();
-    hist[today] = { studied: studiedMinutes, goalMet };
-    saveHistory(hist);
+    // Build an ordered list of ALL plan days across all weeks
+    const weekIds = Object.keys(_cache).sort();
+    const allPlanDays = []; // [{weekId, dayIndex, dayData}]
+    weekIds.forEach(weekId => {
+        (_cache[weekId]?.days || []).forEach((dayData, dayIndex) => {
+            if (dayData) allPlanDays.push({ weekId, dayIndex, dayData });
+        });
+    });
 
-    // Update streak
-    const streak = loadStreakData();
-    const yesterday = getDateStrOffset(1);
+    // Build history: one entry per plan day, keyed by "weekId:dayIndex"
+    const hist = {};
+    allPlanDays.forEach(({ weekId, dayIndex, dayData }) => {
+        let secs = _tlv(dayData.dayTimer).total;
+        (dayData.rows || []).forEach(row => { secs += _tlv(row.timer).total; });
+        const studiedMin = Math.floor(secs / 60);
+        const goalMet = goalSeconds > 0 && secs >= goalSeconds;
+        const key = `${weekId}:${dayIndex}`;
+        hist[key] = { studied: studiedMin, goalMet, date: dayData.date || '' };
+    });
 
-    if (goalMet) {
-        if (streak.lastGoalMetDate === today) {
-            // Already counted today — no change
-        } else if (streak.lastGoalMetDate === yesterday) {
-            // Consecutive day — increment
-            streak.current += 1;
+    // Last plan day = "today" for the widget
+    const studiedMinutes = allPlanDays.length > 0
+        ? hist[`${allPlanDays[allPlanDays.length-1].weekId}:${allPlanDays[allPlanDays.length-1].dayIndex}`]?.studied || 0
+        : 0;
+
+    // Count consecutive streak from the last plan day backwards
+    let currentStreak = 0;
+    for (let i = allPlanDays.length - 1; i >= 0; i--) {
+        const { weekId, dayIndex } = allPlanDays[i];
+        const entry = hist[`${weekId}:${dayIndex}`];
+        if (entry && entry.goalMet) {
+            currentStreak++;
         } else {
-            // Gap or first day — reset to 1
-            streak.current = 1;
-        }
-        streak.lastGoalMetDate = today;
-        if (streak.current > streak.best) streak.best = streak.current;
-        saveStreakData(streak);
-    } else {
-        // Goal not met today — check if streak should break
-        // (We don't break it until the day ends, so today's progress
-        //  still shows — the streak only breaks if lastGoalMetDate
-        //  is neither today nor yesterday when the page loads.)
-        if (streak.lastGoalMetDate &&
-            streak.lastGoalMetDate !== today &&
-            streak.lastGoalMetDate !== yesterday) {
-            // A day was skipped — streak broken
-            streak.current = 0;
-            saveStreakData(streak);
+            break; // streak broken
         }
     }
+
+    const streak = loadStreakData();
+    streak.current = currentStreak;
+    if (currentStreak > streak.best) streak.best = currentStreak;
+    saveStreakData(streak);
 
     renderWidget(studiedMinutes, goalMinutes, streak, hist);
 }
