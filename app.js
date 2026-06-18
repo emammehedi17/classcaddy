@@ -1825,6 +1825,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
             }
             return { session, total };
         }
+        // Expose for module-level streak functions
+        window._getTimerLiveValues = getTimerLiveValues;
+        window._getDefaultTimerObj = getDefaultTimerObj;
 
         function getDaySectionTimerObjects(monthId, weekId, dayIndex) {
             let dayData = null;
@@ -9665,13 +9668,14 @@ function getTodayStudiedMinutes() {
     const todayStr = getTodayDateStr();
     let totalSeconds = 0;
     const _cache = (typeof window !== 'undefined' && window._weeksCache) ? window._weeksCache : {};
+    const _tlv = (typeof window !== 'undefined' && window._getTimerLiveValues) ? window._getTimerLiveValues : () => ({ session: 0, total: 0 });
     if (_cache && typeof _cache === 'object') {
         Object.values(_cache).forEach(weekData => {
             (weekData?.days || []).forEach(dayData => {
                 if (!dayData || dayData.date !== todayStr) return;
-                totalSeconds += getTimerLiveValues(dayData.dayTimer).total;
+                totalSeconds += _tlv(dayData.dayTimer).total;
                 (dayData.rows || []).forEach(row => {
-                    totalSeconds += getTimerLiveValues(row.timer).total;
+                    totalSeconds += _tlv(row.timer).total;
                 });
             });
         });
@@ -9827,13 +9831,14 @@ function renderWidget(studiedMin, goalMin, streak, hist) {
     // Build a dateStr → totalSeconds map from activeWeeksDataCache for the current week
     const weekTimerMap = {};
     const _dotCache = (typeof window !== 'undefined' && window._weeksCache) ? window._weeksCache : {};
+    const _tlv2 = (typeof window !== 'undefined' && window._getTimerLiveValues) ? window._getTimerLiveValues : () => ({ session: 0, total: 0 });
     if (typeof _dotCache === 'object' && _dotCache) {
         Object.values(_dotCache).forEach(weekData => {
             (weekData?.days || []).forEach(dayData => {
                 if (!dayData || !dayData.date) return;
-                let secs = getTimerLiveValues(dayData.dayTimer).total;
+                let secs = _tlv2(dayData.dayTimer).total;
                 (dayData.rows || []).forEach(row => {
-                    secs += getTimerLiveValues(row.timer).total;
+                    secs += _tlv2(row.timer).total;
                 });
                 weekTimerMap[dayData.date] = (weekTimerMap[dayData.date] || 0) + secs;
             });
