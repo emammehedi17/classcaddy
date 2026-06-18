@@ -2422,30 +2422,15 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     *{box-sizing:border-box;margin:0;padding:0;}
                     html,body{width:100%;height:auto;overflow:hidden;}
                     body{background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;font-family:Inter,sans-serif;}
-                    .titlebar{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:rgba(255,255,255,0.07);border-bottom:1px solid rgba(255,255,255,0.08);}
-                    .label{font-size:0.6rem;font-weight:600;color:#9ca3af;letter-spacing:.05em;text-transform:uppercase;}
-                    .dots{display:flex;gap:4px;}
-                    .dot{width:18px;height:18px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.55rem;}
-                    .pin-dot{background:rgba(251,191,36,0.8);color:#78350f;}
-                    .max-dot{background:rgba(52,211,153,0.8);color:#065f46;}
-                    .close-dot{background:rgba(239,68,68,0.8);color:#fff;font-size:0.65rem;}
                     .body{padding:10px 10px 8px;text-align:center;}
-                    #mini-timer-subject{font-size:.6rem;color:#9ca3af;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-                    #mini-timer-session{font-family:monospace;font-size:1.5rem;font-weight:800;letter-spacing:.04em;line-height:1.1;}
+                    #mini-timer-subject{font-size:.65rem;color:#9ca3af;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+                    #mini-timer-session{font-family:monospace;font-size:2.2rem;font-weight:800;letter-spacing:.04em;line-height:1.1;}
                     #mini-timer-total{font-family:monospace;font-size:.75rem;color:#34d399;margin-top:2px;}
                     .btns{display:flex;gap:8px;justify-content:center;margin-top:8px;}
                     .play-btn{width:34px;height:34px;border-radius:50%;border:none;background:#10b981;color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
                     .stop-btn{width:34px;height:34px;border-radius:50%;border:none;background:#ef4444;color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
                 </style>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-                <div class="titlebar">
-                    <span class="label">Timer</span>
-                    <div class="dots">
-                        <button class="dot pin-dot" id="mini-timer-pin-btn" title="Pinned (always on top)"><i class="fas fa-thumbtack"></i></button>
-                        <button class="dot max-dot" id="mini-timer-maximize-btn" title="Maximize"><i class="fas fa-expand"></i></button>
-                        <button class="dot close-dot" id="mini-timer-close-btn" title="Close"><i class="fas fa-times"></i></button>
-                    </div>
-                </div>
                 <div class="body">
                     <div id="mini-timer-subject"></div>
                     <div id="mini-timer-session">00:00:00</div>
@@ -2469,12 +2454,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 updateTimerState(fsModal.dataset.monthId, fsModal.dataset.weekId, parseInt(fsModal.dataset.dayIndex), rowIndex, 'end')
                     .then(() => { tickFullscreenTimer(); syncMiniTimerDisplay(); });
             });
-            doc.getElementById('mini-timer-close-btn')?.addEventListener('click', closeFn);
-            doc.getElementById('mini-timer-maximize-btn')?.addEventListener('click', maximizeFn);
-            doc.getElementById('mini-timer-pin-btn')?.addEventListener('click', () => {
-                const btn = doc.getElementById('mini-timer-pin-btn');
-                if (btn) btn.style.background = btn.style.background.includes('251') ? 'rgba(251,191,36,0.4)' : 'rgba(251,191,36,0.8)';
-            });
+
         }
 
         async function openMiniWindow() {
