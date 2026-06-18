@@ -2420,7 +2420,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
             return `
                 <style>
                     *{box-sizing:border-box;margin:0;padding:0;}
-                    body{background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;font-family:Inter,sans-serif;width:160px;height:auto;overflow:hidden;}
+                    html,body{width:100%;height:auto;overflow:hidden;}
+                    body{background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;font-family:Inter,sans-serif;}
                     .titlebar{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:rgba(255,255,255,0.07);border-bottom:1px solid rgba(255,255,255,0.08);}
                     .label{font-size:0.6rem;font-weight:600;color:#9ca3af;letter-spacing:.05em;text-transform:uppercase;}
                     .dots{display:flex;gap:4px;}
@@ -2482,7 +2483,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
             if ('documentPictureInPicture' in window) {
                 try {
                     miniPipWindow = await window.documentPictureInPicture.requestWindow({
-                        width: 160,
+                        width: 250,
                         height: 200,
                         disallowReturnToOpener: false,
                     });
