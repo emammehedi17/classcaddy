@@ -1049,7 +1049,15 @@
         </div>
     </div>
 	
-	<script type="module" src="app.js" defer></script>
-	<script type="module" src="cc-upgrades.js"></script>
+	<script type="module" src="app.js"></script>
+	<script>
+		// Load cc-upgrades only after app.js has had time to initialize
+		window.addEventListener('load', function() {
+			var s = document.createElement('script');
+			s.type = 'module';
+			s.src = 'cc-upgrades.js';
+			document.body.appendChild(s);
+		});
+	</script>
 </body>
 </html>
