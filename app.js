@@ -90,6 +90,7 @@
         const authContainerDesktop = document.getElementById('auth-container-desktop');
         const authContainerMobile = document.getElementById('auth-container-mobile');
 		let activeWeeksDataCache = {};
+		window._weeksCache = activeWeeksDataCache;
 
         // Header navigation elements
         const pageHeader = document.querySelector('header.main-website-ui');
@@ -499,6 +500,7 @@
             } else {
                 // --- CRITICAL FIX: CLEAR DATA CACHE ON LOGOUT ---
                 activeWeeksDataCache = {}; // Wipes the study plan data
+                window._weeksCache = activeWeeksDataCache;
                 savedResultsCache = null;  // Wipes the quiz results data
                 // ------------------------------------------------
 
@@ -1105,6 +1107,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      });
                      
 					 activeWeeksDataCache = weeksData;
+					 window._weeksCache = activeWeeksDataCache;
 					 
                      console.log("Fetched month data and", weeksQuerySnapshot.size, "week documents.");
 
@@ -4134,6 +4137,7 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                      if (!activeWeeksDataCache[weekId]) activeWeeksDataCache[weekId] = { days: [] };
                      if (!activeWeeksDataCache[weekId].days) activeWeeksDataCache[weekId].days = [];
                      activeWeeksDataCache[weekId].days.push(newDayData);
+                     window._weeksCache = activeWeeksDataCache;
                      console.log("Global cache updated with new day.");
                  }
                  // Refresh the streak/daily-goal widget so the new day's date is reflected immediately
@@ -9660,9 +9664,9 @@ function getShortDayLabel(dateStr) {
 function getTodayStudiedMinutes() {
     const todayStr = getTodayDateStr();
     let totalSeconds = 0;
-
-    if (activeWeeksDataCache && typeof activeWeeksDataCache === 'object') {
-        Object.values(activeWeeksDataCache).forEach(weekData => {
+    const _cache = (typeof window !== 'undefined' && window._weeksCache) ? window._weeksCache : {};
+    if (_cache && typeof _cache === 'object') {
+        Object.values(_cache).forEach(weekData => {
             (weekData?.days || []).forEach(dayData => {
                 if (!dayData || dayData.date !== todayStr) return;
                 totalSeconds += getTimerLiveValues(dayData.dayTimer).total;
@@ -9822,8 +9826,9 @@ function renderWidget(studiedMin, goalMin, streak, hist) {
 
     // Build a dateStr → totalSeconds map from activeWeeksDataCache for the current week
     const weekTimerMap = {};
-    if (typeof activeWeeksDataCache === 'object' && activeWeeksDataCache) {
-        Object.values(activeWeeksDataCache).forEach(weekData => {
+    const _dotCache = (typeof window !== 'undefined' && window._weeksCache) ? window._weeksCache : {};
+    if (typeof _dotCache === 'object' && _dotCache) {
+        Object.values(_dotCache).forEach(weekData => {
             (weekData?.days || []).forEach(dayData => {
                 if (!dayData || !dayData.date) return;
                 let secs = getTimerLiveValues(dayData.dayTimer).total;
