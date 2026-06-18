@@ -9664,23 +9664,31 @@ function getShortDayLabel(dateStr) {
 // (across all weeks of the currently loaded month) whose assigned
 // date matches today's calendar date.
 // ---------------------------------------------------------------
-function getTodayStudiedMinutes() {
-    const todayStr = getTodayDateStr();
-    let totalSeconds = 0;
+// Returns { seconds, date, dayNumber, weekId } for the very last plan day
+// the user has added across all weeks in the cache, ordered by weekId then day index.
+function getLastPlanDayInfo() {
     const _cache = (typeof window !== 'undefined' && window._weeksCache) ? window._weeksCache : {};
-    const _tlv = (typeof window !== 'undefined' && window._getTimerLiveValues) ? window._getTimerLiveValues : () => ({ session: 0, total: 0 });
-    if (_cache && typeof _cache === 'object') {
-        Object.values(_cache).forEach(weekData => {
-            (weekData?.days || []).forEach(dayData => {
-                if (!dayData || dayData.date !== todayStr) return;
-                totalSeconds += _tlv(dayData.dayTimer).total;
-                (dayData.rows || []).forEach(row => {
-                    totalSeconds += _tlv(row.timer).total;
-                });
-            });
-        });
+    if (!_cache || typeof _cache !== 'object') return null;
+    const weekIds = Object.keys(_cache).sort(); // week1, week2, week3 …
+    for (let w = weekIds.length - 1; w >= 0; w--) {
+        const weekId = weekIds[w];
+        const days = _cache[weekId]?.days;
+        if (!days || days.length === 0) continue;
+        const lastDay = days[days.length - 1];
+        return { weekId, dayIndex: days.length - 1, dayData: lastDay };
     }
+    return null;
+}
 
+function getTodayStudiedMinutes() {
+    const _tlv = (typeof window !== 'undefined' && window._getTimerLiveValues) ? window._getTimerLiveValues : () => ({ session: 0, total: 0 });
+    const info = getLastPlanDayInfo();
+    if (!info) return 0;
+    const dayData = info.dayData;
+    let totalSeconds = _tlv(dayData.dayTimer).total;
+    (dayData.rows || []).forEach(row => {
+        totalSeconds += _tlv(row.timer).total;
+    });
     return Math.floor(totalSeconds / 60);
 }
 
@@ -9802,6 +9810,24 @@ function renderWidget(studiedMin, goalMin, streak, hist) {
             (studiedMin > goalMin * 1.05 ? ' goal-over' : '');
     }
 
+    // --- Progress title: show last plan day's date ---
+    const titleEl = document.getElementById('goal-progress-title');
+    if (titleEl) {
+        const lastInfo = getLastPlanDayInfo();
+        if (lastInfo && lastInfo.dayData && lastInfo.dayData.date) {
+            const d = new Date(lastInfo.dayData.date + 'T00:00:00');
+            const todayStr = getTodayDateStr();
+            if (lastInfo.dayData.date === todayStr) {
+                titleEl.textContent = `Day ${(lastInfo.dayIndex + 1)} — Today's progress`;
+            } else {
+                const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                titleEl.textContent = `Day ${(lastInfo.dayIndex + 1)} — ${d.getDate()} ${months[d.getMonth()]}`;
+            }
+        } else {
+            titleEl.textContent = "Today's progress";
+        }
+    }
+
     // --- Status text ---
     const statusEl = document.getElementById('goal-progress-status');
     if (statusEl) {
@@ -9822,89 +9848,72 @@ function renderWidget(studiedMin, goalMin, streak, hist) {
         }
     }
 
-    // --- Current-week dots ---
+    // --- Plan-day dots (last added week, one dot per plan day) ---
     const dotsContainer = document.getElementById('streak-days-row');
     if (!dotsContainer) return;
     dotsContainer.innerHTML = '';
-    const today = getTodayDateStr();
 
-    // Build a dateStr → totalSeconds map from activeWeeksDataCache for the current week
-    const weekTimerMap = {};
     const _dotCache = (typeof window !== 'undefined' && window._weeksCache) ? window._weeksCache : {};
     const _tlv2 = (typeof window !== 'undefined' && window._getTimerLiveValues) ? window._getTimerLiveValues : () => ({ session: 0, total: 0 });
-    if (typeof _dotCache === 'object' && _dotCache) {
-        Object.values(_dotCache).forEach(weekData => {
-            (weekData?.days || []).forEach(dayData => {
-                if (!dayData || !dayData.date) return;
-                let secs = _tlv2(dayData.dayTimer).total;
-                (dayData.rows || []).forEach(row => {
-                    secs += _tlv2(row.timer).total;
-                });
-                weekTimerMap[dayData.date] = (weekTimerMap[dayData.date] || 0) + secs;
-            });
-        });
-    }
-
-    // Determine start of current week (Sunday = day 0)
-    const todayObj = new Date(today + 'T00:00:00');
-    const dayOfWeek = todayObj.getDay(); // 0=Sun … 6=Sat
-    const weekStart = new Date(todayObj);
-    weekStart.setDate(todayObj.getDate() - dayOfWeek); // rewind to Sunday
-
-    // Build list of days from Sunday up to and including today
-    const weekDays = [];
-    for (let i = 0; i <= dayOfWeek; i++) {
-        const d = new Date(weekStart);
-        d.setDate(weekStart.getDate() + i);
-        const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        weekDays.push(ds);
-    }
-
     const goalHours = loadGoal();
     const goalSeconds = Math.round(goalHours * 3600);
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-    weekDays.forEach(dateStr => {
-        const isToday = dateStr === today;
-        const dayData = hist[dateStr];
-        const shortLabel = getShortDayLabel(dateStr);
+    // Find the last week that has at least one day
+    const weekIds = Object.keys(_dotCache).sort();
+    let lastWeekDays = [];
+    let lastWeekId = null;
+    for (let w = weekIds.length - 1; w >= 0; w--) {
+        const wid = weekIds[w];
+        const days = _dotCache[wid]?.days;
+        if (days && days.length > 0) { lastWeekDays = days; lastWeekId = wid; break; }
+    }
 
-        // Actual studied seconds from timers in cache
-        const timerSecs = weekTimerMap[dateStr] || 0;
+    if (lastWeekDays.length === 0) return; // nothing to show
+
+    const lastDayIndex = lastWeekDays.length - 1; // this is "Today"
+
+    lastWeekDays.forEach((planDay, idx) => {
+        if (!planDay) return;
+        const isToday = idx === lastDayIndex;
+        const dateStr = planDay.date || '';
+        const shortLabel = dateStr ? getShortDayLabel(dateStr) : `Day ${idx + 1}`;
+
+        // Timer seconds for this specific plan day
+        let timerSecs = _tlv2(planDay.dayTimer).total;
+        (planDay.rows || []).forEach(row => { timerSecs += _tlv2(row.timer).total; });
         const timerMin = Math.floor(timerSecs / 60);
 
-        // Goal-met check: prefer live timer data, fall back to saved history
-        let goalMet = false;
-        if (timerSecs > 0) {
-            goalMet = goalSeconds > 0 && timerSecs >= goalSeconds;
-        } else if (dayData) {
-            goalMet = dayData.goalMet;
-        }
+        const goalMet = goalSeconds > 0 && timerSecs >= goalSeconds;
 
         let dotClass = 'streak-day-dot';
         if (isToday) {
             dotClass += ' dot-today';
             if (goalMet) dotClass += ' dot-complete';
-        } else if (timerSecs > 0 || dayData) {
-            dotClass += goalMet ? ' dot-complete' : ' dot-missed';
+        } else {
+            dotClass += timerSecs > 0
+                ? (goalMet ? ' dot-complete' : ' dot-missed')
+                : ' dot-no-data';
         }
 
         // Date sub-label e.g. "(15 Jun)"
-        const dateObj = new Date(dateStr + 'T00:00:00');
-        const dateSub = `(${dateObj.getDate()} ${months[dateObj.getMonth()]})`;
+        let dateSub = '';
+        if (dateStr) {
+            const dObj = new Date(dateStr + 'T00:00:00');
+            dateSub = `(${dObj.getDate()} ${months[dObj.getMonth()]})`;
+        }
 
-        // Tooltip with studied time
-        const studiedLabel = timerMin > 0 ? formatMinutes(timerMin) : (dayData ? formatMinutes(dayData.studied || 0) : '0m');
+        const studiedLabel = timerMin > 0 ? formatMinutes(timerMin) : '0m';
 
         const wrapper = document.createElement('div');
         wrapper.className = 'streak-day-dot-wrapper';
 
         const dot = document.createElement('div');
         dot.className = dotClass;
-        if (!goalMet) {
-            dot.textContent = shortLabel[0];
-        }
-        dot.title = isToday ? `Today — ${studiedLabel} studied` : `${dateStr} — ${studiedLabel} studied`;
+        if (!goalMet) dot.textContent = shortLabel[0].toUpperCase();
+        dot.title = isToday
+            ? `Day ${idx + 1} (Today) — ${studiedLabel} studied`
+            : `Day ${idx + 1}: ${dateStr} — ${studiedLabel} studied`;
 
         const label = document.createElement('span');
         label.className = 'streak-dot-label' + (isToday ? ' label-today' : '');
