@@ -946,12 +946,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
         const weekData = weeksData[weekId]; // Get week data from the new object
         // --- END: MODIFIED ---
         
-        // Update weekly target text
-        const targetTextElement = monthElement.querySelector(`#target-text-${monthId}-${weekId}`);
-        if (targetTextElement) {
-            targetTextElement.textContent = monthData.weeklyTargets?.[weekId] || '';
-        }
-
         if (weekData) {
             // Update weekly progress bar
             const weekPerc = calculateWeeklyProgress(weekData);
@@ -1247,8 +1241,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
             // 5. Create the new data object
             const newPlanData = {
                monthName: monthName,
-               createdAt: Timestamp.now(),
-               weeklyTargets: { week1: '', week2: '', week3: '', week4: '' }
+               createdAt: Timestamp.now()
             };
 
             // --- START: NEW OPTIMISTIC FLOW ---
@@ -1393,9 +1386,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
             monthDiv.className = 'mb-12 p-6 card';
             monthDiv.dataset.monthId = monthId;
 
-            const targetColors = { week1: 'text-indigo-700', week2: 'text-teal-700', week3: 'text-amber-700', week4: 'text-rose-700' };
-            const targetHoverBgColors = { week1: 'hover:bg-indigo-50', week2: 'hover:bg-teal-50', week3: 'hover:bg-amber-50', week4: 'hover:bg-rose-50' };
-
             const monthlyPercent = calculateOverallMonthlyProgress(weeksData);
             const { 
                 weekly: lastWeekPercent, 
@@ -1440,29 +1430,12 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     )}
                  </div>
 
-                 <div class="mb-8">
-                    <div class="flex justify-between items-center mb-4">
-                         <h3 class="text-2xl font-semibold text-gray-700">Monthly Targets</h3>
-                         ${isGuestMode ? '' : '<button class="action-button action-button-secondary text-xs edit-targets-btn" data-editing="false"><i class="fas fa-pencil-alt mr-1"></i> Edit Targets</button>'}
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 monthly-targets">
-						${[1, 2, 3, 4].map(weekNum => `
-							<a href="#week-${monthId}-week${weekNum}" class="target-card-link ${targetHoverBgColors[`week${weekNum}`] || ''}">
-								<div class="target-card">
-									<h3 class="font-semibold text-lg ${targetColors[`week${weekNum}`] || 'text-gray-700'} mb-2">Week ${weekNum}</h3>
-									<textarea id="target-week-${monthId}-${weekNum}" data-week="week${weekNum}" class="target-textarea w-full" placeholder="Enter target..." disabled>${escapeHtml(monthData.weeklyTargets?.[`week${weekNum}`] || '')}</textarea>
-								</div>
-							</a>
-						`).join('')}
-					</div>
-                </div>
                  <div class="space-y-8 weekly-plans-container">
                     ${[1, 2, 3, 4].map(weekNum => {
                         const weekId = `week${weekNum}`;
-                        const targetText = monthData.weeklyTargets?.[weekId] || '';
-                        return createWeekElement(monthId, weekId, weeksData[weekId], `week-${monthId}-${weekId}`, targetText);
+                        return createWeekElement(monthId, weekId, weeksData[weekId], `week-${monthId}-${weekId}`);
                     }).join('')}
-                </div>`;
+                </div>`
 
              // --- START: ADD LISTENER FOR NEW BUTTON ---
              monthDiv.querySelector('.view-month-summary-btn').addEventListener('click', () => {
@@ -1471,16 +1444,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
              // --- END: ADD LISTENER FOR NEW BUTTON ---
 
              if (!isGuestMode) {
-                 monthDiv.querySelector('.edit-targets-btn').addEventListener('click', (e) => handleEditTargets(e.currentTarget, monthId));
                  monthDiv.querySelector('.delete-month-btn').addEventListener('click', () => confirmDeleteMonth(monthId, monthData.monthName || monthId));
              }
              
              attachWeekEventListeners(monthDiv, monthId);
-             
-             const targetGroup = monthDiv.querySelector('.monthly-targets');
-             setTimeout(() => {
-                syncTextareaHeights(targetGroup);
-             }, 0); 
 
              animateTrackers(monthDiv);
              
@@ -1489,7 +1456,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
              return monthDiv;
         }
 
-        function createWeekElement(monthId, weekId, weekData, sectionId, targetText) {
+        function createWeekElement(monthId, weekId, weekData, sectionId) {
             // weekData is now the doc { days: [...] } or undefined if it doesn't exist
             const daysHtml = weekData?.days?.length > 0
                 ? weekData.days.map((dayData, index) => createDayElement(monthId, weekId, index, dayData)).join('')
@@ -1498,8 +1465,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
             
             const initialProgress = calculateWeeklyProgress(weekData);
             const headerHeight = (pageHeader.classList.contains('header-hidden') ? 0 : (pageHeader.offsetHeight || 65)) + 'px';
-            
-            const targetHtml = `<p class="week-target-text" id="target-text-${monthId}-${weekId}">${escapeHtml(targetText)}</p>`;
 
             return `
                 <div id="${sectionId}" class="bg-white/60 border border-gray-200 p-4 rounded-lg shadow week-section" data-week-id="${weekId}">
@@ -1509,7 +1474,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             <i class="fas fa-chart-bar mr-1"></i> Study Time Report
                         </button>
                     </div>
-                    ${targetHtml}
                     
                     <div class="sticky-progress-wrapper" style="top: ${headerHeight};">
                         <div class="flex justify-between text-xs text-gray-500">
@@ -1710,10 +1674,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
              // --- END: Req 1 ---
 
              const hasVocabItems = isVocabRow && rowData.vocabData && rowData.vocabData.length > 0;
-             const vocabToggleAttr = hasVocabItems ? '' : 'style="display:none"';
 
              return `
-                 <tr id="${uniqueRowId}" data-row-index="${rowIndex}" class="${isEditing ? 'editing-mode' : ''} ${isVocabRow ? 'vocab-row' : 'normal-row'} ${completedClass}" ${hasVocabItems && !isEditing ? 'data-vocab-collapsed="true" style="cursor:pointer;"' : ''}>
+                 <tr id="${uniqueRowId}" data-row-index="${rowIndex}" class="${isEditing ? 'editing-mode' : ''} ${isVocabRow ? 'vocab-row' : 'normal-row'} ${completedClass}" ${hasVocabItems ? 'data-vocab-collapsed="true" style="cursor:pointer;"' : ''}>
                      <td class="px-3 py-2 align-top subject-cell" data-label="Subject" style="position:relative;">
                         <span class="drag-handle-icon" title="Drag to reorder" style="position:absolute;left:4px;top:50%;transform:translateY(-50%);cursor:grab;color:#d1d5db;font-size:0.7rem;line-height:1;user-select:none;z-index:1;" onmouseenter="this.style.color='#9ca3af'" onmouseleave="this.style.color='#d1d5db'">
                             <i class="fas fa-grip-vertical"></i>
@@ -1723,11 +1686,11 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         </div>
                      </td>
                      <td class="px-3 py-2 align-top vocab-topic-cell" data-label="Topic / Vocab"> 
-                        <div class="vocab-expandable-content" ${hasVocabItems && !isEditing ? 'style="display:none"' : ''}>
+                        <div class="vocab-expandable-content" ${hasVocabItems ? 'style="display:none"' : ''}>
                         ${topicContent}
                         ${buttonsHtml ? `<div class="flex gap-2 mt-2 flex-wrap">${buttonsHtml}</div>` : ''}
                         </div>
-                        ${hasVocabItems && !isEditing ? `<span class="vocab-collapsed-hint" style="font-size:0.7rem;color:#9ca3af;font-style:italic;">${(rowData.vocabData||[]).length} words — click to expand</span>` : ''}
+                        ${hasVocabItems ? `<span class="vocab-collapsed-hint" style="font-size:0.7rem;color:#9ca3af;font-style:italic;">${(rowData.vocabData||[]).length} words — click to expand</span>` : ''}
                      </td>
                      <td class="px-3 py-2 align-middle questions-col" data-label="Questions">
                         ${questionsCellHtml}
@@ -2419,17 +2382,14 @@ function updateMonthUI(monthId, monthData, weeksData) {
             const fsModal = document.getElementById('fullscreen-timer-modal');
             const miniModal = document.getElementById('mini-timer-modal');
 
-            // Decide which DOM to target: PiP window or inline mini modal
             const pip = miniPipWindow;
             const sessionEl  = pip ? pip.document.getElementById('mini-timer-session')  : document.getElementById('mini-timer-session');
             const totalEl    = pip ? pip.document.getElementById('mini-timer-total')    : document.getElementById('mini-timer-total');
             const subjectEl  = pip ? pip.document.getElementById('mini-timer-subject')  : document.getElementById('mini-timer-subject');
             const iconEl     = pip ? pip.document.getElementById('mini-timer-startpause-icon') : document.getElementById('mini-timer-startpause-icon');
 
-            // Neither is open — nothing to do
             if (!pip && (!miniModal || miniModal.style.display === 'none')) return;
 
-            // Pull data from the same source as fullscreen timer
             const monthId  = fsModal.dataset.monthId;
             const weekId   = fsModal.dataset.weekId;
             const dayIndex = parseInt(fsModal.dataset.dayIndex);
@@ -2456,7 +2416,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
         }
         setInterval(syncMiniTimerDisplay, 1000);
 
-        // Build the inner HTML for the PiP window (mirrors the inline mini modal)
         function buildPipHTML() {
             return `
                 <style>
@@ -2476,7 +2435,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     .btns{display:flex;gap:8px;justify-content:center;margin-top:8px;}
                     .play-btn{width:34px;height:34px;border-radius:50%;border:none;background:#10b981;color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
                     .stop-btn{width:34px;height:34px;border-radius:50%;border:none;background:#ef4444;color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-                    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
                 </style>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
                 <div class="titlebar">
@@ -2512,7 +2470,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
             });
             doc.getElementById('mini-timer-close-btn')?.addEventListener('click', closeFn);
             doc.getElementById('mini-timer-maximize-btn')?.addEventListener('click', maximizeFn);
-            // Pin button: in PiP it's always on top (just visual indicator); in fallback it's cosmetic
             doc.getElementById('mini-timer-pin-btn')?.addEventListener('click', () => {
                 const btn = doc.getElementById('mini-timer-pin-btn');
                 if (btn) btn.style.background = btn.style.background.includes('251') ? 'rgba(251,191,36,0.4)' : 'rgba(251,191,36,0.8)';
@@ -2522,7 +2479,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
         async function openMiniWindow() {
             const fsModal = document.getElementById('fullscreen-timer-modal');
 
-            // Try Document Picture-in-Picture (Chrome 116+)
             if ('documentPictureInPicture' in window) {
                 try {
                     miniPipWindow = await window.documentPictureInPicture.requestWindow({
@@ -2533,7 +2489,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                     miniPipWindow.document.body.innerHTML = buildPipHTML();
 
-                    // Copy Font Awesome if already loaded in main page
                     [...document.styleSheets].forEach(ss => {
                         try {
                             if (ss.href && ss.href.includes('font-awesome')) {
@@ -2557,8 +2512,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     );
 
                     miniPipWindow.addEventListener('pagehide', () => { miniPipWindow = null; });
-
-                    // Hide fullscreen modal, mini inline stays hidden
                     fsModal.style.display = 'none';
                     return;
                 } catch(err) {
@@ -2567,7 +2520,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 }
             }
 
-            // ── Fallback: draggable inline mini modal ────────────────────────────
+            // Fallback: draggable inline mini modal
             const mini = document.getElementById('mini-timer-modal');
             mini.style.display = 'block';
             fsModal.style.display = 'none';
@@ -2588,7 +2541,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
             }
         );
 
-        // Draggable helper
         function makeDraggable(el, handle) {
             let startX, startY, startLeft, startTop;
             handle.addEventListener('mousedown', (e) => {
@@ -2598,7 +2550,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 startLeft = rect.left; startTop = rect.top;
                 el.style.right = 'auto'; el.style.bottom = 'auto';
                 el.style.left = startLeft + 'px'; el.style.top = startTop + 'px';
-
                 function onMove(e) {
                     el.style.left = (startLeft + e.clientX - startX) + 'px';
                     el.style.top  = (startTop  + e.clientY - startY) + 'px';
@@ -2610,8 +2561,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 document.addEventListener('mousemove', onMove);
                 document.addEventListener('mouseup', onUp);
             });
-
-            // Touch support
             handle.addEventListener('touchstart', (e) => {
                 const t = e.touches[0];
                 const rect = el.getBoundingClientRect();
@@ -3227,9 +3176,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      return;
                  }
 
-                 // Handle vocab row expand/collapse — click anywhere on the row
+                 // Handle vocab row expand/collapse — click anywhere on the row (normal and edit mode)
                  const vocabRowEl = target.closest('tr[data-vocab-collapsed]');
-                 if (vocabRowEl && !daySection?.classList.contains('editing') && !button) {
+                 if (vocabRowEl && !button && !target.closest('input, textarea, select, .icon-button, .action-button, .delete-vocab-pair-btn, .add-vocab-pair-btn, .add-vocab-code-btn, .add-story-btn')) {
                      e.preventDefault();
                      const expandable = vocabRowEl.querySelector('.vocab-expandable-content');
                      const hint = vocabRowEl.querySelector('.vocab-collapsed-hint');
@@ -4245,91 +4194,6 @@ function addVocabPairInputs(container, word = '', meaning = '') {
         }
 		
 		
-        // --- Monthly Target Edit ---
-        function handleEditTargets(button, monthId) {
-            const isEditing = button.dataset.editing === 'true';
-            
-            // --- THIS IS THE FIX ---
-            // We go back to finding the main parent container
-            const targetsParent = button.closest('.mb-8'); 
-            // Find the grid *inside* the parent
-            const targetsGrid = targetsParent.querySelector('.monthly-targets'); 
-            // Find the links *inside* the parent
-            const links = targetsParent.querySelectorAll('.target-card-link'); 
-            // Find the textareas *inside* the parent
-            const textareas = targetsParent.querySelectorAll('.target-textarea'); 
-            
-            // Define the input handler to use the grid
-            const onInput = () => syncTextareaHeights(targetsGrid);
-
-            if (isEditing) {
-                // --- SAVING ---
-                saveMonthlyTargets(monthId, targetsGrid); // Pass the grid
-                button.innerHTML = '<i class="fas fa-pencil-alt mr-1"></i> Edit Targets';
-                button.dataset.editing = 'false';
-                button.classList.add('action-button-secondary');
-                
-                textareas.forEach(ta => {
-                    ta.disabled = true;
-                    ta.removeEventListener('input', onInput);
-                });
-                
-                syncTextareaHeights(targetsGrid); // Pass the grid
-                
-                // This will work now because 'links' is found correctly
-                links.forEach(link => { 
-                    if (link.dataset.href) { 
-                        link.setAttribute('href', link.dataset.href); 
-                    } 
-                });
-            } else {
-                // --- EDITING ---
-                button.innerHTML = '<i class="fas fa-save mr-1"></i> Save Targets';
-                button.dataset.editing = 'true';
-                button.classList.remove('action-button-secondary');
-                
-                // This will work now because 'links' is found correctly
-                links.forEach(link => { 
-                    link.dataset.href = link.getAttribute('href'); 
-                    link.removeAttribute('href'); 
-                });
-                
-                textareas.forEach(ta => {
-                    ta.disabled = false;
-                    ta.addEventListener('input', onInput);
-                });
-                
-                syncTextareaHeights(targetsGrid); // Pass the grid
-                
-                textareas[0].focus();
-            }
-        }
-        async function saveMonthlyTargets(monthId, targetsContainer) {
-             if (!currentUser || !userId) return;
-             console.log("Saving targets for month:", monthId);
-             setSyncStatus("Syncing...", "yellow");
-             const targets = {};
-             targetsContainer.querySelectorAll('.target-textarea').forEach(textarea => { targets[textarea.dataset.week] = textarea.value.trim(); });
-             const docRef = doc(db, getUserPlansCollectionPath(), monthId);
-             try { 
-                 await updateDoc(docRef, { weeklyTargets: targets }); 
-                 console.log("Monthly targets saved."); 
-                 showCustomAlert("Monthly targets saved!", "success"); 
-                 setSyncStatus("Synced", "green");
-                 
-                 // --- NEW AUTO-UPDATE LOGIC ---
-                 // Manually update the text in the week sections
-                 for (const weekId in targets) {
-                     const targetTextElement = document.getElementById(`target-text-${monthId}-${weekId}`);
-                     if (targetTextElement) {
-                         targetTextElement.innerHTML = escapeHtml(targets[weekId]);
-                     }
-                 }
-                 // --- END NEW LOGIC ---
-                 
-             }
-             catch (error) { console.error("Error saving targets:", error); showCustomAlert("Error saving targets."); setSyncStatus("Error", "red"); }
-        }
 
         // --- Story Modals ---
          async function openEditStoryModal(monthId, weekId, dayIndex, vocabRowIndex) {
@@ -4887,33 +4751,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
              setTimeout(() => { alertBox.remove(); }, 3000);
          }
 		
-		function syncTextareaHeights(groupElement) {
-            if (!groupElement) return;
 
-            const textareas = groupElement.querySelectorAll('.target-textarea');
-            if (textareas.length === 0) return;
-
-            // 1. Reset all heights to auto to get the new natural scrollHeight
-            textareas.forEach(ta => {
-                ta.style.height = 'auto';
-            });
-
-            // 2. Find the maximum scrollHeight from the group
-            let maxHeight = 0;
-            textareas.forEach(ta => {
-                maxHeight = Math.max(maxHeight, ta.scrollHeight);
-            });
-            
-            // 3. Apply the new max height to all textareas in the group
-            textareas.forEach(ta => {
-                // Use a 60px min-height as a fallback
-                ta.style.height = (maxHeight > 60 ? maxHeight : 60) + 'px'; 
-            });
-         }
-		
-		
-		
-		
         // --- START: REFACTORED QUIZ FUNCTIONS ---
 
         /**

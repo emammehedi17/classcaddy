@@ -946,11 +946,10 @@
 
     <!-- Mini Timer Window (draggable, always-on-top via Document PiP or fallback) -->
     <div id="mini-timer-modal" style="display:none; position:fixed; bottom:24px; right:24px; width:160px; background:linear-gradient(135deg,#1a1a2e,#16213e); border:1px solid rgba(255,255,255,0.15); border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.5); z-index:99999; color:#fff; user-select:none; overflow:hidden;">
-        <!-- Title bar (drag handle) -->
         <div id="mini-timer-titlebar" style="display:flex; align-items:center; justify-content:space-between; padding:6px 8px; background:rgba(255,255,255,0.07); cursor:move; border-bottom:1px solid rgba(255,255,255,0.08);">
             <span style="font-size:0.6rem; font-weight:600; color:#9ca3af; letter-spacing:0.05em; text-transform:uppercase;">Timer</span>
             <div style="display:flex; gap:4px;">
-                <button id="mini-timer-pin-btn" title="Pin (always on top)" style="width:18px;height:18px;border-radius:50%;border:none;background:rgba(251,191,36,0.8);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:#78350f;padding:0;" >
+                <button id="mini-timer-pin-btn" title="Pin (always on top)" style="width:18px;height:18px;border-radius:50%;border:none;background:rgba(251,191,36,0.8);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:#78350f;padding:0;">
                     <i class="fas fa-thumbtack"></i>
                 </button>
                 <button id="mini-timer-maximize-btn" title="Maximize" style="width:18px;height:18px;border-radius:50%;border:none;background:rgba(52,211,153,0.8);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:#065f46;padding:0;">
@@ -961,7 +960,6 @@
                 </button>
             </div>
         </div>
-        <!-- Timer display -->
         <div style="padding:10px 10px 8px; text-align:center;">
             <div id="mini-timer-subject" style="font-size:0.6rem; color:#9ca3af; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
             <div id="mini-timer-session" style="font-family:monospace; font-size:1.5rem; font-weight:800; letter-spacing:0.04em; line-height:1.1;">00:00:00</div>
