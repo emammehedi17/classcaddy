@@ -1710,9 +1710,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
              // --- END: Req 1 ---
 
              const hasVocabItems = isVocabRow && rowData.vocabData && rowData.vocabData.length > 0;
+             const vocabToggleAttr = hasVocabItems ? '' : 'style="display:none"';
 
              return `
-                 <tr id="${uniqueRowId}" data-row-index="${rowIndex}" class="${isEditing ? 'editing-mode' : ''} ${isVocabRow ? 'vocab-row' : 'normal-row'} ${completedClass}" ${hasVocabItems ? 'data-vocab-collapsed="true" style="cursor:pointer;"' : ''}>
+                 <tr id="${uniqueRowId}" data-row-index="${rowIndex}" class="${isEditing ? 'editing-mode' : ''} ${isVocabRow ? 'vocab-row' : 'normal-row'} ${completedClass}" ${hasVocabItems && !isEditing ? 'data-vocab-collapsed="true" style="cursor:pointer;"' : ''}>
                      <td class="px-3 py-2 align-top subject-cell" data-label="Subject" style="position:relative;">
                         <span class="drag-handle-icon" title="Drag to reorder" style="position:absolute;left:4px;top:50%;transform:translateY(-50%);cursor:grab;color:#d1d5db;font-size:0.7rem;line-height:1;user-select:none;z-index:1;" onmouseenter="this.style.color='#9ca3af'" onmouseleave="this.style.color='#d1d5db'">
                             <i class="fas fa-grip-vertical"></i>
@@ -1722,11 +1723,11 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         </div>
                      </td>
                      <td class="px-3 py-2 align-top vocab-topic-cell" data-label="Topic / Vocab"> 
-                        <div class="vocab-expandable-content" ${hasVocabItems ? 'style="display:none"' : ''}>
+                        <div class="vocab-expandable-content" ${hasVocabItems && !isEditing ? 'style="display:none"' : ''}>
                         ${topicContent}
                         ${buttonsHtml ? `<div class="flex gap-2 mt-2 flex-wrap">${buttonsHtml}</div>` : ''}
                         </div>
-                        ${hasVocabItems ? `<span class="vocab-collapsed-hint" style="font-size:0.7rem;color:#9ca3af;font-style:italic;">${(rowData.vocabData||[]).length} words — click to expand</span>` : ''}
+                        ${hasVocabItems && !isEditing ? `<span class="vocab-collapsed-hint" style="font-size:0.7rem;color:#9ca3af;font-style:italic;">${(rowData.vocabData||[]).length} words — click to expand</span>` : ''}
                      </td>
                      <td class="px-3 py-2 align-middle questions-col" data-label="Questions">
                         ${questionsCellHtml}
@@ -2411,6 +2412,222 @@ function updateMonthUI(monthId, monthData, weeksData) {
             document.getElementById('fullscreen-timer-modal').style.display = 'none';
         });
 
+        // ── Mini Window ──────────────────────────────────────────────────────────
+        let miniPipWindow = null; // holds the Document PiP window if open
+
+        function syncMiniTimerDisplay() {
+            const fsModal = document.getElementById('fullscreen-timer-modal');
+            const miniModal = document.getElementById('mini-timer-modal');
+
+            // Decide which DOM to target: PiP window or inline mini modal
+            const pip = miniPipWindow;
+            const sessionEl  = pip ? pip.document.getElementById('mini-timer-session')  : document.getElementById('mini-timer-session');
+            const totalEl    = pip ? pip.document.getElementById('mini-timer-total')    : document.getElementById('mini-timer-total');
+            const subjectEl  = pip ? pip.document.getElementById('mini-timer-subject')  : document.getElementById('mini-timer-subject');
+            const iconEl     = pip ? pip.document.getElementById('mini-timer-startpause-icon') : document.getElementById('mini-timer-startpause-icon');
+
+            // Neither is open — nothing to do
+            if (!pip && (!miniModal || miniModal.style.display === 'none')) return;
+
+            // Pull data from the same source as fullscreen timer
+            const monthId  = fsModal.dataset.monthId;
+            const weekId   = fsModal.dataset.weekId;
+            const dayIndex = parseInt(fsModal.dataset.dayIndex);
+            if (!monthId) return;
+
+            const dayData = getDaySectionTimerObjects(monthId, weekId, dayIndex);
+            if (!dayData) return;
+
+            let timerObj, totalToShow;
+            if (fsModal.dataset.timerScope === 'row') {
+                timerObj = dayData.rows?.[parseInt(fsModal.dataset.rowIndex)]?.timer || getDefaultTimerObj();
+                totalToShow = getTimerLiveValues(timerObj).total;
+            } else {
+                timerObj = dayData.dayTimer || getDefaultTimerObj();
+                totalToShow = getTimerLiveValues(timerObj).total;
+                (dayData.rows || []).forEach(row => { totalToShow += getTimerLiveValues(row.timer).total; });
+            }
+
+            const { session } = getTimerLiveValues(timerObj);
+            if (sessionEl) sessionEl.textContent = formatTimerHMS(session);
+            if (totalEl)   totalEl.textContent   = formatTimerHMS(totalToShow);
+            if (subjectEl) subjectEl.textContent = document.getElementById('fullscreen-timer-subject').textContent;
+            if (iconEl)    iconEl.className = timerObj.isRunning ? 'fas fa-pause' : 'fas fa-play';
+        }
+        setInterval(syncMiniTimerDisplay, 1000);
+
+        // Build the inner HTML for the PiP window (mirrors the inline mini modal)
+        function buildPipHTML() {
+            return `
+                <style>
+                    *{box-sizing:border-box;margin:0;padding:0;}
+                    body{background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;font-family:Inter,sans-serif;width:160px;height:auto;overflow:hidden;}
+                    .titlebar{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:rgba(255,255,255,0.07);border-bottom:1px solid rgba(255,255,255,0.08);}
+                    .label{font-size:0.6rem;font-weight:600;color:#9ca3af;letter-spacing:.05em;text-transform:uppercase;}
+                    .dots{display:flex;gap:4px;}
+                    .dot{width:18px;height:18px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.55rem;}
+                    .pin-dot{background:rgba(251,191,36,0.8);color:#78350f;}
+                    .max-dot{background:rgba(52,211,153,0.8);color:#065f46;}
+                    .close-dot{background:rgba(239,68,68,0.8);color:#fff;font-size:0.65rem;}
+                    .body{padding:10px 10px 8px;text-align:center;}
+                    #mini-timer-subject{font-size:.6rem;color:#9ca3af;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+                    #mini-timer-session{font-family:monospace;font-size:1.5rem;font-weight:800;letter-spacing:.04em;line-height:1.1;}
+                    #mini-timer-total{font-family:monospace;font-size:.75rem;color:#34d399;margin-top:2px;}
+                    .btns{display:flex;gap:8px;justify-content:center;margin-top:8px;}
+                    .play-btn{width:34px;height:34px;border-radius:50%;border:none;background:#10b981;color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+                    .stop-btn{width:34px;height:34px;border-radius:50%;border:none;background:#ef4444;color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+                    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+                </style>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+                <div class="titlebar">
+                    <span class="label">Timer</span>
+                    <div class="dots">
+                        <button class="dot pin-dot" id="mini-timer-pin-btn" title="Pinned (always on top)"><i class="fas fa-thumbtack"></i></button>
+                        <button class="dot max-dot" id="mini-timer-maximize-btn" title="Maximize"><i class="fas fa-expand"></i></button>
+                        <button class="dot close-dot" id="mini-timer-close-btn" title="Close"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div class="body">
+                    <div id="mini-timer-subject"></div>
+                    <div id="mini-timer-session">00:00:00</div>
+                    <div id="mini-timer-total">00:00:00</div>
+                    <div class="btns">
+                        <button class="play-btn" id="mini-timer-startpause-btn"><i id="mini-timer-startpause-icon" class="fas fa-play"></i></button>
+                        <button class="stop-btn" id="mini-timer-end-btn"><i class="fas fa-stop"></i></button>
+                    </div>
+                </div>`;
+        }
+
+        function wireMiniButtons(doc, closeFn, maximizeFn) {
+            const fsModal = document.getElementById('fullscreen-timer-modal');
+            doc.getElementById('mini-timer-startpause-btn')?.addEventListener('click', () => {
+                const rowIndex = fsModal.dataset.timerScope === 'row' ? parseInt(fsModal.dataset.rowIndex) : null;
+                updateTimerState(fsModal.dataset.monthId, fsModal.dataset.weekId, parseInt(fsModal.dataset.dayIndex), rowIndex, 'startpause')
+                    .then(() => { tickFullscreenTimer(); syncMiniTimerDisplay(); });
+            });
+            doc.getElementById('mini-timer-end-btn')?.addEventListener('click', () => {
+                const rowIndex = fsModal.dataset.timerScope === 'row' ? parseInt(fsModal.dataset.rowIndex) : null;
+                updateTimerState(fsModal.dataset.monthId, fsModal.dataset.weekId, parseInt(fsModal.dataset.dayIndex), rowIndex, 'end')
+                    .then(() => { tickFullscreenTimer(); syncMiniTimerDisplay(); });
+            });
+            doc.getElementById('mini-timer-close-btn')?.addEventListener('click', closeFn);
+            doc.getElementById('mini-timer-maximize-btn')?.addEventListener('click', maximizeFn);
+            // Pin button: in PiP it's always on top (just visual indicator); in fallback it's cosmetic
+            doc.getElementById('mini-timer-pin-btn')?.addEventListener('click', () => {
+                const btn = doc.getElementById('mini-timer-pin-btn');
+                if (btn) btn.style.background = btn.style.background.includes('251') ? 'rgba(251,191,36,0.4)' : 'rgba(251,191,36,0.8)';
+            });
+        }
+
+        async function openMiniWindow() {
+            const fsModal = document.getElementById('fullscreen-timer-modal');
+
+            // Try Document Picture-in-Picture (Chrome 116+)
+            if ('documentPictureInPicture' in window) {
+                try {
+                    miniPipWindow = await window.documentPictureInPicture.requestWindow({
+                        width: 160,
+                        height: 200,
+                        disallowReturnToOpener: false,
+                    });
+
+                    miniPipWindow.document.body.innerHTML = buildPipHTML();
+
+                    // Copy Font Awesome if already loaded in main page
+                    [...document.styleSheets].forEach(ss => {
+                        try {
+                            if (ss.href && ss.href.includes('font-awesome')) {
+                                const link = miniPipWindow.document.createElement('link');
+                                link.rel = 'stylesheet'; link.href = ss.href;
+                                miniPipWindow.document.head.appendChild(link);
+                            }
+                        } catch(_) {}
+                    });
+
+                    syncMiniTimerDisplay();
+
+                    wireMiniButtons(
+                        miniPipWindow.document,
+                        () => { miniPipWindow.close(); miniPipWindow = null; },
+                        () => {
+                            miniPipWindow.close(); miniPipWindow = null;
+                            fsModal.style.display = 'flex';
+                            tickFullscreenTimer();
+                        }
+                    );
+
+                    miniPipWindow.addEventListener('pagehide', () => { miniPipWindow = null; });
+
+                    // Hide fullscreen modal, mini inline stays hidden
+                    fsModal.style.display = 'none';
+                    return;
+                } catch(err) {
+                    console.warn('Document PiP failed, using fallback mini window:', err);
+                    miniPipWindow = null;
+                }
+            }
+
+            // ── Fallback: draggable inline mini modal ────────────────────────────
+            const mini = document.getElementById('mini-timer-modal');
+            mini.style.display = 'block';
+            fsModal.style.display = 'none';
+            syncMiniTimerDisplay();
+            makeDraggable(mini, document.getElementById('mini-timer-titlebar'));
+        }
+
+        document.getElementById('fullscreen-timer-mini-btn')?.addEventListener('click', openMiniWindow);
+
+        // Inline mini modal buttons
+        wireMiniButtons(
+            document,
+            () => { document.getElementById('mini-timer-modal').style.display = 'none'; },
+            () => {
+                document.getElementById('mini-timer-modal').style.display = 'none';
+                document.getElementById('fullscreen-timer-modal').style.display = 'flex';
+                tickFullscreenTimer();
+            }
+        );
+
+        // Draggable helper
+        function makeDraggable(el, handle) {
+            let startX, startY, startLeft, startTop;
+            handle.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                const rect = el.getBoundingClientRect();
+                startX = e.clientX; startY = e.clientY;
+                startLeft = rect.left; startTop = rect.top;
+                el.style.right = 'auto'; el.style.bottom = 'auto';
+                el.style.left = startLeft + 'px'; el.style.top = startTop + 'px';
+
+                function onMove(e) {
+                    el.style.left = (startLeft + e.clientX - startX) + 'px';
+                    el.style.top  = (startTop  + e.clientY - startY) + 'px';
+                }
+                function onUp() {
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                }
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            });
+
+            // Touch support
+            handle.addEventListener('touchstart', (e) => {
+                const t = e.touches[0];
+                const rect = el.getBoundingClientRect();
+                startX = t.clientX; startY = t.clientY;
+                startLeft = rect.left; startTop = rect.top;
+                el.style.right = 'auto'; el.style.bottom = 'auto';
+                el.style.left = startLeft + 'px'; el.style.top = startTop + 'px';
+            }, { passive: true });
+            handle.addEventListener('touchmove', (e) => {
+                const t = e.touches[0];
+                el.style.left = (startLeft + t.clientX - startX) + 'px';
+                el.style.top  = (startTop  + t.clientY - startY) + 'px';
+            }, { passive: true });
+        }
+        // ── End Mini Window ──────────────────────────────────────────────────────
+
         // Tick the fullscreen modal display every second too
         setInterval(tickFullscreenTimer, 1000);
         // --- END TIMER FEATURE: HELPERS ---
@@ -3010,9 +3227,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      return;
                  }
 
-                 // Handle vocab row expand/collapse — click anywhere on the row (normal and edit mode)
+                 // Handle vocab row expand/collapse — click anywhere on the row
                  const vocabRowEl = target.closest('tr[data-vocab-collapsed]');
-                 if (vocabRowEl && !button && !target.closest('input, textarea, select, .icon-button, .action-button, .delete-vocab-pair-btn, .add-vocab-pair-btn, .add-vocab-code-btn, .add-story-btn')) {
+                 if (vocabRowEl && !daySection?.classList.contains('editing') && !button) {
                      e.preventDefault();
                      const expandable = vocabRowEl.querySelector('.vocab-expandable-content');
                      const hint = vocabRowEl.querySelector('.vocab-collapsed-hint');
@@ -10224,11 +10441,18 @@ function getCardSkeleton() {
 // --- FULLSCREEN TIMER: SPACEBAR START/PAUSE ---
 document.addEventListener('keydown', (e) => {
     if (e.key !== ' ') return;
-    const fsModal = document.getElementById('fullscreen-timer-modal');
-    if (!fsModal || fsModal.style.display === 'none' || fsModal.style.display === '') return;
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    e.preventDefault();
-    document.getElementById('fullscreen-timer-startpause-btn')?.click();
+    const fsModal = document.getElementById('fullscreen-timer-modal');
+    if (fsModal && fsModal.style.display !== 'none' && fsModal.style.display !== '') {
+        e.preventDefault();
+        document.getElementById('fullscreen-timer-startpause-btn')?.click();
+        return;
+    }
+    const miniModal = document.getElementById('mini-timer-modal');
+    if (miniModal && miniModal.style.display !== 'none' && miniModal.style.display !== '') {
+        e.preventDefault();
+        document.getElementById('mini-timer-startpause-btn')?.click();
+    }
 });
 
 // --- NEW: KEYBOARD SHORTCUTS FOR QUIZZES ---
@@ -10239,9 +10463,11 @@ document.addEventListener('keydown', (e) => {
         return;
     }
 
-    // Skip if fullscreen timer is open
+    // Skip if fullscreen or mini timer is open
     const fsModal = document.getElementById('fullscreen-timer-modal');
     if (fsModal && fsModal.style.display !== 'none' && fsModal.style.display !== '') return;
+    const miniModal = document.getElementById('mini-timer-modal');
+    if (miniModal && miniModal.style.display !== 'none' && miniModal.style.display !== '') return;
 
     // 2. Prevent triggering if the user happens to be typing in an input field somewhere
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
