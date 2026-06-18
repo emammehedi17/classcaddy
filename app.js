@@ -498,6 +498,8 @@
 
                 studyPlanContent.classList.remove('hidden');
                 loadStudyPlans();
+                // Re-init streak widget for the newly logged-in account
+                if (typeof initStreakGoalWidget === 'function') initStreakGoalWidget();
             } else {
                 // --- CRITICAL FIX: CLEAR DATA CACHE ON LOGOUT ---
                 activeWeeksDataCache = {}; // Wipes the study plan data
@@ -515,6 +517,8 @@
                 ['studyStreak_v1', 'studyDailyGoal_v1', 'studyDayHistory_v1'].forEach(base => {
                     Object.keys(localStorage).filter(k => k.startsWith(base)).forEach(k => localStorage.removeItem(k));
                 });
+                // Reset streak widget to blank state immediately
+                if (typeof initStreakGoalWidget === 'function') initStreakGoalWidget();
                 console.log("User logged out");
 
                 // --- START: RESET HEADER LOGO TO DU ---
