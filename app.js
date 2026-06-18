@@ -1118,6 +1118,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      
 					 activeWeeksDataCache = weeksData;
 					 window._weeksCache = activeWeeksDataCache;
+					 // Refresh streak widget now that cache has real data
+					 if (typeof checkAndUpdateStreak === 'function') checkAndUpdateStreak();
 					 
                      console.log("Fetched month data and", weeksQuerySnapshot.size, "week documents.");
 
@@ -9796,9 +9798,23 @@ function checkAndUpdateStreak() {
         }
     }
 
+    // Recalculate best streak from scratch (scan all plan days for longest consecutive run)
+    let bestStreak = 0;
+    let runLength = 0;
+    for (let i = 0; i < allPlanDays.length; i++) {
+        const { weekId, dayIndex } = allPlanDays[i];
+        const entry = hist[`${weekId}:${dayIndex}`];
+        if (entry && entry.goalMet) {
+            runLength++;
+            if (runLength > bestStreak) bestStreak = runLength;
+        } else {
+            runLength = 0;
+        }
+    }
+
     const streak = loadStreakData();
     streak.current = currentStreak;
-    if (currentStreak > streak.best) streak.best = currentStreak;
+    streak.best = bestStreak;
     saveStreakData(streak);
 
     renderWidget(studiedMinutes, goalMinutes, streak, hist);
@@ -9991,6 +10007,20 @@ function initStreakGoalWidget() {
     // checkAndUpdateStreak() call hooked into tickAllTimers() (ticks
     // every second), so no separate setInterval is needed here.
     checkAndUpdateStreak();
+
+    // Ensure widget is visible and positioned after progress trackers.
+    // If the month card isn't rendered yet, retry after a short delay.
+    function positionWidget() {
+        const widgetEl = document.getElementById('streak-goal-widget');
+        const trackerContainer = document.querySelector('.progress-trackers-container');
+        if (widgetEl && trackerContainer && trackerContainer.parentNode) {
+            trackerContainer.parentNode.insertBefore(widgetEl, trackerContainer.nextSibling);
+        } else if (widgetEl) {
+            // Month card not rendered yet — retry once it is
+            setTimeout(positionWidget, 300);
+        }
+    }
+    positionWidget();
 }
 /* ============== END: STREAK TRACKER & DAILY GOAL WIDGET ============== */
 
