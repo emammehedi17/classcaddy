@@ -1859,6 +1859,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     if (totalEl && !totalEl.classList.contains('editing')) totalEl.textContent = formatTimerHMS(grandTotal);
                 }
             });
+
+            // Keep the streak/daily-goal widget in sync with live timer values
+            // (handles running timers so the progress bar moves in real time).
+            if (typeof checkAndUpdateStreak === 'function') checkAndUpdateStreak();
         }
 
         // Tick every second for live-updating displays
@@ -9591,6 +9595,304 @@ const scrollLockObserver = new MutationObserver(() => {
 });
 
 // Start watching all modals for style/class changes
+/* ================================================================
+   STREAK TRACKER & DAILY GOAL WIDGET
+   ================================================================
+   Reads study time directly from the real study-plan data model
+   (activeWeeksDataCache) instead of scraping a DOM element: for
+   every "day" entry in the currently loaded month whose assigned
+   date matches today, it sums that day's timer total + all of its
+   row timers, live (via getTimerLiveValues, so a timer that is
+   currently running is included). This is kept in sync every
+   second by a call from tickAllTimers() above.
+
+   NOTE: only the currently open month's data lives in
+   activeWeeksDataCache, so if today's date happens to be assigned
+   to a day inside a month other than the one currently selected,
+   that time won't be counted until that month is opened.
+   ================================================================ */
+
+const STREAK_STORAGE_KEY   = 'studyStreak_v1';
+const GOAL_STORAGE_KEY     = 'studyDailyGoal_v1';
+const HISTORY_STORAGE_KEY  = 'studyDayHistory_v1'; // tracks last 7 days
+
+// ---------------------------------------------------------------
+// UTILITY: get today's date string "YYYY-MM-DD"
+// ---------------------------------------------------------------
+function getTodayDateStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// ---------------------------------------------------------------
+// UTILITY: get date string for N days ago
+// ---------------------------------------------------------------
+function getDateStrOffset(daysAgo) {
+    const d = new Date();
+    d.setDate(d.getDate() - daysAgo);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// ---------------------------------------------------------------
+// UTILITY: short day label "Mon", "Tue" etc.
+// ---------------------------------------------------------------
+function getShortDayLabel(dateStr) {
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const d = new Date(dateStr + 'T00:00:00');
+    return days[d.getDay()];
+}
+
+// ---------------------------------------------------------------
+// READ STUDY TIME — sums live timer totals for every plan "day"
+// (across all weeks of the currently loaded month) whose assigned
+// date matches today's calendar date.
+// ---------------------------------------------------------------
+function getTodayStudiedMinutes() {
+    const todayStr = getTodayDateStr();
+    let totalSeconds = 0;
+
+    if (activeWeeksDataCache && typeof activeWeeksDataCache === 'object') {
+        Object.values(activeWeeksDataCache).forEach(weekData => {
+            (weekData?.days || []).forEach(dayData => {
+                if (!dayData || dayData.date !== todayStr) return;
+                totalSeconds += getTimerLiveValues(dayData.dayTimer).total;
+                (dayData.rows || []).forEach(row => {
+                    totalSeconds += getTimerLiveValues(row.timer).total;
+                });
+            });
+        });
+    }
+
+    return Math.floor(totalSeconds / 60);
+}
+
+// ---------------------------------------------------------------
+// FORMAT minutes → "Xh Ym"
+// ---------------------------------------------------------------
+function formatMinutes(totalMin) {
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    if (h > 0 && m > 0) return `${h}h ${m}m`;
+    if (h > 0) return `${h}h`;
+    return `${m}m`;
+}
+
+// ---------------------------------------------------------------
+// LOAD / SAVE helpers
+// ---------------------------------------------------------------
+function loadStreakData() {
+    try {
+        const raw = localStorage.getItem(STREAK_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : { current: 0, best: 0, lastGoalMetDate: null };
+    } catch { return { current: 0, best: 0, lastGoalMetDate: null }; }
+}
+
+function saveStreakData(data) {
+    localStorage.setItem(STREAK_STORAGE_KEY, JSON.stringify(data));
+}
+
+function loadGoal() {
+    const raw = localStorage.getItem(GOAL_STORAGE_KEY);
+    return raw ? parseFloat(raw) : 2; // default 2 hours
+}
+
+function saveGoalToStorage(hours) {
+    localStorage.setItem(GOAL_STORAGE_KEY, String(hours));
+}
+
+function loadHistory() {
+    try {
+        const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+}
+
+function saveHistory(hist) {
+    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(hist));
+}
+
+// ---------------------------------------------------------------
+// CORE LOGIC: check today and update streak
+// Called on load and every second via tickAllTimers().
+// ---------------------------------------------------------------
+function checkAndUpdateStreak() {
+    const today = getTodayDateStr();
+    const goalHours = loadGoal();
+    const goalMinutes = Math.round(goalHours * 60);
+    const studiedMinutes = getTodayStudiedMinutes();
+    const goalMet = studiedMinutes >= goalMinutes && goalMinutes > 0;
+
+    // Update history for today
+    const hist = loadHistory();
+    hist[today] = { studied: studiedMinutes, goalMet };
+    saveHistory(hist);
+
+    // Update streak
+    const streak = loadStreakData();
+    const yesterday = getDateStrOffset(1);
+
+    if (goalMet) {
+        if (streak.lastGoalMetDate === today) {
+            // Already counted today — no change
+        } else if (streak.lastGoalMetDate === yesterday) {
+            // Consecutive day — increment
+            streak.current += 1;
+        } else {
+            // Gap or first day — reset to 1
+            streak.current = 1;
+        }
+        streak.lastGoalMetDate = today;
+        if (streak.current > streak.best) streak.best = streak.current;
+        saveStreakData(streak);
+    } else {
+        // Goal not met today — check if streak should break
+        // (We don't break it until the day ends, so today's progress
+        //  still shows — the streak only breaks if lastGoalMetDate
+        //  is neither today nor yesterday when the page loads.)
+        if (streak.lastGoalMetDate &&
+            streak.lastGoalMetDate !== today &&
+            streak.lastGoalMetDate !== yesterday) {
+            // A day was skipped — streak broken
+            streak.current = 0;
+            saveStreakData(streak);
+        }
+    }
+
+    renderWidget(studiedMinutes, goalMinutes, streak, hist);
+}
+
+// ---------------------------------------------------------------
+// RENDER: update all DOM elements
+// ---------------------------------------------------------------
+function renderWidget(studiedMin, goalMin, streak, hist) {
+    // --- Streak number ---
+    const numEl = document.getElementById('streak-number');
+    const bestEl = document.getElementById('streak-best-badge');
+    if (numEl) {
+        numEl.textContent = streak.current;
+        numEl.className = 'streak-number' + (streak.current === 0 ? ' streak-zero' : '');
+    }
+    if (bestEl) bestEl.textContent = `Best: ${streak.best}`;
+
+    // --- Progress bar ---
+    const pct = goalMin > 0 ? Math.min((studiedMin / goalMin) * 100, 100) : 0;
+    const bar = document.getElementById('goal-progress-bar');
+    if (bar) {
+        bar.style.width = pct + '%';
+        bar.className = 'goal-progress-bar-fill' +
+            (pct >= 100 ? ' goal-hit' : '') +
+            (studiedMin > goalMin * 1.05 ? ' goal-over' : '');
+    }
+
+    // --- Status text ---
+    const statusEl = document.getElementById('goal-progress-status');
+    if (statusEl) {
+        const studiedEl = document.getElementById('goal-time-studied');
+        const ofTextEl = document.getElementById('goal-of-text');
+        if (goalMin > 0) {
+            if (studiedEl) studiedEl.textContent = formatMinutes(studiedMin);
+            if (ofTextEl) {
+                const goalLabel = formatMinutes(goalMin);
+                if (studiedMin >= goalMin) {
+                    ofTextEl.innerHTML = ` / ${goalLabel} — <span class="goal-complete-text">🎉 Goal complete!</span>`;
+                } else {
+                    ofTextEl.textContent = ` / ${goalLabel} goal`;
+                }
+            }
+        } else {
+            statusEl.textContent = 'No goal set — enter hours above';
+        }
+    }
+
+    // --- 7-day dots ---
+    const dotsContainer = document.getElementById('streak-days-row');
+    if (!dotsContainer) return;
+    dotsContainer.innerHTML = '';
+    const today = getTodayDateStr();
+
+    for (let i = 6; i >= 0; i--) {
+        const dateStr = getDateStrOffset(i);
+        const dayData = hist[dateStr];
+        const isToday = dateStr === today;
+        const shortLabel = getShortDayLabel(dateStr);
+
+        let dotClass = 'streak-day-dot';
+        if (isToday) {
+            dotClass += ' dot-today';
+            if (dayData && dayData.goalMet) dotClass += ' dot-complete';
+        } else if (dayData) {
+            dotClass += dayData.goalMet ? ' dot-complete' : ' dot-missed';
+        }
+        // No data for past day = just empty (future state — shouldn't happen)
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'streak-day-dot-wrapper';
+
+        const dot = document.createElement('div');
+        dot.className = dotClass;
+        // Show day initial if not complete (complete shows ✓ via CSS ::after)
+        if (!(dayData && dayData.goalMet)) {
+            dot.textContent = shortLabel[0]; // M, T, W...
+        }
+        dot.title = isToday ? 'Today' : dateStr;
+
+        const label = document.createElement('span');
+        label.className = 'streak-dot-label' + (isToday ? ' label-today' : '');
+        label.textContent = isToday ? 'Today' : shortLabel;
+
+        wrapper.appendChild(dot);
+        wrapper.appendChild(label);
+        dotsContainer.appendChild(wrapper);
+    }
+}
+
+// ---------------------------------------------------------------
+// SAVE GOAL (called by the Save button)
+// ---------------------------------------------------------------
+function saveGoal() {
+    const input = document.getElementById('goal-hours-input');
+    if (!input) return;
+    const val = parseFloat(input.value);
+    if (isNaN(val) || val <= 0 || val > 24) {
+        input.style.color = '#ef4444';
+        setTimeout(() => input.style.color = '', 800);
+        return;
+    }
+    saveGoalToStorage(val);
+
+    // Show "Saved!" message briefly
+    const msg = document.getElementById('goal-saved-msg');
+    if (msg) {
+        msg.classList.add('visible');
+        setTimeout(() => msg.classList.remove('visible'), 2000);
+    }
+
+    // Re-run logic with new goal
+    checkAndUpdateStreak();
+}
+// Exposed on window because the Save button uses an inline onclick="saveGoal()"
+// handler in the HTML, and this script runs as an ES module (module-scope
+// functions aren't reachable from inline handlers unless exported to window),
+// matching the pattern already used for closeModal/toggleSummaryRow elsewhere
+// in this file.
+window.saveGoal = saveGoal;
+
+// ---------------------------------------------------------------
+// INIT — call this on page load
+// ---------------------------------------------------------------
+function initStreakGoalWidget() {
+    // Restore saved goal into input
+    const savedGoal = loadGoal();
+    const input = document.getElementById('goal-hours-input');
+    if (input) input.value = savedGoal;
+
+    // Run first check. After this, the widget stays live via the
+    // checkAndUpdateStreak() call hooked into tickAllTimers() (ticks
+    // every second), so no separate setInterval is needed here.
+    checkAndUpdateStreak();
+}
+/* ============== END: STREAK TRACKER & DAILY GOAL WIDGET ============== */
+
 document.addEventListener('DOMContentLoaded', () => {
     const modals = document.querySelectorAll('.modal');
     if (modals.length > 0) {
@@ -9601,6 +9903,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // Streak tracker & daily goal widget (see block above)
+    initStreakGoalWidget();
 });
 
 // Fallback: If DOM is already loaded (e.g. hot reload), attach immediately

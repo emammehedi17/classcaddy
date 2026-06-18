@@ -163,6 +163,71 @@
                      <p id="select-month-message" class="text-center text-gray-500 italic py-10 hidden">Select a month from the buttons above to view its plan.</p>
                 </div>
 
+                <!-- ============================================================
+                     STREAK TRACKER & DAILY GOAL WIDGET
+                     ============================================================ -->
+                <div class="streak-goal-widget" id="streak-goal-widget">
+
+                    <!-- TOP ROW: Goal input (left) + Streak counter (right) -->
+                    <div class="streak-goal-top-row">
+
+                        <!-- Goal Setting -->
+                        <div class="goal-section">
+                            <span class="goal-label">📅 Daily study goal:</span>
+                            <div class="goal-input-wrapper">
+                                <input
+                                    type="number"
+                                    id="goal-hours-input"
+                                    class="goal-hours-input"
+                                    min="0.5"
+                                    max="24"
+                                    step="0.5"
+                                    value="2"
+                                    placeholder="2"
+                                    title="Set your daily study goal in hours"
+                                />
+                                <span class="goal-unit">hrs / day</span>
+                            </div>
+                            <button class="goal-save-btn" id="goal-save-btn" onclick="saveGoal()">
+                                Save goal
+                            </button>
+                            <span class="goal-saved-msg" id="goal-saved-msg">✓ Saved!</span>
+                        </div>
+
+                        <!-- Streak Counter -->
+                        <div class="streak-section">
+                            <span class="streak-flame-icon">🔥</span>
+                            <div class="streak-count-block">
+                                <span class="streak-number" id="streak-number">0</span>
+                                <span class="streak-sublabel">day streak</span>
+                            </div>
+                            <span class="streak-best-badge" id="streak-best-badge">Best: 0</span>
+                        </div>
+
+                    </div>
+
+                    <!-- PROGRESS BAR: today's time vs goal -->
+                    <div class="goal-progress-section">
+                        <div class="goal-progress-header">
+                            <span class="goal-progress-title">Today's progress</span>
+                            <span class="goal-progress-status" id="goal-progress-status">
+                                <span class="time-studied" id="goal-time-studied">0h 0m</span>
+                                <span id="goal-of-text"> studied</span>
+                            </span>
+                        </div>
+                        <div class="goal-progress-bar-track">
+                            <div class="goal-progress-bar-fill" id="goal-progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- 7-DAY DOT ROW -->
+                    <div class="streak-days-row" id="streak-days-row">
+                        <!-- Populated by JS -->
+                    </div>
+
+                </div>
+                <!-- END: STREAK TRACKER & DAILY GOAL WIDGET -->
+
             </div> 
 			
 			<div id="result-sheet-modal" class="modal">
