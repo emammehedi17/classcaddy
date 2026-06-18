@@ -441,6 +441,7 @@
 
                 currentUser = user;
                 userId = user.uid; // This will be MEHEDI_UID in guest mode
+                window._currentUserId = userId;
                 console.log("User logged in:", userId);
                 console.log("Is Guest Mode:", isGuestMode); 
 
@@ -509,6 +510,11 @@
                 // --- END: GUEST MODE LOGIC ---
                 currentUser = null;
                 userId = null;
+                window._currentUserId = null;
+                // Clear streak/goal/history data so next account starts fresh
+                ['studyStreak_v1', 'studyDailyGoal_v1', 'studyDayHistory_v1'].forEach(base => {
+                    Object.keys(localStorage).filter(k => k.startsWith(base)).forEach(k => localStorage.removeItem(k));
+                });
                 console.log("User logged out");
 
                 // --- START: RESET HEADER LOGO TO DU ---
@@ -9629,9 +9635,10 @@ const scrollLockObserver = new MutationObserver(() => {
    that time won't be counted until that month is opened.
    ================================================================ */
 
-const STREAK_STORAGE_KEY   = 'studyStreak_v1';
-const GOAL_STORAGE_KEY     = 'studyDailyGoal_v1';
-const HISTORY_STORAGE_KEY  = 'studyDayHistory_v1'; // tracks last 7 days
+// Storage keys are user-specific to prevent data leaking between accounts
+function _streakKey()  { const uid = window._currentUserId || 'guest'; return 'studyStreak_v1_' + uid; }
+function _goalKey()    { const uid = window._currentUserId || 'guest'; return 'studyDailyGoal_v1_' + uid; }
+function _historyKey() { const uid = window._currentUserId || 'guest'; return 'studyDayHistory_v1_' + uid; }
 
 // ---------------------------------------------------------------
 // UTILITY: get today's date string "YYYY-MM-DD"
@@ -9708,33 +9715,33 @@ function formatMinutes(totalMin) {
 // ---------------------------------------------------------------
 function loadStreakData() {
     try {
-        const raw = localStorage.getItem(STREAK_STORAGE_KEY);
+        const raw = localStorage.getItem(_streakKey());
         return raw ? JSON.parse(raw) : { current: 0, best: 0, lastGoalMetDate: null };
     } catch { return { current: 0, best: 0, lastGoalMetDate: null }; }
 }
 
 function saveStreakData(data) {
-    localStorage.setItem(STREAK_STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(_streakKey(), JSON.stringify(data));
 }
 
 function loadGoal() {
-    const raw = localStorage.getItem(GOAL_STORAGE_KEY);
+    const raw = localStorage.getItem(_goalKey());
     return raw ? parseFloat(raw) : 2; // default 2 hours
 }
 
 function saveGoalToStorage(hours) {
-    localStorage.setItem(GOAL_STORAGE_KEY, String(hours));
+    localStorage.setItem(_goalKey(), String(hours));
 }
 
 function loadHistory() {
     try {
-        const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+        const raw = localStorage.getItem(_historyKey());
         return raw ? JSON.parse(raw) : {};
     } catch { return {}; }
 }
 
 function saveHistory(hist) {
-    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(hist));
+    localStorage.setItem(_historyKey(), JSON.stringify(hist));
 }
 
 // ---------------------------------------------------------------
