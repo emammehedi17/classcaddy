@@ -1450,6 +1450,13 @@ function updateMonthUI(monthId, monthData, weeksData) {
              attachWeekEventListeners(monthDiv, monthId);
 
              animateTrackers(monthDiv);
+
+             // Move the streak-goal-widget to sit right after the circular progress bars
+             const widgetEl = document.getElementById('streak-goal-widget');
+             const trackerContainer = monthDiv.querySelector('.progress-trackers-container');
+             if (widgetEl && trackerContainer && trackerContainer.parentNode) {
+                 trackerContainer.parentNode.insertBefore(widgetEl, trackerContainer.nextSibling);
+             }
              
              setTimeout(tickAllTimers, 0);
              
@@ -9804,46 +9811,101 @@ function renderWidget(studiedMin, goalMin, streak, hist) {
         }
     }
 
-    // --- 7-day dots ---
+    // --- Current-week dots ---
     const dotsContainer = document.getElementById('streak-days-row');
     if (!dotsContainer) return;
     dotsContainer.innerHTML = '';
     const today = getTodayDateStr();
 
-    for (let i = 6; i >= 0; i--) {
-        const dateStr = getDateStrOffset(i);
-        const dayData = hist[dateStr];
+    // Build a dateStr → totalSeconds map from activeWeeksDataCache for the current week
+    const weekTimerMap = {};
+    if (typeof activeWeeksDataCache === 'object' && activeWeeksDataCache) {
+        Object.values(activeWeeksDataCache).forEach(weekData => {
+            (weekData?.days || []).forEach(dayData => {
+                if (!dayData || !dayData.date) return;
+                let secs = getTimerLiveValues(dayData.dayTimer).total;
+                (dayData.rows || []).forEach(row => {
+                    secs += getTimerLiveValues(row.timer).total;
+                });
+                weekTimerMap[dayData.date] = (weekTimerMap[dayData.date] || 0) + secs;
+            });
+        });
+    }
+
+    // Determine start of current week (Sunday = day 0)
+    const todayObj = new Date(today + 'T00:00:00');
+    const dayOfWeek = todayObj.getDay(); // 0=Sun … 6=Sat
+    const weekStart = new Date(todayObj);
+    weekStart.setDate(todayObj.getDate() - dayOfWeek); // rewind to Sunday
+
+    // Build list of days from Sunday up to and including today
+    const weekDays = [];
+    for (let i = 0; i <= dayOfWeek; i++) {
+        const d = new Date(weekStart);
+        d.setDate(weekStart.getDate() + i);
+        const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        weekDays.push(ds);
+    }
+
+    const goalHours = loadGoal();
+    const goalSeconds = Math.round(goalHours * 3600);
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    weekDays.forEach(dateStr => {
         const isToday = dateStr === today;
+        const dayData = hist[dateStr];
         const shortLabel = getShortDayLabel(dateStr);
+
+        // Actual studied seconds from timers in cache
+        const timerSecs = weekTimerMap[dateStr] || 0;
+        const timerMin = Math.floor(timerSecs / 60);
+
+        // Goal-met check: prefer live timer data, fall back to saved history
+        let goalMet = false;
+        if (timerSecs > 0) {
+            goalMet = goalSeconds > 0 && timerSecs >= goalSeconds;
+        } else if (dayData) {
+            goalMet = dayData.goalMet;
+        }
 
         let dotClass = 'streak-day-dot';
         if (isToday) {
             dotClass += ' dot-today';
-            if (dayData && dayData.goalMet) dotClass += ' dot-complete';
-        } else if (dayData) {
-            dotClass += dayData.goalMet ? ' dot-complete' : ' dot-missed';
+            if (goalMet) dotClass += ' dot-complete';
+        } else if (timerSecs > 0 || dayData) {
+            dotClass += goalMet ? ' dot-complete' : ' dot-missed';
         }
-        // No data for past day = just empty (future state — shouldn't happen)
+
+        // Date sub-label e.g. "(15 Jun)"
+        const dateObj = new Date(dateStr + 'T00:00:00');
+        const dateSub = `(${dateObj.getDate()} ${months[dateObj.getMonth()]})`;
+
+        // Tooltip with studied time
+        const studiedLabel = timerMin > 0 ? formatMinutes(timerMin) : (dayData ? formatMinutes(dayData.studied || 0) : '0m');
 
         const wrapper = document.createElement('div');
         wrapper.className = 'streak-day-dot-wrapper';
 
         const dot = document.createElement('div');
         dot.className = dotClass;
-        // Show day initial if not complete (complete shows ✓ via CSS ::after)
-        if (!(dayData && dayData.goalMet)) {
-            dot.textContent = shortLabel[0]; // M, T, W...
+        if (!goalMet) {
+            dot.textContent = shortLabel[0];
         }
-        dot.title = isToday ? 'Today' : dateStr;
+        dot.title = isToday ? `Today — ${studiedLabel} studied` : `${dateStr} — ${studiedLabel} studied`;
 
         const label = document.createElement('span');
         label.className = 'streak-dot-label' + (isToday ? ' label-today' : '');
         label.textContent = isToday ? 'Today' : shortLabel;
 
+        const dateLbl = document.createElement('span');
+        dateLbl.className = 'streak-dot-date';
+        dateLbl.textContent = dateSub;
+
         wrapper.appendChild(dot);
         wrapper.appendChild(label);
+        wrapper.appendChild(dateLbl);
         dotsContainer.appendChild(wrapper);
-    }
+    });
 }
 
 // ---------------------------------------------------------------

@@ -5096,6 +5096,13 @@ tr.drag-over td { background-color: #d1fae5 !important; border-top: 2px solid #1
 }
 .streak-dot-label.label-today { color: #10b981; }
 
+.streak-dot-date {
+    font-size: 0.55rem;
+    color: #b0b7c3;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
 /* --- "No goal set" empty state --- */
 .goal-empty-state {
     text-align: center;
@@ -5144,6 +5151,7 @@ body.dark-mode .streak-day-dot.dot-missed {
 }
 body.dark-mode .streak-dot-label { color: #6b7280 !important; }
 body.dark-mode .streak-dot-label.label-today { color: #34d399 !important; }
+body.dark-mode .streak-dot-date { color: #4b5563 !important; }
 body.dark-mode .streak-number { color: #fb923c !important; }
 body.dark-mode .streak-best-badge {
     background-color: #431407 !important;
