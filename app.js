@@ -4129,12 +4129,15 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                      await setDoc(weekDocRef, { days: [newDayData] });
                  }
 
-                 // 2. --- NEW: Update Global Cache Instantly ---
-                 if (activeWeeksDataCache && activeWeeksDataCache[weekId]) {
+                 // 2. --- Update Global Cache Instantly (including first day of a new week) ---
+                 if (activeWeeksDataCache) {
+                     if (!activeWeeksDataCache[weekId]) activeWeeksDataCache[weekId] = { days: [] };
                      if (!activeWeeksDataCache[weekId].days) activeWeeksDataCache[weekId].days = [];
                      activeWeeksDataCache[weekId].days.push(newDayData);
                      console.log("Global cache updated with new day.");
                  }
+                 // Refresh the streak/daily-goal widget so the new day's date is reflected immediately
+                 if (typeof checkAndUpdateStreak === 'function') checkAndUpdateStreak();
                  // --------------------------------------------
                  
                  console.log("New day added successfully.");
