@@ -5171,10 +5171,13 @@ body.dark-mode .streak-day-dot.dot-today { border-color: #34d399 !important; col
     cursor: pointer;
     transition: opacity 0.15s, color 0.15s;
     line-height: 1;
-    margin-left: 2px;
-    vertical-align: middle;
+    margin-left: 1px;
+    align-self: center;
+    flex-shrink: 0;
+    height: auto;
+    width: auto;
 }
-.timer-display-group:hover .timer-total-edit-btn,
+.row-timer-widget:hover .timer-total-edit-btn,
 .timer-total-edit-btn:focus {
     opacity: 1;
 }

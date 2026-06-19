@@ -1724,8 +1724,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             <div class="timer-display-group">
                                 <span class="timer-title">Total</span>
                                 <span class="timer-display timer-total" data-role="total">00:00:00</span>
-                                ${isVocabRow ? `<button class="icon-button timer-total-edit-btn" title="Edit total time" data-action="edit-total" tabindex="-1"><i class="fas fa-pencil-alt"></i></button>` : ''}
                             </div>
+                            ${isVocabRow ? `<button class="icon-button timer-total-edit-btn" title="Edit total time" data-action="edit-total" tabindex="-1"><i class="fas fa-pencil-alt"></i></button>` : ''}
                             <div class="timer-display-group">
                                 <span class="timer-title">Current</span>
                                 <span class="timer-display" data-role="session">00:00:00</span>
