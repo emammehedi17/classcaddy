@@ -18,6 +18,7 @@
         };
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId; // Use projectId as fallback app identifier if __app_id is missing
+        window._appId = appId;
 
         console.log("Using manually added Firebase config:", firebaseConfig); // Log that manual config is used
 
@@ -32,6 +33,11 @@
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
+            // Expose for module-level functions (e.g. saveGoal)
+            window._db = db;
+            window._auth = auth;
+            window._doc = doc;
+            window._setDoc = setDoc;
             
             // --- NEW: ENABLE OFFLINE PERSISTENCE ---
             enableIndexedDbPersistence(db)
@@ -9488,6 +9494,13 @@ function initSettingsSync(userId) {
             if (data.darkMode !== undefined) globalSettings.darkMode = data.darkMode;
             if (data.fontSize !== undefined) globalSettings.fontSize = data.fontSize;
             applySettingsToDom();
+            // Load saved daily goal from Firestore
+            if (data.dailyGoalHours !== undefined) {
+                saveGoalToStorage(data.dailyGoalHours); // cache locally for fast reads
+                const input = document.getElementById('goal-hours-input');
+                if (input) input.value = data.dailyGoalHours;
+                checkAndUpdateStreak();
+            }
         } else {
             setDoc(settingsRef, globalSettings, { merge: true });
         }
@@ -9725,7 +9738,7 @@ function saveStreakData(data) {
 
 function loadGoal() {
     const raw = localStorage.getItem(_goalKey());
-    return raw ? parseFloat(raw) : 2; // default 2 hours
+    return raw ? parseFloat(raw) : 5; // default 5 hours
 }
 
 function saveGoalToStorage(hours) {
@@ -9969,6 +9982,15 @@ function saveGoal() {
         return;
     }
     saveGoalToStorage(val);
+
+    // Persist to Firestore so it survives logout/device switch
+    const _db = window._db, _auth = window._auth, _appId = window._appId;
+    const _docFn = window._doc, _setDocFn = window._setDoc;
+    if (_auth && _auth.currentUser && _db && _appId && _docFn && _setDocFn) {
+        const settingsRef = _docFn(_db, `artifacts/${_appId}/users/${_auth.currentUser.uid}/settings`, 'preferences');
+        _setDocFn(settingsRef, { dailyGoalHours: val }, { merge: true })
+            .catch(e => console.error('Goal save to Firestore failed:', e));
+    }
 
     // Show "Saved!" message briefly
     const msg = document.getElementById('goal-saved-msg');
