@@ -5159,3 +5159,25 @@ body.dark-mode .streak-best-badge {
     border-color: #9a3412 !important;
 }
 body.dark-mode .streak-day-dot.dot-today { border-color: #34d399 !important; color: #34d399 !important; }
+
+/* Edit total time pencil button */
+.timer-total-edit-btn {
+    opacity: 0;
+    font-size: 0.6rem;
+    padding: 2px 4px;
+    color: #6366f1;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s, color 0.15s;
+    line-height: 1;
+    margin-left: 2px;
+    vertical-align: middle;
+}
+.timer-display-group:hover .timer-total-edit-btn,
+.timer-total-edit-btn:focus {
+    opacity: 1;
+}
+.timer-total-edit-btn:hover { color: #4f46e5; }
+body.dark-mode .timer-total-edit-btn { color: #818cf8; }
+body.dark-mode .timer-total-edit-btn:hover { color: #a5b4fc; }

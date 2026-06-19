@@ -1724,6 +1724,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             <div class="timer-display-group">
                                 <span class="timer-title">Total</span>
                                 <span class="timer-display timer-total" data-role="total">00:00:00</span>
+                                <button class="icon-button timer-total-edit-btn" title="Edit total time" data-action="edit-total" tabindex="-1"><i class="fas fa-pencil-alt"></i></button>
                             </div>
                             <div class="timer-display-group">
                                 <span class="timer-title">Current</span>
@@ -2023,6 +2024,14 @@ function updateMonthUI(monthId, monthData, weeksData) {
             const weekId = widget.dataset.weekId;
             const dayIndex = parseInt(widget.dataset.dayIndex);
             const rowIndex = widget.dataset.timerScope === 'row' ? parseInt(widget.dataset.rowIndex) : null;
+
+            if (action === 'edit-total') {
+                const totalEl = widget.querySelector('.timer-total[data-role="total"]');
+                if (totalEl) {
+                    enterTimerTotalEditMode(totalEl, widget);
+                }
+                return;
+            }
 
             updateTimerState(monthId, weekId, dayIndex, rowIndex, action);
         });
@@ -3187,7 +3196,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                  // Handle vocab row expand/collapse — click anywhere on the row (normal and edit mode)
                  const vocabRowEl = target.closest('tr[data-vocab-collapsed]');
-                 if (vocabRowEl && !button && !target.closest('input, textarea, select, .icon-button, .action-button, .delete-vocab-pair-btn, .add-vocab-pair-btn, .add-vocab-code-btn, .add-story-btn')) {
+                 if (vocabRowEl && !button && !target.closest('input, textarea, select, .icon-button, .action-button, .delete-vocab-pair-btn, .add-vocab-pair-btn, .add-vocab-code-btn, .add-story-btn, .timer-total-edit-btn, .timer-edit-wrap, .timer-edit-input')) {
                      e.preventDefault();
                      const expandable = vocabRowEl.querySelector('.vocab-expandable-content');
                      const hint = vocabRowEl.querySelector('.vocab-collapsed-hint');
