@@ -1466,13 +1466,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
              animateTrackers(monthDiv);
 
-             // Move the streak-goal-widget to sit right after the circular progress bars
-             const widgetEl = document.getElementById('streak-goal-widget');
-             const trackerContainer = monthDiv.querySelector('.progress-trackers-container');
-             if (widgetEl && trackerContainer && trackerContainer.parentNode) {
-                 trackerContainer.parentNode.insertBefore(widgetEl, trackerContainer.nextSibling);
-             }
-             
              setTimeout(tickAllTimers, 0);
              
              return monthDiv;
@@ -10008,19 +10001,6 @@ function initStreakGoalWidget() {
     // every second), so no separate setInterval is needed here.
     checkAndUpdateStreak();
 
-    // Ensure widget is visible and positioned after progress trackers.
-    // If the month card isn't rendered yet, retry after a short delay.
-    function positionWidget() {
-        const widgetEl = document.getElementById('streak-goal-widget');
-        const trackerContainer = document.querySelector('.progress-trackers-container');
-        if (widgetEl && trackerContainer && trackerContainer.parentNode) {
-            trackerContainer.parentNode.insertBefore(widgetEl, trackerContainer.nextSibling);
-        } else if (widgetEl) {
-            // Month card not rendered yet — retry once it is
-            setTimeout(positionWidget, 300);
-        }
-    }
-    positionWidget();
 }
 /* ============== END: STREAK TRACKER & DAILY GOAL WIDGET ============== */
 
