@@ -10048,10 +10048,10 @@ function initStreakGoalWidget() {
     if (skelDots) skelDots.style.display = 'flex';
     const skelBar = document.getElementById('goal-progress-skeleton');
     if (skelBar) skelBar.style.display = 'block';
+
     // Reset dot row so stale dots from previous account don't show
     const dotsRow = document.getElementById('streak-days-row');
     if (dotsRow) {
-        // Remove all children except the skeleton
         Array.from(dotsRow.children).forEach(child => {
             if (child.id !== 'streak-skeleton-dots') child.remove();
         });
@@ -10069,10 +10069,22 @@ function initStreakGoalWidget() {
     const input = document.getElementById('goal-hours-input');
     if (input) input.value = savedGoal;
 
-    // Run first check. After this, the widget stays live via the
-    // checkAndUpdateStreak() call hooked into tickAllTimers() (ticks
-    // every second), so no separate setInterval is needed here.
-    checkAndUpdateStreak();
+    // Poll until _weeksCache is populated (Firestore may be slow on first load).
+    // Once data arrives, render the widget. Max wait: 15s.
+    let attempts = 0;
+    const MAX_ATTEMPTS = 30; // 30 × 500ms = 15s
+    function tryRender() {
+        const cache = window._weeksCache;
+        const hasData = cache && typeof cache === 'object' && Object.keys(cache).length > 0 &&
+            Object.values(cache).some(w => w?.days && w.days.length > 0);
+        if (hasData || attempts >= MAX_ATTEMPTS) {
+            checkAndUpdateStreak();
+        } else {
+            attempts++;
+            setTimeout(tryRender, 500);
+        }
+    }
+    tryRender();
 }
 /* ============== END: STREAK TRACKER & DAILY GOAL WIDGET ============== */
 
