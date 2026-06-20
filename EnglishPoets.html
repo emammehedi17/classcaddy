@@ -45,18 +45,7 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             border: 2px solid #4F46E5;
         }
-        @media print {
-            body > * { display: none !important; }
-            #doc-iframe {
-                display: block !important;
-                position: fixed !important;
-                top: 0 !important; left: 0 !important;
-                width: 100vw !important;
-                height: 100vh !important;
-                border: none !important;
-                z-index: 99999 !important;
-            }
-        }
+
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-12">
@@ -343,14 +332,21 @@
             const rawName = urlParts[urlParts.length - 1];
             const pdfName = rawName ? rawName.replace(/\.html?$/i, '') : currentFileName;
 
-            // Temporarily rename this page's title so browser uses filename for PDF
+            const iframeWin = iframe.contentWindow;
+            if (!iframeWin) return;
+
+            // Set the parent page title — some browsers inherit this for the PDF filename
             const prevTitle = document.title;
             document.title = pdfName;
 
-            // Hide everything else via @media print CSS, then print
-            window.print();
+            // Set the iframe document title directly (works since it's same-origin local file)
+            try { iframeWin.document.title = pdfName; } catch(e) {}
 
-            // Restore original title after print dialog closes
+            // Print the iframe's own content window
+            iframeWin.focus();
+            iframeWin.print();
+
+            // Restore parent title
             document.title = prevTitle;
         }
 
