@@ -504,8 +504,11 @@
 
                 studyPlanContent.classList.remove('hidden');
                 loadStudyPlans();
-                // Re-init streak widget for the newly logged-in account
-                if (typeof initStreakGoalWidget === 'function') initStreakGoalWidget();
+                // Init streak widget — small delay lets loadStudyPlans() start its
+                // onSnapshot chain so the cache has a head-start before polling begins.
+                setTimeout(() => {
+                    if (typeof initStreakGoalWidget === 'function') initStreakGoalWidget();
+                }, 200);
             } else {
                 // --- CRITICAL FIX: CLEAR DATA CACHE ON LOGOUT ---
                 activeWeeksDataCache = {}; // Wipes the study plan data
@@ -10099,8 +10102,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Streak tracker & daily goal widget (see block above)
-    initStreakGoalWidget();
+    // Note: initStreakGoalWidget() is called from updateAuthUI() after login,
+    // not here — it requires auth context (userId, Firestore cache).
 });
 
 // Fallback: If DOM is already loaded (e.g. hot reload), attach immediately
