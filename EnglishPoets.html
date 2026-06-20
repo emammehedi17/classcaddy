@@ -90,6 +90,9 @@
                 <h2 id="modal-title" class="text-base font-bold truncate eng-text">Document Title</h2>
             </div>
             <div class="flex items-center gap-2">
+                <button onclick="downloadFile()" class="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded transition-colors" title="HTML ফাইল ডাউনলোড করুন">
+                    <i class="fas fa-download"></i>
+                </button>
                 <button onclick="printModal()" class="w-8 h-8 flex items-center justify-center hover:bg-slate-700 rounded transition-colors" title="প্রিন্ট করুন">
                     <i class="fas fa-print"></i>
                 </button>
@@ -278,10 +281,14 @@
         const iconBtn = document.getElementById('minimize-btn');
         let isMinimized = false;
         let currentZoom = 1;
+        let currentFile = '';
+        let currentFileName = '';
 
         function openModal(file, name) {
             titleEl.innerText = name + " - Notes";
             iframe.src = file;
+            currentFile = file;
+            currentFileName = name;
             currentZoom = 1;
             updateZoom();
             
@@ -324,6 +331,19 @@
                 iframeDoc.focus();
                 iframeDoc.print();
             }
+        }
+
+        function downloadFile() {
+            if (!currentFile) return;
+            const a = document.createElement('a');
+            a.href = currentFile;
+            // Extract filename from path or build from name
+            const urlParts = currentFile.split('/');
+            const rawName = urlParts[urlParts.length - 1];
+            a.download = rawName || (currentFileName + '.html');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
         function changeZoom(step) {
