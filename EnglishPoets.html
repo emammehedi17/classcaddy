@@ -326,10 +326,17 @@
         }
 
         function printModal() {
-            const iframeDoc = iframe.contentWindow;
-            if (iframeDoc) {
-                iframeDoc.focus();
-                iframeDoc.print();
+            const iframeWin = iframe.contentWindow;
+            if (iframeWin) {
+                // Set the iframe document title to the filename so the PDF is named correctly
+                const urlParts = currentFile.split('/');
+                const rawName = urlParts[urlParts.length - 1];
+                const pdfName = rawName ? rawName.replace(/\.html?$/i, '') : currentFileName;
+                try {
+                    iframeWin.document.title = pdfName;
+                } catch(e) {}
+                iframeWin.focus();
+                iframeWin.print();
             }
         }
 
