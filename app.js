@@ -9801,27 +9801,42 @@ function checkAndUpdateStreak() {
         ? hist[`${allPlanDays[allPlanDays.length-1].weekId}:${allPlanDays[allPlanDays.length-1].dayIndex}`]?.studied || 0
         : 0;
 
-    // Count consecutive streak from the last plan day backwards
+    // Count consecutive streak:
+    // - The last plan day is excluded UNLESS it has already met the goal.
+    //   (It gets a grace period — not meeting goal yet doesn't break streak.)
+    // - If a new day is added, the previously-last day becomes a regular day
+    //   and will break the streak if its goal wasn't met.
     let currentStreak = 0;
-    for (let i = allPlanDays.length - 1; i >= 0; i--) {
+    const lastIdx = allPlanDays.length - 1;
+    for (let i = lastIdx; i >= 0; i--) {
         const { weekId, dayIndex } = allPlanDays[i];
         const entry = hist[`${weekId}:${dayIndex}`];
+        const isLastDay = i === lastIdx;
         if (entry && entry.goalMet) {
+            // Goal met — always counts
             currentStreak++;
+        } else if (isLastDay) {
+            // Last day, goal not yet met — skip it (grace period), don't break streak
+            continue;
         } else {
-            break; // streak broken
+            // Past day that didn't meet goal — streak broken
+            break;
         }
     }
 
     // Recalculate best streak from scratch (scan all plan days for longest consecutive run)
+    // Same rule: last day only counts if goal met
     let bestStreak = 0;
     let runLength = 0;
     for (let i = 0; i < allPlanDays.length; i++) {
         const { weekId, dayIndex } = allPlanDays[i];
         const entry = hist[`${weekId}:${dayIndex}`];
+        const isLastPlanDay = i === allPlanDays.length - 1;
         if (entry && entry.goalMet) {
             runLength++;
             if (runLength > bestStreak) bestStreak = runLength;
+        } else if (isLastPlanDay) {
+            // Last day not yet met — don't reset the run (grace period)
         } else {
             runLength = 0;
         }
