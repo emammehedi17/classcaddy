@@ -5184,3 +5184,26 @@ body.dark-mode .streak-day-dot.dot-today { border-color: #34d399 !important; col
 .timer-total-edit-btn:hover { color: #4f46e5; }
 body.dark-mode .timer-total-edit-btn { color: #818cf8; }
 body.dark-mode .timer-total-edit-btn:hover { color: #a5b4fc; }
+
+/* ── Streak widget skeleton loaders ── */
+.streak-skeleton-dots {
+    display: flex;
+    gap: 18px;
+    align-items: flex-end;
+    padding: 4px 0;
+}
+.streak-skeleton-dot {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.goal-progress-skeleton {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    width: 60%;
+}
+#goal-progress-bar-track {
+    position: relative;
+}

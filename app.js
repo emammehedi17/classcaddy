@@ -9839,6 +9839,12 @@ function checkAndUpdateStreak() {
 // RENDER: update all DOM elements
 // ---------------------------------------------------------------
 function renderWidget(studiedMin, goalMin, streak, hist) {
+    // Hide skeleton loaders now that real data is ready
+    const skelDots = document.getElementById('streak-skeleton-dots');
+    if (skelDots) skelDots.style.display = 'none';
+    const skelBar = document.getElementById('goal-progress-skeleton');
+    if (skelBar) skelBar.style.display = 'none';
+
     // --- Streak number ---
     const numEl = document.getElementById('streak-number');
     const bestEl = document.getElementById('streak-best-badge');
@@ -10022,6 +10028,27 @@ window.saveGoal = saveGoal;
 // INIT — call this on page load
 // ---------------------------------------------------------------
 function initStreakGoalWidget() {
+    // Show skeleton while waiting for Firestore data
+    const skelDots = document.getElementById('streak-skeleton-dots');
+    if (skelDots) skelDots.style.display = 'flex';
+    const skelBar = document.getElementById('goal-progress-skeleton');
+    if (skelBar) skelBar.style.display = 'block';
+    // Reset dot row so stale dots from previous account don't show
+    const dotsRow = document.getElementById('streak-days-row');
+    if (dotsRow) {
+        // Remove all children except the skeleton
+        Array.from(dotsRow.children).forEach(child => {
+            if (child.id !== 'streak-skeleton-dots') child.remove();
+        });
+    }
+    // Reset streak numbers to 0 while loading
+    const numEl = document.getElementById('streak-number');
+    if (numEl) numEl.textContent = '0';
+    const bestEl = document.getElementById('streak-best-badge');
+    if (bestEl) bestEl.textContent = 'Best: 0';
+    const barEl = document.getElementById('goal-progress-bar');
+    if (barEl) barEl.style.width = '0%';
+
     // Restore saved goal into input
     const savedGoal = loadGoal();
     const input = document.getElementById('goal-hours-input');
@@ -10031,7 +10058,6 @@ function initStreakGoalWidget() {
     // checkAndUpdateStreak() call hooked into tickAllTimers() (ticks
     // every second), so no separate setInterval is needed here.
     checkAndUpdateStreak();
-
 }
 /* ============== END: STREAK TRACKER & DAILY GOAL WIDGET ============== */
 

@@ -210,14 +210,22 @@
                                 <span id="goal-of-text"> studied</span>
                             </span>
                         </div>
-                        <div class="goal-progress-bar-track">
+                        <div class="goal-progress-bar-track" id="goal-progress-bar-track">
                             <div class="goal-progress-bar-fill" id="goal-progress-bar" style="width: 0%"></div>
+                            <div class="skeleton goal-progress-skeleton" id="goal-progress-skeleton"></div>
                         </div>
                     </div>
 
                     <!-- 7-DAY DOT ROW -->
                     <div class="streak-days-row" id="streak-days-row">
-                        <!-- Populated by JS -->
+                        <!-- Skeleton placeholders shown while loading -->
+                        <div class="streak-skeleton-dots" id="streak-skeleton-dots">
+                            <div class="skeleton streak-skeleton-dot"></div>
+                            <div class="skeleton streak-skeleton-dot"></div>
+                            <div class="skeleton streak-skeleton-dot"></div>
+                            <div class="skeleton streak-skeleton-dot"></div>
+                            <div class="skeleton streak-skeleton-dot"></div>
+                        </div>
                     </div>
 
                 </div>
