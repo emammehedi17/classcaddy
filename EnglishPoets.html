@@ -331,31 +331,42 @@
             const rawName = urlParts[urlParts.length - 1];
             const pdfName = rawName ? rawName.replace(/\.html?$/i, '') : currentFileName;
 
+            // Build the base URL: directory containing the opened HTML file
+            const baseHref = currentFile.substring(0, currentFile.lastIndexOf('/') + 1);
+
             try {
-                // Fetch the HTML content so we can inject the correct title
                 const res = await fetch(currentFile);
                 let html = await res.text();
 
-                // Replace or inject <title> tag with the filename
+                // Inject <base href> so all relative paths (images, css, fonts) resolve correctly
+                if (/<base[^>]*>/i.test(html)) {
+                    html = html.replace(/<base[^>]*>/i, `<base href="${baseHref}">`);
+                } else {
+                    html = html.replace(/<head[^>]*>/i, `$&<base href="${baseHref}">`);
+                }
+
+                // Replace or inject <title> with the filename
                 if (/<title[^>]*>.*?<\/title>/i.test(html)) {
                     html = html.replace(/<title[^>]*>.*?<\/title>/i, `<title>${pdfName}</title>`);
                 } else {
                     html = html.replace(/<head[^>]*>/i, `$&<title>${pdfName}</title>`);
                 }
 
-                // Open a blob URL in a new window and trigger print
+                // Open as blob and print
                 const blob = new Blob([html], { type: 'text/html' });
                 const blobUrl = URL.createObjectURL(blob);
                 const printWin = window.open(blobUrl, '_blank');
                 if (printWin) {
                     printWin.onload = function () {
-                        printWin.focus();
-                        printWin.print();
-                        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                        // Wait a moment for images to fully load before printing
+                        setTimeout(() => {
+                            printWin.focus();
+                            printWin.print();
+                            setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+                        }, 800);
                     };
                 }
             } catch (e) {
-                // Fallback: just print the iframe directly
                 const iframeWin = iframe.contentWindow;
                 if (iframeWin) { iframeWin.focus(); iframeWin.print(); }
             }
