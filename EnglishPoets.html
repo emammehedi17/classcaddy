@@ -45,6 +45,18 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             border: 2px solid #4F46E5;
         }
+        @media print {
+            body > * { display: none !important; }
+            #doc-iframe {
+                display: block !important;
+                position: fixed !important;
+                top: 0 !important; left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                border: none !important;
+                z-index: 99999 !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-12">
@@ -325,51 +337,21 @@
             }
         }
 
-        async function printModal() {
+        function printModal() {
             if (!currentFile) return;
             const urlParts = currentFile.split('/');
             const rawName = urlParts[urlParts.length - 1];
             const pdfName = rawName ? rawName.replace(/\.html?$/i, '') : currentFileName;
 
-            // Build the base URL: directory containing the opened HTML file
-            const baseHref = currentFile.substring(0, currentFile.lastIndexOf('/') + 1);
+            // Temporarily rename this page's title so browser uses filename for PDF
+            const prevTitle = document.title;
+            document.title = pdfName;
 
-            try {
-                const res = await fetch(currentFile);
-                let html = await res.text();
+            // Hide everything else via @media print CSS, then print
+            window.print();
 
-                // Inject <base href> so all relative paths (images, css, fonts) resolve correctly
-                if (/<base[^>]*>/i.test(html)) {
-                    html = html.replace(/<base[^>]*>/i, `<base href="${baseHref}">`);
-                } else {
-                    html = html.replace(/<head[^>]*>/i, `$&<base href="${baseHref}">`);
-                }
-
-                // Replace or inject <title> with the filename
-                if (/<title[^>]*>.*?<\/title>/i.test(html)) {
-                    html = html.replace(/<title[^>]*>.*?<\/title>/i, `<title>${pdfName}</title>`);
-                } else {
-                    html = html.replace(/<head[^>]*>/i, `$&<title>${pdfName}</title>`);
-                }
-
-                // Open as blob and print
-                const blob = new Blob([html], { type: 'text/html' });
-                const blobUrl = URL.createObjectURL(blob);
-                const printWin = window.open(blobUrl, '_blank');
-                if (printWin) {
-                    printWin.onload = function () {
-                        // Wait a moment for images to fully load before printing
-                        setTimeout(() => {
-                            printWin.focus();
-                            printWin.print();
-                            setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
-                        }, 800);
-                    };
-                }
-            } catch (e) {
-                const iframeWin = iframe.contentWindow;
-                if (iframeWin) { iframeWin.focus(); iframeWin.print(); }
-            }
+            // Restore original title after print dialog closes
+            document.title = prevTitle;
         }
 
         function downloadFile() {
