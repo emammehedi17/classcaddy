@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICT পেরিফেরাল ডিভাইস - ইমাম মেহেদি</title>
+    
+    <!-- Google Fonts: Hind Siliguri for text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* CSS Variables for Deep Violet & Teal Theme */
+        :root {
+            --primary-color: #312e81;      /* Indigo 900 */
+            --secondary-color: #0d9488;    /* Teal 600 */
+            --accent-highlight: #fef08a;   /* Yellow 200 */
+            --bg-color: #f8fafc;           /* Slate 50 */
+            --card-bg: #ffffff;            /* White */
+            --text-main: #000000;          /* Strict Full Black */
+            --text-heading: #1e1b4b;       /* Deepest Indigo */
+            --border-color: #ccfbf1;       /* Teal 100 */
+        }
+
+        @font-face {
+            font-family: 'BanglaNumbers';
+            src: local('Kalpurush'), local('Siyam Rupali'), local('Arial');
+            unicode-range: U+09E6-U+09EF, U+0030-U+0039;
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
+        }
+
+        strong, b {
+            font-family: 'Hind Siliguri', sans-serif;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        .note-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4338ca 100%);
+            color: white;
+            padding: 45px 35px;
+            border-radius: 16px;
+            margin-bottom: 35px;
+            position: relative;
+            box-shadow: 0 12px 30px rgba(49, 46, 129, 0.2);
+            overflow: hidden;
+        }
+
+        .note-header::before {
+            content: "\f2db"; /* Microchip icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: -30px;
+            right: -20px;
+            font-size: 180px;
+            color: rgba(255, 255, 255, 0.05);
+            transform: rotate(-10deg);
+        }
+
+        .chapter-tag {
+            background-color: var(--accent-highlight);
+            color: #451a03;
+            padding: 6px 18px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin: 0 0 10px 0;
+            line-height: 1.3;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: white;
+        }
+
+        .header-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 25px;
+        }
+
+        .qr-corner img {
+            width: 65px;
+            height: 65px;
+            border-radius: 10px;
+            border: 3px solid white;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .qr-corner img:hover {
+            transform: scale(1.1);
+        }
+
+        /* Titles and General Components */
+        .section-title {
+            color: var(--text-heading);
+            font-size: 1.9rem;
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-top: 45px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.04);
+            border-top: 5px solid var(--secondary-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.08);
+        }
+
+        .card-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .card-badge {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--border-color);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: #fff;
+            flex-shrink: 0;
+        }
+
+        .info-card h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .info-list li {
+            position: relative;
+            padding-left: 28px;
+            margin-bottom: 14px;
+            color: var(--text-main);
+            line-height: 1.7;
+        }
+
+        .info-list li::before {
+            content: "\f0da"; /* Play arrow icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+        }
+
+        .alert-box {
+            background-color: #f0fdfa; 
+            border-left: 6px solid #0d9488; 
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .alert-title {
+            color: #0f766e;
+            font-weight: bold;
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .correction-box {
+            background-color: #fff1f2;
+            border-left: 6px solid #e11d48;
+            padding: 22px;
+            border-radius: 8px;
+            margin: 30px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .correction-title {
+            color: #be123c;
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Tables */
+        .custom-table-wrapper {
+            overflow-x: auto;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 35px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        th, td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            vertical-align: top;
+            line-height: 1.6;
+        }
+
+        tbody tr:hover {
+            background-color: #f0fdfa; 
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* MCQ Styles */
+        .mcq-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+        
+        .mcq-item {
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .mcq-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .mcq-question {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.15rem;
+        }
+        
+        .mcq-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .mcq-options div {
+            background: #f8fafc;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 1.05rem;
+            transition: all 0.2s;
+        }
+
+        .mcq-options div:hover {
+            background: #ccfbf1;
+            border-color: #5eead4;
+        }
+        
+        .mcq-answer {
+            background-color: #dcfce7;
+            padding: 8px 18px;
+            border-radius: 6px;
+            display: inline-block;
+            font-weight: bold;
+            color: #166534;
+            font-size: 1.05rem;
+            border-left: 4px solid #22c55e;
+            margin-top: 10px;
+        }
+
+        /* Footer */
+        .master-footer {
+            background: #f0fdfa;
+            padding: 35px;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: 60px;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #ccfbf1;
+        }
+
+        .footer-creator-wrapper {
+            margin: 20px 0;
+        }
+
+        .master-footer .qr-corner {
+            position: absolute;
+            bottom: 25px;
+            right: 35px;
+        }
+
+        @media (max-width: 768px) {
+            .header-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .master-footer .qr-corner {
+                position: static;
+                display: block;
+                margin-top: 20px;
+            }
+            .mcq-options {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .number-kalpurush {
+            font-family: 'BanglaNumbers', sans-serif;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header Section -->
+    <header class="note-header">
+        <span class="chapter-tag"><i class="fas fa-desktop"></i> তথ্য ও যোগাযোগ প্রযুক্তি (ICT)</span>
+        <h1>কম্পিউটার পেরিফেরালস</h1>
+        <p style="font-size: 1.15rem; opacity: 0.95; margin: 0; font-weight: 500;">ইনপুট-আউটপুট ডিভাইস, কি-বোর্ড, স্ক্যানার ও বিগত সালের সকল প্রশ্নের বিস্তৃত মাস্টার নোট</p>
+        
+        <div class="header-meta">
+            <!-- Creator Badge -->
+            <div class="creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-highlight); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: #451a03;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: #451a03; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+            
+            <!-- QR Code -->
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile">
+            </a>
+        </div>
+    </header>
+
+    <!-- Dynamic Containers -->
+    <h2 class="section-title"><i class="fas fa-plug"></i> ১. কম্পিউটার পেরিফেরালস (Computer Peripherals)</h2>
+    <div id="peripherals-intro-cards" class="card-grid"></div>
+    <div id="input-devices-table"></div>
+    <div id="io-devices-cards" class="card-grid"></div>
+
+    <h2 class="section-title"><i class="fas fa-keyboard"></i> ২. কী-বোর্ড (Keyboard) ও এর বিস্তারিত ব্যবহার</h2>
+    <div id="keyboard-intro-cards" class="card-grid"></div>
+    <h3 style="color: var(--text-heading); margin-bottom: 15px;"><i class="fas fa-th"></i> কী-বোর্ডের প্রকারভেদ ও বাটন পরিচিতি</h3>
+    <div id="keyboard-types-table"></div>
+    <h3 style="color: var(--text-heading); margin-bottom: 15px;"><i class="fas fa-cogs"></i> ফাংশন কী (F1 থেকে F12) এর বিস্তারিত ব্যবহার</h3>
+    <div id="function-keys-table"></div>
+    <h3 style="color: var(--text-heading); margin-bottom: 15px;"><i class="fas fa-wrench"></i> অন্যান্য গুরুত্বপূর্ণ কী-সমূহের ব্যবহার</h3>
+    <div id="special-keys-table"></div>
+    
+    <div id="bangla-fonts-cards" class="card-grid"></div>
+
+    <h2 class="section-title"><i class="fas fa-mouse"></i> ৩. মাউস, ডিজিটাইজার ও সেন্সর</h2>
+    <div id="mouse-digitizer-cards" class="card-grid"></div>
+
+    <h2 class="section-title"><i class="fas fa-print"></i> ৪. OMR, OCR, MICR এবং স্ক্যানার</h2>
+    <div id="scanner-intro-cards" class="card-grid"></div>
+    <h3 style="color: var(--text-heading); margin-bottom: 15px;"><i class="fas fa-balance-scale"></i> একনজরে OMR, OCR এবং MICR এর পার্থক্য</h3>
+    <div id="omr-ocr-micr-table"></div>
+    
+    <h2 class="section-title"><i class="fas fa-barcode"></i> ৫. বারকোড রিডার, লাইট পেন ও জয়স্টিক</h2>
+    <div id="other-input-cards" class="card-grid"></div>
+    
+    <div id="confusion-box"></div>
+
+    <h2 class="section-title"><i class="fas fa-pen-alt"></i> ৬. বিগত বিসিএস লিখিত পরীক্ষার প্রশ্নাবলি</h2>
+    <div style="background-color: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid var(--border-color); margin-bottom: 35px;">
+        <ol id="written-q-list" style="color: var(--text-heading); font-weight: 500; line-height: 1.8; margin-top: 0;"></ol>
+    </div>
+
+    <h2 class="section-title"><i class="fas fa-question-circle"></i> ৭. বিগত সালের প্রশ্নাবলি (MCQ) - বিশাল সংগ্রহ</h2>
+    <div id="mcq-container" class="mcq-container"></div>
+
+    <!-- Footer Section -->
+    <footer class="master-footer">
+        <p style="margin-bottom: 5px; color: #0f766e; font-weight: 500;">এই নোটটি বিসিএস (BCS) ও অন্যান্য নিয়োগ পরীক্ষার প্রস্তুতির জন্য বিশেষভাবে তৈরি করা হয়েছে। নোট তৈরির তারিখ: ২০ জুন, ২০২৬</p>
+        
+        <div class="footer-creator-wrapper">
+            <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+            </div>
+        </div>
+
+        <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
+            <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile">
+        </a>
+    </footer>
+
+</div>
+
+<!-- JavaScript Data and Rendering Logic -->
+<script>
+    // --- DATA STRUCTURES ---
+    const peripheralsIntroCards = [
+        {
+            title: "কম্পিউটার পেরিফেরালস কী?", icon: "fas fa-plug",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Computer_motherboard.jpg/320px-Computer_motherboard.jpg",
+            text: "নির্দিষ্ট কাজের জন্য কম্পিউটারের সিস্টেমে সংযুক্ত অতিরিক্ত ডিভাইসসমূহকে কম্পিউটার পেরিফেরালস বলে। কম্পিউটার পেরিফেরালস হার্ডওয়্যারের অংশ, কিন্তু হার্ডওয়্যার পেরিফেরালসের অংশ নয়। মাইক্রোপ্রসেসর, মাদারবোর্ড, পাওয়ার সাপ্লাই ইউনিট সিস্টেম ইউনিটের অংশ কিন্তু পেরিফেরালস নয়। পেরিফেরালস ৩ প্রকার: ১. ইনপুট ডিভাইস, ২. আউটপুট ডিভাইস, ৩. মেমোরি ডিভাইস।"
+        },
+        {
+            title: "ইনপুট ডিভাইস (Input Device)", icon: "fas fa-sign-in-alt",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Computer_keyboard_with_the_QWERTY_layout.jpg/320px-Computer_keyboard_with_the_QWERTY_layout.jpg",
+            text: "যেসব ডিভাইস ব্যবহার করে কম্পিউটারকে ডেটা প্রদান ও প্রক্রিয়াকরণের জন্য নির্দেশ দেওয়া হয়, তাদের ইনপুট ডিভাইস বলে। অপটিক্যাল ইনপুট ডিভাইসসমূহ স্ক্যানিংয়ের মাধ্যমে কাজ শুরু করে এবং ইনপুট হিসেবে আলো (Light) গ্রহণ করে। মোবাইল ফোনের ইনপুট ডিভাইস: কি-প্যাড, টাচস্ক্রিন, ক্যামেরা ইত্যাদি।"
+        }
+    ];
+
+    const inputDevicesTable = {
+        headers: ["ক্ষেত্রসমূহ", "ইনপুট ডিভাইসসমূহ"],
+        rows: [
+            ["<strong>১. পয়েন্টং এবং টাইপিং ডিভাইস</strong>", "কী-বোর্ড (Keyboard)"],
+            ["<strong>২. পয়েন্টিং ডিভাইস</strong>", "মাউস, Touch Pad, জয়স্টিক, ডিজিটাইজার, লাইট পেন"],
+            ["<strong>৩. স্ক্যানিং ডিভাইস (অপটিক্যাল)</strong>", "OMR, OCR, MICR, Scanner, Barcode Reader"],
+            ["<strong>৪. সেন্সর ডিভাইস</strong>", "সেন্সর"],
+            ["<strong>৫. অডিও ডিভাইস</strong>", "মাইক্রোফোন"],
+            ["<strong>৬. অডিও ভিডিও ডিভাইস</strong>", "ওয়েবক্যাম (ভিডিও কল করতে ব্যবহার করা হয়)"]
+        ]
+    };
+
+    const ioDevicesCards = [
+        {
+            title: "আউটপুট ডিভাইস (Output Device)", icon: "fas fa-sign-out-alt",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/HP_LaserJet_1020.jpg/320px-HP_LaserJet_1020.jpg",
+            list: [
+                "যে সকল ডিভাইসে ইনপুট ডেটা প্রসেসিং হওয়ার পর, আউটপুট প্রদান করে সেই সকল ডিভাইসকে আউটপুট ডিভাইস বলে।",
+                "<strong>উদাহরণ:</strong> মনিটর, প্লটার, প্রিন্টার, ফিল্ম রেকর্ডার, মাইক্রো ফিশ, ইমেজ সেটার, প্রজেক্টর, হেডফোন, স্পিকার ইত্যাদি।"
+            ]
+        },
+        {
+            title: "ইনপুট-আউটপুট (উভয়) ডিভাইস", icon: "fas fa-exchange-alt",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/IPhone_5s_golden.jpg/320px-IPhone_5s_golden.jpg",
+            list: [
+                "মানুষের ভাষায় উপস্থাপিত তথ্য সংগ্রহ করে কম্পিউটারের ভাষাকে প্রক্রিয়াধীন করে পুনরায় মানুষের ভাষায় উপস্থাপন করার জন্যে যে সকল ডিভাইস ব্যবহার করা হয় তাদেরকে ইনপুট-আউটপুট ডিভাইস বলে।",
+                "<strong>উদাহরণ:</strong> Modem, Touchscreen, Digital Camera, Sound Card, Network Card, Video Cassette Recorder (VCR), Tape Recorder, Punch Card, Fax.",
+                "টাচস্ক্রিন একটি ইনপুট-আউটপুট পয়েন্টিং ডিভাইস।"
+            ]
+        }
+    ];
+
+    const keyboardIntroCards = [
+        {
+            title: "কী-বোর্ডের পরিচিতি", icon: "fas fa-keyboard",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Computer_keyboard_with_the_QWERTY_layout.jpg/320px-Computer_keyboard_with_the_QWERTY_layout.jpg",
+            list: [
+                "অপর নাম: কন্ট্রোল বোর্ড/কনসোল (Console)। এটি সবচেয়ে ধীরগতির ইনপুট ব্যবস্থা।",
+                "আদর্শ কী-বোর্ডের সর্বোচ্চ কী (KEY) সংখ্যা ১০৫টি (আমেরিকান স্ট্যান্ডার্ডে - ১০১টি; উইন্ডোজ কম্পিউটারের - ১০৪টি)।",
+                "কী-বোর্ডের প্রত্যেকটি KEY এক একটি বৈদ্যুতিক সুইচ এবং প্রত্যেকটি সুইচের সঙ্গে একটি করে এনকোডার যুক্ত থাকে।",
+                "কী-বোর্ড ডিজিটাল বৈদ্যুতিক সংকেত (0 বা 1) উৎপন্ন করে মনিটরের মাধ্যমে আউটপুট প্রদর্শন করে।"
+            ]
+        },
+        {
+            title: "কী-বোর্ড বিন্যাস (Layout)", icon: "fas fa-font",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Logitech_K330_keyboard.jpg/320px-Logitech_K330_keyboard.jpg",
+            list: [
+                "কী-বোর্ডের বামপ্রান্তের উপরের প্রথম ৬টি বর্ণের ক্রমের আলোকে কী-বোর্ড লে-আউট নামকরণ করা হয়। যেমন: AZERTY, QWERTY, QWERTZ, DVORAK, JCUKEN ইত্যাদি।",
+                "<strong>QWERTY:</strong> আদর্শ/সাধারণ কী-বোর্ড বিন্যাস। এর আবিষ্কারক: ক্রিস্টোফার লাথাম সোলস (যুক্তরাষ্ট্র)।"
+            ]
+        }
+    ];
+
+    const keyboardTypesTable = {
+        headers: ["KEY এর ধরন", "সংখ্যা", "বিস্তারিত তথ্যপ্রবাহ"],
+        rows: [
+            ["<strong>ফাংশন KEY</strong>", "১২টি", "বিশেষ কাজ সম্পাদনের জন্য কী-বোর্ডের উপরের বামদিকে সন্নিবেশিত কীগুলো (F1 থেকে F12)।"],
+            ["<strong>আলফাবেটিক/আলফানিউমেরিক</strong>", "৩৬টি", "অক্ষর A-Z এবং অঙ্কবাচক (০-৯)। কোনো টেক্সট লিখতে বা টাইপিং করতে ব্যবহার করা হয়।"],
+            ["<strong>অ্যারো KEY</strong>", "৪টি", "অপর নাম: Edit Key/Arrow Key/Cursor Movement Key। কার্সরকে ডানে, বামে, উপরে এবং নিচে সরাতে ব্যবহৃত হয়।"],
+            ["<strong>নিউমেরিক KEY</strong>", "১৭টি", "অপর নাম: Logical KEY। ডানদিকে থাকে। অঙ্কবাচক ১০টি, অ্যারিথমেটিক ৪টি, লজিক্যাল ৩টি।"],
+            ["<strong>মডিফায়ার KEY</strong>", "-", "কী-বোর্ডের অক্ষর টাইপ বা বিশেষ কাজের জন্য যে কী-এর সাহায্য নেওয়া হয় (যেমন: Shift, Ctrl, Alt, Option, Command)।"]
+        ]
+    };
+
+    const functionKeysTable = {
+        headers: ["কী (Key)", "ব্যবহারসমূহ"],
+        rows: [
+            ["<strong>F1</strong>", "প্রোগ্রামের 'হেল্প-Help' মেনু হিসেবে ব্যবহৃত হয়। 'সহায়তাকারী কী' বলা হয়।"],
+            ["<strong>F2</strong>", "ফাইল বা ফোল্ডারের নাম বদলের (Rename) জন্য ব্যবহৃত হয়। MS Word-এ নতুন ফাইল Open করা হয় (Alt+Ctrl+F2) এবং প্রিন্ট প্রিভিউ দেখা যায় (Ctrl+F2)।"],
+            ["<strong>F3</strong>", "প্রোগ্রামে কোনো কিছু খুঁজে (Find) পেতে ব্যবহার করা হয়। Shift+F3 চেপে lowercase, UPPERCASE পরিবর্তন করা হয়।"],
+            ["<strong>F4</strong>", "Running প্রোগ্রাম বন্ধ করা হয় Alt+F4 প্রেস করে (Exit Key)। Running সব উইন্ডো বন্ধ করা হয় Ctrl+F4 প্রেস করে।"],
+            ["<strong>F5</strong>", "মাইক্রোসফট উইন্ডোজ, ইন্টারনেট ব্রাউজারের চলমান লিংকটি Refresh করা হয়। পাওয়ার পয়েন্টের Slide Show শুরু বা বন্ধ করা যায়।"],
+            ["<strong>F6</strong>", "কার্সরকে ওয়েব ব্রাউজারের address bar-এ নিয়ে যায়। খোলা অন্য ডকুমেন্ট সক্রিয় করা যায় (Ctrl+Shift+F6)।"],
+            ["<strong>F7</strong>", "বানান ও ব্যাকরণগত (Spelling & Grammar) ত্রুটি নির্ণয় করা যায়। Shift + F7 চেপে অভিধান (Thesaurus) চালু করা যায়।"],
+            ["<strong>F8</strong>", "প্রেস করলে Entire Document নির্বাচিত করা হয়। ২ বার প্রেস করলে Word, ৩ বার প্রেস করলে Sentence সিলেক্ট হয়।"],
+            ["<strong>F9</strong>", "নতুনভাবে অপারেটিং সিস্টেম Booting করার সময় এবং কোয়ার্ক এক্সপ্রেস ৫.০-এর মেজারমেন্ট টুলবার খুলতে ব্যবহৃত হয়।"],
+            ["<strong>F10</strong>", "ওয়েব ব্রাউজার বা উইন্ডোর Menu Bar নির্বাচন করা হয়। Shift+F10 মাউসের ডান বাটনের alternative হিসেবে কাজ করে।"],
+            ["<strong>F11</strong>", "ওয়েব ব্রাউজার পর্দাজুড়ে (ফুলস্ক্রিন) দেখা যায় এবং পুনরায় পূর্বের অবস্থায় যাওয়া যায়।"],
+            ["<strong>F12</strong>", "Save as উইন্ডো খোলা হয়। Ctrl + F12 দিয়ে Open dialogue box খোলা হয়। Shift+F12 দিয়ে ফাইল সেভ করা হয়। Ctrl+Shift+F12 দিয়ে প্রিন্ট করা হয়।"]
+        ]
+    };
+
+    const specialKeysTable = {
+        headers: ["কী (Key)", "ব্যবহারসমূহ"],
+        rows: [
+            ["<strong>Esc (Escape)</strong>", "কোনো নির্দেশ বাতিল করতে ব্যবহার করা হয়।"],
+            ["<strong>Tab</strong>", "একটি নির্দিষ্ট দূরত্বে (৫ ক্যারেক্টার দূরত্বে) কার্সরকে স্থানান্তর করার জন্য ব্যবহৃত হয়।"],
+            ["<strong>Caps Lock ও Shift</strong>", "Shift কী প্রেস করলে পরবর্তী একটি অক্ষর ছোট/বড় হাতের অক্ষরে পরিবর্তন হয়, কিন্তু Caps Lock প্রেস করলে পরবর্তী সকল অক্ষর পরিবর্তিত হয়।"],
+            ["<strong>Enter</strong>", "প্রোগ্রামের পরবর্তী নির্দেশনা কার্যকর করতে, নতুন প্যারা তৈরি করতে ব্যবহৃত হয়।"],
+            ["<strong>Print Screen</strong>", "কম্পিউটারের মনিটরের Screenshot নিতে ব্যবহার করা হয়।"],
+            ["<strong>Home & End</strong>", "Home দিয়ে কার্সর পাতার প্রথমে এবং End দিয়ে কার্সর পাতার শেষে আনা হয়।"],
+            ["<strong>Insert</strong>", "লেখার মাঝে কিছু লিখলে ওভাররাইটিং হয়। কাজ শেষে আবার চাপলে পূর্বের অবস্থায় ফেরে।"],
+            ["<strong>Backspace & Delete</strong>", "Backspace পিছনের (বামের) অংশ এবং Delete সামনের (ডানের) অংশ মুছে ফেলতে ব্যবহৃত হয়।"]
+        ]
+    };
+
+    const banglaFontsCards = [
+        {
+            title: "বাংলা কী-বোর্ড সফটওয়্যার ও ফন্ট", icon: "fas fa-language",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Bangla_Keyboard.jpg/320px-Bangla_Keyboard.jpg",
+            list: [
+                "<strong>মুনীর কীবোর্ড (১৯৬৫):</strong> প্রথম বিজ্ঞানসম্মত বাংলা টাইপরাইটার কীবোর্ড। আবিষ্কারক মুনীর চৌধুরী।",
+                "<strong>বিজয় কী-বোর্ড (১৯৮৮):</strong> ফনেটিক সমর্থিত। আবিষ্কারক মোস্তফা জব্বার। বিজয় লে-আউটে যেতে Ctrl+Alt+B এবং ইউনিকোডে যেতে Ctrl+Alt+V চাপতে হয়।",
+                "<strong>অভ্র কী-বোর্ড (২০০৩):</strong> ফনেটিক (উচ্চারণভিত্তিক) টাইপিং। আবিষ্কারক ডা. মেহেদি হাসান।",
+                "<strong>Eye Sight (আই সাইট):</strong> দৃষ্টিহীনদের জন্য আবিষ্কৃত প্রথম বাংলা সফটওয়্যার।",
+                "<strong>বাংলা সাধারণ ফন্ট:</strong> SutonnyMJ, আদর্শলিপি, সুলেখা, একুশে, সুশ্রী, লেখনি, মধুমতি।",
+                "<strong>বাংলা ইউনিকোড ফন্ট:</strong> আমার বর্ণমালা (সরকারি উদ্যোগে তৈরি), সিয়াম রুপালি, সোলেমানলিপি, নিকোশ, এরিয়েল।"
+            ]
+        },
+        {
+            title: "মাল্টিমিডিয়া কী-বোর্ড", icon: "fas fa-play-circle",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Logitech_K330_keyboard.jpg/320px-Logitech_K330_keyboard.jpg",
+            list: [
+                "মাল্টিমিডিয়া কী-বোর্ডে অতিরিক্ত কিছু কী থাকে যার সাহায্যে মিউজিক প্লেয়ার চালু করা, ভলিউম কমানো-বাড়ানো, ওয়েব ব্রাউজার চালু করা যায়।",
+                "<strong>Stand by Mood:</strong> কম্পিউটার চালু থাকবে কিন্তু মনিটর বন্ধ হয়ে যাবে।",
+                "<strong>Mail key:</strong> ইন্টারনেট চালু অবস্থায় এই কী প্রেস করে 'আউটলুক এক্সপ্রেস' চালু করে মেইল পাঠানো যায়।",
+                "<strong>Web key:</strong> সরাসরি ওয়েব ব্রাউজার ওপেন করা যায় এবং ইন্টারনেট ব্রাউজ করা যায়।",
+                "<strong>Start Menu key:</strong> স্টার্ট মেনু ওপেন করা যায় এবং প্রয়োজনীয় কমান্ড করা যায়।"
+            ]
+        }
+    ];
+
+    const mouseDigitizerCards = [
+        {
+            title: "মাউস (Mouse)", icon: "fas fa-mouse",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/3-Tasten-Maus_Microsoft.jpg/320px-3-Tasten-Maus_Microsoft.jpg",
+            list: [
+                "আকার ইঁদুর (Mouse)-এর মতো তাই এর নাম 'মাউস' রাখা হয়। এটি আবিষ্কার করেন ডগলাস এঞ্জেলবার্ট (১৯৬৪ সালে)।",
+                "সর্বপ্রথম মাউস ব্যবহৃত হয় ১৯৮৪ সালে (অ্যাপলের 'মেকিন্টোস' কম্পিউটারে)।",
+                "মাইক্রোসফট মাউসে ৩টি (Right, Left ও Scroll-bar) বাটন থাকে। মাউস ২ প্রকার: ক. মেকানিক্যাল খ. অপটিক্যাল মাউস।",
+                "<strong>কার্সর:</strong> মাউসের নড়াচড়ায় মনিটরে প্রদর্শিত তীর বা হাতের মতো চিহ্ন।",
+                "<strong>ক্লিক:</strong> সিঙ্গেল ক্লিক (সিলেক্ট করতে), ডাবল ক্লিক (কোনো বিষয়ে ঢুকতে), রাইট ক্লিক (নির্দেশ তালিকা বা মেনু ওপেন করতে)।"
+            ]
+        },
+        {
+            title: "ডিজিটাইজার ও সেন্সর", icon: "fas fa-tablet-alt",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Wacom_Intuos3_A5.jpg/320px-Wacom_Intuos3_A5.jpg",
+            list: [
+                "<strong>ডিজিটাইজার:</strong> ড্রয়িং, ম্যাপিং, এনিমেশন, গ্রাফিক্সকে কম্পিউটারে সংরক্ষণের জন্য ডিজিটাল ফর্মে কনভার্ট করে। এর অপর নাম ড্রয়িং ট্যাবলেট বা ডিজিটাল আর্ট বোর্ড। একটি স্টাইলাশের (Stylus) সাহায্যে ডিজিটাইজার বোর্ডে যা আঁকা হয় তাই মনিটরে ভেসে ওঠে।",
+                "<strong>সেন্সর (Sensor):</strong> এক ধরনের কনভার্টার যা কোনো সংকেতকে শনাক্ত করে ডিজিটাল সিগন্যালে পরিণত করে। ഫিজিক্যাল প্যারামিটারকে (তাপ, শব্দ, আলো) সিগন্যালে কনভার্ট করে। ২ প্রকার: Analog Sensor (পিটি-১০০) এবং Digital Sensor (PNP, NPN)।"
+            ]
+        }
+    ];
+
+    const scannerIntroCards = [
+        {
+            title: "স্ক্যানার (Scanner)", icon: "fas fa-print",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Epson_Perfection_V33_Scanner_-_Lid_opened.jpg/320px-Epson_Perfection_V33_Scanner_-_Lid_opened.jpg",
+            text: "স্ক্যানার একটি অল্প সেনসিটিভ (Light Sensitive) ইনপুট ডিভাইস, যা লেখা, ছবি বা অবজেক্ট স্ক্যান করে ডিজিটাল ইমেজে কনভার্ট করে। ফ্লাট বেড স্ক্যানার (ফটোকপি মেশিনের মতো), হ্যান্ডহেল্ড স্ক্যানার (বারকোড রিডারের মতো) এবং ড্রাম স্ক্যানার (পেশাদারি মুদ্রণে) ইত্যাদি প্রকারের স্ক্যানার রয়েছে।"
+        },
+        {
+            title: "OMR, OCR, MICR এর সংক্ষিপ্ত পরিচয়", icon: "fas fa-search",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/OMR_form.jpg/320px-OMR_form.jpg",
+            list: [
+                "<strong>OMR:</strong> Optical Mark Reader. পেন্সিলের সীসার উপাদান গ্রাফাইটের উপস্থিতিতে অপটিক্যাল বিম দ্বারা উত্তরপত্র স্ক্যান করে। প্রথম ব্যবহার ১৯৯৪ সালে।",
+                "<strong>OCR:</strong> Optical Character Reader. হাতের লেখা বা প্রিন্ট করা লেখাকে পড়ে মেশিন এনকোডেড টেক্সটে রূপান্তর করে। সর্বোচ্চ ২৪০০ ক্যারেক্টার পড়া যায়।",
+                "<strong>MICR:</strong> Magnetic Ink Character Reader. ফেরোসোফেরিক অক্সাইডযুক্ত কালিতে লেখা কাগজ শক্তিশালী চৌম্বকক্ষেত্রে রেখে পাঠ করে।"
+            ]
+        }
+    ];
+
+    const omrOcrMicrTable = {
+        headers: ["বিষয়বস্তু", "OMR", "OCR", "MICR"],
+        rows: [
+            ["<strong>শনাক্তকরণ</strong>", "কালির দাগের আলোর প্রতিফলন বিচার করে।", "বিভিন্ন বর্ণ, চিহ্ন ও সংখ্যা শনাক্তকরণসহ কালি/পেন্সিলের দাগ বুঝতে পারে।", "চৌম্বক ইংকের (ফেরোসোফেরিক অক্সাইডযুক্ত কালি) লেখা বুঝতে পারে।"],
+            ["<strong>কৌশল</strong>", "তুলনামূলকভাবে সহজ।", "জটিল।", "OCR-এর তুলনায় সহজ।"],
+            ["<strong>বর্ণ</strong>", "কোনো বর্ণ শনাক্ত করতে পারে না।", "যেকোনো বর্ণ শনাক্ত করতে পারে।", "ফেরোসোফেরিক অক্সাইডযুক্ত কালির বর্ণ শনাক্ত করতে পারে।"],
+            ["<strong>সুবিধা</strong>", "বিপুল পরিমাণ তথ্য স্ক্যান করতে পারে।", "স্ক্যানকৃত টেক্সট সফটওয়্যারের মাধ্যমে প্রয়োজনানুযায়ী পরিবর্তন করা যায়।", "অধিক নিরাপত্তা বিশিষ্ট।"],
+            ["<strong>অসুবিধা</strong>", "মার্ক করা কাগজ ময়লা হলে, ভাঁজ পড়লে সঠিক তথ্য পাওয়া যায় পণ্ডিত।", "ফন্ট না মিললে কাগজের তথ্য ভুল হিসেবে গণ্য করে।", "ক্যারেক্টারগুলো ১০ ডিজিট ও ৪টি বিশেষ ক্যারেক্টারের মধ্যে সীমাবদ্ধ থাকে।"],
+            ["<strong>ব্যবহার</strong>", "বহুনির্বাচনি প্রশ্নের উত্তরপত্র মূল্যায়ন, বাজার সমীক্ষা, জনগণনা।", "এয়ারলাইন কোম্পানি, ইলেকট্রিক বিল, ইন্স্যুরেন্স প্রিমিয়াম, চিঠির পিন কোড পড়ার জন্যে।", "ব্যাংকিং শিল্পে ব্যাংকের চেক বইয়ের পড়া ও লিখায় ব্যবহার করা হয়।"]
+        ]
+    };
+
+    const otherInputCards = [
+        {
+            title: "বারকোড রিডার (Barcode Reader)", icon: "fas fa-barcode",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Barcode_scanner_%281%29.jpg/320px-Barcode_scanner_%281%29.jpg",
+            list: [
+                "অপর নাম: ইউনিভার্সাল প্রোডাক্ট কোড। এটি এক ধরনের স্ক্যানার যা বার (Bar) বা রেখা কোড পড়তে পারে।",
+                "Barcode Reader emits – Light (আলো নির্গত করে)।",
+                "প্রথম কয়েকটি সাদা ও কালো দাগ পণ্যের পরিমাণ জানায় এবং পরবর্তী কোডগুলো পণ্যের অন্যান্য তথ্য জানায়।",
+                "বারকোড অনুমোদন করে: ইউনিফর্ম কোড কাউন্সিল (Uniform Code Council)। ব্যবহার: সুপার মার্কেটে পণ্যের বিস্তারিত তথ্য জানতে।"
+            ]
+        },
+        {
+            title: "লাইট পেন ও জয়স্টিক", icon: "fas fa-gamepad",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/JoyStick-with-cross.png/320px-JoyStick-with-cross.png",
+            list: [
+                "<strong>লাইট পেন (Light Pen):</strong> এর এক প্রান্তে লাইট সেন্সর থাকে যা আলো অনুভব করতে পারে। এর সাহায্যে মনিটরের পর্দায় লেখা বা ছবি আঁকা যায়। ব্যবহার: প্রকৌশল ডিজাইন, নকশা তৈরি।",
+                "<strong>জয়স্টিক (Joystick):</strong> লম্বা বাটনটি দ্বারা ইনপুট সিগন্যাল প্রেরণ করা হয় এবং সামনে-পেছনে, ডানে-বামে ঘোরানো যায়। অপর নাম জয়স্টিক ক্যালিব্রেশন। ভিডিও গেম, ভার্চুয়াল রিয়েলিটি ও সিমুলেশনে ব্যবহৃত হয়।"
+            ]
+        }
+    ];
+
+    const confusionData = {
+        title: "Remove Confusion (গুরুত্বপূর্ণ কনসেপ্ট ক্লিয়ারেন্স)", icon: "fas fa-exclamation-triangle",
+        list: [
+            "<strong>১. OMR, OCR, MICR এর পূর্ণরূপ:</strong> বোর্ড বই ও পিএসসি অনুযায়ী এগুলোর পূর্ণরূপে <strong>Reader</strong> হবে, Recognition নয়। অপশনে Reader এবং Recognition দুটিই থাকলে উত্তর হবে Reader। তবে Reader না থাকলে Recognition উত্তর করবেন।",
+            "<strong>২. মুদ্রিত লেখায় সরাসরি ইনপুট:</strong> মুদ্রিত লেখায় সরাসরি ইনপুট দেওয়ার জন্য OCR মেশিন ব্যবহার করা হয়, MICR নয়। কারণ MICR শুধুমাত্র ১০ ডিজিট ও ৪টি বিশেষ ক্যারেক্টারের মধ্যে সীমাবদ্ধ।",
+            "<strong>৩. Barcode Reader কোন ডিভাইস?</strong> বারকোড রিডার কোনো সেন্সর নয়, এটি একটি স্ক্যানার ডিভাইস।",
+            "<strong>৪. ইনপুট ও আউটপুট চেনার উপায়:</strong> আপনি (ইউজার) যদি কম্পিউটারকে তথ্য দেন তবে তা ইনপুট ডিভাইস (যেমন: মাইক্রোফোন)। আর কম্পিউটার যদি আপনাকে তথ্য দেয় তবে তা আউটপুট ডিভাইস (যেমন: স্পিকার)।"
+        ]
+    };
+
+    const writtenQData = [
+        "ইনপুট ও আউটপুট ডিভাইস কাকে বলে? উদাহরণসহ লিখুন। [৩৩তম বিসিএস]",
+        "কম্পিউটারের প্রধান অংশসমূহ কি? Primary Auxiliary Memory, Input ও Output device গুলোর নাম লিখুন। [৩৫তম বিসিএস] <em>(নোট: কম্পিউটারের প্রধান অংশ সিস্টেম ইউনিট, ইনপুট ইউনিট, আউটপুট ইউনিট, মেমোরি ইউনিট।)</em>"
+    ];
+
+    const mcqData = [
+        { q: "নিচের কোন ডিভাইসটি ইনপুট ও আউটপুট ডিভাইস হিসেবে কাজ করে? [৪৪তম/৪০তম বিসিএস]", options: ["A. Scanner", "B. Mouse", "C. Touch Screen", "D. Projector"], ans: "C. Touch Screen" },
+        { q: "নিচের কোনটি output device নয়? [৪৩তম বিসিএস]", options: ["A. monitor", "B. microphone", "C. printer", "D. speaker"], ans: "B. microphone" },
+        { q: "নিচের কোনটি ইনপুট ডিভাইস? [৩৭তম বিসিএস]", options: ["A. OMR", "B. COM", "C. Plotter", "D. Monitor"], ans: "A. OMR" },
+        { q: "Plotter কোন ধরনের ডিভাইস? [৩৬তম বিসিএস]", options: ["A. ইনপুট", "B. আউটপুট", "C. মেমোরি", "D. কোনোটিই নয়"], ans: "B. আউটপুট" },
+        { q: "কম্পিউটার সিস্টেম এ Scanner কোন ধরনের যন্ত্র? [৩৫তম বিসিএস]", options: ["A. Input", "B. Output", "C. উভয়েই", "D. কোনোটিই নয়"], ans: "A. Input" },
+        { q: "মুদ্রিত লেখা সরাসরি ইনপুট নেয়ার জন্য নিচের কোনটি ব্যবহৃত হয়? [৪০তম বিসিএস]", options: ["A. OMR", "B. OCR", "C. MICR", "D. Scanner"], ans: "B. OCR" },
+        { q: "MICR-এর পূর্ণরূপ কী? [৩৫তম বিসিএস]", options: ["A. Magnetic Ink Character Reader", "B. Magnetic Ink Code Reader", "C. Magnetic Ink Case Reader", "D. কোনটিই নয়"], ans: "A. Magnetic Ink Character Reader" },
+        { q: "মাউস কি? [৩৫তম বিসিএস]", options: ["A. ইনপুট ডিভাইস", "B. আউটপুট ডিভাইস", "C. কো অর্ডিনেট ডিভাইস", "D. মিক্স ডিভাইস"], ans: "A. ইনপুট ডিভাইস" },
+        { q: "কম্পিউটার কী বোর্ড কীসের কাজ করে? [BSMMU নার্স: ২৩]", options: ["A. ইনপুট", "B. আউপুট", "C. স্টোরেজ", "D. মেমোরি"], ans: "A. ইনপুট" },
+        { q: "নিচের কোনটি ইনপুট ডিভাইস নয়? [CGDF: ২২]", options: ["A. mouse", "B. keyboard", "C. monitor", "D. joystick"], ans: "C. monitor" },
+        { q: "মাউস কী রকম ডিভাইস? [মাউশি: ২৩]", options: ["A. বহিরাগত ডিভাইস", "B. আউটপুট ডিভাইস", "C. অভ্যন্তরীণ ডিভাইস", "D. ইনপুট ডিভাইস"], ans: "D. ইনপুট ডিভাইস" },
+        { q: "কোনটি ইনপুট ডিভাইস নয়? [পল্লী বিদ্যুতায়ন বোর্ড: ২৩]", options: ["A. মাউস", "B. ওয়েবক্যাম", "C. প্রিন্টার", "D. কোনোটিই নয়"], ans: "C. প্রিন্টার" },
+        { q: "মোবাইল ফোনের কোনটি ইনপুট ডিভাইস নয়? [স্বাস্থ্য প্রকৌশল: ২৩]", options: ["A. কি-প্যাড", "B. টাচস্ক্রিন", "C. পাওয়ার সাপ্লাই", "D. ক্যামেরা"], ans: "C. পাওয়ার সাপ্লাই" },
+        { q: "স্ক্যানার হলো একটি- [বিদ্যুৎ উন্নয়ন বোর্ড: ২৩]", options: ["A. ইনপুট ডিভাইস", "B. আউটপুট ডিভাইস", "C. শর্টপুট", "D. প্রসেসিং ইউনিট"], ans: "A. ইনপুট ডিভাইস" },
+        { q: "কম্পিউটারের প্রিন্টার কি ধরনের ডিভাইস? [প্রাণিসম্পদ অধিদপ্তর: ২৩]", options: ["A. আউটপুট", "B. ইনপুট", "C. মাইক্রোফোন", "D. স্ক্যানার"], ans: "A. আউটপুট" },
+        { q: "কোনটি ইনপুট ডিভাইস? [দুদক: ২২]", options: ["A. MICR", "B. Printer", "C. Plotter", "D. Monitor"], ans: "A. MICR" },
+        { q: "কোনটি Input Device? [মাদকদ্রব্য নিয়ন্ত্রণ: ২১]", options: ["A. OMR", "B. COM", "C. Plotter", "D. Monitor"], ans: "A. OMR" },
+        { q: "নিচের কোনটি Input device নয়? [শিক্ষা প্রকৌশলী: ২১]", options: ["A. Keyboard", "B. Mouse", "C. Speaker", "D. Scanner"], ans: "C. Speaker" },
+        { q: "নিচের কোনটি ইনপুট এবং আউটপুট দুটোই? [রেলপথ মন্ত্রণালয়: ২১]", options: ["A. মনিটর", "B. ওয়েব ক্যাম", "C. নেটওয়ার্ক কার্ড", "D. জয়স্টিক"], ans: "C. নেটওয়ার্ক কার্ড" },
+        { q: "Webcam is a type of_device in computer system. [BB AD: 23]", options: ["A. output", "B. input", "C. system", "D. analogue"], ans: "B. input" },
+        { q: "Which is not Optical Input Device? [MRA AD: 21]", options: ["A. RFID", "B. Barcode Scanner", "C. QR Code Scanner", "D. OMR"], ans: "A. RFID" },
+        { q: "Which of the following is not an output device? [Sonali Bank: 16]", options: ["A. Printer", "B. Monitor", "C. Speaker", "D. Mouse"], ans: "D. Mouse" },
+        { q: "Which of the following is NOT a peripheral device? [Pubali Bank: 14]", options: ["A. Motherboard", "B. Scanner", "C. Monitor", "D. None"], ans: "A. Motherboard" },
+        { q: "নিচের কোনটি ইনপুট ডিভাইস? [সাধারণ বীমা কর্পোরেশন: ১৯]", options: ["A. মনিটর", "B. প্রিন্টার", "C. সিপিইউ", "D. কী-বোর্ড"], ans: "D. কী-বোর্ড (PDF এর উত্তরপত্র অনুযায়ী, স্ক্যানার অপশন থাকলে স্ক্যানারও হয়)" },
+        { q: "Which of the following is used both as input and output device? [Janata Bank: 23]", options: ["A. Touch screen", "B. Printer", "C. Microphone", "D. Mouse"], ans: "A. Touch screen" },
+        { q: "Which one works as an output and input device? [Sonali Bank: 16]", options: ["A. Keyboard", "B. Scanner", "C. Modem", "D. Monitor"], ans: "C. Modem" },
+        { q: "Which one of the following is the most common output device? [Exim bank: 11]", options: ["A. Keyboard", "B. Monitor", "C. Scanner", "D. Printer"], ans: "B. Monitor" },
+        { q: "In computer terminology, OCR stands for- [PKSF: ২৩]", options: ["A. Optical Character Recognition", "B. Optical Character Reader", "C. Office Cash Receiver", "D. Online Computer Retrieval"], ans: "A. Optical Character Recognition (Reader না থাকলে)" },
+        { q: "কী বোর্ডে কতটি ফাংশন কী থাকে? [পল্লী বিদ্যুতায়ন বোর্ড: ২৩]", options: ["A. ১০টি", "B. ১২টি", "C. ১৮টি", "D. ৪টি"], ans: "B. ১২টি" },
+        { q: "ইংরেজিতে সব অক্ষর ক্যাপিটাল লেটারে লেখার জন্য কোন বাটন চাপতে হবে?", options: ["A. Alt", "B. Caps lock", "C. Enter", "D. Ctrl"], ans: "B. Caps lock" },
+        { q: "কোন বাটন চেপে স্ক্রীন শট নেওয়া হয়? [বাংলাদেশ পল্লী বিদ্যুতায়ন বোর্ড: ২৩]", options: ["A. Enter", "B. F5", "C. Ctrl", "D. কোনটিই নয়"], ans: "D. কোনটিই নয় (Print Screen হবে)" },
+        { q: "একটি ফাইল কোন Drive এ save করার জন্য কোন অপশনটিতে যেতে হবে?", options: ["A. Save", "B. Save as", "C. Close", "D. কোনটিই নয়"], ans: "B. Save as" },
+        { q: "কোনটি কম্পিউটারের সংরক্ষণ Key বাটন? [বন অধিদপ্তর: ২৩]", options: ["A. F8", "B. F6", "C. F10", "D. F12"], ans: "D. F12" },
+        { q: "MS Word এ F8 কী তিনবার চাপা হলে কি হয়? [CGDF: ২২]", options: ["A. পুরো পেইজ সিলেক্ট হয়", "B. একটি বাক্য সিলেক্ট হয়", "C. একটি শব্দ সিলেক্ট হয়", "D. একটি প্যারাগ্রাফ সিলেক্ট হয়"], ans: "B. একটি বাক্য সিলেক্ট হয়" },
+        { q: "দৃষ্টিহীনদের জন্য আবিষ্কৃত বাংলায় প্রথম সফটওয়‍্যারের নাম কী? [১৭তম শিক্ষক নিবন্ধন: ২২]", options: ["A. আইলিপ", "B. আইসাইট", "C. আইডট", "D. আইলাইট"], ans: "B. আইসাইট" },
+        { q: "Webcam কী কাজে লাগে? [শিক্ষা প্রকৌশলী: ২১]", options: ["A. Webpage-এ ক্যামেরার ডিজাইন", "B. ভিডিও কল করতে", "C. Webpage-এ ক্যামেরা সার্চ", "D. কম্পিউটারের যন্ত্র সচল রাখতে"], ans: "B. ভিডিও কল করতে" },
+        { q: "Who invented QWERTY keyboard? [শিক্ষা প্রকৌশলী: 21]", options: ["A. Steve Jobs", "B. Christopher Latham Sholes", "C. Brain Sams", "D. Anderson Palimar"], ans: "B. Christopher Latham Sholes" },
+        { q: "Which is the following function keys enter and exits full screen mode...?", options: ["A. F1", "B. F2", "C. F10", "D. F11"], ans: "D. F11" },
+        { q: "নিচের কোনটি বাংলা লেখার সফটওয়্যার? [পরিসংখ্যান ব্যুরো: ১৬]", options: ["A. বিজয়", "B. অভ্র", "C. সুতন্নি", "D. ক ও খ উভয়ই"], ans: "D. ক ও খ উভয়ই" },
+        { q: "OMR-এর পূর্ণরূপ কী? [সমাজসেবা অধিদপ্তর: ১৭]", options: ["A. Optimal Mark Reader", "B. Optical Mark Reader", "C. Optical Mark Recongnition", "D. Optical Magnetic Recognition"], ans: "B. Optical Mark Reader" },
+        { q: "বিজয় লে-আউটে বাংলা লেখার সময় 'দ' বর্ণটি লিখতে কি-বোর্ডে ইংরেজি কোন বর্ণটি চাপতে হবে?", options: ["A. R", "B. K", "C. G", "D. L"], ans: "D. L" },
+        { q: "নিম্নের কোনটি দিয়ে কম্পিউটার কমান্ড বা নির্দেশ দেয়? [১০ম বেসরকারি প্রভাষক নিবন্ধন: 14]", options: ["A. সিপিইউ", "B. কী-বোর্ড", "C. প্রিন্টার", "D. মনিটর"], ans: "B. কী-বোর্ড" },
+        { q: "Which of the following is the device used for converting maps, pictures and drawing into digital form...", options: ["A. Image scanner", "B. Digitizer", "C. MICR", "D. Scanner"], ans: "B. Digitizer" },
+        { q: "Which of the following group has only input devices?", options: ["A. Mouse, Keyboard and Monitor", "B. Mouse, Keyboard and Printer", "C. Mouse, Keyboard and Plotter", "D. Mouse, Keyboard and Scanner"], ans: "D. Mouse, Keyboard and Scanner" },
+        { q: "Which of the key is not on the number keypad?", options: ["A. Ctrl", "B. Del", "C. Enter", "D. Num lock"], ans: "A. Ctrl" },
+        { q: "নিচের কোনটি বাংলা টাইপ ও কম্পোজ সফটওয়‍্যার? [কর্মসংস্থান ব্যাংক: ২২]", options: ["A. হিরো", "B. বিজয়", "C. রাখি", "D. আনন্দ"], ans: "B. বিজয়" },
+        { q: "What function key does F3 stand for in most Computers?", options: ["A. Refresh", "B. Help", "C. Find", "D. Save"], ans: "C. Find" },
+        { q: "Which keys can be used to display the save as box in MS Word?", options: ["A. F12", "B. F5", "C. F9", "D. F6"], ans: "A. F12" },
+        { q: "Which one is not contained in MICR code?", options: ["A. Account Number", "B. Bank Code", "C. Cheque Number", "D. Country Code"], ans: "D. Country Code" },
+        { q: "Which one is the modifier key of the keyboard?", options: ["A. Shift", "B. Backspace", "C. Esc", "D. F4"], ans: "A. Shift" },
+        { q: "Which operation does F1 key perform for all types of applications?", options: ["A. Windows shut down", "B. File open", "C. Help", "D. Save"], ans: "C. Help" },
+        { q: "The job of __ is to translate the array of dots into text.", options: ["A. MICR", "B. VGA", "C. OMR", "D. OCR"], ans: "D. OCR" },
+        { q: "Which key will open an Open dialogue box?", options: ["A. Ctrl + F12", "B. F12", "C. Alt+F12", "D. Shift+F12"], ans: "A. Ctrl + F12" },
+        { q: "Who invented the computer mouse?", options: ["A. Douglas Engelbart", "B. Alan Kay", "C. Vensevar Bush", "D. Ted Nelson"], ans: "A. Douglas Engelbart" },
+        { q: "Which shortcut can be used to switch between open workbooks?", options: ["A. Ctrl + F2", "B. Ctrl+F8", "C. Ctrl+F6", "D. Ctrl+10"], ans: "C. Ctrl+F6" },
+        { q: "You can detect spelling and grammar errors by-", options: ["A. Press Shift+F7", "B. Press Ctrl+F7", "C. Press Alt+F7", "D. Press F7"], ans: "D. Press F7" },
+        { q: "A light sensitive device that converts drawing, printed text or other images into digital form is", options: ["A. Keyboard", "B. Plotter", "C. Scanner", "D. None of these"], ans: "C. Scanner" },
+        { q: "নিচের কোনটি বাংলা ফন্ট?", options: ["A. Malgun", "B. BellMT", "C. Gagidi", "D. BenSen"], ans: "D. BenSen (বেনসেন একটি বাংলা ফন্ট)" },
+        { q: "কম্পিউটারে বাংলা অক্ষর প্রচলনের আবিষ্কারক কে?", options: ["A. মোস্তাফা জব্বার", "B. জন ফক্স", "C. আবুল হোসেন", "D. স্টিভ জবস"], ans: "A. মোস্তাফা জব্বার" },
+        { q: "Which of the following is the save button in computer keyboard?", options: ["A. F12", "B. F8", "C. F6", "D. F1"], ans: "A. F12" },
+        { q: "Common keyboard arrangement is called:", options: ["A. QWETRY", "B. QWRETRY", "C. QWRTEY", "D. QWERTY"], ans: "D. QWERTY" },
+        { q: "To convert paper into an editable document, a scanner would employ_technology.", options: ["A. UPC", "B. scanning", "C. coversion", "D. OCR"], ans: "D. OCR" },
+        { q: "নিচের কোনটি কোনো ফন্টের নাম নয়?", options: ["A. বিজয়", "B. সোলায়মান লিপি", "C. এরিয়েল", "D. সুতন্নি"], ans: "A. বিজয়" },
+        { q: "ইংরেজি বড় হাতের অক্ষর টাইপ করতে কী-বোর্ডের কোন বোতামটি ব্যবহৃত হয়?", options: ["A. Shift", "B. Ctrl", "C. Esc", "D. Tab"], ans: "A. Shift" },
+        { q: "Which of the following type of technology lets computers use light as a source of input?", options: ["A. Operative", "B. Optical", "C. Optimal", "D. Optional"], ans: "B. Optical" },
+        { q: "In MS Word which one of the following keyboard keys creates a new paragraph?", options: ["A. Space", "B. Enter", "C. Backspace", "D. Tab"], ans: "B. Enter" },
+        { q: "Which key is to be pressed in a computer for moving to the beginning of a text?", options: ["A. Home", "B. PgUp", "C. PgDn", "D. F2"], ans: "A. Home" },
+        { q: "Which one of the following keys is most often used to align columns of text accurately?", options: ["A. Border", "B. Tab", "C. Enter", "D. Space"], ans: "B. Tab" },
+        { q: "কম্পিউটারের বাংলা ফন্টের উদ্ভাবক কে?", options: ["A. মোস্তাফা জব্বার", "B. জন এ্যাটানা ফস", "C. আবুল হোসেন", "D. হাওয়ার্ড এইকেন"], ans: "A. মোস্তাফা জব্বার" },
+        { q: "On a standard computer keyboard, keys usually are arranged in_groups.", options: ["A. three", "B. five", "C. eight", "D. all of these"], ans: "B. five" },
+        { q: "বিজয় লে-আউটে বাংলার সময় 'ন' বর্ণটি লিখতে কী-বোর্ডে ইংরেজি কোন বর্ণটি চাপতে হয়?", options: ["A. N", "B. K", "C. G", "D. B"], ans: "D. B" },
+        { q: "Which of the following is not a Bangla Font?", options: ["A. Joy", "B. Ekush", "C. Falgun", "D. Sutonny MJ"], ans: "A. Joy" },
+        { q: "ব্যাংকের চেকের চেক নম্বর লেখা ও পড়া হয় কোন পদ্ধতিতে?", options: ["A. MUCR", "B. MYCR", "C. MRCR", "D. MICR"], ans: "D. MICR" },
+        { q: "চেকের আধুনিক সংস্করণকে কি নামে ডাকা হয়?", options: ["A. CICR চেক", "B. MICR চেক", "C. LICR চেক", "D. MICIR চেক"], ans: "B. MICR চেক" },
+        { q: "অভ্র কী-বোর্ড তৈরি করেন- [ঢাবি 'খ' ইউনিট]", options: ["A. মেহেদী হাসান", "B. মুহম্মদ জাফর ইকবাল", "C. মাকসুদুল আলম", "D. মুনীর চৌধুরী"], ans: "A. মেহেদী হাসান" }
+    ];
+
+    // --- RENDERING LOGIC ---
+    
+    function renderCards(containerId, data) {
+        const container = document.getElementById(containerId);
+        let html = '';
+        data.forEach(card => {
+            let content = '';
+            if(card.text) content = `<p style="margin: 0;">${card.text}</p>`;
+            if(card.list) content += `<ul class="info-list">${card.list.map(li => `<li>${li}</li>`).join('')}</ul>`;
+            
+            let imgHtml = card.img ? `<img src="${card.img}" alt="${card.title}" class="card-badge">` : '';
+            
+            html += `
+                <div class="info-card">
+                    <div class="card-header-flex">
+                        <h3><i class="${card.icon}"></i> ${card.title}</h3>
+                        ${imgHtml}
+                    </div>
+                    ${content}
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function renderTable(containerId, data) {
+        const container = document.getElementById(containerId);
+        let thead = data.headers.map(th => `<th>${th}</th>`).join('');
+        let tbody = data.rows.map(row => `<tr>${row.map(td => `<td>${td}</td>`).join('')}</tr>`).join('');
+        
+        container.innerHTML = `
+            <div class="custom-table-wrapper">
+                <table>
+                    <thead><tr>${thead}</tr></thead>
+                    <tbody>${tbody}</tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    function renderAlert(containerId, data, isCorrection = false) {
+        const container = document.getElementById(containerId);
+        let listHtml = data.list ? `<ul style="margin: 0; padding-left: 20px; line-height: 1.8;">${data.list.map(li => `<li>${li}</li>`).join('')}</ul>` : '';
+        let textHtml = data.text ? `<p style="margin: 0; line-height: 1.8;">${data.text}</p>` : '';
+        let boxClass = isCorrection ? 'correction-box' : 'alert-box';
+        let titleClass = isCorrection ? 'correction-title' : 'alert-title';
+        
+        container.innerHTML = `
+            <div class="${boxClass}">
+                <div class="${titleClass}"><i class="${data.icon}"></i> ${data.title}</div>
+                ${textHtml}
+                ${listHtml}
+            </div>
+        `;
+    }
+
+    function renderListItems(containerId, data) {
+        document.getElementById(containerId).innerHTML = data.map(item => `<li>${item}</li>`).join('');
+    }
+
+    function renderMCQs(containerId, data) {
+        const container = document.getElementById(containerId);
+        let html = '';
+        data.forEach((mcq, index) => {
+            let opts = mcq.options.map(opt => `<div>${opt}</div>`).join('');
+            html += `
+                <div class="mcq-item">
+                    <div class="mcq-question">${index + 1}. ${mcq.q}</div>
+                    <div class="mcq-options">${opts}</div>
+                    <div class="mcq-answer">সঠিক উত্তর: ${mcq.ans}</div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    // Wrap Bangla Numbers Logic
+    function wrapBanglaNumbers(node) {
+        if (node.nodeType === 3) { 
+            const text = node.nodeValue;
+            if (/[০-৯]/.test(text)) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = text.replace(/([০-৯]+)/g, '<span class="number-kalpurush">$1</span>');
+                while (tempDiv.firstChild) {
+                    node.parentNode.insertBefore(tempDiv.firstChild, node);
+                }
+                node.parentNode.removeChild(node);
+            }
+        } else if (node.nodeType === 1 && !['SCRIPT', 'STYLE'].includes(node.nodeName) && !node.classList.contains('number-kalpurush')) {
+            for (let i = node.childNodes.length - 1; i >= 0; i--) {
+                wrapBanglaNumbers(node.childNodes[i]);
+            }
+        }
+    }
+
+    // Execute All Renders
+    document.addEventListener("DOMContentLoaded", function() {
+        renderCards('peripherals-intro-cards', peripheralsIntroCards);
+        renderTable('input-devices-table', inputDevicesTable);
+        renderCards('io-devices-cards', ioDevicesCards);
+        
+        renderCards('keyboard-intro-cards', keyboardIntroCards);
+        renderTable('keyboard-types-table', keyboardTypesTable);
+        renderTable('function-keys-table', functionKeysTable);
+        renderTable('special-keys-table', specialKeysTable);
+        
+        renderCards('bangla-fonts-cards', banglaFontsCards);
+        
+        renderCards('mouse-digitizer-cards', mouseDigitizerCards);
+        
+        renderCards('scanner-intro-cards', scannerIntroCards);
+        renderTable('omr-ocr-micr-table', omrOcrMicrTable);
+        
+        renderCards('other-input-cards', otherInputCards);
+        
+        renderAlert('confusion-box', confusionData, true);
+        
+        renderListItems('written-q-list', writtenQData);
+        renderMCQs('mcq-container', mcqData);
+        
+        // Finally run the number wrapper after all dynamic content is injected
+        wrapBanglaNumbers(document.body);
+    });
+</script>
+
+</body>
+</html>
