@@ -2822,8 +2822,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                                 <col style="width:11%;">
                                 <col style="width:11%;">
                             </colgroup>
-                            <thead>
-                                <tr style="background: linear-gradient(90deg,#10b981 0%,#0ea5e9 60%,#a855f7 100%); color:#fff;">
+                            <thead class="sticky-report-header">
+                                <tr class="report-table-header" style="background: linear-gradient(90deg,#10b981 0%,#0ea5e9 60%,#a855f7 100%); color:#fff;">
                                     <th class="px-2 py-3 border-b border-white/20 text-center" style="font-size:0.82rem; letter-spacing:0.03em;">Subject</th>
                     `;
                     dayLabels.forEach((label, i) => {

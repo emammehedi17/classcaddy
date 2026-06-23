@@ -5216,3 +5216,26 @@ body.dark-mode .timer-total-edit-btn:hover { color: #a5b4fc; }
         print-color-adjust: exact !important;
     }
 }
+
+
+/* Sticky header for the Study Time Report table in the modal */
+.sticky-report-header {
+    position: sticky;
+    top: -1px; /* -1px prevents any tiny visual gaps when scrolling */
+    z-index: 20;
+}
+
+/* Print mode: Remove sticky behavior */
+@media print {
+    .sticky-report-header {
+        position: static !important;
+    }
+    
+    /* From our previous discussion: forces the header to be solid black when printed */
+    .report-table-header {
+        background: #000000 !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
