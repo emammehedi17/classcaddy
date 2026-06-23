@@ -2817,6 +2817,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         <div class="results-table-container overflow-x-auto" style="border-radius:14px; box-shadow:0 4px 24px rgba(0,0,0,0.10); border:1.5px solid #e5e7eb; background:#fff;">
                         <table class="w-full text-sm text-left text-gray-600 study-table" style="border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px; table-layout:fixed;">
                             <colgroup>
+<colgroup>
                                 <col style="width:10%;">
                                 ${dayLabels.map(() => `<col style="width:${Math.floor(68/numDays)}%;">`).join('')}
                                 <col style="width:11%;">
@@ -2847,15 +2848,22 @@ function updateMonthUI(monthId, monthData, weeksData) {
                                     ${escapeHtml(subj)}
                                 </span>
                             </td>`;
+                        
+                        let daysStudiedCount = 0; // NEW: Track actual days studied
+                        
                         for (let d = 0; d < numDays; d++) {
                             const secs = (subjectDaySeconds[subj] && subjectDaySeconds[subj][d]) || 0;
+                            if (secs > 0) daysStudiedCount++; // NEW: Increment if time > 0
+                            
                             const topic = (subjectDayTopics[subj] && subjectDayTopics[subj][d]) || '';
                             const timeHtml = secs > 0 ? `<span style="font-weight:700; color:${rc.text}; font-size:0.82rem;">${formatTimerHMS(secs)}</span>` : `<span style="color:#d1d5db;">—</span>`;
                             const topicHtml = topic ? `<br><span style="font-size:0.65rem; color:#6b7280; font-weight:400; display:block; margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(topic)}">${escapeHtml(topic)}</span>` : '';
                             html += `<td class="px-2 py-2 border-b border-gray-100 text-center" style="vertical-align:top;">${timeHtml}${topicHtml}</td>`;
                         }
+                        
                         const totalSecs = subjectTotals[subj];
-                        const avgSecs = totalSecs / numDays;
+                        const avgSecs = daysStudiedCount > 0 ? totalSecs / daysStudiedCount : 0; // NEW: Calculate average only by studied days
+                        
                         html += `<td class="px-2 py-3 border-b border-gray-100 text-center font-bold" style="color:${rc.text}; background:#f9fafb; font-size:0.82rem;">${formatTimerHMS(avgSecs)}</td>
                                  <td class="px-2 py-3 border-b border-gray-100 text-center font-bold" style="color:${rc.badge}; background:${rc.bg}; border-right:3px solid ${rc.badge}; font-size:0.82rem;">${formatTimerHMS(totalSecs)}</td>
                         </tr>`;
