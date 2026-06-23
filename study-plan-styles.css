@@ -5207,3 +5207,12 @@ body.dark-mode .timer-total-edit-btn:hover { color: #a5b4fc; }
 #goal-progress-bar-track {
     position: relative;
 }
+
+@media print {
+    .report-table-header {
+        background: #000000 !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
