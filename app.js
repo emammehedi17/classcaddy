@@ -2814,8 +2814,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                     html += `
                         <h4 class="text-center font-semibold text-gray-700 mb-3 mt-6" style="font-size:1.1rem;">📊 Total Study Time</h4>
-                        <div class="results-table-container overflow-x-auto" style="border-radius:14px; box-shadow:0 4px 24px rgba(0,0,0,0.10); border:1.5px solid #e5e7eb; background:#fff;">
-                        <table class="w-full text-sm text-left text-gray-600 study-table" style="border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px; table-layout:fixed;">
+                        <div class="results-table-container overflow-auto custom-scrollbar" style="max-height: 55vh; border-radius:14px; box-shadow:0 4px 24px rgba(0,0,0,0.10); border:1.5px solid #e5e7eb; background:#fff;">
+                        <table class="w-full text-sm text-left text-gray-600 study-table" style="border-collapse:separate; border-spacing:0; border-radius:14px; table-layout:fixed;">
                             <colgroup>
                                 <col style="width:10%;">
                                 ${dayLabels.map(() => `<col style="width:${Math.floor(68/numDays)}%;">`).join('')}
