@@ -2818,8 +2818,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         <table class="w-full text-sm text-left text-gray-600 study-table" style="border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px; table-layout:fixed;">
                             <colgroup>
                                 <col style="width:10%;">
-                                ${dayLabels.map(() => `<col style="width:${Math.floor(78/numDays)}%;">`).join('')}
-                                <col style="width:12%;">
+                                ${dayLabels.map(() => `<col style="width:${Math.floor(68/numDays)}%;">`).join('')}
+                                <col style="width:11%;">
+                                <col style="width:11%;">
                             </colgroup>
                             <thead>
                                 <tr style="background: linear-gradient(90deg,#10b981 0%,#0ea5e9 60%,#a855f7 100%); color:#fff;">
@@ -2829,7 +2830,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         const dateStr = dayDateLabels[i] ? `<br><span style="font-size:0.72rem; font-weight:400; opacity:0.85;">(${dayDateLabels[i]})</span>` : '';
                         html += `<th class="px-2 py-3 border-b border-white/20 text-center" style="font-size:0.82rem; letter-spacing:0.03em;">${label}${dateStr}</th>`;
                     });
-                    html += `<th class="px-2 py-3 border-b border-white/20 text-center" style="font-size:0.82rem; letter-spacing:0.03em;">Total</th>
+                    html += `<th class="px-2 py-3 border-b border-white/20 text-center" style="font-size:0.82rem; letter-spacing:0.03em;">Average</th>
+                             <th class="px-2 py-3 border-b border-white/20 text-center" style="font-size:0.82rem; letter-spacing:0.03em;">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -2853,7 +2855,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             html += `<td class="px-2 py-2 border-b border-gray-100 text-center" style="vertical-align:top;">${timeHtml}${topicHtml}</td>`;
                         }
                         const totalSecs = subjectTotals[subj];
-                        html += `<td class="px-2 py-3 border-b border-gray-100 text-center font-bold" style="color:${rc.badge}; background:${rc.bg}; border-right:3px solid ${rc.badge}; font-size:0.82rem;">${formatTimerHMS(totalSecs)}</td>
+                        const avgSecs = totalSecs / numDays;
+                        html += `<td class="px-2 py-3 border-b border-gray-100 text-center font-bold" style="color:${rc.text}; background:#f9fafb; font-size:0.82rem;">${formatTimerHMS(avgSecs)}</td>
+                                 <td class="px-2 py-3 border-b border-gray-100 text-center font-bold" style="color:${rc.badge}; background:${rc.bg}; border-right:3px solid ${rc.badge}; font-size:0.82rem;">${formatTimerHMS(totalSecs)}</td>
                         </tr>`;
                     });
 
@@ -2867,7 +2871,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         html += `<td class="px-2 py-3 border-b border-gray-200 text-center font-semibold text-gray-500" style="font-size:0.82rem;">${formatTimerHMS(avgSecs)}</td>`;
                     }
                     const avgWeekTotal = subjectLabels.length > 0 ? weekGrandTotal / subjectLabels.length : 0;
-                    html += `<td class="px-2 py-3 border-b border-gray-200 text-center font-semibold text-gray-500" style="font-size:0.82rem;">${formatTimerHMS(avgWeekTotal)}</td>
+                    const avgWeekAvg = avgWeekTotal / numDays;
+                    html += `<td class="px-2 py-3 border-b border-gray-200 text-center font-semibold text-gray-500" style="font-size:0.82rem;">${formatTimerHMS(avgWeekAvg)}</td>
+                             <td class="px-2 py-3 border-b border-gray-200 text-center font-semibold text-gray-500" style="font-size:0.82rem;">${formatTimerHMS(avgWeekTotal)}</td>
                     </tr>`;
 
                     // Total Time row
@@ -2876,7 +2882,9 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     for (let d = 0; d < numDays; d++) {
                         html += `<td class="px-2 py-3 text-center font-bold" style="color:#065f46; font-size:0.92rem;">${formatTimerHMS(dayTotals[d] * 60)}</td>`;
                     }
-                    html += `<td class="px-2 py-3 text-center font-bold" style="color:#059669; font-size:1rem; border-right:3px solid #10b981; border-radius:0 0 14px 0;">${formatTimerHMS(weekGrandTotal)}</td>
+                    const overallAvg = weekGrandTotal / numDays;
+                    html += `<td class="px-2 py-3 text-center font-bold" style="color:#059669; font-size:1rem;">${formatTimerHMS(overallAvg)}</td>
+                             <td class="px-2 py-3 text-center font-bold" style="color:#059669; font-size:1rem; border-right:3px solid #10b981; border-radius:0 0 14px 0;">${formatTimerHMS(weekGrandTotal)}</td>
                     </tr>`;
 
                     html += `</tbody></table></div>`;
@@ -9943,49 +9951,61 @@ function renderWidget(studiedMin, goalMin, streak, hist) {
 
     if (lastWeekDays.length === 0) return; // nothing to show
 
-    const lastDayIndex = lastWeekDays.length - 1; // this is "Today"
+   const lastDayIndex = lastWeekDays.length - 1; // this is "Today" among ADDED days
 
-    lastWeekDays.forEach((planDay, idx) => {
-        if (!planDay) return;
+    for (let idx = 0; idx < 7; idx++) {
+        const planDay = lastWeekDays[idx];
         const isToday = idx === lastDayIndex;
-        const dateStr = planDay.date || '';
-        const shortLabel = dateStr ? getShortDayLabel(dateStr) : `Day ${idx + 1}`;
-
-        // Timer seconds for this specific plan day
-        let timerSecs = _tlv2(planDay.dayTimer).total;
-        (planDay.rows || []).forEach(row => { timerSecs += _tlv2(row.timer).total; });
-        const timerMin = Math.floor(timerSecs / 60);
-
-        const goalMet = goalSeconds > 0 && timerSecs >= goalSeconds;
-
+        
         let dotClass = 'streak-day-dot';
-        if (isToday) {
-            dotClass += ' dot-today';
-            if (goalMet) dotClass += ' dot-complete';
-        } else {
-            dotClass += timerSecs > 0
-                ? (goalMet ? ' dot-complete' : ' dot-missed')
-                : ' dot-no-data';
-        }
-
-        // Date sub-label e.g. "(15 Jun)"
         let dateSub = '';
-        if (dateStr) {
-            const dObj = new Date(dateStr + 'T00:00:00');
-            dateSub = `(${dObj.getDate()} ${months[dObj.getMonth()]})`;
-        }
+        let shortLabel = `Day ${idx + 1}`;
+        let studiedLabel = '0m';
+        let goalMet = false;
+        let isFuture = !planDay;
 
-        const studiedLabel = timerMin > 0 ? formatMinutes(timerMin) : '0m';
+        if (!isFuture) {
+            const dateStr = planDay.date || '';
+            if (dateStr) {
+                shortLabel = getShortDayLabel(dateStr);
+                const dObj = new Date(dateStr + 'T00:00:00');
+                dateSub = `(${dObj.getDate()} ${months[dObj.getMonth()]})`;
+            }
+            
+            let timerSecs = _tlv2(planDay.dayTimer).total;
+            (planDay.rows || []).forEach(row => { timerSecs += _tlv2(row.timer).total; });
+            const timerMin = Math.floor(timerSecs / 60);
+            goalMet = goalSeconds > 0 && timerSecs >= goalSeconds;
+            studiedLabel = timerMin > 0 ? formatMinutes(timerMin) : '0m';
+
+            if (isToday) {
+                dotClass += ' dot-today';
+                if (goalMet) dotClass += ' dot-complete';
+            } else {
+                dotClass += timerSecs > 0
+                    ? (goalMet ? ' dot-complete' : ' dot-missed')
+                    : ' dot-no-data';
+            }
+        } else {
+            // Future day (not added yet)
+            dotClass += ' dot-no-data';
+            studiedLabel = 'Not created yet';
+        }
 
         const wrapper = document.createElement('div');
         wrapper.className = 'streak-day-dot-wrapper';
+        if(isFuture) {
+            wrapper.style.opacity = '0.5'; // Make future days look gray/inactive
+        }
 
         const dot = document.createElement('div');
         dot.className = dotClass;
-        if (!goalMet) dot.textContent = shortLabel[0].toUpperCase();
+        if (!goalMet && !isFuture) dot.textContent = shortLabel[0].toUpperCase();
+        else if (isFuture) dot.textContent = shortLabel.replace('Day ', '');
+
         dot.title = isToday
             ? `Day ${idx + 1} (Today) — ${studiedLabel} studied`
-            : `Day ${idx + 1}: ${dateStr} — ${studiedLabel} studied`;
+            : (isFuture ? `Day ${idx + 1} — ${studiedLabel}` : `Day ${idx + 1}: ${planDay.date || ''} — ${studiedLabel} studied`);
 
         const label = document.createElement('span');
         label.className = 'streak-dot-label' + (isToday ? ' label-today' : '');
@@ -9999,7 +10019,7 @@ function renderWidget(studiedMin, goalMin, streak, hist) {
         wrapper.appendChild(label);
         wrapper.appendChild(dateLbl);
         dotsContainer.appendChild(wrapper);
-    });
+    }
 }
 
 // ---------------------------------------------------------------
