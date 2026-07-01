@@ -513,6 +513,8 @@
                 // --- CRITICAL FIX: CLEAR DATA CACHE ON LOGOUT ---
                 activeWeeksDataCache = {}; // Wipes the study plan data
                 window._weeksCache = activeWeeksDataCache;
+                window._allPlanDaysCache = null; // Wipes the universal cross-month streak data
+                window._currentMonthId = null;
                 savedResultsCache = null;  // Wipes the quiz results data
                 // ------------------------------------------------
 
@@ -1127,6 +1129,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      
 					 activeWeeksDataCache = weeksData;
 					 window._weeksCache = activeWeeksDataCache;
+					 window._currentMonthId = monthId;
+					 // Keep the universal (all-months) streak cache in sync with this
+					 // month's live data, without an extra Firestore round-trip.
+					 if (typeof _mergeMonthIntoAllPlanDaysCache === 'function') _mergeMonthIntoAllPlanDaysCache(monthId, weeksData);
 					 // Refresh streak widget now that cache has real data
 					 if (typeof checkAndUpdateStreak === 'function') checkAndUpdateStreak();
 					 
@@ -4179,6 +4185,8 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                      if (!activeWeeksDataCache[weekId].days) activeWeeksDataCache[weekId].days = [];
                      activeWeeksDataCache[weekId].days.push(newDayData);
                      window._weeksCache = activeWeeksDataCache;
+                     // Keep the universal (all-months) streak cache in sync too
+                     if (typeof _mergeMonthIntoAllPlanDaysCache === 'function') _mergeMonthIntoAllPlanDaysCache(monthId, activeWeeksDataCache);
                      console.log("Global cache updated with new day.");
                  }
                  // Refresh the streak/daily-goal widget so the new day's date is reflected immediately
@@ -9661,23 +9669,126 @@ const scrollLockObserver = new MutationObserver(() => {
    STREAK TRACKER & DAILY GOAL WIDGET
    ================================================================
    Reads study time directly from the real study-plan data model
-   (activeWeeksDataCache) instead of scraping a DOM element: for
-   every "day" entry in the currently loaded month whose assigned
-   date matches today, it sums that day's timer total + all of its
-   row timers, live (via getTimerLiveValues, so a timer that is
-   currently running is included). This is kept in sync every
-   second by a call from tickAllTimers() above.
+   instead of scraping a DOM element: for every "day" entry across
+   ALL months/years the user has ever created, it sums that day's
+   timer total + all of its row timers, live (via getTimerLiveValues,
+   so a timer that is currently running is included). This is kept
+   in sync every second by a call from tickAllTimers() above.
 
-   NOTE: only the currently open month's data lives in
-   activeWeeksDataCache, so if today's date happens to be assigned
-   to a day inside a month other than the one currently selected,
-   that time won't be counted until that month is opened.
+   UNIVERSAL (cross-month/cross-year) DATA SOURCE
+   ------------------------------------------------
+   window._allPlanDaysCache holds a flat array of every plan day
+   across every month/year: [{ monthId, weekId, dayIndex, dayData }, ...]
+   - It is fully (re)populated once per login by refreshAllPlanDaysCache(),
+     which reads every month document (and its weeks) from Firestore.
+   - It is kept fresh for the month currently on screen via
+     _mergeMonthIntoAllPlanDaysCache(), called whenever that month's
+     data changes locally (new day added, snapshot update, etc.),
+     so no extra Firestore reads are needed just to see live timers.
+   - Streak/best-streak/today's-progress are all computed from this
+     universal, chronologically-sorted list, so the streak now spans
+     every month and year the user has added — not just the month
+     that happens to be open in the UI.
    ================================================================ */
 
 // Storage keys are user-specific to prevent data leaking between accounts
 function _streakKey()  { const uid = window._currentUserId || 'guest'; return 'studyStreak_v1_' + uid; }
 function _goalKey()    { const uid = window._currentUserId || 'guest'; return 'studyDailyGoal_v1_' + uid; }
 function _historyKey() { const uid = window._currentUserId || 'guest'; return 'studyDayHistory_v1_' + uid; }
+
+// ---------------------------------------------------------------
+// UNIVERSAL (ALL MONTHS / ALL YEARS) PLAN-DAY CACHE
+// ---------------------------------------------------------------
+// Flat list of every plan day the user has ever added, across every
+// month document in Firestore: [{ monthId, weekId, dayIndex, dayData }]
+window._allPlanDaysCache = window._allPlanDaysCache || null;
+let _isFetchingAllPlanDays = false;
+
+// Replace all entries belonging to one month with a fresh copy taken
+// from that month's locally-loaded weeksData (no Firestore read needed —
+// used to keep the currently-open month live without refetching everything).
+function _mergeMonthIntoAllPlanDaysCache(monthId, weeksData) {
+    if (!monthId || !weeksData) return;
+    if (!window._allPlanDaysCache) window._allPlanDaysCache = [];
+    window._allPlanDaysCache = window._allPlanDaysCache.filter(d => d.monthId !== monthId);
+    Object.keys(weeksData).forEach(weekId => {
+        (weeksData[weekId]?.days || []).forEach((dayData, dayIndex) => {
+            if (dayData) window._allPlanDaysCache.push({ monthId, weekId, dayIndex, dayData });
+        });
+    });
+}
+window._mergeMonthIntoAllPlanDaysCache = _mergeMonthIntoAllPlanDaysCache;
+
+// Fetches EVERY month document (and its weeks subcollection) the user
+// has ever created, so the streak can count across all months/years.
+async function fetchAllPlanDaysAcrossMonths() {
+    try {
+        if (typeof userId === 'undefined' || !userId) return null;
+        const plansPath = getUserPlansCollectionPath();
+        const monthsQuery = query(collection(db, plansPath), orderBy(documentId(), "asc"));
+        const monthsSnap = await getDocs(monthsQuery);
+
+        const allDays = [];
+        for (const monthDoc of monthsSnap.docs) {
+            const monthId = monthDoc.id;
+            const weeksRef = collection(db, monthDoc.ref.path, 'weeks');
+            const weeksSnap = await getDocs(weeksRef);
+            weeksSnap.forEach(weekDoc => {
+                const weekId = weekDoc.id;
+                const weekData = weekDoc.data();
+                (weekData?.days || []).forEach((dayData, dayIndex) => {
+                    if (dayData) allDays.push({ monthId, weekId, dayIndex, dayData });
+                });
+            });
+        }
+        return allDays;
+    } catch (error) {
+        console.error("Error fetching all months for universal streak:", error);
+        return null;
+    }
+}
+
+// Refreshes window._allPlanDaysCache from Firestore (full history) and
+// re-renders the widget once done. Safe to call multiple times — guarded
+// against overlapping fetches.
+async function refreshAllPlanDaysCache() {
+    if (_isFetchingAllPlanDays) return;
+    _isFetchingAllPlanDays = true;
+    const days = await fetchAllPlanDaysAcrossMonths();
+    _isFetchingAllPlanDays = false;
+    if (days) {
+        window._allPlanDaysCache = days;
+        if (typeof checkAndUpdateStreak === 'function') checkAndUpdateStreak();
+    }
+}
+window._refreshAllPlanDaysCache = refreshAllPlanDaysCache;
+
+// Returns every known plan day, sorted chronologically by monthId (which
+// sorts correctly as "YYYY-MM"), then weekId, then dayIndex — i.e. the
+// true chronological order across all months and years.
+function _getUniversalSortedPlanDays() {
+    let list;
+    if (window._allPlanDaysCache && window._allPlanDaysCache.length > 0) {
+        list = window._allPlanDaysCache.slice();
+    } else {
+        // Full history hasn't loaded yet — fall back to whatever month is
+        // currently open so the widget still shows something meanwhile.
+        list = [];
+        const _cache = (typeof window !== 'undefined' && window._weeksCache) ? window._weeksCache : {};
+        const monthId = window._currentMonthId || '';
+        Object.keys(_cache).sort().forEach(weekId => {
+            (_cache[weekId]?.days || []).forEach((dayData, dayIndex) => {
+                if (dayData) list.push({ monthId, weekId, dayIndex, dayData });
+            });
+        });
+    }
+    list.sort((a, b) => {
+        if (a.monthId !== b.monthId) return a.monthId < b.monthId ? -1 : 1;
+        if (a.weekId !== b.weekId) return a.weekId < b.weekId ? -1 : 1;
+        return a.dayIndex - b.dayIndex;
+    });
+    return list;
+}
 
 // ---------------------------------------------------------------
 // UTILITY: get today's date string "YYYY-MM-DD"
@@ -9710,20 +9821,12 @@ function getShortDayLabel(dateStr) {
 // (across all weeks of the currently loaded month) whose assigned
 // date matches today's calendar date.
 // ---------------------------------------------------------------
-// Returns { seconds, date, dayNumber, weekId } for the very last plan day
-// the user has added across all weeks in the cache, ordered by weekId then day index.
+// Returns { monthId, weekId, dayIndex, dayData } for the very last plan day
+// the user has added across ALL months/years, in true chronological order.
 function getLastPlanDayInfo() {
-    const _cache = (typeof window !== 'undefined' && window._weeksCache) ? window._weeksCache : {};
-    if (!_cache || typeof _cache !== 'object') return null;
-    const weekIds = Object.keys(_cache).sort(); // week1, week2, week3 …
-    for (let w = weekIds.length - 1; w >= 0; w--) {
-        const weekId = weekIds[w];
-        const days = _cache[weekId]?.days;
-        if (!days || days.length === 0) continue;
-        const lastDay = days[days.length - 1];
-        return { weekId, dayIndex: days.length - 1, dayData: lastDay };
-    }
-    return null;
+    const allPlanDays = _getUniversalSortedPlanDays();
+    if (allPlanDays.length === 0) return null;
+    return allPlanDays[allPlanDays.length - 1];
 }
 
 function getTodayStudiedMinutes() {
@@ -9792,31 +9895,25 @@ function checkAndUpdateStreak() {
     const goalMinutes = Math.round(goalHours * 60);
     const goalSeconds = Math.round(goalHours * 3600);
     const _tlv = (typeof window !== 'undefined' && window._getTimerLiveValues) ? window._getTimerLiveValues : () => ({ session: 0, total: 0 });
-    const _cache = (typeof window !== 'undefined' && window._weeksCache) ? window._weeksCache : {};
 
-    // Build an ordered list of ALL plan days across all weeks
-    const weekIds = Object.keys(_cache).sort();
-    const allPlanDays = []; // [{weekId, dayIndex, dayData}]
-    weekIds.forEach(weekId => {
-        (_cache[weekId]?.days || []).forEach((dayData, dayIndex) => {
-            if (dayData) allPlanDays.push({ weekId, dayIndex, dayData });
-        });
-    });
+    // Build an ordered list of ALL plan days across every month AND year
+    // the user has ever added (universal, not limited to the open month).
+    const allPlanDays = _getUniversalSortedPlanDays(); // [{monthId, weekId, dayIndex, dayData}]
 
-    // Build history: one entry per plan day, keyed by "weekId:dayIndex"
+    // Build history: one entry per plan day, keyed by "monthId:weekId:dayIndex"
     const hist = {};
-    allPlanDays.forEach(({ weekId, dayIndex, dayData }) => {
+    allPlanDays.forEach(({ monthId, weekId, dayIndex, dayData }) => {
         let secs = _tlv(dayData.dayTimer).total;
         (dayData.rows || []).forEach(row => { secs += _tlv(row.timer).total; });
         const studiedMin = Math.floor(secs / 60);
         const goalMet = goalSeconds > 0 && secs >= goalSeconds;
-        const key = `${weekId}:${dayIndex}`;
+        const key = `${monthId}:${weekId}:${dayIndex}`;
         hist[key] = { studied: studiedMin, goalMet, date: dayData.date || '' };
     });
 
-    // Last plan day = "today" for the widget
+    // Last plan day (across ALL months/years) = "today" for the widget
     const studiedMinutes = allPlanDays.length > 0
-        ? hist[`${allPlanDays[allPlanDays.length-1].weekId}:${allPlanDays[allPlanDays.length-1].dayIndex}`]?.studied || 0
+        ? hist[`${allPlanDays[allPlanDays.length-1].monthId}:${allPlanDays[allPlanDays.length-1].weekId}:${allPlanDays[allPlanDays.length-1].dayIndex}`]?.studied || 0
         : 0;
 
     // Count consecutive streak:
@@ -9824,11 +9921,13 @@ function checkAndUpdateStreak() {
     //   (It gets a grace period — not meeting goal yet doesn't break streak.)
     // - If a new day is added, the previously-last day becomes a regular day
     //   and will break the streak if its goal wasn't met.
+    // - This now walks backwards through EVERY month/year in order, so a
+    //   streak keeps counting seamlessly across a month or year boundary.
     let currentStreak = 0;
     const lastIdx = allPlanDays.length - 1;
     for (let i = lastIdx; i >= 0; i--) {
-        const { weekId, dayIndex } = allPlanDays[i];
-        const entry = hist[`${weekId}:${dayIndex}`];
+        const { monthId, weekId, dayIndex } = allPlanDays[i];
+        const entry = hist[`${monthId}:${weekId}:${dayIndex}`];
         const isLastDay = i === lastIdx;
         if (entry && entry.goalMet) {
             // Goal met — always counts
@@ -9842,13 +9941,14 @@ function checkAndUpdateStreak() {
         }
     }
 
-    // Recalculate best streak from scratch (scan all plan days for longest consecutive run)
-    // Same rule: last day only counts if goal met
+    // Recalculate best streak from scratch (scan ALL plan days across every
+    // month/year for the longest consecutive run). Same rule: last day only
+    // counts if goal met.
     let bestStreak = 0;
     let runLength = 0;
     for (let i = 0; i < allPlanDays.length; i++) {
-        const { weekId, dayIndex } = allPlanDays[i];
-        const entry = hist[`${weekId}:${dayIndex}`];
+        const { monthId, weekId, dayIndex } = allPlanDays[i];
+        const entry = hist[`${monthId}:${weekId}:${dayIndex}`];
         const isLastPlanDay = i === allPlanDays.length - 1;
         if (entry && entry.goalMet) {
             runLength++;
@@ -10073,6 +10173,12 @@ window.saveGoal = saveGoal;
 // INIT — call this on page load
 // ---------------------------------------------------------------
 function initStreakGoalWidget() {
+    // Reset the universal (all months/years) cache so a new account/session
+    // doesn't briefly show a previous user's data, then kick off a full
+    // cross-month fetch in the background.
+    window._allPlanDaysCache = null;
+    if (typeof refreshAllPlanDaysCache === 'function') refreshAllPlanDaysCache();
+
     // Show skeleton while waiting for Firestore data
     const skelDots = document.getElementById('streak-skeleton-dots');
     if (skelDots) skelDots.style.display = 'flex';
