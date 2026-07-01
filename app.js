@@ -10043,50 +10043,64 @@ function renderWidget(studiedMin, goalMin, streak, hist) {
         }
     }
 
-    // --- Plan-day dots (last added week, one dot per plan day) ---
+    // --- Plan-day dots: Today is always centered, with the 3 most
+    // recent previous plan days on the left and 3 upcoming (not yet
+    // created) days on the right. Pulls from the universal cross-month
+    // plan-day list so this works seamlessly across week/month/year
+    // boundaries, not just within the currently-open week.
     const dotsContainer = document.getElementById('streak-days-row');
     if (!dotsContainer) return;
     dotsContainer.innerHTML = '';
 
-    const _dotCache = (typeof window !== 'undefined' && window._weeksCache) ? window._weeksCache : {};
     const _tlv2 = (typeof window !== 'undefined' && window._getTimerLiveValues) ? window._getTimerLiveValues : () => ({ session: 0, total: 0 });
     const goalHours = loadGoal();
     const goalSeconds = Math.round(goalHours * 3600);
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const weekdayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-    // Find the last week that has at least one day
-    const weekIds = Object.keys(_dotCache).sort();
-    let lastWeekDays = [];
-    let lastWeekId = null;
-    for (let w = weekIds.length - 1; w >= 0; w--) {
-        const wid = weekIds[w];
-        const days = _dotCache[wid]?.days;
-        if (days && days.length > 0) { lastWeekDays = days; lastWeekId = wid; break; }
+    const allDaysForDots = (typeof _getUniversalSortedPlanDays === 'function') ? _getUniversalSortedPlanDays() : [];
+    if (allDaysForDots.length === 0) return; // nothing to show yet
+
+    const todayDotIdx = allDaysForDots.length - 1; // last added plan day = "Today"
+    const todayDayData = allDaysForDots[todayDotIdx].dayData;
+
+    // Used to label future/missing slots with a real calendar date when
+    // we know today's actual date (e.g. "Thu (2 Jul)") instead of blanks.
+    let baseDate = null;
+    if (todayDayData && todayDayData.date) {
+        baseDate = new Date(todayDayData.date + 'T00:00:00');
     }
 
-    if (lastWeekDays.length === 0) return; // nothing to show
+    for (let offset = -3; offset <= 3; offset++) {
+        const isToday = offset === 0;
+        // Future slots (offset > 0) are never real — those days don't exist yet.
+        const srcIdx = offset <= 0 ? todayDotIdx + offset : -1;
+        const planDay = (srcIdx >= 0 && srcIdx < allDaysForDots.length) ? allDaysForDots[srcIdx].dayData : null;
+        const hasData = !!planDay;
 
-   const lastDayIndex = lastWeekDays.length - 1; // this is "Today" among ADDED days
+        let projectedDate = null;
+        if (baseDate) {
+            projectedDate = new Date(baseDate);
+            projectedDate.setDate(projectedDate.getDate() + offset);
+        }
 
-    for (let idx = 0; idx < 7; idx++) {
-        const planDay = lastWeekDays[idx];
-        const isToday = idx === lastDayIndex;
-        
         let dotClass = 'streak-day-dot';
         let dateSub = '';
-        let shortLabel = `Day ${idx + 1}`;
+        let shortLabel = '';
         let studiedLabel = '0m';
         let goalMet = false;
-        let isFuture = !planDay;
 
-        if (!isFuture) {
+        if (hasData) {
             const dateStr = planDay.date || '';
             if (dateStr) {
                 shortLabel = getShortDayLabel(dateStr);
                 const dObj = new Date(dateStr + 'T00:00:00');
                 dateSub = `(${dObj.getDate()} ${months[dObj.getMonth()]})`;
+            } else if (projectedDate) {
+                shortLabel = weekdayNames[projectedDate.getDay()];
+                dateSub = `(${projectedDate.getDate()} ${months[projectedDate.getMonth()]})`;
             }
-            
+
             let timerSecs = _tlv2(planDay.dayTimer).total;
             (planDay.rows || []).forEach(row => { timerSecs += _tlv2(row.timer).total; });
             const timerMin = Math.floor(timerSecs / 60);
@@ -10102,29 +10116,37 @@ function renderWidget(studiedMin, goalMin, streak, hist) {
                     : ' dot-no-data';
             }
         } else {
-            // Future day (not added yet)
+            // No real plan-day for this slot — either a future day that
+            // hasn't been created yet, or (for a brand-new user) there
+            // simply isn't enough history to fill a past slot.
             dotClass += ' dot-no-data';
-            studiedLabel = 'Not created yet';
+            if (projectedDate) {
+                shortLabel = weekdayNames[projectedDate.getDay()];
+                dateSub = `(${projectedDate.getDate()} ${months[projectedDate.getMonth()]})`;
+            } else {
+                shortLabel = offset > 0 ? `+${offset}` : '—';
+            }
+            studiedLabel = offset > 0 ? 'Not created yet' : 'No data';
         }
 
         const wrapper = document.createElement('div');
         wrapper.className = 'streak-day-dot-wrapper';
-        if(isFuture) {
-            wrapper.style.opacity = '0.5'; // Make future days look gray/inactive
+        if (!hasData) {
+            wrapper.style.opacity = '0.5'; // Make empty/future days look gray/inactive
         }
 
         const dot = document.createElement('div');
         dot.className = dotClass;
-        if (!goalMet && !isFuture) dot.textContent = shortLabel[0].toUpperCase();
-        else if (isFuture) dot.textContent = shortLabel.replace('Day ', '');
+        if (hasData && !goalMet) dot.textContent = shortLabel ? shortLabel[0].toUpperCase() : '';
+        else if (!hasData) dot.textContent = shortLabel ? shortLabel[0].toUpperCase() : (offset > 0 ? `+${offset}` : '');
 
         dot.title = isToday
-            ? `Day ${idx + 1} (Today) — ${studiedLabel} studied`
-            : (isFuture ? `Day ${idx + 1} — ${studiedLabel}` : `Day ${idx + 1}: ${planDay.date || ''} — ${studiedLabel} studied`);
+            ? `Today — ${studiedLabel} studied`
+            : (hasData ? `${planDay.date || shortLabel} — ${studiedLabel} studied` : `${dateSub || shortLabel} — ${studiedLabel}`);
 
         const label = document.createElement('span');
         label.className = 'streak-dot-label' + (isToday ? ' label-today' : '');
-        label.textContent = isToday ? 'Today' : shortLabel;
+        label.textContent = isToday ? 'Today' : (shortLabel || (offset > 0 ? `+${offset}` : '—'));
 
         const dateLbl = document.createElement('span');
         dateLbl.className = 'streak-dot-date';
