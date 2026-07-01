@@ -4122,8 +4122,11 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                              }
                          }
                      } else {
-                         // CASE 3: Copy from Previous Month (New Feature)
-                         // We are in Week 1. Look for Week 4 of the previous month.
+                         // CASE 3: Copy from Previous Month
+                         // We are in Week 1, Day 1 of a new month. Find the previous
+                         // month's LAST NON-EMPTY week (it may not be week4 — the user
+                         // might have only ever gotten as far as week1/2/3 there), then
+                         // copy from that week's last day.
                          try {
                              const parts = monthId.split('-'); // e.g., "2025-11"
                              let y = parseInt(parts[0]);
@@ -4134,16 +4137,21 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                              if (m === 0) { m = 12; y = y - 1; }
                              const prevMonthId = `${y}-${m.toString().padStart(2, '0')}`;
                              
-                             // Fetch Week 4 of previous month
-                             const prevMonthWeekRef = doc(db, getUserPlansCollectionPath(), prevMonthId, 'weeks', 'week4');
-                             const prevMonthWeekSnap = await getDoc(prevMonthWeekRef);
-                             
-                             if (prevMonthWeekSnap.exists()) {
-                                 const prevMDays = prevMonthWeekSnap.data().days || [];
-                                 if (prevMDays.length > 0) {
-                                     // Get the last day of that week
-                                     sourceRows = prevMDays[prevMDays.length - 1].rows || [];
-                                     console.log(`Auto-copied data from previous month: ${prevMonthId}`);
+                             // Walk backwards week4 -> week1 and use the first one
+                             // that actually has days in it.
+                             const candidateWeekIds = ['week4', 'week3', 'week2', 'week1'];
+                             for (const candidateWeekId of candidateWeekIds) {
+                                 const prevMonthWeekRef = doc(db, getUserPlansCollectionPath(), prevMonthId, 'weeks', candidateWeekId);
+                                 const prevMonthWeekSnap = await getDoc(prevMonthWeekRef);
+
+                                 if (prevMonthWeekSnap.exists()) {
+                                     const prevMDays = prevMonthWeekSnap.data().days || [];
+                                     if (prevMDays.length > 0) {
+                                         // Get the last day of that week
+                                         sourceRows = prevMDays[prevMDays.length - 1].rows || [];
+                                         console.log(`Auto-copied data from previous month: ${prevMonthId} (${candidateWeekId})`);
+                                         break; // Found the last non-empty week — stop looking
+                                     }
                                  }
                              }
                          } catch(err) {
