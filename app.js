@@ -3727,6 +3727,16 @@ function updateMonthUI(monthId, monthData, weeksData) {
 	// Missing Function: Handles Autosave (Background Save without UI toggle)
         async function saveDayPlan(monthId, weekId, daySection, isAutosave = true) {
             try {
+                // --- RACE-CONDITION FIX ---
+                // If a story is currently being saved in the background, wait for
+                // it to finish (and update the cache) before we read the cache
+                // and write the whole days array back — otherwise this save can
+                // silently wipe out the story that was just saved.
+                if (window._pendingStorySave) {
+                    if (!isAutosave) setSyncStatus("Saving story first...", "yellow");
+                    await window._pendingStorySave;
+                }
+
                 // 1. Parse data from DOM
                 const parseResult = await parseAndPrepareSaveData(daySection, weekId);
                 if (!parseResult) return;
@@ -4076,6 +4086,13 @@ function addVocabPairInputs(container, word = '', meaning = '') {
              confirmModalTitle.textContent = title; confirmModalMessage.textContent = message; currentConfirmAction = onConfirm;
              confirmModalConfirmBtn.onclick = () => { if (currentConfirmAction) currentConfirmAction(); closeModal('confirm-modal'); };
              confirmModalCancelBtn.onclick = () => closeModal('confirm-modal');
+             // --- STACKING FIX ---
+             // Force this modal to the very end of <body> and give it a very
+             // high z-index every time it's shown, so it always renders above
+             // any other open modal (e.g. the quiz results modal), regardless
+             // of DOM order or any nested stacking context.
+             document.body.appendChild(confirmModal);
+             confirmModal.style.zIndex = '99999';
              confirmModal.style.display = 'block';
          }
 
@@ -4084,6 +4101,14 @@ function addVocabPairInputs(container, word = '', meaning = '') {
             if (!currentUser || !userId) return;
             
             setSyncStatus("Syncing...", "yellow");
+
+            // --- RACE-CONDITION FIX ---
+            // Wait for any in-flight story save on this same week document to
+            // finish first, so we don't read/act on a days array that's about
+            // to be overwritten (or overwrite one that was just written).
+            if (window._pendingStorySave) {
+                await window._pendingStorySave;
+            }
             
             const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
              
@@ -4305,7 +4330,11 @@ function addVocabPairInputs(container, word = '', meaning = '') {
              const targetToSave = currentStoryTarget; 
              currentStoryTarget = null; 
 
-             (async () => {
+             // --- RACE-CONDITION FIX ---
+             // Track this in-flight story save so a day-save started before this
+             // finishes can wait for it, instead of overwriting it (or being
+             // overwritten by it) via a stale copy of the days array.
+             window._pendingStorySave = (async () => {
                  // --- START: MODIFIED ---
                  const weekDocRef = doc(db, getUserPlansCollectionPath(), targetToSave.monthId, 'weeks', targetToSave.weekId);
                  // --- END: MODIFIED ---
@@ -4350,6 +4379,10 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                      console.error("Error saving story in background:", error); 
                      showCustomAlert("Error saving story."); 
                      setSyncStatus("Error", "red"); 
+                 } finally {
+                     // Clear the flag once this save is done, so future day-saves
+                     // don't wait on a story-save that has already finished.
+                     window._pendingStorySave = null;
                  }
              })(); 
          });
