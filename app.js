@@ -3261,6 +3261,13 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                             isCheckboxClickGlobal = { weekId: weekId, dayIndex: dayIndex };
 
+                            // --- RACE-CONDITION FIX ---
+                            // Wait for any in-flight story save on this week doc
+                            // to finish before reading the cache below.
+                            if (window._pendingStorySave) {
+                                await window._pendingStorySave;
+                            }
+
                             const parseResult = await parseAndPrepareSaveData(daySection, weekId, true);
 
                             if (parseResult === null) {
@@ -3471,6 +3478,16 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  if (daySection.autosaveHandler) {
                      daySection.removeEventListener('input', daySection.autosaveHandler);
                      daySection.autosaveHandler = null;
+                 }
+
+                 // --- RACE-CONDITION FIX ---
+                 // If a story is currently being saved in the background, wait for
+                 // it to finish (and update the cache) before we read the cache
+                 // below — otherwise this save reads a stale days array (without
+                 // the story) and overwrites the story that was just saved.
+                 if (window._pendingStorySave) {
+                     setSyncStatus("Saving story first...", "yellow");
+                     await window._pendingStorySave;
                  }
                  
                  // 2. Parse Data Immediately
