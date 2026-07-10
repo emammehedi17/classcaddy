@@ -33,20 +33,19 @@
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
 
-            // --- FIX: MULTI-TAB SAFE OFFLINE PERSISTENCE ---
-            // The old enableIndexedDbPersistence(db) call only lets ONE tab/window
-            // (per browser profile) hold the persistence lock. Every other tab of
-            // the same app open at the same time silently falls back to a
-            // separate, disconnected local cache. Edits made in a "losing" tab
-            // can look "Synced" in the UI while never actually being reconciled
-            // with the tab that owns the real connection, and stale reads in
-            // that tab can get written back to Firestore, clobbering newer data.
-            // persistentMultipleTabManager() lets every tab/window share ONE
-            // synchronized cache, so this can't happen anymore.
+            // Offline/instant-load cache, MULTI-TAB SAFE.
+            // persistentMultipleTabManager() means every open tab/window shares
+            // ONE cache instead of each tab getting its own disconnected copy
+            // (which is what caused divergence before). This only affects how
+            // fast a page load can show data locally before the server responds
+            // -- it is NOT related to the earlier sync bug, which was caused by
+            // this app's own in-memory activeWeeksDataCache going stale during
+            // edit mode (fixed separately in the onSnapshot handler below, where
+            // the cache refresh no longer gets skipped while a day is being
+            // edited). That fix stays in place regardless of this setting.
             db = initializeFirestore(app, {
                 localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
             });
-            // ---------------------------------------
 
             // Expose for module-level functions (e.g. saveGoal)
             window._db = db;
