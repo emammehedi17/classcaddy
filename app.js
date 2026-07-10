@@ -1,7 +1,7 @@
 // Import necessary functions from Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, signInWithCustomToken, signInAnonymously, getRedirectResult, signInWithRedirect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, setDoc, doc, getDoc, collection, query, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, setDoc, doc, getDoc, collection, query, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 		
         // --- Firebase Configuration ---
         setLogLevel('debug'); // Keep debug logging enabled for now
@@ -32,14 +32,27 @@
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
-            db = getFirestore(app);
+
+            // --- FIX: MULTI-TAB SAFE OFFLINE PERSISTENCE ---
+            // The old enableIndexedDbPersistence(db) call only lets ONE tab/window
+            // (per browser profile) hold the persistence lock. Every other tab of
+            // the same app open at the same time silently falls back to a
+            // separate, disconnected local cache. Edits made in a "losing" tab
+            // can look "Synced" in the UI while never actually being reconciled
+            // with the tab that owns the real connection, and stale reads in
+            // that tab can get written back to Firestore, clobbering newer data.
+            // persistentMultipleTabManager() lets every tab/window share ONE
+            // synchronized cache, so this can't happen anymore.
+            db = initializeFirestore(app, {
+                localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+            });
+            // ---------------------------------------
+
             // Expose for module-level functions (e.g. saveGoal)
             window._db = db;
             window._auth = auth;
             window._doc = doc;
             window._setDoc = setDoc;
-            
-            
 
             googleProvider = new GoogleAuthProvider();
             console.log("Firebase initialized successfully.");
@@ -1092,12 +1105,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          return;
                      }
 
-                     const isCurrentlyEditing = currentMonthPlanDisplay.querySelector('.day-section.editing');
-                     if (isCurrentlyEditing) {
-                         console.log("Skipping all re-renders because a day is in edit mode.");
-                         return;
-                     }
-
                      if (!monthDocSnap.exists()) {
                          console.error("Document for monthId not found (or deleted):", monthId);
                          currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">This plan was not found.</p>';
@@ -1128,6 +1135,32 @@ function updateMonthUI(monthId, monthData, weeksData) {
 					 if (typeof checkAndUpdateStreak === 'function') checkAndUpdateStreak();
 					 
                      console.log("Fetched month data and", weeksQuerySnapshot.size, "week documents.");
+
+                     // --- FIX: THE BUG ---
+                     // This check used to sit BEFORE the cache (activeWeeksDataCache)
+                     // was refreshed above, which meant that while ANY day on the
+                     // page was in edit mode, this listener would return early and
+                     // the local cache would go stale -- not just for the day being
+                     // edited, but for the WHOLE month/week. Every save function
+                     // (saveDataToFirebase, updateTimerState, deleteDay, addNewDay,
+                     // etc.) reads that cache and writes the ENTIRE `days` array
+                     // back to Firestore. So: open a day for editing on one device,
+                     // let edits happen elsewhere (another tab/browser/guest view)
+                     // in the meantime, then click Save -- and that Save would
+                     // silently overwrite/erase the other device's changes with
+                     // the stale array, even though the local UI showed "Synced"
+                     // (its own write really did succeed, it just clobbered data).
+                     // That is exactly what caused Firestore to end up missing
+                     // data with no error ever being shown.
+                     //
+                     // Now we only skip the visual re-render while editing (so the
+                     // person's typing isn't disrupted), but the cache itself is
+                     // always kept in sync with the server in the background.
+                     const isCurrentlyEditing = currentMonthPlanDisplay.querySelector('.day-section.editing');
+                     if (isCurrentlyEditing) {
+                         console.log("Cache refreshed in background. Skipping visual re-render only, because a day is in edit mode.");
+                         return;
+                     }
 
                      // 4. Check for structural changes (new/deleted WEEKS)
                      const monthElement = currentMonthPlanDisplay.querySelector(`.card[data-month-id="${monthId}"]`);
@@ -3761,7 +3794,13 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 await saveDataToFirebase(monthDocRef, updatePayload, isAutosave);
 
             } catch (error) {
+                // --- FIX: don't swallow save failures silently ---
+                // This used to only log to console.error, so if this path's
+                // Firestore write failed (offline, permission error, etc.) the
+                // person would see no indication anything was wrong at all.
                 console.error("Autosave failed:", error);
+                setSyncStatus("Error", "red");
+                showCustomAlert("Save failed! Please check your connection.", "error");
             }
         }
         
