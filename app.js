@@ -1,7 +1,7 @@
 // Import necessary functions from Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, signInWithCustomToken, signInAnonymously, getRedirectResult, signInWithRedirect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, setDoc, doc, getDoc, collection, query, getDocs, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeFirestore, setDoc, doc, getDoc, getDocFromServer, collection, query, getDocs, getDocsFromServer, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 		
         // --- Firebase Configuration ---
         setLogLevel('debug'); // Keep debug logging enabled for now
@@ -33,19 +33,12 @@
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
 
-            // Offline/instant-load cache, MULTI-TAB SAFE.
-            // persistentMultipleTabManager() means every open tab/window shares
-            // ONE cache instead of each tab getting its own disconnected copy
-            // (which is what caused divergence before). This only affects how
-            // fast a page load can show data locally before the server responds
-            // -- it is NOT related to the earlier sync bug, which was caused by
-            // this app's own in-memory activeWeeksDataCache going stale during
-            // edit mode (fixed separately in the onSnapshot handler below, where
-            // the cache refresh no longer gets skipped while a day is being
-            // edited). That fix stays in place regardless of this setting.
-            db = initializeFirestore(app, {
-                localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
-            });
+            // Instant-load local persistence (IndexedDB) has been REMOVED.
+            // It was silently showing old cached data as if it were saved/synced,
+            // which let real data loss (2-3 days of entries) go unnoticed. All
+            // reads now go to the server; this is a plain in-memory-cache
+            // Firestore instance (default behavior, no offline persistence).
+            db = initializeFirestore(app, {});
 
             // Expose for module-level functions (e.g. saveGoal)
             window._db = db;
@@ -8327,7 +8320,7 @@ async function generateBackupObject(onProgress = () => {}) {
     const plansCollectionPath = `artifacts/${appId}/users/${userId}/studyPlans`;
     
     const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocsFromServer(q);
     
     const totalMonths = querySnapshot.size;
     const backupData = {};
@@ -8344,7 +8337,7 @@ async function generateBackupObject(onProgress = () => {}) {
         const monthData = docSnap.data();
         
         const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
-        const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
+        const weeksQuerySnapshot = await getDocsFromServer(weeksCollectionRef);
         
         const weeksData = {};
         weeksQuerySnapshot.forEach(weekDoc => {
@@ -8556,6 +8549,9 @@ backupCloudBtn.addEventListener('click', () => executeCloudBackup(false));
 
 // --- 5. SMART SCHEDULER (UNIVERSAL 24-HOUR CYCLE) ---
 
+const SIX_HOURS = 6 * 60 * 60 * 1000;
+let _smartBackupTimerStarted = false; // guard against duplicate setInterval timers
+
 async function initSmartCloudBackup() {
     const checkAndRun = async () => {
         if (!auth.currentUser) return;
@@ -8565,9 +8561,13 @@ async function initSmartCloudBackup() {
         const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
 
         try {
-            // Query the NEWEST backup (Ordered by timestamp DESCending)
+            // Query the NEWEST backup (Ordered by timestamp DESCending).
+            // IMPORTANT: read from the server, not the local cache -- a stale
+            // cached read here was the reason auto-backups were being skipped
+            // (it could see an old/missing backup record and either wrongly
+            // think a recent backup already ran, or wrongly think none exist).
             const q = query(cloudBackupsRef, orderBy("timestamp", "desc")); 
-            const snapshot = await getDocs(q);
+            const snapshot = await getDocsFromServer(q);
 
             let shouldBackup = false;
 
@@ -8579,9 +8579,6 @@ async function initSmartCloudBackup() {
                 const lastBackupDate = lastDoc.data().timestamp.toDate();
                 const lastBackupTime = lastBackupDate.getTime();
                 const now = Date.now();
-                
-                // --- CHANGED TO 6 HOURS ---
-                const SIX_HOURS = 6 * 60 * 60 * 1000; 
 
                 if ((now - lastBackupTime) > SIX_HOURS) {
                     console.log(`Last backup was ${lastBackupDate.toLocaleString()}. >6h ago. Triggering backup.`);
@@ -8598,11 +8595,17 @@ async function initSmartCloudBackup() {
         }
     };
 
-    // 1. Check 5 seconds after load
+    // 1. Check shortly after load (catches the "app was closed for >6h" case)
     setTimeout(checkAndRun, 5000);
 
-    // 2. Check every 20 minutes
-    setInterval(checkAndRun, 20 * 60 * 1000);
+    // 2. Check every 20 minutes while the app stays open, so a backup fires
+    //    as soon as the 6-hour mark is crossed instead of waiting for the
+    //    next full page load. Guarded so re-firing auth state doesn't stack
+    //    up multiple overlapping intervals.
+    if (!_smartBackupTimerStarted) {
+        _smartBackupTimerStarted = true;
+        setInterval(checkAndRun, 20 * 60 * 1000);
+    }
 }
 
 
@@ -8624,9 +8627,9 @@ async function loadCloudBackups() {
         const appId = "study-plan17";
         const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
         
-        // Order by newest first
+        // Order by newest first (read from server -- see note on stale cache reads above)
         const q = query(cloudBackupsRef, orderBy("timestamp", "desc"));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await getDocsFromServer(q);
         
         if (querySnapshot.empty) {
             cloudBackupList.innerHTML = '<p class="text-center text-gray-400 text-xs py-4">No cloud backups found.</p>';
@@ -8677,7 +8680,7 @@ window.restoreFromCloud = async function(docId) {
         const userId = auth.currentUser.uid;
         const appId = "study-plan17";
         const docRef = doc(db, `artifacts/${appId}/users/${userId}/cloudBackups`, docId);
-        const docSnap = await getDoc(docRef);
+        const docSnap = await getDocFromServer(docRef);
         
         if (!docSnap.exists()) {
             showCustomAlert("Backup file not found.", "error");
@@ -8691,9 +8694,9 @@ window.restoreFromCloud = async function(docId) {
         if (docData.isChunked) {
             console.log(`Detected chunked backup (${docData.chunkCount} parts). Reassembling...`);
             
-            // Fetch all parts from subcollection
+            // Fetch all parts from subcollection (server, not cache)
             const partsRef = collection(db, docRef.path, 'parts');
-            const partsSnap = await getDocs(partsRef);
+            const partsSnap = await getDocsFromServer(partsRef);
             
             // Sort by index to ensure correct order
             const parts = [];
