@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day-1 Vocabulary Notes</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration for darker text -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            500: '#374151', /* Made darker for better visibility of translations */
+                            600: '#111827', /* Almost black for secondary text */
+                            700: '#000000', /* Pure black for normal text */
+                            800: '#000000'  /* Pure black for section headers */
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Poppins for English, Hind Siliguri for Bengali -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS for specific styling -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+        }
+        .bn-text {
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Toast Notification Styles */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #10b981; /* Emerald 500 */
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-screen p-4 md:p-8 selection:bg-indigo-200 selection:text-indigo-900">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <!-- Header Section -->
+        <header class="glass-card rounded-2xl shadow-lg p-6 md:p-8 mb-8 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-indigo-500 to-purple-600"></div>
+            
+            <div class="text-center md:text-left mb-6 md:mb-0 z-10">
+                <div class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold mb-3">
+                    <i class="fas fa-calendar-day mr-2"></i>Daily Vocabulary
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 gradient-text pb-1">
+                    Day 1
+                </h1>
+                <p class="text-gray-600 font-medium flex items-center justify-center md:justify-start gap-2">
+                    <i class="fas fa-pen-nib text-purple-500"></i>
+                    Created by: 
+                    <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-indigo-600 hover:text-indigo-800 hover:underline transition-colors font-bold relative group">
+                        Emam Mehedi
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex-shrink-0 z-10 bg-white p-2 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-24 h-24 md:w-28 md:h-28 rounded-lg">
+                <p class="text-center text-xs text-gray-500 mt-1 font-semibold">Scan Me</p>
+            </div>
+        </header>
+
+        <!-- Story Section -->
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-10 mb-8 border-t-4 border-t-purple-500 relative">
+            <div class="absolute -top-4 -right-4 text-purple-200 opacity-20">
+                <i class="fas fa-book-open text-9xl"></i>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                <i class="fas fa-magic text-purple-500"></i> The Mind-Bending Story
+            </h2>
+            
+            <div class="bn-text text-lg md:text-xl text-gray-700 leading-relaxed space-y-4 bg-white/50 p-6 rounded-xl border border-gray-100 shadow-inner">
+                <p>
+                    একবিংশ শতাব্দীর শেষে, মানবজাতি মহাকাশের গভীরে একটি নতুন <span class="font-bold text-indigo-700 bg-indigo-50 px-1 rounded shadow-sm">Continent</span> <span class="text-rose-600 font-semibold">(মহাদেশ)</span> আবিষ্কার করল। এই গ্রহের বাসিন্দারা সবাই দেখতে একই রকম, তাদের সমাজটি ছিল সম্পূর্ণ <span class="font-bold text-indigo-700 bg-indigo-50 px-1 rounded shadow-sm">Homogeneous</span> <span class="text-rose-600 font-semibold">(সমজাতীয়)</span>। সেখানে কোনো দুঃখ, কষ্ট বা দারিদ্র্য ছিল না, যেন একটি নিখুঁত <span class="font-bold text-indigo-700 bg-indigo-50 px-1 rounded shadow-sm">Utopia</span> <span class="text-rose-600 font-semibold">(কল্পরাজ্য)</span>। 
+                </p>
+                <p>
+                    কিন্তু এই নিস্তব্ধতার আড়ালে একটি গোপন রহস্য লুকিয়ে ছিল। হঠাৎ একদিন মহাকাশযানে করে একজন অজানা আগন্তুক এসে পৌঁছাল, যাকে সবাই <span class="font-bold text-indigo-700 bg-indigo-50 px-1 rounded shadow-sm">A Dark Horse</span> <span class="text-rose-600 font-semibold">(অপ্রত্যাশিত প্রতিযোগী বা অজানা ব্যক্তি)</span> বলে ডাকতে শুরু করল। তার অন্তরে ছিল অগাধ <span class="font-bold text-indigo-700 bg-indigo-50 px-1 rounded shadow-sm">Compassion</span> <span class="text-rose-600 font-semibold">(সমবেদনা)</span>, এবং তার একমাত্র উদ্দেশ্য ছিল মহাবিশ্বে <span class="font-bold text-indigo-700 bg-indigo-50 px-1 rounded shadow-sm">Altruism</span> <span class="text-rose-600 font-semibold">(পরার্থপরতা)</span> ছড়িয়ে দেওয়া।
+                </p>
+                <p>
+                    সে জানতে পারল যে গ্রহের অত্যাচারী শাসক একটি প্রাচীন <span class="font-bold text-indigo-700 bg-indigo-50 px-1 rounded shadow-sm">Shrine</span> <span class="text-rose-600 font-semibold">(পুণ্যস্থান)</span>-এর ভেতরে এমন একটি জাদুকরী স্ফটিক আটকে রেখেছে, যা যেকোনো রোগ বা ধ্বংস সারাতে পারে, একেবারে একটি <span class="font-bold text-indigo-700 bg-indigo-50 px-1 rounded shadow-sm">Panacea</span> <span class="text-rose-600 font-semibold">(সর্বরোগহর ঔষধ)</span>-এর মতো। কিন্তু শাসক এটিকে সাধারণ মানুষের কাছে পৌঁছাতে দিচ্ছিল না। 
+                </p>
+                <p>
+                    এই শক্তি মুক্ত করার পথে সবচেয়ে বড় <span class="font-bold text-indigo-700 bg-indigo-50 px-1 rounded shadow-sm">Impediment</span> <span class="text-rose-600 font-semibold">(বাধা)</span> ছিল শাসকের রোবট বাহিনী। কিন্তু আগন্তুক শপথ নিল যে, সে তার বুদ্ধি ও সাহস দিয়ে এই স্বৈরাচারী শাসককে চিরতরে <span class="font-bold text-indigo-700 bg-indigo-50 px-1 rounded shadow-sm">Vanquish</span> <span class="text-rose-600 font-semibold">(পরাস্ত করা)</span> করবে।
+                </p>
+            </div>
+        </section>
+
+        <!-- Word Details Section -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-3 px-2">
+                <i class="fas fa-layer-group text-indigo-500"></i> Word Breakdown
+            </h2>
+            
+            <div class="grid grid-cols-1 gap-6">
+                
+                <!-- Word 1 -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-indigo-500">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                        <h3 class="text-2xl font-bold text-indigo-700">1. A Dark Horse <span class="text-sm font-normal text-gray-500 bn-text ml-2">(অপ্রত্যাশিত বিজয়ী)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold"><i class="fas fa-check-circle mr-1"></i>Syn: Underdog</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full font-semibold"><i class="fas fa-times-circle mr-1"></i>Ant: Favorite</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-400"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed bn-text">উনবিংশ শতাব্দীতে ঘোড়দৌড় থেকে এর উৎপত্তি, যেখানে এমন একটি ঘোড়াকে বোঝানো হতো যার সম্পর্কে জুয়াড়িরা খুব কম জানত কিন্তু অপ্রত্যাশিতভাবে জিতে যেত। ১৮৩১ সালে বেঞ্জামিন ডিসরেইলি তার 'দ্য ইয়াং ডিউক' উপন্যাসে এটি জনপ্রিয় করেন।</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-400"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-2">
+                            <li>
+                                He was considered a dark horse in the local election.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">স্থানীয় নির্বাচনে তাকে একজন অপ্রত্যাশিত প্রতিযোগী হিসেবে বিবেচনা করা হয়েছিল।</span>
+                            </li>
+                            <li>
+                                No one expected her to win; she is a true dark horse.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">কেউ তার জেতার আশা করেনি; সে সত্যিই একজন অপ্রত্যাশিত বিজয়ী।</span>
+                            </li>
+                            <li>
+                                The new team turned out to be a dark horse in the tournament.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">টুর্নামেন্টে নতুন দলটি একটি অপ্রত্যাশিত প্রতিযোগী হিসেবে আবির্ভূত হলো।</span>
+                            </li>
+                            <li>
+                                Never underestimate a dark horse in a tough competition.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">কঠিন প্রতিযোগিতায় কখনো কোনো অপ্রত্যাশিত প্রতিযোগীকে অবমূল্যায়ন করবেন না।</span>
+                            </li>
+                            <li>
+                                She remained a dark horse until the final round of the quiz.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">কুইজের চূড়ান্ত পর্ব পর্যন্ত সে একজন অপ্রত্যাশিত প্রতিযোগী হিসেবেই ছিল।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-50 p-4 rounded-xl">
+                        <div>
+                            <span class="font-bold text-green-600">Synonym:</span> Underdog <span class="bn-text text-sm font-normal text-gray-600">(দুর্বল বা পিছিয়ে থাকা প্রতিযোগী)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">The underdog surprised everyone by winning the final match.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">পিছিয়ে থাকা দলটি ফাইনাল ম্যাচ জিতে সবাইকে অবাক করে দিয়েছিল।</p>
+                        </div>
+                        <div>
+                            <span class="font-bold text-red-500">Antonym:</span> Favorite <span class="bn-text text-sm font-normal text-gray-600">(সুপরিচিত বা সম্ভাব্য বিজয়ী)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">He is the clear favorite to win the gold medal this year.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">এ বছর স্বর্ণপদক জেতার জন্য সে স্পষ্টতই সম্ভাব্য বিজয়ী।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 2 -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-purple-500">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                        <h3 class="text-2xl font-bold text-purple-700">2. Compassion <span class="text-sm font-normal text-gray-500 bn-text ml-2">(সমবেদনা / করুণা)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold"><i class="fas fa-check-circle mr-1"></i>Syn: Sympathy</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full font-semibold"><i class="fas fa-times-circle mr-1"></i>Ant: Cruelty</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-400"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed bn-text">শেষ ল্যাটিন শব্দ 'compassio' থেকে এসেছে, যার অর্থ "সহ-ভোগান্তি" বা "একসাথে অনুভব করা" (com- 'একসাথে' + pati 'ভোগ করা' থেকে)।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-400"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-2">
+                            <li>
+                                She showed great compassion for the poor children.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">সে গরিব শিশুদের প্রতি গভীর সমবেদনা দেখিয়েছিল।</span>
+                            </li>
+                            <li>
+                                Compassion is what makes us better human beings.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">সমবেদনাই আমাদের আরও ভালো মানুষ করে তোলে।</span>
+                            </li>
+                            <li>
+                                He felt compassion when he saw the crying child on the street.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">রাস্তায় কাঁদরত শিশুটিকে দেখে সে সমবেদনা অনুভব করেছিল।</span>
+                            </li>
+                            <li>
+                                A good and wise leader always acts with compassion.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">একজন ভালো এবং জ্ঞানী নেতা সর্বদা সমবেদনার সাথে কাজ করেন।</span>
+                            </li>
+                            <li>
+                                We must treat all living animals with compassion.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">আমাদের অবশ্যই সমস্ত জীবজন্তুর সাথে সদয় আচরণ করতে হবে।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-50 p-4 rounded-xl">
+                        <div>
+                            <span class="font-bold text-green-600">Synonym:</span> Sympathy <span class="bn-text text-sm font-normal text-gray-600">(সহানুভূতি)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">I have deep sympathy for your tragic loss.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">আপনার মর্মান্তিক ক্ষতিতে আমার গভীর সহানুভূতি রয়েছে।</p>
+                        </div>
+                        <div>
+                            <span class="font-bold text-red-500">Antonym:</span> Cruelty <span class="bn-text text-sm font-normal text-gray-600">(নিষ্ঠুরতা)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">The evil king was known for his extreme cruelty towards prisoners.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">দুষ্ট রাজা বন্দীদের প্রতি তার চরম নিষ্ঠুরতার জন্য পরিচিত ছিল।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 3 -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-pink-500">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                        <h3 class="text-2xl font-bold text-pink-700">3. Homogeneous <span class="text-sm font-normal text-gray-500 bn-text ml-2">(সমজাতীয়)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold"><i class="fas fa-check-circle mr-1"></i>Syn: Uniform</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full font-semibold"><i class="fas fa-times-circle mr-1"></i>Ant: Heterogeneous</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-400"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed bn-text">গ্রীক শব্দ 'homogenes' থেকে এসেছে, যা 'homos' (একই) এবং 'genos' (ধরণ, জাতি) নিয়ে গঠিত। এটি পরে গঠন বা উপাদানের সমতা বোঝাতে বিবর্তিত হয়েছে।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-400"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-2">
+                            <li>
+                                The students in this advanced class are a homogeneous group.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">এই উন্নত ক্লাসের শিক্ষার্থীরা একটি সমজাতীয় দল।</span>
+                            </li>
+                            <li>
+                                Processed milk is an example of a homogeneous liquid.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">প্রক্রিয়াজাত দুধ একটি সমজাতীয় তরলের উদাহরণ।</span>
+                            </li>
+                            <li>
+                                Japan has a highly homogeneous cultural population.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">জাপানে অত্যন্ত সমজাতীয় সাংস্কৃতিক জনসংখ্যা রয়েছে।</span>
+                            </li>
+                            <li>
+                                The chef stirred the sauce until it was smooth and homogeneous.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">শেফ সসটি মসৃণ এবং সমজাতীয় না হওয়া পর্যন্ত নাড়তে থাকলেন।</span>
+                            </li>
+                            <li>
+                                We want to create a homogeneous mixture for the experiment.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">আমরা পরীক্ষার জন্য একটি সমজাতীয় মিশ্রণ তৈরি করতে চাই।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-50 p-4 rounded-xl">
+                        <div>
+                            <span class="font-bold text-green-600">Synonym:</span> Uniform <span class="bn-text text-sm font-normal text-gray-600">(অভিন্ন / একরূপ)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">The houses in this neighborhood are of a uniform size and shape.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">এই পাড়ার বাড়িগুলো অভিন্ন আকার এবং আকৃতির।</p>
+                        </div>
+                        <div>
+                            <span class="font-bold text-red-500">Antonym:</span> Heterogeneous <span class="bn-text text-sm font-normal text-gray-600">(অসমজাতীয় / বিবিধ)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">New York City has a very heterogeneous and diverse society.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">নিউইয়র্ক সিটিতে একটি অত্যন্ত অসমজাতীয় এবং বৈচিত্র্যময় সমাজ রয়েছে।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 4 -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-teal-500">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                        <h3 class="text-2xl font-bold text-teal-700">4. Panacea <span class="text-sm font-normal text-gray-500 bn-text ml-2">(সর্বরোগহর ঔষধ)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold"><i class="fas fa-check-circle mr-1"></i>Syn: Cure-all</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full font-semibold"><i class="fas fa-times-circle mr-1"></i>Ant: Toxin</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-400"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed bn-text">গ্রীক দেবী 'Panakeia' (সার্বজনীন প্রতিকারের দেবী)-এর নামানুসারে এর নামকরণ করা হয়েছে, যিনি ছিলেন চিকিৎসার দেবতা অ্যাসক্লেপিয়াসের কন্যা।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-400"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-2">
+                            <li>
+                                Technology is helpful, but it is not a panacea for all our problems.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">প্রযুক্তি সহায়ক, তবে এটি আমাদের সকল সমস্যার সর্বরোগহর ঔষধ নয়।</span>
+                            </li>
+                            <li>
+                                There is no magic panacea to instantly cure global poverty.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">বৈশ্বিক দারিদ্র্য তাৎক্ষণিকভাবে নিরাময়ের কোনো জাদুকরী ঔষধ নেই।</span>
+                            </li>
+                            <li>
+                                The salesman falsely claimed his herbal tea was a panacea.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">বিক্রেতা মিথ্যা দাবি করেছিল যে তার ভেষজ চা একটি সর্বরোগহর ঔষধ।</span>
+                            </li>
+                            <li>
+                                Education is often seen as a panacea for social issues.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">শিক্ষাকে প্রায়শই সামাজিক সমস্যার সর্বরোগহর ঔষধ হিসেবে দেখা হয়।</span>
+                            </li>
+                            <li>
+                                We cannot rely on a single panacea to fix the economy.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">অর্থনীতি ঠিক করতে আমরা একটিমাত্র সমাধানের ওপর নির্ভর করতে পারি না।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-50 p-4 rounded-xl">
+                        <div>
+                            <span class="font-bold text-green-600">Synonym:</span> Cure-all <span class="bn-text text-sm font-normal text-gray-600">(সর্বব্যাধিনাশক)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">The scammer tried to sell me a fake cure-all potion.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">প্রতারক আমাকে একটি নকল সর্বব্যাধিনাশক ঔষধ বিক্রি করার চেষ্টা করেছিল।</p>
+                        </div>
+                        <div>
+                            <span class="font-bold text-red-500">Antonym:</span> Toxin <span class="bn-text text-sm font-normal text-gray-600">(বিষ)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">The poisonous snake bite released a deadly toxin into his blood.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">বিষাক্ত সাপের কামড় তার রক্তে একটি মারাত্মক বিষ ছড়িয়ে দেয়।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 5 -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-red-500">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                        <h3 class="text-2xl font-bold text-red-700">5. Vanquish <span class="text-sm font-normal text-gray-500 bn-text ml-2">(পরাস্ত করা)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold"><i class="fas fa-check-circle mr-1"></i>Syn: Defeat</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full font-semibold"><i class="fas fa-times-circle mr-1"></i>Ant: Surrender</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-400"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed bn-text">পুরাতন ফরাসি শব্দ 'venquis' থেকে উদ্ভূত, যা ল্যাটিন শব্দ 'vincere' থেকে এসেছে যার অর্থ "জয় করা বা পরাস্ত করা"।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-400"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-2">
+                            <li>
+                                The brave hero will finally vanquish the evil dragon.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">সাহসী বীর অবশেষে দুষ্ট ড্রাগনটিকে পরাস্ত করবে।</span>
+                            </li>
+                            <li>
+                                To succeed in life, we must vanquish our inner fears.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">জীবনে সফল হতে হলে আমাদের ভেতরের ভয়কে পরাস্ত করতে হবে।</span>
+                            </li>
+                            <li>
+                                The general led his army to vanquish the enemy troops.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">সেনাপতি শত্রু বাহিনীকে পরাস্ত করতে তার সেনাবাহিনীর নেতৃত্ব দিয়েছিলেন।</span>
+                            </li>
+                            <li>
+                                He trained hard, determined to vanquish his biggest rival.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">সে তার সবচেয়ে বড় প্রতিদ্বন্দ্বীকে পরাস্ত করতে দৃঢ়প্রতিজ্ঞ হয়ে কঠোর প্রশিক্ষণ নিয়েছিল।</span>
+                            </li>
+                            <li>
+                                True love has the power to vanquish deep hatred.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">গভীর ঘৃণাকে পরাস্ত করার ক্ষমতা প্রকৃত ভালোবাসার রয়েছে।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-50 p-4 rounded-xl">
+                        <div>
+                            <span class="font-bold text-green-600">Synonym:</span> Defeat <span class="bn-text text-sm font-normal text-gray-600">(পরাজিত করা)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">Our football team will definitely defeat them tomorrow.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">আমাদের ফুটবল দল আগামীকাল অবশ্যই তাদের পরাজিত করবে।</p>
+                        </div>
+                        <div>
+                            <span class="font-bold text-red-500">Antonym:</span> Surrender <span class="bn-text text-sm font-normal text-gray-600">(আত্মসমর্পণ করা)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">When surrounded, the soldiers had no choice but to surrender.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">চারপাশ ঘেরাও হয়ে গেলে সৈন্যদের আত্মসমর্পণ করা ছাড়া আর কোনো উপায় ছিল না।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 6 -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-orange-500">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                        <h3 class="text-2xl font-bold text-orange-700">6. Altruism <span class="text-sm font-normal text-gray-500 bn-text ml-2">(পরার্থপরতা)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold"><i class="fas fa-check-circle mr-1"></i>Syn: Selflessness</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full font-semibold"><i class="fas fa-times-circle mr-1"></i>Ant: Selfishness</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-400"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed bn-text">১৯শ শতাব্দীতে ফরাসি দার্শনিক অগাস্ট কোঁত ইতালীয় শব্দ 'altrui' (অন্যদের প্রতি) থেকে এটি তৈরি করেন, যা ল্যাটিন শব্দ 'alter' (অন্য) থেকে এসেছে।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-400"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-2">
+                            <li>
+                                Mother Teresa is remembered globally as a symbol of true altruism.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">মাদার তেরেসা বিশ্বব্যাপী প্রকৃত পরার্থপরতার প্রতীক হিসেবে স্মরণীয় হয়ে আছেন।</span>
+                            </li>
+                            <li>
+                                His altruism inspired many young people to help the poor.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">তার পরার্থপরতা অনেক তরুণকে গরিবদের সাহায্য করতে অনুপ্রাণিত করেছিল।</span>
+                            </li>
+                            <li>
+                                Practicing altruism brings genuine joy to the giver's heart.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">পরার্থপরতা চর্চা করা দাতার মনে প্রকৃত আনন্দ নিয়ে আসে।</span>
+                            </li>
+                            <li>
+                                We desperately need more altruism in this highly selfish world.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">এই অত্যন্ত স্বার্থপর পৃথিবীতে আমাদের আরও বেশি পরার্থপরতা প্রয়োজন।</span>
+                            </li>
+                            <li>
+                                Her quick act of altruism saved the stray dog's life.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">তার দ্রুত পরার্থপরতার কাজটি পথকুকুরটির জীবন বাঁচিয়েছিল।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-50 p-4 rounded-xl">
+                        <div>
+                            <span class="font-bold text-green-600">Synonym:</span> Selflessness <span class="bn-text text-sm font-normal text-gray-600">(নিঃস্বার্থতা)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">His remarkable selflessness made him a local hero during the flood.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">বন্যার সময় তার অসাধারণ নিঃস্বার্থতা তাকে স্থানীয় হিরো বানিয়েছিল।</p>
+                        </div>
+                        <div>
+                            <span class="font-bold text-red-500">Antonym:</span> Selfishness <span class="bn-text text-sm font-normal text-gray-600">(স্বার্থপরতা)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">Her extreme selfishness eventually ruined all her close friendships.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">তার চরম স্বার্থপরতা শেষ পর্যন্ত তার সমস্ত ঘনিষ্ঠ বন্ধুত্ব নষ্ট করে দেয়।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 7 -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-yellow-500">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                        <h3 class="text-2xl font-bold text-yellow-700">7. Impediment <span class="text-sm font-normal text-gray-500 bn-text ml-2">(বাধা)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold"><i class="fas fa-check-circle mr-1"></i>Syn: Obstacle</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full font-semibold"><i class="fas fa-times-circle mr-1"></i>Ant: Advantage</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-400"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed bn-text">ল্যাটিন শব্দ 'impedimentum' (বাধা) থেকে এসেছে, যা 'impedire' "পায়ে শিকল পরানো" থেকে গঠিত (in- 'ভিতরে' + pes/ped- 'পা')।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-400"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-2">
+                            <li>
+                                Lack of proper funding is a major impediment to the research project.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">উপযুক্ত তহবিলের অভাব গবেষণা প্রকল্পটির জন্য একটি প্রধান বাধা।</span>
+                            </li>
+                            <li>
+                                With practice, he completely overcame his childhood speech impediment.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">অনুশীলনের মাধ্যমে সে তার শৈশবের কথা বলার বাধাটি সম্পূর্ণ কাটিয়ে উঠেছে।</span>
+                            </li>
+                            <li>
+                                Fear of failure is often the biggest impediment to success.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">ব্যর্থতার ভয় প্রায়শই সফলতার সবচেয়ে বড় বাধা।</span>
+                            </li>
+                            <li>
+                                There is no legal impediment preventing their marriage.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">তাদের বিয়েতে বাধা দেওয়ার মতো কোনো আইনি বাধা নেই।</span>
+                            </li>
+                            <li>
+                                The heavy snow was a severe impediment to our winter travel.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">প্রবল তুষারপাত আমাদের শীতকালীন ভ্রমণের জন্য একটি তীব্র বাধা ছিল।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-50 p-4 rounded-xl">
+                        <div>
+                            <span class="font-bold text-green-600">Synonym:</span> Obstacle <span class="bn-text text-sm font-normal text-gray-600">(প্রতিবন্ধকতা)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">We faced and overcame many obstacles on the long journey.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">দীর্ঘ যাত্রায় আমরা অনেক প্রতিবন্ধকতার সম্মুখীন হয়েছি এবং তা অতিক্রম করেছি।</p>
+                        </div>
+                        <div>
+                            <span class="font-bold text-red-500">Antonym:</span> Advantage <span class="bn-text text-sm font-normal text-gray-600">(সুবিধা)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">Being exceptionally tall is a clear advantage in basketball.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">অসাধারণ লম্বা হওয়া বাস্কেটবলে একটি স্পষ্ট সুবিধা।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 8 -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-blue-500">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                        <h3 class="text-2xl font-bold text-blue-700">8. Continent <span class="text-sm font-normal text-gray-500 bn-text ml-2">(মহাদেশ)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold"><i class="fas fa-check-circle mr-1"></i>Syn: Landmass</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full font-semibold"><i class="fas fa-times-circle mr-1"></i>Ant: Ocean</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-400"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed bn-text">ল্যাটিন শব্দ 'terra continens' থেকে উদ্ভূত, যার অর্থ "অবিচ্ছিন্ন ভূমি" ('continere' - একসাথে ধরে রাখা থেকে)।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-400"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-2">
+                            <li>
+                                Asia is the largest and most populous continent on Earth.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">এশিয়া পৃথিবীর বৃহত্তম এবং সবচেয়ে জনবহুল মহাদেশ।</span>
+                            </li>
+                            <li>
+                                The adventurous team traveled across the entire African continent.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">দুঃসাহসিক দলটি সমগ্র আফ্রিকা মহাদেশ জুড়ে ভ্রমণ করেছিল।</span>
+                            </li>
+                            <li>
+                                Antarctica is a very cold and icy continent with no permanent residents.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">অ্যান্টার্কটিকা স্থায়ী বাসিন্দা শূন্য একটি খুব ঠান্ডা এবং বরফাচ্ছাদিত মহাদেশ।</span>
+                            </li>
+                            <li>
+                                Early explorers sailed for months to find a new continent.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">আগের যুগের অভিযাত্রীরা নতুন মহাদেশ আবিষ্কারের জন্য মাসের পর মাস সমুদ্রযাত্রা করত।</span>
+                            </li>
+                            <li>
+                                Europe is a historically rich and diverse continent.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">ইউরোপ একটি ঐতিহাসিকভাবে সমৃদ্ধ এবং বৈচিত্র্যময় মহাদেশ।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-50 p-4 rounded-xl">
+                        <div>
+                            <span class="font-bold text-green-600">Synonym:</span> Landmass <span class="bn-text text-sm font-normal text-gray-600">(ভূখণ্ড)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">Eurasia is considered a single, massive landmass by some geographers.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">ইউরেশিয়াকে কিছু ভূগোলবিদ একটি একক, বিশাল ভূখণ্ড বলে মনে করেন।</p>
+                        </div>
+                        <div>
+                            <span class="font-bold text-red-500">Antonym:</span> Ocean <span class="bn-text text-sm font-normal text-gray-600">(মহাসাগর)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">The vast Pacific Ocean separates the Americas from Asia.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">বিশাল প্রশান্ত মহাসাগর আমেরিকা ও এশিয়াকে আলাদা করেছে।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 9 -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-cyan-500">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                        <h3 class="text-2xl font-bold text-cyan-700">9. Shrine <span class="text-sm font-normal text-gray-500 bn-text ml-2">(পুণ্যস্থান)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold"><i class="fas fa-check-circle mr-1"></i>Syn: Sanctuary</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full font-semibold"><i class="fas fa-times-circle mr-1"></i>Ant: Desecration</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-400"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed bn-text">পুরানো ইংরেজি 'scrīn' থেকে এসেছে, যার উৎপত্তি ল্যাটিন শব্দ 'scrinium' থেকে, অর্থ "বই বা কাগজের জন্য বাক্স"। পরে এটি পবিত্র ধ্বংসাবশেষ রাখার পাত্র এবং তারপর সেই পাত্র রাখার স্থান বোঝাতে বিবর্তিত হয়।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-400"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-2">
+                            <li>
+                                Thousands of devoted people visit the holy shrine every year.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">প্রতি বছর হাজার হাজার ধর্মপ্রাণ মানুষ পবিত্র পুণ্যস্থানে যান।</span>
+                            </li>
+                            <li>
+                                The community built a beautiful small shrine in the public garden.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">সম্প্রদায়টি পাবলিক বাগানে একটি সুন্দর ছোট পুণ্যস্থান তৈরি করেছে।</span>
+                            </li>
+                            <li>
+                                The ancient wooden shrine is over five centuries old.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">প্রাচীন কাঠের পুণ্যস্থানটি পাঁচ শতাব্দীরও বেশি পুরানো।</span>
+                            </li>
+                            <li>
+                                She silently prayed and lit a candle at the peaceful shrine.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">সে শান্ত পুণ্যস্থানে নীরবে প্রার্থনা করল এবং একটি মোমবাতি জ্বালাল।</span>
+                            </li>
+                            <li>
+                                It is a famous Buddhist shrine located high in the mountains.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">এটি উঁচু পাহাড়ে অবস্থিত একটি বিখ্যাত বৌদ্ধ পুণ্যস্থান।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-50 p-4 rounded-xl">
+                        <div>
+                            <span class="font-bold text-green-600">Synonym:</span> Sanctuary <span class="bn-text text-sm font-normal text-gray-600">(আশ্রয়স্থল / পবিত্র স্থান)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">The wounded birds found absolute safety inside the sanctuary.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">আহত পাখিরা আশ্রয়স্থলের ভেতরে পরম নিরাপত্তা পেয়েছিল।</p>
+                        </div>
+                        <div>
+                            <span class="font-bold text-red-500">Antonym:</span> Desecration <span class="bn-text text-sm font-normal text-gray-600">(পবিত্রতা নষ্ট করা)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">The deliberate desecration of the temple shocked the entire village.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">মন্দিরের ইচ্ছাকৃত পবিত্রতা নষ্ট করা পুরো গ্রামকে হতবাক করেছিল।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 10 -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-fuchsia-500">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                        <h3 class="text-2xl font-bold text-fuchsia-700">10. Utopia <span class="text-sm font-normal text-gray-500 bn-text ml-2">(কল্পরাজ্য)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold"><i class="fas fa-check-circle mr-1"></i>Syn: Paradise</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-700 text-xs rounded-full font-semibold"><i class="fas fa-times-circle mr-1"></i>Ant: Dystopia</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-400"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-gray-700 leading-relaxed bn-text">১৫১৬ সালে স্যার টমাস মোর তার বইয়ের শিরোনাম হিসেবে শব্দটি তৈরি করেন। এটি গ্রীক 'ou' (না) এবং 'topos' (স্থান) থেকে এসেছে, যার আক্ষরিক অর্থ "এমন কোনো জায়গা নেই"।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold text-gray-700 flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-400"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2 ml-2">
+                            <li>
+                                He constantly dreams of living in a perfect, peaceful utopia.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">সে প্রতিনিয়ত একটি নিখুঁত, শান্তিপূর্ণ কল্পরাজ্যে বসবাসের স্বপ্ন দেখে।</span>
+                            </li>
+                            <li>
+                                Historians argue that a true utopia probably does not exist in reality.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">ঐতিহাসিকরা যুক্তি দেন যে একটি সত্যিকারের কল্পরাজ্য সম্ভবত বাস্তবে বিদ্যমান নেই।</span>
+                            </li>
+                            <li>
+                                The science fiction book describes a highly advanced futuristic utopia.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">বৈজ্ঞানিক কল্পকাহিনীর বইটি একটি অত্যন্ত উন্নত ভবিষ্যতের কল্পরাজ্যের বর্ণনা দেয়।</span>
+                            </li>
+                            <li>
+                                The isolated group tried to build their own socialist utopia on the island.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">বিচ্ছিন্ন দলটি দ্বীপে তাদের নিজস্ব সমাজতান্ত্রিক কল্পরাজ্য গড়ে তোলার চেষ্টা করেছিল।</span>
+                            </li>
+                            <li>
+                                Her blooming, quiet garden is her personal utopia away from the city.<br>
+                                <span class="text-xs text-gray-500 bn-text ml-5 block mt-0.5">তার প্রস্ফুটিত, শান্ত বাগানটি শহর থেকে দূরে তার ব্যক্তিগত কল্পরাজ্য।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-50 p-4 rounded-xl">
+                        <div>
+                            <span class="font-bold text-green-600">Synonym:</span> Paradise <span class="bn-text text-sm font-normal text-gray-600">(স্বর্গ)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">The warm, sunny tropical island felt like a true paradise.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">উষ্ণ, রৌদ্রোজ্জ্বল গ্রীষ্মমন্ডলীয় দ্বীপটি সত্যিকারের স্বর্গের মতো মনে হয়েছিল।</p>
+                        </div>
+                        <div>
+                            <span class="font-bold text-red-500">Antonym:</span> Dystopia <span class="bn-text text-sm font-normal text-gray-600">(দুঃস্বপ্নের জগত)</span>
+                            <p class="text-sm text-gray-700 italic mt-1">The dark movie is set in a terrifying and oppressive dystopia.</p>
+                            <p class="text-xs text-gray-500 bn-text mt-0.5">অন্ধকার সিনেমাটি একটি ভীতিকর এবং নিপীড়ক দুঃস্বপ্নের জগতে তৈরি।</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-8 bg-gradient-to-r from-gray-900 to-indigo-900 text-white relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10">
+                <i class="fas fa-clipboard-list text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 class="text-2xl font-bold flex items-center gap-3">
+                    <i class="fas fa-list-check text-indigo-400"></i> Summary List
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 bg-indigo-500 hover:bg-indigo-400 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 border border-indigo-400">
+                    <i class="fas fa-copy"></i> Copy List
+                </button>
+            </div>
+            
+            <div class="bg-black/30 p-5 rounded-xl border border-indigo-500/30 font-mono text-sm leading-relaxed overflow-x-auto z-10 relative bn-text">
+<pre id="summaryText" class="whitespace-pre-wrap text-indigo-100">A Dark Horse, অপ্রত্যাশিত বিজয়ী - Underdog;
+Compassion, সমবেদনা - Sympathy;
+Homogeneous, সমজাতীয় - Uniform;
+Panacea, সর্বরোগহর ঔষধ - Cure-all;
+Vanquish, পরাস্ত করা - Defeat;
+Altruism, পরার্থপরতা - Selflessness;
+Impediment, বাধা - Obstacle;
+Continent, মহাদেশ - Landmass;
+Shrine, পুণ্যস্থান - Sanctuary;
+Utopia, কল্পরাজ্য - Paradise;</pre>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-500 text-sm mt-8 pb-8 font-medium">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i class="fas fa-check-circle mr-2"></i>Copied to clipboard successfully!</div>
+
+    <script>
+        function copySummary() {
+            const summaryText = document.getElementById('summaryText').innerText;
+            
+            // Create a temporary textarea to copy from (works better in iframes/older browsers)
+            const textArea = document.createElement("textarea");
+            textArea.value = summaryText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                // Execute copy command
+                document.execCommand('copy');
+                showToast();
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                // Fallback to modern clipboard API if execCommand fails
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(summaryText).then(showToast).catch(e => console.error("Clipboard API failed", e));
+                }
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            
+            // Hide after 3 seconds
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
