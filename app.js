@@ -8432,7 +8432,7 @@ async function executeCloudBackup(isAuto = false) {
         if (!isAuto) updateProgress(5, "Checking storage...");
         
         const q = query(cloudBackupsRef, orderBy("timestamp", "asc"));
-        const snapshot = await getDocs(q);
+        const snapshot = await getDocsFromServer(q);
 
         let successMessage = isAuto ? "Daily Auto-Backup Complete!" : "Backup saved to cloud successfully!";
 
@@ -8448,7 +8448,7 @@ async function executeCloudBackup(isAuto = false) {
                 const oldDoc = snapshot.docs[i];
                 if (oldDoc.data().isChunked) {
                     const partsRef = collection(db, oldDoc.ref.path, 'parts');
-                    const partsSnap = await getDocs(partsRef);
+                    const partsSnap = await getDocsFromServer(partsRef);
                     partsSnap.forEach(part => batch.delete(part.ref));
                 }
                 batch.delete(oldDoc.ref);
@@ -8486,12 +8486,22 @@ async function executeCloudBackup(isAuto = false) {
 
             if (!isAuto) updateProgress(90, `Uploading ${chunks.length} parts...`);
 
+            // IMPORTANT: the index doc is created with uploadComplete:false,
+            // then the chunk docs are written, then we flip uploadComplete
+            // to true. If the old code marked a backup "done" (chunkCount:
+            // 30) before the chunks actually existed, closing the tab or
+            // losing network between those two writes left a backup that
+            // LOOKS complete in the list but has an empty parts subcollection
+            // -- exactly the "Unexpected end of JSON input" restore failure.
+            // With the flag, an interrupted upload stays uploadComplete:false
+            // forever, so restore/list code below can detect and skip it.
             const backupDocRef = await addDoc(cloudBackupsRef, {
                 timestamp: Timestamp.now(),
                 note: noteText,
                 isChunked: true,
                 chunkCount: chunks.length,
-                totalSize: jsonString.length
+                totalSize: jsonString.length,
+                uploadComplete: false
             });
 
             const batch = writeBatch(db);
@@ -8500,6 +8510,9 @@ async function executeCloudBackup(isAuto = false) {
                 batch.set(chunkRef, { data: chunk, index: index });
             });
             await batch.commit();
+
+            // Chunks are confirmed on the server -- now finalize the index doc.
+            await updateDoc(backupDocRef, { uploadComplete: true });
 
         } else {
             // Small File
@@ -8645,15 +8658,19 @@ async function loadCloudBackups() {
             
             // Note handling
             const note = backup.note || "Manual Cloud Backup";
+            const isIncomplete = backup.isChunked && backup.uploadComplete === false;
+            const incompleteBadge = isIncomplete
+                ? `<span class="text-xs text-red-500 font-semibold ml-2"><i class="fas fa-exclamation-triangle mr-1"></i>Upload never finished</span>`
+                : '';
             
             html += `
             <div class="cloud-backup-card">
                 <div>
                     <span class="backup-info-title"><i class="fas fa-clock text-gray-400 mr-1"></i> ${dateStr}</span>
-                    <span class="backup-info-date">${timeStr} - ${note}</span>
+                    <span class="backup-info-date">${timeStr} - ${note}</span>${incompleteBadge}
                 </div>
                 <div class="flex items-center">
-                    <button class="restore-cloud-btn" onclick="restoreFromCloud('${doc.id}')">
+                    <button class="restore-cloud-btn" onclick="restoreFromCloud('${doc.id}')" ${isIncomplete ? 'disabled title="This backup is incomplete and cannot be restored"' : ''}>
                         Restore
                     </button>
                 </div>
@@ -8692,11 +8709,27 @@ window.restoreFromCloud = async function(docId) {
 
         // --- CHECK FOR CHUNKS ---
         if (docData.isChunked) {
+            // If this backup's upload never finished (tab closed / network
+            // dropped mid-upload), its chunkCount says "complete" but the
+            // parts subcollection may be empty or partial. Refuse early with
+            // a clear message rather than crashing on JSON.parse below.
+            if (docData.uploadComplete === false) {
+                showCustomAlert("This backup never finished uploading and can't be restored. Please try an older backup from the list.", "error");
+                return;
+            }
+
             console.log(`Detected chunked backup (${docData.chunkCount} parts). Reassembling...`);
             
             // Fetch all parts from subcollection (server, not cache)
             const partsRef = collection(db, docRef.path, 'parts');
             const partsSnap = await getDocsFromServer(partsRef);
+
+            // Integrity check: make sure every expected chunk actually came back.
+            if (docData.chunkCount && partsSnap.size !== docData.chunkCount) {
+                console.error(`Chunk mismatch: expected ${docData.chunkCount}, found ${partsSnap.size}.`);
+                showCustomAlert(`This backup is incomplete (found ${partsSnap.size} of ${docData.chunkCount} parts) and can't be restored. Please try an older backup.`, "error");
+                return;
+            }
             
             // Sort by index to ensure correct order
             const parts = [];
