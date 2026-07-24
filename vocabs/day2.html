@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day-2 Vocabulary Notes</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration for darker text -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            500: '#000000', /* Forced black for high contrast */
+                            600: '#000000', /* Forced black for high contrast */
+                            700: '#000000', /* Pure black for normal text */
+                            800: '#000000', /* Pure black for section headers */
+                            900: '#000000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Poppins for English, Hind Siliguri for Bengali -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS for specific styling -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            color: #000000; /* Default text color is black */
+        }
+        .bn-text {
+            font-family: 'Hind Siliguri', sans-serif;
+            color: #000000; /* Ensure all Bangla text is black */
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Toast Notification Styles */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #10b981;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 min-h-screen p-4 md:p-8 selection:bg-teal-200 selection:text-teal-900 text-black">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <!-- Header Section -->
+        <header class="glass-card rounded-2xl shadow-lg p-6 md:p-8 mb-8 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-teal-500 to-cyan-600"></div>
+            
+            <div class="text-center md:text-left mb-6 md:mb-0 z-10">
+                <div class="inline-block px-3 py-1 bg-teal-100 text-teal-800 rounded-full text-sm font-bold mb-3">
+                    <i class="fas fa-calendar-day mr-2"></i>Daily Vocabulary
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-2 bg-gradient-to-r from-teal-700 to-cyan-700 gradient-text pb-1">
+                    Day 2
+                </h1>
+                <p class="text-black font-semibold flex items-center justify-center md:justify-start gap-2">
+                    <i class="fas fa-pen-nib text-teal-600"></i>
+                    Created by: 
+                    <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-teal-700 hover:text-teal-900 hover:underline transition-colors font-bold relative group">
+                        Emam Mehedi
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-teal-600 transition-all group-hover:w-full"></span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex-shrink-0 z-10 bg-white p-2 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300 border-2 border-teal-100">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-24 h-24 md:w-28 md:h-28 rounded-lg">
+                <p class="text-center text-xs text-black mt-1 font-bold">Scan Me</p>
+            </div>
+        </header>
+
+        <!-- Story Section -->
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-10 mb-8 border-t-4 border-t-teal-500 relative">
+            <div class="absolute -top-4 -right-4 text-teal-200 opacity-20">
+                <i class="fas fa-book-open text-9xl"></i>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-black mb-6 flex items-center gap-3">
+                <i class="fas fa-magic text-teal-600"></i> The Mind-Bending Story
+            </h2>
+            
+            <div class="bn-text text-lg md:text-xl text-black font-medium leading-relaxed space-y-4 bg-white/70 p-6 rounded-xl border border-teal-100 shadow-inner">
+                <p>
+                    একসময়, মহাকাশচারী আরিয়ান একটি অদ্ভুত গ্রহে অবতীর্ণ হলো, যা দূর থেকে দেখতে একদম <span class="font-bold text-teal-800 bg-teal-100 px-1.5 py-0.5 rounded shadow-sm">A Fantasy</span> <span class="text-rose-700 font-bold">(একটি কল্পকাহিনী)</span>-এর মতো মনে হচ্ছিল। গ্রহটির বাসিন্দারা অত্যন্ত <span class="font-bold text-teal-800 bg-teal-100 px-1.5 py-0.5 rounded shadow-sm">Compassionate</span> <span class="text-rose-700 font-bold">(করুণাময়)</span> ছিল এবং তারা আরিয়ানকে তাদের শহরের একটি <span class="font-bold text-teal-800 bg-teal-100 px-1.5 py-0.5 rounded shadow-sm">Honorary</span> <span class="text-rose-700 font-bold">(সম্মানসূচক)</span> নাগরিকত্ব প্রদান করল। 
+                </p>
+                <p>
+                    শহরের সবচেয়ে উঁচু পাহাড় থেকে পুরো উপত্যকার একটি জাদুকরী ও <span class="font-bold text-teal-800 bg-teal-100 px-1.5 py-0.5 rounded shadow-sm">Panoramic</span> <span class="text-rose-700 font-bold">(বিস্তৃত)</span> দৃশ্য দেখা যেত। কিন্তু সেখানকার আবহাওয়া ছিল অত্যন্ত <span class="font-bold text-teal-800 bg-teal-100 px-1.5 py-0.5 rounded shadow-sm">Variable</span> <span class="text-rose-700 font-bold">(পরিবর্তনশীল)</span>; এক মুহূর্তে কাঠফাটা রোদ তো পরক্ষণেই তুষারপাত!
+                </p>
+                <p>
+                    সেখানকার জ্ঞানী ব্যক্তিরা চেয়েছিলেন ভিন্ন ভিন্ন গোত্রকে <span class="font-bold text-teal-800 bg-teal-100 px-1.5 py-0.5 rounded shadow-sm">Amalgamate</span> <span class="text-rose-700 font-bold">(একত্রিত করা)</span> করে একটি শক্তিশালী জাতি গঠন করতে। কিন্তু কিছু উদ্ধত যুবক এই প্রস্তাবকে <span class="font-bold text-teal-800 bg-teal-100 px-1.5 py-0.5 rounded shadow-sm">Impertinent</span> <span class="text-rose-700 font-bold">(বেয়াদব)</span> আচরণ দিয়ে প্রত্যাখ্যান করত। এর সমাধানে এগিয়ে এলেন এক মহান <span class="font-bold text-teal-800 bg-teal-100 px-1.5 py-0.5 rounded shadow-sm">Philanthropist</span> <span class="text-rose-700 font-bold">(জনহিতৈষী)</span>।
+                </p>
+                <p>
+                    তিনি তার সম্পূর্ণ সম্পদ দিয়ে একটি বিশাল জাদুর <span class="font-bold text-teal-800 bg-teal-100 px-1.5 py-0.5 rounded shadow-sm">Reservoir</span> <span class="text-rose-700 font-bold">(জলাধার)</span> তৈরি করে সবার পানির কষ্ট দূর করলেন। অবশেষে, শত বছর পর যখন তিনি মারা গেলেন, পুরো গ্রহবাসী তার স্মরণে একটি মর্মস্পর্শী <span class="font-bold text-teal-800 bg-teal-100 px-1.5 py-0.5 rounded shadow-sm">Elegy</span> <span class="text-rose-700 font-bold">(শোকগাথা)</span> গাইতে লাগল, যা আজও সেই গ্রহের বাতাসে প্রতিধ্বনিত হয়।
+                </p>
+            </div>
+        </section>
+
+        <!-- Word Details Section -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-black mb-6 flex items-center gap-3 px-2">
+                <i class="fas fa-layer-group text-teal-600"></i> Word Breakdown
+            </h2>
+            
+            <div class="grid grid-cols-1 gap-6">
+                
+                <!-- Word 1: A Fantasy -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-indigo-600">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold text-indigo-800">1. A Fantasy <span class="text-sm font-bold text-gray-700 bn-text ml-2">(একটি কল্পকাহিনী / ফ্যান্টাসি)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: Illusion</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: Reality</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">গ্রীক শব্দ 'phantasia' থেকে এসেছে, যার অর্থ 'কল্পনা' বা 'প্রদর্শন'। এটি এমন কিছু বোঝায় যা বাস্তব নয় কিন্তু মন দ্বারা সৃষ্ট।</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            <li>
+                                The movie is based on a beautiful fantasy.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">সিনেমাটি একটি সুন্দর কল্পকাহিনীর উপর ভিত্তি করে তৈরি।</span>
+                            </li>
+                            <li>
+                                Children often live in a world of fantasy.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">শিশুরা প্রায়ই কল্পনার জগতে বাস করে।</span>
+                            </li>
+                            <li>
+                                His dream of becoming a king is just a fantasy.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">রাজা হওয়ার স্বপ্ন তার জন্য শুধুই একটি কল্পনা।</span>
+                            </li>
+                            <li>
+                                The author writes amazing fantasy novels.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">লেখক চমৎকার কল্পকাহিনীর উপন্যাস লেখেন।</span>
+                            </li>
+                            <li>
+                                It is hard to tell reality from fantasy in this game.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">এই খেলায় বাস্তব এবং কল্পনার মধ্যে পার্থক্য করা কঠিন।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">Illusion</span> <span class="bn-text text-sm font-bold text-black">(ভ্রম / মায়া)</span>
+                            <p class="text-sm text-black font-semibold mt-1">The magician created an incredible illusion.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">জাদুকর একটি অবিশ্বাস্য ভ্রম তৈরি করেছিলেন।</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">Reality</span> <span class="bn-text text-sm font-bold text-black">(বাস্তবতা)</span>
+                            <p class="text-sm text-black font-semibold mt-1">We must face the harsh reality of life.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">আমাদের জীবনের কঠোর বাস্তবতার মুখোমুখি হতে হবে।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 2: Compassionate -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-blue-600">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold text-blue-800">2. Compassionate <span class="text-sm font-bold text-gray-700 bn-text ml-2">(করুণাময় / সমবেদনাশীল)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: Merciful</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: Cruel</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">ল্যাটিন 'compati' (একসাথে কষ্ট পাওয়া) থেকে উদ্ভূত, যা থেকে ফরাসি 'compassion' শব্দটি এসেছে। এটি অন্যের দুঃখ বোঝার ক্ষমতাকে বোঝায়।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            <li>
+                                She is a very compassionate nurse.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">তিনি একজন অত্যন্ত সমবেদনাশীল নার্স।</span>
+                            </li>
+                            <li>
+                                We should be compassionate towards street animals.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">রাস্তার প্রাণীদের প্রতি আমাদের করুণাময় হওয়া উচিত।</span>
+                            </li>
+                            <li>
+                                The compassionate king forgave the prisoner.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">করুণাময় রাজা বন্দীকে ক্ষমা করে দিলেন।</span>
+                            </li>
+                            <li>
+                                Her compassionate words comforted the crying child.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">তার সমবেদনাপূর্ণ কথাগুলো কাঁদরত শিশুটিকে সান্ত্বনা দিয়েছিল।</span>
+                            </li>
+                            <li>
+                                A compassionate heart makes the world a better place.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">একটি করুণাময় হৃদয় পৃথিবীকে একটি সুন্দর জায়গা করে তোলে।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">Merciful</span> <span class="bn-text text-sm font-bold text-black">(দয়ালু)</span>
+                            <p class="text-sm text-black font-semibold mt-1">The merciful judge gave him a second chance.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">দয়ালু বিচারক তাকে দ্বিতীয় সুযোগ দিয়েছিলেন।</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">Cruel</span> <span class="bn-text text-sm font-bold text-black">(নিষ্ঠুর)</span>
+                            <p class="text-sm text-black font-semibold mt-1">It is a cruel world for those who are weak.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">যারা দুর্বল তাদের জন্য এটি একটি নিষ্ঠুর পৃথিবী।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 3: Honorary -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-emerald-600">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold text-emerald-800">3. Honorary <span class="text-sm font-bold text-gray-700 bn-text ml-2">(সম্মানসূচক / অবৈতনিক)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: Unpaid</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: Paid</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">ল্যাটিন শব্দ 'honorarius' থেকে এসেছে, যার অর্থ 'সম্মান বা উপহারস্বরূপ দেওয়া'।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            <li>
+                                He received an honorary degree from the university.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">তিনি বিশ্ববিদ্যালয় থেকে একটি সম্মানসূচক ডিগ্রি পেয়েছেন।</span>
+                            </li>
+                            <li>
+                                She is an honorary member of the science club.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">তিনি বিজ্ঞান ক্লাবের একজন অবৈতনিক সদস্য।</span>
+                            </li>
+                            <li>
+                                The mayor gave him an honorary title.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">মেয়র তাকে একটি সম্মানসূচক উপাধি দিয়েছিলেন।</span>
+                            </li>
+                            <li>
+                                Even though he retired, he holds an honorary position.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">যদিও তিনি অবসর নিয়েছেন, তিনি একটি সম্মানসূচক পদে অধিষ্ঠিত আছেন।</span>
+                            </li>
+                            <li>
+                                An honorary job usually does not pay any salary.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">একটি অবৈতনিক চাকরিতে সাধারণত কোনো বেতন দেওয়া হয় না।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">Unpaid</span> <span class="bn-text text-sm font-bold text-black">(অবৈতনিক)</span>
+                            <p class="text-sm text-black font-semibold mt-1">He does unpaid volunteer work every weekend.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">তিনি প্রতি সপ্তাহান্তে অবৈতনিক স্বেচ্ছাসেবকের কাজ করেন।</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">Paid</span> <span class="bn-text text-sm font-bold text-black">(বেতনভুক্ত)</span>
+                            <p class="text-sm text-black font-semibold mt-1">She finally got a paid internship at the company.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">অবশেষে সে কোম্পানিতে একটি বেতনভুক্ত ইন্টার্নশিপ পেল।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 4: Panoramic -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-amber-500">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold text-amber-800">4. Panoramic <span class="text-sm font-bold text-gray-700 bn-text ml-2">(বিস্তৃত / প্যানোরামিক)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: Scenic</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: Restricted</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">১৮ শতকে 'panorama' শব্দটি তৈরি হয় গ্রীক 'pan' (সব) এবং 'horama' (দৃশ্য) থেকে। এর অর্থ এমন দৃশ্য যা চারপাশে বিস্তৃত বা চারপাশে দেখা যায়।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            <li>
+                                The hotel room offers a panoramic view of the sea.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">হোটেল রুমটি সমুদ্রের একটি বিস্তৃত দৃশ্য দেয়।</span>
+                            </li>
+                            <li>
+                                We took a panoramic photo of the mountains.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">আমরা পাহাড়ের একটি প্যানোরামিক (বিস্তৃত) ছবি তুলেছিলাম।</span>
+                            </li>
+                            <li>
+                                The glass elevator provides a panoramic experience.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">কাঁচের লিফটটি একটি বিস্তৃত দৃশ্য দেখার অভিজ্ঞতা দেয়।</span>
+                            </li>
+                            <li>
+                                Look at the panoramic beauty of this green valley.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">এই সবুজ উপত্যকার বিস্তৃত সৌন্দর্য দেখো।</span>
+                            </li>
+                            <li>
+                                The tall tower gives a panoramic sight of the whole city.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">উঁচু টাওয়ারটি পুরো শহরের একটি বিস্তৃত দৃশ্য দেয়।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">Scenic</span> <span class="bn-text text-sm font-bold text-black">(মনোরম / দৃশ্যময়)</span>
+                            <p class="text-sm text-black font-semibold mt-1">They drove through a scenic route in the countryside.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">তারা গ্রামাঞ্চলের একটি মনোরম রাস্তা দিয়ে গাড়ি চালিয়েছিল।</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">Restricted</span> <span class="bn-text text-sm font-bold text-black">(সীমাবদ্ধ)</span>
+                            <p class="text-sm text-black font-semibold mt-1">The view from the small window was very restricted.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">ছোট জানালা থেকে দৃশ্যটি খুবই সীমাবদ্ধ ছিল।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 5: Variable -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-rose-600">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold text-rose-800">5. Variable <span class="text-sm font-bold text-gray-700 bn-text ml-2">(পরিবর্তনশীল)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: Changeable</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: Constant</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">ল্যাটিন শব্দ 'variabilis' থেকে এসেছে, যার অর্থ 'পরিবর্তনশীল' বা 'ভিন্ন হতে সক্ষম'।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            <li>
+                                The weather in this city is highly variable.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">এই শহরের আবহাওয়া অত্যন্ত পরিবর্তনশীল।</span>
+                            </li>
+                            <li>
+                                In this experiment, time is a variable factor.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">এই পরীক্ষায়, সময় একটি পরিবর্তনশীল নিয়ামক।</span>
+                            </li>
+                            <li>
+                                The interest rates of the bank are variable.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">ব্যাংকের সুদের হার পরিবর্তনশীল।</span>
+                            </li>
+                            <li>
+                                His moods are so variable that I never know what to expect.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">তার মেজাজ এত পরিবর্তনশীল যে আমি কখনই জানি না কী আশা করতে হবে।</span>
+                            </li>
+                            <li>
+                                You must account for variable costs in your business plan.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">আপনার ব্যবসায়িক পরিকল্পনায় পরিবর্তনশীল খরচের হিসাব রাখতে হবে।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">Changeable</span> <span class="bn-text text-sm font-bold text-black">(পরিবর্তনযোগ্য)</span>
+                            <p class="text-sm text-black font-semibold mt-1">The schedule is changeable if everyone agrees.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">সবাই একমত হলে সময়সূচী পরিবর্তনযোগ্য।</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">Constant</span> <span class="bn-text text-sm font-bold text-black">(ধ্রুবক / অপরিবর্তনশীল)</span>
+                            <p class="text-sm text-black font-semibold mt-1">The speed of light is constant in a vacuum.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">শূন্যস্থানে আলোর গতি ধ্রুবক।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 6: Amalgamate -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-fuchsia-600">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold text-fuchsia-800">6. Amalgamate <span class="text-sm font-bold text-gray-700 bn-text ml-2">(একত্রিত করা)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: Merge</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: Separate</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">ল্যাটিন শব্দ 'amalgamare' থেকে এসেছে, যা মূলত ধাতুবিদ্যা বা রসায়নে ব্যবহৃত হতো দুটি ভিন্ন পদার্থকে মিশ্রিত করার অর্থে।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            <li>
+                                The two small schools will amalgamate next year.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">দুটি ছোট স্কুল আগামী বছর একত্রিত হবে।</span>
+                            </li>
+                            <li>
+                                The company decided to amalgamate with its rival.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">কোম্পানিটি তার প্রতিদ্বন্দ্বীর সাথে একত্রিত হওয়ার সিদ্ধান্ত নিয়েছে।</span>
+                            </li>
+                            <li>
+                                We need to amalgamate our ideas to solve this problem.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">এই সমস্যা সমাধানের জন্য আমাদের ধারণাগুলোকে একত্রিত করা দরকার।</span>
+                            </li>
+                            <li>
+                                Different cultures amalgamate beautifully in this city.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">এই শহরে বিভিন্ন সংস্কৃতি সুন্দরভাবে একত্রিত হয়।</span>
+                            </li>
+                            <li>
+                                The chef amalgamated various spices to create a new flavor.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">নতুন স্বাদ তৈরি করতে শেফ বিভিন্ন মশলা একত্রিত করেছিলেন।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">Merge</span> <span class="bn-text text-sm font-bold text-black">(একত্রিত করা)</span>
+                            <p class="text-sm text-black font-semibold mt-1">The two banks plan to merge into one large bank.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">ব্যাংক দুটি একত্রিত হয়ে একটি বড় ব্যাংকে পরিণত হওয়ার পরিকল্পনা করেছে।</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">Separate</span> <span class="bn-text text-sm font-bold text-black">(আলাদা করা)</span>
+                            <p class="text-sm text-black font-semibold mt-1">Please separate the white clothes from the colored ones.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">অনুগ্রহ করে রঙিন কাপড় থেকে সাদা কাপড় আলাদা করুন।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 7: Impertinent -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-red-600">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold text-red-800">7. Impertinent <span class="text-sm font-bold text-gray-700 bn-text ml-2">(বেয়াদব / ধৃষ্টতামূলক)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: Rude</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: Respectful</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">ল্যাটিন 'impertinentem' থেকে এসেছে। পূর্বে এর অর্থ ছিল 'অপ্রাসঙ্গিক', পরে এটি 'বেয়াদব' বা 'অসম্মানজনক' আচরণ অর্থে ব্যাপকভাবে ব্যবহৃত হতে শুরু করে।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            <li>
+                                The student was punished for his impertinent behavior.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">ছাত্রটিকে তার বেয়াদব আচরণের জন্য শাস্তি দেওয়া হয়েছিল।</span>
+                            </li>
+                            <li>
+                                She asked an impertinent question about his personal life.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">সে তার ব্যক্তিগত জীবন সম্পর্কে একটি অপ্রাসঙ্গিক বা ধৃষ্টতামূলক প্রশ্ন জিজ্ঞাসা করেছিল।</span>
+                            </li>
+                            <li>
+                                Don't be impertinent to your elders.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">বড়দের সাথে বেয়াদবি কোরো না।</span>
+                            </li>
+                            <li>
+                                His impertinent remarks made everyone angry.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">তার ধৃষ্টতামূলক মন্তব্য সবাইকে রাগান্বিত করেছিল।</span>
+                            </li>
+                            <li>
+                                The waiter was fired because he was impertinent to a customer.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">ওয়েটারকে বরখাস্ত করা হয়েছিল কারণ সে একজন গ্রাহকের সাথে বেয়াদবি করেছিল।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">Rude</span> <span class="bn-text text-sm font-bold text-black">(অভদ্র)</span>
+                            <p class="text-sm text-black font-semibold mt-1">It is rude to interrupt someone while they are speaking.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">কেউ কথা বলার সময় বাধা দেওয়া অভদ্রতা।</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">Respectful</span> <span class="bn-text text-sm font-bold text-black">(সম্মানজনক)</span>
+                            <p class="text-sm text-black font-semibold mt-1">The boy was always polite and respectful to his teachers.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">ছেলেটি সর্বদা তার শিক্ষকদের প্রতি ভদ্র এবং সম্মানজনক ছিল।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 8: Philanthropist -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-purple-600">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold text-purple-800">8. Philanthropist <span class="text-sm font-bold text-gray-700 bn-text ml-2">(জনহিতৈষী)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: Benefactor</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: Miser</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">গ্রীক 'philanthrōpos' থেকে এসেছে, যেখানে 'philos' অর্থ 'ভালোবাসা' এবং 'anthrōpos' অর্থ 'মানুষ'। অর্থাৎ, যিনি মানবজাতিকে ভালোবাসেন এবং তাদের কল্যাণের জন্য কাজ করেন।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            <li>
+                                The wealthy philanthropist donated millions to the hospital.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">ধনী জনহিতৈষী হাসপাতালে মিলিয়ন মিলিয়ন দান করেছেন।</span>
+                            </li>
+                            <li>
+                                He is known globally as a great philanthropist.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">তিনি বিশ্বব্যাপী একজন মহান জনহিতৈষী হিসেবে পরিচিত।</span>
+                            </li>
+                            <li>
+                                The philanthropist built three schools in the poor village.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">জনহিতৈষী দরিদ্র গ্রামে তিনটি স্কুল নির্মাণ করেছিলেন।</span>
+                            </li>
+                            <li>
+                                Her dream is to become a successful businesswoman and a philanthropist.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">তার স্বপ্ন হলো একজন সফল ব্যবসায়ী এবং একজন জনহিতৈষী হওয়া।</span>
+                            </li>
+                            <li>
+                                A true philanthropist helps people without expecting anything back.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">একজন সত্যিকারের জনহিতৈষী কিছু পাওয়ার আশা না করেই মানুষকে সাহায্য করেন।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">Benefactor</span> <span class="bn-text text-sm font-bold text-black">(হিতকারী / দানবীর)</span>
+                            <p class="text-sm text-black font-semibold mt-1">The anonymous benefactor paid for her college tuition.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">অজ্ঞাত হিতকারী তার কলেজের বেতন পরিশোধ করেছিলেন।</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">Miser</span> <span class="bn-text text-sm font-bold text-black">(কিপটে)</span>
+                            <p class="text-sm text-black font-semibold mt-1">The old miser never gave a single coin to charity.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">বুড়ো কিপটে মানুষটি দাতব্য প্রতিষ্ঠানে একটি পয়সাও দেয়নি।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 9: Reservoir -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-cyan-600">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold text-cyan-800">9. Reservoir <span class="text-sm font-bold text-gray-700 bn-text ml-2">(জলাধার / ভাণ্ডার)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: Basin</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: Source</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">ফরাসি শব্দ 'réservoir' থেকে এসেছে, যার অর্থ 'সংরক্ষণ করার স্থান'। এটি মূলত পানি বা অন্য তরল জমা রাখার কৃত্রিম হ্রদ বা পাত্রকে বোঝায়।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            <li>
+                                The city gets its drinking water from a huge reservoir.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">শহরটি একটি বিশাল জলাধার থেকে তার পানীয় জল পায়।</span>
+                            </li>
+                            <li>
+                                Heavy rainfall has filled the reservoir to the top.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">ভারী বৃষ্টিপাত জলাধারটিকে কানায় কানায় পূর্ণ করেছে।</span>
+                            </li>
+                            <li>
+                                We walked around the beautiful reservoir in the park.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">আমরা পার্কের সুন্দর জলাধারটির চারপাশে হেঁটেছিলাম।</span>
+                            </li>
+                            <li>
+                                The pen has a small ink reservoir inside.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">কলমটির ভিতরে একটি ছোট কালির জলাধার রয়েছে।</span>
+                            </li>
+                            <li>
+                                He has a vast reservoir of knowledge about ancient history.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">প্রাচীন ইতিহাস সম্পর্কে তার জ্ঞানের বিশাল ভাণ্ডার বা জলাধার রয়েছে।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">Basin</span> <span class="bn-text text-sm font-bold text-black">(জলাশয় / বেসিন)</span>
+                            <p class="text-sm text-black font-semibold mt-1">The river flows into a large natural basin.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">নদীটি একটি বড় প্রাকৃতিক জলাশয়ে প্রবাহিত হয়।</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">Source</span> <span class="bn-text text-sm font-bold text-black">(উৎস)</span>
+                            <p class="text-sm text-black font-semibold mt-1">The melting snow is the source of the river.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">গলিত বরফ হলো নদীর উৎস।</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word 10: Elegy -->
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 border-gray-800">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold text-gray-900">10. Elegy <span class="text-sm font-bold text-gray-700 bn-text ml-2">(শোকগাথা)</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: Lament</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: Paean</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">গ্রীক শব্দ 'elegeia' থেকে এসেছে, যার অর্থ 'শোকগাথা' বা 'বিলাপের গান'। এটি সাধারণত মৃত ব্যক্তির স্মরণে রচিত কবিতাকে বোঝায়।</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            <li>
+                                The poet wrote a beautiful elegy for his late friend.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">কবি তার মৃত বন্ধুর জন্য একটি সুন্দর শোকগাথা লিখেছিলেন।</span>
+                            </li>
+                            <li>
+                                She recited an elegy at her grandfather's funeral.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">সে তার দাদার অন্ত্যেষ্টিক্রিয়ায় একটি শোকগাথা আবৃত্তি করেছিল।</span>
+                            </li>
+                            <li>
+                                Thomas Gray's 'Elegy Written in a Country Churchyard' is very famous.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">টমাস গ্রে'র 'এলিজি রিটেন ইন আ কান্ট্রি চার্চইয়ার্ড' অত্যন্ত বিখ্যাত।</span>
+                            </li>
+                            <li>
+                                The sad song felt like an elegy for the dying town.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">দুঃখজনক গানটি মৃতপ্রায় শহরের জন্য একটি শোকগাথা বলে মনে হয়েছিল।</span>
+                            </li>
+                            <li>
+                                An elegy expresses sorrow and respect for the dead.<br>
+                                <span class="text-xs text-black bn-text ml-5 block mt-0.5">একটি শোকগাথা মৃতের প্রতি শোক এবং সম্মান প্রকাশ করে।</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">Lament</span> <span class="bn-text text-sm font-bold text-black">(বিলাপ / শোকগীতি)</span>
+                            <p class="text-sm text-black font-semibold mt-1">The mother's tearful lament moved everyone to tears.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">মায়ের অশ্রুসিক্ত বিলাপ সবাইকে কাঁদিয়ে দিয়েছিল।</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">Paean</span> <span class="bn-text text-sm font-bold text-black">(জয়ধ্বনি / আনন্দগীতি)</span>
+                            <p class="text-sm text-black font-semibold mt-1">The crowd sang a joyful paean to celebrate the victory.</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">জনতা বিজয় উদযাপনের জন্য একটি আনন্দগীতি গেয়েছিল।</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-8 bg-gradient-to-r from-teal-900 to-cyan-900 text-white relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10">
+                <i class="fas fa-clipboard-list text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 class="text-2xl font-bold flex items-center gap-3">
+                    <i class="fas fa-list-check text-cyan-400"></i> Summary List
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 bg-cyan-500 hover:bg-cyan-400 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 border border-cyan-400">
+                    <i class="fas fa-copy"></i> Copy List
+                </button>
+            </div>
+            
+            <div class="bg-black/40 p-5 rounded-xl border border-cyan-500/30 font-mono text-sm leading-relaxed overflow-x-auto z-10 relative bn-text">
+<pre id="summaryText" class="whitespace-pre-wrap text-cyan-50 font-bold">A Fantasy, একটি কল্পকাহিনী - Illusion;
+Compassionate, করুণাময় - Merciful;
+Honorary, সম্মানসূচক - Unpaid;
+Panoramic, বিস্তৃত - Scenic;
+Variable, পরিবর্তনশীল - Changeable;
+Amalgamate, একত্রিত করা - Merge;
+Impertinent, বেয়াদব - Rude;
+Philanthropist, জনহিতৈষী - Benefactor;
+Reservoir, জলাধার - Basin;
+Elegy, শোকগাথা - Lament;</pre>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-700 text-sm mt-8 pb-8 font-bold">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i class="fas fa-check-circle mr-2"></i>Copied to clipboard successfully!</div>
+
+    <script>
+        function copySummary() {
+            const summaryText = document.getElementById('summaryText').innerText;
+            
+            const textArea = document.createElement("textarea");
+            textArea.value = summaryText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast();
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(summaryText).then(showToast).catch(e => console.error("Clipboard API failed", e));
+                }
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

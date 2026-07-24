@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day-3 Vocabulary Notes</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration for darker text -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            500: '#000000', 
+                            600: '#000000', 
+                            700: '#000000', /* Pure black for normal text */
+                            800: '#000000', /* Pure black for section headers */
+                            900: '#000000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Poppins for English, Hind Siliguri for Bengali -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS for specific styling -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            color: #000000; /* Default text color is black */
+        }
+        .bn-text {
+            font-family: 'Hind Siliguri', sans-serif;
+            color: #000000; /* Ensure all Bangla text is black */
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Toast Notification Styles */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #f59e0b; /* Amber for Day 3 Theme */
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 min-h-screen p-4 md:p-8 selection:bg-amber-200 selection:text-amber-900 text-black">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <!-- Header Section -->
+        <header class="glass-card rounded-2xl shadow-lg p-6 md:p-8 mb-8 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-amber-500 to-orange-600"></div>
+            
+            <div class="text-center md:text-left mb-6 md:mb-0 z-10">
+                <div class="inline-block px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-bold mb-3">
+                    <i class="fas fa-calendar-day mr-2"></i>Daily Vocabulary
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-2 bg-gradient-to-r from-amber-700 to-orange-700 gradient-text pb-1">
+                    Day 3
+                </h1>
+                <p class="text-black font-semibold flex items-center justify-center md:justify-start gap-2">
+                    <i class="fas fa-pen-nib text-amber-600"></i>
+                    Created by: 
+                    <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-amber-700 hover:text-amber-900 hover:underline transition-colors font-bold relative group">
+                        Emam Mehedi
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-600 transition-all group-hover:w-full"></span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex-shrink-0 z-10 bg-white p-2 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300 border-2 border-amber-100">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-24 h-24 md:w-28 md:h-28 rounded-lg">
+                <p class="text-center text-xs text-black mt-1 font-bold">Scan Me</p>
+            </div>
+        </header>
+
+        <!-- Story Section -->
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-10 mb-8 border-t-4 border-t-amber-500 relative">
+            <div class="absolute -top-4 -right-4 text-amber-200 opacity-20">
+                <i class="fas fa-user-secret text-9xl"></i>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-black mb-6 flex items-center gap-3">
+                <i class="fas fa-search text-amber-600"></i> The Mystery of the Stolen Heirloom
+            </h2>
+            
+            <div class="bn-text text-lg md:text-xl text-black font-medium leading-relaxed space-y-4 bg-white/70 p-6 rounded-xl border border-amber-100 shadow-inner">
+                <p>
+                    চণ্ডীপুর গ্রামের প্রাক্তন স্কুল মাস্টার, হরিচরণ বাবু ছিলেন একজন অত্যন্ত <span class="font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded shadow-sm">Competent</span> <span class="text-rose-700 font-bold">(দক্ষ / যোগ্য)</span> মানুষ। অবসর নেওয়ার পর থেকেই তিনি গ্রামের ছোটখাটো রহস্য সমাধানে সময় কাটাতেন। একদিন জমিদার বাড়ির বড় কর্তা তাকে ডেকে পাঠালেন। জমিদার বাড়ির মানুষজন তাদের বিখ্যাত <span class="font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded shadow-sm">Hospitality</span> <span class="text-rose-700 font-bold">(আতিথেয়তা)</span>-এর জন্য পরিচিত হলেও, আজ তাদের মুখে বিষাদের ছায়া। 
+                </p>
+                <p>
+                    জানা গেল, গতরাতে জমিদারদের একশো বছরের পুরোনো সোনার মূর্তিটি চুরি হয়ে গেছে! এই <span class="font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded shadow-sm">Amazing</span> <span class="text-rose-700 font-bold">(বিস্ময়কর)</span> চুরির ঘটনায় পুরো গ্রাম থমথমে। অনেকেই সন্দেহ করছিল জমিদারের ছোট ভাই নরেনকে। নরেন ছিল এক ধরনের <span class="font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded shadow-sm">Demagogue</span> <span class="text-rose-700 font-bold">(বাগাড়ম্বরপূর্ণ জননেতা)</span>, যে সবসময় গ্রামের সহজ-সরল মানুষকে মিথ্যে কথায় ভুলিয়ে নিজের স্বার্থ হাসিল করার চেষ্টা করত। তাছাড়া তার <span class="font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded shadow-sm">Parsimony</span> <span class="text-rose-700 font-bold">(কৃপণতা)</span>-র কথাও সবার জানা ছিল।
+                </p>
+                <p>
+                    তবে হরিচরণ বাবু জানতেন, কোনো কিছু প্রমাণ ছাড়া বলা উচিত নয়। তিনি দেখলেন, চোর অত্যন্ত দ্রুত <span class="font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded shadow-sm">Velocity</span> <span class="text-rose-700 font-bold">(বেগ / গতি)</span>-তে জানালার কাঁচ ভেঙে পালিয়েছে। কিন্তু পালানোর সময় চোর একটি <span class="font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded shadow-sm">Inadvertent</span> <span class="text-rose-700 font-bold">(অনিচ্ছাকৃত)</span> ভুল করে ফেলেছিল—সে তার পায়ের ছাপ কাদার মধ্যে রেখে গিয়েছিল। হরিচরণ বাবু তার তীক্ষ্ণ <span class="font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded shadow-sm">Profundity</span> <span class="text-rose-700 font-bold">(গভীরতা / প্রজ্ঞা)</span> দিয়ে বুঝতে পারলেন, চোর নরেন নয়, বরং জমিদার বাড়ির পুরনো দারোয়ান!
+                </p>
+                <p>
+                    দারোয়ান নিজের <span class="font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded shadow-sm">Misdeed</span> <span class="text-rose-700 font-bold">(অপকর্ম / দুষ্কর্ম)</span> স্বীকার করে মূর্তিটি ফিরিয়ে দিল। এই রহস্যের সমাধান করা হরিচরণ বাবুর জীবনের জন্য সত্যিই <span class="font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded shadow-sm">A Feather In Your Cap</span> <span class="text-rose-700 font-bold">(গর্বের বিষয়)</span> হয়ে রইল। 
+                </p>
+            </div>
+        </section>
+
+        <!-- Word Details Section -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-black mb-6 flex items-center gap-3 px-2">
+                <i class="fas fa-layer-group text-amber-600"></i> Word Breakdown
+            </h2>
+            
+            <div id="word-breakdown-container" class="grid grid-cols-1 gap-6">
+                <!-- Word cards will be dynamically injected here via JavaScript -->
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-8 bg-gradient-to-r from-amber-900 to-orange-900 text-white relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10">
+                <i class="fas fa-clipboard-list text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-orange-50">
+                    <i class="fas fa-list-check text-amber-400"></i> Summary List
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 bg-amber-500 hover:bg-amber-400 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 border border-amber-400">
+                    <i class="fas fa-copy"></i> Copy List
+                </button>
+            </div>
+            
+            <div class="bg-black/40 p-5 rounded-xl border border-amber-500/30 font-mono text-sm leading-relaxed overflow-x-auto z-10 relative bn-text">
+<pre id="summaryText" class="whitespace-pre-wrap text-amber-50 font-bold">A Feather In Your Cap, গর্বের বিষয় - Fell proud of;
+Competent, দক্ষ - Able;
+Hospitality, আতিথেয়তা - Welcome;
+Parsimony, কৃপণতা - Miserliness;
+Velocity, বেগ - Speed;
+Amazing, বিস্ময়কর - Shocking;
+Inadvertent, অনিচ্ছাকৃত - Intentional;
+Misdeed, অপকর্ম - Crime;
+Profundity, গভীরতা - Insight;
+Demagogue, বাগাড়ম্বরপূর্ণ নেতা - Agitator;</pre>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-700 text-sm mt-8 pb-8 font-bold">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i class="fas fa-check-circle mr-2"></i>Copied to clipboard successfully!</div>
+
+    <script>
+        const wordData = [
+            {
+                id: 1,
+                word: "A Feather In Your Cap",
+                bnTitle: "(গর্বের বিষয়)",
+                theme: { border: "border-indigo-600", text: "text-indigo-800" },
+                syn: { en: "Fell proud of", bn: "(গর্ববোধ করা)", ex: "He felt proud of his son's success.", exBn: "(সে তার ছেলের সাফল্যে গর্ববোধ করেছিল।)" },
+                ant: { en: "Ashamed", bn: "(লজ্জিত)", ex: "She felt ashamed of her mistake.", exBn: "(সে তার ভুলের জন্য লজ্জিত বোধ করেছিল।)" },
+                origin: "প্রাচীনকালে আদিবাসী যোদ্ধা বা শিকারীরা তাদের সাহসিকতা বা সফলতার স্বীকৃতিস্বরূপ মাথার মুকুটে বা টুপিতে একটি নতুন পালক যুক্ত করত। সেখান থেকেই এই বাগধারার উৎপত্তি, যা গর্বের বিষয় বা নতুন অর্জনকে বোঝায়।",
+                sentences: [
+                    { en: "Winning the championship is a feather in your cap.", bn: "(চ্যাম্পিয়নশিপ জেতা আপনার জন্য একটি গর্বের বিষয়।)" },
+                    { en: "Completing the difficult project was another feather in her cap.", bn: "(কঠিন প্রকল্পটি সম্পন্ন করা তার সাফল্যের মুকুটে আরেকটি পালক যোগ করেছে।)" },
+                    { en: "The promotion is a real feather in his cap.", bn: "(পদান্নতি তার জন্য একটি সত্যিকারের গর্বের বিষয়।)" },
+                    { en: "Adding this degree to your resume is a big feather in your cap.", bn: "(জীবনবৃত্তান্তে এই ডিগ্রিটি যুক্ত করা আপনার জন্য বড় একটি অর্জন।)" },
+                    { en: "Every good deed is a feather in your cap.", bn: "(প্রতিটি ভালো কাজই তোমার জন্য একটি গর্বের বিষয়।)" }
+                ]
+            },
+            {
+                id: 2,
+                word: "Competent",
+                bnTitle: "(দক্ষ / যোগ্য)",
+                theme: { border: "border-blue-600", text: "text-blue-800" },
+                syn: { en: "Able", bn: "(সক্ষম / যোগ্য)", ex: "He is able to solve this puzzle quickly.", exBn: "(সে এই ধাঁধাটি দ্রুত সমাধান করতে সক্ষম।)" },
+                ant: { en: "Incapable", bn: "(অক্ষম)", ex: "The man was incapable of doing heavy work.", exBn: "(লোকটি ভারী কাজ করতে অক্ষম ছিল।)" },
+                origin: "ল্যাটিন 'competere' থেকে এসেছে, যার অর্থ 'একসাথে পড়া' বা 'উপযুক্ত হওয়া'। পরবর্তীতে এটি 'দক্ষ' বা 'সক্ষম' অর্থ ধারণ করে।",
+                sentences: [
+                    { en: "We need a competent mechanic to fix this car.", bn: "(এই গাড়িটি মেরামত করার জন্য আমাদের একজন দক্ষ মেকানিক দরকার।)" },
+                    { en: "He is competent enough to handle the stress.", bn: "(তিনি মানসিক চাপ সামলানোর জন্য যথেষ্ট যোগ্য।)" },
+                    { en: "The company hired a competent software engineer.", bn: "(কোম্পানিটি একজন দক্ষ সফটওয়্যার ইঞ্জিনিয়ার নিয়োগ করেছে।)" },
+                    { en: "She proved herself as a competent leader.", bn: "(তিনি নিজেকে একজন যোগ্য নেতা হিসেবে প্রমাণ করেছেন।)" },
+                    { en: "Only competent candidates will be called for the interview.", bn: "(শুধুমাত্র যোগ্য প্রার্থীদেরই সাক্ষাৎকারের জন্য ডাকা হবে।)" }
+                ]
+            },
+            {
+                id: 3,
+                word: "Hospitality",
+                bnTitle: "(আতিথেয়তা)",
+                theme: { border: "border-emerald-600", text: "text-emerald-800" },
+                syn: { en: "Welcome", bn: "(অভ্যর্থনা / স্বাগত জানানো)", ex: "They gave us a warm welcome at the door.", exBn: "(তারা দরজায় আমাদের উষ্ণ অভ্যর্থনা জানিয়েছিল।)" },
+                ant: { en: "Hostility", bn: "(শত্রুতা)", ex: "The two neighbors looked at each other with hostility.", exBn: "(দুই প্রতিবেশী একে অপরের দিকে শত্রুতার দৃষ্টিতে তাকিয়েছিল।)" },
+                origin: "ল্যাটিন শব্দ 'hospes' (অতিথি বা আয়োজক) থেকে 'hospitalitas' হয়ে শব্দটি এসেছে। এটি অতিথিদের প্রতি বন্ধুত্বপূর্ণ এবং উষ্ণ আচরণের প্রতীক।",
+                sentences: [
+                    { en: "Thank you for your warm hospitality.", bn: "(আপনার উষ্ণ আতিথেয়তার জন্য আপনাকে ধন্যবাদ।)" },
+                    { en: "Bengali people are famous for their hospitality.", bn: "(বাঙালিরা তাদের আতিথেয়তার জন্য বিখ্যাত।)" },
+                    { en: "The hotel provides excellent hospitality to its guests.", bn: "(হোটেলটি তার অতিথিদের চমৎকার আতিথেয়তা প্রদান করে।)" },
+                    { en: "We enjoyed the hospitality of the local people.", bn: "(আমরা স্থানীয় মানুষের আতিথেয়তা উপভোগ করেছি।)" },
+                    { en: "Good hospitality makes everyone feel at home.", bn: "(ভালো আতিথেয়তা সবাইকে আপন মনে করতে সাহায্য করে।)" }
+                ]
+            },
+            {
+                id: 4,
+                word: "Parsimony",
+                bnTitle: "(কৃপণতা)",
+                theme: { border: "border-amber-500", text: "text-amber-800" },
+                syn: { en: "Miserliness", bn: "(কিপটেমি)", ex: "His miserliness made him very unpopular.", exBn: "(তার কিপটেমি তাকে খুব অজনপ্রিয় করে তুলেছিল।)" },
+                ant: { en: "Generosity", bn: "(উদারতা)", ex: "The charity runs on the generosity of people.", exBn: "(দাতব্য সংস্থাটি মানুষের উদারতার উপর চলে।)" },
+                origin: "ল্যাটিন শব্দ 'parsimonia' থেকে এসেছে, যা 'parcere' (সঞ্চয় করা বা বিরত থাকা) থেকে উদ্ভূত। এর অর্থ অর্থ ব্যয় করার ক্ষেত্রে চরম অনীহা বা কৃপণতা।",
+                sentences: [
+                    { en: "The old man was known for his extreme parsimony.", bn: "(বৃদ্ধ লোকটি তার চরম কৃপণতার জন্য পরিচিত ছিল।)" },
+                    { en: "Due to her parsimony, she rarely bought new clothes.", bn: "(তার কৃপণতার কারণে সে খুব কমই নতুন জামাকাপড় কিনত।)" },
+                    { en: "Parsimony is not always a good habit.", bn: "(কৃপণতা সবসময় একটি ভালো অভ্যাস নয়।)" },
+                    { en: "His parsimony prevented him from enjoying life.", bn: "(তার কৃপণতা তাকে জীবন উপভোগ করতে বাধা দিয়েছিল।)" },
+                    { en: "The company failed because of the parsimony of its owner.", bn: "(মালিকের কৃপণতার কারণে কোম্পানিটি ব্যর্থ হয়েছিল।)" }
+                ]
+            },
+            {
+                id: 5,
+                word: "Velocity",
+                bnTitle: "(বেগ / গতি)",
+                theme: { border: "border-rose-600", text: "text-rose-800" },
+                syn: { en: "Speed", bn: "(গতি / দ্রুতি)", ex: "The car was traveling at a high speed.", exBn: "(গাড়িটি উচ্চ গতিতে চলছিল।)" },
+                ant: { en: "Slowness", bn: "(মন্থরতা / ধীরগতি)", ex: "The slowness of the internet is annoying.", exBn: "(ইন্টারনেটের মন্থরতা বিরক্তিকর।)" },
+                origin: "ল্যাটিন 'velocitas' থেকে এসেছে, যার মূল শব্দ 'velox' (দ্রুত)। এটি মূলত বিজ্ঞান ও পদার্থবিদ্যায় একটি নির্দিষ্ট দিকে গতির হার বোঝাতে ব্যবহৃত হয়।",
+                sentences: [
+                    { en: "Light travels at an incredible velocity.", bn: "(আলো একটি অবিশ্বাস্য বেগে ভ্রমণ করে।)" },
+                    { en: "The wind velocity increased during the storm.", bn: "(ঝড়ের সময় বাতাসের বেগ বেড়ে গিয়েছিল।)" },
+                    { en: "The rocket needs to reach a high velocity to enter space.", bn: "(মহাকাশে প্রবেশের জন্য রকেটটিকে একটি উচ্চ বেগে পৌঁছাতে হবে।)" },
+                    { en: "Scientists measured the velocity of the river current.", bn: "(বিজ্ঞানীরা নদীর স্রোতের গতিবেগ মেপেছিলেন।)" },
+                    { en: "The bullet lost its velocity after hitting the wall.", bn: "(দেয়ালে আঘাত করার পর বুলেটটি তার বেগ হারিয়ে ফেলে।)" }
+                ]
+            },
+            {
+                id: 6,
+                word: "Amazing",
+                bnTitle: "(বিস্ময়কর)",
+                theme: { border: "border-fuchsia-600", text: "text-fuchsia-800" },
+                syn: { en: "Shocking", bn: "(আশ্চর্যজনক / চমকপ্রদ)", ex: "The news of his sudden resignation was shocking.", exBn: "(তার আকস্মিক পদত্যাগের খবরটি চমকপ্রদ ছিল।)" },
+                ant: { en: "Ordinary", bn: "(সাধারণ)", ex: "It was just an ordinary day at work.", exBn: "(এটি কাজের ক্ষেত্রে একটি সাধারণ দিন ছিল।)" },
+                origin: "প্রাচীন ইংরেজি 'amasian' থেকে এসেছে, যার অর্থ 'হতবুদ্ধি করা' বা 'বিভ্রান্ত করা'। সময়ের সাথে সাথে এটি বিস্ময়কর বা চমৎকার অর্থে একটি ইতিবাচক রূপ পেয়েছে।",
+                sentences: [
+                    { en: "The view from the mountain top was amazing.", bn: "(পাহাড়ের চূড়া থেকে দৃশ্যটি বিস্ময়কর ছিল।)" },
+                    { en: "She did an amazing job on the presentation.", bn: "(সে প্রেজেন্টেশনে চমৎকার একটি কাজ করেছে।)" },
+                    { en: "It is amazing how fast children grow.", bn: "(শিশুরা কত দ্রুত বেড়ে ওঠে তা বিস্ময়কর।)" },
+                    { en: "We had an amazing time at the beach.", bn: "(আমরা সমুদ্র সৈকতে একটি চমৎকার সময় কাটিয়েছি।)" },
+                    { en: "His survival in the desert is truly amazing.", bn: "(মরুভূমিতে তার বেঁচে থাকা সত্যিই বিস্ময়কর।)" }
+                ]
+            },
+            {
+                id: 7,
+                word: "Inadvertent",
+                bnTitle: "(অনিচ্ছাকৃত)",
+                theme: { border: "border-red-600", text: "text-red-800" },
+                syn: { en: "Accidental", bn: "(দুর্ঘটনাবশত)", ex: "Breaking the glass was completely accidental.", exBn: "(গ্লাসটি ভেঙে ফেলা সম্পূর্ণ দুর্ঘটনাবশত ছিল।)" },
+                ant: { en: "Intentional", bn: "(ইচ্ছাকৃত)", ex: "He made an intentional foul during the game.", exBn: "(খেলার সময় সে একটি ইচ্ছাকৃত ফাউল করেছিল।)" },
+                origin: "সতেরো শতকের দিকে ল্যাটিন 'inadvertentem' (মনোযোগ না দেওয়া) থেকে এসেছে। 'in-' (না) এবং 'advertere' (মনোযোগ দেওয়া) এর সমন্বয়।",
+                sentences: [
+                    { en: "Deleting the file was an inadvertent mistake.", bn: "(ফাইলটি মুছে ফেলা একটি অনিচ্ছাকৃত ভুল ছিল।)" },
+                    { en: "I apologize for any inadvertent errors in the report.", bn: "(প্রতিবেদনে কোনো অনিচ্ছাকৃত ভুলের জন্য আমি ক্ষমা চাইছি।)" },
+                    { en: "An inadvertent step caused him to fall down the stairs.", bn: "(একটি অসতর্ক পদক্ষেপের কারণে সে সিঁড়ি থেকে পড়ে গেল।)" },
+                    { en: "The secret was revealed by an inadvertent comment.", bn: "(একটি অনিচ্ছাকৃত মন্তব্যের কারণে গোপনীয়তা ফাঁস হয়ে গেল।)" },
+                    { en: "His inadvertent insult hurt her feelings.", bn: "(তার অনিচ্ছাকৃত অপমান তার অনুভূতিতে আঘাত করেছিল।)" }
+                ]
+            },
+            {
+                id: 8,
+                word: "Misdeed",
+                bnTitle: "(অপকর্ম)",
+                theme: { border: "border-purple-600", text: "text-purple-800" },
+                syn: { en: "Crime", bn: "(অপরাধ)", ex: "Stealing is a serious crime.", exBn: "(চুরি করা একটি মারাত্মক অপরাধ।)" },
+                ant: { en: "Good deed", bn: "(সৎ কাজ)", ex: "Helping the blind man cross the street was a good deed.", exBn: "(অন্ধ লোকটিকে রাস্তা পার হতে সাহায্য করা একটি সৎ কাজ ছিল।)" },
+                origin: "প্রাচীন ইংরেজি 'misdǣd' থেকে এসেছে, যেখানে 'mis-' (ভুল বা খারাপ) এবং 'dǣd' (কাজ) যুক্ত হয়ে 'খারাপ কাজ' বা 'অপকর্ম' অর্থ তৈরি করেছে।",
+                sentences: [
+                    { en: "He was punished for his past misdeeds.", bn: "(তার অতীতের অপকর্মের জন্য তাকে শাস্তি দেওয়া হয়েছিল।)" },
+                    { en: "The king tried to cover up the misdeeds of his son.", bn: "(রাজা তার ছেলের দুষ্কর্ম ঢাকতে চেষ্টা করেছিলেন।)" },
+                    { en: "A person must face the consequences of their misdeeds.", bn: "(একজন ব্যক্তিকে অবশ্যই তার অপকর্মের পরিণতি ভোগ করতে হবে।)" },
+                    { en: "She felt guilty about her previous misdeed.", bn: "(সে তার পূর্ববর্তী দুষ্কর্মের জন্য দোষী বোধ করেছিল।)" },
+                    { en: "History will not forgive the tyrant's misdeeds.", bn: "(ইতিহাস স্বৈরাচারীর অপকর্ম ক্ষমা করবে না।)" }
+                ]
+            },
+            {
+                id: 9,
+                word: "Profundity",
+                bnTitle: "(গভীরতা / প্রজ্ঞা)",
+                theme: { border: "border-cyan-600", text: "text-cyan-800" },
+                syn: { en: "Insight", bn: "(অন্তর্দৃষ্টি / গভীর উপলব্ধি)", ex: "Her book gives a clear insight into rural life.", exBn: "(তার বইটি গ্রামীণ জীবন সম্পর্কে একটি স্পষ্ট অন্তর্দৃষ্টি দেয়।)" },
+                ant: { en: "Shallowness", bn: "(অগভীরতা)", ex: "The shallowness of his argument was obvious.", exBn: "(তার যুক্তির অগভীরতা স্পষ্ট ছিল।)" },
+                origin: "ল্যাটিন শব্দ 'profundus' (গভীর) থেকে ফরাসি হয়ে ইংরেজিতে এসেছে। এটি শুধু পানির গভীরতা নয়, বরং চিন্তার বা জ্ঞানের অগাধ গভীরতা বোঝায়।",
+                sentences: [
+                    { en: "The profundity of the poem is hard to understand.", bn: "(কবিতাটির গভীরতা বোঝা কঠিন।)" },
+                    { en: "Everyone respected the monk for his profundity.", bn: "(সবাই সন্ন্যাসীকে তার প্রজ্ঞার জন্য সম্মান করত।)" },
+                    { en: "His speeches are known for their great profundity.", bn: "(তার বক্তৃতাগুলো মহান প্রজ্ঞা বা গভীরতার জন্য পরিচিত।)" },
+                    { en: "We were amazed by the profundity of his knowledge.", bn: "(আমরা তার জ্ঞানের গভীরতায় অবাক হয়েছিলাম।)" },
+                    { en: "It takes time to grasp the profundity of this philosophy.", bn: "(এই দর্শনের গভীরতা বুঝতে সময় লাগে।)" }
+                ]
+            },
+            {
+                id: 10,
+                word: "Demagogue",
+                bnTitle: "(বাগাড়ম্বরপূর্ণ জননেতা)",
+                theme: { border: "border-gray-800", text: "text-gray-900" },
+                syn: { en: "Agitator", bn: "(উত্তেজক / প্ররোচক)", ex: "The agitator stirred up the crowd to protest.", exBn: "(প্ররোচক বা উত্তেজক ব্যক্তি জনতাকে প্রতিবাদ করার জন্য উসকে দিয়েছিল।)" },
+                ant: { en: "Peacemaker", bn: "(শান্তিস্থাপক)", ex: "The peacemaker successfully stopped the violent conflict.", exBn: "(শান্তিস্থাপক ব্যক্তি সফলভাবে হিংসাত্মক সংঘাত থামিয়েছিলেন।)" },
+                origin: "গ্রীক 'dēmagōgos' থেকে এসেছে ('dēmos' মানে জনগণ এবং 'agōgos' মানে নেতা)। মূলত এটি জনপ্রিয় নেতা বোঝাত, কিন্তু পরে এটি এমন নেতা বোঝাতে শুরু করে যে যুক্তি নয়, আবেগ দিয়ে জনগণকে চালিত করে।",
+                sentences: [
+                    { en: "The demagogue used fear to control the citizens.", bn: "(বাগাড়ম্বরপূর্ণ নেতা নাগরিকদের নিয়ন্ত্রণ করার জন্য ভয়কে ব্যবহার করেছিল।)" },
+                    { en: "He is just a demagogue seeking personal power.", bn: "(সে শুধু একজন জননেতা যে ব্যক্তিগত ক্ষমতা খুঁজছে।)" },
+                    { en: "A true leader inspires, but a demagogue manipulates.", bn: "(একজন সত্যিকারের নেতা অনুপ্রাণিত করেন, কিন্তু একজন বাগাড়ম্বরপূর্ণ নেতা কারসাজি করেন।)" },
+                    { en: "The crowd was easily fooled by the clever demagogue.", bn: "(চতুর জননেতার দ্বারা জনতা সহজেই বোকা হয়েছিল।)" },
+                    { en: "History shows how dangerous a demagogue can be.", bn: "(ইতিহাস দেখায় একজন আবেগ উসকে দেওয়া জননেতা কতটা বিপজ্জনক হতে পারে।)" }
+                ]
+            }
+        ];
+
+        function renderWordBreakdown() {
+            const container = document.getElementById('word-breakdown-container');
+            let htmlContent = '';
+
+            wordData.forEach(data => {
+                let sentencesHtml = '';
+                data.sentences.forEach(s => {
+                    sentencesHtml += `
+                        <li>
+                            ${s.en}<br>
+                            <span class="text-xs text-black bn-text ml-5 block mt-0.5">${s.bn}</span>
+                        </li>
+                    `;
+                });
+
+                htmlContent += `
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 ${data.theme.border}">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold ${data.theme.text}">${data.id}. ${data.word} <span class="text-sm font-bold text-gray-700 bn-text ml-2">${data.bnTitle}</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: ${data.syn.en}</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: ${data.ant.en}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">${data.origin}</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            ${sentencesHtml}
+                        </ul>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">${data.syn.en}</span> <span class="bn-text text-sm font-bold text-black">${data.syn.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.syn.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.syn.exBn}</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">${data.ant.en}</span> <span class="bn-text text-sm font-bold text-black">${data.ant.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.ant.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.ant.exBn}</p>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        document.addEventListener('DOMContentLoaded', renderWordBreakdown);
+
+        function copySummary() {
+            const summaryText = document.getElementById('summaryText').innerText;
+            
+            const textArea = document.createElement("textarea");
+            textArea.value = summaryText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast();
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(summaryText).then(showToast).catch(e => console.error("Clipboard API failed", e));
+                }
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
