@@ -403,13 +403,13 @@
         <span class="modal-close" onclick="closeModal('vocab-code-modal')">&times;</span>
         <h3 class="text-xl font-semibold mb-3 text-emerald-600">Add Vocabulary with Code</h3>
         <p class="text-sm text-gray-500 mb-2">
-            Enter words and meanings. Separate words from meanings with a comma (,).
+            Enter words and meanings. Format: <strong>Word, Meaning - Synonym @ Antonym;</strong>
             &nbsp;
-            Separate each new pair with a semicolon (;).
+            Separate each new pair with a semicolon (;). The synonym and antonym are optional.
         </p>
-        <p class="text-xs text-gray-600 mb-4">Example: Cow, গরু; Hen, মুরগী; Disrupt, ব্যাহত করা;</p>
+        <p class="text-xs text-gray-600 mb-4">Example: Cow, গরু; Disrupt, ব্যাহত করা - Interrupt @ Calm; Hen, মুরগী @ Rooster;</p>
         
-        <textarea id="vocab-code-textarea" rows="8" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-md text-gray-800 placeholder-gray-400 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Word, Meaning; Word, Meaning; ..."></textarea>
+        <textarea id="vocab-code-textarea" rows="8" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-md text-gray-800 placeholder-gray-400 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Word, Meaning - Synonym @ Antonym; Word, Meaning; ..."></textarea>
         
         <div class="mt-4 flex justify-end gap-3">
              <button onclick="closeModal('vocab-code-modal')" class="action-button action-button-secondary">Cancel</button>
