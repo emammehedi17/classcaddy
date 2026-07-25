@@ -8678,12 +8678,32 @@ async function executeCloudBackup(isAuto = false) {
                 uploadComplete: false
             });
 
-            const batch = writeBatch(db);
-            chunks.forEach((chunk, index) => {
-                const chunkRef = doc(db, backupDocRef.path, 'parts', index.toString());
-                batch.set(chunkRef, { data: chunk, index: index });
-            });
-            await batch.commit();
+            // Chunk writes are split into small groups instead of one giant
+            // batch. A single writeBatch() commit is capped by Firestore at
+            // roughly 10 MiB of total request payload -- for an account with
+            // a lot of accumulated data (many months, dense vocab/notes
+            // content, especially Bangla/Arabic text which takes ~3 bytes
+            // per character in UTF-8), a handful of 200,000-char chunks can
+            // already blow past that cap in one commit. That commit then
+            // throws, gets caught below, and the index doc is left at
+            // uploadComplete:false forever -- exactly "Upload never
+            // finished". Writing a few chunks per batch keeps every single
+            // commit small regardless of how much data the account has.
+            const CHUNKS_PER_BATCH = 10;
+            for (let i = 0; i < chunks.length; i += CHUNKS_PER_BATCH) {
+                const batch = writeBatch(db);
+                const group = chunks.slice(i, i + CHUNKS_PER_BATCH);
+                group.forEach((chunk, offset) => {
+                    const index = i + offset;
+                    const chunkRef = doc(db, backupDocRef.path, 'parts', index.toString());
+                    batch.set(chunkRef, { data: chunk, index: index });
+                });
+                await batch.commit();
+                if (!isAuto) {
+                    const done = Math.min(i + CHUNKS_PER_BATCH, chunks.length);
+                    updateProgress(90, `Uploading part ${done}/${chunks.length}...`);
+                }
+            }
 
             // Chunks are confirmed on the server -- now finalize the index doc.
             await updateDoc(backupDocRef, { uploadComplete: true });
@@ -8762,14 +8782,24 @@ async function initSmartCloudBackup() {
                 console.log("No cloud backups found. Initializing first auto-backup.");
                 shouldBackup = true;
             } else {
-                const lastDoc = snapshot.docs[0]; 
-                const lastBackupDate = lastDoc.data().timestamp.toDate();
-                const lastBackupTime = lastBackupDate.getTime();
-                const now = Date.now();
+                // Skip past any failed/incomplete chunked backups (uploadComplete:false)
+                // when deciding how "recent" the last backup was -- otherwise a failed
+                // attempt still counts as "just backed up" and the scheduler waits
+                // another 6h before trying again, repeating the same failure on a loop.
+                const lastGoodDoc = snapshot.docs.find(d => !(d.data().isChunked && d.data().uploadComplete === false));
 
-                if ((now - lastBackupTime) > SIX_HOURS) {
-                    console.log(`Last backup was ${lastBackupDate.toLocaleString()}. >6h ago. Triggering backup.`);
+                if (!lastGoodDoc) {
+                    console.log("No successful cloud backup found (all recent attempts failed). Retrying now.");
                     shouldBackup = true;
+                } else {
+                    const lastBackupDate = lastGoodDoc.data().timestamp.toDate();
+                    const lastBackupTime = lastBackupDate.getTime();
+                    const now = Date.now();
+
+                    if ((now - lastBackupTime) > SIX_HOURS) {
+                        console.log(`Last successful backup was ${lastBackupDate.toLocaleString()}. >6h ago. Triggering backup.`);
+                        shouldBackup = true;
+                    }
                 }
             }
 
