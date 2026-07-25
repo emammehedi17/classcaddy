@@ -4950,10 +4950,11 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         /**
-         * UPGRADED: Generates varied question types (meaning, synonym, antonym —
-         * each asked in BOTH directions, with randomized phrasing templates)
+         * UPGRADED: Generates varied question types (meaning, synonym, antonym),
+         * each with a randomly chosen direction and randomized phrasing template,
          * from a specific list, using a global pool for incorrect options.
-         * Total questions produced = (vocabs + synonyms available + antonyms available) * 2
+         * Total questions produced = vocabs + synonyms available + antonyms available
+         * (exactly one question per vocab word, one per available synonym, one per available antonym).
          * @param {Array} questionList - The pre-processed vocab list to generate *questions* from.
          * @param {Object} optionPool - An object { allWords, allBanglaMeanings, allSynonyms, allAntonyms } for *options*.
          */
@@ -5012,78 +5013,84 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const allSynonyms = optionPool.allSynonyms || [];
             const allAntonyms = optionPool.allAntonyms || [];
 
-            // --- 1. Meaning questions: EACH vocab asked in BOTH directions ---
+            // --- 1. Meaning questions: ONE per vocab word, direction chosen at random ---
             for (const item of questionList) {
                 const { word, banglaMeaning } = item;
                 if (!word || !banglaMeaning) continue;
 
-                // Eng -> Ban
-                questions.push({
-                    question: pickTemplate(QUIZ_TEMPLATES.engToBan, word),
-                    options: buildOptions(banglaMeaning, allBanglaMeanings, [word]),
-                    correctAnswer: banglaMeaning,
-                    userAnswer: null,
-                    isCorrect: null
-                });
-
-                // Ban -> Eng
-                questions.push({
-                    question: pickTemplate(QUIZ_TEMPLATES.banToEng, banglaMeaning),
-                    options: buildOptions(word, allWords, [banglaMeaning]),
-                    correctAnswer: word,
-                    userAnswer: null,
-                    isCorrect: null
-                });
+                if (Math.random() < 0.5) {
+                    // Eng -> Ban
+                    questions.push({
+                        question: pickTemplate(QUIZ_TEMPLATES.engToBan, word),
+                        options: buildOptions(banglaMeaning, allBanglaMeanings, [word]),
+                        correctAnswer: banglaMeaning,
+                        userAnswer: null,
+                        isCorrect: null
+                    });
+                } else {
+                    // Ban -> Eng
+                    questions.push({
+                        question: pickTemplate(QUIZ_TEMPLATES.banToEng, banglaMeaning),
+                        options: buildOptions(word, allWords, [banglaMeaning]),
+                        correctAnswer: word,
+                        userAnswer: null,
+                        isCorrect: null
+                    });
+                }
             }
 
-            // --- 2. Synonym questions: BOTH directions, only where a synonym exists ---
+            // --- 2. Synonym questions: ONE per available synonym, direction chosen at random ---
             for (const item of questionList) {
                 const { word, synonym } = item;
                 if (!synonym) continue;
 
-                // Eng -> Synonym
-                let synOptionsPool = allSynonyms.length >= 3 ? allSynonyms : [...allSynonyms, ...allWords];
-                questions.push({
-                    question: pickTemplate(QUIZ_TEMPLATES.engToSyn, word),
-                    options: buildOptions(synonym, synOptionsPool, [word]),
-                    correctAnswer: synonym,
-                    userAnswer: null,
-                    isCorrect: null
-                });
-
-                // Synonym -> Eng (reverse: answer is the original word)
-                questions.push({
-                    question: pickTemplate(QUIZ_TEMPLATES.synToEng, synonym),
-                    options: buildOptions(word, allWords, [synonym]),
-                    correctAnswer: word,
-                    userAnswer: null,
-                    isCorrect: null
-                });
+                if (Math.random() < 0.5) {
+                    // Eng -> Synonym
+                    let synOptionsPool = allSynonyms.length >= 3 ? allSynonyms : [...allSynonyms, ...allWords];
+                    questions.push({
+                        question: pickTemplate(QUIZ_TEMPLATES.engToSyn, word),
+                        options: buildOptions(synonym, synOptionsPool, [word]),
+                        correctAnswer: synonym,
+                        userAnswer: null,
+                        isCorrect: null
+                    });
+                } else {
+                    // Synonym -> Eng (reverse: answer is the original word)
+                    questions.push({
+                        question: pickTemplate(QUIZ_TEMPLATES.synToEng, synonym),
+                        options: buildOptions(word, allWords, [synonym]),
+                        correctAnswer: word,
+                        userAnswer: null,
+                        isCorrect: null
+                    });
+                }
             }
 
-            // --- 3. Antonym questions: BOTH directions, only where an antonym exists ---
+            // --- 3. Antonym questions: ONE per available antonym, direction chosen at random ---
             for (const item of questionList) {
                 const { word, antonym } = item;
                 if (!antonym) continue;
 
-                // Eng -> Antonym
-                let antOptionsPool = allAntonyms.length >= 3 ? allAntonyms : [...allAntonyms, ...allWords];
-                questions.push({
-                    question: pickTemplate(QUIZ_TEMPLATES.engToAnt, word),
-                    options: buildOptions(antonym, antOptionsPool, [word]),
-                    correctAnswer: antonym,
-                    userAnswer: null,
-                    isCorrect: null
-                });
-
-                // Antonym -> Eng (reverse: answer is the original word)
-                questions.push({
-                    question: pickTemplate(QUIZ_TEMPLATES.antToEng, antonym),
-                    options: buildOptions(word, allWords, [antonym]),
-                    correctAnswer: word,
-                    userAnswer: null,
-                    isCorrect: null
-                });
+                if (Math.random() < 0.5) {
+                    // Eng -> Antonym
+                    let antOptionsPool = allAntonyms.length >= 3 ? allAntonyms : [...allAntonyms, ...allWords];
+                    questions.push({
+                        question: pickTemplate(QUIZ_TEMPLATES.engToAnt, word),
+                        options: buildOptions(antonym, antOptionsPool, [word]),
+                        correctAnswer: antonym,
+                        userAnswer: null,
+                        isCorrect: null
+                    });
+                } else {
+                    // Antonym -> Eng (reverse: answer is the original word)
+                    questions.push({
+                        question: pickTemplate(QUIZ_TEMPLATES.antToEng, antonym),
+                        options: buildOptions(word, allWords, [antonym]),
+                        correctAnswer: word,
+                        userAnswer: null,
+                        isCorrect: null
+                    });
+                }
             }
 
             // --- 4. Final shuffle ---
@@ -6066,7 +6073,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 currentOptionPool = optionPool; 
                 currentQuizQuestions = []; 
                 
-                const totalQuestions = (questionList.length + questionList.filter(v => v.synonym).length + questionList.filter(v => v.antonym).length) * 2;
+                const totalQuestions = questionList.length + questionList.filter(v => v.synonym).length + questionList.filter(v => v.antonym).length;
                 const totalTimeInSeconds = totalQuestions * quizSettings.timePerQuestion;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
@@ -6741,7 +6748,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 currentOptionPool = optionPool;
                 currentQuizQuestions = []; 
                 
-                const totalQuestions = (questionList.length + questionList.filter(v => v.synonym).length + questionList.filter(v => v.antonym).length) * 2;
+                const totalQuestions = questionList.length + questionList.filter(v => v.synonym).length + questionList.filter(v => v.antonym).length;
                 const totalTimeInSeconds = totalQuestions * quizSettings.timePerQuestion;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
