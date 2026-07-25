@@ -4950,86 +4950,143 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         /**
-         * UPGRADED: Generates 3 types of questions from a specific list,
-         * using a global pool for incorrect options.
+         * UPGRADED: Generates varied question types (meaning, synonym, antonym —
+         * each asked in BOTH directions, with randomized phrasing templates)
+         * from a specific list, using a global pool for incorrect options.
+         * Total questions produced = (vocabs + synonyms available + antonyms available) * 2
          * @param {Array} questionList - The pre-processed vocab list to generate *questions* from.
-         * @param {Object} optionPool - An object { allWords, allBanglaMeanings, allSynonyms } for *options*.
+         * @param {Object} optionPool - An object { allWords, allBanglaMeanings, allSynonyms, allAntonyms } for *options*.
          */
+        // --- Phrasing template banks (picked at random for structural variety) ---
+        const QUIZ_TEMPLATES = {
+            engToBan: [
+                w => `What is the meaning of "${w}"?`,
+                w => `Choose the correct Bangla meaning of "${w}":`,
+                w => `The word "${w}" means -`
+            ],
+            banToEng: [
+                m => `What is the English word for "${m}"?`,
+                m => `Which English word means "${m}"?`,
+                m => `Select the English word for the meaning: "${m}"`
+            ],
+            engToSyn: [
+                w => `What is the synonym of "${w}"?`,
+                w => `Which word is closest in meaning to "${w}"?`,
+                w => `"${w}" is a synonym of -`
+            ],
+            synToEng: [
+                s => `"${s}" is a synonym of which word?`,
+                s => `Which word has the same meaning as "${s}"?`,
+                s => `Select the word that means the same as "${s}":`
+            ],
+            engToAnt: [
+                w => `What is the antonym of "${w}"?`,
+                w => `Which word means the opposite of "${w}"?`,
+                w => `"${w}" is the opposite of -`
+            ],
+            antToEng: [
+                a => `"${a}" is the opposite of which word?`,
+                a => `Which word is opposite in meaning to "${a}"?`,
+                a => `Select the word that is opposite of "${a}":`
+            ]
+        };
+
+        function pickTemplate(bank, value) {
+            const fn = bank[Math.floor(Math.random() * bank.length)];
+            return fn(value);
+        }
+
+        function buildOptions(correctAnswer, pool, exclude) {
+            let wrongOptions = pool.filter(p => p !== correctAnswer && !exclude.includes(p));
+            let options = shuffleArray([...new Set(wrongOptions)]).slice(0, 3);
+            options.push(correctAnswer);
+            return shuffleArray(options);
+        }
+
         function generateQuizData(questionList, optionPool) {
             let questions = [];
-            
-            // --- 1. Get helper arrays from the provided option pool ---
-            const { allWords, allBanglaMeanings, allSynonyms } = optionPool;
 
-            // --- 2. Type 1: Synonym questions (Eng -> Syn) ---
+            // --- Get helper arrays from the provided option pool ---
+            const allWords = optionPool.allWords || [];
+            const allBanglaMeanings = optionPool.allBanglaMeanings || [];
+            const allSynonyms = optionPool.allSynonyms || [];
+            const allAntonyms = optionPool.allAntonyms || [];
+
+            // --- 1. Meaning questions: EACH vocab asked in BOTH directions ---
             for (const item of questionList) {
-                const { word, synonym } = item;
-
-                if (synonym) {
-                    // Wrong options come from the global pool
-                    let wrongOptions = allSynonyms.filter(s => s !== synonym && s !== word);
-                    if (wrongOptions.length < 3) {
-                        wrongOptions.push(...allWords.filter(w => w !== word && w !== synonym));
-                    }
-                    
-                    let options = shuffleArray([...new Set(wrongOptions)]).slice(0, 3);
-                    options.push(synonym); // Add correct answer
-
-                    questions.push({
-                        question: `What is the synonym of "${word}"?`,
-                        options: shuffleArray(options),
-                        correctAnswer: synonym,
-                        userAnswer: null,
-                        isCorrect: null
-                    });
-                }
-            }
-
-            // --- 3. Type 2 & 3: Split the *question list* ---
-            let shuffledList = shuffleArray([...questionList]);
-            const n = shuffledList.length;
-            const halfN = Math.ceil(n / 2);
-
-            const engToBanList = shuffledList.slice(0, halfN);
-            const banToEngList = shuffledList.slice(halfN);
-
-            // --- 4. Type 2: Eng -> Ban questions ---
-            for (const item of engToBanList) {
                 const { word, banglaMeaning } = item;
-                
-                // Wrong options come from the global pool
-                let wrongMeanings = allBanglaMeanings.filter(m => m !== banglaMeaning);
-                let options = shuffleArray([...new Set(wrongMeanings)]).slice(0, 3);
-                options.push(banglaMeaning); // Add correct answer
-                
+                if (!word || !banglaMeaning) continue;
+
+                // Eng -> Ban
                 questions.push({
-                    question: `What is the meaning of "${word}"?`,
-                    options: shuffleArray(options),
+                    question: pickTemplate(QUIZ_TEMPLATES.engToBan, word),
+                    options: buildOptions(banglaMeaning, allBanglaMeanings, [word]),
                     correctAnswer: banglaMeaning,
                     userAnswer: null,
                     isCorrect: null
                 });
-            }
 
-            // --- 5. Type 3: Ban -> Eng questions ---
-            for (const item of banToEngList) {
-                const { word, banglaMeaning } = item;
-                
-                // Wrong options come from the global pool
-                let wrongWords = allWords.filter(w => w !== word);
-                let options = shuffleArray([...new Set(wrongWords)]).slice(0, 3);
-                options.push(word); // Add correct answer
-                
+                // Ban -> Eng
                 questions.push({
-                    question: `What is the English word for "${banglaMeaning}"?`,
-                    options: shuffleArray(options),
+                    question: pickTemplate(QUIZ_TEMPLATES.banToEng, banglaMeaning),
+                    options: buildOptions(word, allWords, [banglaMeaning]),
                     correctAnswer: word,
                     userAnswer: null,
                     isCorrect: null
                 });
             }
 
-            // --- 6. Final shuffle ---
+            // --- 2. Synonym questions: BOTH directions, only where a synonym exists ---
+            for (const item of questionList) {
+                const { word, synonym } = item;
+                if (!synonym) continue;
+
+                // Eng -> Synonym
+                let synOptionsPool = allSynonyms.length >= 3 ? allSynonyms : [...allSynonyms, ...allWords];
+                questions.push({
+                    question: pickTemplate(QUIZ_TEMPLATES.engToSyn, word),
+                    options: buildOptions(synonym, synOptionsPool, [word]),
+                    correctAnswer: synonym,
+                    userAnswer: null,
+                    isCorrect: null
+                });
+
+                // Synonym -> Eng (reverse: answer is the original word)
+                questions.push({
+                    question: pickTemplate(QUIZ_TEMPLATES.synToEng, synonym),
+                    options: buildOptions(word, allWords, [synonym]),
+                    correctAnswer: word,
+                    userAnswer: null,
+                    isCorrect: null
+                });
+            }
+
+            // --- 3. Antonym questions: BOTH directions, only where an antonym exists ---
+            for (const item of questionList) {
+                const { word, antonym } = item;
+                if (!antonym) continue;
+
+                // Eng -> Antonym
+                let antOptionsPool = allAntonyms.length >= 3 ? allAntonyms : [...allAntonyms, ...allWords];
+                questions.push({
+                    question: pickTemplate(QUIZ_TEMPLATES.engToAnt, word),
+                    options: buildOptions(antonym, antOptionsPool, [word]),
+                    correctAnswer: antonym,
+                    userAnswer: null,
+                    isCorrect: null
+                });
+
+                // Antonym -> Eng (reverse: answer is the original word)
+                questions.push({
+                    question: pickTemplate(QUIZ_TEMPLATES.antToEng, antonym),
+                    options: buildOptions(word, allWords, [antonym]),
+                    correctAnswer: word,
+                    userAnswer: null,
+                    isCorrect: null
+                });
+            }
+
+            // --- 4. Final shuffle ---
             return shuffleArray(questions);
         }
 
@@ -5993,20 +6050,23 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     optionPool = {
                         allWords: questionList.map(v => v.word),
                         allBanglaMeanings: questionList.map(v => v.banglaMeaning),
-                        allSynonyms: questionList.map(v => v.synonym).filter(Boolean)
+                        allSynonyms: questionList.map(v => v.synonym).filter(Boolean),
+                        allAntonyms: questionList.map(v => v.antonym).filter(Boolean)
                     };
                 } else {
+                    if (!optionPool.allAntonyms) optionPool.allAntonyms = [];
                     questionList.forEach(v => {
                         if(v.word) optionPool.allWords.push(v.word);
                         if(v.banglaMeaning) optionPool.allBanglaMeanings.push(v.banglaMeaning);
                         if (v.synonym) optionPool.allSynonyms.push(v.synonym);
+                        if (v.antonym) optionPool.allAntonyms.push(v.antonym);
                     });
                 }
                 
                 currentOptionPool = optionPool; 
                 currentQuizQuestions = []; 
                 
-                const totalQuestions = questionList.length + questionList.filter(v => v.synonym).length;
+                const totalQuestions = (questionList.length + questionList.filter(v => v.synonym).length + questionList.filter(v => v.antonym).length) * 2;
                 const totalTimeInSeconds = totalQuestions * quizSettings.timePerQuestion;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
@@ -6488,6 +6548,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
             const allWords = new Set();
             const allBanglaMeanings = new Set();
             const allSynonyms = new Set();
+            const allAntonyms = new Set();
 
             try {
                 const plansCollectionPath = getUserPlansCollectionPath();
@@ -6528,6 +6589,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                                         if (v.word) allWords.add(v.word);
                                         if (v.banglaMeaning) allBanglaMeanings.add(v.banglaMeaning);
                                         if (v.synonym) allSynonyms.add(v.synonym);
+                                        if (v.antonym) allAntonyms.add(v.antonym);
                                     });
                                 }
                             }
@@ -6541,7 +6603,8 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
             return {
                 allWords: [...allWords],
                 allBanglaMeanings: [...allBanglaMeanings],
-                allSynonyms: [...allSynonyms]
+                allSynonyms: [...allSynonyms],
+                allAntonyms: [...allAntonyms]
             };
         }
 		
@@ -6662,20 +6725,23 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                     optionPool = {
                         allWords: questionList.map(v => v.word),
                         allBanglaMeanings: questionList.map(v => v.banglaMeaning),
-                        allSynonyms: questionList.map(v => v.synonym).filter(Boolean)
+                        allSynonyms: questionList.map(v => v.synonym).filter(Boolean),
+                        allAntonyms: questionList.map(v => v.antonym).filter(Boolean)
                     };
                 } else {
+                    if (!optionPool.allAntonyms) optionPool.allAntonyms = [];
                     questionList.forEach(v => {
                         if(v.word) optionPool.allWords.push(v.word);
                         if(v.banglaMeaning) optionPool.allBanglaMeanings.push(v.banglaMeaning);
                         if (v.synonym) optionPool.allSynonyms.push(v.synonym);
+                        if (v.antonym) optionPool.allAntonyms.push(v.antonym);
                     });
                 }
 
                 currentOptionPool = optionPool;
                 currentQuizQuestions = []; 
                 
-                const totalQuestions = questionList.length + questionList.filter(v => v.synonym).length;
+                const totalQuestions = (questionList.length + questionList.filter(v => v.synonym).length + questionList.filter(v => v.antonym).length) * 2;
                 const totalTimeInSeconds = totalQuestions * quizSettings.timePerQuestion;
                 
                 const warningP = document.getElementById('quiz-total-time-warning');
