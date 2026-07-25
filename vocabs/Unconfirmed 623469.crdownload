@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day-4 Vocabulary Notes</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration for darker text -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            500: '#000000', 
+                            600: '#000000', 
+                            700: '#000000', 
+                            800: '#000000', 
+                            900: '#000000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            color: #000000; 
+        }
+        .bn-text {
+            font-family: 'Hind Siliguri', sans-serif;
+            color: #000000; 
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Details/Summary animation for MCQs */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #ef4444; 
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-red-50 via-rose-50 to-pink-50 min-h-screen p-4 md:p-8 selection:bg-rose-200 selection:text-rose-900 text-black">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <header class="glass-card rounded-2xl shadow-lg p-6 md:p-8 mb-8 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-red-500 to-rose-600"></div>
+            
+            <div class="text-center md:text-left mb-6 md:mb-0 z-10">
+                <div class="inline-block px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-bold mb-3">
+                    <i class="fas fa-calendar-day mr-2"></i>Daily Vocabulary
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-2 bg-gradient-to-r from-red-700 to-rose-700 gradient-text pb-1">
+                    Day 4
+                </h1>
+                <p class="text-black font-semibold flex items-center justify-center md:justify-start gap-2">
+                    <i class="fas fa-pen-nib text-red-600"></i>
+                    Created by: 
+                    <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-red-700 hover:text-red-900 hover:underline transition-colors font-bold relative group">
+                        Emam Mehedi
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-red-600 transition-all group-hover:w-full"></span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex-shrink-0 z-10 bg-white p-2 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300 border-2 border-red-100">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-24 h-24 md:w-28 md:h-28 rounded-lg">
+                <p class="text-center text-xs text-black mt-1 font-bold">Scan Me</p>
+            </div>
+        </header>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-10 mb-8 border-t-4 border-t-red-500 relative">
+            <div class="absolute -top-4 -right-4 text-red-200 opacity-20">
+                <i class="fas fa-chess-knight text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 id="story-title" class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-crown text-red-600"></i> The Fall of the Arrogant King
+                </h2>
+                <button onclick="copyStory()" class="mt-4 md:mt-0 bg-red-100 hover:bg-red-200 text-red-800 font-bold py-2 px-4 rounded-lg shadow-sm transition-all flex items-center gap-2 border border-red-300">
+                    <i class="fas fa-copy"></i> Copy Story
+                </button>
+            </div>
+            
+            <div id="story-content" class="bn-text text-lg md:text-xl text-black font-medium leading-relaxed space-y-4 bg-white/70 p-6 rounded-xl border border-red-100 shadow-inner">
+                <p>
+                    প্রাচীন যুগে এক অহংকারী রাজা ছিলেন যিনি প্রায়শই তার প্রজাদের <span class="font-bold text-red-800 bg-red-100 px-1.5 py-0.5 rounded shadow-sm">Abase</span> <span class="text-rose-700 font-bold">(হেয় করা / অপমান করা)</span> করতেন। তিনি নিজেকে অত্যন্ত <span class="font-bold text-red-800 bg-red-100 px-1.5 py-0.5 rounded shadow-sm">Competent</span> <span class="text-rose-700 font-bold">(সক্ষম / যোগ্য)</span> মনে করতেন এবং বিশ্বাস করতেন যে তার চেয়ে বুদ্ধিমান আর কেউ নেই। তার এই <span class="font-bold text-red-800 bg-red-100 px-1.5 py-0.5 rounded shadow-sm">Inconsiderate</span> <span class="text-rose-700 font-bold">(অবিবেচক)</span> আচরণের কারণে প্রতিবেশী রাজ্যগুলোর সাথে তার এক নীরব <span class="font-bold text-red-800 bg-red-100 px-1.5 py-0.5 rounded shadow-sm">Hostility</span> <span class="text-rose-700 font-bold">(শত্রুতা)</span> তৈরি হয়েছিল।
+                </p>
+                <p>
+                    একদিন, এক সাধারণ <span class="font-bold text-red-800 bg-red-100 px-1.5 py-0.5 rounded shadow-sm">Peasant</span> <span class="text-rose-700 font-bold">(কৃষক)</span> রাজসভায় এসে দাবি করল যে রাজার নতুন আইনগুলো অত্যন্ত <span class="font-bold text-red-800 bg-red-100 px-1.5 py-0.5 rounded shadow-sm">Ambiguous</span> <span class="text-rose-700 font-bold">(অস্পষ্ট / দ্ব্যর্থবোধক)</span> এবং সাধারণ মানুষের পক্ষে বোঝা অসম্ভব। কৃষক আরও বলল যে একজন রাজহংসের যেমন তার <span class="font-bold text-red-800 bg-red-100 px-1.5 py-0.5 rounded shadow-sm">Cygnet</span> <span class="text-rose-700 font-bold">(রাজহংসের ছানা)</span>-এর প্রতি দায়িত্ব থাকে, তেমনি রাজারও প্রজাদের প্রতি দায়িত্ব আছে।
+                </p>
+                <p>
+                    রাজা প্রথমে রেগে গেলেও কৃষকের সাহসিকতা দেখে মুগ্ধ হলেন। তিনি বুঝতে পারলেন যে সাহিত্যের জগতে যেমন একটি নিখুঁত <span class="font-bold text-red-800 bg-red-100 px-1.5 py-0.5 rounded shadow-sm">Sonnet</span> <span class="text-rose-700 font-bold">(চতুর্দশপদী কবিতা)</span>-এর কদর রয়েছে, তেমনি একটি রাজ্যেও ন্যায়বিচারের কদর থাকা উচিত। অনুতপ্ত হয়ে রাজা তার ভুল স্বীকার করলেন। 
+                </p>
+                <p>
+                    প্রজারা রাজাকে ক্ষমা করে দিল এবং সবাই মিলে মন্দিরে গিয়ে একটি পবিত্র <span class="font-bold text-red-800 bg-red-100 px-1.5 py-0.5 rounded shadow-sm">Hymn</span> <span class="text-rose-700 font-bold">(ধর্মীয় স্তোত্র / ভজন)</span> গাইতে শুরু করল। এরপর থেকে রাজা তার প্রজাদের <span class="font-bold text-red-800 bg-red-100 px-1.5 py-0.5 rounded shadow-sm">Venerate</span> <span class="text-rose-700 font-bold">(শ্রদ্ধা করা)</span> করতে শুরু করেন এবং রাজ্যটিতে শান্তি ফিরে আসে।
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-black mb-6 flex items-center gap-3 px-2">
+                <i class="fas fa-layer-group text-red-600"></i> Word Breakdown
+            </h2>
+            
+            <div id="word-breakdown-container" class="grid grid-cols-1 gap-6">
+                <!-- Word cards will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="mb-8 mt-12 border-t-4 border-dashed border-red-200 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 px-2">
+                <h2 class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-tasks text-red-600"></i> Knowledge Check (MCQs)
+                </h2>
+                <button onclick="copyMCQs()" class="mt-4 md:mt-0 bg-white hover:bg-gray-50 text-red-700 font-bold py-2 px-4 rounded-lg shadow transition-all flex items-center gap-2 border border-red-200">
+                    <i class="fas fa-copy"></i> Copy MCQs
+                </button>
+            </div>
+            
+            <div id="mcq-container" class="space-y-4">
+                <!-- MCQs will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-8 bg-gradient-to-r from-red-900 to-rose-900 text-white relative overflow-hidden mt-8">
+            <div class="absolute -right-10 -bottom-10 opacity-10">
+                <i class="fas fa-clipboard-list text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-red-50">
+                    <i class="fas fa-list-check text-rose-400"></i> Summary List
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 bg-rose-500 hover:bg-rose-400 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 border border-rose-400">
+                    <i class="fas fa-copy"></i> Copy List
+                </button>
+            </div>
+            
+            <div class="bg-black/40 p-5 rounded-xl border border-rose-500/30 font-mono text-sm leading-relaxed overflow-x-auto z-10 relative bn-text">
+<pre id="summaryText" class="whitespace-pre-wrap text-rose-50 font-bold">Abase, অপমান করা/হেয় করা - Lower / Degrade @ Exalt / Elevate;
+Competent, সক্ষম/যোগ্য - Capable @ Incompetent;
+Hostility, শত্রুতা - Enmity @ Friendship;
+Peasant, কৃষক - Farmer @ Aristocrat;
+Venerate, শ্রদ্ধা করা - Respect @ Despise;
+Ambiguous, অস্পষ্ট/দ্ব্যর্থবোধক - Unclear @ Lucid / Clear;
+Inconsiderate, অবিবেচক - Thoughtless @ Thoughtful;
+Cygnet, রাজহংসের ছানা - Young swan @ Adult swan;
+Sonnet, চতুর্দশপদী কবিতা - Poem (14 lines) @ Prose;
+Hymn, ধর্মীয় স্তোত্র/ভজন - Religious song / Chant @ Profane song;</pre>
+            </div>
+        </section>
+
+        <!-- Navigation Buttons -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 mb-4">
+            <a href="https://classcaddy.netlify.app/vocabs/day3" class="w-full sm:w-auto text-center bg-white hover:bg-red-50 text-red-700 font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-red-200 hover:border-red-400 group">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Previous (Day-3)
+            </a>
+            <a href="https://classcaddy.netlify.app/vocabs/day5" class="w-full sm:w-auto text-center bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-transparent hover:shadow-lg transform hover:-translate-y-0.5 group">
+                Next (Day-5) <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-700 text-sm mt-8 pb-8 font-bold">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i id="toast-icon" class="fas fa-check-circle mr-2"></i><span id="toast-message">Copied!</span></div>
+
+    <script>
+        const wordData = [
+            {
+                id: 1,
+                word: "Abase",
+                bnTitle: "(অপমান করা / হেয় করা)",
+                theme: { border: "border-red-600", text: "text-red-800" },
+                syn: { en: "Lower / Degrade", bn: "(নিচু করা / পদাবনতি ঘটানো)", ex: "He degraded himself by lying.", exBn: "(সে মিথ্যা বলে নিজেকে নিচু করেছে।)" },
+                ant: { en: "Exalt / Elevate", bn: "(উচ্চ প্রশংসা করা / উন্নত করা)", ex: "The king exalted the brave knight.", exBn: "(রাজা সাহসী নাইটকে উচ্চ প্রশংসা করেছিলেন।)" },
+                origin: "পুরানো ফরাসি শব্দ 'abaissier' থেকে এসেছে, যার অর্থ 'নিচু করা' বা 'নিচে নামানো'। এটি মূলত কারও পদমর্যাদা বা সম্মান কমিয়ে দেওয়া বোঝায়।",
+                sentences: [
+                    { en: "A good leader should never abase his employees.", bn: "(একজন ভালো নেতার কখনই তার কর্মীদের হেয় করা উচিত নয়।)" },
+                    { en: "He felt abased when he was scolded in public.", bn: "(জনসমক্ষে বকা খাওয়ার সময় সে অপমানিত বোধ করেছিল।)" },
+                    { en: "I will not abase myself by begging for money.", bn: "(টাকা ভিক্ষা করে আমি নিজেকে ছোট করব না।)" },
+                    { en: "The cruel master tried to abase his servant.", bn: "(নিষ্ঠুর প্রভু তার ভৃত্যকে অপমান করার চেষ্টা করেছিল।)" },
+                    { en: "Don't abase others just to make yourself look better.", bn: "(নিজেকে ভালো দেখানোর জন্য অন্যদের ছোট কোরো না।)" }
+                ]
+            },
+            {
+                id: 2,
+                word: "Competent",
+                bnTitle: "(সক্ষম / যোগ্য)",
+                theme: { border: "border-blue-600", text: "text-blue-800" },
+                syn: { en: "Capable", bn: "(সক্ষম)", ex: "She is capable of doing this job alone.", exBn: "(সে একাই এই কাজ করতে সক্ষম।)" },
+                ant: { en: "Incompetent", bn: "(অযোগ্য / অক্ষম)", ex: "The incompetent doctor was fired.", exBn: "(অযোগ্য ডাক্তারকে বরখাস্ত করা হয়েছিল।)" },
+                origin: "ল্যাটিন 'competere' থেকে এসেছে, যার অর্থ 'একসাথে পড়া' বা 'উপযুক্ত হওয়া'। পরবর্তীতে এটি 'দক্ষ' বা 'সক্ষম' অর্থ ধারণ করে।",
+                sentences: [
+                    { en: "We need a competent mechanic to fix this car.", bn: "(এই গাড়িটি মেরামত করার জন্য আমাদের একজন দক্ষ মেকানিক দরকার।)" },
+                    { en: "He is competent enough to handle the stress.", bn: "(তিনি মানসিক চাপ সামলানোর জন্য যথেষ্ট যোগ্য।)" },
+                    { en: "The company hired a competent software engineer.", bn: "(কোম্পানিটি একজন দক্ষ সফটওয়্যার ইঞ্জিনিয়ার নিয়োগ করেছে।)" },
+                    { en: "She proved herself as a competent leader.", bn: "(তিনি নিজেকে একজন যোগ্য নেতা হিসেবে প্রমাণ করেছেন।)" },
+                    { en: "Only competent candidates will be called for the interview.", bn: "(শুধুমাত্র যোগ্য প্রার্থীদেরই সাক্ষাৎকারের জন্য ডাকা হবে।)" }
+                ]
+            },
+            {
+                id: 3,
+                word: "Hostility",
+                bnTitle: "(শত্রুতা)",
+                theme: { border: "border-emerald-600", text: "text-emerald-800" },
+                syn: { en: "Enmity", bn: "(শত্রুতা / বিদ্বেষ)", ex: "There is a long history of enmity between the two families.", exBn: "(দুই পরিবারের মধ্যে শত্রুতার দীর্ঘ ইতিহাস রয়েছে।)" },
+                ant: { en: "Friendship", bn: "(বন্ধুত্ব)", ex: "Their friendship started in college.", exBn: "(তাদের বন্ধুত্ব কলেজে শুরু হয়েছিল।)" },
+                origin: "ল্যাটিন 'hostilis' (শত্রুভাবাপন্ন) থেকে 'hostilitas' হয়ে ইংরেজিতে এসেছে। এটি প্রকাশ্যে ঘৃণা বা শত্রুতা প্রকাশ করা বোঝায়।",
+                sentences: [
+                    { en: "There is open hostility between the two rival gangs.", bn: "(দুটি প্রতিদ্বন্দ্বী দলের মধ্যে প্রকাশ্য শত্রুতা রয়েছে।)" },
+                    { en: "He looked at me with deep hostility.", bn: "(সে গভীর শত্রুতার সাথে আমার দিকে তাকিয়েছিল।)" },
+                    { en: "The hostility between the two countries could lead to war.", bn: "(দুই দেশের মধ্যে শত্রুতা যুদ্ধের দিকে নিয়ে যেতে পারে।)" },
+                    { en: "They managed to end the years of hostility.", bn: "(তারা বছরের পর বছর ধরে চলা শত্রুতার অবসান ঘটাতে পেরেছিল।)" },
+                    { en: "She felt a sense of hostility in the room.", bn: "(সে ঘরে একটি শত্রুতার অনুভূতি অনুভব করেছিল।)" }
+                ]
+            },
+            {
+                id: 4,
+                word: "Peasant",
+                bnTitle: "(কৃষক / চাষি)",
+                theme: { border: "border-amber-500", text: "text-amber-800" },
+                syn: { en: "Farmer", bn: "(কৃষক)", ex: "The farmer grows vegetables in his field.", exBn: "(কৃষক তার মাঠে শাকসবজি ফলায়।)" },
+                ant: { en: "Aristocrat", bn: "(অভিজাত ব্যক্তি)", ex: "The wealthy aristocrat owned most of the land.", exBn: "(ধনী অভিজাত ব্যক্তিটি বেশিরভাগ জমির মালিক ছিল।)" },
+                origin: "পুরানো ফরাসি 'paisant' থেকে উদ্ভূত, যার অর্থ 'স্থানীয় ব্যক্তি' বা 'গ্রামের বাসিন্দা'। এটি মূলত দরিদ্র কৃষক বা কৃষিশ্রমিকদের বোঝাতে ব্যবহৃত হতো।",
+                sentences: [
+                    { en: "The poor peasant worked hard from dawn to dusk.", bn: "(দরিদ্র কৃষক ভোর থেকে সন্ধ্যা পর্যন্ত কঠোর পরিশ্রম করেছিল।)" },
+                    { en: "Peasants used to pay high taxes to the king.", bn: "(কৃষকরা রাজাকে উচ্চ কর প্রদান করত।)" },
+                    { en: "The story is about a brave peasant boy.", bn: "(গল্পটি এক সাহসী কৃষক ছেলেকে নিয়ে।)" },
+                    { en: "Many peasants revolted against the cruel landlord.", bn: "(অনেক কৃষক নিষ্ঠুর জমিদারের বিরুদ্ধে বিদ্রোহ করেছিল।)" },
+                    { en: "He came from a simple peasant family.", bn: "(সে একটি সাধারণ কৃষক পরিবার থেকে এসেছিল।)" }
+                ]
+            },
+            {
+                id: 5,
+                word: "Venerate",
+                bnTitle: "(শ্রদ্ধা করা)",
+                theme: { border: "border-indigo-600", text: "text-indigo-800" },
+                syn: { en: "Respect", bn: "(সম্মান করা)", ex: "You should respect your elders.", exBn: "(আপনার বড়দের সম্মান করা উচিত।)" },
+                ant: { en: "Despise", bn: "(অবজ্ঞা করা / ঘৃণা করা)", ex: "Honest people despise liars.", exBn: "(সৎ মানুষ মিথ্যাবাদীদের অবজ্ঞা করে।)" },
+                origin: "ল্যাটিন 'venerari' থেকে এসেছে, যার অর্থ 'শ্রদ্ধা বা আরাধনা করা'। এটি প্রায়শই ধর্মীয় বা গভীর আধ্যাত্মিক সম্মানের ক্ষেত্রে ব্যবহৃত হয়।",
+                sentences: [
+                    { en: "In many cultures, people venerate their ancestors.", bn: "(অনেক সংস্কৃতিতে, লোকেরা তাদের পূর্বপুরুষদের শ্রদ্ধা করে।)" },
+                    { en: "Mother Teresa is venerated for her charity work.", bn: "(মাদার তেরেসা তার দাতব্য কাজের জন্য শ্রদ্ধেয়।)" },
+                    { en: "We venerate the heroes who fought for our freedom.", bn: "(যারা আমাদের স্বাধীনতার জন্য লড়াই করেছিল আমরা সেই বীরদের শ্রদ্ধা করি।)" },
+                    { en: "The ancient tree was venerated as a sacred object.", bn: "(প্রাচীন গাছটিকে একটি পবিত্র বস্তু হিসেবে শ্রদ্ধা করা হতো।)" },
+                    { en: "It is important to venerate the wise and old.", bn: "(জ্ঞানী এবং বৃদ্ধদের সম্মান করা গুরুত্বপূর্ণ।)" }
+                ]
+            },
+            {
+                id: 6,
+                word: "Ambiguous",
+                bnTitle: "(অস্পষ্ট / দ্ব্যর্থবোধক)",
+                theme: { border: "border-fuchsia-600", text: "text-fuchsia-800" },
+                syn: { en: "Unclear", bn: "(অস্পষ্ট)", ex: "The instructions were unclear, so we made a mistake.", exBn: "(নির্দেশনাগুলো অস্পষ্ট ছিল, তাই আমরা ভুল করেছিলাম।)" },
+                ant: { en: "Lucid / Clear", bn: "(সুস্পষ্ট / প্রাঞ্জল)", ex: "The teacher gave a lucid explanation of the math problem.", exBn: "(শিক্ষক গণিত সমস্যাটির একটি সুস্পষ্ট ব্যাখ্যা দিয়েছিলেন।)" },
+                origin: "ল্যাটিন 'ambiguus' থেকে এসেছে, যার অর্থ 'সন্দেহজনক' বা 'অনিশ্চিত' (ambi- 'উভয় দিকে' + agere 'চালনা করা')। এর অর্থ এমন কিছু যার একাধিক অর্থ থাকতে পারে।",
+                sentences: [
+                    { en: "His answer to the question was highly ambiguous.", bn: "(তার প্রশ্নের উত্তরটি অত্যন্ত দ্ব্যর্থবোধক ছিল।)" },
+                    { en: "The ending of the movie was left intentionally ambiguous.", bn: "(সিনেমার শেষটা ইচ্ছাকৃতভাবেই অস্পষ্ট রাখা হয়েছিল।)" },
+                    { en: "The contract contains some ambiguous clauses.", bn: "(চুক্তিতে কিছু অস্পষ্ট ধারা রয়েছে।)" },
+                    { en: "Don't use ambiguous language in official documents.", bn: "(সরকারি নথিতে দ্ব্যর্থবোধক ভাষা ব্যবহার করবেন পণ্ডিত।)" },
+                    { en: "The politician made an ambiguous statement to avoid trouble.", bn: "(ঝামেলা এড়াতে রাজনীতিবিদ একটি অস্পষ্ট বক্তব্য দিয়েছেন।)" }
+                ]
+            },
+            {
+                id: 7,
+                word: "Inconsiderate",
+                bnTitle: "(অবিবেচক)",
+                theme: { border: "border-pink-600", text: "text-pink-800" },
+                syn: { en: "Thoughtless", bn: "(চিন্তাহীন / অবিবেচক)", ex: "It was thoughtless of you to leave the door open.", exBn: "(দরজা খোলা রেখে আসাটা তোমার অবিবেচকের কাজ ছিল।)" },
+                ant: { en: "Thoughtful", bn: "(বিবেচক / চিন্তাশীল)", ex: "Thank you for the thoughtful gift.", exBn: "(বিবেচনামূলক উপহারটির জন্য আপনাকে ধন্যবাদ।)" },
+                origin: "'in-' (না) এবং 'considerate' (বিবেচক) শব্দের সমন্বয়ে গঠিত। এর অর্থ অন্যের অনুভূতি বা সুবিধার কথা চিন্তা না করা।",
+                sentences: [
+                    { en: "Playing loud music late at night is very inconsiderate.", bn: "(গভীর রাতে উচ্চস্বরে গান বাজানো অত্যন্ত অবিবেচকের কাজ।)" },
+                    { en: "It was inconsiderate of him to keep us waiting for hours.", bn: "(আমাদের ঘণ্টার পর ঘণ্টা অপেক্ষা করানোটা তার অবিবেচকের কাজ ছিল।)" },
+                    { en: "The inconsiderate driver parked blocking the driveway.", bn: "(অবিবেচক চালকটি ড্রাইভওয়ে অবরুদ্ধ করে পার্ক করেছিল।)" },
+                    { en: "Don't be so inconsiderate of other people's feelings.", bn: "(অন্যের অনুভূতির প্রতি এতটা অবিবেচক হবেন না।)" },
+                    { en: "Her inconsiderate comment hurt her best friend.", bn: "(তার অবিবেচক মন্তব্যটি তার সবচেয়ে ভালো বন্ধুকে আঘাত করেছিল।)" }
+                ]
+            },
+            {
+                id: 8,
+                word: "Cygnet",
+                bnTitle: "(রাজহংসের ছানা)",
+                theme: { border: "border-purple-600", text: "text-purple-800" },
+                syn: { en: "Young swan", bn: "(অল্পবয়সী রাজহাঁস)", ex: "The young swan swam behind its mother.", exBn: "(ছোট রাজহাঁসটি তার মায়ের পেছনে সাঁতার কাটছিল।)" },
+                ant: { en: "Adult swan", bn: "(প্রাপ্তবয়স্ক রাজহাঁস)", ex: "The adult swan has beautiful white feathers.", exBn: "(প্রাপ্তবয়স্ক রাজহাঁসটির সুন্দর সাদা পালক আছে।)" },
+                origin: "পুরানো ফরাসি শব্দ 'cigne' (রাজহাঁস) এবং ক্ষুদ্রার্থক প্রত্যয় '-et' যুক্ত হয়ে 'cygnet' শব্দটি তৈরি হয়েছে, যার অর্থ 'ছোট রাজহাঁস'।",
+                sentences: [
+                    { en: "We saw a beautiful cygnet at the lake today.", bn: "(আমরা আজ হ্রদে একটি সুন্দর রাজহংসের ছানা দেখেছি।)" },
+                    { en: "A cygnet is usually gray or brown in color.", bn: "(একটি রাজহংসের ছানা সাধারণত ধূসর বা বাদামী রঙের হয়।)" },
+                    { en: "The mother swan aggressively protected her cygnet.", bn: "(মা রাজহাঁস আক্রমণাত্মকভাবে তার ছানাকে রক্ষা করেছিল।)" },
+                    { en: "The ugly duckling was actually a swan cygnet.", bn: "(কুৎসিত হাঁসের ছানাটি আসলে একটি রাজহংসের ছানা ছিল।)" },
+                    { en: "Cygnets stay with their parents for almost a year.", bn: "(রাজহংসের ছানারা প্রায় এক বছর তাদের বাবা-মায়ের সাথে থাকে।)" }
+                ]
+            },
+            {
+                id: 9,
+                word: "Sonnet",
+                bnTitle: "(চতুর্দশপদী কবিতা)",
+                theme: { border: "border-cyan-600", text: "text-cyan-800" },
+                syn: { en: "Poem (14 lines)", bn: "(১৪ লাইনের কবিতা)", ex: "He wrote a beautiful poem for his wife.", exBn: "(সে তার স্ত্রীর জন্য একটি সুন্দর কবিতা লিখেছিল।)" },
+                ant: { en: "Prose", bn: "(গদ্য)", ex: "The novel is written in simple prose.", exBn: "(উপন্যাসটি সহজ গদ্যে লেখা।)" },
+                origin: "ইতালীয় শব্দ 'sonetto' থেকে উদ্ভূত, যার অর্থ 'ছোট গান' বা 'ছোট শব্দ'। এটি ১৪ লাইনের একটি নির্দিষ্ট ছন্দের কবিতাকে বোঝায়, যা উইলিয়াম শেক্সপিয়র অত্যন্ত জনপ্রিয় করেছিলেন।",
+                sentences: [
+                    { en: "Shakespeare wrote 154 famous sonnets.", bn: "(শেক্সপিয়র ১৫৪টি বিখ্যাত চতুর্দশপদী কবিতা লিখেছিলেন।)" },
+                    { en: "The English teacher asked us to memorize a sonnet.", bn: "(ইংরেজি শিক্ষক আমাদের একটি চতুর্দশপদী কবিতা মুখস্থ করতে বলেছিলেন।)" },
+                    { en: "A typical sonnet has exactly fourteen lines.", bn: "(একটি সাধারণ চতুর্দশপদী কবিতায় ঠিক চৌদ্দটি লাইন থাকে।)" },
+                    { en: "He dedicated a romantic sonnet to his lover.", bn: "(সে তার প্রেমিকাকে একটি রোমান্টিক চতুর্দশপদী কবিতা উৎসর্গ করেছিল।)" },
+                    { en: "Writing a perfect sonnet requires great skill.", bn: "(একটি নিখুঁত চতুর্দশপদী কবিতা লেখার জন্য দুর্দান্ত দক্ষতার প্রয়োজন।)" }
+                ]
+            },
+            {
+                id: 10,
+                word: "Hymn",
+                bnTitle: "(ধর্মীয় স্তোত্র / ভজন)",
+                theme: { border: "border-gray-800", text: "text-gray-900" },
+                syn: { en: "Religious song / Chant", bn: "(ধর্মীয় গান / জপ)", ex: "The monks softly sang a chant in the temple.", exBn: "(সন্ন্যাসীরা মন্দিরে মৃদুস্বরে একটি ধর্মীয় গান গাইছিলেন।)" },
+                ant: { en: "Profane song", bn: "(অপবিত্র বা ধর্মহীন গান)", ex: "He disliked listening to profane songs.", exBn: "(সে ধর্মহীন গান শুনতে অপছন্দ করত।)" },
+                origin: "গ্রীক শব্দ 'hymnos' থেকে এসেছে, যার অর্থ 'দেবতাদের প্রশংসায় গাওয়া গান'। এটি ঈশ্বরের প্রশংসা বা উপাসনার জন্য গাওয়া ধর্মীয় গান।",
+                sentences: [
+                    { en: "The choir sang a beautiful hymn during the church service.", bn: "(গির্জার প্রার্থনার সময় গায়কদল একটি সুন্দর ধর্মীয় স্তোত্র গেয়েছিল।)" },
+                    { en: "My grandmother taught me an old religious hymn.", bn: "(আমার দাদি আমাকে একটি পুরোনো ধর্মীয় ভজন শিখিয়েছিলেন।)" },
+                    { en: "Singing a hymn can bring peace to a troubled mind.", bn: "(একটি স্তোত্র গাওয়া অশান্ত মনে শান্তি আনতে পারে।)" },
+                    { en: "The hymn was written in praise of God.", bn: "(স্তোত্রটি ঈশ্বরের প্রশংসায় লেখা হয়েছিল।)" },
+                    { en: "Everyone stood up when the national hymn was played.", bn: "(জাতীয় স্তোত্র বাজানো হলে সবাই উঠে দাঁড়ায়।)" }
+                ]
+            }
+        ];
+
+        const mcqData = [
+            {
+                q: "What is the primary meaning of the word 'Abase'?",
+                options: { a: "To elevate in status", b: "To humiliate or degrade", c: "To praise highly", d: "To construct carefully" },
+                correct: "b",
+                note: "'Abase' means to lower in rank, prestige, or esteem (humiliate). Options 'a' and 'c' are antonyms, while 'd' is unrelated."
+            },
+            {
+                q: "Choose the correct synonym for 'Competent'.",
+                options: { a: "Inept", b: "Proficient", c: "Apathetic", d: "Ignorant" },
+                correct: "b",
+                note: "'Competent' means capable or having the necessary ability. 'Proficient' is the closest synonym. 'Inept' is an antonym."
+            },
+            {
+                q: "Which word represents the exact opposite (antonym) of 'Hostility'?",
+                options: { a: "Animosity", b: "Belligerence", c: "Amity", d: "Apathy" },
+                correct: "c",
+                note: "'Hostility' means enmity or unfriendliness. 'Amity' means peaceful harmony and friendship, making it the perfect antonym. 'Animosity' and 'Belligerence' are synonyms."
+            },
+            {
+                q: "Fill in the blank: The cruel king loved to _____ his servants in front of the whole court.",
+                options: { a: "Venerate", b: "Abase", c: "Amalgamate", d: "Competent" },
+                correct: "b",
+                note: "The context of 'cruel king' implies a negative action toward servants. 'Abase' (to humiliate/degrade) fits perfectly."
+            },
+            {
+                q: "Solve the analogy - Cygnet : Swan :: Kid : ?",
+                options: { a: "Sheep", b: "Goat", c: "Cow", d: "Horse" },
+                correct: "b",
+                note: "A cygnet is the young of a swan, just as a kid is the young of a goat. (A young sheep is a lamb, a young cow is a calf, a young horse is a foal)."
+            },
+            {
+                q: "A poetic form that strictly consists of 14 lines is called a:",
+                options: { a: "Ballad", b: "Elegy", c: "Sonnet", d: "Hymn" },
+                correct: "c",
+                note: "A 'Sonnet' is specifically defined as a 14-line poem, often written in iambic pentameter. An elegy is a poem for the dead, and a hymn is a religious song."
+            },
+            {
+                q: "What does it mean to 'Venerate' someone?",
+                options: { a: "To violently despise them", b: "To regard them with great respect", c: "To violate their privacy", d: "To evacuate them from danger" },
+                correct: "b",
+                note: "'Venerate' comes from the Latin 'venerari' (to worship/revere) and means to treat someone with deep respect or reverence."
+            },
+            {
+                q: "Which of the following is an antonym for 'Ambiguous'?",
+                options: { a: "Obscure", b: "Vague", c: "Lucid", d: "Cryptic" },
+                correct: "c",
+                note: "'Ambiguous' means unclear or having double meaning. 'Lucid' means clear and easily understood, serving as its direct antonym."
+            },
+            {
+                q: "Find the synonym for 'Inconsiderate'.",
+                options: { a: "Thoughtless", b: "Compassionate", c: "Prudent", d: "Meticulous" },
+                correct: "a",
+                note: "'Inconsiderate' means failing to think about the feelings of others. 'Thoughtless' is its exact synonym."
+            },
+            {
+                q: "A song embodying religious and sacred emotions is called a:",
+                options: { a: "Ode", b: "Sonnet", c: "Hymn", d: "Lullaby" },
+                correct: "c",
+                note: "A 'Hymn' is a religious song or chant meant for praise and worship. An ode is a lyric poem, and a lullaby is for putting babies to sleep."
+            },
+            {
+                q: "Fill in the blank: The terms of the contract were so _____ that neither party understood their obligations.",
+                options: { a: "Competent", b: "Ambiguous", c: "Lucid", d: "Inconsiderate" },
+                correct: "b",
+                note: "If neither party understood the contract, it means the text was unclear. 'Ambiguous' correctly fills this blank."
+            },
+            {
+                q: "The term 'Peasant' traditionally refers to:",
+                options: { a: "A wealthy aristocrat", b: "A poor rural farmer", c: "An urban merchant", d: "A skilled artisan" },
+                correct: "b",
+                note: "'Peasant' historically refers to a poor farmer of low social status who owns or rents a small piece of land for cultivation."
+            },
+            {
+                q: "Which word is an antonym for 'Abase'?",
+                options: { a: "Degrade", b: "Demean", c: "Exalt", d: "Disgrace" },
+                correct: "c",
+                note: "'Abase', 'Degrade', 'Demean', and 'Disgrace' all mean to lower in status. 'Exalt' means to elevate or praise highly, making it the antonym."
+            },
+            {
+                q: "Fill in the blank: It was highly _____ of you to park your car right across my driveway.",
+                options: { a: "Inconsiderate", b: "Ambiguous", c: "Competent", d: "Hostile" },
+                correct: "a",
+                note: "Blocking someone's driveway shows a lack of thought for their convenience, which is the definition of being 'Inconsiderate'."
+            },
+            {
+                q: "Identify the synonym for 'Hostility'.",
+                options: { a: "Empathy", b: "Enmity", c: "Sympathy", d: "Affinity" },
+                correct: "b",
+                note: "'Hostility' refers to aggressive behavior or unfriendliness. 'Enmity' (deep-seated hatred) is the closest synonym among the choices."
+            },
+            {
+                q: "The word 'Sonnet' originates from the Italian word 'sonetto', which translates to:",
+                options: { a: "Little song", b: "Deep thought", c: "Broken heart", d: "Holy chant" },
+                correct: "a",
+                note: "The Italian root 'sonetto' literally means 'little song' or 'little sound', which reflects its poetic nature."
+            },
+            {
+                q: "Solve the analogy - Sonnet : Literature :: Football : ?",
+                options: { a: "Field", b: "Sport", c: "Goal", d: "Team" },
+                correct: "b",
+                note: "A sonnet is a specific type of literature, just as football is a specific type of sport."
+            },
+            {
+                q: "Which of the following is an antonym for 'Venerate'?",
+                options: { a: "Worship", b: "Idolize", c: "Despise", d: "Honor" },
+                correct: "c",
+                note: "'Venerate', 'Worship', 'Idolize', and 'Honor' all imply deep respect. 'Despise' means to feel profound contempt for, making it the antonym."
+            },
+            {
+                q: "Fill in the blank: The HR manager assured us that only highly _____ candidates would pass the rigorous exam.",
+                options: { a: "Incompetent", b: "Ambiguous", c: "Competent", d: "Inconsiderate" },
+                correct: "c",
+                note: "A rigorous exam is designed to find capable individuals. 'Competent' is the only positive, skill-based word that fits."
+            },
+            {
+                q: "What is the correct plural form of 'Cygnet'?",
+                options: { a: "Cygni", b: "Cygnets", c: "Cygnetes", d: "Cygnae" },
+                correct: "b",
+                note: "'Cygnet' follows standard English pluralization rules by simply adding an 's' to form 'Cygnets'."
+            },
+            {
+                q: "Which word best describes a person who lacks regard for the rights or feelings of others?",
+                options: { a: "Hostile", b: "Inconsiderate", c: "Ambiguous", d: "Abased" },
+                correct: "b",
+                note: "While 'Hostile' implies active aggression, 'Inconsiderate' specifically describes thoughtlessness regarding others' feelings."
+            },
+            {
+                q: "The word 'Hymn' originates from the Greek word 'hymnos', meaning:",
+                options: { a: "A song of grief", b: "A song in praise of gods", c: "A song for the harvest", d: "A song of war" },
+                correct: "b",
+                note: "'Hymnos' historically referred to songs sung in praise or honor of gods, heroes, or prominent figures."
+            },
+            {
+                q: "Fill in the blank: Following the bitter argument, the two rival factions viewed each other with open _____.",
+                options: { a: "Veneration", b: "Competence", c: "Hostility", d: "Sonnet" },
+                correct: "c",
+                note: "A bitter argument between rival factions would naturally result in 'Hostility' (enmity/aggression)."
+            },
+            {
+                q: "Find the antonym of 'Competent'.",
+                options: { a: "Adept", b: "Inept", c: "Skilled", d: "Capable" },
+                correct: "b",
+                note: "'Adept', 'Skilled', and 'Capable' are all synonyms of 'Competent'. 'Inept' means having or showing no skill, which is the antonym."
+            },
+            {
+                q: "Which of the following pairs represents a true Synonym relationship?",
+                options: { a: "Abase – Exalt", b: "Hostility – Enmity", c: "Ambiguous – Lucid", d: "Inconsiderate – Thoughtful" },
+                correct: "b",
+                note: "Options A, C, and D are all antonym pairs. Only 'Hostility' and 'Enmity' share the same meaning."
+            }
+        ];
+
+        function renderWordBreakdown() {
+            const container = document.getElementById('word-breakdown-container');
+            let htmlContent = '';
+
+            wordData.forEach(data => {
+                let sentencesHtml = '';
+                data.sentences.forEach(s => {
+                    sentencesHtml += `
+                        <li>
+                            ${s.en}<br>
+                            <span class="text-xs text-black bn-text ml-5 block mt-0.5">${s.bn}</span>
+                        </li>
+                    `;
+                });
+
+                htmlContent += `
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 ${data.theme.border}">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold ${data.theme.text}">${data.id}. ${data.word} <span class="text-sm font-bold text-gray-700 bn-text ml-2">${data.bnTitle}</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: ${data.syn.en.split(' / ')[0]}</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: ${data.ant.en.split(' / ')[0]}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">${data.origin}</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            ${sentencesHtml}
+                        </ul>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">${data.syn.en}</span> <span class="bn-text text-sm font-bold text-black">${data.syn.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.syn.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.syn.exBn}</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">${data.ant.en}</span> <span class="bn-text text-sm font-bold text-black">${data.ant.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.ant.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.ant.exBn}</p>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        function renderMCQs() {
+            const container = document.getElementById('mcq-container');
+            let htmlContent = '';
+
+            mcqData.forEach((mcq, index) => {
+                htmlContent += `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-lg text-black mb-3">${index + 1}. ${mcq.q}</h3>
+                    <ul class="space-y-2 mb-4 ml-2">
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">a.</span> ${mcq.options.a}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">b.</span> ${mcq.options.b}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">c.</span> ${mcq.options.c}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">d.</span> ${mcq.options.d}</li>
+                    </ul>
+                    
+                    <details class="group bg-red-50 rounded-lg outline-none border border-red-100">
+                        <summary class="cursor-pointer font-bold text-red-700 px-4 py-2 flex items-center justify-between select-none">
+                            <span class="flex items-center gap-2"><i class="fas fa-eye"></i> Show Answer</span>
+                            <i class="fas fa-chevron-down transform group-open:rotate-180 transition-transform duration-300"></i>
+                        </summary>
+                        <div class="px-4 pb-4 pt-1 border-t border-red-200 mt-1">
+                            <p class="text-black font-bold mb-2">Correct Answer: <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded uppercase">${mcq.correct}</span></p>
+                            <p class="text-sm text-black font-medium"><span class="font-bold">Note:</span> ${mcq.note}</p>
+                        </div>
+                    </details>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderWordBreakdown();
+            renderMCQs();
+        });
+
+        function copySummary() {
+            const summaryText = document.getElementById('summaryText').innerText;
+            copyTextToClipboard(summaryText, 'Summary list copied!');
+        }
+        
+        function copyStory() {
+            const storyTitle = document.getElementById('story-title').innerText.trim();
+            const storyParagraphs = document.querySelectorAll('#story-content p');
+            let storyText = storyTitle + '\n\n';
+            
+            storyParagraphs.forEach(p => {
+                storyText += p.innerText + '\n\n';
+            });
+            
+            copyTextToClipboard(storyText.trim(), 'Story copied!');
+        }
+
+        function copyMCQs() {
+            let copyText = '';
+            
+            mcqData.forEach((mcq, index) => {
+                copyText += `${index + 1}. ${mcq.q}\n`;
+                copyText += `a. ${mcq.options.a}\n`;
+                copyText += `b. ${mcq.options.b}\n`;
+                copyText += `c. ${mcq.options.c}\n`;
+                copyText += `d. ${mcq.options.d}\n`;
+                copyText += `correct answer: ${mcq.correct}\n`;
+                copyText += `Note: ${mcq.note}\n\n`;
+            });
+            
+            copyTextToClipboard(copyText.trim(), '25 MCQs copied exactly formatted!');
+        }
+
+        function copyTextToClipboard(text, successMessage) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(successMessage);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => showToast(successMessage)).catch(e => console.error("Clipboard API failed", e));
+                }
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toast-message");
+            toastMessage.innerText = message;
+            
+            toast.className = "show";
+            
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
