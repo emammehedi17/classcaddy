@@ -38,7 +38,16 @@
             // which let real data loss (2-3 days of entries) go unnoticed. All
             // reads now go to the server; this is a plain in-memory-cache
             // Firestore instance (default behavior, no offline persistence).
-            db = initializeFirestore(app, {});
+            // experimentalAutoDetectLongPolling: some networks/ISPs run proxies
+            // that silently buffer the live WebChannel connection Firestore uses
+            // by default -- the write looks "sent" from the browser's side but
+            // the server's confirmation never arrives, so it hangs forever with
+            // no error. This tells the SDK to detect that situation and fall
+            // back to plain long-polling instead, which those proxies handle
+            // correctly. See: https://firebase.google.com/docs/reference/js/firestore_.firestoresettings
+            db = initializeFirestore(app, {
+                experimentalAutoDetectLongPolling: true
+            });
 
             // Expose for module-level functions (e.g. saveGoal)
             window._db = db;
@@ -8645,7 +8654,7 @@ async function executeCloudBackup(isAuto = false) {
         });
 
         const jsonString = JSON.stringify(backupData);
-        const CHUNK_SIZE = 200000; 
+        const CHUNK_SIZE = 50000; 
         const noteText = isAuto ? "Auto-Backup (24h Cycle)" : "Manual Cloud Backup";
 
         // --- STEP 3: UPLOAD (Writing is fast, but we track it) ---
