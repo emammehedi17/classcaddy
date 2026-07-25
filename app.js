@@ -8698,7 +8698,7 @@ async function executeCloudBackup(isAuto = false) {
             // uploadComplete:false forever -- exactly "Upload never
             // finished". Writing a few chunks per batch keeps every single
             // commit small regardless of how much data the account has.
-            const CHUNKS_PER_BATCH = 10;
+            const CHUNKS_PER_BATCH = 25;
             for (let i = 0; i < chunks.length; i += CHUNKS_PER_BATCH) {
                 const batch = writeBatch(db);
                 const group = chunks.slice(i, i + CHUNKS_PER_BATCH);
