@@ -1643,11 +1643,12 @@ function updateMonthUI(monthId, monthData, weeksData) {
              if (isEditing) {
                  if (isVocabRow) {
                      topicContent = `<div class="vocab-edit-container space-y-2">`;
-                     (rowData.vocabData || [{ word: '', meaning: '' }]).forEach((pair, pairIndex) => {
+                     (rowData.vocabData || [{ word: '', meaning: '', antonym: '' }]).forEach((pair, pairIndex) => {
                          topicContent += `
                              <div class="vocab-pair" data-pair-index="${pairIndex}">
                                  <input type="text" class="vocab-input vocab-word-input" placeholder="Word" value="${escapeHtml(pair.word || '')}">
                                  <input type="text" class="vocab-input vocab-meaning-input" placeholder="Meaning" value="${escapeHtml(pair.meaning || '')}">
+                                 <input type="text" class="vocab-input vocab-antonym-input" placeholder="Antonym" value="${escapeHtml(pair.antonym || '')}">
                                  <button type="button" class="icon-button delete-vocab-pair-btn" title="Delete Pair"><i class="fas fa-times text-red-500"></i></button>
                              </div>`;
                      });
@@ -1819,6 +1820,11 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     } else {
                         meaningHtml = escapeHtml(meaningStr);
                     }
+                }
+
+                // Append the antonym, if one is set, as " @ Antonym"
+                if (v.antonym && v.antonym.trim()) {
+                    meaningHtml += ` <span class="vocab-antonym-text">@ ${escapeHtml(v.antonym.trim())}</span>`;
                 }
 
                 return `<div class="vocab-word" tabindex="0">
@@ -3405,7 +3411,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                  else if (button.classList.contains('quiz-btn')) {
                      const dayIndex = parseInt(daySection.dataset.dayIndex);
                      const rowIndex = parseInt(row.dataset.rowIndex);
-                     startQuiz(monthId, weekId, dayIndex, rowIndex);
+                     handleVocabQuizButtonClick(monthId, weekId, dayIndex, rowIndex);
                  }
                  // --- END: QUIZ BUTTON HANDLER ---
 
@@ -3634,7 +3640,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                              row.querySelectorAll('.vocab-pair').forEach(pairEl => {
                                  const word = pairEl.querySelector('.vocab-word-input')?.value.trim();
                                  const meaning = pairEl.querySelector('.vocab-meaning-input')?.value.trim();
-                                 if (word) { vocabData.push({ word: word, meaning: meaning || '' }); }
+                                 const antonym = pairEl.querySelector('.vocab-antonym-input')?.value.trim();
+                                 if (word) { vocabData.push({ word: word, meaning: meaning || '', antonym: antonym || '' }); }
                              });
                              topic = null;
                          } else {
@@ -3806,7 +3813,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
              const newRowIndex = maxIndex + 1;
 
              let newRowData;
-             if (type === 'vocabulary') { newRowData = { subject: 'Vocabulary', topic: null, completed: false, comment: '', completionPercentage: null, vocabData: [{ word: '', meaning: '' }], story: null }; }
+             if (type === 'vocabulary') { newRowData = { subject: 'Vocabulary', topic: null, completed: false, comment: '', completionPercentage: null, vocabData: [{ word: '', meaning: '', antonym: '' }], story: null }; }
              else { newRowData = { subject: '', topic: '', completed: false, comment: '', completionPercentage: null, vocabData: null, story: null }; }
 
              const newRowHtml = createTableRow(monthId, weekId, dayIndex, newRowIndex, newRowData, true);
@@ -3814,12 +3821,13 @@ function updateMonthUI(monthId, monthData, weeksData) {
          }
 
         // Add/Delete Vocab Pair Inputs
-function addVocabPairInputs(container, word = '', meaning = '') {
-             console.log("Checkpoint 8: addVocabPairInputs called with:", word, meaning);
+function addVocabPairInputs(container, word = '', meaning = '', antonym = '') {
+             console.log("Checkpoint 8: addVocabPairInputs called with:", word, meaning, antonym);
              const newPairIndex = container.querySelectorAll('.vocab-pair').length;
              const pairHtml = `<div class="vocab-pair" data-pair-index="${newPairIndex}">
                                  <input type="text" class="vocab-input vocab-word-input" placeholder="Word" value="${escapeHtml(word)}">
                                  <input type="text" class="vocab-input vocab-meaning-input" placeholder="Meaning" value="${escapeHtml(meaning)}">
+                                 <input type="text" class="vocab-input vocab-antonym-input" placeholder="Antonym" value="${escapeHtml(antonym)}">
                                  <button type="button" class="icon-button delete-vocab-pair-btn" title="Delete Pair"><i class="fas fa-times text-red-500"></i></button>
                              </div>`;
 
@@ -3886,7 +3894,8 @@ function addVocabPairInputs(container, word = '', meaning = '') {
                 const lastPair = allPairs[allPairs.length - 1];
                 const lastWordInput = lastPair.querySelector('.vocab-word-input');
                 const lastMeaningInput = lastPair.querySelector('.vocab-meaning-input');
-                if (lastWordInput.value.trim() === '' && lastMeaningInput.value.trim() === '') {
+                const lastAntonymInput = lastPair.querySelector('.vocab-antonym-input');
+                if (lastWordInput.value.trim() === '' && lastMeaningInput.value.trim() === '' && (!lastAntonymInput || lastAntonymInput.value.trim() === '')) {
                     lastPair.remove();
                 }
             }
@@ -3895,33 +3904,43 @@ function addVocabPairInputs(container, word = '', meaning = '') {
             const pairs = text.split(';');
 
             // --- REPLACED LOGIC ---
+            // Format: word, meaning - synonym @ antonym;
             pairs.forEach(pairStr => {
                 const pair = pairStr.trim();
                 if (pair) {
                     let word = '';
                     let meaning = '';
-                    
-                    const commaIndex = pair.indexOf(',');
+                    let antonym = '';
+
+                    // First, split off the antonym (comes after "@")
+                    let mainPart = pair;
+                    const atIndex = pair.indexOf('@');
+                    if (atIndex !== -1) {
+                        mainPart = pair.substring(0, atIndex).trim();
+                        antonym = pair.substring(atIndex + 1).trim();
+                    }
+
+                    const commaIndex = mainPart.indexOf(',');
 
                     if (commaIndex === -1) {
                         // No comma found, treat the whole thing as a word
-                        word = pair.trim();
+                        word = mainPart.trim();
                     } else {
                         // Comma found, split into word and meaning
-                        word = pair.substring(0, commaIndex).trim();
-                        meaning = pair.substring(commaIndex + 1).trim();
+                        word = mainPart.substring(0, commaIndex).trim();
+                        meaning = mainPart.substring(commaIndex + 1).trim();
                     }
 
                     if (word) { // Check if the word is not empty
-                        console.log("Adding pair:", word, meaning); 
-                        addVocabPairInputs(container, word, meaning);
+                        console.log("Adding pair:", word, meaning, antonym); 
+                        addVocabPairInputs(container, word, meaning, antonym);
                     }
                 }
             });
             // --- END REPLACED LOGIC ---
 
             // Add one new empty pair for the user to manually add more
-            addVocabPairInputs(container, '', '');
+            addVocabPairInputs(container, '', '', '');
 
             closeVocabCodeModal();
         }
@@ -4919,10 +4938,13 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                     synonym = meaningStr.substring(hyphenIndex + 1).trim();
                 }
                 
+                const antonym = item.antonym?.trim() || null;
+
                 return {
                     word: word,
                     banglaMeaning: banglaMeaning,
-                    synonym: synonym
+                    synonym: synonym,
+                    antonym: antonym
                 };
             });
         }
@@ -5140,7 +5162,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 if (badgeAnswered) badgeAnswered.style.display = 'flex';
             }
             
-            quizRestartBtn.onclick = runQuizGame;
+            quizRestartBtn.onclick = () => confirmUnsavedResultBeforeAction(runQuizGame);
             
             const totalQuestions = currentQuizQuestions.length;
             
@@ -5627,8 +5649,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         
         // 1. Button on Results Page: "Review Wrong"
         quizReviewBtn.addEventListener('click', () => {
-			isReviewingSavedResult = false;
-            showReviewScreen();
+            confirmUnsavedResultBeforeAction(() => {
+                isReviewingSavedResult = false;
+                showReviewScreen();
+            });
         });
         
         // 2. Button on Review Page: "Back to Results" (FIXED)
@@ -5769,6 +5793,26 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         // --- END: ADD THIS NEW FUNCTION ---
 		
 		
+        /**
+         * Req 4: Same "unsaved result" warning used when closing the quiz
+         * modal, reused before "Review Wrong" / "Try Again" so unsaved
+         * results can't be silently lost (Try Again overwrites them by
+         * restarting the quiz).
+         */
+        function confirmUnsavedResultBeforeAction(actionFn) {
+            if (!isGuestMode && !isQuizResultSaved) {
+                showConfirmationModal(
+                    "Discard Results?",
+                    "You haven't saved your result yet. Are you sure you want to continue? This data will be lost.",
+                    () => {
+                        actionFn();
+                    }
+                );
+            } else {
+                actionFn();
+            }
+        }
+
         /**
          * Checks if a quiz is in progress OR if results are unsaved before closing.
          */
@@ -6501,6 +6545,63 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
             };
         }
 		
+		// --- START: Req 2 - Vocab row "Quiz" button chooser ---
+        /**
+         * Handles clicks on a vocab row's "Quiz" button.
+         * If the row also has custom MCQs saved, ask the user whether they
+         * want the Vocab Quiz or the MCQs. Otherwise, behave exactly as before.
+         */
+        async function handleVocabQuizButtonClick(monthId, weekId, dayIndex, rowIndex) {
+            try {
+                const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
+                const weekDocSnap = await getDoc(weekDocRef);
+                if (!weekDocSnap.exists()) throw new Error("Week document not found.");
+
+                const rowData = weekDocSnap.data().days?.[dayIndex]?.rows?.[rowIndex];
+                if (!rowData) throw new Error("Row data not found.");
+
+                const hasMcqs = rowData.mcqData && rowData.mcqData.length > 0;
+
+                if (hasMcqs) {
+                    openVocabQuizChoiceModal(monthId, weekId, dayIndex, rowIndex);
+                } else {
+                    // No MCQs on this row: function exactly as before.
+                    startQuiz(monthId, weekId, dayIndex, rowIndex);
+                }
+            } catch (error) {
+                console.error("Error checking row data for quiz button:", error);
+                // Fail safe: fall back to the original vocab quiz behavior.
+                startQuiz(monthId, weekId, dayIndex, rowIndex);
+            }
+        }
+
+        /**
+         * Shows the "Vocab Quiz vs MCQs" choice modal and wires up the buttons
+         * to kick off the appropriate quiz.
+         */
+        function openVocabQuizChoiceModal(monthId, weekId, dayIndex, rowIndex) {
+            const modal = document.getElementById('vocab-quiz-choice-modal');
+            const vocabBtn = document.getElementById('vocab-quiz-choice-vocab-btn');
+            const mcqBtn = document.getElementById('vocab-quiz-choice-mcq-btn');
+            if (!modal || !vocabBtn || !mcqBtn) return;
+
+            // Force to front / top of stacking order, consistent with other
+            // confirmation-style modals in this app.
+            document.body.appendChild(modal);
+            modal.style.zIndex = '130';
+            modal.style.display = 'block';
+
+            vocabBtn.onclick = () => {
+                modal.style.display = 'none';
+                startQuiz(monthId, weekId, dayIndex, rowIndex);
+            };
+            mcqBtn.onclick = () => {
+                modal.style.display = 'none';
+                startMcqQuiz(monthId, weekId, dayIndex, rowIndex);
+            };
+        }
+        // --- END: Req 2 ---
+
 		// 5. "Quiz" বাটনে ক্লিক করলে (Vocabulary-এর জন্য)
         async function startQuiz(monthId, weekId, dayIndex, rowIndex) {
 			isWeaknessTest = false;
@@ -9480,70 +9581,104 @@ if (viewMcqTestBtn) {
             showCustomAlert("No MCQs to test.", "error");
             return;
         }
-        
-        // Fix: Exit Fullscreen if active so Quiz Modal appears on top
+
+        // --- Req 3 fix: the actual quiz-launch logic is moved into this
+        // helper so we can guarantee it only runs *after* any fullscreen
+        // element has fully exited. While a fullscreen element is active,
+        // browsers render it in a special "top layer" above every other
+        // element regardless of z-index, so opening the quiz modal before
+        // the exit completes made it appear behind the View Qs modal.
+        const openQuizFromViewMcq = () => {
+            // Start Quiz with the data we just loaded
+            const mcqData = currentViewMcqData.mcqs;
+            const title = currentViewMcqData.title;
+
+            // Set Quiz Context
+            currentMcqTarget = { quizType: 'aggregated', description: title };
+
+            // --- FIX: Use the actual subject we captured ---
+            window.currentQuizSubjectInfo = { 
+                subjectName: currentViewMcqData.subject || "Quick Test", 
+                topicDetail: title 
+            };
+
+            // Init Quiz (Standard Force Hide Logic)
+            quizTitle.textContent = 'MCQ Quiz';
+
+            // --- Req 3 fix: force the quiz modal to the very end of <body>
+            // and to a z-index above the View Qs modal every time, so it
+            // always renders on top regardless of DOM order or any nested
+            // stacking context (same pattern used for confirm-modal).
+            document.body.appendChild(quizModal);
+            quizModal.style.zIndex = '150';
+            quizModal.style.display = "block";
+
+            quizMainScreen.classList.add('hidden');
+            quizMainScreen.style.display = 'none';
+
+            quizResultsScreen.classList.add('hidden');
+            quizResultsScreen.style.display = 'none';
+
+            quizReviewScreen.classList.add('hidden');
+            quizReviewScreen.style.display = 'none';
+
+            quizStartScreen.classList.remove('hidden');
+            quizStartScreen.style.display = '';
+
+            currentMcqData = mcqData;
+            currentVocabData = null;
+            // ADDED shuffleArray HERE
+            currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
+                question: mcq.question, 
+                options: getProcessedOptions(mcq.options), 
+                correctAnswer: mcq.correctAnswer, 
+                explanation: mcq.explanation || null, 
+                note: mcq.note || null, 
+                userAnswer: null, 
+                isCorrect: null 
+            })));
+
+            const totalTime = currentQuizQuestions.length * quizSettings.timePerQuestion;
+            const warningP = document.getElementById('quiz-total-time-warning');
+            document.getElementById('display-total-time').textContent = formatTime(totalTime);
+            warningP.style.display = 'block';
+
+            quizStartMessage.textContent = `Ready to test yourself on ${currentQuizQuestions.length} MCQs?`;
+            window._pendingQuizQuestionCount = currentQuizQuestions.length;
+            updateQuizStartScreenUI(); // <--- Add this
+            quizStartBtn.classList.remove('hidden');
+
+            const newStartBtn = quizStartBtn.cloneNode(true);
+            quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
+            newStartBtn.addEventListener('click', runQuizGame);
+            quizStartBtn = newStartBtn;
+        };
+
+        // Fix: Exit Fullscreen if active so Quiz Modal appears on top.
+        // Wait for the exit to actually complete (fullscreenchange event,
+        // with a small fallback timeout) before opening the quiz modal.
         if (document.fullscreenElement) {
+            let launched = false;
+            const launchOnce = () => {
+                if (launched) return;
+                launched = true;
+                document.removeEventListener('fullscreenchange', launchOnce);
+                document.removeEventListener('webkitfullscreenchange', launchOnce);
+                document.removeEventListener('msfullscreenchange', launchOnce);
+                openQuizFromViewMcq();
+            };
+            document.addEventListener('fullscreenchange', launchOnce);
+            document.addEventListener('webkitfullscreenchange', launchOnce);
+            document.addEventListener('msfullscreenchange', launchOnce);
+            // Fallback in case the event doesn't fire for some reason
+            setTimeout(launchOnce, 300);
+
             if (document.exitFullscreen) document.exitFullscreen();
             else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
             else if (document.msExitFullscreen) document.msExitFullscreen();
+        } else {
+            openQuizFromViewMcq();
         }
-        
-        // Start Quiz with the data we just loaded
-        const mcqData = currentViewMcqData.mcqs;
-        const title = currentViewMcqData.title;
-        
-        // Set Quiz Context
-        currentMcqTarget = { quizType: 'aggregated', description: title };
-        
-        // --- FIX: Use the actual subject we captured ---
-        window.currentQuizSubjectInfo = { 
-            subjectName: currentViewMcqData.subject || "Quick Test", 
-            topicDetail: title 
-        };
-        
-        // Init Quiz (Standard Force Hide Logic)
-        quizTitle.textContent = 'MCQ Quiz';
-        quizModal.style.display = "block";
-        
-        quizMainScreen.classList.add('hidden');
-        quizMainScreen.style.display = 'none';
-        
-        quizResultsScreen.classList.add('hidden');
-        quizResultsScreen.style.display = 'none';
-        
-        quizReviewScreen.classList.add('hidden');
-        quizReviewScreen.style.display = 'none';
-
-        quizStartScreen.classList.remove('hidden');
-        quizStartScreen.style.display = '';
-        
-        currentMcqData = mcqData;
-        currentVocabData = null;
-        // ADDED shuffleArray HERE
-		currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
-			question: mcq.question, 
-			options: getProcessedOptions(mcq.options), 
-			correctAnswer: mcq.correctAnswer, 
-			explanation: mcq.explanation || null, 
-			note: mcq.note || null, 
-			userAnswer: null, 
-			isCorrect: null 
-		})));
-				
-        const totalTime = currentQuizQuestions.length * quizSettings.timePerQuestion;
-        const warningP = document.getElementById('quiz-total-time-warning');
-        document.getElementById('display-total-time').textContent = formatTime(totalTime);
-        warningP.style.display = 'block';
-        
-        quizStartMessage.textContent = `Ready to test yourself on ${currentQuizQuestions.length} MCQs?`;
-		window._pendingQuizQuestionCount = currentQuizQuestions.length;
-		updateQuizStartScreenUI(); // <--- Add this
-        quizStartBtn.classList.remove('hidden');
-        
-        const newStartBtn = quizStartBtn.cloneNode(true);
-        quizStartBtn.parentNode.replaceChild(newStartBtn, quizStartBtn);
-        newStartBtn.addEventListener('click', runQuizGame);
-        quizStartBtn = newStartBtn;
     });
 }
 

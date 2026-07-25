@@ -1593,6 +1593,19 @@ body.dark-mode .done-btn-completed {
 			/* font-size: 0.8rem; (ডিফল্ট) */
 		}
 		/* --- END: BANGLA MEANING TOOLTIP STYLE --- */
+
+		/* --- START: ANTONYM TOOLTIP STYLE --- */
+		.vocab-meaning .vocab-antonym-text {
+			font-weight: 500;
+			color: #dc2626; /* red-600, signals "opposite" visually */
+		}
+		/* --- END: ANTONYM TOOLTIP STYLE --- */
+
+		/* --- START: ANTONYM INPUT (Manual Edit Mode) --- */
+		.vocab-antonym-input {
+			border-left: 2px solid #fca5a5; /* subtle red accent to distinguish from meaning */
+		}
+		/* --- END: ANTONYM INPUT --- */
 		
 		/* --- START: PROGRESS CHART BUTTON STYLE --- */
 		.progress-chart-btn {

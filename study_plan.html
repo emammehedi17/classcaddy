@@ -758,6 +758,23 @@
         </div>
       </div>
     </div>
+    <div id="vocab-quiz-choice-modal" class="modal" style="z-index: 130;">
+      <div class="modal-content" style="max-width: 420px;">
+        <h3 class="text-lg font-semibold mb-2 text-gray-800">Choose Quiz Type</h3>
+        <p class="text-gray-600 mb-6 text-sm">This row has both vocabulary words and custom MCQs. Which would you like to be tested on?</p>
+        <div class="flex flex-col gap-3">
+            <button id="vocab-quiz-choice-vocab-btn" class="action-button" style="background-color: #4f46e5; border-color: #4f46e5;">
+                <i class="fas fa-book mr-1.5"></i> Vocab Quiz
+            </button>
+            <button id="vocab-quiz-choice-mcq-btn" class="action-button" style="background-color: #10b981; border-color: #10b981;">
+                <i class="fas fa-question-circle mr-1.5"></i> MCQs
+            </button>
+            <button id="vocab-quiz-choice-cancel-btn" class="action-button action-button-secondary" onclick="closeModal('vocab-quiz-choice-modal')">
+                Cancel
+            </button>
+        </div>
+      </div>
+    </div>
     <div id="add-mcq-modal" class="modal" style="z-index: 105;">
       <div class="modal-content" style="max-width: 600px;">
         <span class="modal-close" onclick="closeModal('add-mcq-modal')">&times;</span>
