@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 5 - Systematic Vocabulary Batch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', 'Hind Siliguri', sans-serif; background-color: #f3f4f6; color: #000000; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .text-black-high { color: #000000; }
+        .text-black-medium { color: #111827; }
+        .gradient-text { background: linear-gradient(90deg, #4f46e5, #9333ea); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+    </style>
+</head>
+<body class="antialiased p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto space-y-8">
+        <!-- Header Section -->
+        <header class="glass-panel rounded-3xl p-6 md:p-10 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+            <div class="z-10 text-center md:text-left mb-6 md:mb-0">
+                <h1 class="text-4xl md:text-5xl font-bold gradient-text mb-4">Day 5 Vocabulary</h1>
+                <p class="text-lg text-black-high font-semibold mb-2">Systematic Vocabulary Batch</p>
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-700 font-medium">
+                    <i class="fas fa-certificate text-indigo-500"></i>
+                    <span>Created by: <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="underline hover:text-indigo-900">Emam Mehedi</a></span>
+                </div>
+            </div>
+            <div class="z-10 flex-shrink-0 bg-white p-2 rounded-xl shadow-md">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-24 h-24 object-cover rounded-lg">
+            </div>
+        </header>
+
+        <!-- Story Section -->
+        <section class="glass-panel rounded-3xl p-6 md:p-10 shadow-xl relative">
+            <div class="flex justify-between items-center mb-6 border-b pb-4 border-gray-200">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-black-high"><i class="fas fa-book-open text-purple-500"></i> Mind-Bending Story</h2>
+                <button onclick="copyStory()" class="px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg font-medium transition-colors flex items-center gap-2">
+                    <i class="far fa-copy"></i> Copy Story
+                </button>
+            </div>
+            <div id="storyContent" class="text-black-high leading-relaxed text-lg text-justify font-medium">
+                <h3 class="text-xl font-bold mb-3 text-center">দ্য সাইবর্গ রেবেলিয়ন (The Cyborg Rebellion)</h3>
+                ভবিষ্যতের ঢাকা শহর। আকাশে উড়ন্ত গাড়ি, কিন্তু আবহাওয়া সবসময় <strong>Humid</strong> (স্যাঁতসেঁতে)। বিজ্ঞানী অর্ণব তার টাইম-মেশিন প্রজেক্টে একটি মারাত্মক <strong>Aberration</strong> (বিচ্যুতি) লক্ষ্য করলেন। শহরের মানুষ যন্ত্রের উপর নির্ভর করে এতটাই <strong>Complacent</strong> (আত্মসন্তুষ্ট) হয়ে পড়েছে যে তারা বাস্তবতাকে ভুলে গেছে। আধুনিক <strong>Pedagogy</strong> (শিক্ষাবিজ্ঞান) শুধু যন্ত্রের গুণগান গায়। একদিন সেন্ট্রাল এআই (AI) একটি চূড়ান্ত <strong>Verdict</strong> (রায়) জারি করল যে, অর্ণবের গবেষণা ধ্বংস করতে হবে। অর্ণব প্রথমে তার পরবর্তী পদক্ষেপ নিয়ে <strong>Ambivalent</strong> (দ্বিধাগ্রস্ত/দোদুল্যমান) ছিলেন। কিন্তু এআই-এর এই সিদ্ধান্তটি তার কাছে অত্যন্ত <strong>Indecent</strong> (অশালীন/অনুচিত) মনে হলো। তিনি টাইম-মেশিন নিয়ে পালালেন এবং ভূগর্ভস্থ বিদ্রোহীদের কাছে একটি <strong>Cynosure</strong> (আকর্ষণের কেন্দ্রবিন্দু) হয়ে উঠলেন। ঠিক যেভাবে তামার তারের ভেতর দিয়ে <strong>Electricity</strong> (বিদ্যুৎ) দ্রুত প্রবাহিত হয়, তেমনি তার বিদ্রোহের স্ফুলিঙ্গ পুরো শহরে ছড়িয়ে পড়ল। অবশেষে তার বন্ধু, যিনি পেশায় একজন <strong>Cardiologist</strong> (হৃদরোগ বিশেষজ্ঞ), তাকে একটি বিশেষ বায়োমেট্রিক চিপ দিয়ে সাহায্য করলেন, যা এআই-এর সেন্সরকে চিরতরে ফাঁকি দিতে সক্ষম।
+            </div>
+        </section>
+
+        <!-- Word Breakdown Section -->
+        <section class="space-y-6">
+            <h2 class="text-2xl font-bold flex items-center gap-3 text-black-high ml-2"><i class="fas fa-layer-group text-indigo-500"></i> Word Breakdowns</h2>
+            <div id="wordsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- JS will populate this -->
+            </div>
+        </section>
+
+        <!-- Summary Section -->
+        <section class="glass-panel rounded-3xl p-6 md:p-10 shadow-xl">
+            <div class="flex justify-between items-center mb-6 border-b pb-4 border-gray-200">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-black-high"><i class="fas fa-list text-purple-500"></i> Summary List</h2>
+                <button onclick="copySummary()" class="px-4 py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-lg font-medium transition-colors flex items-center gap-2">
+                    <i class="far fa-copy"></i> Copy List
+                </button>
+            </div>
+            <div id="summaryContainer" class="bg-gray-50 p-6 rounded-xl border border-gray-200 font-mono text-black-medium whitespace-pre-wrap text-sm md:text-base"></div>
+        </section>
+
+        <!-- MCQs Section -->
+        <section class="glass-panel rounded-3xl p-6 md:p-10 shadow-xl">
+            <div class="flex justify-between items-center mb-6 border-b pb-4 border-gray-200">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-black-high"><i class="fas fa-question-circle text-indigo-500"></i> Assessment (25 MCQs)</h2>
+                <button onclick="copyMCQs()" class="px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg font-medium transition-colors flex items-center gap-2">
+                    <i class="far fa-copy"></i> Copy MCQs
+                </button>
+            </div>
+            <div id="mcqContainer" class="space-y-4">
+                <!-- JS will populate this -->
+            </div>
+        </section>
+
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between items-center py-8">
+            <a href="https://classcaddy.netlify.app/vocabs/day4" class="px-6 py-3 bg-white text-indigo-700 border border-indigo-200 rounded-full font-bold shadow hover:bg-indigo-50 transition-all flex items-center gap-3">
+                <i class="fas fa-arrow-left"></i> Previous (Day-4)
+            </a>
+            <a href="https://classcaddy.netlify.app/vocabs/day6" class="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-bold shadow-lg hover:shadow-xl transition-all flex items-center gap-3 transform hover:-translate-y-1">
+                Next (Day-6) <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-2xl opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex items-center gap-3">
+        <i class="fas fa-check-circle text-green-400"></i>
+        <span id="toastMsg">Copied successfully!</span>
+    </div>
+
+    <script>
+        // --- 1. WORD DATA ---
+        const vocabData = [
+            {
+                word: "Aberration", meaning: "বিচ্যুতি / বিপথগামিতা", syn: "Deviation", ant: "Normality",
+                origin: "ল্যাটিন শব্দ 'aberrare' (বিপথে ঘুরা) থেকে এসেছে। এটি স্বাভাবিক নিয়ম বা অবস্থা থেকে বিচ্যুতি বোঝাতে ব্যবহৃত হয়।",
+                sentences: [
+                    { en: "The sudden drop in temperature is an aberration.", bn: "তাপমাত্রার হঠাৎ এই পতন একটি বিচ্যুতি।" },
+                    { en: "His angry outburst was a strange aberration.", bn: "তার রাগান্বিত প্রকাশটি ছিল একটি অদ্ভুত বিচ্যুতি।" },
+                    { en: "We treat this error as a minor aberration.", bn: "আমরা এই ভুলটিকে একটি সামান্য বিচ্যুতি হিসেবে ধরি।" },
+                    { en: "Genetic aberration can cause diseases.", bn: "জিনগত বিচ্যুতি রোগের কারণ হতে পারে।" },
+                    { en: "She is normally calm, so this is an aberration.", bn: "সে সাধারণত শান্ত থাকে, তাই এটি একটি বিচ্যুতি।" }
+                ],
+                synData: { word: "Deviation", meaning: "বিচ্যুতি", en: "Any deviation from the rule is punished.", bn: "নিয়ম থেকে যেকোনো বিচ্যুতি হলে শাস্তি দেওয়া হয়।" },
+                antData: { word: "Normality", meaning: "স্বাভাবিকতা", en: "We hope to return to normality soon.", bn: "আমরা শীঘ্রই স্বাভাবিকতায় ফেরার আশা করছি।" }
+            },
+            {
+                word: "Complacent", meaning: "আত্মসন্তুষ্ট", syn: "Satisfied", ant: "Dissatisfied",
+                origin: "ল্যাটিন 'complacere' (অত্যন্ত সন্তোষজনক হওয়া) থেকে উদ্ভূত। যে নিজের বর্তমান অবস্থা নিয়ে বেশি সন্তুষ্ট এবং উন্নতির চেষ্টা করে না।",
+                sentences: [
+                    { en: "We cannot afford to be complacent now.", bn: "এখন আমাদের আত্মসন্তুষ্ট হওয়ার সুযোগ নেই।" },
+                    { en: "The winner smiled with a complacent look.", bn: "বিজয়ী আত্মসন্তুষ্ট দৃষ্টিতে হাসল।" },
+                    { en: "He became complacent after his first success.", bn: "প্রথম সাফল্যের পর সে আত্মসন্তুষ্ট হয়ে পড়েছিল।" },
+                    { en: "A complacent attitude leads to failure.", bn: "আত্মসন্তুষ্ট মনোভাব ব্যর্থতার দিকে নিয়ে যায়।" },
+                    { en: "Don't be complacent about your health.", bn: "নিজের স্বাস্থ্যের ব্যাপারে আত্মসন্তুষ্ট হবেন না।" }
+                ],
+                synData: { word: "Satisfied", meaning: "সন্তুষ্ট", en: "She was satisfied with her exam results.", bn: "সে তার পরীক্ষার ফলাফলে সন্তুষ্ট ছিল।" },
+                antData: { word: "Dissatisfied", meaning: "অসন্তুষ্ট", en: "The customer was dissatisfied with the service.", bn: "গ্রাহক সেবায় অসন্তুষ্ট ছিলেন।" }
+            },
+            {
+                word: "Humid", meaning: "স্যাঁতসেঁতে / আর্দ্র", syn: "Damp", ant: "Dry",
+                origin: "ল্যাটিন শব্দ 'humidus' (ভেজা বা আর্দ্র) থেকে এর উৎপত্তি। বাতাসে প্রচুর জলীয় বাষ্প থাকলে এটি বলা হয়।",
+                sentences: [
+                    { en: "The weather is hot and humid today.", bn: "আজ আবহাওয়া গরম এবং স্যাঁতসেঁতে।" },
+                    { en: "I hate living in a humid climate.", bn: "আমি স্যাঁতসেঁতে জলবায়ুতে থাকতে ঘৃণা করি।" },
+                    { en: "The air in the jungle was extremely humid.", bn: "জঙ্গলের বাতাস ছিল অত্যন্ত আর্দ্র।" },
+                    { en: "Humid conditions help plants to grow fast.", bn: "আর্দ্র অবস্থা গাছপালাকে দ্রুত বাড়তে সাহায্য করে।" },
+                    { en: "My clothes feel sticky in this humid room.", bn: "এই স্যাঁতসেঁতে ঘরে আমার কাপড় চটচটে লাগছে।" }
+                ],
+                synData: { word: "Damp", meaning: "স্যাঁতসেঁতে", en: "Wipe the table with a damp cloth.", bn: "একটি স্যাঁতসেঁতে কাপড় দিয়ে টেবিলটি মুছুন।" },
+                antData: { word: "Dry", meaning: "শুষ্ক", en: "The desert air is very dry.", bn: "মরুভূমির বাতাস খুব শুষ্ক।" }
+            },
+            {
+                word: "Pedagogy", meaning: "শিক্ষাবিজ্ঞান / শিক্ষাদান পদ্ধতি", syn: "Education", ant: "Ignorance",
+                origin: "গ্রিক শব্দ 'paidagōgos' (যে দাস শিশুদের স্কুলে নিয়ে যেত) থেকে এসেছে। বর্তমানে এটি শিক্ষাদান এবং শেখার পদ্ধতিকে বোঝায়।",
+                sentences: [
+                    { en: "He is studying the pedagogy of science.", bn: "সে বিজ্ঞানের শিক্ষাদান পদ্ধতি নিয়ে পড়াশোনা করছে।" },
+                    { en: "Modern pedagogy focuses on practical skills.", bn: "আধুনিক শিক্ষাবিজ্ঞান ব্যবহারিক দক্ষতার ওপর জোর দেয়।" },
+                    { en: "She introduced a new pedagogy in her class.", bn: "সে তার ক্লাসে একটি নতুন শিক্ষাদান পদ্ধতি চালু করেছে।" },
+                    { en: "Understanding pedagogy is essential for teachers.", bn: "শিক্ষকদের জন্য শিক্ষাবিজ্ঞান বোঝা অপরিহার্য।" },
+                    { en: "The university offers a master's degree in pedagogy.", bn: "বিশ্ববিদ্যালয়টি শিক্ষাবিজ্ঞানে স্নাতকোত্তর ডিগ্রি প্রদান করে।" }
+                ],
+                synData: { word: "Education", meaning: "শিক্ষা", en: "Education changes people's lives.", bn: "শিক্ষা মানুষের জীবন বদলে দেয়।" },
+                antData: { word: "Ignorance", meaning: "অজ্ঞতা", en: "Ignorance is not always bliss.", bn: "অজ্ঞতা সব সময় আশীর্বাদ নয়।" }
+            },
+            {
+                word: "Verdict", meaning: "রায় / সিদ্ধান্ত", syn: "Judgment", ant: "Accusation",
+                origin: "অ্যাংলো-নর্মান শব্দ 'verdit' (সত্য কথা) থেকে এসেছে। এটি সাধারণত বিচারকের বা জুরির চূড়ান্ত সিদ্ধান্তকে বোঝায়।",
+                sentences: [
+                    { en: "The jury reached a guilty verdict.", bn: "জুরি দোষী সাব্যস্ত করার রায় দিয়েছেন।" },
+                    { en: "We are waiting for the doctor's verdict.", bn: "আমরা ডাক্তারের সিদ্ধান্তের জন্য অপেক্ষা করছি।" },
+                    { en: "The court's verdict was final.", bn: "আদালতের রায় চূড়ান্ত ছিল।" },
+                    { en: "People protested against the unfair verdict.", bn: "মানুষ অন্যায্য রায়ের বিরুদ্ধে প্রতিবাদ করেছিল।" },
+                    { en: "He accepted the verdict with a heavy heart.", bn: "সে ভারাক্রান্ত হৃদয়ে রায় মেনে নিয়েছিল।" }
+                ],
+                synData: { word: "Judgment", meaning: "রায় / বিচার", en: "His judgment is highly respected.", bn: "তার বিচার অত্যন্ত সম্মানিত।" },
+                antData: { word: "Accusation", meaning: "অভিযোগ", en: "He denied the accusation of theft.", bn: "সে চুরির অভিযোগ অস্বীকার করেছে।" }
+            },
+            {
+                word: "Ambivalent", meaning: "দ্বিধাগ্রস্ত / দোদুল্যমান", syn: "Uncertain", ant: "Decisive",
+                origin: "ল্যাটিন 'ambi-' (উভয়) এবং 'valere' (শক্তিশালী হওয়া) থেকে গঠিত। যখন কেউ একটি বিষয়ে একই সাথে ইতিবাচক ও নেতিবাচক মনোভাব পোষণ করে।",
+                sentences: [
+                    { en: "She felt ambivalent about her new job.", bn: "সে তার নতুন চাকরির ব্যাপারে দ্বিধাগ্রস্ত বোধ করছিল।" },
+                    { en: "His reaction to the news was ambivalent.", bn: "খবরটির প্রতি তার প্রতিক্রিয়া ছিল দোদুল্যমান।" },
+                    { en: "I am ambivalent about moving to the city.", bn: "শহরে যাওয়ার ব্যাপারে আমি দ্বিধাগ্রস্ত।" },
+                    { en: "An ambivalent attitude causes confusion.", bn: "একটি দোদুল্যমান মনোভাব বিভ্রান্তির সৃষ্টি করে।" },
+                    { en: "The voters are ambivalent about the candidates.", bn: "ভোটাররা প্রার্থীদের বিষয়ে দ্বিধাগ্রস্ত।" }
+                ],
+                synData: { word: "Uncertain", meaning: "অনিশ্চিত", en: "I am uncertain about my future plans.", bn: "আমি আমার ভবিষ্যৎ পরিকল্পনা নিয়ে অনিশ্চিত।" },
+                antData: { word: "Decisive", meaning: "চূড়ান্ত / সিদ্ধান্তমূলক", en: "A leader must be decisive in a crisis.", bn: "সঙ্কটকালে একজন নেতাকে অবশ্যই সিদ্ধান্তমূলক হতে হবে।" }
+            },
+            {
+                word: "Indecent", meaning: "অশালীন / অনুচিত", syn: "Vulgar", ant: "Decent",
+                origin: "ল্যাটিন 'indecentem' (যা উপযুক্ত নয়) থেকে এসেছে। সামাজিকভাবে অগ্রহণযোগ্য বা লজ্জাজনক আচরণ।",
+                sentences: [
+                    { en: "He was arrested for indecent behavior.", bn: "অশালীন আচরণের জন্য তাকে গ্রেপ্তার করা হয়েছিল।" },
+                    { en: "Such indecent language is not allowed here.", bn: "এই ধরনের অশালীন ভাষা এখানে অনুমোদিত নয়।" },
+                    { en: "She complained about his indecent remarks.", bn: "সে তার অশালীন মন্তব্যের অভিযোগ করেছিল।" },
+                    { en: "It is indecent to laugh at a funeral.", bn: "অন্ত্যেষ্টিক্রিয়ায় হাসা অনুচিত।" },
+                    { en: "They wore indecent clothing to the formal event.", bn: "তারা আনুষ্ঠানিক অনুষ্ঠানে অশালীন পোশাক পরেছিল।" }
+                ],
+                synData: { word: "Vulgar", meaning: "অশ্লীল / অমার্জিত", en: "He made a vulgar joke in the meeting.", bn: "সে মিটিংয়ে একটি অশ্লীল কৌতুক করেছিল।" },
+                antData: { word: "Decent", meaning: "শালীন / ভদ্র", en: "Please wear a decent shirt for the interview.", bn: "অনুগ্রহ করে ইন্টারভিউয়ের জন্য একটি শালীন শার্ট পরুন।" }
+            },
+            {
+                word: "Cynosure", meaning: "আকর্ষণের কেন্দ্রবিন্দু", syn: "Magnet", ant: "Nobody",
+                origin: "গ্রিক 'kynosoura' (কুকুরের লেজ, যা দ্বারা উরসা মাইনর নক্ষত্রমণ্ডল বোঝাতো যা নাবিকরা দিক নির্ণয়ে ব্যবহার করত)। সেখান থেকে 'সবকিছুর লক্ষ্যবস্তু'।",
+                sentences: [
+                    { en: "The bride was the cynosure of all eyes.", bn: "কনে সবার আকর্ষণের কেন্দ্রবিন্দু ছিল।" },
+                    { en: "His new car became the cynosure of the neighborhood.", bn: "তার নতুন গাড়িটি পাড়ার আকর্ষণের কেন্দ্রবিন্দুতে পরিণত হলো।" },
+                    { en: "She loves being the cynosure of the party.", bn: "সে পার্টির কেন্দ্রবিন্দু হতে ভালোবাসে।" },
+                    { en: "The beautiful painting was the cynosure of the gallery.", bn: "সুন্দর চিত্রকর্মটি গ্যালারির আকর্ষণের কেন্দ্রবিন্দু ছিল।" },
+                    { en: "The famous actor was the cynosure of the event.", bn: "বিখ্যাত অভিনেতাটি অনুষ্ঠানের কেন্দ্রবিন্দু ছিলেন।" }
+                ],
+                synData: { word: "Magnet", meaning: "আকর্ষণ বস্তু", en: "The free food was a magnet for students.", bn: "বিনামূল্যের খাবার শিক্ষার্থীদের জন্য একটি আকর্ষণ বস্তু ছিল।" },
+                antData: { word: "Nobody", meaning: "অজ্ঞাত ব্যক্তি / গুরুত্বহীন", en: "He went from a nobody to a superstar.", bn: "সে একজন গুরুত্বহীন ব্যক্তি থেকে সুপারস্টার হয়ে উঠল।" }
+            },
+            {
+                word: "Electricity", meaning: "বিদ্যুৎ", syn: "Power", ant: "Outage",
+                origin: "গ্রিক শব্দ 'ēlektron' (অ্যাম্বার বা রজন) থেকে এসেছে। প্রাচীনকালে অ্যাম্বার ঘষলে স্থির বিদ্যুৎ তৈরি হতো বলে এই নামকরণ।",
+                sentences: [
+                    { en: "Electricity changed the modern world.", bn: "বিদ্যুৎ আধুনিক বিশ্বকে বদলে দিয়েছে।" },
+                    { en: "Turn off the lights to save electricity.", bn: "বিদ্যুৎ সাশ্রয় করতে আলো নিভিয়ে দিন।" },
+                    { en: "Copper is a good conductor of electricity.", bn: "তামা বিদ্যুতের একটি ভালো পরিবাহী।" },
+                    { en: "The storm cut off the electricity supply.", bn: "ঝড়ে বিদ্যুৎ সরবরাহ বিচ্ছিন্ন হয়ে যায়।" },
+                    { en: "We use electricity for heating and cooling.", bn: "আমরা ঘর গরম ও ঠান্ডা করতে বিদ্যুৎ ব্যবহার করি।" }
+                ],
+                synData: { word: "Power", meaning: "শক্তি / বিদ্যুৎ", en: "The power went out during the storm.", bn: "ঝড়ের সময় বিদ্যুৎ চলে গিয়েছিল।" },
+                antData: { word: "Outage", meaning: "বিদ্যুৎহীনতা", en: "We suffered a long power outage yesterday.", bn: "গতকাল আমরা দীর্ঘ সময় বিদ্যুৎহীনতায় ভুগেছি।" }
+            },
+            {
+                word: "Cardiologist", meaning: "হৃদরোগ বিশেষজ্ঞ", syn: "Heart specialist", ant: "General Practitioner",
+                origin: "গ্রিক 'kardia' (হৃদয়) এবং '-logist' (বিশেষজ্ঞ) থেকে গঠিত। যিনি হৃদপিন্ড এবং রক্তনালীর রোগ নির্ণয় ও চিকিৎসা করেন।",
+                sentences: [
+                    { en: "My father has an appointment with a cardiologist.", bn: "আমার বাবার একজন হৃদরোগ বিশেষজ্ঞের সাথে অ্যাপয়েন্টমেন্ট আছে।" },
+                    { en: "The cardiologist advised him to exercise daily.", bn: "হৃদরোগ বিশেষজ্ঞ তাকে প্রতিদিন ব্যায়াম করার পরামর্শ দিয়েছেন।" },
+                    { en: "She wants to become a famous cardiologist.", bn: "সে একজন বিখ্যাত হৃদরোগ বিশেষজ্ঞ হতে চায়।" },
+                    { en: "A cardiologist performs delicate heart surgeries.", bn: "একজন হৃদরোগ বিশেষজ্ঞ জটিল হার্ট সার্জারি করেন।" },
+                    { en: "You should see a cardiologist for chest pain.", bn: "বুকের ব্যথার জন্য আপনার একজন হৃদরোগ বিশেষজ্ঞের কাছে যাওয়া উচিত।" }
+                ],
+                synData: { word: "Heart specialist", meaning: "হৃদরোগ চিকিৎসক", en: "The heart specialist saved his life.", bn: "হৃদরোগ চিকিৎসক তার জীবন বাঁচিয়েছেন।" },
+                antData: { word: "General Practitioner", meaning: "সাধারণ চিকিৎসক", en: "A general practitioner treats common illnesses.", bn: "একজন সাধারণ চিকিৎসক সাধারণ অসুস্থতার চিকিৎসা করেন।" }
+            }
+        ];
+
+        // --- 2. MCQ DATA ---
+        const mcqData = [
+            { q: "What does the word 'Aberration' most closely mean?", opts: { a: "A strict adherence to the rules", b: "A minor physical injury", c: "A deviation from what is normal", d: "A prolonged state of sadness" }, ans: "c", note: "Aberration refers to a departure from what is normal or expected. Options A, B, and D are unrelated concepts." },
+            { q: "Choose the exact synonym for 'Complacent':", opts: { a: "Satisfied", b: "Aggressive", c: "Ambitious", d: "Restless" }, ans: "a", note: "Complacent means feeling so satisfied with your own abilities or situation that you feel you do not need to try any harder." },
+            { q: "Which of the following is the antonym of 'Humid'?", opts: { a: "Moist", b: "Dry", c: "Cloudy", d: "Sticky" }, ans: "b", note: "Humid means damp or having a high level of moisture in the air. Therefore, its direct opposite is Dry." },
+            { q: "What is 'Pedagogy' related to?", opts: { a: "The study of soil", b: "The medical treatment of feet", c: "The profession or science of teaching", d: "The process of child growth" }, ans: "c", note: "Pedagogy specifically relates to education, teaching methods, and instructional theory." },
+            { q: "In a court of law, a 'Verdict' represents:", opts: { a: "A formal accusation", b: "A witness's testimony", c: "The judge's opening statement", d: "A final judgment or decision" }, ans: "d", note: "A verdict is the final decision or judgment made by a jury or judge in a legal proceeding." },
+            { q: "If someone is 'Ambivalent' about a decision, they are:", opts: { a: "Completely confident", b: "Having mixed or contradictory feelings", c: "Angry about the choices", d: "Ignorant of the facts" }, ans: "b", note: "Ambivalent means holding two conflicting views or feelings at the same time, leading to uncertainty." },
+            { q: "The word 'Indecent' is best replaced by which synonym?", opts: { a: "Appropriate", b: "Vulgar", c: "Elegant", d: "Respectful" }, ans: "b", note: "Indecent means morally offensive or socially unacceptable, making 'Vulgar' the closest matching synonym." },
+            { q: "Analogy -> Cynosure : Brilliant :: Magnet : ?", opts: { a: "Iron", b: "Attractive", c: "Repulsive", d: "Shiny" }, ans: "b", note: "A Cynosure is something brilliant that attracts attention. Similarly, a Magnet possesses the quality of being Attractive." },
+            { q: "Analogy -> Sound : Air :: Electricity : ?", opts: { a: "Water", b: "Copper", c: "Light", d: "Glass" }, ans: "b", note: "Sound travels predominantly through the medium of Air. Electricity travels efficiently through a conductor like Copper." },
+            { q: "What is a 'Cardiologist'?", opts: { a: "A specialist in brain disorders", b: "A specialist in skin diseases", c: "A specialist in heart and its diseases", d: "A specialist in bone structure" }, ans: "c", note: "Cardio- relates to the heart, and -logist means specialist. Thus, a cardiologist treats heart diseases." },
+            { q: "Fill in the blank: His sudden angry outburst was a strange ______ in his normally calm behavior.", opts: { a: "Pedagogy", b: "Verdict", c: "Aberration", d: "Cynosure" }, ans: "c", note: "An aberration is an unwelcome deviation from normal behavior, fitting the context of a sudden angry outburst." },
+            { q: "Fill in the blank: After winning three championships, the team became too ______ and lost the next match.", opts: { a: "Ambivalent", b: "Complacent", c: "Humid", d: "Indecent" }, ans: "b", note: "Complacent describes someone who rests on their laurels and stops putting in effort due to prior success." },
+            { q: "Which word best completes the sentence? 'The professor's ______ was highly praised by his students.'", opts: { a: "Pedagogy", b: "Aberration", c: "Verdict", d: "Electricity" }, ans: "a", note: "Pedagogy refers to teaching methods, which is exactly what students would praise in a professor." },
+            { q: "Which of the following scenarios best depicts a 'Cynosure'?", opts: { a: "A hidden gem in a remote village", b: "The bride standing at the center of the wedding hall", c: "A worker doing his regular job quietly", d: "A broken machine in the corner" }, ans: "b", note: "A cynosure is the center of attention or admiration, perfectly describing a bride at a wedding." },
+            { q: "Identify the antonym for 'Ambivalent':", opts: { a: "Unsure", b: "Decisive", c: "Hesitant", d: "Conflicting" }, ans: "b", note: "Since ambivalent means indecisive or having mixed feelings, 'Decisive' is the clear antonym." },
+            { q: "Which word pair holds a similar relationship to 'Verdict : Judgment'?", opts: { a: "Crime : Reward", b: "Pedagogy : Education", c: "Aberration : Routine", d: "Cynosure : Nobody" }, ans: "b", note: "Verdict and Judgment are synonyms. Pedagogy and Education act as a synonymous pair as well." },
+            { q: "If the air is described as 'Humid', what can you infer?", opts: { a: "It is freezing cold", b: "It is extremely dry", c: "It is damp and moist", d: "It is windy and stormy" }, ans: "c", note: "Humid specifically refers to a high level of moisture or water vapor in the atmosphere." },
+            { q: "What is the antonym of 'Indecent'?", opts: { a: "Vulgar", b: "Impolite", c: "Decent", d: "Cruel" }, ans: "c", note: "The prefix 'in-' creates the negative form of 'decent'. Thus, 'Decent' is its direct antonym." },
+            { q: "Fill in the blank: The jury's ______ was delivered after three days of intense debate.", opts: { a: "Aberration", b: "Pedagogy", c: "Verdict", d: "Cynosure" }, ans: "c", note: "A jury's primary role is to deliberate and eventually deliver a verdict (final judgment)." },
+            { q: "Which of these is NOT considered an 'Aberration'?", opts: { a: "Snowing in the middle of summer", b: "A straight-A student failing an exam", c: "A fish breathing underwater", d: "A dog walking on its hind legs permanently" }, ans: "c", note: "A fish breathing underwater is completely normal, hence it is NOT a deviation or aberration." },
+            { q: "A person who says 'I don't know whether to laugh or cry' is demonstrating:", opts: { a: "Complacency", b: "Ambivalence", c: "Indecency", d: "Pedagogy" }, ans: "b", note: "Having contradictory feelings (laughing vs. crying) at the same time is the definition of ambivalence." },
+            { q: "Which word shares its etymological root with the Greek word for 'dog's tail'?", opts: { a: "Pedagogy", b: "Cardiologist", c: "Cynosure", d: "Electricity" }, ans: "c", note: "Cynosure comes from Greek kynosoura (dog's tail), which was the name of the constellation containing the North Star." },
+            { q: "Analogy -> Ignorance : Pedagogy :: Outage : ?", opts: { a: "Electricity", b: "Humid", c: "Verdict", d: "Ambivalent" }, ans: "a", note: "Pedagogy cures or combats Ignorance. Electricity cures or combats an Outage." },
+            { q: "Which of the following would a 'Cardiologist' most likely prescribe?", opts: { a: "Skin ointment", b: "Blood pressure medication", c: "Eye drops", d: "Bone cast" }, ans: "b", note: "As a heart specialist, a cardiologist deals with cardiovascular issues like blood pressure." },
+            { q: "If a student claims the exam questions were 'Indecent', they most likely mean:", opts: { a: "The questions were too easy", b: "The questions were inappropriate or offensive", c: "The questions were excellently drafted", d: "The questions were printed in blue ink" }, ans: "b", note: "Indecent means morally offensive, inappropriate, or unsuitable for the context." }
+        ];
+
+        // --- Render Functions ---
+        function renderWords() {
+            const container = document.getElementById('wordsContainer');
+            let html = '';
+            
+            vocabData.forEach((w, index) => {
+                let sentencesHtml = w.sentences.map(s => 
+                    `<li class="mb-2"><span class="text-black-high font-medium">${s.en}</span><br><span class="text-sm text-gray-700">${s.bn}</span></li>`
+                ).join('');
+
+                html += `
+                <div class="glass-panel p-6 rounded-2xl border border-gray-200 card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center font-bold text-lg">${index + 1}</div>
+                        <h3 class="text-2xl font-bold text-black-high">${w.word} <span class="text-lg font-normal text-gray-600">(${w.meaning})</span></h3>
+                    </div>
+                    
+                    <div class="mb-4 bg-indigo-50 p-3 rounded-lg border-l-4 border-indigo-400">
+                        <p class="text-sm text-black-high font-medium"><strong>Origin:</strong> ${w.origin}</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="font-bold text-indigo-700 mb-2 border-b pb-1">Sentences:</h4>
+                        <ul class="list-disc pl-5 text-black-high">
+                            ${sentencesHtml}
+                        </ul>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div class="bg-green-50 p-3 rounded-lg border border-green-200">
+                            <p class="font-bold text-green-700"><i class="fas fa-equals"></i> Synonym: ${w.synData.word} <span class="text-sm font-normal text-gray-700">(${w.synData.meaning})</span></p>
+                            <p class="text-sm mt-1 text-black-high font-medium">${w.synData.en}</p>
+                            <p class="text-xs text-gray-700">${w.synData.bn}</p>
+                        </div>
+                        <div class="bg-red-50 p-3 rounded-lg border border-red-200">
+                            <p class="font-bold text-red-700"><i class="fas fa-not-equal"></i> Antonym: ${w.antData.word} <span class="text-sm font-normal text-gray-700">(${w.antData.meaning})</span></p>
+                            <p class="text-sm mt-1 text-black-high font-medium">${w.antData.en}</p>
+                            <p class="text-xs text-gray-700">${w.antData.bn}</p>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderSummary() {
+            const container = document.getElementById('summaryContainer');
+            let summaryText = vocabData.map(w => `${w.word}, ${w.meaning} - ${w.syn} @ ${w.ant};`).join('\n');
+            container.textContent = summaryText;
+        }
+
+        function renderMCQs() {
+            const container = document.getElementById('mcqContainer');
+            let html = '';
+            
+            mcqData.forEach((mcq, index) => {
+                html += `
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm mb-4">
+                    <p class="font-bold text-lg text-black-high mb-3">${index + 1}. ${mcq.q}</p>
+                    <div class="space-y-2 ml-4 mb-4 text-black-medium font-medium">
+                        <p>a. ${mcq.opts.a}</p>
+                        <p>b. ${mcq.opts.b}</p>
+                        <p>c. ${mcq.opts.c}</p>
+                        <p>d. ${mcq.opts.d}</p>
+                    </div>
+                    <details class="group cursor-pointer">
+                        <summary class="inline-flex items-center gap-2 text-indigo-600 font-bold bg-indigo-50 px-4 py-2 rounded-lg hover:bg-indigo-100 transition-colors">
+                            <i class="fas fa-eye"></i> Show Answer
+                        </summary>
+                        <div class="mt-4 p-4 bg-gray-50 border-l-4 border-green-500 rounded-r-lg">
+                            <p class="font-bold text-green-700 mb-1">Correct Answer: ${mcq.ans}</p>
+                            <p class="text-sm text-black-high"><strong>Note:</strong> ${mcq.note}</p>
+                        </div>
+                    </details>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // --- Copy Functions ---
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none'), 2500);
+        }
+
+        function copyStory() {
+            const text = document.getElementById('storyContent').innerText;
+            navigator.clipboard.writeText(text).then(() => showToast("Story copied to clipboard!"));
+        }
+
+        function copySummary() {
+            const text = document.getElementById('summaryContainer').innerText;
+            navigator.clipboard.writeText(text).then(() => showToast("Summary list copied to clipboard!"));
+        }
+
+        function copyMCQs() {
+            let text = "";
+            mcqData.forEach((mcq, index) => {
+                text += `${index + 1}. ${mcq.q}\n`;
+                text += `a. ${mcq.opts.a}\n`;
+                text += `b. ${mcq.opts.b}\n`;
+                text += `c. ${mcq.opts.c}\n`;
+                text += `d. ${mcq.opts.d}\n`;
+                text += `correct answer: ${mcq.ans}\n`;
+                text += `Note: ${mcq.note}\n\n`;
+            });
+            navigator.clipboard.writeText(text.trim()).then(() => showToast("MCQs copied to clipboard!"));
+        }
+
+        // Initialize Page
+        window.onload = () => {
+            renderWords();
+            renderSummary();
+            renderMCQs();
+        };
+    </script>
+</body>
+</html>
