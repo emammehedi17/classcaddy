@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 1-7 Weekly Mastery Practice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', 'Hind Siliguri', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.2); }
+        .gradient-text { background: linear-gradient(90deg, #c084fc, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .bn-text { font-family: 'Hind Siliguri', sans-serif; }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        
+        /* Custom Scrollbar for the dark theme */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    </style>
+</head>
+<body class="antialiased p-4 md:p-8 selection:bg-purple-500/30">
+
+    <div class="max-w-6xl mx-auto space-y-10">
+        <header class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between border-t-4 border-t-purple-500">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl -z-10 transform translate-x-1/2 -translate-y-1/2"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-sky-600/10 rounded-full blur-3xl -z-10 transform -translate-x-1/2 translate-y-1/2"></div>
+            
+            <div class="z-10 text-center md:text-left mb-6 md:mb-0">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-800/80 rounded-full text-purple-300 font-bold mb-4 border border-purple-500/30">
+                    <i class="fas fa-crown text-amber-400"></i>
+                    <span>Weekly Review: Day 1 to 7</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold gradient-text mb-4 tracking-tight">The Master Practice</h1>
+                <p class="text-lg text-slate-300 font-medium mb-3">70 Words. Epic Story. 50 MCQs.</p>
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-lg text-slate-300 font-medium border border-slate-600 shadow-sm">
+                    <i class="fas fa-pen-nib text-sky-400"></i>
+                    <span>Created by: <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-sky-300 hover:text-sky-200 underline font-bold transition-colors">Emam Mehedi</a></span>
+                </div>
+            </div>
+            <div class="z-10 flex-shrink-0 bg-slate-800 p-2 rounded-2xl shadow-xl border border-slate-600 transform hover:scale-105 transition-transform duration-300">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-28 h-28 object-cover rounded-xl opacity-90 hover:opacity-100 transition-opacity">
+            </div>
+        </header>
+
+        <section class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl relative">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-700 pb-5">
+                <h2 id="story-title" class="text-3xl font-bold flex items-center gap-3 text-slate-100">
+                    <i class="fas fa-book-journal-whills text-purple-400"></i> মায়াবী মহাদেশের রহস্য (The Mega Epic)
+                </h2>
+                <button onclick="copyStory()" class="mt-4 md:mt-0 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-purple-300 rounded-xl font-bold transition-all flex items-center gap-2 border border-purple-500/30 shadow-lg hover:shadow-purple-500/20">
+                    <i class="far fa-copy"></i> Copy Epic Story
+                </button>
+            </div>
+            
+            <div id="story-content" class="text-slate-300 leading-relaxed text-lg md:text-xl text-justify font-medium bg-slate-900/50 p-6 md:p-8 rounded-2xl border border-slate-700/50 shadow-inner space-y-5 bn-text">
+                <p>
+                    অনেককাল আগে, এক অজানা <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Continent</span> (মহাদেশ) ছিল, যা মানুষের কাছে ছিল একটি নিছক <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Utopia</span> (কল্পরাজ্য) বা <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">A Fantasy</span> (কল্পকাহিনী)। এই মহাদেশের প্রকৃতি ছিল চরম <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Variable</span> (পরিবর্তনশীল) এবং আবহাওয়া সবসময় <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Humid</span> (স্যাঁতসেঁতে) থাকত। সেখানে এক <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Panoramic</span> (বিস্তৃত) পাহাড়ের চূড়ায় একটি প্রাচীন <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Shrine</span> (পুণ্যস্থান) ছিল।
+                </p>
+                <p>
+                    অধিবাসীরা ছিল <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Homogeneous</span> (সমজাতীয়), কিন্তু তারা নিজেদের জ্ঞান নিয়ে খুব <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Complacent</span> (আত্মসন্তুষ্ট) হয়ে পড়েছিল। তাদের <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Pedagogy</span> (শিক্ষাবিজ্ঞান) ছিল সেকেলে। একদিন, এক <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">A Dark Horse</span> (অপ্রত্যাশিত প্রতিযোগী) গ্রামে এসে হাজির হলো। তার নাম আরিয়ান। সে ছিল একজন <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Philanthropist</span> (জনহিতৈষী), যার হৃদয়ে ছিল গভীর <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Compassion</span> (সমবেদনা) এবং <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Altruism</span> (পরার্থপরতা)।
+                </p>
+                <p>
+                    আরিয়ান লক্ষ্য করল, গ্রামের এক <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Demagogue</span> (বাগাড়ম্বরপূর্ণ নেতা) সাধারণ <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Peasant</span> (কৃষক)-দের অকারণে <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Abase</span> (হেয় করা) করত এবং তার আচরণ ছিল চরম <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Impertinent</span> (বেয়াদব) ও <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Inconsiderate</span> (অবিবেচক)। নেতার এই <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Hostility</span> (শত্রুতা) ও <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Parsimony</span> (কৃপণতা) পুরো গ্রামের জন্য একটি বড় <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Impediment</span> (বাধা) হয়ে দাঁড়িয়েছিল।
+                </p>
+                <p>
+                    একদিন, সেই নেতা একটি <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Verbose</span> (শব্দবহুল) এবং <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Ambiguous</span> (অস্পষ্ট) <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Extempore</span> (উপস্থিত বক্তৃতা) দিয়ে ঘোষণা করল যে, গ্রামের একমাত্র <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Reservoir</span> (জলাধার) এখন তার দখলে। সে আরও <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Confirm</span> (নিশ্চিত) করল যে, সে গ্রামের <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Honorary</span> (সম্মানসূচক) পদে বসবে। কিন্তু তার এই <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Indecent</span> (অশালীন) <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Misdeed</span> (অপকর্ম) দেখে গ্রামের মানুষ <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Ambivalent</span> (দ্বিধাগ্রস্ত) হয়ে পড়ল।
+                </p>
+                <p>
+                    আরিয়ান এই পরিস্থিতি <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Ameliorate</span> (উন্নত করা)-র সিদ্ধান্ত নিল। সে যথেষ্ট <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Competent</span> (সক্ষম) এবং <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Able</span> (সক্ষম) ছিল। সে একটি পরিত্যক্ত <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Hut</span> (কুঁড়েঘর)-এ বসে <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Pensive</span> (চিন্তামগ্ন) হয়ে পরিকল্পনা করতে লাগল। তার সঙ্গী ছিল এক <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Cardiologist</span> (হৃদরোগ বিশেষজ্ঞ) এবং এক <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Pediatric</span> (শিশুরোগ বিশেষজ্ঞ), যারা <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Craven</span> (ভীতু) না হয়ে আরিয়ানের সাথে <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Concur</span> (একমত হওয়া) করল। তারা তাদের শক্তি <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Amalgamate</span> (একত্রিত করা) করল।
+                </p>
+                <p>
+                    আরিয়ান জানত যে, <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Demand : Receive</span> (দাবি করা : গ্রহণ করা) নীতিতে ন্যায়ের দাবি করতে হবে। সে <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Vertical</span> (উল্লম্ব) পাহাড় বেয়ে সেই পুণ্যস্থানে পৌঁছাল। সেখানে একটি <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Cygnet</span> (রাজহংসের ছানা) তাকে পথ দেখাল। সেখানে একটি <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Panacea</span> (সর্বরোগহর ঔষধ) লুকানো ছিল, যা মাত্র এক <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Ounce</span> (আউন্স) খেলেই অসীম শক্তি পাওয়া যায়।
+                </p>
+                <p>
+                    আরিয়ান প্রচণ্ড <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Velocity</span> (বেগ)-এর সাথে নিচে নেমে এলো যেন <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Electricity</span> (বিদ্যুৎ) প্রবাহিত হচ্ছে। সে নেতার সামনে দাঁড়িয়ে তার <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Profundity</span> (প্রজ্ঞা) দিয়ে বলল, "তোমার মতো নেতার <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Verdict</span> (রায়) এখন <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Abeyance</span> (স্থগিতাবস্থা)-এ থাকবে।" নেতা শুরুতে <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Indifference</span> (উদাসীনতা) দেখানোর চেষ্টা করলেও, আরিয়ানের সাহসের কাছে হার মানল।
+                </p>
+                <p>
+                    আরিয়ানের এই <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Amazing</span> (বিস্ময়কর) সাহসিকতায় গ্রামবাসী তাকে <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Venerate</span> (শ্রদ্ধা করা) শুরু করল। এটি আরিয়ানের জন্য সত্যিই <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">A Feather In Your Cap</span> (গর্বের বিষয়) ছিল। গ্রামের মানুষ তার সম্মানে একটি <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Sonnet</span> (চতুর্দশপদী কবিতা) ও <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Hymn</span> (ধর্মীয় স্তোত্র) গাইল। যারা আগে <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Amenable</span> (বাধ্য) ছিল নেতার প্রতি, তারা এখন আরিয়ানের <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Hospitality</span> (আতিথেয়তা) গ্রহণ করল। 
+                </p>
+                <p>
+                    দুষ্ট নেতাকে <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Vanquish</span> (পরাস্ত করা) করে, আরিয়ান শান্তির বীজ <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Sow</span> (বপন করা) করল। আর সেই নেতার জন্য কেউ কোনো <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Elegy</span> (শোকগাথা) গাইল না। সবাই বুঝল যে <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Square : Cube</span> (বর্গ : ঘনক)-এর মতো সত্যের গভীরতা অনেক বেশি। কোনো <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Inadvertent</span> (অনিচ্ছাকৃত) ভুলেও তারা আর <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Compassionate</span> (করুণাময়) পথ থেকে সরবে না। এই গল্পটি আজ সবার কাছে একটি <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Cynosure</span> (আকর্ষণের কেন্দ্রবিন্দু), যা আমাদের <span class="text-purple-300 font-bold bg-purple-900/30 px-1.5 rounded">Humility</span> (নম্রতা) শেখায়।
+                </p>
+            </div>
+        </section>
+
+        <section class="space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-2">
+                <h2 class="text-3xl font-bold flex items-center gap-3 text-slate-100 ml-2">
+                    <i class="fas fa-layer-group text-sky-400"></i> Interactive Flashcards (70 Words)
+                </h2>
+                <p class="text-slate-400 font-medium text-sm hidden md:block">Hover to reveal details <i class="fas fa-hand-pointer ml-1"></i></p>
+            </div>
+            
+            <div id="flashcardContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <!-- JS will populate this with 70 flashcards -->
+            </div>
+        </section>
+
+        <section class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl border-t-4 border-t-sky-500">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-700 pb-5">
+                <h2 class="text-3xl font-bold flex items-center gap-3 text-slate-100">
+                    <i class="fas fa-tasks text-sky-400"></i> Grand Assessment (50 MCQs)
+                </h2>
+                <button onclick="copyMCQs()" class="mt-4 md:mt-0 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-sky-300 rounded-xl font-bold transition-all flex items-center gap-2 border border-sky-500/30 shadow-lg hover:shadow-sky-500/20">
+                    <i class="far fa-copy"></i> Copy Assessment
+                </button>
+            </div>
+            <div id="mcqContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- JS will populate this with 50 MCQs -->
+            </div>
+        </section>
+
+        <section class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden bg-slate-900 border border-slate-700">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative border-b border-slate-700 pb-5">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-slate-100">
+                    <i class="fas fa-list-check text-purple-400"></i> Master Summary List
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 px-6 py-2.5 bg-gradient-to-r from-purple-600 to-sky-600 hover:from-purple-500 hover:to-sky-500 text-white rounded-xl font-bold shadow-lg transition-all transform hover:scale-105 flex items-center gap-2">
+                    <i class="fas fa-copy"></i> Copy Full List
+                </button>
+            </div>
+            
+            <div class="bg-black/50 p-6 rounded-2xl border border-slate-700 font-mono text-sm leading-relaxed overflow-y-auto max-h-96 z-10 relative bn-text scrollbar-thin">
+                <pre id="summaryText" class="whitespace-pre-wrap text-slate-300 font-medium"></pre>
+            </div>
+        </section>
+
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-10 mb-4 z-10 relative">
+            <a href="https://classcaddy.netlify.app/vocabs/day7" class="w-full sm:w-auto text-center px-6 py-3 bg-slate-800 text-purple-300 border border-purple-500/30 rounded-xl font-bold shadow-lg hover:bg-slate-700 hover:border-purple-400 transition-all flex items-center justify-center gap-3 group">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Previous (Day-7)
+            </a>
+            <a href="https://classcaddy.netlify.app/vocabs/day8" class="w-full sm:w-auto text-center px-6 py-3 bg-gradient-to-r from-purple-600 to-sky-600 hover:from-purple-500 hover:to-sky-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 transform hover:-translate-y-1 group">
+                Next (Day-8) <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-slate-500 text-sm mt-8 pb-12 font-medium">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-4 rounded-xl shadow-2xl opacity-0 pointer-events-none transition-all duration-300 z-50 flex items-center gap-3 transform translate-y-4">
+        <i class="fas fa-check-circle text-xl"></i>
+        <span id="toastMsg" class="font-bold">Copied successfully!</span>
+    </div>
+
+    <script>
+        const allWords = [
+            { word: "A Dark Horse", meaning: "অপ্রত্যাশিত বিজয়ী", syn: "Underdog", ant: "Favorite" },
+            { word: "Compassion", meaning: "সমবেদনা / করুণা", syn: "Sympathy", ant: "Cruelty" },
+            { word: "Homogeneous", meaning: "সমজাতীয়", syn: "Uniform", ant: "Heterogeneous" },
+            { word: "Panacea", meaning: "সর্বরোগহর ঔষধ", syn: "Cure-all", ant: "Toxin" },
+            { word: "Vanquish", meaning: "পরাস্ত করা", syn: "Defeat", ant: "Surrender" },
+            { word: "Altruism", meaning: "পরার্থপরতা", syn: "Selflessness", ant: "Selfishness" },
+            { word: "Impediment", meaning: "বাধা", syn: "Obstacle", ant: "Advantage" },
+            { word: "Continent", meaning: "মহাদেশ", syn: "Landmass", ant: "Ocean" },
+            { word: "Shrine", meaning: "পুণ্যস্থান", syn: "Sanctuary", ant: "Desecration" },
+            { word: "Utopia", meaning: "কল্পরাজ্য", syn: "Paradise", ant: "Dystopia" },
+            { word: "A Fantasy", meaning: "একটি কল্পকাহিনী", syn: "Illusion", ant: "Reality" },
+            { word: "Compassionate", meaning: "করুণাময়", syn: "Merciful", ant: "Cruel" },
+            { word: "Honorary", meaning: "সম্মানসূচক", syn: "Voluntary", ant: "Paid" },
+            { word: "Panoramic", meaning: "বিস্তৃত", syn: "Scenic", ant: "Restricted" },
+            { word: "Variable", meaning: "পরিবর্তনশীল", syn: "Changeable", ant: "Constant" },
+            { word: "Amalgamate", meaning: "একত্রিত করা", syn: "Merge", ant: "Separate" },
+            { word: "Impertinent", meaning: "বেয়াদব", syn: "Rude", ant: "Respectful" },
+            { word: "Philanthropist", meaning: "জনহিতৈষী", syn: "Benefactor", ant: "Miser" },
+            { word: "Reservoir", meaning: "জলাধার", syn: "Basin", ant: "Source" },
+            { word: "Elegy", meaning: "শোকগাথা", syn: "Lament", ant: "Paean" },
+            { word: "A Feather In Your Cap", meaning: "গর্বের বিষয়", syn: "Proud achievement", ant: "Disgrace" },
+            { word: "Competent (1)", meaning: "দক্ষ / যোগ্য", syn: "Able", ant: "Incompetent" },
+            { word: "Hospitality", meaning: "আতিথেয়তা", syn: "Welcome", ant: "Hostility" },
+            { word: "Parsimony", meaning: "কৃপণতা", syn: "Miserliness", ant: "Generosity" },
+            { word: "Velocity", meaning: "বেগ / গতি", syn: "Speed", ant: "Slowness" },
+            { word: "Amazing", meaning: "বিস্ময়কর", syn: "Shocking", ant: "Ordinary" },
+            { word: "Inadvertent", meaning: "অনিচ্ছাকৃত", syn: "Accidental", ant: "Intentional" },
+            { word: "Misdeed", meaning: "অপকর্ম", syn: "Crime", ant: "Good deed" },
+            { word: "Profundity", meaning: "গভীরতা", syn: "Insight", ant: "Shallowness" },
+            { word: "Demagogue", meaning: "বাগাড়ম্বরপূর্ণ নেতা", syn: "Agitator", ant: "Peacemaker" },
+            { word: "Abase", meaning: "অপমান করা / হেয় করা", syn: "Low / Degrade", ant: "Exalt" },
+            { word: "Competent (2)", meaning: "সক্ষম / যোগ্য", syn: "Capable", ant: "Incompetent" },
+            { word: "Hostility", meaning: "শত্রুতা", syn: "Enmity", ant: "Friendship" },
+            { word: "Peasant", meaning: "কৃষক", syn: "Farmer", ant: "Aristocrat" },
+            { word: "Venerate", meaning: "শ্রদ্ধা করা", syn: "Respect", ant: "Despise" },
+            { word: "Ambiguous", meaning: "অস্পষ্ট", syn: "Unclear", ant: "Lucid" },
+            { word: "Inconsiderate", meaning: "অবিবেচক", syn: "Thoughtless", ant: "Thoughtful" },
+            { word: "Cygnet", meaning: "রাজহংসের ছানা", syn: "Young swan", ant: "Adult swan" },
+            { word: "Sonnet", meaning: "চতুর্দশপদী কবিতা", syn: "Poem (14 lines)", ant: "Prose" },
+            { word: "Hymn", meaning: "ধর্মীয় স্তোত্র", syn: "Religious song", ant: "Profane song" },
+            { word: "Aberration", meaning: "বিচ্যুতি", syn: "Deviation", ant: "Normality" },
+            { word: "Complacent", meaning: "আত্মসন্তুষ্ট", syn: "Satisfied", ant: "Dissatisfied" },
+            { word: "Humid", meaning: "স্যাঁতসেঁতে", syn: "Damp", ant: "Dry" },
+            { word: "Pedagogy", meaning: "শিক্ষাবিজ্ঞান", syn: "Teaching profession", ant: "Ignorance" },
+            { word: "Verdict", meaning: "রায়", syn: "Judgment", ant: "Accusation" },
+            { word: "Ambivalent", meaning: "দ্বিধাগ্রস্ত", syn: "Uncertain", ant: "Decisive" },
+            { word: "Indecent", meaning: "অশালীন", syn: "Vulgar", ant: "Decent" },
+            { word: "Cynosure", meaning: "আকর্ষণের কেন্দ্রবিন্দু", syn: "Magnet", ant: "Nobody" },
+            { word: "Electricity", meaning: "বিদ্যুৎ", syn: "Power", ant: "Outage" },
+            { word: "Cardiologist", meaning: "হৃদরোগ বিশেষজ্ঞ", syn: "Heart specialist", ant: "General Practitioner" },
+            { word: "Abeyance", meaning: "স্থগিতাবস্থা", syn: "Suspended Act", ant: "Continuation" },
+            { word: "Concur", meaning: "একমত হওয়া", syn: "Agree", ant: "Disagree" },
+            { word: "Humility", meaning: "নম্রতা", syn: "Modesty", ant: "Arrogance" },
+            { word: "Pediatric", meaning: "শিশুরোগ-সংক্রান্ত", syn: "Children", ant: "Geriatric" },
+            { word: "Craven", meaning: "কাপুরুষোচিত", syn: "Cowardly", ant: "Brave" },
+            { word: "Ameliorate", meaning: "উন্নত করা", syn: "Improve", ant: "Worsen" },
+            { word: "Indifference (1)", meaning: "উদাসীনতা", syn: "Apathy", ant: "Ardour" },
+            { word: "Ounce", meaning: "ওজন মাপার একক", syn: "Weight", ant: "Bulk" },
+            { word: "Sow", meaning: "বীজ বপন করা", syn: "Plant", ant: "Harvest" },
+            { word: "Verbose", meaning: "বাগাড়ম্বরপূর্ণ", syn: "Wordy", ant: "Concise" },
+            { word: "Able", meaning: "সক্ষম", syn: "Capable", ant: "Unable" },
+            { word: "Confirm", meaning: "নিশ্চিত করা", syn: "Bear out", ant: "Deny" },
+            { word: "Hut", meaning: "কুঁড়েঘর", syn: "Cottage", ant: "Mansion" },
+            { word: "Pensive", meaning: "চিন্তামগ্ন", syn: "Thoughtful", ant: "Carefree" },
+            { word: "Vertical", meaning: "উল্লম্ব", syn: "Erect", ant: "Horizontal" },
+            { word: "Amenable", meaning: "বাধ্য", syn: "Compliant", ant: "Stubborn" },
+            { word: "Indifferent (2)", meaning: "উদাসীন", syn: "Apathetic", ant: "Interested" },
+            { word: "Demand : Receive", meaning: "দাবি করা : গ্রহণ করা", syn: "Ask for : Get", ant: "Offer : Give" },
+            { word: "Square : Cube", meaning: "বর্গ : ঘনক", syn: "Circle : Sphere", ant: "Point : Line" },
+            { word: "Extempore", meaning: "উপস্থিত বক্তৃতা", syn: "Impromptu", ant: "Prepared" }
+        ];
+
+        const mcqs = [
+            { q: "What is the synonym of 'A Dark Horse'?", opts: { a: "Underdog", b: "Favorite", c: "Hero", d: "Villain" }, ans: "a", note: "A Dark Horse refers to an unknown competitor who surprises everyone." },
+            { q: "Which word means 'cure all'?", opts: { a: "Panacea", b: "Utopia", c: "Shrine", d: "Elegy" }, ans: "a", note: "Panacea means a universal cure." },
+            { q: "Analogy -> Continent : Island :: Ocean : ?", opts: { a: "River", b: "Lake", c: "Pond", d: "Water" }, ans: "b", note: "Continent is a large landmass, Island is small. Ocean is a large water body, Lake is small." },
+            { q: "What is the antonym of 'Vanquish'?", opts: { a: "Defeat", b: "Surrender", c: "Conquer", d: "Fight" }, ans: "b", note: "Vanquish means to defeat, so surrender is the antonym." },
+            { q: "A place of ideal peace and happiness is known as:", opts: { a: "Shrine", b: "Continent", c: "Utopia", d: "Reservoir" }, ans: "c", note: "Utopia refers to an imagined perfect place." },
+            { q: "What does 'Amalgamate' mean?", opts: { a: "To separate", b: "To merge", c: "To destroy", d: "To build" }, ans: "b", note: "Amalgamate means to combine or unite." },
+            { q: "Analogy -> Coward : Brave :: Philanthropist : ?", opts: { a: "Generous", b: "Selfish", c: "Helper", d: "Rich" }, ans: "b", note: "Coward and Brave are antonyms. Philanthropist (generous) and Selfish are antonyms." },
+            { q: "A poem written on the death of someone is an:", opts: { a: "Elegy", b: "Sonnet", c: "Hymn", d: "Ode" }, ans: "a", note: "An elegy is a sorrowful poem for the dead." },
+            { q: "What is the antonym of 'Impertinent'?", opts: { a: "Rude", b: "Respectful", c: "Angry", d: "Sad" }, ans: "b", note: "Impertinent means rude or showing lack of respect." },
+            { q: "Analogy -> Silo : Corn :: Reservoir : ?", opts: { a: "Oil", b: "Water", c: "Grain", d: "Milk" }, ans: "b", note: "A silo stores corn; a reservoir stores water." },
+            { q: "What does 'A Feather In Your Cap' mean?", opts: { a: "A bird's feather", b: "A proud achievement", c: "A heavy burden", d: "A mistake" }, ans: "b", note: "It refers to an accomplishment to be proud of." },
+            { q: "Which word is an antonym of 'Parsimony'?", opts: { a: "Miserliness", b: "Generosity", c: "Cruelty", d: "Hostility" }, ans: "b", note: "Parsimony is extreme unwillingness to spend money (miserliness)." },
+            { q: "Analogy -> Crime : Punishment :: Misdeed : ?", opts: { a: "Penalty", b: "Reward", c: "Praise", d: "Justice" }, ans: "a", note: "A crime leads to punishment; a misdeed leads to a penalty." },
+            { q: "A political leader who tries to stir up people by appealing to emotions is a:", opts: { a: "Philanthropist", b: "Cardiologist", c: "Demagogue", d: "Peasant" }, ans: "c", note: "A demagogue gains power by arousing emotions and prejudices." },
+            { q: "What is the antonym of 'Inadvertent'?", opts: { a: "Accidental", b: "Intentional", c: "Careless", d: "Thoughtful" }, ans: "b", note: "Inadvertent means unintentional." },
+            { q: "What does 'Abase' mean?", opts: { a: "To elevate", b: "To humiliate or lower", c: "To respect", d: "To ignore" }, ans: "b", note: "Abase means to behave in a way that belittles or degrades." },
+            { q: "Analogy -> Cygnet : Swan :: Kid : ?", opts: { a: "Goat", b: "Sheep", c: "Cow", d: "Horse" }, ans: "a", note: "A cygnet is a young swan; a kid is a young goat." },
+            { q: "A song embodying religious and sacred emotions is a:", opts: { a: "Sonnet", b: "Hymn", c: "Elegy", d: "Lullaby" }, ans: "b", note: "A hymn is a religious song of praise." },
+            { q: "Which word is an antonym for 'Ambiguous'?", opts: { a: "Unclear", b: "Lucid", c: "Vague", d: "Dark" }, ans: "b", note: "Ambiguous means having multiple meanings; lucid means clear." },
+            { q: "Analogy -> Sonnet : Literature :: Football : ?", opts: { a: "Sport", b: "Game", c: "Field", d: "Team" }, ans: "a", note: "A sonnet is a type of literature; football is a type of sport." },
+            { q: "What is an 'Aberration'?", opts: { a: "A normal event", b: "A deviation from what is normal", c: "A type of bird", d: "A medical tool" }, ans: "b", note: "Aberration refers to something unusual or unexpected." },
+            { q: "What is the antonym of 'Ambivalent'?", opts: { a: "Uncertain", b: "Decisive", c: "Hesitant", d: "Angry" }, ans: "b", note: "Ambivalent means having mixed feelings; decisive means being certain." },
+            { q: "Analogy -> Sound : Air :: Electricity : ?", opts: { a: "Copper", b: "Water", c: "Plastic", d: "Wood" }, ans: "a", note: "Sound travels through air; electricity travels through copper." },
+            { q: "A specialist in heart and its diseases is a:", opts: { a: "Pediatric", b: "Cardiologist", c: "Demagogue", d: "Philanthropist" }, ans: "b", note: "A cardiologist specializes in the heart." },
+            { q: "Analogy -> Cynosure : Brilliant :: Magnet : ?", opts: { a: "Metal", b: "Attractive", c: "Repulsive", d: "Heavy" }, ans: "b", note: "A cynosure is brilliant (attracts attention); a magnet is attractive." },
+            { q: "What does 'Abeyance' mean?", opts: { a: "Continuation", b: "Suspended action", c: "Agreement", d: "Refusal" }, ans: "b", note: "Abeyance is a state of temporary suspension." },
+            { q: "Which word is an antonym for 'Ameliorate'?", opts: { a: "Improve", b: "Worsen", c: "Cure", d: "Fix" }, ans: "b", note: "Ameliorate means to make better; worsen is the opposite." },
+            { q: "Analogy -> Degree : Temperature :: Ounce : ?", opts: { a: "Volume", b: "Weight", c: "Length", d: "Time" }, ans: "b", note: "Degree measures temperature; ounce measures weight." },
+            { q: "A speech full of too many words is called:", opts: { a: "Extempore", b: "Verbose", c: "Pensive", d: "Lucid" }, ans: "b", note: "Verbose means using more words than needed." },
+            { q: "Analogy -> Sow : Harvest :: Plant : ?", opts: { a: "Water", b: "Yield", c: "Seed", d: "Grow" }, ans: "b", note: "You sow to get a harvest; you plant to get a yield." },
+            { q: "What is the synonym of 'Confirm'?", opts: { a: "Deny", b: "Bear out", c: "Reject", d: "Question" }, ans: "b", note: "To bear out means to confirm or support." },
+            { q: "What is the antonym of 'Amenable'?", opts: { a: "Compliant", b: "Stubborn", c: "Friendly", d: "Helpful" }, ans: "b", note: "Amenable means cooperative; stubborn means unyielding." },
+            { q: "Analogy -> Demand : Receive :: Ask for : ?", opts: { a: "Give", b: "Get", c: "Offer", d: "Take" }, ans: "b", note: "Demand leads to receiving; asking for leads to getting." },
+            { q: "A speech made without previous preparation is:", opts: { a: "Verbose", b: "Extempore", c: "Sonnet", d: "Elegy" }, ans: "b", note: "Extempore means spoken or done without preparation." },
+            { q: "Analogy -> Square : Cube :: Circle : ?", opts: { a: "Sphere", b: "Triangle", c: "Cone", d: "Cylinder" }, ans: "a", note: "A square (2D) becomes a cube (3D); a circle (2D) becomes a sphere (3D)." },
+            { q: "Fill in the blank: The old man lived in a small ______ near the forest.", opts: { a: "Mansion", b: "Hut", c: "Continent", d: "Reservoir" }, ans: "b", note: "Hut fits the context of a small dwelling." },
+            { q: "Which of these means 'thoughtful or mildly sad'?", opts: { a: "Complacent", b: "Pensive", c: "Indifferent", d: "Craven" }, ans: "b", note: "Pensive means engaged in deep or serious thought." },
+            { q: "Fill in the blank: The wall is perfectly ______.", opts: { a: "Vertical", b: "Verbose", c: "Humid", d: "Inadvertent" }, ans: "a", note: "Vertical means standing straight up." },
+            { q: "Which word means 'Cowardly'?", opts: { a: "Brave", b: "Craven", c: "Able", d: "Competent" }, ans: "b", note: "Craven means contemptibly lacking in courage." },
+            { q: "What is the synonym of 'Concur'?", opts: { a: "Disagree", b: "Agree", c: "Argue", d: "Fight" }, ans: "b", note: "Concur means to be of the same opinion." },
+            { q: "Which word is related to children's medicine?", opts: { a: "Pedagogy", b: "Pediatric", c: "Cardiologist", d: "Philanthropist" }, ans: "b", note: "Pediatric relates to the medical care of children." },
+            { q: "Fill in the blank: He showed great ______ by admitting his mistake.", opts: { a: "Arrogance", b: "Humility", c: "Hostility", d: "Parsimony" }, ans: "b", note: "Humility is the quality of being humble." },
+            { q: "Which word describes a lack of interest?", opts: { a: "Indifference", b: "Ardour", c: "Compassion", d: "Hospitality" }, ans: "a", note: "Indifference means a lack of interest or concern." },
+            { q: "Fill in the blank: The weather today is very ______ and sticky.", opts: { a: "Humid", b: "Dry", c: "Panoramic", d: "Variable" }, ans: "a", note: "Humid refers to a high level of moisture in the air." },
+            { q: "What is 'Pedagogy'?", opts: { a: "Study of feet", b: "Profession of teaching", c: "Study of heart", d: "Study of plants" }, ans: "b", note: "Pedagogy is the method and practice of teaching." },
+            { q: "Which word means a final decision or judgment?", opts: { a: "Verdict", b: "Misdeed", c: "Aberration", d: "Elegy" }, ans: "a", note: "Verdict is a decision on a disputed issue in a civil or criminal case." },
+            { q: "Fill in the blank: It is ______ to wear torn clothes to a formal event.", opts: { a: "Decent", b: "Indecent", c: "Honorary", d: "Homogeneous" }, ans: "b", note: "Indecent means not conforming to accepted standards of morality or respectability." },
+            { q: "What is the synonym of 'Venerate'?", opts: { a: "Despise", b: "Respect", c: "Abase", d: "Vanquish" }, ans: "b", note: "Venerate means to regard with great respect." },
+            { q: "Fill in the blank: The rich ______ donated millions to build a new hospital.", opts: { a: "Peasant", b: "Philanthropist", c: "Demagogue", d: "Cygnet" }, ans: "b", note: "A philanthropist seeks to promote the welfare of others." },
+            { q: "What does 'Inconsiderate' mean?", opts: { a: "Thoughtful", b: "Thoughtless", c: "Careful", d: "Kind" }, ans: "b", note: "Inconsiderate means thoughtlessly causing hurt or inconvenience to others." }
+        ];
+
+        function renderFlashcards() {
+            const container = document.getElementById('flashcardContainer');
+            let html = '';
+            
+            allWords.forEach((w) => {
+                let displayName = w.word.replace(/\(\d\)/g, '').trim(); // Remove (1) or (2) from duplicates
+                
+                html += `
+                <div class="group relative bg-slate-800 rounded-xl shadow-lg border border-purple-500/30 h-28 cursor-pointer overflow-hidden flex flex-col items-center justify-center transition-all duration-300 hover:border-sky-400 hover:shadow-sky-500/20">
+                    <h3 class="font-bold text-[15px] text-purple-200 z-10 transition-transform duration-300 group-hover:-translate-y-4 text-center px-2">${displayName}</h3>
+                    <div class="absolute inset-0 bg-gradient-to-t from-sky-700 to-purple-800 flex flex-col justify-end items-center pb-3 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+                        <p class="font-bold bn-text text-[13px] mb-1">${w.meaning}</p>
+                        <p class="text-[10px] text-sky-100 font-medium tracking-wide">
+                            <span class="text-green-300 font-bold">Syn:</span> ${w.syn} <br>
+                            <span class="text-rose-300 font-bold">Ant:</span> ${w.ant}
+                        </p>
+                    </div>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderMCQs() {
+            const container = document.getElementById('mcqContainer');
+            let html = '';
+            
+            mcqs.forEach((mcq, index) => {
+                html += `
+                <div class="bg-slate-800/60 p-5 rounded-2xl border border-slate-700 shadow-sm hover:border-sky-500/50 transition-colors">
+                    <p class="font-bold text-lg text-slate-100 mb-4">${index + 1}. ${mcq.q}</p>
+                    <div class="space-y-2.5 ml-2 mb-5 text-slate-300 font-medium">
+                        <p class="flex items-start gap-2"><span class="text-sky-400 font-bold w-5">a.</span> ${mcq.opts.a}</p>
+                        <p class="flex items-start gap-2"><span class="text-sky-400 font-bold w-5">b.</span> ${mcq.opts.b}</p>
+                        <p class="flex items-start gap-2"><span class="text-sky-400 font-bold w-5">c.</span> ${mcq.opts.c}</p>
+                        <p class="flex items-start gap-2"><span class="text-sky-400 font-bold w-5">d.</span> ${mcq.opts.d}</p>
+                    </div>
+                    <details class="group cursor-pointer">
+                        <summary class="inline-flex items-center justify-between w-full text-purple-300 font-bold bg-slate-900/80 px-4 py-3 rounded-xl hover:bg-slate-700 transition-colors border border-slate-600 select-none">
+                            <span class="flex items-center gap-2"><i class="fas fa-eye text-sky-400"></i> Show Answer</span>
+                            <i class="fas fa-chevron-down transform group-open:rotate-180 transition-transform duration-300"></i>
+                        </summary>
+                        <div class="mt-2 p-4 bg-slate-900 border-l-4 border-green-500 rounded-r-xl rounded-bl-xl shadow-inner border-t border-r border-b border-slate-700">
+                            <p class="font-bold text-green-400 mb-2">Correct Answer: <span class="uppercase bg-green-500/20 px-2 py-0.5 rounded">${mcq.ans}</span></p>
+                            <p class="text-sm text-slate-300 leading-relaxed"><strong>Note:</strong> ${mcq.note}</p>
+                        </div>
+                    </details>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderSummary() {
+            const container = document.getElementById('summaryText');
+            // Remove duplicates visually (1) (2)
+            let summaryText = allWords.map(w => {
+                let displayName = w.word.replace(/\(\d\)/g, '').trim();
+                return `${displayName}, ${w.meaning} - ${w.syn} @ ${w.ant};`;
+            }).join('\n');
+            container.textContent = summaryText;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+            setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4'), 2500);
+        }
+
+        function copyTextToClipboard(text, successMsg) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast(successMsg);
+            } catch (err) {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => showToast(successMsg)).catch(e => console.error("Clipboard failed", e));
+                }
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function copyStory() {
+            const title = document.getElementById('story-title').innerText.trim();
+            const paragraphs = document.querySelectorAll('#story-content p');
+            let text = title + '\n\n';
+            paragraphs.forEach(p => text += p.innerText + '\n\n');
+            copyTextToClipboard(text.trim(), "Epic Story copied to clipboard!");
+        }
+
+        function copySummary() {
+            const text = document.getElementById('summaryText').innerText;
+            copyTextToClipboard(text, "Master Summary copied to clipboard!");
+        }
+
+        function copyMCQs() {
+            let text = "";
+            mcqs.forEach((mcq, index) => {
+                text += `${index + 1}. ${mcq.q}\n`;
+                text += `a. ${mcq.opts.a}\n`;
+                text += `b. ${mcq.opts.b}\n`;
+                text += `c. ${mcq.opts.c}\n`;
+                text += `d. ${mcq.opts.d}\n`;
+                text += `correct answer: ${mcq.ans}\n`;
+                text += `Note: ${mcq.note}\n\n`;
+            });
+            copyTextToClipboard(text.trim(), "Grand Assessment copied to clipboard!");
+        }
+
+        window.onload = () => {
+            renderFlashcards();
+            renderMCQs();
+            renderSummary();
+        };
+    </script>
+</body>
+</html>
