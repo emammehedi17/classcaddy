@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 8 - Systematic Vocabulary Batch</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration for darker text -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            500: '#000000', 
+                            600: '#000000', 
+                            700: '#000000', 
+                            800: '#000000', 
+                            900: '#000000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f3ff;
+            color: #000000; 
+        }
+        .bn-text {
+            font-family: 'Hind Siliguri', sans-serif;
+            color: #000000; 
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #8b5cf6; 
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-violet-50 via-fuchsia-50 to-purple-50 min-h-screen p-4 md:p-8 selection:bg-violet-200 selection:text-violet-900 text-black">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <header class="glass-card rounded-2xl shadow-lg p-6 md:p-8 mb-8 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-violet-500 to-fuchsia-600"></div>
+            
+            <div class="text-center md:text-left mb-6 md:mb-0 z-10">
+                <div class="inline-block px-3 py-1 bg-violet-100 text-violet-800 rounded-full text-sm font-bold mb-3">
+                    <i class="fas fa-calendar-day mr-2"></i>Daily Vocabulary
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-2 bg-gradient-to-r from-violet-700 to-fuchsia-700 gradient-text pb-1">
+                    Day 8
+                </h1>
+                <p class="text-black font-semibold flex items-center justify-center md:justify-start gap-2">
+                    <i class="fas fa-pen-nib text-violet-600"></i>
+                    Created by: 
+                    <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-violet-700 hover:text-violet-900 hover:underline transition-colors font-bold relative group">
+                        Emam Mehedi
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-600 transition-all group-hover:w-full"></span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex-shrink-0 z-10 bg-white p-2 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300 border-2 border-violet-100">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-24 h-24 md:w-28 md:h-28 rounded-lg">
+                <p class="text-center text-xs text-black mt-1 font-bold">Scan Me</p>
+            </div>
+        </header>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-10 mb-8 border-t-4 border-t-violet-500 relative">
+            <div class="absolute -top-4 -right-4 text-violet-200 opacity-20">
+                <i class="fas fa-rocket text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 id="story-title" class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-user-astronaut text-violet-600"></i> লাল গ্রহের ডায়েরি (Diary of the Red Planet)
+                </h2>
+                <button onclick="copyStory()" class="mt-4 md:mt-0 bg-violet-100 hover:bg-violet-200 text-violet-800 font-bold py-2 px-4 rounded-lg shadow-sm transition-all flex items-center gap-2 border border-violet-300">
+                    <i class="fas fa-copy"></i> Copy Story
+                </button>
+            </div>
+            
+            <div id="story-content" class="bn-text text-lg md:text-xl text-black font-medium leading-relaxed space-y-4 bg-white/70 p-6 rounded-xl border border-violet-100 shadow-inner">
+                <p>
+                    মঙ্গল গ্রহে অবতীর্ণ হওয়ার পর ক্যাপ্টেন রবিনসন তার স্পেসস্যুট খোলার আগে বিশেষ রাসায়নিক দিয়ে একটি <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Ablution</span> <span class="text-fuchsia-700 font-bold">(প্রক্ষালন / ধৌতকরণ)</span> সম্পন্ন করলেন। এই গ্রহে প্রাণের অস্তিত্ব আছে কি না, তা নিয়ে বিজ্ঞানীদের অনেক <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Conjecture</span> <span class="text-fuchsia-700 font-bold">(অনুমান)</span> ছিল। মিশনটি সফল করার জন্য তাদের একটি অত্যন্ত <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Viable</span> <span class="text-fuchsia-700 font-bold">(কার্যকর / টেকসই)</span> পরিকল্পনা প্রয়োজন ছিল।
+                </p>
+                <p>
+                    রবিনসন গুহার ভেতরে ঢুকে এক বৃদ্ধ এলিয়েনের দেখা পেলেন। এলিয়েনটি দেখতে ভয়ংকর হলেও সে ছিল অত্যন্ত <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Amiable</span> <span class="text-fuchsia-700 font-bold">(অমায়িক / বন্ধুত্বপূর্ণ)</span>। গুহাটি দেখে মনে হচ্ছিল এলিয়েনটি খুবই <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Indigent</span> <span class="text-fuchsia-700 font-bold">(দরিদ্র / অভাবগ্রস্ত)</span> অবস্থায় দিন কাটাচ্ছে। মজার ব্যাপার হলো, বয়সের ভারে এলিয়েনটির দাঁত পড়ে যাওয়ায় সে এক ধরনের পাথরের তৈরি <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Denture</span> <span class="text-fuchsia-700 font-bold">(কৃত্রিম দাঁত)</span> ব্যবহার করছিল!
+                </p>
+                <p>
+                    এলিয়েনটি গুহার আলোতে <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Squint</span> <span class="text-fuchsia-700 font-bold">(চোখ কুঁচকে দেখা)</span> করে রবিনসনের দিকে তাকাল। রবিনসন ভাবছিলেন, এলিয়েনরা কি মানুষের মতো খাবার খায়? এটি একটি সম্পূর্ণ <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Hypothetical</span> <span class="text-fuchsia-700 font-bold">(অনুমানমূলক / তাত্ত্বিক)</span> প্রশ্ন ছিল। তবে রবিনসনের কাছে থাকা খাবারগুলো ছিল <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Perishable</span> <span class="text-fuchsia-700 font-bold">(পচনশীল)</span>, তাই তিনি দ্রুত সেগুলো খেয়ে ফেললেন।
+                </p>
+                <p>
+                    যাওয়ার আগে এলিয়েনটি রবিনসনকে একটি উজ্জ্বল নীল পাথর দিল। এটি ছিল দুই গ্রহের বন্ধুত্বের একটি চমৎকার <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Memento</span> <span class="text-fuchsia-700 font-bold">(স্মৃতিচিহ্ন)</span>, যা মানবজাতির ইতিহাসে চিরকাল স্মরণীয় হয়ে থাকবে।
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-black mb-6 flex items-center gap-3 px-2">
+                <i class="fas fa-layer-group text-violet-600"></i> Word Breakdown
+            </h2>
+            
+            <div id="word-breakdown-container" class="grid grid-cols-1 gap-6">
+                <!-- Word cards will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="mb-8 mt-12 border-t-4 border-dashed border-violet-200 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 px-2">
+                <h2 class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-tasks text-violet-600"></i> Knowledge Check (MCQs)
+                </h2>
+                <button onclick="copyMCQs()" class="mt-4 md:mt-0 bg-white hover:bg-gray-50 text-violet-700 font-bold py-2 px-4 rounded-lg shadow transition-all flex items-center gap-2 border border-violet-200">
+                    <i class="fas fa-copy"></i> Copy MCQs
+                </button>
+            </div>
+            
+            <div id="mcq-container" class="space-y-4">
+                <!-- MCQs will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-8 bg-gradient-to-r from-violet-900 to-fuchsia-900 text-white relative overflow-hidden mt-8">
+            <div class="absolute -right-10 -bottom-10 opacity-10">
+                <i class="fas fa-clipboard-list text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-violet-50">
+                    <i class="fas fa-list-check text-fuchsia-400"></i> Summary List
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 bg-fuchsia-500 hover:bg-fuchsia-400 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 border border-fuchsia-400">
+                    <i class="fas fa-copy"></i> Copy List
+                </button>
+            </div>
+            
+            <div class="bg-black/40 p-5 rounded-xl border border-fuchsia-500/30 font-mono text-sm leading-relaxed overflow-x-auto z-10 relative bn-text">
+<pre id="summaryText" class="whitespace-pre-wrap text-fuchsia-50 font-bold">Ablution, প্রক্ষালন/ধৌতকরণ - Washing @ Pollution;
+Conjecture, অনুমান - Guess @ Fact;
+Hypothetical, অনুমানমূলক - Assumed @ Real;
+Perishable, পচনশীল/ক্ষণস্থায়ী - Temporary @ Durable;
+Viable, কার্যকর/টেকসই - Capable @ Impossible;
+Amiable, বন্ধুত্বপূর্ণ/অমায়িক - Friendly @ Unfriendly;
+Indigent, দরিদ্র/অভাবগ্রস্ত - Poor @ Affluent;
+Denture, কৃত্রিম দাঁত - False teeth @ Natural teeth;
+Squint, চোখ কুঁচকে দেখা - Peek @ Stare;
+Memento, স্মৃতিচিহ্ন - Souvenir @ Oblivion;</pre>
+            </div>
+        </section>
+
+        <!-- Navigation Buttons -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 mb-4">
+            <a href="https://classcaddy.netlify.app/vocabs/weekly1" class="w-full sm:w-auto text-center bg-white hover:bg-violet-50 text-violet-700 font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-violet-200 hover:border-violet-400 group">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Previous (Weekly-1)
+            </a>
+            <a href="https://classcaddy.netlify.app/vocabs/day9" class="w-full sm:w-auto text-center bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-transparent hover:shadow-lg transform hover:-translate-y-0.5 group">
+                Next (Day-9) <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-700 text-sm mt-8 pb-8 font-bold">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i id="toast-icon" class="fas fa-check-circle mr-2"></i><span id="toast-message">Copied!</span></div>
+
+    <script>
+        const wordData = [
+            {
+                id: 1,
+                word: "Ablution",
+                bnTitle: "(প্রক্ষালন / ধৌতকরণ / ওজু)",
+                theme: { border: "border-violet-600", text: "text-violet-800" },
+                syn: { en: "Washing", bn: "(ধৌতকরণ)", ex: "Washing your hands is important for hygiene.", exBn: "(স্বাস্থ্যবিধির জন্য আপনার হাত ধৌতকরণ গুরুত্বপূর্ণ।)" },
+                ant: { en: "Pollution", bn: "(দূষণ / অপবিত্রকরণ)", ex: "Air pollution is a major problem in big cities.", exBn: "(বড় শহরগুলোতে বায়ু দূষণ একটি প্রধান সমস্যা।)" },
+                origin: "ল্যাটিন 'ablutio' (ab- 'দূর' + luere 'ধোয়া') থেকে এসেছে। এটি প্রধানত ধর্মীয় আচার বা প্রার্থনার আগে শরীর ধোয়ার কাজকে বোঝায়, যেমন মুসলমানদের ওজু।",
+                sentences: [
+                    { en: "He performed his ablution before the morning prayer.", bn: "(তিনি সকালের প্রার্থনার আগে তার ওজু বা প্রক্ষালন সম্পন্ন করেছিলেন।)" },
+                    { en: "Ablution is a necessary ritual in many religions.", bn: "(প্রক্ষালন অনেক ধর্মের একটি প্রয়োজনীয় আচার।)" },
+                    { en: "She brought a bowl of water for the ablution.", bn: "(সে ধৌতকরণের জন্য এক বাটি পানি এনেছিল।)" },
+                    { en: "The priest guided them through the ablution process.", bn: "(পুরোহিত তাদের প্রক্ষালন প্রক্রিয়ার মাধ্যমে পরিচালিত করেছিলেন।)" },
+                    { en: "Daily ablution keeps the body clean and fresh.", bn: "(দৈনিক ধৌতকরণ শরীরকে পরিষ্কার এবং সতেজ রাখে।)" }
+                ]
+            },
+            {
+                id: 2,
+                word: "Conjecture",
+                bnTitle: "(অনুমান)",
+                theme: { border: "border-blue-600", text: "text-blue-800" },
+                syn: { en: "Guess", bn: "(অনুমান করা)", ex: "My guess is that it will rain today.", exBn: "(আমার অনুমান হলো যে আজ বৃষ্টি হবে।)" },
+                ant: { en: "Fact", bn: "(বাস্তব সত্য / প্রমাণ)", ex: "It is a known fact that the Earth is round.", exBn: "(এটি একটি জানা সত্য যে পৃথিবী গোলাকার।)" },
+                origin: "ল্যাটিন শব্দ 'conicere' (একসাথে নিক্ষেপ করা) থেকে এসেছে। এর অর্থ হলো পর্যাপ্ত প্রমাণ ছাড়াই কেবল ধারণার উপর ভিত্তি করে কোনো সিদ্ধান্তে আসা।",
+                sentences: [
+                    { en: "His statement about the accident was pure conjecture.", bn: "(দুর্ঘটনা সম্পর্কে তার বক্তব্য ছিল নিছক অনুমান।)" },
+                    { en: "We should not make a conjecture without solid proof.", bn: "(কঠিন প্রমাণ ছাড়া আমাদের অনুমান করা উচিত নয়।)" },
+                    { en: "The scientist rejected the theory as a mere conjecture.", bn: "(বিজ্ঞানী তত্ত্বটিকে নিছক অনুমান বলে প্রত্যাখ্যান করেছিলেন।)" },
+                    { en: "Her conjecture about the hidden treasure turned out to be wrong.", bn: "(লুকানো গুপ্তধন সম্পর্কে তার অনুমান ভুল প্রমাণিত হয়েছিল।)" },
+                    { en: "Much of what he says is based on conjecture.", bn: "(সে যা বলে তার বেশিরভাগই অনুমানের উপর ভিত্তি করে।)" }
+                ]
+            },
+            {
+                id: 3,
+                word: "Hypothetical",
+                bnTitle: "(অনুমানমূলক / তাত্ত্বিক)",
+                theme: { border: "border-fuchsia-600", text: "text-fuchsia-800" },
+                syn: { en: "Assumed", bn: "(অনুমান করা হয়েছে এমন / গৃৃহীত)", ex: "The assumed cost of the project is very high.", exBn: "(প্রকল্পটির অনুমানকৃত খরচ অনেক বেশি।)" },
+                ant: { en: "Real", bn: "(বাস্তব / প্রকৃত)", ex: "This is a real problem, not just an imagination.", exBn: "(এটি একটি বাস্তব সমস্যা, শুধু কল্পনা নয়।)" },
+                origin: "গ্রিক শব্দ 'hupothesis' (ভিত্তি বা প্রস্তাবনা) থেকে এসেছে। এমন কোনো পরিস্থিতি বা ধারণা যা বাস্তবে ঘটেনি, কিন্তু আলোচনার স্বার্থে ধরে নেওয়া হয়।",
+                sentences: [
+                    { en: "Let us consider a hypothetical situation where you are the boss.", bn: "(ধরা যাক একটি অনুমানমূলক পরিস্থিতি যেখানে আপনি বস।)" },
+                    { en: "The questions asked in the interview were mostly hypothetical.", bn: "(সাক্ষাৎকারে জিজ্ঞাসা করা প্রশ্নগুলো বেশিরভাগই অনুমানমূলক ছিল।)" },
+                    { en: "He explained the theory using a hypothetical example.", bn: "(তিনি একটি তাত্ত্বিক উদাহরণ ব্যবহার করে তত্ত্বটি ব্যাখ্যা করেছিলেন।)" },
+                    { en: "It is a hypothetical scenario, so don't worry too much.", bn: "(এটি একটি অনুমানমূলক দৃশ্য, তাই খুব বেশি চিন্তা করবেন না।)" },
+                    { en: "Her argument was based on hypothetical data.", bn: "(তার যুক্তি অনুমানমূলক ডেটার উপর ভিত্তি করে ছিল।)" }
+                ]
+            },
+            {
+                id: 4,
+                word: "Perishable",
+                bnTitle: "(পচনশীল / ক্ষণস্থায়ী)",
+                theme: { border: "border-emerald-600", text: "text-emerald-800" },
+                syn: { en: "Temporary", bn: "(অস্থায়ী)", ex: "The pain is only temporary and will go away soon.", exBn: "(ব্যথাটি কেবল অস্থায়ী এবং শীঘ্রই চলে যাবে।)" },
+                ant: { en: "Durable", bn: "(টেকসই / দীর্ঘস্থায়ী)", ex: "These durable shoes will last for years.", exBn: "(এই টেকসই জুতাগুলো বছরের পর বছর টিকবে।)" },
+                origin: "ল্যাটিন 'perire' (নষ্ট হওয়া বা মারা যাওয়া) থেকে ফরাসি শব্দ 'perissable' হয়ে ইংরেজিতে এসেছে। এটি এমন জিনিসকে বোঝায় যা দ্রুত পচে যায় বা নষ্ট হয়ে যায় (যেমন: খাবার)।",
+                sentences: [
+                    { en: "Milk and meat are highly perishable goods.", bn: "(দুধ এবং মাংস অত্যন্ত পচনশীল পণ্য।)" },
+                    { en: "Store perishable items in the refrigerator.", bn: "(পচনশীল জিনিসগুলো রেফ্রিজারেটরে সংরক্ষণ করুন।)" },
+                    { en: "Human life is fragile and perishable.", bn: "(মানবজীবন ভঙ্গুর এবং ক্ষণস্থায়ী।)" },
+                    { en: "They ship perishable food in cold containers.", bn: "(তারা ঠান্ডা পাত্রে পচনশীল খাবার পাঠায়।)" },
+                    { en: "Fruit is a perishable product that goes bad quickly.", bn: "(ফল একটি পচনশীল পণ্য যা দ্রুত নষ্ট হয়ে যায়।)" }
+                ]
+            },
+            {
+                id: 5,
+                word: "Viable",
+                bnTitle: "(কার্যকর / টেকসই / বেঁচে থাকতে সক্ষম)",
+                theme: { border: "border-amber-600", text: "text-amber-800" },
+                syn: { en: "Capable", bn: "(সক্ষম / যোগ্য)", ex: "He is highly capable of leading the team.", exBn: "(সে দলটির নেতৃত্ব দিতে অত্যন্ত সক্ষম।)" },
+                ant: { en: "Impossible", bn: "(অসম্ভব)", ex: "It is impossible to live without water.", exBn: "(পানি ছাড়া বেঁচে থাকা অসম্ভব।)" },
+                origin: "ফরাসি শব্দ 'vie' (জীবন) থেকে ল্যাটিন 'vita' হয়ে এসেছে। এর আক্ষরিক অর্থ 'বেঁচে থাকতে সক্ষম'। ব্যবসায় বা পরিকল্পনায় এর অর্থ 'সফল হতে সক্ষম বা কার্যকর'।",
+                sentences: [
+                    { en: "We need to find a viable solution to the pollution problem.", bn: "(দূষণ সমস্যার একটি কার্যকর সমাধান আমাদের খুঁজে বের করতে হবে।)" },
+                    { en: "Solar energy is a commercially viable alternative to coal.", bn: "(সৌরশক্তি কয়লার একটি বাণিজ্যিকভাবে টেকসই বিকল্প।)" },
+                    { en: "His business plan did not seem viable to the investors.", bn: "(তার ব্যবসায়িক পরিকল্পনা বিনিয়োগকারীদের কাছে কার্যকর বলে মনে হয়নি।)" },
+                    { en: "A premature baby can be viable with good medical care.", bn: "(ভালো চিকিৎসা সেবার মাধ্যমে একটি অকালজাত শিশু বেঁচে থাকতে সক্ষম হতে পারে।)" },
+                    { en: "Is it a viable option to travel by train?", bn: "(ট্রেনে ভ্রমণ করা কি একটি কার্যকর বিকল্প?)" }
+                ]
+            },
+            {
+                id: 6,
+                word: "Amiable",
+                bnTitle: "(অমায়িক / বন্ধুত্বপূর্ণ)",
+                theme: { border: "border-pink-600", text: "text-pink-800" },
+                syn: { en: "Friendly", bn: "(বন্ধুভাবাপন্ন)", ex: "The shopkeeper gave us a friendly smile.", exBn: "(দোকানদার আমাদের একটি বন্ধুভাবাপন্ন হাসি দিয়েছিলেন।)" },
+                ant: { en: "Unfriendly", bn: "(অবন্ধুত্বপূর্ণ / রুক্ষ)", ex: "His unfriendly behavior pushed everyone away.", exBn: "(তার অবন্ধুত্বপূর্ণ আচরণ সবাইকে দূরে সরিয়ে দিয়েছে।)" },
+                origin: "ল্যাটিন শব্দ 'amicabilis' (বন্ধুত্বপূর্ণ) থেকে ফরাসি হয়ে ইংরেজিতে এসেছে। যে ব্যক্তি স্বভাবগতভাবে মিষ্টি, অমায়িক এবং সহজে মিশতে পারে।",
+                sentences: [
+                    { en: "He is an amiable young man who is loved by everyone.", bn: "(সে একজন অমায়িক যুবক যাকে সবাই ভালোবাসে।)" },
+                    { en: "Our new neighbor seems very amiable and polite.", bn: "(আমাদের নতুন প্রতিবেশীকে খুব বন্ধুত্বপূর্ণ এবং ভদ্র মনে হচ্ছে।)" },
+                    { en: "The meeting ended in a highly amiable atmosphere.", bn: "(মিটিংটি একটি অত্যন্ত বন্ধুত্বপূর্ণ পরিবেশে শেষ হয়েছিল।)" },
+                    { en: "She has an amiable personality that attracts friends easily.", bn: "(তার একটি অমায়িক ব্যক্তিত্ব রয়েছে যা সহজেই বন্ধুদের আকর্ষণ করে।)" },
+                    { en: "Despite the argument, they remained amiable to each other.", bn: "(তর্ক হওয়া সত্ত্বেও, তারা একে অপরের প্রতি বন্ধুত্বপূর্ণ ছিল।)" }
+                ]
+            },
+            {
+                id: 7,
+                word: "Indigent",
+                bnTitle: "(দরিদ্র / অভাবগ্রস্ত)",
+                theme: { border: "border-red-600", text: "text-red-800" },
+                syn: { en: "Poor", bn: "(দরিদ্র)", ex: "He grew up in a poor family but became very successful.", exBn: "(সে একটি দরিদ্র পরিবারে বড় হয়েছিল কিন্তু খুব সফল হয়েছিল।)" },
+                ant: { en: "Affluent", bn: "(ধনী / সচ্ছল)", ex: "They live in an affluent neighborhood of the city.", exBn: "(তারা শহরের একটি ধনী পাড়ায় বাস করে।)" },
+                origin: "ল্যাটিন 'indigere' (অভাব বোধ করা) থেকে উদ্ভূত, যেখানে 'indu-' (ভিতরে) এবং 'egere' (অভাব হওয়া) যুক্ত হয়েছে। এটি চরম দারিদ্র্য বা খাদ্যের অভাব বোঝায়।",
+                sentences: [
+                    { en: "The hospital provides free medical care to indigent patients.", bn: "(হাসপাতালটি দরিদ্র রোগীদের বিনামূল্যে চিকিৎসা সেবা প্রদান করে।)" },
+                    { en: "Many indigent families lost their homes in the flood.", bn: "(বন্যায় অনেক অভাবগ্রস্ত পরিবার তাদের বাড়িঘর হারিয়েছে।)" },
+                    { en: "The charity distributes food among the indigent people of the city.", bn: "(দাতব্য সংস্থাটি শহরের দরিদ্র মানুষের মাঝে খাবার বিতরণ করে।)" },
+                    { en: "He felt deep sympathy for the indigent beggar.", bn: "(দরিদ্র ভিক্ষুকের প্রতি সে গভীর সহানুভূতি অনুভব করেছিল।)" },
+                    { en: "The government launched a project to help indigent farmers.", bn: "(সরকার অভাবগ্রস্ত কৃষকদের সাহায্য করার জন্য একটি প্রকল্প চালু করেছে।)" }
+                ]
+            },
+            {
+                id: 8,
+                word: "Denture",
+                bnTitle: "(কৃত্রিম দাঁত / বাঁধানো দাঁত)",
+                theme: { border: "border-cyan-600", text: "text-cyan-800" },
+                syn: { en: "False teeth", bn: "(নকল দাঁত)", ex: "My grandfather took out his false teeth before sleeping.", exBn: "(আমার দাদা ঘুমানোর আগে তার নকল দাঁত খুলে রেখেছিলেন।)" },
+                ant: { en: "Natural teeth", bn: "(প্রাকৃতিক দাঁত)", ex: "Brushing daily helps keep your natural teeth strong.", exBn: "(প্রতিদিন ব্রাশ করা আপনার প্রাকৃতিক দাঁত মজবুত রাখতে সাহায্য করে।)" },
+                origin: "ফরাসি শব্দ 'dent' থেকে এসেছে, যার মূল ল্যাটিন 'dens' (দাঁত)। এটি এমন একটি অপসারণযোগ্য প্লেট বা ফ্রেম যা কৃত্রিম দাঁত ধরে রাখে।",
+                sentences: [
+                    { en: "The old man lost his denture while swimming in the river.", bn: "(বৃদ্ধ লোকটি নদীতে সাঁতার কাটার সময় তার কৃত্রিম দাঁত হারিয়ে ফেলেছিল।)" },
+                    { en: "She went to the dentist to get a new denture fitted.", bn: "(সে নতুন কৃত্রিম দাঁত লাগানোর জন্য ডেন্টিস্টের কাছে গিয়েছিল।)" },
+                    { en: "You must clean your denture regularly to avoid infection.", bn: "(সংক্রমণ এড়াতে আপনাকে অবশ্যই আপনার বাঁধানো দাঁত নিয়মিত পরিষ্কার করতে হবে।)" },
+                    { en: "He smiled, revealing a perfect upper denture.", bn: "(সে হাসল, যার ফলে একটি নিখুঁত উপরের পাটির কৃত্রিম দাঁত প্রকাশ পেল।)" },
+                    { en: "The dog chewed up his master's expensive denture.", bn: "(কুকুরটি তার প্রভুর দামি কৃত্রিম দাঁত চিবিয়ে নষ্ট করে ফেলেছিল।)" }
+                ]
+            },
+            {
+                id: 9,
+                word: "Squint",
+                bnTitle: "(চোখ কুঁচকে দেখা / ট্যারা দৃষ্টি)",
+                theme: { border: "border-orange-600", text: "text-orange-800" },
+                syn: { en: "Peek", bn: "(উঁকি দেওয়া / আংশিক দেখা)", ex: "The child took a peek at his birthday present.", exBn: "(শিশুটি তার জন্মদিনের উপহারটি উঁকি দিয়ে দেখেছিল।)" },
+                ant: { en: "Stare", bn: "(একদৃষ্টে তাকিয়ে থাকা)", ex: "It is rude to stare at strangers.", exBn: "(অপরিচিতদের দিকে একদৃষ্টে তাকিয়ে থাকা অভদ্রতা।)" },
+                origin: "প্রাচীন শব্দ 'asquint' (আড়চোখে তাকানো) থেকে উদ্ভূত। উজ্জ্বল আলো থেকে বাঁচতে বা ভালোভাবে দেখার জন্য চোখ আংশিক বন্ধ করাকে বোঝায়।",
+                sentences: [
+                    { en: "He had to squint against the bright morning sun.", bn: "(উজ্জ্বল সকালের রোদের কারণে তাকে চোখ কুঁচকে তাকাতে হয়েছিল।)" },
+                    { en: "She squinted at the small writing on the medicine bottle.", bn: "(সে ওষুধের বোতলের ছোট লেখার দিকে চোখ কুঁচকে তাকাল।)" },
+                    { en: "The bright light made everyone squint.", bn: "(উজ্জ্বল আলো সবাইকে চোখ কুঁচকে তাকাতে বাধ্য করেছিল।)" },
+                    { en: "Without his glasses, he squints to read the newspaper.", bn: "(চশমা ছাড়া, পত্রিকা পড়ার জন্য সে চোখ কুঁচকে তাকায়।)" },
+                    { en: "He has a slight squint in his left eye.", bn: "(তার বাম চোখে সামান্য ট্যারা দৃষ্টি আছে।)" }
+                ]
+            },
+            {
+                id: 10,
+                word: "Memento",
+                bnTitle: "(স্মৃতিচিহ্ন)",
+                theme: { border: "border-gray-800", text: "text-gray-900" },
+                syn: { en: "Souvenir", bn: "(স্মারক)", ex: "I bought this small Eiffel Tower as a souvenir from Paris.", exBn: "(প্যারিস থেকে স্মারক হিসেবে আমি এই ছোট আইফেল টাওয়ারটি কিনেছিলাম।)" },
+                ant: { en: "Oblivion", bn: "(বিস্মৃতি / ভুলে যাওয়া)", ex: "The ancient city slowly faded into oblivion.", exBn: "(প্রাচীন শহরটি ধীরে ধীরে বিস্মৃতিতে তলিয়ে গেছে।)" },
+                origin: "ল্যাটিন শব্দ 'meminisse' (স্মরণ করা) এর অনুজ্ঞাসূচক রূপ 'memento' থেকে এসেছে, যার অর্থ 'মনে রেখো'। এটি অতীত ঘটনা বা মানুষের স্মৃতির উদ্দেশ্যে রাখা বস্তু।",
+                sentences: [
+                    { en: "He kept the dry rose as a memento of their first meeting.", bn: "(তাদের প্রথম দেখার স্মৃতিচিহ্ন হিসেবে সে শুকনো গোলাপটি রেখে দিয়েছিল।)" },
+                    { en: "This watch is a precious memento from my late grandfather.", bn: "(এই ঘড়িটি আমার প্রয়াত দাদার একটি মূল্যবান স্মৃতিচিহ্ন।)" },
+                    { en: "Visitors were given a small memento at the end of the tour.", bn: "(সফরের শেষে দর্শনার্থীদের একটি ছোট স্মৃতিচিহ্ন দেওয়া হয়েছিল।)" },
+                    { en: "I bought a key-ring as a memento of my trip to London.", bn: "(লন্ডনে আমার ভ্রমণের স্মৃতিচিহ্ন হিসেবে আমি একটি চাবির রিং কিনেছি।)" },
+                    { en: "Photographs are the best mementos of happy times.", bn: "(আলোকচিত্র হলো আনন্দের সময়ের সেরা স্মৃতিচিহ্ন।)" }
+                ]
+            }
+        ];
+
+        const mcqData = [
+            {
+                q: "What does the word 'Ablution' refer to?",
+                options: { a: "A false statement", b: "The act of washing oneself", c: "A temporary phase", d: "Deep thinking" },
+                correct: "b",
+                note: "'Ablution' originates from Latin meaning to wash away, typically referring to religious or ceremonial washing of the body."
+            },
+            {
+                q: "Which word is the closest synonym for 'Conjecture'?",
+                options: { a: "Proof", b: "Fact", c: "Guess", d: "Evidence" },
+                correct: "c",
+                note: "'Conjecture' means forming an opinion on incomplete information, which is essentially a 'Guess'. The other options refer to solid facts."
+            },
+            {
+                q: "If a scenario is described as 'Hypothetical', it means it is:",
+                options: { a: "Based on undeniable truth", b: "Occurring in the present moment", c: "Assumed for the sake of argument", d: "Historically accurate" },
+                correct: "c",
+                note: "'Hypothetical' situations are imaginary or assumed scenarios used to explore an idea, rather than real, factual events."
+            },
+            {
+                q: "Which of the following items is most likely to be 'Perishable'?",
+                options: { a: "A diamond ring", b: "A wooden chair", c: "Fresh strawberries", d: "A steel pipe" },
+                correct: "c",
+                note: "'Perishable' refers to things, especially food, that are likely to decay or go bad quickly. Strawberries fit this description perfectly."
+            },
+            {
+                q: "What is the antonym of 'Viable'?",
+                options: { a: "Capable", b: "Feasible", c: "Impossible", d: "Practical" },
+                correct: "c",
+                note: "'Viable' means capable of working successfully. Its exact opposite is 'Impossible'. Capable, Feasible, and Practical are synonyms."
+            },
+            {
+                q: "How would you describe an 'Amiable' person?",
+                options: { a: "Hostile and aggressive", b: "Friendly and pleasant", c: "Poor and needy", d: "Doubtful and hesitant" },
+                correct: "b",
+                note: "'Amiable' comes from a Latin word for friend, meaning displaying a friendly and pleasant manner."
+            },
+            {
+                q: "Fill in the blank: The wealthy businessman donated millions to build a shelter for the ______ families of the city.",
+                options: { a: "Affluent", b: "Hypothetical", c: "Indigent", d: "Amiable" },
+                correct: "c",
+                note: "A shelter is built for those in need. 'Indigent' means poor or needy, making it the perfect fit."
+            },
+            {
+                q: "Solve the Analogy -> Denture : Teeth :: Toupee : ?",
+                options: { a: "Head", b: "Hat", c: "Hair", d: "Eyes" },
+                correct: "c",
+                note: "A denture is artificial teeth worn over the gums. A toupee is artificial hair (a small wig) worn on the head."
+            },
+            {
+                q: "Solve the Analogy -> Squint : Eyes :: Limp : ?",
+                options: { a: "Arms", b: "Limbs", c: "Ears", d: "Mouth" },
+                correct: "b",
+                note: "To squint is an impaired or restricted action of the eyes. To limp is an impaired action of the legs/limbs."
+            },
+            {
+                q: "What is a 'Memento'?",
+                options: { a: "A sudden loss of memory", b: "A physical object kept as a reminder of a person or event", c: "An official government document", d: "A type of artificial teeth" },
+                correct: "b",
+                note: "'Memento' comes from the Latin word for 'remember'. It is a souvenir or keepsake."
+            },
+            {
+                q: "Identify the antonym for 'Indigent':",
+                options: { a: "Destitute", b: "Poor", c: "Affluent", d: "Needy" },
+                correct: "c",
+                note: "'Indigent', 'Destitute', 'Poor', and 'Needy' all mean lacking money. 'Affluent' means having a great deal of wealth."
+            },
+            {
+                q: "Which word best completes the sentence? 'The light was so blinding that I had to ______ to read the street sign.'",
+                options: { a: "Conjecture", b: "Squint", c: "Ablution", d: "Stare" },
+                correct: "b",
+                note: "When light is blinding, a person will partially close their eyes to see better, which is the definition of 'squinting'."
+            },
+            {
+                q: "If a business plan is 'not viable', what does that mean?",
+                options: { a: "It is highly profitable", b: "It will not work successfully", c: "It is friendly and polite", d: "It is based on a true story" },
+                correct: "b",
+                note: "If something is viable, it is capable of success. Therefore, 'not viable' means it is impossible or will fail."
+            },
+            {
+                q: "Which of the following words is an antonym for 'Amiable'?",
+                options: { a: "Friendly", b: "Pleasant", c: "Unfriendly", d: "Sociable" },
+                correct: "c",
+                note: "'Amiable' means having a friendly nature. Therefore, 'Unfriendly' is the direct antonym."
+            },
+            {
+                q: "Fill in the blank: The detective refused to arrest the suspect because the evidence was based purely on ______ rather than facts.",
+                options: { a: "Conjecture", b: "Ablution", c: "Memento", d: "Denture" },
+                correct: "a",
+                note: "An arrest requires factual evidence, not a 'Conjecture' (a guess or assumption)."
+            },
+            {
+                q: "What is the relationship in the analogy 'Squint : Stare'?",
+                options: { a: "They are synonyms", b: "They are antonyms", c: "They both relate to walking", d: "One causes the other" },
+                correct: "b",
+                note: "To squint means to look with eyes partly closed, while to stare means to look with eyes wide open. Thus, they are antonyms."
+            },
+            {
+                q: "Which word shares its etymological root with the Latin word for 'wash away'?",
+                options: { a: "Indigent", b: "Perishable", c: "Viable", d: "Ablution" },
+                correct: "d",
+                note: "'Ablution' comes from 'ablutio', where 'ab-' means away and 'luere' means to wash."
+            },
+            {
+                q: "A person who loses their natural teeth might replace them with a:",
+                options: { a: "Toupee", b: "Memento", c: "Denture", d: "Conjecture" },
+                correct: "c",
+                note: "A 'Denture' is a removable plate or frame holding one or more artificial teeth."
+            },
+            {
+                q: "Fill in the blank: The museum gift shop sells small replicas of the famous statue as a ______ for tourists.",
+                options: { a: "Denture", b: "Memento", c: "Hypothesis", d: "Ablution" },
+                correct: "b",
+                note: "A replica bought by a tourist to remember a trip is a souvenir, which is synonymous with 'Memento'."
+            },
+            {
+                q: "Which of these pairs represents a true Synonym relationship?",
+                options: { a: "Perishable – Durable", b: "Indigent – Affluent", c: "Viable – Capable", d: "Amiable – Hostile" },
+                correct: "c",
+                note: "Options A, B, and D are all antonym pairs. Only 'Viable' and 'Capable' share the same meaning."
+            },
+            {
+                q: "Why are refrigerators important in supermarkets?",
+                options: { a: "To store hypothetical goods", b: "To preserve perishable items", c: "To keep indigent people away", d: "To conduct daily ablutions" },
+                correct: "b",
+                note: "Refrigerators are used to keep 'perishable' (decaying/spoiling) food items fresh for a longer time."
+            },
+            {
+                q: "If two scientists are debating a 'Hypothetical' particle, what does it mean?",
+                options: { a: "The particle has been caught in a jar", b: "The particle is known to be deadly", c: "The particle's existence is only assumed in theory", d: "The particle is very poor" },
+                correct: "c",
+                note: "Hypothetical refers to something that is proposed as a theory but not yet proven to exist in reality."
+            },
+            {
+                q: "Which of the following is NOT an attribute of being 'Indigent'?",
+                options: { a: "Poverty", b: "Neediness", c: "Wealth", d: "Destitution" },
+                correct: "c",
+                note: "Indigent means suffering from extreme poverty. Therefore, 'Wealth' is the exact opposite attribute."
+            },
+            {
+                q: "Fill in the blank: The old man walked with a slight ______ due to an injury in his left leg.",
+                options: { a: "Squint", b: "Limp", c: "Denture", d: "Conjecture" },
+                correct: "b",
+                note: "An injury to the leg causes an uneven or impaired walk, which is called a 'Limp'."
+            },
+            {
+                q: "What is the synonym for 'Memento'?",
+                options: { a: "Forgetfulness", b: "Oblivion", c: "Souvenir", d: "Future" },
+                correct: "c",
+                note: "Both a Memento and a Souvenir are objects kept as a reminder of a person, place, or event."
+            }
+        ];
+
+        // --- Render Functions ---
+        function renderWords() {
+            const container = document.getElementById('word-breakdown-container');
+            let htmlContent = '';
+
+            wordData.forEach(data => {
+                let sentencesHtml = '';
+                data.sentences.forEach(s => {
+                    sentencesHtml += `
+                        <li>
+                            ${s.en}<br>
+                            <span class="text-xs text-black bn-text ml-5 block mt-0.5">${s.bn}</span>
+                        </li>
+                    `;
+                });
+
+                htmlContent += `
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 ${data.theme.border}">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold ${data.theme.text}">${data.id}. ${data.word} <span class="text-sm font-bold text-gray-700 bn-text ml-2">${data.bnTitle}</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: ${data.syn.en.split(' / ')[0]}</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: ${data.ant.en.split(' / ')[0]}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">${data.origin}</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            ${sentencesHtml}
+                        </ul>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">${data.syn.en}</span> <span class="bn-text text-sm font-bold text-black">${data.syn.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.syn.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.syn.exBn}</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">${data.ant.en}</span> <span class="bn-text text-sm font-bold text-black">${data.ant.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.ant.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.ant.exBn}</p>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        function renderMCQs() {
+            const container = document.getElementById('mcq-container');
+            let htmlContent = '';
+
+            mcqData.forEach((mcq, index) => {
+                htmlContent += `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-lg text-black mb-3">${index + 1}. ${mcq.q}</h3>
+                    <ul class="space-y-2 mb-4 ml-2">
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">a.</span> ${mcq.options.a}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">b.</span> ${mcq.options.b}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">c.</span> ${mcq.options.c}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">d.</span> ${mcq.options.d}</li>
+                    </ul>
+                    
+                    <details class="group bg-violet-50 rounded-lg outline-none border border-violet-100">
+                        <summary class="cursor-pointer font-bold text-violet-700 px-4 py-2 flex items-center justify-between select-none">
+                            <span class="flex items-center gap-2"><i class="fas fa-eye"></i> Show Answer</span>
+                            <i class="fas fa-chevron-down transform group-open:rotate-180 transition-transform duration-300"></i>
+                        </summary>
+                        <div class="px-4 pb-4 pt-1 border-t border-violet-200 mt-1">
+                            <p class="text-black font-bold mb-2">Correct Answer: <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded uppercase">${mcq.correct}</span></p>
+                            <p class="text-sm text-black font-medium"><span class="font-bold">Note:</span> ${mcq.note}</p>
+                        </div>
+                    </details>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderWords();
+            renderMCQs();
+        });
+
+        function copySummary() {
+            const summaryText = document.getElementById('summaryText').innerText;
+            copyTextToClipboard(summaryText, 'Summary list copied!');
+        }
+        
+        function copyStory() {
+            const storyTitle = document.getElementById('story-title').innerText.trim();
+            const storyParagraphs = document.querySelectorAll('#story-content p');
+            let storyText = storyTitle + '\n\n';
+            
+            storyParagraphs.forEach(p => {
+                storyText += p.innerText + '\n\n';
+            });
+            
+            copyTextToClipboard(storyText.trim(), 'Story copied!');
+        }
+
+        function copyMCQs() {
+            let copyText = '';
+            
+            mcqData.forEach((mcq, index) => {
+                copyText += `${index + 1}. ${mcq.q}\n`;
+                copyText += `a. ${mcq.options.a}\n`;
+                copyText += `b. ${mcq.options.b}\n`;
+                copyText += `c. ${mcq.options.c}\n`;
+                copyText += `d. ${mcq.options.d}\n`;
+                copyText += `correct answer: ${mcq.correct}\n`;
+                copyText += `Note: ${mcq.note}\n\n`;
+            });
+            
+            copyTextToClipboard(copyText.trim(), '25 MCQs copied exactly formatted!');
+        }
+
+        function copyTextToClipboard(text, successMessage) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(successMessage);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => showToast(successMessage)).catch(e => console.error("Clipboard API failed", e));
+                }
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toast-message");
+            toastMessage.innerText = message;
+            
+            toast.className = "show";
+            
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
