@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 10 - Systematic Vocabulary Batch</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            500: '#000000', 
+                            600: '#000000', 
+                            700: '#000000', 
+                            800: '#000000', 
+                            900: '#000000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0fdf4; /* lime-50 */
+            color: #000000; 
+        }
+        .bn-text {
+            font-family: 'Hind Siliguri', sans-serif;
+            color: #000000; 
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #0284c7; /* sky-600 */
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-lime-50 via-sky-50 to-blue-50 min-h-screen p-4 md:p-8 selection:bg-blue-200 selection:text-blue-900 text-black">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <header class="glass-card rounded-2xl shadow-lg p-6 md:p-8 mb-8 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-lime-500 to-blue-600"></div>
+            
+            <div class="text-center md:text-left mb-6 md:mb-0 z-10">
+                <div class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-bold mb-3">
+                    <i class="fas fa-calendar-day mr-2"></i>Daily Vocabulary
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-2 bg-gradient-to-r from-lime-600 to-blue-700 gradient-text pb-1">
+                    Day 10
+                </h1>
+                <p class="text-black font-semibold flex items-center justify-center md:justify-start gap-2">
+                    <i class="fas fa-pen-nib text-blue-600"></i>
+                    Created by: 
+                    <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-blue-700 hover:text-blue-900 hover:underline transition-colors font-bold relative group">
+                        Emam Mehedi
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full"></span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex-shrink-0 z-10 bg-white p-2 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300 border-2 border-blue-100">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-24 h-24 md:w-28 md:h-28 rounded-lg">
+                <p class="text-center text-xs text-black mt-1 font-bold">Scan Me</p>
+            </div>
+        </header>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-10 mb-8 border-t-4 border-t-blue-500 relative">
+            <div class="absolute -top-4 -right-4 text-blue-200 opacity-20">
+                <i class="fas fa-leaf text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 id="story-title" class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-compass text-blue-600"></i> মরুভূমির অদ্ভুত স্বাদ (The Bizarre Taste of the Desert)
+                </h2>
+                <button onclick="copyStory()" class="mt-4 md:mt-0 bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold py-2 px-4 rounded-lg shadow-sm transition-all flex items-center gap-2 border border-blue-300">
+                    <i class="fas fa-copy"></i> Copy Story
+                </button>
+            </div>
+            
+            <div id="story-content" class="bn-text text-lg md:text-xl text-black font-medium leading-relaxed space-y-4 bg-white/70 p-6 rounded-xl border border-blue-100 shadow-inner">
+                <p>
+                    অধ্যাপক রায়হান এবং বিখ্যাত খাদ্য-সমালোচক মি. রতন মিলে একটি দুর্গম <span class="font-bold text-blue-800 bg-blue-100 px-1.5 py-0.5 rounded shadow-sm">Xeric</span> <span class="text-lime-700 font-bold">(অত্যন্ত শুষ্ক)</span> মরুভূমিতে একটি বিরল উদ্ভিদের খোঁজে বেরিয়েছিলেন। উদ্ভিদটি নাকি যেকোনো চর্মরোগ, এমনকি <span class="font-bold text-blue-800 bg-blue-100 px-1.5 py-0.5 rounded shadow-sm">Psoriasis</span> <span class="text-lime-700 font-bold">(সোরিয়াসিস / একধরনের চর্মরোগ)</span> নিরাময় করতে পারে। মি. রতন স্বভাবতই খুব <span class="font-bold text-blue-800 bg-blue-100 px-1.5 py-0.5 rounded shadow-sm">Pugnacious</span> <span class="text-lime-700 font-bold">(ঝগড়াটে)</span> মানুষ ছিলেন। মরুভূমির গরমে তার মেজাজ আরও খারাপ হয়ে গিয়েছিল।
+                </p>
+                <p>
+                    পথে একটু বিশ্রাম নেওয়ার সময় মি. রতন অযথা <span class="font-bold text-blue-800 bg-blue-100 px-1.5 py-0.5 rounded shadow-sm">Quibble</span> <span class="text-lime-700 font-bold">(তুচ্ছ বিষয়ে তর্ক করা)</span> করতে শুরু করলেন যে, কেন তারা এই দুর্গম পথে এসেছেন। অধ্যাপক রায়হান তাকে শান্ত করার চেষ্টা করলেন, কিন্তু রতন সাহেব প্রতিটি কথার মধ্যে <span class="font-bold text-blue-800 bg-blue-100 px-1.5 py-0.5 rounded shadow-sm">Cavil</span> <span class="text-lime-700 font-bold">(অযথা খুঁত ধরা)</span> করতে লাগলেন। অবশেষে তারা সেই বিরল উদ্ভিদটির সন্ধান পেলেন। 
+                </p>
+                <p>
+                    মি. রতন উদ্ভিদটির একটি পাতা চিবিয়ে দেখলেন এবং অবাক হয়ে বললেন, "আরে! এটি তো অত্যন্ত <span class="font-bold text-blue-800 bg-blue-100 px-1.5 py-0.5 rounded shadow-sm">Palatable</span> <span class="text-lime-700 font-bold">(সুস্বাদু / রুচিকর)</span>!" তার রাগ মুহূর্তেই উধাও হয়ে গেল। কিন্তু অধ্যাপক রায়হান দীর্ঘশ্বাস ফেলে বললেন, "এই মরুভূমিতে এর স্বাদ খুবই <span class="font-bold text-blue-800 bg-blue-100 px-1.5 py-0.5 rounded shadow-sm">Ephemeral</span> <span class="text-lime-700 font-bold">(ক্ষণস্থায়ী)</span>; পাতা তোলার কিছুক্ষণ পরই এটি তিতকুটে হয়ে যায়।"
+                </p>
+                <p>
+                    মি. রতন হঠাৎ করেই অত্যন্ত <span class="font-bold text-blue-800 bg-blue-100 px-1.5 py-0.5 rounded shadow-sm">Mawkish</span> <span class="text-lime-700 font-bold">(অতিমাত্রায় ভাবালু / ন্যাকা)</span> হয়ে উঠলেন এবং বলতে লাগলেন কীভাবে প্রকৃতির সৌন্দর্য এত দ্রুত হারিয়ে যায়। অধ্যাপক মুচকি হেসে বললেন, "এটাই এই পৃথিবীর বর্তমান <span class="font-bold text-blue-800 bg-blue-100 px-1.5 py-0.5 rounded shadow-sm">Zeitgeist</span> <span class="text-lime-700 font-bold">(যুগধর্ম / সময়কার মানসিকতা)</span>; আমরা ভালো কিছু পেলেও ধরে রাখতে পারি না। তবে আমাদের এই হতাশা এখন <span class="font-bold text-blue-800 bg-blue-100 px-1.5 py-0.5 rounded shadow-sm">Ubiquitous</span> <span class="text-lime-700 font-bold">(সর্বব্যাপী / সর্বত্র বিদ্যমান)</span> হয়ে উঠেছে।"
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-black mb-6 flex items-center gap-3 px-2">
+                <i class="fas fa-layer-group text-blue-600"></i> Word Breakdown
+            </h2>
+            
+            <div id="word-breakdown-container" class="grid grid-cols-1 gap-6">
+                <!-- Word cards will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="mb-8 mt-12 border-t-4 border-dashed border-blue-200 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 px-2">
+                <h2 class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-tasks text-blue-600"></i> Knowledge Check (MCQs)
+                </h2>
+                <button onclick="copyMCQs()" class="mt-4 md:mt-0 bg-white hover:bg-gray-50 text-blue-700 font-bold py-2 px-4 rounded-lg shadow transition-all flex items-center gap-2 border border-blue-200">
+                    <i class="fas fa-copy"></i> Copy MCQs
+                </button>
+            </div>
+            
+            <div id="mcq-container" class="space-y-4">
+                <!-- MCQs will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-8 bg-gradient-to-r from-blue-900 to-lime-900 text-white relative overflow-hidden mt-8">
+            <div class="absolute -right-10 -bottom-10 opacity-10">
+                <i class="fas fa-clipboard-list text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-blue-50">
+                    <i class="fas fa-list-check text-lime-400"></i> Summary List
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 bg-lime-500 hover:bg-lime-400 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 border border-lime-400">
+                    <i class="fas fa-copy"></i> Copy List
+                </button>
+            </div>
+            
+            <div class="bg-black/40 p-5 rounded-xl border border-lime-500/30 font-mono text-sm leading-relaxed overflow-x-auto z-10 relative bn-text">
+<pre id="summaryText" class="whitespace-pre-wrap text-lime-50 font-bold"></pre>
+            </div>
+        </section>
+
+        <!-- Navigation Buttons -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 mb-4">
+            <a href="https://classcaddy.netlify.app/vocabs/day9" class="w-full sm:w-auto text-center bg-white hover:bg-blue-50 text-blue-700 font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-blue-200 hover:border-blue-400 group">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Previous (Day-9)
+            </a>
+            <a href="https://classcaddy.netlify.app/vocabs/day11" class="w-full sm:w-auto text-center bg-gradient-to-r from-blue-600 to-lime-600 hover:from-blue-700 hover:to-lime-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-transparent hover:shadow-lg transform hover:-translate-y-0.5 group">
+                Next (Day-11) <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-700 text-sm mt-8 pb-8 font-bold">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i id="toast-icon" class="fas fa-check-circle mr-2"></i><span id="toast-message">Copied!</span></div>
+
+    <script>
+        const wordData = [
+            {
+                id: 1,
+                word: "Mawkish",
+                pronunciation: "মকিশ",
+                bnTitle: "(অতিমাত্রায় ভাবালু / ন্যাকা)",
+                theme: { border: "border-pink-500", text: "text-pink-700" },
+                syn: { en: "Sentimental", pronunciation: "সেন্টিমেন্টাল", bn: "(ভাবপ্রবণ)", ex: "She cried over the sentimental movie.", exBn: "(সে ভাবপ্রবণ সিনেমাটি দেখে কেঁদেছিল।)" },
+                ant: { en: "Unemotional", pronunciation: "আনইমোশনাল", bn: "(আবেগহীন)", ex: "He remained unemotional during the sad speech.", exBn: "(দুঃখজনক বক্তৃতার সময় সে আবেগহীন ছিল।)" },
+                origin: "পুরানো নর্স শব্দ 'maðok' (ম্যাগট বা পোকা) থেকে এসেছে। মূলত এর অর্থ ছিল স্বাদহীন বা বমি উদ্রেককারী, যা পরে অতিমাত্রায় আবেগপূর্ণ বা ন্যাকা আচরণকে বোঝাতে ব্যবহৃত হয়।",
+                mnemonic: "'Mock' (মস্করা) শব্দটি দিয়ে মনে রাখুন। কেউ যখন অতিরিক্ত ন্যাকা বা ভাবালু আচরণ করে, তখন সবাই তাকে নিয়ে Mock করে।",
+                sentences: [
+                    { en: "The love letter was far too mawkish for my taste.", bn: "(প্রেমের চিঠিটি আমার রুচির জন্য খুব বেশি ন্যাকা বা ভাবালু ছিল।)" },
+                    { en: "She gave a mawkish speech about her childhood.", bn: "(সে তার শৈশব সম্পর্কে একটি অতিমাত্রায় ভাবালু বক্তৃতা দিয়েছিল।)" },
+                    { en: "I dislike movies with mawkish and predictable endings.", bn: "(আমি ন্যাকা এবং অনুমানযোগ্য সমাপ্তিযুক্ত সিনেমা অপছন্দ করি।)" },
+                    { en: "He tried to sound romantic, but it came off as mawkish.", bn: "(সে রোমান্টিক হওয়ার চেষ্টা করেছিল, কিন্তু এটি ন্যাকা শোনাল।)" },
+                    { en: "The poem was criticized for being overly mawkish.", bn: "(কবিতাটি অতিমাত্রায় ভাবপ্রবণ হওয়ার কারণে সমালোচিত হয়েছিল।)" }
+                ]
+            },
+            {
+                id: 2,
+                word: "Psoriasis",
+                pronunciation: "সোরিয়াসিস",
+                bnTitle: "(সোরিয়াসিস / একধরনের চর্মরোগ)",
+                theme: { border: "border-red-500", text: "text-red-700" },
+                syn: { en: "Dermatosis", pronunciation: "ডার্মাটোসিস", bn: "(চর্মরোগ)", ex: "He consulted a doctor for his dermatosis.", exBn: "(সে তার চর্মরোগের জন্য ডাক্তারের পরামর্শ নিয়েছিল।)" },
+                ant: { en: "Healthy skin", pronunciation: "হেলদি স্কিন", bn: "(সুস্থ ত্বক)", ex: "A good diet promotes healthy skin.", exBn: "(সুষম খাদ্য সুস্থ ত্বকের উন্নতি করে।)" },
+                origin: "গ্রীক শব্দ 'psōriasis' থেকে এসেছে, যার মূল শব্দ 'psōra' মানে 'চুলকানি'। এটি ত্বকের একটি দীর্ঘস্থায়ী রোগ যেখানে লাল ও শুষ্ক দাগ দেখা দেয়।",
+                mnemonic: "'Sore' (ঘা) শব্দটি দিয়ে মনে রাখুন। এটি এমন একটি রোগ যেখানে ত্বকে ঘা, লাল দাগ বা চুলকানি হয়।",
+                sentences: [
+                    { en: "He has been suffering from psoriasis for ten years.", bn: "(সে দশ বছর ধরে সোরিয়াসিসে ভুগছে।)" },
+                    { en: "Psoriasis causes red, itchy patches on the skin.", bn: "(সোরিয়াসিস ত্বকে লাল, চুলকানিযুক্ত দাগের সৃষ্টি করে।)" },
+                    { en: "Stress can sometimes make psoriasis worse.", bn: "(মানসিক চাপ কখনও কখনও সোরিয়াসিসকে আরও খারাপ করতে পারে।)" },
+                    { en: "There is no complete cure for psoriasis yet.", bn: "(সোরিয়াসিসের এখনও কোনো সম্পূর্ণ নিরাময় নেই।)" },
+                    { en: "The doctor prescribed a special cream for her psoriasis.", bn: "(ডাক্তার তার সোরিয়াসিসের জন্য একটি বিশেষ ক্রিম লিখে দিয়েছেন।)" }
+                ]
+            },
+            {
+                id: 3,
+                word: "Xeric",
+                pronunciation: "জেরিক",
+                bnTitle: "(অত্যন্ত শুষ্ক)",
+                theme: { border: "border-orange-500", text: "text-orange-700" },
+                syn: { en: "Arid", pronunciation: "অ্যারিড", bn: "(শুষ্ক / খরা)", ex: "The camel is perfectly adapted to the arid desert.", exBn: "(উট শুষ্ক মরুভূমির সাথে পুরোপুরি খাপ খাইয়ে নিয়েছে।)" },
+                ant: { en: "Humid", pronunciation: "হিউমিড", bn: "(স্যাঁতসেঁতে / আর্দ্র)", ex: "The jungle has a very hot and humid climate.", exBn: "(জঙ্গলে অত্যন্ত গরম এবং স্যাঁতসেঁতে জলবায়ু রয়েছে।)" },
+                origin: "গ্রীক শব্দ 'xēros' থেকে এসেছে, যার অর্থ 'শুষ্ক'। এটি সাধারণত উদ্ভিদবিদ্যা বা বাস্তুশাস্ত্রে এমন পরিবেশ বোঝাতে ব্যবহৃত হয় যেখানে খুব কম আর্দ্রতা থাকে।",
+                mnemonic: "'Zero' (জিরো) শব্দটি দিয়ে মনে রাখুন। যেখানে আর্দ্রতা বা পানির পরিমাণ একদম Zero, সেটাই Xeric বা অত্যন্ত শুষ্ক পরিবেশ।",
+                sentences: [
+                    { en: "Cactus plants thrive in xeric environments.", bn: "(ক্যাকটাস গাছ অত্যন্ত শুষ্ক পরিবেশে ভালোভাবে বৃদ্ধি পায়।)" },
+                    { en: "The xeric landscape had almost no vegetation.", bn: "(শুষ্ক প্রাকৃতিক দৃশ্যে প্রায় কোনো গাছপালা ছিল না।)" },
+                    { en: "Scientists are studying animals living in xeric regions.", bn: "(বিজ্ঞানীরা শুষ্ক অঞ্চলে বসবাসকারী প্রাণীদের নিয়ে গবেষণা করছেন।)" },
+                    { en: "Xeric conditions make it impossible to grow rice.", bn: "(অত্যন্ত শুষ্ক অবস্থা ধান চাষ করা অসম্ভব করে তোলে।)" },
+                    { en: "They traveled across a harsh, xeric desert.", bn: "(তারা একটি কঠোর, শুষ্ক মরুভূমি পার হয়েছিল।)" }
+                ]
+            },
+            {
+                id: 4,
+                word: "Zeitgeist",
+                pronunciation: "জাইটগাইস্ট",
+                bnTitle: "(যুগধর্ম / সময়কার মানসিকতা)",
+                theme: { border: "border-blue-500", text: "text-blue-700" },
+                syn: { en: "Trend", pronunciation: "ট্রেন্ড", bn: "(প্রবণতা)", ex: "The new fashion trend caught on quickly.", exBn: "(নতুন ফ্যাশন প্রবণতাটি দ্রুত জনপ্রিয় হয়ে ওঠে।)" },
+                ant: { en: "Tradition", pronunciation: "ট্র্যাডিশন", bn: "(ঐতিহ্য)", ex: "We celebrate the festival according to ancient tradition.", exBn: "(আমরা প্রাচীন ঐতিহ্য অনুযায়ী উৎসব উদযাপন করি।)" },
+                origin: "জার্মান শব্দ থেকে এসেছে, যেখানে 'Zeit' মানে 'সময়' এবং 'Geist' মানে 'আত্মা'। এটি কোনো নির্দিষ্ট যুগ বা সময়ের মূল ধারণা, বিশ্বাস বা মানসিকতাকে বোঝায়।",
+                mnemonic: "'Zeit' (সময়) + 'Geist' (Ghost বা আত্মা) = যুগের আত্মা। অর্থাৎ কোনো নির্দিষ্ট সময়ের মানুষের মূল চিন্তাভাবনা বা ট্রেন্ড।",
+                sentences: [
+                    { en: "The movie perfectly captures the zeitgeist of the 1980s.", bn: "(সিনেমাটি ১৯৮০-এর দশকের যুগধর্মকে নিখুঁতভাবে ধারণ করেছে।)" },
+                    { en: "His novels reflect the cultural zeitgeist of his time.", bn: "(তার উপন্যাসগুলো তার সময়ের সাংস্কৃতিক মানসিকতাকে প্রতিফলিত করে।)" },
+                    { en: "Understanding the zeitgeist is important for a marketer.", bn: "(যুগধর্ম বা সময়ের ট্রেন্ড বোঝা একজন মার্কেটারের জন্য গুরুত্বপূর্ণ।)" },
+                    { en: "The song became an anthem for the national zeitgeist.", bn: "(গানটি জাতীয় যুগধর্মের একটি সংগীত হয়ে উঠেছিল।)" },
+                    { en: "It is hard to define the exact zeitgeist of today's digital age.", bn: "(আজকের ডিজিটাল যুগের সঠিক মানসিকতা সংজ্ঞায়িত করা কঠিন।)" }
+                ]
+            },
+            {
+                id: 5,
+                word: "Ubiquitous",
+                pronunciation: "ইউবিকুইটাস",
+                bnTitle: "(সর্বব্যাপী / সর্বত্র বিদ্যমান)",
+                theme: { border: "border-purple-500", text: "text-purple-700" },
+                syn: { en: "Omnipresent", pronunciation: "অমনিনপ্রেজেন্ট", bn: "(সর্বত্র বিরাজমান)", ex: "God is considered to be omnipresent.", exBn: "(ঈশ্বরকে সর্বত্র বিরাজমান বলে মনে করা হয়।)" },
+                ant: { en: "Rare", pronunciation: "রেয়ার", bn: "(বিরল)", ex: "This kind of diamond is extremely rare.", exBn: "(এই ধরনের হীরা অত্যন্ত বিরল।)" },
+                origin: "ল্যাটিন শব্দ 'ubique' থেকে এসেছে, যার অর্থ 'সব জায়গায়'। যে ব্যক্তি বা বস্তু একই সাথে সব জায়গায় উপস্থিত থাকে বলে মনে হয়।",
+                mnemonic: "'Mosquito' (মশা) এর কথা ভাবুন। মশা আমাদের দেশে Ubiquitous, অর্থাৎ সব জায়গায় বিরাজমান, যাকে সহজে এড়ানো যায় না।",
+                sentences: [
+                    { en: "Smartphones have become ubiquitous in modern society.", bn: "(আধুনিক সমাজে স্মার্টফোন সর্বব্যাপী হয়ে উঠেছে।)" },
+                    { en: "The company's logo is ubiquitous across the city.", bn: "(কোম্পানির লোগোটি পুরো শহর জুড়ে সর্বত্র বিদ্যমান।)" },
+                    { en: "Coffee shops are ubiquitous in this neighborhood.", bn: "(এই পাড়ায় কফির দোকান সর্বত্র বিদ্যমান।)" },
+                    { en: "He is a ubiquitous figure in the fashion industry.", bn: "(তিনি ফ্যাশন শিল্পে একটি সর্বত্র পরিচিত বা সর্বব্যাপী ব্যক্তিত্ব।)" },
+                    { en: "Plastic waste is a ubiquitous problem in our oceans.", bn: "(প্লাস্টিক বর্জ্য আমাদের মহাসাগরগুলোতে একটি সর্বব্যাপী সমস্যা।)" }
+                ]
+            },
+            {
+                id: 6,
+                word: "Pugnacious",
+                pronunciation: "পাগনেশাস",
+                bnTitle: "(ঝগড়াটে / লড়াকু)",
+                theme: { border: "border-amber-500", text: "text-amber-700" },
+                syn: { en: "Combative", pronunciation: "কমব্যাটিভ", bn: "(লড়াকু / মারমুখী)", ex: "The player took a combative stance.", exBn: "(খেলোয়াড়টি একটি মারমুখী অবস্থান নিয়েছিল।)" },
+                ant: { en: "Peaceful", pronunciation: "পিসফুল", bn: "(শান্তিপূর্ণ)", ex: "The village is very quiet and peaceful.", exBn: "(গ্রামটি খুব শান্ত এবং শান্তিপূর্ণ।)" },
+                origin: "ল্যাটিন 'pugnax' থেকে এসেছে, যার মূল শব্দ 'pugnare' (লড়াই করা)। যে ব্যক্তি সহজেই ঝগড়া বা মারামারি করতে প্রস্তুত থাকে।",
+                mnemonic: "'Pug' (পাগ কুকুর) দিয়ে মনে রাখুন। পাগ কুকুরগুলো দেখতে ছোট হলেও খুব রাগী ও ঝগড়াটে (Pugnacious) প্রকৃতির হয়।",
+                sentences: [
+                    { en: "The pugnacious dog barked at every stranger.", bn: "(ঝগড়াটে কুকুরটি প্রতিটি অপরিচিত লোককে দেখে ঘেউ ঘেউ করত।)" },
+                    { en: "His pugnacious attitude caused many problems at work.", bn: "(তার লড়াকু বা ঝগড়াটে মনোভাব কর্মক্ষেত্রে অনেক সমস্যার সৃষ্টি করেছিল।)" },
+                    { en: "The politician was known for his pugnacious debating style.", bn: "(রাজনীতিবিদ তার লড়াকু বিতর্কের শৈলীর জন্য পরিচিত ছিলেন।)" },
+                    { en: "I try to avoid pugnacious people who love to argue.", bn: "(আমি ঝগড়াটে লোকদের এড়িয়ে চলার চেষ্টা করি যারা তর্ক করতে ভালোবাসে।)" },
+                    { en: "The little boy was quite pugnacious when someone took his toys.", bn: "(কেউ তার খেলনা নিয়ে গেলে ছোট ছেলেটি বেশ মারমুখী হয়ে উঠত।)" }
+                ]
+            },
+            {
+                id: 7,
+                word: "Palatable",
+                pronunciation: "প্যালাটেবল",
+                bnTitle: "(সুস্বাদু / রুচিকর)",
+                theme: { border: "border-green-500", text: "text-green-700" },
+                syn: { en: "Tasty", pronunciation: "টেস্টি", bn: "(সুস্বাদু)", ex: "My mother cooked a very tasty meal.", exBn: "(আমার মা খুব সুস্বাদু খাবার রান্না করেছিলেন।)" },
+                ant: { en: "Tasteless", pronunciation: "টেস্টলেস", bn: "(স্বাদহীন)", ex: "The hospital food was completely tasteless.", exBn: "(হাসপাতালের খাবার পুরোপুরি স্বাদহীন ছিল।)" },
+                origin: "ল্যাটিন 'palatum' (মুখের তালু) থেকে এসেছে। যে খাবার স্বাদযুক্ত বা মনের মতো গ্রহণীয়।",
+                mnemonic: "'Plate-able' (প্লেট-এবল) দিয়ে মনে রাখুন। যে খাবার এতোটাই সুস্বাদু যে প্লেটে নেওয়ার যোগ্য, সেটাই Palatable।",
+                sentences: [
+                    { en: "The chef prepared a highly palatable dish.", bn: "(শেফ একটি অত্যন্ত সুস্বাদু খাবার তৈরি করেছিলেন।)" },
+                    { en: "They added spices to make the food more palatable.", bn: "(খাবারটিকে আরও রুচিকর করার জন্য তারা মশলা যোগ করেছিল।)" },
+                    { en: "The manager's offer was not very palatable to the workers.", bn: "(ম্যানেজারের প্রস্তাবটি শ্রমিকদের কাছে খুব বেশি গ্রহণীয় বা রুচিকর ছিল না।)" },
+                    { en: "Fresh water is much more palatable than salty water.", bn: "(লবণাক্ত জলের চেয়ে মিঠা জল অনেক বেশি সুস্বাদু।)" },
+                    { en: "He tried to make the difficult truth palatable to his friend.", bn: "(সে কঠিন সত্যটিকে তার বন্ধুর কাছে গ্রহণযোগ্য করার চেষ্টা করেছিল।)" }
+                ]
+            },
+            {
+                id: 8,
+                word: "Ephemeral",
+                pronunciation: "ইফেমেরাল",
+                bnTitle: "(ক্ষণস্থায়ী / স্বল্পায়ু)",
+                theme: { border: "border-cyan-500", text: "text-cyan-700" },
+                syn: { en: "Transient", pronunciation: "ট্রানজিয়েন্ট", bn: "(অস্থায়ী)", ex: "Joy and sorrow are transient emotions.", exBn: "(আনন্দ এবং দুঃখ অস্থায়ী আবেগ।)" },
+                ant: { en: "Permanent", pronunciation: "পার্মানেন্ট", bn: "(স্থায়ী)", ex: "He is looking for a permanent job.", exBn: "(সে একটি স্থায়ী চাকরি খুঁজছে।)" },
+                origin: "গ্রীক শব্দ 'ephēmeros' থেকে এসেছে (epi 'উপরে' + hēmera 'দিন'), যার আক্ষরিক অর্থ 'যা কেবল একদিন স্থায়ী হয়'।",
+                mnemonic: "'E-frame-ral' দিয়ে মনে রাখুন। একটি ফ্রেমে (frame) বাঁধানো ছবি চিরকাল থাকে, কিন্তু বাস্তবের সুন্দর মুহূর্তগুলো 'Ephemeral' (ক্ষণস্থায়ী) হয়।",
+                sentences: [
+                    { en: "Fame and wealth are often ephemeral.", bn: "(খ্যাতি এবং সম্পদ প্রায়শই ক্ষণস্থায়ী হয়।)" },
+                    { en: "The beauty of a rainbow is ephemeral.", bn: "(রংধনুর সৌন্দর্য ক্ষণস্থায়ী।)" },
+                    { en: "He enjoyed the ephemeral thrill of the roller coaster.", bn: "(সে রোলার কোস্টারের ক্ষণস্থায়ী রোমাঞ্চ উপভোগ করেছিল।)" },
+                    { en: "Many internet trends are completely ephemeral.", bn: "(অনেক ইন্টারনেট ট্রেন্ড সম্পূর্ণ ক্ষণস্থায়ী হয়।)" },
+                    { en: "The flower blooms with an ephemeral elegance.", bn: "(ফুলটি একটি ক্ষণস্থায়ী কমনীয়তার সাথে ফুটে ওঠে।)" }
+                ]
+            },
+            {
+                id: 9,
+                word: "Quibble",
+                pronunciation: "কুইবল",
+                bnTitle: "(তুচ্ছ বিষয়ে তর্ক করা)",
+                theme: { border: "border-teal-500", text: "text-teal-700" },
+                syn: { en: "Argue", pronunciation: "আর্গিউ", bn: "(তর্ক করা)", ex: "Please do not argue with the referee.", exBn: "(দয়া করে রেফারির সাথে তর্ক করবেন না।)" },
+                ant: { en: "Agree", pronunciation: "অ্যাগ্রি", bn: "(একমত হওয়া)", ex: "I agree with your brilliant idea.", exBn: "(আমি আপনার চমৎকার ধারণার সাথে একমত।)" },
+                origin: "ল্যাটিন 'quibus' (যার দ্বারা বা কী জিনিস দ্বারা) থেকে এসেছে। মূলত এটি আইনি নথিতে ব্যবহৃত হতো, পরে এটি 'তুচ্ছ বা ছোটখাটো বিষয়ে তর্ক করা' বোঝাতে শুরু করে।",
+                mnemonic: "'Pebble' (নুড়ি পাথর) এর সাথে মিলিয়ে মনে রাখুন। নুড়ি পাথরের মতো ছোট বা তুচ্ছ বিষয় নিয়ে তর্ক করা হলো Quibble।",
+                sentences: [
+                    { en: "Let us not quibble over a few dollars.", bn: "(আসুন আমরা কয়েক ডলার নিয়ে তুচ্ছ তর্ক না করি।)" },
+                    { en: "He always finds something to quibble about in my reports.", bn: "(সে সবসময় আমার প্রতিবেদনে তুচ্ছ আপত্তি তোলার মতো কিছু খুঁজে পায়।)" },
+                    { en: "They spent hours quibbling about the movie's ending.", bn: "(তারা সিনেমার শেষ পরিণতি নিয়ে তুচ্ছ তর্ক করতে ঘণ্টার পর ঘণ্টা কাটিয়েছিল।)" },
+                    { en: "My only quibble with this phone is its battery life.", bn: "(এই ফোনটি নিয়ে আমার একমাত্র ছোটখাটো আপত্তি হলো এর ব্যাটারি লাইফ।)" },
+                    { en: "We are in agreement; there is no need to quibble.", bn: "(আমরা একমত; অযথা তর্ক করার কোনো প্রয়োজন নেই।)" }
+                ]
+            },
+            {
+                id: 10,
+                word: "Cavil",
+                pronunciation: "ক্যাভিল",
+                bnTitle: "(অযথা খুঁত ধরা)",
+                theme: { border: "border-gray-800", text: "text-gray-900" },
+                syn: { en: "Complain", pronunciation: "কমপ্লেইন", bn: "(অভিযোগ করা)", ex: "She always finds a reason to complain.", exBn: "(সে সবসময় অভিযোগ করার একটা কারণ খুঁজে পায়।)" },
+                ant: { en: "Praise", pronunciation: "প্রেইজ", bn: "(প্রশংসা করা)", ex: "The teacher will praise the hardworking student.", exBn: "(শিক্ষক কঠোর পরিশ্রমী ছাত্রের প্রশংসা করবেন।)" },
+                origin: "ল্যাটিন শব্দ 'cavillari' থেকে এসেছে, যার অর্থ 'মস্করা করা' বা 'তুচ্ছ আপত্তি তোলা'। এটি Quibble এর খুব কাছাকাছি একটি শব্দ।",
+                mnemonic: "'Evil' (দুষ্ট) এর সাথে মিলিয়ে মনে রাখুন। যারা Evil বা দুষ্ট প্রকৃতির, তারা সবসময় অন্যের কাজের অযথা খুঁত ধরে বা Cavil করে।",
+                sentences: [
+                    { en: "It is unfair to cavil at his small mistakes.", bn: "(তার ছোট ভুলের জন্য অযথা খুঁত ধরাটা অন্যায়।)" },
+                    { en: "The critic will cavil about every detail of the play.", bn: "(সমালোচক নাটকের প্রতিটি খুঁটিনাটি নিয়ে অযথা খুঁত ধরবেন।)" },
+                    { en: "I hate people who constantly cavil and complain.", bn: "(যারা ক্রমাগত অযথা আপত্তি তোলে এবং অভিযোগ করে আমি তাদের ঘৃণা করি।)" },
+                    { en: "Despite the excellent service, he found a reason to cavil.", bn: "(চমৎকার সেবা সত্ত্বেও, সে খুঁত ধরার একটি কারণ খুঁজে পেয়েছিল।)" },
+                    { en: "She accepted the gift without a single cavil.", bn: "(সে কোনো অযথা আপত্তি ছাড়াই উপহারটি গ্রহণ করেছিল।)" }
+                ]
+            }
+        ];
+
+        // --- STREAMING_CHUNK: Setting up MCQ Data... ---
+        const mcqData = [
+            {
+                q: "What does the word 'Mawkish' mean?",
+                options: { a: "Extremely funny", b: "Excessively sentimental in a sickly way", c: "Very hard and solid", d: "Highly intelligent" },
+                correct: "b",
+                note: "'Mawkish' originally meant slightly nauseating, but today it is used to describe something that is overly sentimental, cheesy, or 'nyaka' in Bengali."
+            },
+            {
+                q: "Which word correctly acts as an antonym for 'Ephemeral'?",
+                options: { a: "Transient", b: "Short-lived", c: "Permanent", d: "Temporary" },
+                correct: "c",
+                note: "'Ephemeral' means lasting for a very short time. Therefore, 'Permanent' (lasting indefinitely) is its exact antonym."
+            },
+            {
+                q: "What is 'Psoriasis'?",
+                options: { a: "A disease of the lungs", b: "A rare mental condition", c: "A chronic skin disease", d: "A type of ancient dinosaur" },
+                correct: "c",
+                note: "Psoriasis is a medical term for a chronic skin disease characterized by red, itchy, scaly patches."
+            },
+            {
+                q: "If an environment is described as 'Xeric', it means it is:",
+                options: { a: "Extremely wet", b: "Covered in snow", c: "Highly populated", d: "Very dry" },
+                correct: "d",
+                note: "Derived from the Greek word 'xēros', xeric refers to an environment or habitat containing little moisture; very dry."
+            },
+            {
+                q: "What does 'Zeitgeist' refer to?",
+                options: { a: "A ghost story", b: "The defining spirit or mood of a particular period of history", c: "A German type of food", d: "A mechanical clock" },
+                correct: "b",
+                note: "Zeitgeist literally translates from German as 'time spirit'. It refers to the general intellectual, moral, and cultural climate of an era."
+            },
+            {
+                q: "Which word is a synonym for 'Ubiquitous'?",
+                options: { a: "Rare", b: "Invisible", c: "Omnipresent", d: "Unique" },
+                correct: "c",
+                note: "'Ubiquitous' means present, appearing, or found everywhere. 'Omnipresent' shares this exact definition."
+            },
+            {
+                q: "If someone is 'Pugnacious', they are likely to:",
+                options: { a: "Run away from a fight", b: "Start an argument or fight easily", c: "Give money to the poor", d: "Stay completely silent" },
+                correct: "b",
+                note: "Pugnacious comes from the Latin 'pugnare' (to fight) and describes someone who is combative, aggressive, and eager to argue."
+            },
+            {
+                q: "Which of the following describes food that is 'Palatable'?",
+                options: { a: "Disgusting", b: "Poisonous", c: "Pleasant to taste", d: "Extremely spicy" },
+                correct: "c",
+                note: "'Palatable' refers to food or drink that is acceptable or agreeable to the palate/taste."
+            },
+            {
+                q: "Fill in the blank: Please do not ______ over the price; it is already very cheap.",
+                options: { a: "Quibble", b: "Palatable", c: "Ubiquitous", d: "Xeric" },
+                correct: "a",
+                note: "To 'quibble' means to argue or raise objections about a trivial matter, such as bargaining over a very cheap price."
+            },
+            {
+                q: "Which of the following words is essentially a synonym for 'Quibble'?",
+                options: { a: "Cavil", b: "Zeitgeist", c: "Psoriasis", d: "Mawkish" },
+                correct: "a",
+                note: "Both 'Quibble' and 'Cavil' mean to make petty or unnecessary objections. They are synonyms."
+            },
+            {
+                q: "Fill in the blank: The internet has become a ______ part of modern daily life.",
+                options: { a: "Pugnacious", b: "Ubiquitous", c: "Xeric", d: "Mawkish" },
+                correct: "b",
+                note: "The internet is found everywhere in modern life, making 'ubiquitous' the perfect fit."
+            },
+            {
+                q: "What is the antonym of 'Pugnacious'?",
+                options: { a: "Combative", b: "Aggressive", c: "Peaceful", d: "Hostile" },
+                correct: "c",
+                note: "Since a pugnacious person loves to fight, a 'Peaceful' person who avoids conflict is the exact opposite."
+            },
+            {
+                q: "Analogy -> Psoriasis : Skin :: Astigmatism : ?",
+                options: { a: "Ears", b: "Eyes", c: "Lungs", d: "Bones" },
+                correct: "b",
+                note: "Psoriasis is a condition affecting the skin. Astigmatism is a condition affecting the eyes."
+            },
+            {
+                q: "Fill in the blank: The cactus is famous for its ability to survive in a harsh, ______ environment.",
+                options: { a: "Palatable", b: "Ephemeral", c: "Xeric", d: "Pugnacious" },
+                correct: "c",
+                note: "Cacti live in very dry deserts. 'Xeric' describes an extremely dry environment."
+            },
+            {
+                q: "Which word best completes the sentence? 'The critic gave the movie a terrible review, complaining about its ______ and overly emotional ending.'",
+                options: { a: "Mawkish", b: "Ubiquitous", c: "Xeric", d: "Palatable" },
+                correct: "a",
+                note: "A movie with an 'overly emotional' ending is best described as 'mawkish' (sickly sentimental)."
+            },
+            {
+                q: "What is the relationship in the analogy 'Ephemeral : Permanent'?",
+                options: { a: "They are synonyms", b: "They are antonyms", c: "One is a cause, the other is an effect", d: "They both describe food" },
+                correct: "b",
+                note: "Ephemeral means short-lived, while permanent means lasting forever. Thus, they are antonyms."
+            },
+            {
+                q: "If a manager tends to 'Cavil' during meetings, what is he doing?",
+                options: { a: "Praising employees", b: "Sleeping", c: "Making petty objections", d: "Offering constructive advice" },
+                correct: "c",
+                note: "To cavil means to make petty, unnecessary, or annoying objections (অযথা খুঁত ধরা)."
+            },
+            {
+                q: "Which word would you use to describe a meal that isn't great, but is acceptable enough to eat?",
+                options: { a: "Pugnacious", b: "Palatable", c: "Zeitgeist", d: "Ephemeral" },
+                correct: "b",
+                note: "Palatable means pleasant or acceptable to the taste."
+            },
+            {
+                q: "Fill in the blank: The Beatles perfectly captured the ______ of the 1960s with their music.",
+                options: { a: "Psoriasis", b: "Cavil", c: "Zeitgeist", d: "Xeric" },
+                correct: "c",
+                note: "The Beatles captured the spirit, mood, and cultural trend of their era, which is the definition of 'Zeitgeist'."
+            },
+            {
+                q: "Which word is derived from the Greek word for 'lasting only a day'?",
+                options: { a: "Ubiquitous", b: "Ephemeral", c: "Mawkish", d: "Quibble" },
+                correct: "b",
+                note: "'Ephemeral' comes from Greek 'ephēmeros', meaning lasting only for a day or a very short time."
+            },
+            {
+                q: "What is the antonym of 'Mawkish'?",
+                options: { a: "Sentimental", b: "Emotional", c: "Unemotional", d: "Weepy" },
+                correct: "c",
+                note: "Mawkish means overly emotional or sentimental, making 'unemotional' the direct antonym."
+            },
+            {
+                q: "If two friends are having a 'Quibble', they are:",
+                options: { a: "Having a serious physical fight", b: "Arguing over something trivial", c: "Sharing a palatable meal", d: "Suffering from psoriasis together" },
+                correct: "b",
+                note: "A quibble is a minor, trivial argument or objection."
+            },
+            {
+                q: "Analogy -> Ubiquitous : Rare :: Xeric : ?",
+                options: { a: "Dry", b: "Humid", c: "Hot", d: "Arid" },
+                correct: "b",
+                note: "Ubiquitous and Rare are antonyms. The antonym of Xeric (dry) is Humid (wet/damp)."
+            },
+            {
+                q: "Which word describes a bulldog that barks and snaps at every other dog it sees?",
+                options: { a: "Palatable", b: "Pugnacious", c: "Zeitgeist", d: "Ephemeral" },
+                correct: "b",
+                note: "A dog that constantly wants to fight is combative or 'Pugnacious'."
+            },
+            {
+                q: "Fill in the blank: Life is ______, so we should enjoy every single moment while it lasts.",
+                options: { a: "Ephemeral", b: "Ubiquitous", c: "Pugnacious", d: "Mawkish" },
+                correct: "a",
+                note: "Because life is short and temporary ('Ephemeral'), the advice to enjoy every moment makes logical sense."
+            }
+        ];
+
+        // --- STREAMING_CHUNK: Function to render the Word Breakdown ---
+        function renderWordBreakdown() {
+            const container = document.getElementById('word-breakdown-container');
+            let htmlContent = '';
+
+            wordData.forEach(data => {
+                let sentencesHtml = '';
+                data.sentences.forEach(s => {
+                    sentencesHtml += `
+                        <li>
+                            ${s.en}<br>
+                            <span class="text-xs text-black bn-text ml-5 block mt-0.5">${s.bn}</span>
+                        </li>
+                    `;
+                });
+
+                htmlContent += `
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 ${data.theme.border}">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold ${data.theme.text}">${data.id}. ${data.word} <span class="text-lg font-medium text-gray-500 ml-1">/${data.pronunciation}/</span> <span class="text-sm font-bold text-gray-700 bn-text ml-2">${data.bnTitle}</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: ${data.syn.en.split(' / ')[0]}</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: ${data.ant.en.split(' / ')[0]}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">${data.origin}</p>
+                    </div>
+
+                    <div class="mb-5 bg-yellow-50 p-4 rounded-xl border-l-4 border-yellow-400 shadow-sm">
+                        <h4 class="font-bold text-yellow-800 flex items-center gap-2 mb-1"><i class="fas fa-lightbulb text-yellow-500"></i> Mnemonic (স্মৃতিসূত্র)</h4>
+                        <p class="text-sm text-black font-bold bn-text leading-relaxed">${data.mnemonic}</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            ${sentencesHtml}
+                        </ul>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">${data.syn.en}</span> <span class="text-xs text-gray-500 ml-1">/${data.syn.pronunciation}/</span> <span class="bn-text text-sm font-bold text-black">${data.syn.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.syn.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.syn.exBn}</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">${data.ant.en}</span> <span class="text-xs text-gray-500 ml-1">/${data.ant.pronunciation}/</span> <span class="bn-text text-sm font-bold text-black">${data.ant.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.ant.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.ant.exBn}</p>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // --- STREAMING_CHUNK: Function to render the MCQs ---
+        function renderMCQs() {
+            const container = document.getElementById('mcq-container');
+            let htmlContent = '';
+
+            mcqData.forEach((mcq, index) => {
+                htmlContent += `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-lg text-black mb-3">${index + 1}. ${mcq.q}</h3>
+                    <ul class="space-y-2 mb-4 ml-2">
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">a.</span> ${mcq.options.a}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">b.</span> ${mcq.options.b}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">c.</span> ${mcq.options.c}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">d.</span> ${mcq.options.d}</li>
+                    </ul>
+                    
+                    <details class="group bg-blue-50 rounded-lg outline-none border border-blue-100">
+                        <summary class="cursor-pointer font-bold text-blue-700 px-4 py-2 flex items-center justify-between select-none">
+                            <span class="flex items-center gap-2"><i class="fas fa-eye"></i> Show Answer</span>
+                            <i class="fas fa-chevron-down transform group-open:rotate-180 transition-transform duration-300"></i>
+                        </summary>
+                        <div class="px-4 pb-4 pt-1 border-t border-blue-200 mt-1">
+                            <p class="text-black font-bold mb-2">Correct Answer: <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded uppercase">${mcq.correct}</span></p>
+                            <p class="text-sm text-black font-medium"><span class="font-bold">Note:</span> ${mcq.note}</p>
+                        </div>
+                    </details>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // --- STREAMING_CHUNK: Function to render the Summary List ---
+        function generateSummary() {
+            const summaryElement = document.getElementById('summaryText');
+            let summaryString = '';
+            wordData.forEach(data => {
+                // Word, Meaning - Synonym @ Antonym;
+                let meaning = data.bnTitle.replace(/[()]/g, '');
+                let syn = data.syn.en.split(' / ')[0];
+                let ant = data.ant.en.split(' / ')[0];
+                summaryString += `${data.word}, ${meaning} - ${syn} @ ${ant};\n`;
+            });
+            summaryElement.innerText = summaryString;
+        }
+
+        // --- STREAMING_CHUNK: Initialization and DOM Content Loaded ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderWordBreakdown();
+            renderMCQs();
+            generateSummary();
+        });
+
+        // --- STREAMING_CHUNK: Copy Functions ---
+        function copySummary() {
+            const summaryText = document.getElementById('summaryText').innerText;
+            copyTextToClipboard(summaryText, 'Summary list copied!');
+        }
+        
+        function copyStory() {
+            const storyTitle = document.getElementById('story-title').innerText.trim();
+            const storyParagraphs = document.querySelectorAll('#story-content p');
+            let storyText = storyTitle + '\n\n';
+            
+            storyParagraphs.forEach(p => {
+                storyText += p.innerText + '\n\n';
+            });
+            
+            copyTextToClipboard(storyText.trim(), 'Story copied!');
+        }
+
+        function copyMCQs() {
+            let copyText = '';
+            
+            mcqData.forEach((mcq, index) => {
+                copyText += `${index + 1}. ${mcq.q}\n`;
+                copyText += `a. ${mcq.options.a}\n`;
+                copyText += `b. ${mcq.options.b}\n`;
+                copyText += `c. ${mcq.options.c}\n`;
+                copyText += `d. ${mcq.options.d}\n`;
+                copyText += `correct answer: ${mcq.correct}\n`;
+                copyText += `Note: ${mcq.note}\n\n`;
+            });
+            
+            copyTextToClipboard(copyText.trim(), '25 MCQs copied exactly formatted!');
+        }
+
+        function copyTextToClipboard(text, successMessage) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(successMessage);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => showToast(successMessage)).catch(e => console.error("Clipboard API failed", e));
+                }
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toast-message");
+            toastMessage.innerText = message;
+            
+            toast.className = "show";
+            
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
