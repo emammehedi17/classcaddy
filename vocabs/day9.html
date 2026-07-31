@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 9 - Systematic Vocabulary Batch</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            500: '#000000', 
+                            600: '#000000', 
+                            700: '#000000', 
+                            800: '#000000', 
+                            900: '#000000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ecfeff; /* cyan-50 */
+            color: #000000; 
+        }
+        .bn-text {
+            font-family: 'Hind Siliguri', sans-serif;
+            color: #000000; 
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #0891b2; /* cyan-600 */
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-cyan-50 via-teal-50 to-amber-50 min-h-screen p-4 md:p-8 selection:bg-cyan-200 selection:text-cyan-900 text-black">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <header class="glass-card rounded-2xl shadow-lg p-6 md:p-8 mb-8 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-cyan-500 to-amber-500"></div>
+            
+            <div class="text-center md:text-left mb-6 md:mb-0 z-10">
+                <div class="inline-block px-3 py-1 bg-cyan-100 text-cyan-800 rounded-full text-sm font-bold mb-3">
+                    <i class="fas fa-calendar-day mr-2"></i>Daily Vocabulary
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-2 bg-gradient-to-r from-cyan-700 to-amber-600 gradient-text pb-1">
+                    Day 9
+                </h1>
+                <p class="text-black font-semibold flex items-center justify-center md:justify-start gap-2">
+                    <i class="fas fa-pen-nib text-cyan-600"></i>
+                    Created by: 
+                    <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-cyan-700 hover:text-cyan-900 hover:underline transition-colors font-bold relative group">
+                        Emam Mehedi
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-cyan-600 transition-all group-hover:w-full"></span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex-shrink-0 z-10 bg-white p-2 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300 border-2 border-cyan-100">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-24 h-24 md:w-28 md:h-28 rounded-lg">
+                <p class="text-center text-xs text-black mt-1 font-bold">Scan Me</p>
+            </div>
+        </header>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-10 mb-8 border-t-4 border-t-cyan-500 relative">
+            <div class="absolute -top-4 -right-4 text-cyan-200 opacity-20">
+                <i class="fas fa-pyramid text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 id="story-title" class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-globe-americas text-cyan-600"></i> ভিনদেশী রত্নগুচ্ছ (The Alien Cluster)
+                </h2>
+                <button onclick="copyStory()" class="mt-4 md:mt-0 bg-cyan-100 hover:bg-cyan-200 text-cyan-800 font-bold py-2 px-4 rounded-lg shadow-sm transition-all flex items-center gap-2 border border-cyan-300">
+                    <i class="fas fa-copy"></i> Copy Story
+                </button>
+            </div>
+            
+            <div id="story-content" class="bn-text text-lg md:text-xl text-black font-medium leading-relaxed space-y-4 bg-white/70 p-6 rounded-xl border border-cyan-100 shadow-inner">
+                <p>
+                    প্রত্নতত্ত্ববিদ ড. শিহাব প্রাচীন মিশরের একটি গোপন পিরামিড আবিষ্কার করলেন। পিরামিডের ভেতরে প্রবেশ করতেই তিনি দেখতে পেলেন তাদের <span class="font-bold text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded shadow-sm">Ancestors</span> <span class="text-amber-700 font-bold">(পূর্বপুরুষ)</span>-দের তৈরি প্রাচীন লিপি, যা পড়তে একজন দক্ষ ভাষাবিদের প্রয়োজন ছিল (যেমন, <span class="font-bold text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded shadow-sm">Devotee : Religion :: Linguist : Language</span>)। সেখানে একটি বেদিতে এক অদ্ভূত <span class="font-bold text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded shadow-sm">Alien</span> <span class="text-amber-700 font-bold">(ভিনদেশী / অপরিচিত)</span> যন্ত্র রাখা ছিল।
+                </p>
+                <p>
+                    যন্ত্রটির চারধারে একটি জাদুকরী পাথরের <span class="font-bold text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded shadow-sm">Cluster</span> <span class="text-amber-700 font-bold">(গুচ্ছ / স্তবক)</span> সাজানো ছিল, ঠিক যেমন আকাশে তারার গুচ্ছ (Star : Cluster :: Tree : Clump) থাকে। ড. শিহাব জানতেন যে এই যন্ত্রটিতে <span class="font-bold text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded shadow-sm">Infinite</span> <span class="text-amber-700 font-bold">(অসীম)</span> শক্তি লুকানো রয়েছে। প্রাচীন রাজারা তাদের <span class="font-bold text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded shadow-sm">Conjugal</span> <span class="text-amber-700 font-bold">(দাম্পত্য / বৈবাহিক)</span> জীবনে সুখ এবং রাজ্যের নিরাপত্তার জন্য এই যন্ত্রটির পূজা করত।
+                </p>
+                <p>
+                    তিনি অত্যন্ত <span class="font-bold text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded shadow-sm">Vigilant</span> <span class="text-amber-700 font-bold">(সতর্ক / সজাগ)</span> হয়ে যন্ত্রটির গায়ে হাত দিলেন, কারণ সামান্য ভুল হলেই সেটি চারপাশের সবকিছু পুড়িয়ে ছাই করে দিতে পারে। তিনি যন্ত্রটিতে একটি বিশেষ সংকেত দিতেই সেটি একটি <span class="font-bold text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded shadow-sm">Perpetual</span> <span class="text-amber-700 font-bold">(চিরস্থায়ী)</span> আলো নির্গত করতে শুরু করল। 
+                </p>
+                <p>
+                    তবে যন্ত্রটি চালু করতে হলে একটি গোপন মন্ত্র দিয়ে এর মূল শক্তিকে <span class="font-bold text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded shadow-sm">Ignite</span> <span class="text-amber-700 font-bold">(প্রজ্জ্বলিত করা / আগুন লাগানো)</span> করতে হবে। ড. শিহাব ভাবলেন, এই অসীম শক্তি যদি ভুল মানুষের হাতে পড়ে, তবে তারা পৃথিবীর বর্তমান সব নিয়মকানুন <span class="font-bold text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded shadow-sm">Abolish</span> <span class="text-amber-700 font-bold">(বাতিল করা)</span> করে ধ্বংস ডেকে আনবে। তাই তিনি যন্ত্রটির শক্তি পুনরায় ঘুম পাড়িয়ে রাখার সিদ্ধান্ত নিলেন।
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-black mb-6 flex items-center gap-3 px-2">
+                <i class="fas fa-layer-group text-cyan-600"></i> Word Breakdown
+            </h2>
+            
+            <div id="word-breakdown-container" class="grid grid-cols-1 gap-6">
+                <!-- Word cards will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="mb-8 mt-12 border-t-4 border-dashed border-cyan-200 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 px-2">
+                <h2 class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-tasks text-cyan-600"></i> Knowledge Check (MCQs)
+                </h2>
+                <button onclick="copyMCQs()" class="mt-4 md:mt-0 bg-white hover:bg-gray-50 text-cyan-700 font-bold py-2 px-4 rounded-lg shadow transition-all flex items-center gap-2 border border-cyan-200">
+                    <i class="fas fa-copy"></i> Copy MCQs
+                </button>
+            </div>
+            
+            <div id="mcq-container" class="space-y-4">
+                <!-- MCQs will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-8 bg-gradient-to-r from-cyan-900 to-amber-900 text-white relative overflow-hidden mt-8">
+            <div class="absolute -right-10 -bottom-10 opacity-10">
+                <i class="fas fa-clipboard-list text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-cyan-50">
+                    <i class="fas fa-list-check text-amber-400"></i> Summary List
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 bg-amber-500 hover:bg-amber-400 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 border border-amber-400">
+                    <i class="fas fa-copy"></i> Copy List
+                </button>
+            </div>
+            
+            <div class="bg-black/40 p-5 rounded-xl border border-amber-500/30 font-mono text-sm leading-relaxed overflow-x-auto z-10 relative bn-text">
+<pre id="summaryText" class="whitespace-pre-wrap text-amber-50 font-bold">Abolish, বাতিল করা - Cancel @ Establish;
+Conjugal, দাম্পত্য/বৈবাহিক - Bridal @ Single;
+Ignite, প্রজ্জ্বলিত করা/আগুন লাগানো - Set fire @ Extinguish;
+Perpetual, চিরস্থায়ী - Everlasting @ Temporary;
+Vigilant, সতর্ক/সজাগ - Watchful @ Careless;
+Ancestors, পূর্বপুরুষ - Forefathers @ Descendants;
+Infinite, অসীম - Limitless @ Limited;
+Devotee, ভক্ত/অনুরাগী - Follower @ Critic;
+Cluster, গুচ্ছ/স্তবক - Group @ Individual;
+Alien, ভিনদেশী/অপরিচিত - Foreigner @ Native;</pre>
+            </div>
+        </section>
+
+        <!-- Navigation Buttons -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 mb-4">
+            <a href="https://classcaddy.netlify.app/vocabs/day8" class="w-full sm:w-auto text-center bg-white hover:bg-cyan-50 text-cyan-700 font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-cyan-200 hover:border-cyan-400 group">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Previous (Day-8)
+            </a>
+            <a href="https://classcaddy.netlify.app/vocabs/day10" class="w-full sm:w-auto text-center bg-gradient-to-r from-cyan-600 to-amber-600 hover:from-cyan-700 hover:to-amber-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-transparent hover:shadow-lg transform hover:-translate-y-0.5 group">
+                Next (Day-10) <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-700 text-sm mt-8 pb-8 font-bold">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i id="toast-icon" class="fas fa-check-circle mr-2"></i><span id="toast-message">Copied!</span></div>
+
+    <script>
+        const wordData = [
+            {
+                id: 1,
+                word: "Abolish",
+                bnTitle: "(বাতিল করা / উচ্ছেদ করা)",
+                theme: { border: "border-red-500", text: "text-red-700" },
+                syn: { en: "Cancel", bn: "(বাতিল করা)", ex: "The meeting was canceled due to rain.", exBn: "(বৃষ্টির কারণে সভা বাতিল করা হয়েছিল।)" },
+                ant: { en: "Establish", bn: "(প্রতিষ্ঠা করা / স্থাপন করা)", ex: "They plan to establish a new school here.", exBn: "(তারা এখানে একটি নতুন স্কুল স্থাপনের পরিকল্পনা করেছে।)" },
+                origin: "ল্যাটিন শব্দ 'abolere' থেকে এসেছে, যার অর্থ 'ধ্বংস করা' বা 'নির্মূল করা'। সাধারণত কোনো নিয়ম, প্রথা বা আইন আনুষ্ঠানিকভাবে বাতিল করাকে বোঝায়।",
+                sentences: [
+                    { en: "The government decided to abolish the unfair tax.", bn: "(সরকার অন্যায্য কর বাতিল করার সিদ্ধান্ত নিয়েছে।)" },
+                    { en: "Slavery was abolished in America in 1865.", bn: "(১৮৬৫ সালে আমেরিকায় দাসপ্রথা উচ্ছেদ করা হয়েছিল।)" },
+                    { en: "They want to abolish the old educational system.", bn: "(তারা পুরানো শিক্ষাব্যবস্থা বাতিল করতে চায়।)" },
+                    { en: "Some people argue that we should abolish the death penalty.", bn: "(কিছু লোক যুক্তি দেয় যে আমাদের মৃত্যুদণ্ড বাতিল করা উচিত।)" },
+                    { en: "The king promised to abolish all cruel laws.", bn: "(রাজা সমস্ত নিষ্ঠুর আইন বাতিল করার প্রতিশ্রুতি দিয়েছিলেন।)" }
+                ]
+            },
+            {
+                id: 2,
+                word: "Conjugal",
+                bnTitle: "(দাম্পত্য / বৈবাহিক)",
+                theme: { border: "border-pink-500", text: "text-pink-700" },
+                syn: { en: "Bridal / Marital", bn: "(বৈবাহিক / বিবাহ সংক্রান্ত)", ex: "She looked beautiful in her bridal dress.", exBn: "(বৈবাহিক পোশাকে তাকে সুন্দর দেখাচ্ছিল।)" },
+                ant: { en: "Single", bn: "(অবিবাহিত / একা)", ex: "He has been single for five years.", exBn: "(সে পাঁচ বছর ধরে অবিবাহিত।)" },
+                origin: "ল্যাটিন 'conjugalis' থেকে এসেছে, যা 'conjux' (স্বামী বা স্ত্রী) থেকে গঠিত। এটি বিবাহ বা স্বামী-স্ত্রীর সম্পর্ক নির্দেশ করে।",
+                sentences: [
+                    { en: "They are celebrating 20 years of conjugal happiness.", bn: "(তারা ২০ বছরের দাম্পত্য সুখ উদযাপন করছে।)" },
+                    { en: "Conjugal harmony requires trust and respect.", bn: "(দাম্পত্য সম্প্রীতির জন্য বিশ্বাস এবং সম্মান প্রয়োজন।)" },
+                    { en: "The lawyer deals with conjugal disputes.", bn: "(আইনজীবী দাম্পত্য বিরোধ নিয়ে কাজ করেন।)" },
+                    { en: "Prisoners are sometimes allowed conjugal visits.", bn: "(বন্দীদের মাঝে মাঝে বৈবাহিক সাক্ষাতের অনুমতি দেওয়া হয়।)" },
+                    { en: "Love is the foundation of conjugal life.", bn: "(ভালোবাসা হলো দাম্পত্য জীবনের ভিত্তি।)" }
+                ]
+            },
+            {
+                id: 3,
+                word: "Ignite",
+                bnTitle: "(প্রজ্জ্বলিত করা / আগুন লাগানো)",
+                theme: { border: "border-orange-500", text: "text-orange-700" },
+                syn: { en: "Set fire / Kindle", bn: "(আগুন ধরানো)", ex: "He used dry leaves to set fire to the wood.", exBn: "(সে কাঠে আগুন ধরাতে শুকনো পাতা ব্যবহার করেছিল।)" },
+                ant: { en: "Extinguish", bn: "(নেভানো)", ex: "The firefighters quickly extinguished the flames.", exBn: "(ফায়ারফাইটাররা দ্রুত আগুন নিভিয়ে ফেলেছিল।)" },
+                origin: "ল্যাটিন 'ignire' থেকে এসেছে, যার মূল শব্দ 'ignis' মানে আগুন। কোনো কিছুতে আগুন লাগানো বা কারও মনে তীব্র আবেগ সৃষ্টি করাকে বোঝায়।",
+                sentences: [
+                    { en: "A single spark can ignite dry grass.", bn: "(একটি মাত্র স্ফুলিঙ্গ শুকনো ঘাসে আগুন লাগাতে পারে।)" },
+                    { en: "The speaker's words ignited passion in the crowd.", bn: "(বক্তার কথাগুলো জনতার মাঝে আবেগ প্রজ্জ্বলিত করেছিল।)" },
+                    { en: "He used a match to ignite the gas stove.", bn: "(গ্যাসের চুলায় আগুন ধরাতে সে একটি দেশলাই ব্যবহার করেছিল।)" },
+                    { en: "The unfair decision ignited a strong protest.", bn: "(অন্যায্য সিদ্ধান্তটি একটি জোরালো প্রতিবাদের জন্ম দিয়েছিল।)" },
+                    { en: "It takes high temperature to ignite this chemical.", bn: "(এই রাসায়নিকটিকে প্রজ্জ্বলিত করতে উচ্চ তাপমাত্রার প্রয়োজন।)" }
+                ]
+            },
+            {
+                id: 4,
+                word: "Perpetual",
+                bnTitle: "(চিরস্থায়ী / অবিরাম)",
+                theme: { border: "border-blue-500", text: "text-blue-700" },
+                syn: { en: "Everlasting", bn: "(অনন্ত / চিরস্থায়ী)", ex: "I wish you everlasting peace and joy.", exBn: "(আমি আপনার অনন্ত শান্তি এবং আনন্দ কামনা করি।)" },
+                ant: { en: "Temporary", bn: "(অস্থায়ী / সাময়িক)", ex: "This problem is only temporary.", exBn: "(এই সমস্যাটি কেবল অস্থায়ী।)" },
+                origin: "ল্যাটিন 'perpetualis' থেকে উদ্ভূত, যার অর্থ 'নিরবচ্ছিন্ন' বা 'যা কখনো শেষ হয় না'।",
+                sentences: [
+                    { en: "The mountain peaks are covered in perpetual snow.", bn: "(পাহাড়ের চূড়াগুলো চিরস্থায়ী বরফে ঢাকা।)" },
+                    { en: "He lives in a state of perpetual fear.", bn: "(সে অবিরাম ভয়ের মধ্যে বাস করে।)" },
+                    { en: "They argued over a perpetual land dispute.", bn: "(তারা একটি চিরস্থায়ী জমি বিবাদ নিয়ে তর্ক করেছিল।)" },
+                    { en: "A perpetual machine running without energy is impossible.", bn: "(শক্তি ছাড়া চলা একটি অবিরাম যন্ত্র অসম্ভব।)" },
+                    { en: "Her perpetual complaining annoyed everyone.", bn: "(তার অবিরাম অভিযোগ সবাইকে বিরক্ত করেছিল।)" }
+                ]
+            },
+            {
+                id: 5,
+                word: "Vigilant",
+                bnTitle: "(সতর্ক / সজাগ)",
+                theme: { border: "border-amber-500", text: "text-amber-700" },
+                syn: { en: "Watchful", bn: "(সতর্ক / পাহারাদার)", ex: "A watchful mother never leaves her baby alone.", exBn: "(একজন সতর্ক মা তার বাচ্চাকে কখনো একা রাখেন না।)" },
+                ant: { en: "Careless", bn: "(অসতর্ক / অমনোযোগী)", ex: "Careless driving causes many accidents.", exBn: "(অসতর্ক গাড়ি চালানো অনেক দুর্ঘটনার কারণ।)" },
+                origin: "ল্যাটিন 'vigilare' (জেগে থাকা বা সজাগ থাকা) থেকে এসেছে। বিপদ বা সমস্যার জন্য সজাগ দৃষ্টি রাখাকে বোঝায়।",
+                sentences: [
+                    { en: "The vigilant guard noticed the thief at night.", bn: "(সতর্ক পাহারাদার রাতে চোরটিকে লক্ষ্য করেছিল।)" },
+                    { en: "We must remain vigilant against internet scams.", bn: "(ইন্টারনেট কেলেঙ্কারির বিরুদ্ধে আমাদের সতর্ক থাকতে হবে।)" },
+                    { en: "The bird kept a vigilant eye on its nest.", bn: "(পাখিটি তার বাসার ওপর সতর্ক দৃষ্টি রেখেছিল।)" },
+                    { en: "Citizens should be vigilant to protect their rights.", bn: "(নাগরিকদের তাদের অধিকার রক্ষায় সজাগ থাকতে হবে।)" },
+                    { en: "The security team was highly vigilant during the event.", bn: "(অনুষ্ঠানের সময় নিরাপত্তা দল অত্যন্ত সতর্ক ছিল।)" }
+                ]
+            },
+            {
+                id: 6,
+                word: "Ancestors",
+                bnTitle: "(পূর্বপুরুষ)",
+                theme: { border: "border-green-500", text: "text-green-700" },
+                syn: { en: "Forefathers", bn: "(পূর্বপুরুষগণ)", ex: "Our forefathers fought bravely for our freedom.", exBn: "(আমাদের পূর্বপুরুষগণ স্বাধীনতার জন্য সাহসিকতার সাথে লড়াই করেছিলেন।)" },
+                ant: { en: "Descendants", bn: "(বংশধর)", ex: "We want to leave a better world for our descendants.", exBn: "(আমরা আমাদের বংশধরদের জন্য একটি উন্নত বিশ্ব রেখে যেতে চাই।)" },
+                origin: "ল্যাটিন শব্দ 'antecessor' থেকে ফরাসি 'ancestre' হয়ে ইংরেজিতে এসেছে। এর আক্ষরিক অর্থ 'যিনি আগে গেছেন'।",
+                sentences: [
+                    { en: "My ancestors came from a small village in India.", bn: "(আমার পূর্বপুরুষরা ভারতের একটি ছোট গ্রাম থেকে এসেছিলেন।)" },
+                    { en: "We should respect the traditions of our ancestors.", bn: "(আমাদের পূর্বপুরুষদের রীতিনীতিকে সম্মান করা উচিত।)" },
+                    { en: "Their ancestors built this huge temple.", bn: "(তাদের পূর্বপুরুষরা এই বিশাল মন্দিরটি নির্মাণ করেছিলেন।)" },
+                    { en: "Scientists study bones to learn about human ancestors.", bn: "(বিজ্ঞানীরা মানুষের পূর্বপুরুষদের সম্পর্কে জানতে হাড় নিয়ে গবেষণা করেন।)" },
+                    { en: "He proudly displayed pictures of his royal ancestors.", bn: "(তিনি গর্বভরে তার রাজকীয় পূর্বপুরুষদের ছবি প্রদর্শন করেছিলেন।)" }
+                ]
+            },
+            {
+                id: 7,
+                word: "Infinite",
+                bnTitle: "(অসীম / অন্তহীন)",
+                theme: { border: "border-indigo-500", text: "text-indigo-700" },
+                syn: { en: "Limitless", bn: "(সীমাহীন)", ex: "The internet provides a limitless amount of information.", exBn: "(ইন্টারনেট সীমাহীন তথ্য প্রদান করে।)" },
+                ant: { en: "Limited", bn: "(সীমিত)", ex: "We only have a limited amount of time.", exBn: "(আমাদের কাছে কেবল সীমিত সময় আছে।)" },
+                origin: "ল্যাটিন 'infinitus' থেকে উদ্ভূত, যেখানে 'in-' (না) এবং 'finis' (শেষ বা সীমা) যুক্ত হয়ে 'যাহার শেষ নেই' অর্থ প্রকাশ করে।",
+                sentences: [
+                    { en: "The universe appears to be infinite.", bn: "(মহাবিশ্বকে অসীম বলে মনে হয়।)" },
+                    { en: "A mother's love for her child is infinite.", bn: "(সন্তানের প্রতি মায়ের ভালোবাসা অসীম।)" },
+                    { en: "There is an infinite number of stars in the galaxy.", bn: "(গ্যালাক্সিতে অগণিত বা অসীম সংখ্যক তারা রয়েছে।)" },
+                    { en: "He has infinite patience when teaching kids.", bn: "(বাচ্চাদের শেখানোর সময় তার অসীম ধৈর্য থাকে।)" },
+                    { en: "Human desires are practically infinite.", bn: "(মানুষের আকাঙ্ক্ষা কার্যত অসীম।)" }
+                ]
+            },
+            {
+                id: 8,
+                word: "Devotee",
+                bnTitle: "(ভক্ত / অনুরাগী)",
+                theme: { border: "border-cyan-500", text: "text-cyan-700" },
+                syn: { en: "Follower", bn: "(অনুসারী)", ex: "He is a devoted follower of the great philosopher.", exBn: "(তিনি মহান দার্শনিকের একজন একনিষ্ঠ অনুসারী।)" },
+                ant: { en: "Critic", bn: "(সমালোচক / বিরোধী)", ex: "The harsh critic disliked the new movie.", exBn: "(কঠোর সমালোচক নতুন সিনেমাটি অপছন্দ করেছিলেন।)" },
+                origin: "ল্যাটিন 'devovere' (উৎসর্গ করা বা প্রতিজ্ঞা করা) থেকে এসেছে। যে ব্যক্তি কোনো ধর্ম, ব্যক্তি বা শখের প্রতি নিজেকে সম্পূর্ণভাবে সমর্পণ করে।",
+                sentences: [
+                    { en: "He is a great devotee of classical music.", bn: "(তিনি শাস্ত্রীয় সঙ্গীতের একজন বড় ভক্ত।)" },
+                    { en: "The temple was filled with religious devotees.", bn: "(মন্দিরটি ধর্মীয় ভক্তদের দ্বারা পূর্ণ ছিল।)" },
+                    { en: "As a devotee of science, she reads many books.", bn: "(বিজ্ঞানের অনুরাগী হিসেবে সে অনেক বই পড়ে।)" },
+                    { en: "Devotees of the guru gathered to hear him speak.", bn: "(গুরুর ভক্তরা তার কথা শুনতে জড়ো হয়েছিল।)" },
+                    { en: "She is a lifelong devotee of the arts.", bn: "(সে শিল্পকলার একজন আজীবন অনুরাগী।)" }
+                ]
+            },
+            {
+                id: 9,
+                word: "Cluster",
+                bnTitle: "(গুচ্ছ / স্তবক)",
+                theme: { border: "border-teal-500", text: "text-teal-700" },
+                syn: { en: "Group", bn: "(দল / সমষ্টি)", ex: "A group of tourists visited the museum.", exBn: "(একদল পর্যটক জাদুঘর পরিদর্শন করেছিলেন।)" },
+                ant: { en: "Individual", bn: "(স্বতন্ত্র / একক)", ex: "Each individual is responsible for their actions.", exBn: "(প্রতিটি স্বতন্ত্র ব্যক্তি তার কাজের জন্য দায়ী।)" },
+                origin: "পুরানো ইংরেজি 'clyster' বা 'clyster' (একত্রে থাকা) থেকে এসেছে। এটি একই ধরণের জিনিসের একটি ছোট এবং ঘন সন্নিবদ্ধ দলকে বোঝায়।",
+                sentences: [
+                    { en: "We saw a cluster of beautiful stars in the sky.", bn: "(আমরা আকাশে সুন্দর তারার একটি গুচ্ছ দেখেছিলাম।)" },
+                    { en: "There is a cluster of trees near the river.", bn: "(নদীর কাছে একগুচ্ছ গাছ রয়েছে।)" },
+                    { en: "The virus affected a small cluster of houses.", bn: "(ভাইরাসটি কয়েকটি বাড়ির একটি স্তবক বা গুচ্ছকে আক্রান্ত করেছিল।)" },
+                    { en: "She held a cluster of red grapes in her hand.", bn: "(সে হাতে একগুচ্ছ লাল আঙুর ধরে ছিল।)" },
+                    { en: "A cluster of people gathered around the accident.", bn: "(দুর্ঘটনাকে কেন্দ্র করে একদল লোক জড়ো হয়েছিল।)" }
+                ]
+            },
+            {
+                id: 10,
+                word: "Alien",
+                bnTitle: "(ভিনদেশী / অপরিচিত)",
+                theme: { border: "border-gray-800", text: "text-gray-900" },
+                syn: { en: "Foreigner", bn: "(বিদেশী)", ex: "The local people welcomed the foreigner.", exBn: "(স্থানীয় লোকজন বিদেশী মানুষটিকে স্বাগত জানিয়েছিল।)" },
+                ant: { en: "Native", bn: "(স্থানীয় / স্বদেশী)", ex: "He is a native of this small village.", exBn: "(সে এই ছোট্ট গ্রামের একজন স্থানীয় বাসিন্দা।)" },
+                origin: "ল্যাটিন শব্দ 'alienus' (অন্যের বা ভিন্ন জায়গার) থেকে এসেছে, যা 'alius' (অন্য) থেকে উদ্ভূত। অন্য দেশ, গ্রহ বা সম্পূর্ণ ভিন্ন পরিবেশের কিছু বোঝাতে ব্যবহৃত হয়।",
+                sentences: [
+                    { en: "The new city felt completely alien to her.", bn: "(নতুন শহরটি তার কাছে সম্পূর্ণ অপরিচিত বা ভিনদেশী মনে হয়েছিল।)" },
+                    { en: "Do you believe in alien life on other planets?", bn: "(তুমি কি অন্য গ্রহে ভিনগ্রহীদের জীবনে বিশ্বাস করো?)" },
+                    { en: "The law restricts alien citizens from voting.", bn: "(আইনটি বিদেশী নাগরিকদের ভোট দিতে বাধা দেয়।)" },
+                    { en: "This tropical plant is alien to our cold climate.", bn: "(এই গ্রীষ্মমন্ডলীয় গাছটি আমাদের ঠান্ডা জলবায়ুর জন্য অপরিচিত।)" },
+                    { en: "He felt like an alien in his own home.", bn: "(সে তার নিজের বাড়িতেই একজন ভিনদেশীর মতো অনুভব করেছিল।)" }
+                ]
+            }
+        ];
+
+        // --- STREAMING_CHUNK: Writing JavaScript for MCQs ---
+        const mcqData = [
+            {
+                q: "What does the word 'Abolish' mean?",
+                options: { a: "To create a new law", b: "To formally cancel or put an end to something", c: "To clean thoroughly", d: "To build a strong foundation" },
+                correct: "b",
+                note: "'Abolish' means to completely do away with or cancel something, like a law or practice. Options a and d are antonyms, while c is unrelated."
+            },
+            {
+                q: "Which word correctly acts as a synonym for 'Conjugal'?",
+                options: { a: "Single", b: "Bridal", c: "Divorced", d: "Professional" },
+                correct: "b",
+                note: "'Conjugal' relates to marriage or the relationship between a married couple. 'Bridal' (or marital) is the closest synonym. 'Single' is an antonym."
+            },
+            {
+                q: "Which of the following represents the exact antonym for 'Ignite'?",
+                options: { a: "Kindle", b: "Extinguish", c: "Burn", d: "Explode" },
+                correct: "b",
+                note: "To 'ignite' means to catch fire or cause to catch fire. To 'extinguish' means to put out a fire, making it the perfect antonym."
+            },
+            {
+                q: "Fill in the blank: The sound of the waterfall provided a _____ background noise that never stopped.",
+                options: { a: "Conjugal", b: "Perpetual", c: "Alien", d: "Vigilant" },
+                correct: "b",
+                note: "Since the noise 'never stopped', the word 'Perpetual' (everlasting/continuous) fits perfectly."
+            },
+            {
+                q: "Solve the analogy -> Devotee : Religion :: Linguist : ?",
+                options: { a: "Science", b: "Language", c: "Music", d: "History" },
+                correct: "b",
+                note: "A devotee is deeply dedicated to a Religion. A linguist is deeply dedicated to studying Language."
+            },
+            {
+                q: "Which word best describes someone who is keeping careful watch for possible danger?",
+                options: { a: "Infinite", b: "Vigilant", c: "Perpetual", d: "Abolished" },
+                correct: "b",
+                note: "'Vigilant' means watchful and alert to danger. 'Careless' would be its antonym."
+            },
+            {
+                q: "What does the word 'Ancestors' refer to?",
+                options: { a: "People related to you who lived a long time ago", b: "Your children and grandchildren", c: "People who live next door", d: "Animals that look like humans" },
+                correct: "a",
+                note: "'Ancestors' (forefathers) are the people from whom you are descended. Your children are your descendants (the antonym)."
+            },
+            {
+                q: "Which of the following is an antonym for 'Infinite'?",
+                options: { a: "Limitless", b: "Boundless", c: "Limited", d: "Endless" },
+                correct: "c",
+                note: "'Infinite' means having no limits or boundaries. 'Limited' means restricted in size or amount, serving as its direct antonym."
+            },
+            {
+                q: "Find the synonym for 'Cluster'.",
+                options: { a: "Individual", b: "Group", c: "Separation", d: "Distance" },
+                correct: "b",
+                note: "A 'Cluster' is a group of similar things positioned closely together (like stars or trees). 'Group' is the exact synonym."
+            },
+            {
+                q: "The word 'Alien' can be used to describe:",
+                options: { a: "A close friend from childhood", b: "Someone or something foreign or unfamiliar", c: "A native of the local town", d: "A common everyday object" },
+                correct: "b",
+                note: "'Alien' originates from the Latin 'alienus' (belonging to another) and describes something foreign, strange, or unfamiliar."
+            },
+            {
+                q: "Fill in the blank: The old dictator's rules were finally _____ after the revolution.",
+                options: { a: "Ignited", b: "Abolished", c: "Clustered", d: "Conjugal" },
+                correct: "b",
+                note: "Dictator rules are typically canceled or put to an end after a revolution, making 'Abolished' the correct word."
+            },
+            {
+                q: "The term 'Conjugal rights' relates to:",
+                options: { a: "The rights of a foreigner", b: "The rights of a married couple", c: "The right to remain silent", d: "The right to infinite wealth" },
+                correct: "b",
+                note: "Since 'conjugal' relates to marriage, conjugal rights specifically refer to the rights implied by the marriage bond."
+            },
+            {
+                q: "Which word is an antonym for 'Vigilant'?",
+                options: { a: "Alert", b: "Watchful", c: "Careless", d: "Awake" },
+                correct: "c",
+                note: "'Vigilant', 'Alert', and 'Watchful' are all synonyms. 'Careless' means not paying attention to danger, which is the antonym."
+            },
+            {
+                q: "Fill in the blank: The sparks from the campfire _____ the dry bushes nearby.",
+                options: { a: "Ignited", b: "Abolished", c: "Venerated", d: "Alienated" },
+                correct: "a",
+                note: "Sparks typically cause dry bushes to catch fire. 'Ignited' fits the context flawlessly."
+            },
+            {
+                q: "Identify the synonym for 'Ancestors'.",
+                options: { a: "Descendants", b: "Offspring", c: "Forefathers", d: "Heirs" },
+                correct: "c",
+                note: "'Ancestors' and 'Forefathers' both refer to past generations. 'Descendants', 'Offspring', and 'Heirs' refer to future generations."
+            },
+            {
+                q: "Solve the analogy -> Star : Cluster :: Tree : ?",
+                options: { a: "Leaf", b: "Clump", c: "Root", d: "Fruit" },
+                correct: "b",
+                note: "A group of stars is called a cluster. A group of trees growing closely together is often called a clump (or forest/grove)."
+            },
+            {
+                q: "Which of the following is a synonym for 'Perpetual'?",
+                options: { a: "Temporary", b: "Everlasting", c: "Short-lived", d: "Brief" },
+                correct: "b",
+                note: "'Perpetual' means never ending or changing. 'Everlasting' shares this exact meaning."
+            },
+            {
+                q: "Fill in the blank: The concept of snow was completely _____ to the boy who grew up in the hot desert.",
+                options: { a: "Alien", b: "Conjugal", c: "Vigilant", d: "Infinite" },
+                correct: "a",
+                note: "If a boy grew up in a hot desert, snow would be foreign, strange, and unfamiliar (Alien) to him."
+            },
+            {
+                q: "What is the relationship in 'Infinite : Limited'?",
+                options: { a: "They are synonyms", b: "They are antonyms", c: "They both relate to marriage", d: "One causes the other" },
+                correct: "b",
+                note: "Infinite (limitless) and Limited (restricted) have exactly opposite meanings."
+            },
+            {
+                q: "If a person is a 'Devotee' of Lord Krishna, they are:",
+                options: { a: "A harsh critic of Lord Krishna", b: "An ignorant person", c: "A dedicated follower of Lord Krishna", d: "An alien from another planet" },
+                correct: "c",
+                note: "A devotee is a person who is very interested in and enthusiastic about someone or something (a dedicated follower)."
+            },
+            {
+                q: "Which word shares its etymological root with the Latin word for 'to keep awake'?",
+                options: { a: "Abolish", b: "Vigilant", c: "Ignite", d: "Cluster" },
+                correct: "b",
+                note: "'Vigilant' originates from the Latin 'vigilare', which means to keep awake or watch."
+            },
+            {
+                q: "What is the antonym for 'Alien' (in the context of belonging)?",
+                options: { a: "Foreigner", b: "Native", c: "Extraterrestrial", d: "Stranger" },
+                correct: "b",
+                note: "An alien is a foreigner or outsider. A 'Native' is someone born or belonging naturally to a place, serving as the antonym."
+            },
+            {
+                q: "Which word best completes the analogy -> Ignite : Extinguish :: Abolish : ?",
+                options: { a: "Cancel", b: "Establish", c: "Destroy", d: "Remove" },
+                correct: "b",
+                note: "Ignite and Extinguish are antonyms. The antonym of Abolish (to cancel) is Establish (to create/set up)."
+            },
+            {
+                q: "Which of the following is NOT an attribute of a 'Cluster'?",
+                options: { a: "Being grouped together", b: "Close proximity", c: "Being a single, isolated individual", d: "A bunch or collection" },
+                correct: "c",
+                note: "A cluster is by definition a group. Being a single, isolated individual contradicts the meaning of a cluster."
+            },
+            {
+                q: "If a machine has a 'Perpetual' motion, it means:",
+                options: { a: "It stops every 5 minutes", b: "It requires constant repair", c: "It moves continuously without stopping", d: "It can only move backwards" },
+                correct: "c",
+                note: "Perpetual means occurring repeatedly or continuously without interruption."
+            }
+        ];
+
+        // --- STREAMING_CHUNK: Writing JavaScript render and copy functions ---
+        function renderWordBreakdown() {
+            const container = document.getElementById('word-breakdown-container');
+            let htmlContent = '';
+
+            wordData.forEach(data => {
+                let sentencesHtml = '';
+                data.sentences.forEach(s => {
+                    sentencesHtml += `
+                        <li>
+                            ${s.en}<br>
+                            <span class="text-xs text-black bn-text ml-5 block mt-0.5">${s.bn}</span>
+                        </li>
+                    `;
+                });
+
+                htmlContent += `
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 ${data.theme.border}">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold ${data.theme.text}">${data.id}. ${data.word} <span class="text-sm font-bold text-gray-700 bn-text ml-2">${data.bnTitle}</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: ${data.syn.en.split(' / ')[0]}</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: ${data.ant.en.split(' / ')[0]}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">${data.origin}</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            ${sentencesHtml}
+                        </ul>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">${data.syn.en}</span> <span class="bn-text text-sm font-bold text-black">${data.syn.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.syn.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.syn.exBn}</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">${data.ant.en}</span> <span class="bn-text text-sm font-bold text-black">${data.ant.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.ant.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.ant.exBn}</p>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        function renderMCQs() {
+            const container = document.getElementById('mcq-container');
+            let htmlContent = '';
+
+            mcqData.forEach((mcq, index) => {
+                htmlContent += `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-lg text-black mb-3">${index + 1}. ${mcq.q}</h3>
+                    <ul class="space-y-2 mb-4 ml-2">
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">a.</span> ${mcq.options.a}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">b.</span> ${mcq.options.b}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">c.</span> ${mcq.options.c}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">d.</span> ${mcq.options.d}</li>
+                    </ul>
+                    
+                    <details class="group bg-cyan-50 rounded-lg outline-none border border-cyan-100">
+                        <summary class="cursor-pointer font-bold text-cyan-700 px-4 py-2 flex items-center justify-between select-none">
+                            <span class="flex items-center gap-2"><i class="fas fa-eye"></i> Show Answer</span>
+                            <i class="fas fa-chevron-down transform group-open:rotate-180 transition-transform duration-300"></i>
+                        </summary>
+                        <div class="px-4 pb-4 pt-1 border-t border-cyan-200 mt-1">
+                            <p class="text-black font-bold mb-2">Correct Answer: <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded uppercase">${mcq.correct}</span></p>
+                            <p class="text-sm text-black font-medium"><span class="font-bold">Note:</span> ${mcq.note}</p>
+                        </div>
+                    </details>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderWordBreakdown();
+            renderMCQs();
+        });
+
+        function copySummary() {
+            const summaryText = document.getElementById('summaryText').innerText;
+            copyTextToClipboard(summaryText, 'Summary list copied!');
+        }
+        
+        function copyStory() {
+            const storyTitle = document.getElementById('story-title').innerText.trim();
+            const storyParagraphs = document.querySelectorAll('#story-content p');
+            let storyText = storyTitle + '\n\n';
+            
+            storyParagraphs.forEach(p => {
+                storyText += p.innerText + '\n\n';
+            });
+            
+            copyTextToClipboard(storyText.trim(), 'Story copied!');
+        }
+
+        function copyMCQs() {
+            let copyText = '';
+            
+            mcqData.forEach((mcq, index) => {
+                copyText += `${index + 1}. ${mcq.q}\n`;
+                copyText += `a. ${mcq.options.a}\n`;
+                copyText += `b. ${mcq.options.b}\n`;
+                copyText += `c. ${mcq.options.c}\n`;
+                copyText += `d. ${mcq.options.d}\n`;
+                copyText += `correct answer: ${mcq.correct}\n`;
+                copyText += `Note: ${mcq.note}\n\n`;
+            });
+            
+            copyTextToClipboard(copyText.trim(), '25 MCQs copied exactly formatted!');
+        }
+
+        function copyTextToClipboard(text, successMessage) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(successMessage);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => showToast(successMessage)).catch(e => console.error("Clipboard API failed", e));
+                }
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toast-message");
+            toastMessage.innerText = message;
+            
+            toast.className = "show";
+            
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
