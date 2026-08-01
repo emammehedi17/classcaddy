@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 11 - Systematic Vocabulary Batch</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            500: '#000000', 
+                            600: '#000000', 
+                            700: '#000000', 
+                            800: '#000000', 
+                            900: '#000000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #fdf2f8; /* rose-50 */
+            color: #000000; 
+        }
+        .bn-text {
+            font-family: 'Hind Siliguri', sans-serif;
+            color: #000000; 
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #db2777; /* pink-600 */
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-fuchsia-50 via-rose-50 to-pink-50 min-h-screen p-4 md:p-8 selection:bg-pink-200 selection:text-pink-900 text-black">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <header class="glass-card rounded-2xl shadow-lg p-6 md:p-8 mb-8 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-purple-500 to-rose-600"></div>
+            
+            <div class="text-center md:text-left mb-6 md:mb-0 z-10">
+                <div class="inline-block px-3 py-1 bg-pink-100 text-pink-800 rounded-full text-sm font-bold mb-3">
+                    <i class="fas fa-calendar-day mr-2"></i>Daily Vocabulary
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-2 bg-gradient-to-r from-purple-700 to-rose-700 gradient-text pb-1">
+                    Day 11
+                </h1>
+                <p class="text-black font-semibold flex items-center justify-center md:justify-start gap-2">
+                    <i class="fas fa-pen-nib text-pink-600"></i>
+                    Created by: 
+                    <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-pink-700 hover:text-pink-900 hover:underline transition-colors font-bold relative group">
+                        Emam Mehedi
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-pink-600 transition-all group-hover:w-full"></span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex-shrink-0 z-10 bg-white p-2 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300 border-2 border-pink-100">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-24 h-24 md:w-28 md:h-28 rounded-lg">
+                <p class="text-center text-xs text-black mt-1 font-bold">Scan Me</p>
+            </div>
+        </header>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-10 mb-8 border-t-4 border-t-purple-500 relative">
+            <div class="absolute -top-4 -right-4 text-purple-200 opacity-20">
+                <i class="fas fa-user-secret text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 id="story-title" class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-search text-purple-600"></i> ছায়া ও হীরক রহস্য (The Shadow and the Diamond Mystery)
+                </h2>
+                <button onclick="copyStory()" class="mt-4 md:mt-0 bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold py-2 px-4 rounded-lg shadow-sm transition-all flex items-center gap-2 border border-purple-300">
+                    <i class="fas fa-copy"></i> Copy Story
+                </button>
+            </div>
+            
+            <div id="story-content" class="bn-text text-lg md:text-xl text-black font-medium leading-relaxed space-y-4 bg-white/70 p-6 rounded-xl border border-purple-100 shadow-inner">
+                <p>
+                    শহরের সবচেয়ে ধনী ব্যক্তি মি. সেনের <span class="font-bold text-purple-800 bg-purple-100 px-1.5 py-0.5 rounded shadow-sm">Opulence</span> <span class="text-rose-700 font-bold">(প্রাচুর্য)</span> সবার চোখ ধাঁধিয়ে দিত। কিন্তু তার একটি গোপন <span class="font-bold text-purple-800 bg-purple-100 px-1.5 py-0.5 rounded shadow-sm">Niche</span> <span class="text-rose-700 font-bold">(কুলুঙ্গি / নির্দিষ্ট ক্ষেত্র)</span> ছিল—তিনি প্রাচীন প্রত্নতাত্ত্বিক জিনিস সংগ্রহ করতেন। একদিন তার সবচেয়ে দামি হীরাটি চুরি হয়ে গেল, যার ফলে তার পুরো সম্মান <span class="font-bold text-purple-800 bg-purple-100 px-1.5 py-0.5 rounded shadow-sm">Jeopardy</span> <span class="text-rose-700 font-bold">(ঝুঁকি / বিপদ)</span>-তে পড়ল।
+                </p>
+                <p>
+                    ডিটেকটিভ অর্ক বুঝতে পারলেন এই কাজটি শহরের সবচেয়ে <span class="font-bold text-purple-800 bg-purple-100 px-1.5 py-0.5 rounded shadow-sm">Nefarious</span> <span class="text-rose-700 font-bold">(জঘন্য / অতিশয় দুষ্ট)</span> অপরাধী 'শ্যাডো'-এর। অর্ক তার জীবনে <span class="font-bold text-purple-800 bg-purple-100 px-1.5 py-0.5 rounded shadow-sm">struck several bad patches</span> <span class="text-rose-700 font-bold">(বেশ কয়েকটি খারাপ সময়ের মধ্য দিয়ে গেছেন)</span>, কিন্তু তার <span class="font-bold text-purple-800 bg-purple-100 px-1.5 py-0.5 rounded shadow-sm">Perseverance</span> <span class="text-rose-700 font-bold">(অধ্যবসায়)</span> তাকে কখনো হার মানতে দেয়নি।
+                </p>
+                <p>
+                    অর্ক জানতেন শ্যাডো স্বভাবতই অত্যন্ত <span class="font-bold text-purple-800 bg-purple-100 px-1.5 py-0.5 rounded shadow-sm">Loquacious</span> <span class="text-rose-700 font-bold">(বাচাল / বেশি কথা বলে)</span> প্রকৃতির, তাই তাকে কথা বলিয়ে ফাঁদে ফেলা খুব সহজ। অন্যদিকে অর্ক নিজে ছিলেন অত্যন্ত <span class="font-bold text-purple-800 bg-purple-100 px-1.5 py-0.5 rounded shadow-sm">Phlegmatic</span> <span class="text-rose-700 font-bold">(ধীরস্থির / শান্ত)</span>; কোনো বিপদেই তার চোখেমুখে আবেগ প্রকাশ পেত না। 
+                </p>
+                <p>
+                    অবশেষে অর্ক যখন শ্যাডোকে ধরে ফেললেন, শ্যাডো সম্পূর্ণ <span class="font-bold text-purple-800 bg-purple-100 px-1.5 py-0.5 rounded shadow-sm">Impecunious</span> <span class="text-rose-700 font-bold">(কপর্দকশূন্য / দরিদ্র)</span> অবস্থায় ছিল কারণ সে হীরাটি বিক্রি করতে পারেনি। শহরের সবাই অর্কের এই সাহসিকতা এবং বুদ্ধির জন্য তার নামে <span class="font-bold text-purple-800 bg-purple-100 px-1.5 py-0.5 rounded shadow-sm">Panegyric</span> <span class="text-rose-700 font-bold">(উচ্চ প্রশংসা / স্তুতিবাদ)</span> গাইতে শুরু করল।
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-black mb-6 flex items-center gap-3 px-2">
+                <i class="fas fa-layer-group text-purple-600"></i> Word Breakdown
+            </h2>
+            
+            <div id="word-breakdown-container" class="grid grid-cols-1 gap-6">
+                <!-- Word cards will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="mb-8 mt-12 border-t-4 border-dashed border-purple-200 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 px-2">
+                <h2 class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-tasks text-purple-600"></i> Knowledge Check (MCQs)
+                </h2>
+                <button onclick="copyMCQs()" class="mt-4 md:mt-0 bg-white hover:bg-gray-50 text-purple-700 font-bold py-2 px-4 rounded-lg shadow transition-all flex items-center gap-2 border border-purple-200">
+                    <i class="fas fa-copy"></i> Copy MCQs
+                </button>
+            </div>
+            
+            <div id="mcq-container" class="space-y-4">
+                <!-- MCQs will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-8 bg-gradient-to-r from-purple-900 to-rose-900 text-white relative overflow-hidden mt-8">
+            <div class="absolute -right-10 -bottom-10 opacity-10">
+                <i class="fas fa-clipboard-list text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-purple-50">
+                    <i class="fas fa-list-check text-rose-400"></i> Summary List
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 bg-rose-500 hover:bg-rose-400 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 border border-rose-400">
+                    <i class="fas fa-copy"></i> Copy List
+                </button>
+            </div>
+            
+            <div class="bg-black/40 p-5 rounded-xl border border-rose-500/30 font-mono text-sm leading-relaxed overflow-x-auto z-10 relative bn-text">
+<pre id="summaryText" class="whitespace-pre-wrap text-rose-50 font-bold"></pre>
+            </div>
+        </section>
+
+        <!-- Navigation Buttons -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 mb-4">
+            <a href="https://classcaddy.netlify.app/vocabs/day10" class="w-full sm:w-auto text-center bg-white hover:bg-purple-50 text-purple-700 font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-purple-200 hover:border-purple-400 group">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Previous (Day-10)
+            </a>
+            <a href="https://classcaddy.netlify.app/vocabs/day12" class="w-full sm:w-auto text-center bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-700 hover:to-rose-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-transparent hover:shadow-lg transform hover:-translate-y-0.5 group">
+                Next (Day-12) <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-700 text-sm mt-8 pb-8 font-bold">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i id="toast-icon" class="fas fa-check-circle mr-2"></i><span id="toast-message">Copied!</span></div>
+
+    <script>
+        const wordData = [
+            {
+                id: 1,
+                word: "Perseverance",
+                pronunciation: "পার্সিভিয়ারেন্স",
+                bnTitle: "(অধ্যবসায় / লেগে থাকা)",
+                theme: { border: "border-indigo-500", text: "text-indigo-700" },
+                syn: { en: "Dedication", pronunciation: "ডেডিকেশন", bn: "(উৎসর্গ / একাগ্রতা)", ex: "Her dedication to the project was amazing.", exBn: "(প্রকল্পটির প্রতি তার একাগ্রতা ছিল আশ্চর্যজনক।)" },
+                ant: { en: "Apathy", pronunciation: "অ্যাপ্যাথি", bn: "(অনীহা / উদাসীনতা)", ex: "His apathy towards his studies led to failure.", exBn: "(পড়ালেখার প্রতি তার অনীহা ব্যর্থতার দিকে নিয়ে যায়।)" },
+                origin: "ল্যাটিন শব্দ 'perseverare' থেকে এসেছে, যেখানে 'per-' অর্থ 'কঠোরভাবে' এবং 'severus' অর্থ 'কঠোর'। এর অর্থ হলো কোনো কাজে কঠোরভাবে লেগে থাকা।",
+                mnemonic: "'Severe' (কঠোর) শব্দটি দিয়ে মনে রাখুন। যত Severe বা কঠোর বাধাই আসুক না কেন, যে পার হয়ে টিকে থাকে তার মাঝেই Perseverance (অধ্যবসায়) আছে।",
+                sentences: [
+                    { en: "Through hard work and perseverance, he achieved his goals.", bn: "(কঠোর পরিশ্রম এবং অধ্যবসায়ের মাধ্যমে সে তার লক্ষ্য অর্জন করেছিল।)" },
+                    { en: "Perseverance is the key to success in life.", bn: "(অধ্যবসায় হলো জীবনে সাফল্যের চাবিকাঠি।)" },
+                    { en: "She showed great perseverance during her long illness.", bn: "(দীর্ঘ অসুস্থতার সময় সে অত্যন্ত অধ্যবসায় দেখিয়েছিল।)" },
+                    { en: "His lack of perseverance caused him to lose the race.", bn: "(তার অধ্যবসায়ের অভাব তাকে দৌড়ে হারতে বাধ্য করেছিল।)" },
+                    { en: "The teacher praised the student for his perseverance.", bn: "(শিক্ষক ছাত্রটিকে তার অধ্যবসায়ের জন্য প্রশংসা করেছিলেন।)" }
+                ]
+            },
+            {
+                id: 2,
+                word: "Niche",
+                pronunciation: "নিশ / নিচ",
+                bnTitle: "(কুলুঙ্গি / উপযুক্ত স্থান বা নির্দিষ্ট ক্ষেত্র)",
+                theme: { border: "border-teal-500", text: "text-teal-700" },
+                syn: { en: "Specialty", pronunciation: "স্পেশালিটি", bn: "(বিশেষত্ব / নির্দিষ্ট ক্ষেত্র)", ex: "Cooking Italian food is her specialty.", exBn: "(ইতালীয় খাবার রান্না করা তার বিশেষত্ব।)" },
+                ant: { en: "General", pronunciation: "জেনারেল", bn: "(সাধারণ / সার্বজনীন)", ex: "He gave a general overview of the topic.", exBn: "(তিনি বিষয়টির একটি সাধারণ ওভারভিউ দিয়েছিলেন।)" },
+                origin: "ফরাসি শব্দ 'niche' থেকে এসেছে, যার অর্থ 'পাখির বাসা' বা 'কুকুরের ঘর'। স্থপতিরা এটি দেয়ালের গর্ত বা কুলুঙ্গি বোঝাতে ব্যবহার করতেন, যা পরে 'কারও জন্য উপযুক্ত স্থান বা পেশা' বোঝাতে ব্যবহৃত হয়।",
+                mnemonic: "'নীচ' (নিচে) দিয়ে মনে রাখুন। দেয়ালের নিচের কোণে যেখানে সুন্দর জিনিস সাজিয়ে রাখা হয়, সেটাই Niche বা কুলুঙ্গি। অর্থাৎ, আপনার জন্য পারফেক্ট একটি ছোট জায়গা বা কাজ।",
+                sentences: [
+                    { en: "He finally found his niche in graphic design.", bn: "(অবশেষে সে গ্রাফিক ডিজাইনে তার উপযুক্ত স্থান বা পেশা খুঁজে পেয়েছে।)" },
+                    { en: "The business targets a specific market niche.", bn: "(ব্যবসাটি একটি নির্দিষ্ট বাজারের কুলুঙ্গিকে লক্ষ্য করে।)" },
+                    { en: "There is a niche in the wall for a statue.", bn: "(মূর্তি রাখার জন্য দেয়ালে একটি কুলুঙ্গি বা গর্ত আছে।)" },
+                    { en: "She created a profitable niche selling handmade soaps.", bn: "(হাতে তৈরি সাবান বিক্রি করে সে একটি লাভজনক ক্ষেত্র তৈরি করেছে।)" },
+                    { en: "Everyone needs to find their own niche in life.", bn: "(প্রত্যেকেরই জীবনে নিজের উপযুক্ত স্থান খুঁজে বের করা দরকার।)" }
+                ]
+            },
+            {
+                id: 3,
+                word: "Opulence",
+                pronunciation: "অপিউল্যান্স",
+                bnTitle: "(প্রাচুর্য / ধনসম্পদ)",
+                theme: { border: "border-yellow-600", text: "text-yellow-700" },
+                syn: { en: "Wealth", pronunciation: "ওয়েলথ", bn: "(সম্পদ)", ex: "Health is more important than wealth.", exBn: "(স্বাস্থ্যের গুরুত্ব সম্পদের চেয়ে বেশি।)" },
+                ant: { en: "Poverty", pronunciation: "পভার্টি", bn: "(দারিদ্র্য)", ex: "Many people in the world live in extreme poverty.", exBn: "(বিশ্বের অনেক মানুষ চরম দারিদ্র্যের মধ্যে বাস করে।)" },
+                origin: "ল্যাটিন শব্দ 'opulentus' (ধনী) এবং 'ops' (শক্তি বা সম্পদ) থেকে উদ্ভূত। এটি বিলাসবহুল জীবনযাপন বা সম্পদের প্রাচুর্য বোঝাতে ব্যবহৃত হয়।",
+                mnemonic: "'Oppo + Lens' দিয়ে মনে রাখুন। অনেক দামী Oppo ফোনের উন্নত লেন্স কেনার সামর্থ্য যার আছে, তার অনেক Opulence (প্রাচুর্য বা ধনসম্পদ) আছে।",
+                sentences: [
+                    { en: "The king lived a life of extreme opulence.", bn: "(রাজা চরম প্রাচুর্যের জীবনযাপন করতেন।)" },
+                    { en: "The opulence of the grand hotel amazed everyone.", bn: "(বিশাল হোটেলটির প্রাচুর্য সবাইকে অবাক করেছিল।)" },
+                    { en: "She showed off her opulence by wearing expensive diamonds.", bn: "(দামি হীরা পরে সে তার ধনসম্পদের বড়াই করেছিল।)" },
+                    { en: "Not everyone is born into opulence.", bn: "(সবাই প্রাচুর্যের মাঝে জন্মগ্রহণ করে না।)" },
+                    { en: "The interior of the palace reflects immense opulence.", bn: "(প্রাসাদের ভেতরের অংশ অপরিসীম প্রাচুর্য প্রতিফলিত করে।)" }
+                ]
+            },
+            {
+                id: 4,
+                word: "Nefarious",
+                pronunciation: "নিফারিয়াস",
+                bnTitle: "(জঘন্য / অতিশয় দুষ্ট)",
+                theme: { border: "border-red-600", text: "text-red-800" },
+                syn: { en: "Wicked", pronunciation: "উইকেড", bn: "(দুষ্ট / জঘন্য)", ex: "The wicked witch cast a dark spell.", exBn: "(দুষ্ট ডাইনিটি একটি কালো জাদুমন্ত্র করেছিল।)" },
+                ant: { en: "Virtuous", pronunciation: "ভার্চুয়াস", bn: "(পুণ্যবান / ধার্মিক)", ex: "She is a virtuous woman who always helps others.", exBn: "(তিনি একজন পুণ্যবান নারী যিনি সর্বদা অন্যদের সাহায্য করেন।)" },
+                origin: "ল্যাটিন শব্দ 'nefas' থেকে এসেছে, যার অর্থ 'পাপ' বা 'ঐশ্বরিক আইনের বিরুদ্ধে কাজ করা' (ne- 'না' + fas 'আইন')।",
+                mnemonic: "'Ne-Furious' দিয়ে মনে রাখুন। যে ব্যক্তি সবসময় Furious (ভয়ংকর রাগী) হয়ে খারাপ কাজ করে, সে হলো Nefarious (জঘন্য বা অতিশয় দুষ্ট)।",
+                sentences: [
+                    { en: "The police caught the mastermind behind the nefarious plot.", bn: "(পুলিশ জঘন্য ষড়যন্ত্রের মূল হোতাকে ধরে ফেলেছে।)" },
+                    { en: "He was punished for his nefarious activities.", bn: "(তাকে তার অতিশয় দুষ্ট বা জঘন্য কার্যকলাপের জন্য শাস্তি দেওয়া হয়েছিল।)" },
+                    { en: "A nefarious hacker stole all their data.", bn: "(একজন জঘন্য হ্যাকার তাদের সমস্ত ডেটা চুরি করেছে।)" },
+                    { en: "They hatched a nefarious plan to rob the bank.", bn: "(তারা ব্যাংক লুট করার জন্য একটি জঘন্য পরিকল্পনা করেছিল।)" },
+                    { en: "His nefarious reputation spread throughout the city.", bn: "(তার জঘন্য সুনাম পুরো শহর জুড়ে ছড়িয়ে পড়েছিল।)" }
+                ]
+            },
+            {
+                id: 5,
+                word: "Phlegmatic",
+                pronunciation: "ফ্লেগম্যাটিক",
+                bnTitle: "(ধীরস্থির / আবেগহীন / শান্ত)",
+                theme: { border: "border-blue-500", text: "text-blue-700" },
+                syn: { en: "Calm", pronunciation: "কাম", bn: "(শান্ত)", ex: "Please stay calm during the emergency.", exBn: "(জরুরি অবস্থার সময় দয়া করে শান্ত থাকুন।)" },
+                ant: { en: "Excitable", pronunciation: "এক্সাইটেবল", bn: "(সহজেই উত্তেজিত হয় এমন)", ex: "The excitable puppy jumped all over the guests.", exBn: "(সহজেই উত্তেজিত কুকুরছানাটি অতিথিদের গায়ে লাফিয়ে পড়ল।)" },
+                origin: "গ্রীক শব্দ 'phlegma' (কফ) থেকে উদ্ভূত। প্রাচীন চিকিৎসাবিদ্যায় বিশ্বাস করা হতো যে শরীরে কফের পরিমাণ বেশি থাকলে মানুষ ধীরস্থির এবং আবেগহীন প্রকৃতির হয়।",
+                mnemonic: "'Phlegm' (কফ) শব্দ দিয়ে মনে রাখুন। কারো গলায় কফ বা শ্লেষ্মা জমে গেলে মানুষ যেমন চুপচাপ, শান্ত বা ধীরস্থির হয়ে যায়, সেটাই Phlegmatic।",
+                sentences: [
+                    { en: "Despite the crisis, the manager remained completely phlegmatic.", bn: "(সঙ্কট সত্ত্বেও, ম্যানেজার সম্পূর্ণ ধীরস্থির ছিলেন।)" },
+                    { en: "He has a phlegmatic personality and never gets angry.", bn: "(তার একটি শান্ত ব্যক্তিত্ব রয়েছে এবং সে কখনো রাগান্বিত হয় না।)" },
+                    { en: "A phlegmatic person does not panic easily.", bn: "(একজন ধীরস্থির ব্যক্তি সহজে আতঙ্কিত হয় না।)" },
+                    { en: "Her phlegmatic response surprised everyone in the room.", bn: "(তার আবেগহীন প্রতিক্রিয়া ঘরের সবাইকে অবাক করেছিল।)" },
+                    { en: "You need to be phlegmatic when solving hard problems.", bn: "(কঠিন সমস্যা সমাধানের সময় আপনাকে শান্ত বা ধীরস্থির হতে হবে।)" }
+                ]
+            },
+            {
+                id: 6,
+                word: "Jeopardy",
+                pronunciation: "জেপার্ডি",
+                bnTitle: "(বিপদ / ঝুঁকি)",
+                theme: { border: "border-orange-500", text: "text-orange-700" },
+                syn: { en: "Danger", pronunciation: "ডেঞ্জার", bn: "(বিপদ)", ex: "The warning sign told us to keep away from danger.", exBn: "(সতর্কীকরণ চিহ্নটি আমাদের বিপদ থেকে দূরে থাকতে বলেছিল।)" },
+                ant: { en: "Safety", pronunciation: "সেফটি", bn: "(নিরাপত্তা)", ex: "Always wear a helmet for your own safety.", exBn: "(আপনার নিজের নিরাপত্তার জন্য সর্বদা একটি হেলমেট পরুন।)" },
+                origin: "পুরোনো ফরাসি শব্দ 'jeu parti' থেকে এসেছে, যার অর্থ 'একটি বিভক্ত খেলা' বা এমন একটি খেলা যেখানে জেতা বা হারার সমান সম্ভাবনা থাকে (ঝুঁকি)।",
+                mnemonic: "'Leopard' (চিতাবাঘ) দিয়ে মনে রাখুন। সামনে একটি Leopard পড়লে আপনার জীবনটা Jeopardy (বিপদ বা ঝুঁকি)-তে পড়ে যাবে।",
+                sentences: [
+                    { en: "His foolish actions put the whole mission in jeopardy.", bn: "(তার বোকামি কাজ পুরো মিশনটিকে ঝুঁকিতে ফেলেছিল।)" },
+                    { en: "The company's future is in serious jeopardy.", bn: "(কোম্পানির ভবিষ্যৎ মারাত্মক বিপদের মুখে।)" },
+                    { en: "I will not put my career in jeopardy for this.", bn: "(আমি এর জন্য আমার ক্যারিয়ার ঝুঁকিতে ফেলব না।)" },
+                    { en: "Smoking puts your lungs in jeopardy.", bn: "(ধূমপান আপনার ফুসফুসকে বিপদে ফেলে।)" },
+                    { en: "Thousands of jobs are in jeopardy due to the crisis.", bn: "(সঙ্কটের কারণে হাজার হাজার চাকরি ঝুঁকিতে রয়েছে।)" }
+                ]
+            },
+            {
+                id: 7,
+                word: "Panegyric",
+                pronunciation: "প্যানেজিরিক",
+                bnTitle: "(স্তুতিবাদ / উচ্চ প্রশংসা)",
+                theme: { border: "border-purple-500", text: "text-purple-700" },
+                syn: { en: "Tribute", pronunciation: "ট্রিবিউট", bn: "(শ্রদ্ধাঞ্জলি / প্রশংসা)", ex: "The concert was a tribute to the great singer.", exBn: "(কনসার্টটি ছিল মহান গায়কের প্রতি একটি শ্রদ্ধাঞ্জলি।)" },
+                ant: { en: "Criticism", pronunciation: "ক্রিটিসিজম", bn: "(সমালোচনা)", ex: "He could not handle the harsh criticism of his work.", exBn: "(সে তার কাজের কঠোর সমালোচনা সহ্য করতে পারেনি।)" },
+                origin: "গ্রীক শব্দ 'panēgyrikos' থেকে এসেছে, যার অর্থ 'জনসভার জন্য' (pan- 'সব' + agyris 'সমাবেশ')। প্রাচীনকালে জনসভায় কোনো বীর বা নেতার প্রশংসায় দেওয়া ভাষণকে বোঝাত।",
+                mnemonic: "'Pan' (প্যান/কড়াই) দিয়ে মনে রাখুন। প্যানে রান্না করা খাবার খুব সুস্বাদু হলে সবাই রাঁধুনির Panegyric (উচ্চ প্রশংসা) করে।",
+                sentences: [
+                    { en: "The principal delivered a panegyric for the retiring teacher.", bn: "(অধ্যক্ষ অবসরপ্রাপ্ত শিক্ষকের জন্য একটি স্তুতিবাদ বা উচ্চ প্রশংসা প্রদান করেন।)" },
+                    { en: "Her poem was a beautiful panegyric to nature.", bn: "(তার কবিতাটি প্রকৃতির প্রতি একটি সুন্দর উচ্চ প্রশংসা ছিল।)" },
+                    { en: "He wrote a panegyric honoring his late grandfather.", bn: "(তিনি তার প্রয়াত দাদাকে সম্মান জানিয়ে একটি স্তুতিবাদ লিখেছিলেন।)" },
+                    { en: "The book is basically a panegyric of the king's rule.", bn: "(বইটি মূলত রাজার শাসনের একটি উচ্চ প্রশংসা।)" },
+                    { en: "Instead of a balanced review, he wrote a panegyric.", bn: "(একটি ভারসাম্যপূর্ণ পর্যালোচনার পরিবর্তে, সে একটি স্তুতিবাদ লিখেছিল।)" }
+                ]
+            },
+            {
+                id: 8,
+                word: "Loquacious",
+                pronunciation: "লোকোয়াশাস",
+                bnTitle: "(বাচাল / বেশি কথা বলে এমন)",
+                theme: { border: "border-cyan-500", text: "text-cyan-700" },
+                syn: { en: "Talkative", pronunciation: "টকেটিভ", bn: "(বাচাল / গল্পগুজবকারী)", ex: "The talkative boy annoyed his quiet friend.", exBn: "(বাচাল ছেলেটি তার শান্ত বন্ধুকে বিরক্ত করেছিল।)" },
+                ant: { en: "Silent", pronunciation: "সাইলেন্ট", bn: "(নীরব / চুপচাপ)", ex: "The library was completely silent.", exBn: "(লাইব্রেরিটি সম্পূর্ণ নীরব ছিল।)" },
+                origin: "ল্যাটিন শব্দ 'loquax' থেকে এসেছে, যার মূল ধাতু 'loqui' অর্থ 'কথা বলা'। যে ব্যক্তি অনেক বেশি কথা বলতে ভালোবাসে।",
+                mnemonic: "'লোকো' (Local) দিয়ে মনে রাখুন। লোকাল (Local) বা লোকাল ট্রেনের যাত্রীরা সাধারণত একে অপরের সাথে অনেক কথা বলে, অর্থাৎ তারা Loquacious (বাচাল) হয়।",
+                sentences: [
+                    { en: "The loquacious parrot would not stop mimicking us.", bn: "(বাচাল তোতাপাখিটি আমাদের নকল করা থামায়নি।)" },
+                    { en: "I sat next to a very loquacious passenger on the train.", bn: "(আমি ট্রেনে একজন অত্যন্ত বাচাল যাত্রীর পাশে বসেছিলাম।)" },
+                    { en: "Normally she is shy, but today she was quite loquacious.", bn: "(সাধারণত সে লাজুক, তবে আজ সে বেশ বাচাল ছিল।)" },
+                    { en: "A loquacious person can sometimes reveal secrets accidentally.", bn: "(একজন বাচাল ব্যক্তি মাঝে মাঝে ভুলবশত গোপন কথা ফাঁস করে দিতে পারে।)" },
+                    { en: "The host of the show was energetic and loquacious.", bn: "(অনুষ্ঠানের উপস্থাপক ছিলেন উদ্যমী এবং বাচাল।)" }
+                ]
+            },
+            {
+                id: 9,
+                word: "Impecunious",
+                pronunciation: "ইমপিকিউনিয়াস",
+                bnTitle: "(কপর্দকশূন্য / দরিদ্র)",
+                theme: { border: "border-gray-600", text: "text-gray-800" },
+                syn: { en: "Penniless", pronunciation: "পেনিনলেস", bn: "(নিঃস্ব / কপর্দকহীন)", ex: "He arrived in the city broke and penniless.", exBn: "(সে শহরে একদম নিঃস্ব ও কপর্দকহীন অবস্থায় পৌঁছেছিল।)" },
+                ant: { en: "Wealthy", pronunciation: "ওয়েলদি", bn: "(ধনী / সম্পদশালী)", ex: "The wealthy businessman bought a new yacht.", exBn: "(ধনী ব্যবসায়ীটি একটি নতুন ইয়ট কিনেছিলেন।)" },
+                origin: "ল্যাটিন শব্দ 'impecuniosus' থেকে এসেছে। 'im-' অর্থ 'ছাড়া' বা 'না' এবং 'pecunia' অর্থ 'অর্থ বা টাকা'। অর্থাৎ, যার কাছে কোনো টাকা নেই।",
+                mnemonic: "ইংরেজিতে 'I am without pennies' (আমার কাছে পেনি বা পয়সা নেই) - এর সাথে মিলিয়ে Impecunious (দরিদ্র বা কপর্দকশূন্য) মনে রাখুন।",
+                sentences: [
+                    { en: "The impecunious artist struggled to buy paint.", bn: "(দরিদ্র শিল্পী রঙ কিনতে সংগ্রাম করেছিল।)" },
+                    { en: "He comes from a respectable but impecunious family.", bn: "(সে একটি সম্মানজনক কিন্তু দরিদ্র পরিবার থেকে এসেছে।)" },
+                    { en: "After losing his job, he was left completely impecunious.", bn: "(চাকরি হারানোর পর, সে সম্পূর্ণ কপর্দকশূন্য হয়ে পড়েছিল।)" },
+                    { en: "The impecunious student had to work three jobs.", bn: "(দরিদ্র ছাত্রটিকে তিনটি চাকরি করতে হয়েছিল।)" },
+                    { en: "They lived an impecunious life in the small village.", bn: "(তারা ছোট গ্রামে একটি দরিদ্র জীবনযাপন করত।)" }
+                ]
+            },
+            {
+                id: 10,
+                word: "Struck several bad patches",
+                pronunciation: "স্ট্রাক সেভেরাল ব্যাড প্যাচেস",
+                bnTitle: "(খারাপ সময়ের মধ্য দিয়ে যাওয়া - Idiom)",
+                theme: { border: "border-rose-800", text: "text-rose-900" },
+                syn: { en: "Suffer", pronunciation: "সাফার", bn: "(কষ্ট ভোগ করা)", ex: "They suffered a lot during the winter storm.", exBn: "(শীতের ঝড়ের সময় তারা অনেক কষ্ট ভোগ করেছিল।)" },
+                ant: { en: "Prosper", pronunciation: "প্রোস্পার", bn: "(উন্নতি লাভ করা / সমৃদ্ধ হওয়া)", ex: "The small town began to prosper after the factory opened.", exBn: "(কারখানাটি খোলার পর ছোট শহরটি উন্নতি লাভ করতে শুরু করেছিল।)" },
+                origin: "এটি একটি ইংরেজি বাগধারা (Idiom)। 'Bad patch' বলতে রাস্তার খারাপ বা খানাখন্দ বোঝায়। গাড়ি চালাতে গিয়ে খারাপ রাস্তায় পড়লে যেমন ঝাঁকুনি ও কষ্ট হয়, তেমনি জীবনে খারাপ বা কঠিন সময়ের মুখোমুখি হওয়াকে এটি দিয়ে বোঝানো হয়।",
+                mnemonic: "রাস্তায় গাড়ি চালানোর সময় 'Bad patch' বা খানাখন্দে পড়লে যেমন বিপদে পড়তে হয়, তেমনি জীবনে 'bad patches' আসা মানে হলো খারাপ সময়ের মধ্য দিয়ে যাওয়া।",
+                sentences: [
+                    { en: "Our business struck several bad patches last year.", bn: "(আমাদের ব্যবসা গত বছর বেশ কয়েকটি খারাপ সময়ের মধ্য দিয়ে গেছে।)" },
+                    { en: "He struck several bad patches before finally finding success.", bn: "(অবশেষে সাফল্য খোঁজার আগে সে বেশ কয়েকটি খারাপ সময়ের মধ্য দিয়ে গিয়েছিল।)" },
+                    { en: "Every relationship strikes bad patches occasionally.", bn: "(প্রতিটি সম্পর্ক মাঝে মাঝে খারাপ সময়ের মুখোমুখি হয়।)" },
+                    { en: "Although we struck several bad patches, we never gave up.", bn: "(যদিও আমরা বেশ কয়েকটি খারাপ সময়ের মধ্য দিয়ে গিয়েছিলাম, আমরা কখনো হাল ছাড়িনি।)" },
+                    { en: "The team struck a bad patch and lost five games in a row.", bn: "(দলটি একটি খারাপ সময়ের মধ্যে পড়েছিল এবং টানা পাঁচটি ম্যাচ হেরেছিল।)" }
+                ]
+            }
+        ];
+
+        // --- STREAMING_CHUNK: Setting up the MCQs Data ---
+        const mcqData = [
+            {
+                q: "What does the word 'Perseverance' mean?",
+                options: { a: "A quick burst of energy", b: "Giving up easily", c: "Continued effort to do something despite difficulties", d: "A state of deep sleep" },
+                correct: "c",
+                note: "'Perseverance' originates from a Latin word meaning strict or severe continuation. It implies dedication and not giving up."
+            },
+            {
+                q: "Which word correctly acts as an antonym for 'Opulence'?",
+                options: { a: "Wealth", b: "Luxury", c: "Poverty", d: "Splendor" },
+                correct: "c",
+                note: "'Opulence' means great wealth or luxuriousness. Therefore, 'Poverty' is its direct antonym."
+            },
+            {
+                q: "What describes a person who is 'Nefarious'?",
+                options: { a: "Wicked or criminal", b: "Kind and gentle", c: "Extremely funny", d: "Very intelligent" },
+                correct: "a",
+                note: "Nefarious describes an action or person that is extremely wicked, villainous, or criminal."
+            },
+            {
+                q: "If an environment provides the perfect 'Niche' for a business, it means it is a:",
+                options: { a: "Terrible location", b: "Suitable or specialized position/market", c: "Dangerous hazard", d: "Temporary setup" },
+                correct: "b",
+                note: "A 'niche' refers to a comfortable or suitable position in life or employment, or a specialized segment of the market."
+            },
+            {
+                q: "What does 'Phlegmatic' refer to?",
+                options: { a: "Easily angered", b: "Having an unemotional and stolidly calm disposition", c: "Sick with a cold", d: "Talking too much" },
+                correct: "b",
+                note: "Derived from the ancient belief about bodily humors, a phlegmatic person is calm, composed, and not easily excited."
+            },
+            {
+                q: "Which word is a synonym for 'Jeopardy'?",
+                options: { a: "Safety", b: "Danger", c: "Certainty", d: "Boredom" },
+                correct: "b",
+                note: "'Jeopardy' means danger of loss, harm, or failure. Thus, 'Danger' is its synonym."
+            },
+            {
+                q: "If a speech is a 'Panegyric', it is:",
+                options: { a: "A harsh criticism", b: "A public speech or published text in praise of someone or something", c: "A boring lecture about math", d: "An apology" },
+                correct: "b",
+                note: "Panegyric comes from Greek roots for public assemblies and means a formal expression of high praise."
+            },
+            {
+                q: "Which of the following describes someone who is 'Loquacious'?",
+                options: { a: "Silent and reserved", b: "Tending to talk a great deal", c: "Angry and aggressive", d: "Poor and penniless" },
+                correct: "b",
+                note: "'Loquacious' is rooted in the Latin word 'loquax' (talkative)."
+            },
+            {
+                q: "Fill in the blank: The _____ beggar asked for a coin to buy some bread.",
+                options: { a: "Opulent", b: "Impecunious", c: "Nefarious", d: "Loquacious" },
+                correct: "b",
+                note: "A beggar asking for a coin is without money, which perfectly fits the definition of 'impecunious' (penniless)."
+            },
+            {
+                q: "What does the idiom 'Struck several bad patches' mean?",
+                options: { a: "Won the lottery", b: "Experienced a period of difficulties or failures", c: "Bought a new car", d: "Paved a broken road" },
+                correct: "b",
+                note: "A 'bad patch' metaphorically refers to a bumpy or difficult part of a journey or a person's life."
+            },
+            {
+                q: "Fill in the blank: His _____ paid off when he finally passed the exam after failing three times.",
+                options: { a: "Jeopardy", b: "Opulence", c: "Perseverance", d: "Phlegmatic" },
+                correct: "c",
+                note: "Continuing to try after failing three times is the exact definition of 'Perseverance'."
+            },
+            {
+                q: "What is the antonym of 'Loquacious'?",
+                options: { a: "Talkative", b: "Silent", c: "Chatty", d: "Noisy" },
+                correct: "b",
+                note: "Since loquacious means talkative, its direct opposite is silent or reserved."
+            },
+            {
+                q: "Analogy -> Opulence : Poverty :: Nefarious : ?",
+                options: { a: "Wicked", b: "Virtuous", c: "Evil", d: "Jeopardy" },
+                correct: "b",
+                note: "Opulence and Poverty are antonyms. The antonym of Nefarious (wicked) is Virtuous (good/righteous)."
+            },
+            {
+                q: "Fill in the blank: The detective remained completely _____ even when the suspect pulled out a gun.",
+                options: { a: "Phlegmatic", b: "Loquacious", c: "Impecunious", d: "Nefarious" },
+                correct: "a",
+                note: "Remaining calm and unemotional during a dangerous situation perfectly describes a 'phlegmatic' person."
+            },
+            {
+                q: "Which word best completes the sentence? 'The new startup found a profitable ______ in selling eco-friendly pet toys.'",
+                options: { a: "Jeopardy", b: "Panegyric", c: "Niche", d: "Opulence" },
+                correct: "c",
+                note: "A specialized segment of the market for a specific product is called a 'Niche'."
+            },
+            {
+                q: "What is the relationship in the analogy 'Jeopardy : Danger'?",
+                options: { a: "They are antonyms", b: "They are synonyms", c: "One is a cause, the other is an effect", d: "They relate to wealth" },
+                correct: "b",
+                note: "Both Jeopardy and Danger mean a situation involving risk or peril. They are synonyms."
+            },
+            {
+                q: "If a critic writes a 'Panegyric' about a movie, what are they doing?",
+                options: { a: "Saying it is the worst movie ever", b: "Praising the movie highly", c: "Spoiling the ending", d: "Refusing to watch it" },
+                correct: "b",
+                note: "A panegyric is a formal expression of praise."
+            },
+            {
+                q: "Which word would you use to describe a villain who plans to destroy the world?",
+                options: { a: "Phlegmatic", b: "Impecunious", c: "Nefarious", d: "Loquacious" },
+                correct: "c",
+                note: "Nefarious means extremely wicked or villainous."
+            },
+            {
+                q: "Fill in the blank: Due to his bad investments, he went from living in _____ to being completely impecunious.",
+                options: { a: "Opulence", b: "Jeopardy", c: "Niche", d: "Perseverance" },
+                correct: "a",
+                note: "Going from being completely wealthy to penniless creates a stark contrast. 'Opulence' (wealth) fits the first blank."
+            },
+            {
+                q: "Which word is derived from the Latin word for 'without money'?",
+                options: { a: "Impecunious", b: "Opulence", c: "Nefarious", d: "Phlegmatic" },
+                correct: "a",
+                note: "'Impecunious' comes from 'im-' (without) and 'pecunia' (money)."
+            },
+            {
+                q: "What is the antonym of 'Phlegmatic'?",
+                options: { a: "Calm", b: "Excitable", c: "Composed", d: "Peaceful" },
+                correct: "b",
+                note: "A phlegmatic person is calm. Therefore, an 'Excitable' person (easily emotional/upset) is the antonym."
+            },
+            {
+                q: "If a student 'struck several bad patches' during their semester, they:",
+                options: { a: "Got straight A's", b: "Had a lot of difficulties and poor grades", c: "Found some hidden money", d: "Dropped out of school" },
+                correct: "b",
+                note: "Striking bad patches means going through difficult or troubled times."
+            },
+            {
+                q: "Analogy -> Panegyric : Criticism :: Impecunious : ?",
+                options: { a: "Poor", b: "Penniless", c: "Wealthy", d: "Broke" },
+                correct: "c",
+                note: "Panegyric and Criticism are antonyms. The antonym of Impecunious (poor) is Wealthy."
+            },
+            {
+                q: "Which word describes a person who cannot keep a secret because they talk too much?",
+                options: { a: "Loquacious", b: "Phlegmatic", c: "Nefarious", d: "Impecunious" },
+                correct: "a",
+                note: "A 'loquacious' person is very talkative."
+            },
+            {
+                q: "Fill in the blank: The rescue team put their own lives in _____ to save the trapped hikers.",
+                options: { a: "Opulence", b: "Jeopardy", c: "Niche", d: "Panegyric" },
+                correct: "b",
+                note: "Putting lives in 'Jeopardy' means putting them at risk or in danger, which fits a rescue scenario perfectly."
+            }
+        ];
+
+        // --- STREAMING_CHUNK: Function to render the Word Breakdown ---
+        function renderWordBreakdown() {
+            const container = document.getElementById('word-breakdown-container');
+            let htmlContent = '';
+
+            wordData.forEach(data => {
+                let sentencesHtml = '';
+                data.sentences.forEach(s => {
+                    sentencesHtml += `
+                        <li>
+                            ${s.en}<br>
+                            <span class="text-xs text-black bn-text ml-5 block mt-0.5">${s.bn}</span>
+                        </li>
+                    `;
+                });
+
+                htmlContent += `
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 ${data.theme.border}">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold ${data.theme.text}">${data.id}. ${data.word} <span class="text-lg font-medium text-gray-500 ml-1">/${data.pronunciation}/</span> <span class="text-sm font-bold text-gray-700 bn-text ml-2">${data.bnTitle}</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: ${data.syn.en.split(' / ')[0]}</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: ${data.ant.en.split(' / ')[0]}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">${data.origin}</p>
+                    </div>
+
+                    <div class="mb-5 bg-pink-50 p-4 rounded-xl border-l-4 border-pink-400 shadow-sm">
+                        <h4 class="font-bold text-pink-800 flex items-center gap-2 mb-1"><i class="fas fa-lightbulb text-pink-500"></i> Mnemonic (স্মৃতিসূত্র)</h4>
+                        <p class="text-sm text-black font-bold bn-text leading-relaxed">${data.mnemonic}</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            ${sentencesHtml}
+                        </ul>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">${data.syn.en}</span> <span class="text-xs text-gray-500 ml-1">/${data.syn.pronunciation}/</span> <span class="bn-text text-sm font-bold text-black">${data.syn.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.syn.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.syn.exBn}</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">${data.ant.en}</span> <span class="text-xs text-gray-500 ml-1">/${data.ant.pronunciation}/</span> <span class="bn-text text-sm font-bold text-black">${data.ant.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.ant.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.ant.exBn}</p>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // --- STREAMING_CHUNK: Function to render the MCQs ---
+        function renderMCQs() {
+            const container = document.getElementById('mcq-container');
+            let htmlContent = '';
+
+            mcqData.forEach((mcq, index) => {
+                htmlContent += `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-lg text-black mb-3">${index + 1}. ${mcq.q}</h3>
+                    <ul class="space-y-2 mb-4 ml-2">
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">a.</span> ${mcq.options.a}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">b.</span> ${mcq.options.b}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">c.</span> ${mcq.options.c}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">d.</span> ${mcq.options.d}</li>
+                    </ul>
+                    
+                    <details class="group bg-purple-50 rounded-lg outline-none border border-purple-100">
+                        <summary class="cursor-pointer font-bold text-purple-700 px-4 py-2 flex items-center justify-between select-none">
+                            <span class="flex items-center gap-2"><i class="fas fa-eye"></i> Show Answer</span>
+                            <i class="fas fa-chevron-down transform group-open:rotate-180 transition-transform duration-300"></i>
+                        </summary>
+                        <div class="px-4 pb-4 pt-1 border-t border-purple-200 mt-1">
+                            <p class="text-black font-bold mb-2">Correct Answer: <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded uppercase">${mcq.correct}</span></p>
+                            <p class="text-sm text-black font-medium"><span class="font-bold">Note:</span> ${mcq.note}</p>
+                        </div>
+                    </details>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // --- STREAMING_CHUNK: Function to generate Summary List ---
+        function generateSummary() {
+            const summaryElement = document.getElementById('summaryText');
+            let summaryString = '';
+            wordData.forEach(data => {
+                let meaning = data.bnTitle.replace(/[()]/g, '');
+                let syn = data.syn.en.split(' / ')[0];
+                let ant = data.ant.en.split(' / ')[0];
+                summaryString += `${data.word}, ${meaning} - ${syn} @ ${ant};\n`;
+            });
+            summaryElement.innerText = summaryString;
+        }
+
+        // --- STREAMING_CHUNK: DOM Content Loaded initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderWordBreakdown();
+            renderMCQs();
+            generateSummary();
+        });
+
+        // --- STREAMING_CHUNK: Copy functionality ---
+        function copySummary() {
+            const summaryText = document.getElementById('summaryText').innerText;
+            copyTextToClipboard(summaryText, 'Summary list copied!');
+        }
+        
+        function copyStory() {
+            const storyTitle = document.getElementById('story-title').innerText.trim();
+            const storyParagraphs = document.querySelectorAll('#story-content p');
+            let storyText = storyTitle + '\n\n';
+            
+            storyParagraphs.forEach(p => {
+                storyText += p.innerText + '\n\n';
+            });
+            
+            copyTextToClipboard(storyText.trim(), 'Story copied!');
+        }
+
+        function copyMCQs() {
+            let copyText = '';
+            
+            mcqData.forEach((mcq, index) => {
+                copyText += `${index + 1}. ${mcq.q}\n`;
+                copyText += `a. ${mcq.options.a}\n`;
+                copyText += `b. ${mcq.options.b}\n`;
+                copyText += `c. ${mcq.options.c}\n`;
+                copyText += `d. ${mcq.options.d}\n`;
+                copyText += `correct answer: ${mcq.correct}\n`;
+                copyText += `Note: ${mcq.note}\n\n`;
+            });
+            
+            copyTextToClipboard(copyText.trim(), '25 MCQs copied exactly formatted!');
+        }
+
+        function copyTextToClipboard(text, successMessage) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(successMessage);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => showToast(successMessage)).catch(e => console.error("Clipboard API failed", e));
+                }
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toast-message");
+            toastMessage.innerText = message;
+            
+            toast.className = "show";
+            
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
