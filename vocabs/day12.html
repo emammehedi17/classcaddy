@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 12 - Systematic Vocabulary Batch</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            500: '#000000', 
+                            600: '#000000', 
+                            700: '#000000', 
+                            800: '#000000', 
+                            900: '#000000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #eef2ff; /* indigo-50 */
+            color: #000000; 
+        }
+        .bn-text {
+            font-family: 'Hind Siliguri', sans-serif;
+            color: #000000; 
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #4f46e5; /* indigo-600 */
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-blue-50 to-amber-50 min-h-screen p-4 md:p-8 selection:bg-indigo-200 selection:text-indigo-900 text-black">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <header class="glass-card rounded-2xl shadow-lg p-6 md:p-8 mb-8 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-indigo-500 to-amber-500"></div>
+            
+            <div class="text-center md:text-left mb-6 md:mb-0 z-10">
+                <div class="inline-block px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-bold mb-3">
+                    <i class="fas fa-calendar-day mr-2"></i>Daily Vocabulary
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-2 bg-gradient-to-r from-indigo-700 to-amber-600 gradient-text pb-1">
+                    Day 12
+                </h1>
+                <p class="text-black font-semibold flex items-center justify-center md:justify-start gap-2">
+                    <i class="fas fa-pen-nib text-indigo-600"></i>
+                    Created by: 
+                    <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-indigo-700 hover:text-indigo-900 hover:underline transition-colors font-bold relative group">
+                        Emam Mehedi
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex-shrink-0 z-10 bg-white p-2 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300 border-2 border-indigo-100">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-24 h-24 md:w-28 md:h-28 rounded-lg">
+                <p class="text-center text-xs text-black mt-1 font-bold">Scan Me</p>
+            </div>
+        </header>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-10 mb-8 border-t-4 border-t-indigo-500 relative">
+            <div class="absolute -top-4 -right-4 text-indigo-200 opacity-20">
+                <i class="fas fa-chess-rook text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 id="story-title" class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-cloud-moon text-indigo-600"></i> অবিরাম বৃষ্টি ও রহস্যময় আগন্তুক (The Incessant Rain)
+                </h2>
+                <button onclick="copyStory()" class="mt-4 md:mt-0 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-2 px-4 rounded-lg shadow-sm transition-all flex items-center gap-2 border border-indigo-300">
+                    <i class="fas fa-copy"></i> Copy Story
+                </button>
+            </div>
+            
+            <div id="story-content" class="bn-text text-lg md:text-xl text-black font-medium leading-relaxed space-y-4 bg-white/70 p-6 rounded-xl border border-indigo-100 shadow-inner">
+                <p>
+                    ইথেলগার্ড রাজ্যে গত এক মাস ধরে <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Incessant</span> <span class="text-amber-700 font-bold">(অবিরাম / বিরতিহীন)</span> বৃষ্টি হচ্ছিল। রাজা আর্থার সিংহাসনে বসেছিলেন এক অদ্ভুত <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Morose</span> <span class="text-amber-700 font-bold">(বিষণ্ণ / গোমড়ামুখো)</span> অভিব্যক্তি নিয়ে। চিন্তায় এবং না ঘুমিয়ে তার চেহারা হয়ে গিয়েছিল একেবারে <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Haggard</span> <span class="text-amber-700 font-bold">(ক্লান্ত / জীর্ণশীর্ণ)</span>। রাজা আর্থার স্বভাবতই তার সভাসদদের <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Despise</span> <span class="text-amber-700 font-bold">(ঘৃণা / অবজ্ঞা)</span> করতেন, কারণ তারা সবাই শুধু তার মন জুগিয়ে মিথ্যা কথা বলত।
+                </p>
+                <p>
+                    এমন সময় রাজদরবারে লম্বা লম্বা <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Stride</span> <span class="text-amber-700 font-bold">(লম্বা পা ফেলে হাঁটা)</span> দিয়ে এক বৃদ্ধ প্রবেশ করলেন। তার আগমনের কোনো রাজকীয় <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Pageantry</span> <span class="text-amber-700 font-bold">(জাঁকজমক / আড়ম্বর)</span> ছিল না। বৃদ্ধ নিজেকে নতুন এক ভোরের <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Harbinger</span> <span class="text-amber-700 font-bold">(অগ্রদূত)</span> হিসেবে দাবি করলেন। 
+                </p>
+                <p>
+                    রাজার মন্ত্রী বৃদ্ধকে তাচ্ছিল্য করে বলল, "তুমি নিশ্চয়ই একজন <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Sophist</span> <span class="text-amber-700 font-bold">(কুতর্ককারী / মিথ্যা যুক্তিবাদী)</span> যে শুধু মানুষকে বোকা বানায়!" কিন্তু বৃদ্ধ মুচকি হেসে রাজাকে একটি প্রাচীন পাথরের বাক্স দিলেন। তিনি বললেন, "মহারাজ, এই বৃষ্টির কারণ একটি <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Enigma</span> <span class="text-amber-700 font-bold">(ধাঁধা / রহস্য)</span>। আর এই রহস্যের সমাধান ভবিষ্যতের জন্য ফেলে রাখবেন না। আপনাকে এখনই <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Seize the day</span> <span class="text-amber-700 font-bold">(বর্তমানের সদ্ব্যবহার করা)</span> করতে হবে।" 
+                </p>
+                <p>
+                    বৃদ্ধের কথায় রাজা প্রথমবার নিজের বিষণ্ণতা ঝেড়ে ফেললেন এবং রাজ্য বাঁচানোর কাজে নেমে পড়লেন।
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-black mb-6 flex items-center gap-3 px-2">
+                <i class="fas fa-layer-group text-indigo-600"></i> Word Breakdown
+            </h2>
+            
+            <div id="word-breakdown-container" class="grid grid-cols-1 gap-6">
+                <!-- Word cards will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="mb-8 mt-12 border-t-4 border-dashed border-indigo-200 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 px-2">
+                <h2 class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-tasks text-indigo-600"></i> Knowledge Check (MCQs)
+                </h2>
+                <button onclick="copyMCQs()" class="mt-4 md:mt-0 bg-white hover:bg-gray-50 text-indigo-700 font-bold py-2 px-4 rounded-lg shadow transition-all flex items-center gap-2 border border-indigo-200">
+                    <i class="fas fa-copy"></i> Copy MCQs
+                </button>
+            </div>
+            
+            <div id="mcq-container" class="space-y-4">
+                <!-- MCQs will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-8 bg-gradient-to-r from-indigo-900 to-blue-900 text-white relative overflow-hidden mt-8">
+            <div class="absolute -right-10 -bottom-10 opacity-10">
+                <i class="fas fa-clipboard-list text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-indigo-50">
+                    <i class="fas fa-list-check text-amber-400"></i> Summary List
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 bg-amber-500 hover:bg-amber-400 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 border border-amber-400">
+                    <i class="fas fa-copy"></i> Copy List
+                </button>
+            </div>
+            
+            <div class="bg-black/40 p-5 rounded-xl border border-amber-500/30 font-mono text-sm leading-relaxed overflow-x-auto z-10 relative bn-text">
+<pre id="summaryText" class="whitespace-pre-wrap text-amber-50 font-bold"></pre>
+            </div>
+        </section>
+
+        <!-- Navigation Buttons -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 mb-4">
+            <a href="https://classcaddy.netlify.app/vocabs/day11" class="w-full sm:w-auto text-center bg-white hover:bg-indigo-50 text-indigo-700 font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-indigo-200 hover:border-indigo-400 group">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Previous (Day-11)
+            </a>
+            <a href="https://classcaddy.netlify.app/vocabs/day13" class="w-full sm:w-auto text-center bg-gradient-to-r from-indigo-600 to-amber-600 hover:from-indigo-700 hover:to-amber-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-transparent hover:shadow-lg transform hover:-translate-y-0.5 group">
+                Next (Day-13) <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-700 text-sm mt-8 pb-8 font-bold">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i id="toast-icon" class="fas fa-check-circle mr-2"></i><span id="toast-message">Copied!</span></div>
+
+    <script>
+        const wordData = [
+            {
+                id: 1,
+                word: "Harbinger",
+                pronunciation: "হারবিনজার",
+                bnTitle: "(অগ্রদূত / সংকেত)",
+                theme: { border: "border-indigo-500", text: "text-indigo-700" },
+                syn: { en: "Forerunner", pronunciation: "ফোররানার", bn: "(অগ্রদূত)", ex: "The snowdrop is a forerunner of spring.", exBn: "(স্নোড্রপ ফুল বসন্তের একটি অগ্রদূত।)" },
+                ant: { en: "Follower", pronunciation: "ফলোয়ার", bn: "(অনুসারী)", ex: "He is a strict follower of the rules.", exBn: "(সে নিয়মের একজন কঠোর অনুসারী।)" },
+                origin: "পুরানো ফরাসি শব্দ 'herbergier' (যিনি আগে গিয়ে অন্যদের জন্য থাকার জায়গা ব্যবস্থা করেন) থেকে এসেছে। বর্তমানে এটি এমন কিছু বোঝায় যা ভবিষ্যতের কোনো ঘটনার সংকেত দেয়।",
+                mnemonic: "'হার্বিন' (Harbin) + 'জার' (Ger) দিয়ে মনে রাখুন। যে জার বা পাত্রে করে প্রথমে সুখবর নিয়ে আসে, সে হলো Harbinger বা অগ্রদূত।",
+                sentences: [
+                    { en: "The robin is often seen as a harbinger of spring.", bn: "(রবিন পাখিকে প্রায়শই বসন্তের অগ্রদূত হিসেবে দেখা হয়।)" },
+                    { en: "Dark clouds are usually a harbinger of rain.", bn: "(কালো মেঘ সাধারণত বৃষ্টির সংকেত।)" },
+                    { en: "His success was a harbinger of greater things to come.", bn: "(তার সাফল্য ছিল ভবিষ্যতের মহৎ কাজের একটি অগ্রদূত।)" },
+                    { en: "The sudden drop in temperature was a harbinger of winter.", bn: "(তাপমাত্রার হঠাৎ পতন ছিল শীতের একটি সংকেত।)" },
+                    { en: "This new technology is a harbinger of a better future.", bn: "(এই নতুন প্রযুক্তি একটি ভালো ভবিষ্যতের অগ্রদূত।)" }
+                ]
+            },
+            {
+                id: 2,
+                word: "Sophist",
+                pronunciation: "সফিস্ট",
+                bnTitle: "(কুতর্ককারী / মিথ্যা যুক্তিবাদী)",
+                theme: { border: "border-teal-500", text: "text-teal-700" },
+                syn: { en: "Deceiver", pronunciation: "ডিসিভার", bn: "(প্রতারক)", ex: "The deceiver tricked the old woman into giving him money.", exBn: "(প্রতারক বৃদ্ধ মহিলাকে বোকা বানিয়ে তার কাছ থেকে টাকা নিয়েছিল।)" },
+                ant: { en: "Truth-teller", pronunciation: "ট্রুথ-টেলার", bn: "(সত্যবাদী)", ex: "A truth-teller is respected by everyone.", exBn: "(একজন সত্যবাদীকে সবাই সম্মান করে।)" },
+                origin: "প্রাচীন গ্রীক শব্দ 'sophistēs' (জ্ঞানী ব্যক্তি) থেকে এর উৎপত্তি। প্রাচীন গ্রীসে এরা অর্থের বিনিময়ে দর্শন ও যুক্তিবিদ্যা শেখাত। পরে প্লেটো এবং সক্রেটিসের কারণে এটি 'যে চতুরতার সাথে মিথ্যা যুক্তি দিয়ে জেতার চেষ্টা করে' এমন নেতিবাচক অর্থ ধারণ করে।",
+                mnemonic: "'Sophisticated' (জটিল) শব্দটি দিয়ে মনে রাখুন। যে ব্যক্তি Sophisticated বা জটিল কথা বলে সত্যকে মিথ্যা বানিয়ে ফেলে, সে হলো Sophist।",
+                sentences: [
+                    { en: "The politician was a clever sophist who twisted the truth.", bn: "(রাজনীতিবিদ ছিলেন একজন চতুর কুতর্ককারী যিনি সত্যকে বিকৃত করতেন।)" },
+                    { en: "Do not listen to that sophist; his arguments are completely false.", bn: "(সেই মিথ্যা যুক্তিবাদীর কথা শুনবেন না; তার যুক্তিগুলো সম্পূর্ণ মিথ্যা।)" },
+                    { en: "A sophist knows how to make a bad idea look good.", bn: "(একজন কুতর্ককারী জানে কীভাবে একটি খারাপ ধারণাকে ভালো দেখাতে হয়।)" },
+                    { en: "The lawyer played the role of a sophist to win the case.", bn: "(আইনজীবী মামলাটি জেতার জন্য একজন মিথ্যা যুক্তিবাদীর ভূমিকা পালন করেছিলেন।)" },
+                    { en: "He relies on logic, unlike a sophist who relies on tricks.", bn: "(সে যুক্তির ওপর নির্ভর করে, একজন কুতর্ককারীর মতো নয় যে চালাকির ওপর নির্ভর করে।)" }
+                ]
+            },
+            {
+                id: 3,
+                word: "Despise",
+                pronunciation: "ডেস্পাইজ",
+                bnTitle: "(ঘৃণা করা / অবজ্ঞা করা)",
+                theme: { border: "border-red-600", text: "text-red-800" },
+                syn: { en: "Hate", pronunciation: "হেইট", bn: "(ঘৃণা করা)", ex: "I hate people who lie.", exBn: "(আমি মিথ্যাবাদীদের ঘৃণা করি।)" },
+                ant: { en: "Admire", pronunciation: "অ্যাডমায়ার", bn: "(প্রশংসা করা)", ex: "I admire her dedication to her work.", exBn: "(আমি তার কাজের প্রতি একাগ্রতার প্রশংসা করি।)" },
+                origin: "ল্যাটিন শব্দ 'despicere' থেকে এসেছে, যার অর্থ 'নিচের দিকে তাকানো' বা 'অবজ্ঞার চোখে দেখা'। (de- 'নিচে' + specere 'তাকানো')।",
+                mnemonic: "'Despite' (সত্ত্বেও) এর মতো শোনায়। এত ভালো কাজ করা 'Despite' (সত্ত্বেও) তাকে সবাই 'Despise' (ঘৃণা) করে।",
+                sentences: [
+                    { en: "Honest people despise those who cheat and lie.", bn: "(সৎ মানুষ তাদের ঘৃণা করে যারা প্রতারণা করে এবং মিথ্যা বলে।)" },
+                    { en: "She secretly despised him for his arrogance.", bn: "(তার অহংকারের জন্য সে গোপনে তাকে অবজ্ঞা করত।)" },
+                    { en: "He despised the way they treated the poor animals.", bn: "(দরিদ্র প্রাণীদের সাথে তারা যে আচরণ করত তা সে ঘৃণা করত।)" },
+                    { en: "It is wrong to despise someone just because they are poor.", bn: "(কাউকে কেবল গরিব হওয়ার কারণে অবজ্ঞা করা ভুল।)" },
+                    { en: "I despise getting up early in the cold winter mornings.", bn: "(আমি শীতের সকালে তাড়াতাড়ি ঘুম থেকে ওঠা ঘৃণা করি।)" }
+                ]
+            },
+            {
+                id: 4,
+                word: "Stride",
+                pronunciation: "স্ট্রাইড",
+                bnTitle: "(লম্বা পা ফেলে হাঁটা / অগ্রগতি)",
+                theme: { border: "border-blue-600", text: "text-blue-800" },
+                syn: { en: "Pace", pronunciation: "পেস", bn: "(গতি / পদক্ষেপ)", ex: "He walked at a very fast pace.", exBn: "(সে খুব দ্রুত গতিতে বা পদক্ষেপে হাঁটছিল।)" },
+                ant: { en: "Stumble", pronunciation: "স্টাম্বল", bn: "(হোঁচট খাওয়া)", ex: "He stumbled over a rock in the dark.", exBn: "(অন্ধকারে সে একটি পাথরের সাথে হোঁচট খেয়েছিল।)" },
+                origin: "পুরানো ইংরেজি শব্দ 'strīdan' (পা ফাঁক করে দাঁড়ানো বা হাঁটা) থেকে এসেছে। এটি আত্মবিশ্বাসের সাথে লম্বা পদক্ষেপ ফেলা বা কোনো কাজে বড় অগ্রগতি বোঝায়।",
+                mnemonic: "'Ride' (চালানো) দিয়ে মনে রাখুন। ঘোড়ায় Ride করার মতো লম্বা লম্বা পা ফেলে হাঁটাকেই Stride বলে।",
+                sentences: [
+                    { en: "He walked into the room with a confident stride.", bn: "(সে একটি আত্মবিশ্বাসী লম্বা পদক্ষেপ নিয়ে ঘরে প্রবেশ করল।)" },
+                    { en: "Science has made great strides in the last century.", bn: "(বিজ্ঞান গত শতাব্দীতে দারুণ অগ্রগতি লাভ করেছে।)" },
+                    { en: "She matched his long stride to keep up with him.", bn: "(তার সাথে তাল মিলিয়ে চলতে সে তার লম্বা পদক্ষেপের সাথে তাল মেলাল।)" },
+                    { en: "The horse broke into a steady stride.", bn: "(ঘোড়াটি একটি স্থির লম্বা পদক্ষেপে ছুটতে শুরু করল।)" },
+                    { en: "He took the bad news in his stride and kept working.", bn: "(সে দুঃসংবাদটিকে স্বাভাবিকভাবে গ্রহণ করে (in stride) কাজ চালিয়ে গেল।)" }
+                ]
+            },
+            {
+                id: 5,
+                word: "Morose",
+                pronunciation: "মোরোস",
+                bnTitle: "(বিষণ্ণ / গোমড়ামুখো)",
+                theme: { border: "border-gray-600", text: "text-gray-800" },
+                syn: { en: "Gloomy", pronunciation: "গ্লুমি", bn: "(বিষণ্ণ / অন্ধকারাচ্ছন্ন)", ex: "The weather was cold and gloomy today.", exBn: "(আজকের আবহাওয়া ঠান্ডা এবং বিষণ্ণ ছিল।)" },
+                ant: { en: "Cheerful", pronunciation: "চিয়ারফুল", bn: "(প্রফুল্ল / হাসিখুশি)", ex: "She always has a cheerful attitude.", exBn: "(তার সবসময় একটি প্রফুল্ল মনোভাব থাকে।)" },
+                origin: "ল্যাটিন শব্দ 'morosus' থেকে এসেছে, যার অর্থ 'খিটখিটে' বা 'বদমেজাজি'। এটি এমন ব্যক্তিকে বোঝায় যে অসামাজিক, বিষণ্ণ এবং কথা বলতে অনীহা প্রকাশ করে।",
+                mnemonic: "'No Rose' (কোনো গোলাপ নেই) দিয়ে মনে রাখুন। ভ্যালেন্টাইনস ডে-তে কোনো Rose না পেলে মানুষের মন Morose (বিষণ্ণ বা গোমড়ামুখো) হয়ে যায়।",
+                sentences: [
+                    { en: "He became morose after losing his favorite job.", bn: "(প্রিয় চাকরিটি হারানোর পর সে বিষণ্ণ হয়ে পড়েছিল।)" },
+                    { en: "The old man sat in a morose silence all evening.", bn: "(বৃদ্ধ লোকটি সারা সন্ধ্যা গোমড়ামুখো নীরবতায় বসেছিলেন।)" },
+                    { en: "Why are you looking so morose today?", bn: "(আজ তোমাকে এত বিষণ্ণ দেখাচ্ছে কেন?)" },
+                    { en: "Her morose personality made it hard to be friends with her.", bn: "(তার গোমড়ামুখো ব্যক্তিত্ব তার সাথে বন্ধুত্ব করা কঠিন করে তুলেছিল।)" },
+                    { en: "The rainy weather always puts him in a morose mood.", bn: "(বৃষ্টির আবহাওয়া তাকে সবসময় একটি বিষণ্ণ মেজাজে ফেলে দেয়।)" }
+                ]
+            },
+            {
+                id: 6,
+                word: "Seize the day",
+                pronunciation: "সিজ দ্য ডে",
+                bnTitle: "(বর্তমানের সদ্ব্যবহার করা)",
+                theme: { border: "border-amber-600", text: "text-amber-800" },
+                syn: { en: "Carpe diem", pronunciation: "কার্পে ডিয়েম", bn: "(সময়কে কাজে লাগানো)", ex: "His motto in life has always been carpe diem.", exBn: "(জীবনে তার মূলমন্ত্র সবসময়ই কার্পে ডিয়েম বা সময়কে কাজে লাগানো।)" },
+                ant: { en: "Procrastinate", pronunciation: "প্রোক্রাস্টিনেট", bn: "(গড়িমসি করা / বিলম্ব করা)", ex: "Do not procrastinate when you have important work to do.", exBn: "(গুরুত্বপূর্ণ কাজ করার সময় গড়িমসি করবেন না।)" },
+                origin: "এটি বিখ্যাত ল্যাটিন প্রবাদ 'carpe diem' এর ইংরেজি অনুবাদ, যা রোমান কবি হোরেস (Horace) তার কবিতায় ব্যবহার করেছিলেন। এর অর্থ হলো ভবিষ্যৎ নিয়ে চিন্তা না করে আজকের দিনটি উপভোগ করা বা কাজে লাগানো।",
+                mnemonic: "'Seize' মানে ধরা বা দখল করা। আজকের দিনটাকে (Day) শক্ত করে ধরে কাজে লাগানোই হলো Seize the day।",
+                sentences: [
+                    { en: "You are young and healthy; seize the day and travel the world!", bn: "(আপনি তরুণ এবং সুস্থ; বর্তমানের সদ্ব্যবহার করুন এবং বিশ্ব ভ্রমণ করুন!)" },
+                    { en: "He decided to seize the day and start his own business.", bn: "(সে বর্তমান সময়কে কাজে লাগিয়ে নিজের ব্যবসা শুরু করার সিদ্ধান্ত নিয়েছিল।)" },
+                    { en: "Don't wait for tomorrow; seize the day and make it yours.", bn: "(আগামীকালের জন্য অপেক্ষা করবেন না; আজকের দিনটিকে কাজে লাগান এবং নিজের করে নিন।)" },
+                    { en: "Her father always told her to seize the day and grab every opportunity.", bn: "(তার বাবা তাকে সবসময় বলতেন বর্তমানের সদ্ব্যবহার করতে এবং প্রতিটি সুযোগ লুফে নিতে।)" },
+                    { en: "We should seize the day instead of worrying about the past.", bn: "(অতীত নিয়ে চিন্তা করার পরিবর্তে আমাদের বর্তমানের সদ্ব্যবহার করা উচিত।)" }
+                ]
+            },
+            {
+                id: 7,
+                word: "Incessant",
+                pronunciation: "ইনসেস্যান্ট",
+                bnTitle: "(অবিরাম / বিরতিহীন)",
+                theme: { border: "border-cyan-600", text: "text-cyan-800" },
+                syn: { en: "Continuous", pronunciation: "কন্টিনিউয়াস", bn: "(অবিচ্ছিন্ন)", ex: "The continuous rain caused severe flooding.", exBn: "(অবিচ্ছিন্ন বৃষ্টি মারাত্মক বন্যার সৃষ্টি করেছিল।)" },
+                ant: { en: "Intermittent", pronunciation: "ইন্টারমিটেন্ট", bn: "(থেমে থেমে)", ex: "We expect intermittent showers throughout the day.", exBn: "(আমরা সারা দিন থেমে থেমে বৃষ্টির আশা করছি।)" },
+                origin: "ল্যাটিন শব্দ 'incessant-' (যা থামে না) থেকে এসেছে, যেখানে 'in-' (না) এবং 'cessare' (থামা) যুক্ত হয়েছে।",
+                mnemonic: "'In' (না) + 'Cease' (থামা)। যা কখনো Cease বা থামে না, তাই Incessant (অবিরাম বা বিরতিহীন)।",
+                sentences: [
+                    { en: "The incessant rain ruined our plans for a picnic.", bn: "(অবিরাম বৃষ্টি আমাদের পিকনিকের পরিকল্পনা নষ্ট করে দিয়েছিল।)" },
+                    { en: "He was annoyed by the incessant barking of the neighbor's dog.", bn: "(প্রতিবেশীর কুকুরের অবিরাম ঘেউ ঘেউ শুনে সে বিরক্ত হয়েছিল।)" },
+                    { en: "Her incessant talking gave me a terrible headache.", bn: "(তার বিরতিহীন কথা বলা আমাকে একটি ভয়ানক মাথাব্যথা দিয়েছিল।)" },
+                    { en: "The city traffic creates a low, incessant noise.", bn: "(শহরের যানজট একটি ধীর, অবিরাম শব্দের সৃষ্টি করে।)" },
+                    { en: "They worked under the incessant pressure of their boss.", bn: "(তারা তাদের বসের অবিরাম চাপের মধ্যে কাজ করেছিল।)" }
+                ]
+            },
+            {
+                id: 8,
+                word: "Pageantry",
+                pronunciation: "প্যাজেন্ট্রি",
+                bnTitle: "(জাঁকজমক / আড়ম্বরপূর্ণ প্রদর্শন)",
+                theme: { border: "border-purple-600", text: "text-purple-800" },
+                syn: { en: "Spectacle", pronunciation: "স্পেকটাকল", bn: "(দর্শনীয় বস্তু / জাঁকজমক)", ex: "The opening ceremony was a magnificent spectacle.", exBn: "(উদ্বোধনী অনুষ্ঠানটি ছিল একটি চমৎকার জাঁকজমকপূর্ণ দৃশ্য।)" },
+                ant: { en: "Simplicity", pronunciation: "সিমপ্লিসিটি", bn: "(সরলতা)", ex: "She admired the simplicity of the village life.", exBn: "(সে গ্রামের জীবনের সরলতার প্রশংসা করেছিল।)" },
+                origin: "মধ্যযুগীয় ইংরেজি শব্দ 'pagyn' (মঞ্চের দৃশ্য বা নাটক) থেকে উদ্ভূত। এটি সাধারণত রাজকীয় অনুষ্ঠান, কুচকাওয়াজ বা জাঁকজমকপূর্ণ উৎসবকে বোঝায়।",
+                mnemonic: "'Page' (পৃষ্ঠা) + 'Entry' (প্রবেশ)। কোনো রাজকীয় বইয়ের প্রথম Page-এ জাঁকজমকপূর্ণ বা Pageantry ডিজাইনের Entry (নকশা) থাকে।",
+                sentences: [
+                    { en: "The royal wedding was a day of magnificent pageantry.", bn: "(রাজকীয় বিয়েটি ছিল চমৎকার জাঁকজমকের একটি দিন।)" },
+                    { en: "We enjoyed the colorful pageantry of the local festival.", bn: "(আমরা স্থানীয় উৎসবের রঙিন আড়ম্বর উপভোগ করেছি।)" },
+                    { en: "Behind all the pageantry, the king was actually very lonely.", bn: "(সমস্ত জাঁকজমকের আড়ালে, রাজা আসলে খুব একাকী ছিলেন।)" },
+                    { en: "The coronation ceremony was full of grand pageantry.", bn: "(রাজ্যাভিষেক অনুষ্ঠানটি দুর্দান্ত জাঁকজমকে পূর্ণ ছিল।)" },
+                    { en: "Military pageantry was displayed during the parade.", bn: "(কুচকাওয়াজের সময় সামরিক জাঁকজমক প্রদর্শিত হয়েছিল।)" }
+                ]
+            },
+            {
+                id: 9,
+                word: "Enigma",
+                pronunciation: "এনিগমা",
+                bnTitle: "(ধাঁধা / রহস্য)",
+                theme: { border: "border-fuchsia-600", text: "text-fuchsia-800" },
+                syn: { en: "Mystery", pronunciation: "মিস্ট্রি", bn: "(রহস্য)", ex: "The disappearance of the flight remains an unsolved mystery.", exBn: "(ফ্লাইটটির নিখোঁজ হওয়া একটি অমীমাংসিত রহস্য হয়ে আছে।)" },
+                ant: { en: "Clarity", pronunciation: "ক্ল্যারিটি", bn: "(স্পষ্টতা)", ex: "He explained the complex topic with absolute clarity.", exBn: "(তিনি নিখুঁত স্পষ্টতার সাথে জটিল বিষয়টি ব্যাখ্যা করেছিলেন।)" },
+                origin: "গ্রীক শব্দ 'ainigma' থেকে এসেছে, যার অর্থ 'অস্পষ্টভাবে কথা বলা' বা 'ধাঁধায় কথা বলা'। দ্বিতীয় বিশ্বযুদ্ধে জার্মানদের সাংকেতিক কোড মেশিনের নামও ছিল 'Enigma'।",
+                mnemonic: "'এ' + 'কী' + 'মা' (এনিগমা)। এমন একটা অদ্ভুত বা রহস্যময় জিনিস যা দেখে সবাই অবাক হয়ে বলে, 'এ কী মা!'—অর্থাৎ এটি একটি রহস্য বা Enigma।",
+                sentences: [
+                    { en: "The sudden disappearance of the diamond is an absolute enigma.", bn: "(হীরাটির আকস্মিক নিখোঁজ হওয়া একটি নিখুঁত রহস্য।)" },
+                    { en: "His true motivation remains an enigma to us all.", bn: "(তার আসল উদ্দেশ্য আমাদের সবার কাছে একটি ধাঁধা হয়ে আছে।)" },
+                    { en: "The universe is full of unsolved enigmas.", bn: "(মহাবিশ্ব অমীমাংসিত রহস্যে পূর্ণ।)" },
+                    { en: "She is an enigma; nobody knows what she is thinking.", bn: "(সে একজন রহস্যময়ী; কেউ জানে না সে কী ভাবছে।)" },
+                    { en: "The detective tried to solve the enigma of the locked room.", bn: "(গোয়েন্দা তালাবদ্ধ ঘরের রহস্য সমাধানের চেষ্টা করেছিলেন।)" }
+                ]
+            },
+            {
+                id: 10,
+                word: "Haggard",
+                pronunciation: "হ্যাগ্যার্ড",
+                bnTitle: "(ক্লান্ত / জীর্ণশীর্ণ)",
+                theme: { border: "border-orange-600", text: "text-orange-800" },
+                syn: { en: "Exhausted", pronunciation: "এক্সজস্টেড", bn: "(অত্যন্ত ক্লান্ত)", ex: "He was completely exhausted after the long run.", exBn: "(দীর্ঘ দৌড়ের পর সে পুরোপুরি ক্লান্ত হয়ে পড়েছিল।)" },
+                ant: { en: "Energetic", pronunciation: "এনার্জেটিক", bn: "(উদ্যমী / শক্তিতে ভরপুর)", ex: "The children were very energetic playing in the park.", exBn: "(বাচ্চারা পার্কে খেলার সময় খুব উদ্যমী ছিল।)" },
+                origin: "মধ্য ফরাসি শব্দ 'hagard' থেকে এসেছে, যা মূলত একটি 'বন্য, অবাধ্য বাজপাখি' বোঝাতে ব্যবহৃত হতো। পরে এটি দুশ্চিন্তা বা ক্লান্তিতে চোখ-মুখ বসে যাওয়া জীর্ণ চেহারা বোঝাতে শুরু করে।",
+                mnemonic: "'Hag' (ডাইনি)। ডাইনি বা Hag-দের মতো দেখতে রোগা, ক্লান্ত ও জীর্ণশীর্ণ চেহারাই হলো Haggard।",
+                sentences: [
+                    { en: "After three days of working without sleep, he looked incredibly haggard.", bn: "(তিন দিন না ঘুমিয়ে কাজ করার পর তাকে অবিশ্বাস্যরকম জীর্ণশীর্ণ দেখাচ্ছিল।)" },
+                    { en: "The rescued hikers were starving and haggard.", bn: "(উদ্ধারকৃত হাইকাররা ক্ষুধার্ত এবং ক্লান্ত ছিল।)" },
+                    { en: "She had a pale and haggard face from the illness.", bn: "(অসুস্থতার কারণে তার একটি ফ্যাকাশে এবং জীর্ণশীর্ণ মুখমণ্ডল ছিল।)" },
+                    { en: "He emerged from the forest looking old and haggard.", bn: "(জঙ্গল থেকে বেরিয়ে আসার পর তাকে বৃদ্ধ এবং ক্লান্ত দেখাচ্ছিল।)" },
+                    { en: "Stress and overwork made him look haggard beyond his years.", bn: "(মানসিক চাপ এবং অতিরিক্ত কাজ তাকে তার বয়সের চেয়েও বেশি জীর্ণশীর্ণ করে তুলেছিল।)" }
+                ]
+            }
+        ];
+
+        // --- STREAMING_CHUNK: Setting up the MCQs Data ---
+        const mcqData = [
+            {
+                q: "What does the word 'Harbinger' mean?",
+                options: { a: "A dangerous animal", b: "A person or thing that signals the approach of something", c: "A peaceful agreement", d: "A fast runner" },
+                correct: "b",
+                note: "'Harbinger' comes from Old French for providing lodging, and now means a forerunner or something that signals what is to come."
+            },
+            {
+                q: "Which word correctly acts as an antonym for 'Sophist'?",
+                options: { a: "Deceiver", b: "Truth-teller", c: "Philosopher", d: "Agitator" },
+                correct: "b",
+                note: "A 'Sophist' is someone who uses clever but false arguments (deceiver). Therefore, 'Truth-teller' is the antonym."
+            },
+            {
+                q: "Fill in the blank: The honest citizens ______ the corrupt mayor for his actions.",
+                options: { a: "Venerate", b: "Despise", c: "Stride", d: "Amalgamate" },
+                correct: "b",
+                note: "Honest people would strongly hate or look down upon a corrupt mayor, which is the definition of 'Despise'."
+            },
+            {
+                q: "If someone takes a long, confident 'Stride', they are:",
+                options: { a: "Walking with long, decisive steps", b: "Falling down the stairs", c: "Swimming in a pool", d: "Crawling quietly" },
+                correct: "a",
+                note: "A 'Stride' refers to a long, confident step or pace while walking."
+            },
+            {
+                q: "What describes a person who is 'Morose'?",
+                options: { a: "Cheerful and happy", b: "Sullen, gloomy, and ill-tempered", c: "Wealthy and powerful", d: "Fast and energetic" },
+                correct: "b",
+                note: "Derived from Latin 'morosus', a morose person is gloomy, miserable, and bad-tempered."
+            },
+            {
+                q: "Which phrase is synonymous with 'Seize the day'?",
+                options: { a: "Procrastinate", b: "Carpe diem", c: "A dark horse", d: "Panacea" },
+                correct: "b",
+                note: "'Seize the day' is the direct English translation of the Latin phrase 'Carpe diem'."
+            },
+            {
+                q: "If a noise is 'Incessant', it is:",
+                options: { a: "Very quiet", b: "Pleasant to hear", c: "Never stopping or continuous", d: "Intermittent" },
+                correct: "c",
+                note: "Incessant (In + cease) means unceasing or continuing without pause or interruption."
+            },
+            {
+                q: "Which of the following would be an example of 'Pageantry'?",
+                options: { a: "A quiet dinner at home", b: "A grand, colorful royal parade", c: "A short, simple email", d: "A secret meeting" },
+                correct: "b",
+                note: "'Pageantry' refers to a spectacular, elaborate display or ceremony, like a royal parade."
+            },
+            {
+                q: "Fill in the blank: How the magician performed the trick remains a complete ______ to the audience.",
+                options: { a: "Harbinger", b: "Sophist", c: "Enigma", d: "Pageantry" },
+                correct: "c",
+                note: "A magic trick that cannot be explained is a mystery or an 'Enigma'."
+            },
+            {
+                q: "What does a 'Haggard' person look like?",
+                options: { a: "Exhausted, unwell, and drawn", b: "Fresh and energetic", c: "Young and glowing", d: "Overweight and happy" },
+                correct: "a",
+                note: "Haggard means looking exhausted and unwell, especially from fatigue, worry, or suffering."
+            },
+            {
+                q: "Which word is the antonym of 'Incessant'?",
+                options: { a: "Continuous", b: "Intermittent", c: "Perpetual", d: "Endless" },
+                correct: "b",
+                note: "Incessant means non-stop. Intermittent means occurring at irregular intervals (stopping and starting), making it the antonym."
+            },
+            {
+                q: "Analogy -> Smile : Cheerful :: Frown : ?",
+                options: { a: "Morose", b: "Able", c: "Amiable", d: "Vigilant" },
+                correct: "a",
+                note: "A smile indicates a cheerful person. A frown indicates a gloomy or 'Morose' person."
+            },
+            {
+                q: "Which word is derived from the Greek word for 'to speak darkly or in riddles'?",
+                options: { a: "Sophist", b: "Enigma", c: "Harbinger", d: "Despise" },
+                correct: "b",
+                note: "'Enigma' comes from the Greek 'ainigma', meaning a riddle or mystery."
+            },
+            {
+                q: "Fill in the blank: The general rode in with his army, surrounded by military ______.",
+                options: { a: "Pageantry", b: "Psoriasis", c: "Parsimony", d: "Impediment" },
+                correct: "a",
+                note: "Military parades and displays are accompanied by grand 'Pageantry'."
+            },
+            {
+                q: "What is the relationship in 'Despise : Hate'?",
+                options: { a: "They are antonyms", b: "They are synonyms", c: "One causes the other", d: "They relate to love" },
+                correct: "b",
+                note: "Both Despise and Hate mean to feel a strong dislike for someone or something."
+            },
+            {
+                q: "If a student decides to 'Seize the day', what are they most likely doing?",
+                options: { a: "Sleeping all afternoon", b: "Taking advantage of an immediate opportunity to study or grow", c: "Waiting for next year to start", d: "Complaining about the past" },
+                correct: "b",
+                note: "Seizing the day means making the most of the present moment."
+            },
+            {
+                q: "Which word implies making a false argument sound clever or logical?",
+                options: { a: "Sophist", b: "Philanthropist", c: "Demagogue", d: "Cardiologist" },
+                correct: "a",
+                note: "A 'Sophist' uses clever, sophisticated, but false reasoning to deceive others."
+            },
+            {
+                q: "Fill in the blank: The dark storm clouds gathering in the sky were a ______ of the hurricane.",
+                options: { a: "Harbinger", b: "Memento", c: "Hut", d: "Cygnet" },
+                correct: "a",
+                note: "Dark clouds signal or announce the coming of a storm, acting as a 'Harbinger'."
+            },
+            {
+                q: "Which word describes the physical appearance of someone who hasn't slept for days?",
+                options: { a: "Haggard", b: "Competent", c: "Lucid", d: "Panoramic" },
+                correct: "a",
+                note: "Lack of sleep results in an exhausted, drawn, or 'Haggard' appearance."
+            },
+            {
+                q: "What is the antonym of 'Despise'?",
+                options: { a: "Hate", b: "Loathe", c: "Admire", d: "Abase" },
+                correct: "c",
+                note: "To despise is to hate. To 'Admire' is to regard with respect or warm approval, making it the antonym."
+            },
+            {
+                q: "Analogy -> Whisper : Shout :: Stumble : ?",
+                options: { a: "Fall", b: "Stride", c: "Limp", d: "Crawl" },
+                correct: "b",
+                note: "Whisper is the opposite of Shout. Stumbling (clumsy walking) is the opposite of taking a confident 'Stride'."
+            },
+            {
+                q: "If someone tells you a story that makes no sense and has no clear answer, it is an:",
+                options: { a: "Enigma", b: "Elegy", c: "Extempore", d: "Ablution" },
+                correct: "a",
+                note: "A confusing, unsolvable puzzle or story is an 'Enigma'."
+            },
+            {
+                q: "Which word best completes the sentence: 'The ______ dripping of the leaky faucet kept me awake all night.'",
+                options: { a: "Incessant", b: "Ephemeral", c: "Hypothetical", d: "Amiable" },
+                correct: "a",
+                note: "A dripping faucet that doesn't stop is 'Incessant' (continuous)."
+            },
+            {
+                q: "A person who is 'Morose' is LEAST likely to:",
+                options: { a: "Sit quietly in a corner", b: "Frown at a joke", c: "Dance joyfully at a party", d: "Complain about the weather" },
+                correct: "c",
+                note: "A morose (gloomy/sullen) person would not be cheerful or dance joyfully."
+            },
+            {
+                q: "Which of the following words originally referred to a 'wild untamed hawk'?",
+                options: { a: "Harbinger", b: "Haggard", c: "Cygnet", d: "Sophist" },
+                correct: "b",
+                note: "'Haggard' comes from the Middle French word for a wild, untamed hawk before evolving to mean looking exhausted or wild."
+            }
+        ];
+
+        // --- STREAMING_CHUNK: Function to render the Word Breakdown ---
+        function renderWordBreakdown() {
+            const container = document.getElementById('word-breakdown-container');
+            let htmlContent = '';
+
+            wordData.forEach(data => {
+                let sentencesHtml = '';
+                data.sentences.forEach(s => {
+                    sentencesHtml += `
+                        <li>
+                            ${s.en}<br>
+                            <span class="text-xs text-black bn-text ml-5 block mt-0.5">${s.bn}</span>
+                        </li>
+                    `;
+                });
+
+                htmlContent += `
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 ${data.theme.border}">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold ${data.theme.text}">${data.id}. ${data.word} <span class="text-lg font-medium text-gray-500 ml-1">/${data.pronunciation}/</span> <span class="text-sm font-bold text-gray-700 bn-text ml-2">${data.bnTitle}</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: ${data.syn.en.split(' / ')[0]}</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: ${data.ant.en.split(' / ')[0]}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">${data.origin}</p>
+                    </div>
+
+                    <div class="mb-5 bg-indigo-50 p-4 rounded-xl border-l-4 border-indigo-400 shadow-sm">
+                        <h4 class="font-bold text-indigo-800 flex items-center gap-2 mb-1"><i class="fas fa-lightbulb text-indigo-500"></i> Mnemonic (স্মৃতিসূত্র)</h4>
+                        <p class="text-sm text-black font-bold bn-text leading-relaxed">${data.mnemonic}</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            ${sentencesHtml}
+                        </ul>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">${data.syn.en}</span> <span class="text-xs text-gray-500 ml-1">/${data.syn.pronunciation}/</span> <span class="bn-text text-sm font-bold text-black">${data.syn.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.syn.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.syn.exBn}</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">${data.ant.en}</span> <span class="text-xs text-gray-500 ml-1">/${data.ant.pronunciation}/</span> <span class="bn-text text-sm font-bold text-black">${data.ant.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.ant.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.ant.exBn}</p>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // --- STREAMING_CHUNK: Function to render the MCQs ---
+        function renderMCQs() {
+            const container = document.getElementById('mcq-container');
+            let htmlContent = '';
+
+            mcqData.forEach((mcq, index) => {
+                htmlContent += `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-lg text-black mb-3">${index + 1}. ${mcq.q}</h3>
+                    <ul class="space-y-2 mb-4 ml-2">
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">a.</span> ${mcq.options.a}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">b.</span> ${mcq.options.b}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">c.</span> ${mcq.options.c}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">d.</span> ${mcq.options.d}</li>
+                    </ul>
+                    
+                    <details class="group bg-indigo-50 rounded-lg outline-none border border-indigo-100">
+                        <summary class="cursor-pointer font-bold text-indigo-700 px-4 py-2 flex items-center justify-between select-none">
+                            <span class="flex items-center gap-2"><i class="fas fa-eye"></i> Show Answer</span>
+                            <i class="fas fa-chevron-down transform group-open:rotate-180 transition-transform duration-300"></i>
+                        </summary>
+                        <div class="px-4 pb-4 pt-1 border-t border-indigo-200 mt-1">
+                            <p class="text-black font-bold mb-2">Correct Answer: <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded uppercase">${mcq.correct}</span></p>
+                            <p class="text-sm text-black font-medium"><span class="font-bold">Note:</span> ${mcq.note}</p>
+                        </div>
+                    </details>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // --- STREAMING_CHUNK: Function to generate Summary List ---
+        function generateSummary() {
+            const summaryElement = document.getElementById('summaryText');
+            let summaryString = '';
+            wordData.forEach(data => {
+                let meaning = data.bnTitle.replace(/[()]/g, '');
+                let syn = data.syn.en.split(' / ')[0];
+                let ant = data.ant.en.split(' / ')[0];
+                summaryString += `${data.word}, ${meaning} - ${syn} @ ${ant};\n`;
+            });
+            summaryElement.innerText = summaryString;
+        }
+
+        // --- STREAMING_CHUNK: DOM Content Loaded initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderWordBreakdown();
+            renderMCQs();
+            generateSummary();
+        });
+
+        // --- STREAMING_CHUNK: Copy functionality ---
+        function copySummary() {
+            const summaryText = document.getElementById('summaryText').innerText;
+            copyTextToClipboard(summaryText, 'Summary list copied!');
+        }
+        
+        function copyStory() {
+            const storyTitle = document.getElementById('story-title').innerText.trim();
+            const storyParagraphs = document.querySelectorAll('#story-content p');
+            let storyText = storyTitle + '\n\n';
+            
+            storyParagraphs.forEach(p => {
+                storyText += p.innerText + '\n\n';
+            });
+            
+            copyTextToClipboard(storyText.trim(), 'Story copied!');
+        }
+
+        function copyMCQs() {
+            let copyText = '';
+            
+            mcqData.forEach((mcq, index) => {
+                copyText += `${index + 1}. ${mcq.q}\n`;
+                copyText += `a. ${mcq.options.a}\n`;
+                copyText += `b. ${mcq.options.b}\n`;
+                copyText += `c. ${mcq.options.c}\n`;
+                copyText += `d. ${mcq.options.d}\n`;
+                copyText += `correct answer: ${mcq.correct}\n`;
+                copyText += `Note: ${mcq.note}\n\n`;
+            });
+            
+            copyTextToClipboard(copyText.trim(), '25 MCQs copied exactly formatted!');
+        }
+
+        function copyTextToClipboard(text, successMessage) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(successMessage);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => showToast(successMessage)).catch(e => console.error("Clipboard API failed", e));
+                }
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toast-message");
+            toastMessage.innerText = message;
+            
+            toast.className = "show";
+            
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

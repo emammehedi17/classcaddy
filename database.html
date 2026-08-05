@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Database - Individual Downloads</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header-section h1 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+        .badge {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+        .badge a {
+            color: #2980b9;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .badge a:hover {
+            text-decoration: underline;
+        }
+        .qr-code {
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .table-container {
+            overflow-x: auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center; 
+        }
+        th, td {
+            padding: 15px 10px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: middle;
+        }
+        td:nth-child(2), td:nth-child(3) {
+            text-align: left; 
+        }
+        th {
+            background-color: #2c3e50;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        /* Base image styles */
+        .table-img {
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: #f0f0f0 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="50" x="50" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="10" fill="%23aaa">Loading</text></svg>') center center no-repeat;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: block;
+            margin: 0 auto 8px auto; /* Centered with space below for button */
+        }
+        
+        /* Specific sizes */
+        .img-pic {
+            width: 300px;
+            height: 300px;
+            object-fit: cover; 
+        }
+        
+        .img-signature {
+            width: 300px;
+            height: 100px;
+            object-fit: contain; 
+            background-color: #ffffff;
+        }
+        
+        .img-default {
+            width: 150px;
+            height: auto;
+            max-height: 200px;
+            object-fit: contain;
+        }
+
+        .table-img:hover {
+            transform: scale(1.05); /* Slight zoom on hover */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 10;
+        }
+        
+        a.link-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        /* Download Button Styles */
+        .dl-btn {
+            display: inline-block;
+            padding: 4px 10px;
+            background-color: #e67e22;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.85em;
+            transition: background-color 0.2s;
+            font-weight: 500;
+        }
+        .dl-btn:hover {
+            background-color: #d35400;
+        }
+        
+        .img-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-section">
+        <h1>Database Records</h1>
+        <div class="badge">Created by <a href="https://www.facebook.com/emammehedi17/" target="_blank">Emam Mehedi</a></div>
+        <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="qr-code">
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Serial</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>NID</th>
+                    <th>PiC (300x300)</th>
+                    <th>Signature (300x100)</th>
+                    <th>Certificate</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Srabani Khatun</td>
+                    <td>srabonikhatunhabiba@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1ILNrf4p8JEEpKv1LAH6ZQ-LSt0wXAbf_' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1ILNrf4p8JEEpKv1LAH6ZQ-LSt0wXAbf_&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1ILNrf4p8JEEpKv1LAH6ZQ-LSt0wXAbf_" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1jZPDadF8jZHxRuvaErvvsZatdu8s233u' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1jZPDadF8jZHxRuvaErvvsZatdu8s233u&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1jZPDadF8jZHxRuvaErvvsZatdu8s233u" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1tqGntIE_NgR5KGN4Q-OUMUPvJn0AHRS8' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1tqGntIE_NgR5KGN4Q-OUMUPvJn0AHRS8&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1tqGntIE_NgR5KGN4Q-OUMUPvJn0AHRS8" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1dasoI4xOkrxwqmVKrsOhM2Iwd7l8AuR_' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1dasoI4xOkrxwqmVKrsOhM2Iwd7l8AuR_&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1dasoI4xOkrxwqmVKrsOhM2Iwd7l8AuR_" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>kamini khatun</td>
+                    <td>kaminisarkar09876@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1iJZQbwlgEGyZD2LT5oJR_7AWasuZgyEi' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1iJZQbwlgEGyZD2LT5oJR_7AWasuZgyEi&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1iJZQbwlgEGyZD2LT5oJR_7AWasuZgyEi" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1tj_O_XiHMWaB2J2EJsBTg8MSw9oTxHnz' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1tj_O_XiHMWaB2J2EJsBTg8MSw9oTxHnz&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1tj_O_XiHMWaB2J2EJsBTg8MSw9oTxHnz" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1dHMWMjnMefw1COpOgCw2513T6bZexJkG' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1dHMWMjnMefw1COpOgCw2513T6bZexJkG&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1dHMWMjnMefw1COpOgCw2513T6bZexJkG" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1sj4Zbx6p6KvR29me0fswPvdc-DTzjZrc' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1sj4Zbx6p6KvR29me0fswPvdc-DTzjZrc&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1sj4Zbx6p6KvR29me0fswPvdc-DTzjZrc" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Samira Akter</td>
+                    <td>aktersamira252@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1XBFzSft8oxGURTuUeQTc07SA2ll2NOUk' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1XBFzSft8oxGURTuUeQTc07SA2ll2NOUk&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1XBFzSft8oxGURTuUeQTc07SA2ll2NOUk" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1qAnvNNp4B30uF9meyiYAi44gP7uLbKrm' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1qAnvNNp4B30uF9meyiYAi44gP7uLbKrm&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1qAnvNNp4B30uF9meyiYAi44gP7uLbKrm" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1WWEWfP2xyjmCK6EX1SgbMFne6YkOOQXk' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1WWEWfP2xyjmCK6EX1SgbMFne6YkOOQXk&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1WWEWfP2xyjmCK6EX1SgbMFne6YkOOQXk" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1ftDHJ7PZDidK8YSGFVzBcUXOKBHW9Ovw' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1ftDHJ7PZDidK8YSGFVzBcUXOKBHW9Ovw&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1ftDHJ7PZDidK8YSGFVzBcUXOKBHW9Ovw" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Shohaba Maria Lubna</td>
+                    <td>mrs.adiba.abs@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1QNFevlXuspJ6kaArTDZ2tYZkW4tGzqfi' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1QNFevlXuspJ6kaArTDZ2tYZkW4tGzqfi&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1QNFevlXuspJ6kaArTDZ2tYZkW4tGzqfi" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1uMI7Y8CaD-Mm5cnK8VlXDIriEEAZTQtH' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1uMI7Y8CaD-Mm5cnK8VlXDIriEEAZTQtH&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1uMI7Y8CaD-Mm5cnK8VlXDIriEEAZTQtH" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=14IwnP3PpypexhuZw0Mw5QuaDkJWTFzB5' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=14IwnP3PpypexhuZw0Mw5QuaDkJWTFzB5&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=14IwnP3PpypexhuZw0Mw5QuaDkJWTFzB5" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=12ht2Pol06fQJTkpP8VC2WiH7piKoaR_3' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=12ht2Pol06fQJTkpP8VC2WiH7piKoaR_3&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=12ht2Pol06fQJTkpP8VC2WiH7piKoaR_3" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Maruf Fakir</td>
+                    <td>2002mmaruf@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1y0NmtRf2ZJ_uB3C6hDrL0sH349nBZmf6' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1y0NmtRf2ZJ_uB3C6hDrL0sH349nBZmf6&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1y0NmtRf2ZJ_uB3C6hDrL0sH349nBZmf6" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1BdPo0vJ6LNwoaTKpSdnRzk7B0fjLUJav' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1BdPo0vJ6LNwoaTKpSdnRzk7B0fjLUJav&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1BdPo0vJ6LNwoaTKpSdnRzk7B0fjLUJav" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1AbOUyukzv15nPj2oNvxb8PNnq2UgbuoV' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1AbOUyukzv15nPj2oNvxb8PNnq2UgbuoV&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1AbOUyukzv15nPj2oNvxb8PNnq2UgbuoV" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1-rZvqi2ICz89-2ultoeGusFaMNmv9YBs' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1-rZvqi2ICz89-2ultoeGusFaMNmv9YBs&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1-rZvqi2ICz89-2ultoeGusFaMNmv9YBs" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Sujana Khan</td>
+                    <td>sujanakhan729@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1qi5IelU67bbHWmsQmnZJaU7ClRAA2dfq' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1qi5IelU67bbHWmsQmnZJaU7ClRAA2dfq&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1qi5IelU67bbHWmsQmnZJaU7ClRAA2dfq" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1isHGn7KeM-RanyF__gQoEIkgrWnCJKF0' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1isHGn7KeM-RanyF__gQoEIkgrWnCJKF0&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1isHGn7KeM-RanyF__gQoEIkgrWnCJKF0" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1gzH1bh3MegORU738I8Ldm021sLbq0JjF' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1gzH1bh3MegORU738I8Ldm021sLbq0JjF&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1gzH1bh3MegORU738I8Ldm021sLbq0JjF" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1v8rLe-L4TqpuA892xDtT5AP00Qeoyrl7' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1v8rLe-L4TqpuA892xDtT5AP00Qeoyrl7&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1v8rLe-L4TqpuA892xDtT5AP00Qeoyrl7" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Jannatul Ferdous Ratna</td>
+                    <td>tajrianmomin@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1ZsY602uiTKar1NyDYlQvfEM698ne56dq' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1ZsY602uiTKar1NyDYlQvfEM698ne56dq&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1ZsY602uiTKar1NyDYlQvfEM698ne56dq" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=19O6Xt010kzF9jNSVuImnCFamM1JPTNsW' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=19O6Xt010kzF9jNSVuImnCFamM1JPTNsW&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=19O6Xt010kzF9jNSVuImnCFamM1JPTNsW" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1X7xZEkVLui9qEvioVrne5BzUfvs0qn0_' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1X7xZEkVLui9qEvioVrne5BzUfvs0qn0_&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1X7xZEkVLui9qEvioVrne5BzUfvs0qn0_" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1JRQN2eBz-ljDrgp6Zrv1t2ZmHc7Cg2rJ' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1JRQN2eBz-ljDrgp6Zrv1t2ZmHc7Cg2rJ&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1JRQN2eBz-ljDrgp6Zrv1t2ZmHc7Cg2rJ" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>Saddad Hasan</td>
+                    <td>saddadhasan3@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1eYcVEpKBh7P6RdjcHNauDS2oCci3tIE4' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1eYcVEpKBh7P6RdjcHNauDS2oCci3tIE4&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1eYcVEpKBh7P6RdjcHNauDS2oCci3tIE4" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1fatApp7a-Lyv5YztsgUzrxSs_EPnlSm2' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1fatApp7a-Lyv5YztsgUzrxSs_EPnlSm2&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1fatApp7a-Lyv5YztsgUzrxSs_EPnlSm2" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1-Z3ege0IoBSaIwv9H8v3-ILhC1d0Gz62' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1-Z3ege0IoBSaIwv9H8v3-ILhC1d0Gz62&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1-Z3ege0IoBSaIwv9H8v3-ILhC1d0Gz62" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1Zq1XvHx8Q20eUo9W7aPbloeFh41R7ChI' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1Zq1XvHx8Q20eUo9W7aPbloeFh41R7ChI&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1Zq1XvHx8Q20eUo9W7aPbloeFh41R7ChI" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>khadiza akter</td>
+                    <td>khadiza2001@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1BDwHt8D04pe9W4Vq4HiXrwm5OoRdQvy2' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1BDwHt8D04pe9W4Vq4HiXrwm5OoRdQvy2&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1BDwHt8D04pe9W4Vq4HiXrwm5OoRdQvy2" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1XPJy2HFP1u4g7gtzKZ9w7XpzF3X3d1VQ' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1XPJy2HFP1u4g7gtzKZ9w7XpzF3X3d1VQ&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1XPJy2HFP1u4g7gtzKZ9w7XpzF3X3d1VQ" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1ocAUERnQYQZBX6zn-DyfgnnwF2HlofY7' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1ocAUERnQYQZBX6zn-DyfgnnwF2HlofY7&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1ocAUERnQYQZBX6zn-DyfgnnwF2HlofY7" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1H9oWoeXZKqLOocGXmhxTWAQxAKur4V4C' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1H9oWoeXZKqLOocGXmhxTWAQxAKur4V4C&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1H9oWoeXZKqLOocGXmhxTWAQxAKur4V4C" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>Md. Monirul Kabir</td>
+                    <td>saundra.royule1m@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=16etCWNsNZIcLZ32kwDhz6mhXh6-5bUwZ' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=16etCWNsNZIcLZ32kwDhz6mhXh6-5bUwZ&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=16etCWNsNZIcLZ32kwDhz6mhXh6-5bUwZ" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1NzEXL9dG69kIn1lbmTCPm-QZloFagFNQ' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1NzEXL9dG69kIn1lbmTCPm-QZloFagFNQ&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1NzEXL9dG69kIn1lbmTCPm-QZloFagFNQ" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=14LFXM34X3kjOTM6hIcWfEjnNtrfV63qg' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=14LFXM34X3kjOTM6hIcWfEjnNtrfV63qg&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=14LFXM34X3kjOTM6hIcWfEjnNtrfV63qg" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1Ihi7GUuQ8zO5evT9KyEiLDkmsuEs3KL4' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1Ihi7GUuQ8zO5evT9KyEiLDkmsuEs3KL4&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1Ihi7GUuQ8zO5evT9KyEiLDkmsuEs3KL4" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>Rashed Musharaf Anonto</td>
+                    <td>anontorashed38@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=13nCTMBOOdbutbTXU8WanbibfaVHzurIJ' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=13nCTMBOOdbutbTXU8WanbibfaVHzurIJ&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=13nCTMBOOdbutbTXU8WanbibfaVHzurIJ" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1iI8AI7EJPOXpHhUtYyAHYLAkMRC5K5AL' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1iI8AI7EJPOXpHhUtYyAHYLAkMRC5K5AL&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1iI8AI7EJPOXpHhUtYyAHYLAkMRC5K5AL" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1xS5X_ZWw8n1RM_Qftes6aUaOycRrQr8r' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1xS5X_ZWw8n1RM_Qftes6aUaOycRrQr8r&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1xS5X_ZWw8n1RM_Qftes6aUaOycRrQr8r" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1l4qXEcW-Ksb6BuKHjv39JxDfwaIyZsSt' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1l4qXEcW-Ksb6BuKHjv39JxDfwaIyZsSt&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1l4qXEcW-Ksb6BuKHjv39JxDfwaIyZsSt" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td>A.K.M.Ruman Sadek</td>
+                    <td>rumansadek199@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1TsStQnySNzznLQdfdDNQ7z2lP7_ExFkm' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1TsStQnySNzznLQdfdDNQ7z2lP7_ExFkm&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1TsStQnySNzznLQdfdDNQ7z2lP7_ExFkm" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1CcDeTgm0UQqh9xZ8KSG4sXbpitGo1-jc' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1CcDeTgm0UQqh9xZ8KSG4sXbpitGo1-jc&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1CcDeTgm0UQqh9xZ8KSG4sXbpitGo1-jc" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1kXOWQCXnGIfhbV1jKgA7APkdWzmIsKX8' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1kXOWQCXnGIfhbV1jKgA7APkdWzmIsKX8&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1kXOWQCXnGIfhbV1jKgA7APkdWzmIsKX8" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1G3ErZ2Ur2tAxW1XTIkEo1AUPiwu9TZIP' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1G3ErZ2Ur2tAxW1XTIkEo1AUPiwu9TZIP&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1G3ErZ2Ur2tAxW1XTIkEo1AUPiwu9TZIP" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>13</td>
+                    <td>Khondokar Anarul Kabir</td>
+                    <td>bethina.pruett9c26s@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1JeCcP_5M1eNFFbzWKe7oKY0j1XXmFe9B' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1JeCcP_5M1eNFFbzWKe7oKY0j1XXmFe9B&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1JeCcP_5M1eNFFbzWKe7oKY0j1XXmFe9B" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1cUYZn7AlpP9YpgB906cA5VTcrDO8EbYd' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1cUYZn7AlpP9YpgB906cA5VTcrDO8EbYd&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1cUYZn7AlpP9YpgB906cA5VTcrDO8EbYd" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1fDVpSTOa9WZ2jwWuSDkdr5ZA-K7tqcwX' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1fDVpSTOa9WZ2jwWuSDkdr5ZA-K7tqcwX&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1fDVpSTOa9WZ2jwWuSDkdr5ZA-K7tqcwX" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1Okg0Wx5f2CSYvjqBtFA309ZKPnQp4hEC' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1Okg0Wx5f2CSYvjqBtFA309ZKPnQp4hEC&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1Okg0Wx5f2CSYvjqBtFA309ZKPnQp4hEC" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>14</td>
+                    <td>Mst. Nasrin Akter Bonna</td>
+                    <td>nasrinakter2007@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1LckVcQdYr3Rrcx7bL_uDaY1vx6fey-wK' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1LckVcQdYr3Rrcx7bL_uDaY1vx6fey-wK&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1LckVcQdYr3Rrcx7bL_uDaY1vx6fey-wK" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1AnGLpPmzOZFtcfkVI2BT2A0kmj_PeuXL' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1AnGLpPmzOZFtcfkVI2BT2A0kmj_PeuXL&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1AnGLpPmzOZFtcfkVI2BT2A0kmj_PeuXL" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1bUFCHEHQE54YsaMyghpuNLPKqghNJ3E9' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1bUFCHEHQE54YsaMyghpuNLPKqghNJ3E9&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1bUFCHEHQE54YsaMyghpuNLPKqghNJ3E9" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1KT6yl3EZdVL6dfh4S_IN1BKVKr1a1hdU' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1KT6yl3EZdVL6dfh4S_IN1BKVKr1a1hdU&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1KT6yl3EZdVL6dfh4S_IN1BKVKr1a1hdU" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>15</td>
+                    <td>Mst. Monira Akter Urmi</td>
+                    <td>aurmi7986@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1eRO945t4eVlhRkha3QDs6VKQDL0Kk5Y9' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1eRO945t4eVlhRkha3QDs6VKQDL0Kk5Y9&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1eRO945t4eVlhRkha3QDs6VKQDL0Kk5Y9" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1l9eHm-kwoFU2-c_7HiX7_yXQnIQTT9uZ' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1l9eHm-kwoFU2-c_7HiX7_yXQnIQTT9uZ&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1l9eHm-kwoFU2-c_7HiX7_yXQnIQTT9uZ" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1YYrHZKdykHoWfPje2QKulvHRqjXj0AFt' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1YYrHZKdykHoWfPje2QKulvHRqjXj0AFt&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1YYrHZKdykHoWfPje2QKulvHRqjXj0AFt" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=12unk4bDY5MNQpYMbq0GX67X9z-shmASB' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=12unk4bDY5MNQpYMbq0GX67X9z-shmASB&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=12unk4bDY5MNQpYMbq0GX67X9z-shmASB" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>16</td>
+                    <td>Ruhana Akter Suchi</td>
+                    <td>ruhanaakter10@email.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1vtnwWmn0xkqwzNCP43O9XlpSE2wzU4t_' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1vtnwWmn0xkqwzNCP43O9XlpSE2wzU4t_&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1vtnwWmn0xkqwzNCP43O9XlpSE2wzU4t_" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1kJanqWJLIELIe5qeoaIJqVNIK7dHfv4p' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1kJanqWJLIELIe5qeoaIJqVNIK7dHfv4p&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1kJanqWJLIELIe5qeoaIJqVNIK7dHfv4p" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1XYHutyzrJ3DsceEQv8dR-oXx3KnhKPUu' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1XYHutyzrJ3DsceEQv8dR-oXx3KnhKPUu&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1XYHutyzrJ3DsceEQv8dR-oXx3KnhKPUu" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1Qs3fV9ZUY9CVIVV8joCxujKL8Xr2Bznn' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1Qs3fV9ZUY9CVIVV8joCxujKL8Xr2Bznn&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1Qs3fV9ZUY9CVIVV8joCxujKL8Xr2Bznn" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>17</td>
+                    <td>Md. Ariful Islam</td>
+                    <td>fianna.vaughtnnvno@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1rzoc808Ovfqrb7RVbgGTAY4HKMG_XV0L' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1rzoc808Ovfqrb7RVbgGTAY4HKMG_XV0L&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1rzoc808Ovfqrb7RVbgGTAY4HKMG_XV0L" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1E_YmRvp3b0C0tM8-UmmGhx8FEMrNNkkS' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1E_YmRvp3b0C0tM8-UmmGhx8FEMrNNkkS&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1E_YmRvp3b0C0tM8-UmmGhx8FEMrNNkkS" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1eQLIz_XsDNz_nZ7nMuzL7C-b7rs4k89S' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1eQLIz_XsDNz_nZ7nMuzL7C-b7rs4k89S&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1eQLIz_XsDNz_nZ7nMuzL7C-b7rs4k89S" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1BnHebOP5Y7z2V9byH6Who1c4LR1R-023' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1BnHebOP5Y7z2V9byH6Who1c4LR1R-023&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1BnHebOP5Y7z2V9byH6Who1c4LR1R-023" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>18</td>
+                    <td>Md. Rajmahmud</td>
+                    <td>rajmahmud5772@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1vYN7yGFSAL0KL1rnSPBDwS-1Qfk_5IQL' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1vYN7yGFSAL0KL1rnSPBDwS-1Qfk_5IQL&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1vYN7yGFSAL0KL1rnSPBDwS-1Qfk_5IQL" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1n-All98OkpXi8BNwpAJCRzrQ3epwaCAC' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1n-All98OkpXi8BNwpAJCRzrQ3epwaCAC&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1n-All98OkpXi8BNwpAJCRzrQ3epwaCAC" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1OBOcI2XpV4Vl4ABOphwwhBkO7fIYYKrM' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1OBOcI2XpV4Vl4ABOphwwhBkO7fIYYKrM&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1OBOcI2XpV4Vl4ABOphwwhBkO7fIYYKrM" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=17LFMl2ZaeDfWS6nqDdQhdFNqlrVMyF_U' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=17LFMl2ZaeDfWS6nqDdQhdFNqlrVMyF_U&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=17LFMl2ZaeDfWS6nqDdQhdFNqlrVMyF_U" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>19</td>
+                    <td>Shafayat Tarafder</td>
+                    <td>stsohan001@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1uOR0D9B-PsBkgNhnEnUTJT0TrB3kLVaq' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1uOR0D9B-PsBkgNhnEnUTJT0TrB3kLVaq&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1uOR0D9B-PsBkgNhnEnUTJT0TrB3kLVaq" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1DqLSdCamwhdcJP7-Rpp7Z3F-371lrJyx' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1DqLSdCamwhdcJP7-Rpp7Z3F-371lrJyx&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1DqLSdCamwhdcJP7-Rpp7Z3F-371lrJyx" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1ZRemcuwJhDYE5FJQycImsConhYSGvSPx' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1ZRemcuwJhDYE5FJQycImsConhYSGvSPx&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1ZRemcuwJhDYE5FJQycImsConhYSGvSPx" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1Foenxf-acb9xeEhbiniUNABzVFQjtF-L' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1Foenxf-acb9xeEhbiniUNABzVFQjtF-L&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1Foenxf-acb9xeEhbiniUNABzVFQjtF-L" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>20</td>
+                    <td>Sadia Akter Keya</td>
+                    <td>keyasadiaakter12@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1KxD_FFSixCRK9iGLJrHBBor6os9Xjxis' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1KxD_FFSixCRK9iGLJrHBBor6os9Xjxis&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1KxD_FFSixCRK9iGLJrHBBor6os9Xjxis" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1xRtLX5iAd-RQyqfiDdBrvugmVu8gHCZO' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1xRtLX5iAd-RQyqfiDdBrvugmVu8gHCZO&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1xRtLX5iAd-RQyqfiDdBrvugmVu8gHCZO" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1V-RI9rumLSkCYsE1_x9sIBiETuv3dbNE' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1V-RI9rumLSkCYsE1_x9sIBiETuv3dbNE&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1V-RI9rumLSkCYsE1_x9sIBiETuv3dbNE" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1BzGzfEOcAiiImrAt6pBJDMiOtBTdrxra' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1BzGzfEOcAiiImrAt6pBJDMiOtBTdrxra&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1BzGzfEOcAiiImrAt6pBJDMiOtBTdrxra" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>21</td>
+                    <td>Homeyra Afroz Shuha</td>
+                    <td>tuamoni99@gmail.cim</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1x90uKwNAr4Q0_x4TIE8hBjVNeaLbuwJM' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1x90uKwNAr4Q0_x4TIE8hBjVNeaLbuwJM&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1x90uKwNAr4Q0_x4TIE8hBjVNeaLbuwJM" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=164tPGx-VJ8TKBFS8qBiavSEg1OmDFIt3' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=164tPGx-VJ8TKBFS8qBiavSEg1OmDFIt3&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=164tPGx-VJ8TKBFS8qBiavSEg1OmDFIt3" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1bKQBUspX8vPizcSH6FoGxN5ptRccsTYF' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1bKQBUspX8vPizcSH6FoGxN5ptRccsTYF&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1bKQBUspX8vPizcSH6FoGxN5ptRccsTYF" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1MCJ0i_ZGE6wYoQEVNGZgtRHITbOVh_u1' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1MCJ0i_ZGE6wYoQEVNGZgtRHITbOVh_u1&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1MCJ0i_ZGE6wYoQEVNGZgtRHITbOVh_u1" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>22</td>
+                    <td>Sultana Akter</td>
+                    <td>mmhmhasan625@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1v0r1c06Th6wViSijBA3BwHV4JDA14pVa' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1v0r1c06Th6wViSijBA3BwHV4JDA14pVa&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1v0r1c06Th6wViSijBA3BwHV4JDA14pVa" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1Y4wSyKI3nod0E0vIx7KLpjPul45Y3Dra' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1Y4wSyKI3nod0E0vIx7KLpjPul45Y3Dra&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1Y4wSyKI3nod0E0vIx7KLpjPul45Y3Dra" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1sScc-nJzBsc0jyzPIUgnZEi-UQO0wk_2' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1sScc-nJzBsc0jyzPIUgnZEi-UQO0wk_2&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1sScc-nJzBsc0jyzPIUgnZEi-UQO0wk_2" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1h-K6SocB40lgxOtjKX9kuGkzVh_rokfu' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1h-K6SocB40lgxOtjKX9kuGkzVh_rokfu&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1h-K6SocB40lgxOtjKX9kuGkzVh_rokfu" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>23</td>
+                    <td>Marufa Amzad</td>
+                    <td>marufaamzad55@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1tF-CADgrTYqfBYr8RCV5EIKWTQ_0QYCJ' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1tF-CADgrTYqfBYr8RCV5EIKWTQ_0QYCJ&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1tF-CADgrTYqfBYr8RCV5EIKWTQ_0QYCJ" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1IZZ7atp7_d6gbVfMdR6CdmdVirR3bQoy' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1IZZ7atp7_d6gbVfMdR6CdmdVirR3bQoy&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1IZZ7atp7_d6gbVfMdR6CdmdVirR3bQoy" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1tBd-pEdjebU1QV6PoXGxHgUhZnGwRmWy' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1tBd-pEdjebU1QV6PoXGxHgUhZnGwRmWy&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1tBd-pEdjebU1QV6PoXGxHgUhZnGwRmWy" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1YJBgGsmeAlhZ2tqe95_pQFDxe4KsdbUd' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1YJBgGsmeAlhZ2tqe95_pQFDxe4KsdbUd&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1YJBgGsmeAlhZ2tqe95_pQFDxe4KsdbUd" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>24</td>
+                    <td>Jannattug Zahura</td>
+                    <td>jannattugzahura123@gmail.com</td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1W_Gs32XzXszTpjoLSIFIGwPLjaXRbMYb' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1W_Gs32XzXszTpjoLSIFIGwPLjaXRbMYb&sz=w600" alt="NID" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1W_Gs32XzXszTpjoLSIFIGwPLjaXRbMYb" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1LA3OROpG_z7JuXinOGlGvuoR4soPK5PL' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1LA3OROpG_z7JuXinOGlGvuoR4soPK5PL&sz=w600" alt="PiC" class="table-img img-pic" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1LA3OROpG_z7JuXinOGlGvuoR4soPK5PL" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1pSNBsGqjMbrGhKqSiPctL4sEqnKyQ76o' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1pSNBsGqjMbrGhKqSiPctL4sEqnKyQ76o&sz=w600" alt="Signature" class="table-img img-signature" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1pSNBsGqjMbrGhKqSiPctL4sEqnKyQ76o" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="img-container">
+                            <a href='https://drive.google.com/u/0/open?usp=forms_web&id=1oSJW_eJK5aDeiBigv2nhUY-oJ8HhRlcW' target='_blank' title='Click to view original'>
+                                <img src="https://drive.google.com/thumbnail?id=1oSJW_eJK5aDeiBigv2nhUY-oJ8HhRlcW&sz=w600" alt="Certificate" class="table-img img-default" loading="lazy">
+                            </a>
+                            <a href="https://drive.google.com/uc?export=download&id=1oSJW_eJK5aDeiBigv2nhUY-oJ8HhRlcW" class="dl-btn">Download</a>
+                        </div>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
