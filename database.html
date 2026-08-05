@@ -837,13 +837,13 @@
                 targetW = 800; targetH = 800; mode = 'contain'; // default larger size for NID/Cert
             }
 
-            // Using Google's own drive proxy (by requesting the image as a blob)
             for (let i = 0; i < images.length; i++) {
                 const img = images[i];
                 const tr = img.closest('tr');
                 const serial = tr.querySelector('td:nth-child(1)').textContent.trim();
                 const rawName = tr.querySelector('.person-name').textContent.trim();
                 const safeName = cleanFilename(rawName);
+                const filename = `${serial}_${safeName}_${colType.toUpperCase()}.jpg`;
                 
                 // Get the file ID stored in the dataset
                 const fileId = img.getAttribute('data-id');
@@ -853,9 +853,8 @@
                         // Request maximum resolution thumbnail (w2000) to ensure high quality
                         const fetchUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w2000`;
                         
-                        // We must use a CORS proxy to fetch the image data into JS. 
-                        // Using 'corsproxy.io' as it allows passing headers.
-                        const proxiedUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(fetchUrl);
+                        // Switched proxy to allorigins which is generally more reliable for hosted sites like Netlify
+                        const proxiedUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(fetchUrl);
                         
                         const response = await fetch(proxiedUrl);
                         
@@ -865,8 +864,6 @@
                             // We need to resize it on a canvas to enforce the exact 300x300 or 300x100 rules
                             const resizedBlob = await processBlobOnCanvas(blob, targetW, targetH, mode);
                             
-                            const filename = `${serial}_${safeName}_${colType.toUpperCase()}.jpg`;
-                            
                             // Add to ZIP
                             zip.file(filename, resizedBlob);
                             successCount++;
@@ -874,7 +871,7 @@
                             console.error(`Failed to fetch ${filename}: HTTP ${response.status}`);
                         }
                     } catch (error) {
-                        console.error(`Error processing row ${serial}:`, error);
+                        console.error(`Error processing row ${serial} (${filename}):`, error);
                     }
                 }
                 
