@@ -799,6 +799,40 @@
             return str.replace(/[^a-zA-Z0-9]/g, '_').trim();
         }
 
+        // Helper to delay execution to prevent proxy rate-limiting
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        // Helper to fetch with fallback proxies to avoid 408/522/CORS issues
+        async function fetchImageWithFallbacks(url) {
+            const encodedUrl = encodeURIComponent(url);
+            const proxies = [
+                `https://corsproxy.io/?${encodedUrl}`,
+                `https://api.allorigins.win/raw?url=${encodedUrl}`
+            ];
+
+            for (let i = 0; i < proxies.length; i++) {
+                try {
+                    // 15-second timeout per proxy to prevent hanging requests
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 15000); 
+                    
+                    const response = await fetch(proxies[i], { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        // Verify it's actually an image (some proxies return HTML error pages)
+                        if (blob.type.startsWith('image/')) {
+                            return blob;
+                        }
+                    }
+                } catch (e) {
+                    console.warn(`Proxy ${i+1} failed:`, e.message);
+                }
+            }
+            throw new Error("All proxies failed to fetch the image.");
+        }
+
         /**
          * Main function to download all images in a specific column as a ZIP
          * @param {string} colType - 'nid', 'pic', 'sig', or 'cert'
@@ -816,25 +850,23 @@
             allBtns.forEach(btn => btn.disabled = true);
             
             const progressSpan = document.getElementById(`prog-${colType}`);
-            progressSpan.textContent = "0 / 24 fetched...";
+            const images = document.querySelectorAll(`img[data-col="${colType}"]`);
+            progressSpan.textContent = `0 / ${images.length} fetched...`;
 
             // Initialize JSZip
             const zip = new JSZip();
             
-            // Find all images belonging to this column
-            const images = document.querySelectorAll(`img[data-col="${colType}"]`);
-            
             let fetchedCount = 0;
             let successCount = 0;
 
-            // Define target canvas dimensions based on column type to resize correctly before saving
-            let targetW, targetH, mode;
+            // Define target canvas dimensions and optimized fetch sizes
+            let targetW, targetH, mode, fetchSize;
             if (colType === 'pic') {
-                targetW = 300; targetH = 300; mode = 'cover';
+                targetW = 300; targetH = 300; mode = 'cover'; fetchSize = 'w600';
             } else if (colType === 'sig') {
-                targetW = 300; targetH = 100; mode = 'contain';
+                targetW = 300; targetH = 100; mode = 'contain'; fetchSize = 'w600';
             } else {
-                targetW = 800; targetH = 800; mode = 'contain'; // default larger size for NID/Cert
+                targetW = 800; targetH = 800; mode = 'contain'; fetchSize = 'w1200'; // Lowered from w2000 to prevent proxy timeout
             }
 
             for (let i = 0; i < images.length; i++) {
@@ -850,33 +882,30 @@
                 
                 if (fileId) {
                     try {
-                        // Request maximum resolution thumbnail (w2000) to ensure high quality
-                        const fetchUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w2000`;
+                        progressSpan.textContent = `${fetchedCount} / ${images.length} (Fetching ${serial})...`;
                         
-                        // Switched proxy to allorigins which is generally more reliable for hosted sites like Netlify
-                        const proxiedUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(fetchUrl);
+                        // Request a reasonable resolution thumbnail
+                        const fetchUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=${fetchSize}`;
                         
-                        const response = await fetch(proxiedUrl);
+                        // Fetch using our robust fallback proxy mechanism
+                        const blob = await fetchImageWithFallbacks(fetchUrl);
                         
-                        if (response.ok) {
-                            const blob = await response.blob();
-                            
-                            // We need to resize it on a canvas to enforce the exact 300x300 or 300x100 rules
-                            const resizedBlob = await processBlobOnCanvas(blob, targetW, targetH, mode);
-                            
-                            // Add to ZIP
-                            zip.file(filename, resizedBlob);
-                            successCount++;
-                        } else {
-                            console.error(`Failed to fetch ${filename}: HTTP ${response.status}`);
-                        }
+                        // We need to resize it on a canvas to enforce the exact 300x300 or 300x100 rules
+                        const resizedBlob = await processBlobOnCanvas(blob, targetW, targetH, mode);
+                        
+                        // Add to ZIP
+                        zip.file(filename, resizedBlob);
+                        successCount++;
+                        
+                        // Brief pause to prevent the proxy from blocking us for spamming requests
+                        await delay(300);
                     } catch (error) {
                         console.error(`Error processing row ${serial} (${filename}):`, error);
                     }
                 }
                 
                 fetchedCount++;
-                progressSpan.textContent = `${fetchedCount} / 24 fetched...`;
+                progressSpan.textContent = `${fetchedCount} / ${images.length} fetched...`;
             }
 
             progressSpan.textContent = "Zipping files...";
