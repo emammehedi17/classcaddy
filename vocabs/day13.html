@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 13 - Systematic Vocabulary Batch</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            500: '#000000', 
+                            600: '#000000', 
+                            700: '#000000', 
+                            800: '#000000', 
+                            900: '#000000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #ecfdf5; /* emerald-50 */
+            color: #000000; 
+        }
+        .bn-text {
+            font-family: 'Hind Siliguri', sans-serif;
+            color: #000000; 
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #10b981; /* emerald-500 */
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 via-teal-50 to-indigo-50 min-h-screen p-4 md:p-8 selection:bg-emerald-200 selection:text-emerald-900 text-black">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <header class="glass-card rounded-2xl shadow-lg p-6 md:p-8 mb-8 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-emerald-500 to-indigo-600"></div>
+            
+            <div class="text-center md:text-left mb-6 md:mb-0 z-10">
+                <div class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-bold mb-3">
+                    <i class="fas fa-calendar-day mr-2"></i>Daily Vocabulary
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-2 bg-gradient-to-r from-emerald-700 to-indigo-700 gradient-text pb-1">
+                    Day 13
+                </h1>
+                <p class="text-black font-semibold flex items-center justify-center md:justify-start gap-2">
+                    <i class="fas fa-pen-nib text-emerald-600"></i>
+                    Created by: 
+                    <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-emerald-700 hover:text-emerald-900 hover:underline transition-colors font-bold relative group">
+                        Emam Mehedi
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-600 transition-all group-hover:w-full"></span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex-shrink-0 z-10 bg-white p-2 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300 border-2 border-emerald-100">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-24 h-24 md:w-28 md:h-28 rounded-lg">
+                <p class="text-center text-xs text-black mt-1 font-bold">Scan Me</p>
+            </div>
+        </header>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-10 mb-8 border-t-4 border-t-emerald-500 relative">
+            <div class="absolute -top-4 -right-4 text-emerald-200 opacity-20">
+                <i class="fas fa-shield-halved text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 id="story-title" class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-user-secret text-emerald-600"></i> শেষ চুক্তি (The Final Treaty)
+                </h2>
+                <button onclick="copyStory()" class="mt-4 md:mt-0 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold py-2 px-4 rounded-lg shadow-sm transition-all flex items-center gap-2 border border-emerald-300">
+                    <i class="fas fa-copy"></i> Copy Story
+                </button>
+            </div>
+            
+            <div id="story-content" class="bn-text text-lg md:text-xl text-black font-medium leading-relaxed space-y-4 bg-white/70 p-6 rounded-xl border border-emerald-100 shadow-inner">
+                <p>
+                    শত্রু বাহিনীর <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Stupendous</span> <span class="text-indigo-700 font-bold">(বিস্ময়কর / বিপুল)</span> আক্রমণ দেখে আমাদের রাজা অবশেষে <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Capitulate</span> <span class="text-indigo-700 font-bold">(আত্মসমর্পণ করা)</span> করতে বাধ্য হলেন। রাজার প্রধান পরামর্শদাতা আসলে একজন <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Charlatan</span> <span class="text-indigo-700 font-bold">(ভণ্ড / হাতুড়ে)</span> ছিল, যে তার <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Ulterior</span> <span class="text-indigo-700 font-bold">(গোপন / প্রচ্ছন্ন)</span> উদ্দেশ্য হাসিল করতে রাজাকে এই বিপদে ফেলেছিল। রাজ্যের অর্থনীতি ইতিমধ্যে <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Effete</span> <span class="text-indigo-700 font-bold">(নিঃশেষিত / দুর্বল)</span> হয়ে পড়েছিল।
+                </p>
+                <p>
+                    শত্রুপক্ষ একটি চরম <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Conundrum</span> <span class="text-indigo-700 font-bold">(ধাঁধা / জটিল সমস্যা)</span> তৈরি করল। তারা বলল, রাজার একমাত্র রাজকন্যাকে তাদের যুবরাজের হাতে তুলে দিতে হবে। এই প্রস্তাবটি রাজার কাছে অত্যন্ত <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Erotic</span> <span class="text-indigo-700 font-bold">(কামোদ্দীপক / আপত্তিকর)</span> এবং অপমানজনক মনে হলো। কিন্তু তার কিছু করার ছিল না। রাজকন্যা, যার <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Naivete</span> <span class="text-indigo-700 font-bold">(সরলতা)</span> এবং <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Immaculate</span> <span class="text-indigo-700 font-bold">(নিখুঁত / পবিত্র)</span> চরিত্র সবার মন জয় করেছিল, সে দেশের স্বার্থে বলি হতে রাজি হলো। এটি যেন শত্রুদের সান্ত্বনা দিতে <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">A sop to cerberus</span> <span class="text-indigo-700 font-bold">(বিপদ এড়াতে ঘুষ দেওয়া)</span>-এর মতো ব্যাপার।
+                </p>
+                <p>
+                    চুক্তি স্বাক্ষরের রাতে, সবাই যখন উৎসবের কারণে <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Drowsy</span> <span class="text-indigo-700 font-bold">(তন্দ্রাচ্ছন্ন)</span> হয়ে পড়েছিল, তখন আমাদের সেনাপতি, যিনি স্বভাবতই খুব <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Abstemious</span> <span class="text-indigo-700 font-bold">(সংযমী / মিতাহারী)</span> মানুষ ছিলেন, তিনি জেগে ছিলেন। তিনি শত্রুদের শিবিরে একটি গোপন <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Reconnaissance</span> <span class="text-indigo-700 font-bold">(সামরিক পর্যবেক্ষণ)</span> চালিয়েছিলেন এবং তাদের আসল দুর্বলতা খুঁজে বের করেছিলেন। 
+                </p>
+                <p>
+                    পরদিন সকালে, রাজার <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Prerogative</span> <span class="text-indigo-700 font-bold">(বিশেষ অধিকার)</span> ব্যবহার করে সেনাপতি একটি নতুন শান্তি প্রস্তাব দিলেন। তিনি অত্যন্ত বুদ্ধিমত্তার সাথে দুই দেশের মাঝে বিবাদ মেটাতে <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">To pour oil in troubled water</span> <span class="text-indigo-700 font-bold">(উত্তপ্ত পরিস্থিতি শান্ত করা)</span>-এর কাজ করলেন। অবশেষে একটি পবিত্র চুক্তি স্বাক্ষরিত হলো এবং একটি নতুন মন্দির <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Consecrate</span> <span class="text-indigo-700 font-bold">(পবিত্র করা / উৎসর্গ করা)</span> করা হলো। এর ফলে, যুদ্ধবন্দীদের জন্য একটি সাধারণ <span class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded shadow-sm">Amnesty</span> <span class="text-indigo-700 font-bold">(সাধারণ ক্ষমা)</span> ঘোষণা করা হলো এবং রাজ্যটি রক্ষা পেল।
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-black mb-6 flex items-center gap-3 px-2">
+                <i class="fas fa-layer-group text-emerald-600"></i> Word Breakdown
+            </h2>
+            
+            <div id="word-breakdown-container" class="grid grid-cols-1 gap-6">
+                <!-- Word cards will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="mb-8 mt-12 border-t-4 border-dashed border-emerald-200 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 px-2">
+                <h2 class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-tasks text-emerald-600"></i> Knowledge Check (40 MCQs)
+                </h2>
+                <button onclick="copyMCQs()" class="mt-4 md:mt-0 bg-white hover:bg-gray-50 text-emerald-700 font-bold py-2 px-4 rounded-lg shadow transition-all flex items-center gap-2 border border-emerald-200">
+                    <i class="fas fa-copy"></i> Copy MCQs
+                </button>
+            </div>
+            
+            <div id="mcq-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- MCQs will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-8 bg-gradient-to-r from-emerald-900 to-indigo-900 text-white relative overflow-hidden mt-8">
+            <div class="absolute -right-10 -bottom-10 opacity-10">
+                <i class="fas fa-clipboard-list text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-emerald-50">
+                    <i class="fas fa-list-check text-indigo-400"></i> Summary List
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 bg-indigo-500 hover:bg-indigo-400 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 border border-indigo-400">
+                    <i class="fas fa-copy"></i> Copy List
+                </button>
+            </div>
+            
+            <div class="bg-black/40 p-5 rounded-xl border border-indigo-500/30 font-mono text-sm leading-relaxed overflow-x-auto z-10 relative bn-text">
+<pre id="summaryText" class="whitespace-pre-wrap text-indigo-50 font-bold"></pre>
+            </div>
+        </section>
+
+        <!-- Navigation Buttons -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 mb-4">
+            <a href="https://classcaddy.netlify.app/vocabs/day12" class="w-full sm:w-auto text-center bg-white hover:bg-emerald-50 text-emerald-700 font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-emerald-200 hover:border-emerald-400 group">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Previous (Day-12)
+            </a>
+            <a href="https://classcaddy.netlify.app/vocabs/weekly2" class="w-full sm:w-auto text-center bg-gradient-to-r from-emerald-600 to-indigo-600 hover:from-emerald-700 hover:to-indigo-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-transparent hover:shadow-lg transform hover:-translate-y-0.5 group">
+                Next (Weekly-2) <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-700 text-sm mt-8 pb-8 font-bold">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i id="toast-icon" class="fas fa-check-circle mr-2"></i><span id="toast-message">Copied!</span></div>
+
+    <script>
+        // --- STREAMING_CHUNK: Defining Word Data Array ---
+        const wordData = [
+            {
+                id: 1,
+                word: "Prerogative",
+                pronunciation: "প্রিরগেটিভ",
+                bnTitle: "(বিশেষ অধিকার / জন্মগত অধিকার)",
+                theme: { border: "border-indigo-500", text: "text-indigo-700" },
+                syn: { en: "Privilege", pronunciation: "প্রিভিলেজ", bn: "(সুবিধা / বিশেষ অধিকার)", ex: "Education should be a right, not a privilege.", exBn: "(শিক্ষা একটি অধিকার হওয়া উচিত, বিশেষ সুবিধা নয়।)" },
+                ant: { en: "Restriction", pronunciation: "রেস্ট্রিকশন", bn: "(বাধা / সীমাবদ্ধতা)", ex: "There is a strict restriction on entering this room.", exBn: "(এই ঘরে প্রবেশের ক্ষেত্রে কঠোর সীমাবদ্ধতা রয়েছে।)" },
+                origin: "ল্যাটিন 'praerogativa' থেকে এসেছে (prae- 'আগে' + rogare 'জিজ্ঞাসা করা')। প্রাচীন রোমে যে সম্প্রদায়কে প্রথমে ভোট দেওয়ার জন্য ডাকা হতো তাদের এই বিশেষ অধিকার ছিল।",
+                mnemonic: "'Pre' (আগে) + 'Rogue' (খারাপ লোক)। খারাপ লোকেরা (Rogue) সব সময় আগে (Pre) সুযোগ পাওয়ার 'Prerogative' বা বিশেষ অধিকার দাবি করে।",
+                sentences: [
+                    { en: "It is the president's prerogative to grant pardons.", bn: "(ক্ষমা প্রদর্শন করা রাষ্ট্রপতির বিশেষ অধিকার।)" },
+                    { en: "You have the prerogative to change your mind at any time.", bn: "(যেকোনো সময় আপনার সিদ্ধান্ত পরিবর্তন করার অধিকার আপনার আছে।)" },
+                    { en: "Making the final decision is the manager's prerogative.", bn: "(চূড়ান্ত সিদ্ধান্ত নেওয়া ম্যানেজারের বিশেষ অধিকার।)" },
+                    { en: "He exercised his royal prerogative to stop the war.", bn: "(তিনি যুদ্ধ থামাতে তার রাজকীয় বিশেষ অধিকার প্রয়োগ করেছিলেন।)" },
+                    { en: "Arriving late seems to be her special prerogative.", bn: "(দেরিতে পৌঁছানো মনে হয় তার একটি বিশেষ অধিকার।)" }
+                ]
+            },
+            {
+                id: 2,
+                word: "Stupendous",
+                pronunciation: "স্টুপেন্ডাস",
+                bnTitle: "(বিস্ময়কর / বিপুল)",
+                theme: { border: "border-emerald-500", text: "text-emerald-700" },
+                syn: { en: "Amazing", pronunciation: "অ্যামেজিং", bn: "(আশ্চর্যজনক)", ex: "She has an amazing talent for singing.", exBn: "(তার গান গাওয়ার একটি আশ্চর্যজনক প্রতিভা রয়েছে।)" },
+                ant: { en: "Ordinary", pronunciation: "অর্ডিনারি", bn: "(সাধারণ)", ex: "It was just an ordinary day at work.", exBn: "(এটি কর্মক্ষেত্রে একটি সাধারণ দিন ছিল।)" },
+                origin: "ল্যাটিন 'stupendus' থেকে এসেছে, যার অর্থ 'যা বিস্ময় বা হতবুদ্ধি তৈরি করে' (stupere 'হতবাক হওয়া' থেকে)।",
+                mnemonic: "'Stupid' (বোকা) দিয়ে মনে রাখুন। এত বিপুল বা Stupendous জিনিস দেখে মানুষ অবাক হয়ে Stupid বা বোকা বনে যায়।",
+                sentences: [
+                    { en: "The building of the pyramids was a stupendous achievement.", bn: "(পিরামিড নির্মাণ ছিল একটি বিস্ময়কর অর্জন।)" },
+                    { en: "He owes a stupendous amount of money to the bank.", bn: "(তিনি ব্যাংকের কাছে বিপুল পরিমাণ অর্থ ঋণী।)" },
+                    { en: "The athlete showed a stupendous performance in the final.", bn: "(অ্যাথলিট ফাইনালে একটি বিস্ময়কর পারফরম্যান্স দেখিয়েছিলেন।)" },
+                    { en: "We were shocked by the stupendous size of the mountain.", bn: "(পাহাড়ের বিপুল আকার দেখে আমরা হতবাক হয়ে গিয়েছিলাম।)" },
+                    { en: "The new movie was a stupendous success at the box office.", bn: "(নতুন সিনেমাটি বক্স অফিসে একটি বিস্ময়কর সাফল্য ছিল।)" }
+                ]
+            },
+            {
+                id: 3,
+                word: "Charlatan",
+                pronunciation: "শার্লটান",
+                bnTitle: "(ভণ্ড / হাতুড়ে ডাক্তার)",
+                theme: { border: "border-teal-500", text: "text-teal-700" },
+                syn: { en: "Fraud", pronunciation: "ফ্রড", bn: "(প্রতারক)", ex: "The man who sold me the fake watch was a fraud.", exBn: "(যে লোকটি আমাকে নকল ঘড়ি বিক্রি করেছিল সে একজন প্রতারক ছিল।)" },
+                ant: { en: "Expert", pronunciation: "এক্সপার্ট", bn: "(বিশেষজ্ঞ)", ex: "We need an expert to solve this complex problem.", exBn: "(এই জটিল সমস্যাটি সমাধান করার জন্য আমাদের একজন বিশেষজ্ঞ প্রয়োজন।)" },
+                origin: "ইতালীয় 'ciarlatano' থেকে এসেছে, যার অর্থ 'যে ব্যক্তি অনর্গল বকবক করে'। এটি এমন ব্যক্তিকে বোঝায় যে নিজের জ্ঞান বা দক্ষতা সম্পর্কে মিথ্যা দাবি করে।",
+                mnemonic: "'Char' (চার) + 'Lata' (লতা)। যে হাতুড়ে ডাক্তার বা ভণ্ড শুধু চারটা লতা-পাতা দিয়ে ক্যানসারের ওষুধ বানানোর দাবি করে, সে হলো Charlatan।",
+                sentences: [
+                    { en: "The charlatan promised that his herbal tonic could cure any disease.", bn: "(ভণ্ড বা হাতুড়ে ডাক্তারটি প্রতিশ্রুতি দিয়েছিল যে তার ভেষজ ওষুধ যেকোনো রোগ সারাতে পারে।)" },
+                    { en: "He was exposed as a charlatan after failing to provide his degree.", bn: "(তার ডিগ্রি প্রদান করতে ব্যর্থ হওয়ার পর সে একজন প্রতারক বা ভণ্ড হিসেবে ধরা পড়ে।)" },
+                    { en: "Do not trust that charlatan; he only wants your money.", bn: "(সেই ভণ্ডকে বিশ্বাস করবেন না; সে শুধু আপনার টাকা চায়।)" },
+                    { en: "The history of medicine is full of dangerous charlatans.", bn: "(চিকিৎসাবিজ্ঞানের ইতিহাস বিপজ্জনক হাতুড়ে ডাক্তারদের দ্বারা পূর্ণ।)" },
+                    { en: "The political charlatan tricked the voters with false promises.", bn: "(রাজনৈতিক ভণ্ড মিথ্যা প্রতিশ্রুতি দিয়ে ভোটারদের প্রতারিত করেছিল।)" }
+                ]
+            },
+            {
+                id: 4,
+                word: "Drowsy",
+                pronunciation: "ড্রাউজি",
+                bnTitle: "(তন্দ্রাচ্ছন্ন / ঘুম ঘুম ভাব)",
+                theme: { border: "border-purple-500", text: "text-purple-700" },
+                syn: { en: "Sleepy", pronunciation: "স্লিপি", bn: "(ঘুমকাতুরে)", ex: "The soft music made the baby feel sleepy.", exBn: "(মৃদু সুরটি শিশুটিকে ঘুমকাতুরে করে তুলেছিল।)" },
+                ant: { en: "Alert", pronunciation: "অ্যালার্ট", bn: "(সতর্ক / সজাগ)", ex: "The guard must stay alert all night.", exBn: "(পাহারাদারকে অবশ্যই সারারাত সজাগ থাকতে হবে।)" },
+                origin: "পুরানো ইংরেজি শব্দ 'drūsian' (নিস্তেজ হয়ে পড়া বা ঝিমিয়ে পড়া) থেকে এসেছে।",
+                mnemonic: "'Draw' (টানা)। ক্লাস এত বোরিং যে চোখ এমনিতেই Draw হয়ে নিচে নেমে যাচ্ছে, অর্থাৎ Drowsy বা তন্দ্রাচ্ছন্ন ভাব হচ্ছে।",
+                sentences: [
+                    { en: "The medicine can make you feel a little drowsy.", bn: "(ওষুধটি আপনাকে কিছুটা তন্দ্রাচ্ছন্ন অনুভব করাতে পারে।)" },
+                    { en: "I felt very drowsy after eating a heavy lunch.", bn: "(ভারী দুপুরের খাবার খাওয়ার পর আমি খুব তন্দ্রাচ্ছন্ন বোধ করছিলাম।)" },
+                    { en: "If you are feeling drowsy, you should not drive the car.", bn: "(আপনি যদি তন্দ্রাচ্ছন্ন বোধ করেন তবে আপনার গাড়ি চালানো উচিত নয়।)" },
+                    { en: "The warm room made all the students drowsy.", bn: "(উষ্ণ ঘরটি সব ছাত্রকে তন্দ্রাচ্ছন্ন করে তুলেছিল।)" },
+                    { en: "She gave a drowsy smile and went back to sleep.", bn: "(সে একটি ঘুম ঘুম হাসি দিয়ে আবার ঘুমাতে গেল।)" }
+                ]
+            },
+            {
+                id: 5,
+                word: "Erotic",
+                pronunciation: "ইরোটিক",
+                bnTitle: "(কামোদ্দীপক / কামুক)",
+                theme: { border: "border-rose-500", text: "text-rose-700" },
+                syn: { en: "Sensual", pronunciation: "সেন্সুয়াল", bn: "(ইন্দ্রিয়গত / কামুক)", ex: "She enjoys painting highly sensual art.", exBn: "(সে অত্যন্ত কামুক শিল্পকর্ম আঁকতে পছন্দ করে।)" },
+                ant: { en: "Chaste", pronunciation: "চেস্ট", bn: "(সতী / পবিত্র)", ex: "They lived a pure and chaste life.", exBn: "(তারা একটি খাঁটি এবং পবিত্র জীবনযাপন করত।)" },
+                origin: "গ্রীক প্রেমের দেবতা 'Eros' এর নাম থেকে 'erōtikos' শব্দটি উদ্ভূত হয়েছে, যা যৌন প্রেম বা আকাঙ্ক্ষা সম্পর্কিত।",
+                mnemonic: "প্রেমের দেবতা Eros (ইরোস) এর নাম থেকে Erotic এসেছে, যার অর্থ কামোদ্দীপক।",
+                sentences: [
+                    { en: "The movie contained several highly erotic scenes.", bn: "(সিনেমাটিতে বেশ কয়েকটি অত্যন্ত কামোদ্দীপক দৃশ্য ছিল।)" },
+                    { en: "He wrote an erotic poem for his lover.", bn: "(সে তার প্রেমিকের জন্য একটি কামোদ্দীপক কবিতা লিখেছিল।)" },
+                    { en: "The art gallery displayed a collection of erotic paintings.", bn: "(আর্ট গ্যালারিটি কামোদ্দীপক চিত্রকর্মের একটি সংগ্রহ প্রদর্শন করেছিল।)" },
+                    { en: "Some people find this type of dancing very erotic.", bn: "(কিছু লোক এই ধরনের নাচকে খুব কামোদ্দীপক বলে মনে করে।)" },
+                    { en: "The novel was banned for its explicitly erotic content.", bn: "(উপন্যাসটি এর স্পষ্টভাবে কামোদ্দীপক বিষয়বস্তুর জন্য নিষিদ্ধ করা হয়েছিল।)" }
+                ]
+            },
+            {
+                id: 6,
+                word: "Abstemious",
+                pronunciation: "অ্যাব্‌স্‌টিমিয়াস",
+                bnTitle: "(মিতাচারী / সংযমী)",
+                theme: { border: "border-cyan-600", text: "text-cyan-800" },
+                syn: { en: "Moderate", pronunciation: "মডারেট", bn: "(পরিমিত / সংযত)", ex: "He takes a moderate amount of sugar in his tea.", exBn: "(সে তার চায়ে পরিমিত পরিমাণ চিনি খায়।)" },
+                ant: { en: "Gluttonous", pronunciation: "গ্লাটোনাস", bn: "(পেটুক / অতিভোজী)", ex: "The gluttonous king ate the entire feast by himself.", exBn: "(পেটুক রাজা একাই পুরো ভোজের খাবার খেয়ে ফেলল।)" },
+                origin: "ল্যাটিন 'abstemius' (abs- 'থেকে দূরে' + temetum 'মদ') থেকে এসেছে। যে ব্যক্তি খাদ্য ও পানীয় গ্রহণে (বিশেষ করে মদ্যপানে) কঠোর সংযম পালন করে।",
+                mnemonic: "'Abs' (অ্যাবস / সিক্স প্যাক)। সিক্স প্যাক Abs বানাতে গেলে খাওয়াদাওয়ার ব্যাপারে খুব Abstemious বা সংযমী হতে হয়।",
+                sentences: [
+                    { en: "He is known for his abstemious lifestyle, often eating only simple vegetables.", bn: "(তিনি তার মিতাচারী জীবনযাপনের জন্য পরিচিত, প্রায়শই কেবল সাধারণ শাকসবজি খেয়ে থাকেন।)" },
+                    { en: "The monk lived a strictly abstemious life in the monastery.", bn: "(সন্ন্যাসীটি মঠে অত্যন্ত সংযত জীবনযাপন করতেন।)" },
+                    { en: "An abstemious diet is often recommended for better health.", bn: "(উন্নত স্বাস্থ্যের জন্য প্রায়শই একটি পরিমিত খাদ্যাভ্যাসের পরামর্শ দেওয়া হয়।)" },
+                    { en: "She is very abstemious with alcohol, drinking only on special occasions.", bn: "(সে মদ্যপানের ক্ষেত্রে খুব সংযত, কেবল বিশেষ অনুষ্ঠানেই পান করে।)" },
+                    { en: "Despite the grand feast, he remained abstemious.", bn: "(বিশাল ভোজ হওয়া সত্ত্বেও, সে সংযমী ছিল।)" }
+                ]
+            },
+            {
+                id: 7,
+                word: "Capitulate",
+                pronunciation: "কাপিচুলেইট",
+                bnTitle: "(আত্মসমর্পণ করা / নতি স্বীকার করা)",
+                theme: { border: "border-red-600", text: "text-red-800" },
+                syn: { en: "Surrender", pronunciation: "সারেন্ডার", bn: "(আত্মসমর্পণ করা)", ex: "The thief had no choice but to surrender to the police.", exBn: "(চোরটির পুলিশের কাছে আত্মসমর্পণ করা ছাড়া কোনো উপায় ছিল না।)" },
+                ant: { en: "Resist", pronunciation: "রেজিস্ট", bn: "(প্রতিরোধ করা)", ex: "The immune system helps to resist infections.", exBn: "(রোগ প্রতিরোধ ক্ষমতা সংক্রমণ প্রতিরোধ করতে সাহায্য করে।)" },
+                origin: "ল্যাটিন 'capitulum' (অধ্যায় বা শর্তাবলী) থেকে এসেছে। যুদ্ধে পরাজিত হওয়ার পর লিখিত শর্তাবলীর মাধ্যমে আত্মসমর্পণ করা।",
+                mnemonic: "'Cap' (টুপি) + 'Late' (দেরি)। যুদ্ধে জেতার জন্য আসতে Late (দেরি) হওয়ায় সেনাপতি নিজের Cap বা টুপি খুলে Capitulate (আত্মসমর্পণ) করল।",
+                sentences: [
+                    { en: "The rebels were forced to capitulate after their supplies ran out.", bn: "(রসদ ফুরিয়ে যাওয়ার পর বিদ্রোহীরা আত্মসমর্পণ করতে বাধ্য হয়েছিল।)" },
+                    { en: "He finally capitulated to his daughter's demands for a new toy.", bn: "(নতুন খেলনার জন্য মেয়ের জেদের কাছে শেষ পর্যন্ত তিনি নতি স্বীকার করলেন।)" },
+                    { en: "The government refused to capitulate to the terrorists' demands.", bn: "(সরকার সন্ত্রাসবাদীদের দাবির কাছে নতি স্বীকার করতে অস্বীকার করেছে।)" },
+                    { en: "They fought bravely for weeks before they had to capitulate.", bn: "(আত্মসমর্পণ করতে বাধ্য হওয়ার আগে তারা কয়েক সপ্তাহ ধরে বীরত্বের সাথে লড়াই করেছিল।)" },
+                    { en: "I will never capitulate to pressure from my boss.", bn: "(আমি কখনই আমার বসের চাপের কাছে নতি স্বীকার করব না।)" }
+                ]
+            },
+            {
+                id: 8,
+                word: "Conundrum",
+                pronunciation: "কানানড্রাম",
+                bnTitle: "(ধাঁধা / জটিল সমস্যা)",
+                theme: { border: "border-amber-600", text: "text-amber-800" },
+                syn: { en: "Puzzle", pronunciation: "পাজল", bn: "(ধাঁধা / রহস্য)", ex: "Solving this math puzzle is quite difficult.", exBn: "(এই গণিতের ধাঁধাটি সমাধান করা বেশ কঠিন।)" },
+                ant: { en: "Solution", pronunciation: "সলিউশন", bn: "(সমাধান)", ex: "We finally found a working solution to the issue.", exBn: "(অবশেষে আমরা সমস্যাটির একটি কার্যকরী সমাধান খুঁজে পেয়েছি।)" },
+                origin: "১৬শ শতাব্দীর অক্সফোর্ড বিশ্ববিদ্যালয়ের একটি রসিকতা বা ছদ্ম-ল্যাটিন শব্দ থেকে উদ্ভূত, যার অর্থ এমন একটি প্রশ্ন যার উত্তর দেওয়া কঠিন।",
+                mnemonic: "'কণা' + 'ড্রাম'। একটা বড় ড্রামের ভেতর ছোট একটা বালুর কণা হারিয়ে গেলে সেটা খুঁজে বের করা একটা Conundrum বা জটিল সমস্যা।",
+                sentences: [
+                    { en: "The issue of climate change is a complex conundrum for global leaders.", bn: "(জলবায়ু পরিবর্তনের বিষয়টি বিশ্ব নেতাদের জন্য একটি জটিল ধাঁধা।)" },
+                    { en: "Arranging the schedule for the entire team proved to be a real conundrum.", bn: "(পুরো দলের জন্য সময়সূচী নির্ধারণ করাটা সত্যিই একটি কঠিন সমস্যা হয়ে দাঁড়িয়েছিল।)" },
+                    { en: "He faced a moral conundrum whether to tell the truth or save his friend.", bn: "(সত্য বলবে নাকি বন্ধুকে বাঁচাবে, তা নিয়ে সে একটি নৈতিক জটিল সমস্যার সম্মুখীন হয়েছিল।)" },
+                    { en: "This riddle is a famous historical conundrum.", bn: "(এই ধাঁধাটি একটি বিখ্যাত ঐতিহাসিক জটিল সমস্যা।)" },
+                    { en: "Finding a cure for this disease is a medical conundrum.", bn: "(এই রোগের নিরাময় খোঁজা একটি চিকিৎসাবিজ্ঞানের ধাঁধা।)" }
+                ]
+            },
+            {
+                id: 9,
+                word: "Ulterior",
+                pronunciation: "আলটিরিয়ার",
+                bnTitle: "(গোপন / প্রচ্ছন্ন)",
+                theme: { border: "border-gray-600", text: "text-gray-800" },
+                syn: { en: "Hidden", pronunciation: "হিডেন", bn: "(লুকানো)", ex: "There is a hidden door behind the bookshelf.", exBn: "(বইয়ের তাকের পেছনে একটি লুকানো দরজা আছে।)" },
+                ant: { en: "Obvious", pronunciation: "অবভিয়াস", bn: "(সুস্পষ্ট / প্রকাশ্য)", ex: "It was obvious that she was lying.", exBn: "(এটি সুস্পষ্ট ছিল যে সে মিথ্যা বলছিল।)" },
+                origin: "ল্যাটিন 'ulterior' থেকে এসেছে, যার অর্থ 'অধিকতর দূরে' বা 'লুক্কায়িত'। সাধারণত এটি এমন উদ্দেশ্য বোঝাতে ব্যবহৃত হয় যা প্রকাশ্যে বলা হয়নি।",
+                mnemonic: "'উল্টো' (Ulterior)। যে ব্যক্তি উল্টো বা ঘুরিয়ে কথা বলে, তার মনে নিশ্চয়ই কোনো Ulterior (গোপন) উদ্দেশ্য আছে।",
+                sentences: [
+                    { en: "He had an ulterior motive for helping her.", bn: "(তাকে সাহায্য করার পেছনে তার একটি গোপন উদ্দেশ্য ছিল।)" },
+                    { en: "She denied having any ulterior plans for the company.", bn: "(তিনি কোম্পানিটির জন্য কোনো গোপন পরিকল্পনা থাকার কথা অস্বীকার করেছেন।)" },
+                    { en: "I suspect he has an ulterior reason for his sudden kindness.", bn: "(আমার সন্দেহ হয় যে তার আকস্মিক দয়ার পেছনে একটি গোপন কারণ রয়েছে।)" },
+                    { en: "The gift was given completely without any ulterior motive.", bn: "(উপহারটি সম্পূর্ণ কোনো গোপন উদ্দেশ্য ছাড়াই দেওয়া হয়েছিল।)" },
+                    { en: "Always try to understand the ulterior goals of a politician.", bn: "(সব সময় একজন রাজনীতিবিদের গোপন লক্ষ্যগুলো বোঝার চেষ্টা করবেন।)" }
+                ]
+            },
+            {
+                id: 10,
+                word: "Amnesty",
+                pronunciation: "অ্যামনেস্টি",
+                bnTitle: "(সাধারণ ক্ষমা)",
+                theme: { border: "border-blue-500", text: "text-blue-700" },
+                syn: { en: "Pardon", pronunciation: "পার্ডন", bn: "(ক্ষমা)", ex: "The governor granted a pardon to the innocent man.", exBn: "(গভর্নর নির্দোষ লোকটিকে ক্ষমা প্রদান করেছিলেন।)" },
+                ant: { en: "Punishment", pronunciation: "পানিশমেন্ট", bn: "(শাস্তি)", ex: "The criminal deserves a severe punishment.", exBn: "(অপরাধীর কঠোর শাস্তি প্রাপ্য।)" },
+                origin: "গ্রীক শব্দ 'amnēstia' থেকে এসেছে, যার অর্থ 'বিস্মৃতি' (a- 'না' + mnasthai 'মনে রাখা')। অর্থাৎ অতীত অপরাধ ভুলে গিয়ে আনুষ্ঠানিকভাবে ক্ষমা করা।",
+                mnemonic: "'Amnesia' (স্মৃতিভ্রংশ) রোগ হলে মানুষ যেমন সব ভুলে যায়, তেমনি সরকার যখন অপরাধীদের অপরাধ ভুলে গিয়ে ক্ষমা করে দেয়, তাকে Amnesty বা সাধারণ ক্ষমা বলে।",
+                sentences: [
+                    { en: "The government granted a general amnesty to all political prisoners.", bn: "(সরকার সমস্ত রাজনৈতিক বন্দীদের সাধারণ ক্ষমা প্রদান করেছে।)" },
+                    { en: "We are hoping for an amnesty for illegal immigrants.", bn: "(আমরা অবৈধ অভিবাসীদের জন্য একটি সাধারণ ক্ষমার আশা করছি।)" },
+                    { en: "The rebels laid down their weapons after the amnesty was declared.", bn: "(সাধারণ ক্ষমা ঘোষণার পর বিদ্রোহীরা তাদের অস্ত্র জমা দিয়েছিল।)" },
+                    { en: "Amnesty International works to protect human rights globally.", bn: "(অ্যামনেস্টি ইন্টারন্যাশনাল বিশ্বব্যাপী মানবাধিকার রক্ষায় কাজ করে।)" },
+                    { en: "The new king started his rule with an act of amnesty.", bn: "(নতুন রাজা সাধারণ ক্ষমার একটি কাজ দিয়ে তার শাসন শুরু করেছিলেন।)" }
+                ]
+            },
+            {
+                id: 11,
+                word: "Effete",
+                pronunciation: "ইফীট",
+                bnTitle: "(নিঃশেষিত / দুর্বল / ক্ষয়িষ্ণু)",
+                theme: { border: "border-orange-500", text: "text-orange-700" },
+                syn: { en: "Exhausted", pronunciation: "এক্সজস্টেড", bn: "(ক্লান্ত / নিঃশেষিত)", ex: "I was completely exhausted after the long run.", exBn: "(দীর্ঘ দৌড়ের পর আমি পুরোপুরি ক্লান্ত হয়ে পড়েছিলাম।)" },
+                ant: { en: "Vigorous", pronunciation: "ভিগোরাস", bn: "(তেজস্বী / সবল)", ex: "He is a vigorous old man who exercises daily.", exBn: "(তিনি একজন সবল বৃদ্ধ মানুষ যিনি প্রতিদিন ব্যায়াম করেন।)" },
+                origin: "ল্যাটিন 'effetus' (বংশবৃদ্ধির পর নিঃশেষিত) থেকে এসেছে (ex- 'বাইরে' + fetus 'প্রসূতি')। বর্তমানে শক্তি বা কার্যকারিতা হারানো ব্যক্তি বা সমাজকে বোঝায়।",
+                mnemonic: "'Defeat' (পরাজয়)। যুদ্ধে Defeat হওয়ার পর সৈন্যরা Effete বা দুর্বল ও নিঃশেষিত হয়ে পড়ে।",
+                sentences: [
+                    { en: "The once powerful empire had become effete and unable to defend its borders.", bn: "(একসময়ের শক্তিশালী সাম্রাজ্যটি ক্ষয়প্রাপ্ত হয়ে পড়েছিল এবং তার সীমানা রক্ষা করতে অক্ষম ছিল।)" },
+                    { en: "He criticized the effete aristocracy for their lack of contribution.", bn: "(তিনি সমাজের প্রতি অবদানের অভাবের জন্য দুর্বল অভিজাতদের সমালোচনা করেছিলেন।)" },
+                    { en: "The current political system has grown effete and corrupt.", bn: "(বর্তমান রাজনৈতিক ব্যবস্থা দুর্বল এবং দুর্নীতিগ্রস্ত হয়ে পড়েছে।)" },
+                    { en: "An effete society eventually falls to stronger nations.", bn: "(একটি ক্ষয়িষ্ণু সমাজ শেষ পর্যন্ত শক্তিশালী দেশগুলোর কাছে পতন লাভ করে।)" },
+                    { en: "He gave an effete and lazy response to the urgent problem.", bn: "(তিনি জরুরি সমস্যাটিতে একটি দুর্বল এবং অলস প্রতিক্রিয়া জানিয়েছিলেন।)" }
+                ]
+            },
+            {
+                id: 12,
+                word: "To pour oil in troubled water",
+                pronunciation: "টু পোর অয়েল ইন ট্রাবল্ড ওয়াটার",
+                bnTitle: "(উত্তপ্ত পরিস্থিতি শান্ত করা - Idiom)",
+                theme: { border: "border-teal-600", text: "text-teal-800" },
+                syn: { en: "Pacify", pronunciation: "প্যাসিফাই", bn: "(শান্ত করা)", ex: "She managed to pacify the crying baby.", exBn: "(সে কাঁদরত শিশুটিকে শান্ত করতে পেরেছিল।)" },
+                ant: { en: "Provoke", pronunciation: "প্রোভোক", bn: "(উসকে দেওয়া)", ex: "Do not provoke the angry dog.", exBn: "(রাগী কুকুরটিকে উসকে দেবেন না।)" },
+                origin: "এটি একটি প্রাচীন পর্যবেক্ষণ থেকে আসা বাগধারা। বলা হতো যে, উত্তাল সমুদ্রের ঢেউয়ের উপর তেল ঢাললে তা শান্ত হয়ে যায়। সেখান থেকে এর অর্থ বিবাদ বা রাগকে শান্ত করা।",
+                mnemonic: "ঝড়ের সময় অশান্ত বা troubled পানিতে তেল (oil) ঢাললে পানি যেমন শান্ত হয়ে যায়, তেমনি উত্তপ্ত পরিস্থিতি শান্ত করাকেই 'To pour oil in troubled water' বলে।",
+                sentences: [
+                    { en: "The manager tried to pour oil on troubled waters during the heated argument.", bn: "(ম্যানেজার উত্তপ্ত বিতর্কের সময় পরিস্থিতি শান্ত করার চেষ্টা করেছিলেন।)" },
+                    { en: "Her kind words poured oil on troubled waters between the two friends.", bn: "(তার সদয় কথা দুই বন্ধুর মধ্যে উত্তপ্ত পরিস্থিতি শান্ত করেছিল।)" },
+                    { en: "A good leader knows how to pour oil in troubled water.", bn: "(একজন ভালো নেতা জানেন কীভাবে উত্তপ্ত পরিস্থিতি শান্ত করতে হয়।)" },
+                    { en: "Instead of fighting, he stepped in to pour oil on troubled waters.", bn: "(মারামারি করার পরিবর্তে, সে পরিস্থিতি শান্ত করার জন্য হস্তক্ষেপ করেছিল।)" },
+                    { en: "The mother's hug poured oil on troubled waters for the frightened child.", bn: "(মায়ের আলিঙ্গন ভীত শিশুটির জন্য উত্তপ্ত পরিস্থিতি শান্ত করেছিল।)" }
+                ]
+            },
+            {
+                id: 13,
+                word: "A sop to Cerberus",
+                pronunciation: "এ সপ টু সারবেরাস",
+                bnTitle: "(বিপদ এড়াতে ঘুষ দেওয়া - Idiom)",
+                theme: { border: "border-red-800", text: "text-red-900" },
+                syn: { en: "Bribe", pronunciation: "ব্রাইব", bn: "(ঘুষ / উপঢৌকন)", ex: "He offered a bribe to the security guard.", exBn: "(সে নিরাপত্তারক্ষীকে ঘুষের প্রস্তাব দিয়েছিল।)" },
+                ant: { en: "Punishment", pronunciation: "পানিশমেন্ট", bn: "(শাস্তি)", ex: "The thief received a harsh punishment.", exBn: "(চোরটি কঠোর শাস্তি পেয়েছিল।)" },
+                origin: "গ্রীক পুরাণে, সারবেরাস (Cerberus) ছিল পাতালপুরীর প্রবেশদ্বার পাহারারত তিন মাথাওয়ালা কুকুর। আত্মারা যখন পাতালে যেত, তখন কুকুরটিকে শান্ত করার জন্য তারা একটি কেক বা রুটির টুকরো (Sop) দিত।",
+                mnemonic: "গ্রিক পুরাণের তিন মাথার কুকুর Cerberus-কে শান্ত করতে রুটি (sop) দেওয়া হতো। তেমনি বিপদ এড়াতে কাউকে ঘুষ বা সুবিধা দেওয়াকে 'A sop to Cerberus' বলে।",
+                sentences: [
+                    { en: "The tax cut was just a sop to Cerberus to keep the voters happy.", bn: "(কর কমানোটা ভোটারদের খুশি রাখার জন্য স্রেফ বিপদ এড়াতে একটি ঘুষ বা সুবিধা ছিল।)" },
+                    { en: "He gave his demanding boss a gift as a sop to Cerberus.", bn: "(সে তার দাবিদার বসকে বিপদ এড়াতে ঘুষ হিসেবে একটি উপহার দিয়েছিল।)" },
+                    { en: "The small bonus was nothing but a sop to Cerberus to stop the strike.", bn: "(ছোট বোনাসটি ধর্মঘট থামাতে সান্ত্বনামূলক ঘুষ ছাড়া আর কিছুই ছিল না।)" },
+                    { en: "They offered a minor position to the angry politician as a sop to Cerberus.", bn: "(তারা রাগান্বিত রাজনীতিবিদকে সান্ত্বনা দিতে একটি ছোট পদের প্রস্তাব করেছিল।)" },
+                    { en: "You cannot solve real problems with just a sop to Cerberus.", bn: "(আপনি কেবল সান্ত্বনামূলক সুবিধা দিয়ে বাস্তব সমস্যার সমাধান করতে পারবেন না।)" }
+                ]
+            },
+            {
+                id: 14,
+                word: "Naivete",
+                pronunciation: "নাইভিটি",
+                bnTitle: "(সরলতা / অনভিজ্ঞতা)",
+                theme: { border: "border-pink-500", text: "text-pink-700" },
+                syn: { en: "Innocence", pronunciation: "ইনোসেন্স", bn: "(নিষ্পাপতা / সরলতা)", ex: "The innocence of a child is beautiful.", exBn: "(একটি শিশুর নিষ্পাপতা সুন্দর।)" },
+                ant: { en: "Experience", pronunciation: "এক্সপেরিয়েন্স", bn: "(অভিজ্ঞতা / পরিপক্কতা)", ex: "He has years of experience in this field.", exBn: "(এই ক্ষেত্রে তার বছরের পর বছর অভিজ্ঞতা রয়েছে।)" },
+                origin: "ফরাসি শব্দ 'naïveté' থেকে এসেছে, যার অর্থ প্রাকৃতিক, সরল বা শিল্পহীন। এটি এমন ব্যক্তিকে বোঝায় যার দুনিয়া সম্পর্কে খুব বেশি বাস্তব জ্ঞান নেই।",
+                mnemonic: "'Naive' (সরল) থেকে Naivete। যে নতুন বা 'Native' গ্রামের লোক, তার শহরে এসে অনেক Naivete বা সরলতা দেখা যায়।",
+                sentences: [
+                    { en: "Her naivete made her an easy target for scammers.", bn: "(তার সরলতা তাকে প্রতারকদের জন্য একটি সহজ লক্ষ্যে পরিণত করেছিল।)" },
+                    { en: "I smiled at the charming naivete of his question.", bn: "(আমি তার প্রশ্নের কমনীয় সরলতায় হাসলাম।)" },
+                    { en: "He lost all his money due to his political naivete.", bn: "(রাজনৈতিক অনভিজ্ঞতার কারণে সে তার সমস্ত অর্থ হারায়।)" },
+                    { en: "Youthful naivete quickly fades away in the real world.", bn: "(যৌবনের সরলতা বাস্তব জগতে দ্রুত ম্লান হয়ে যায়।)" },
+                    { en: "She trusted everyone with absolute naivete.", bn: "(সে পরম সরলতার সাথে সবাইকে বিশ্বাস করেছিল।)" }
+                ]
+            },
+            {
+                id: 15,
+                word: "Immaculate",
+                pronunciation: "ইম্যাকিউলেট",
+                bnTitle: "(নিখুঁত / পবিত্র)",
+                theme: { border: "border-emerald-600", text: "text-emerald-800" },
+                syn: { en: "Spotless", pronunciation: "স্পটলেস", bn: "(দাগহীন / নিখুঁত)", ex: "She kept her kitchen completely spotless.", exBn: "(সে তার রান্নাঘরটি সম্পূর্ণ দাগহীন রাখত।)" },
+                ant: { en: "Dirty", pronunciation: "ডার্টি", bn: "(নোংরা / অপবিত্র)", ex: "Please do not wear those dirty shoes inside.", exBn: "(দয়া করে ওই নোংরা জুতো পরে ভেতরে আসবেন না।)" },
+                origin: "ল্যাটিন 'immaculatus' (in- 'না' + maculatus 'দাগযুক্ত') থেকে এসেছে। যার আক্ষরিক অর্থ কোনো দাগ বা ত্রুটি নেই।",
+                mnemonic: "'Mac' (ম্যাক) মানে দাগ। 'Im' (না) + Mac = Immaculate। যাতে কোনো ম্যাক বা দাগ নেই, তাই নিখুঁত বা পবিত্র।",
+                sentences: [
+                    { en: "Her white dress was absolutely immaculate.", bn: "(তার সাদা পোশাকটি একদম নিখুঁত এবং দাগহীন ছিল।)" },
+                    { en: "He has an immaculate record as a police officer.", bn: "(একজন পুলিশ অফিসার হিসেবে তার একটি নিখুঁত রেকর্ড রয়েছে।)" },
+                    { en: "The hotel room was kept in an immaculate condition.", bn: "(হোটেলের ঘরটি একটি নিখুঁত অবস্থায় রাখা হয়েছিল।)" },
+                    { en: "She gave an immaculate performance in the final match.", bn: "(সে ফাইনাল ম্যাচে একটি নিখুঁত পারফরম্যান্স দিয়েছিল।)" },
+                    { en: "His timing and planning were simply immaculate.", bn: "(তার সময় এবং পরিকল্পনা ছিল স্রেফ নিখুঁত।)" }
+                ]
+            },
+            {
+                id: 16,
+                word: "Consecrate",
+                pronunciation: "কনসিক্রেট",
+                bnTitle: "(পবিত্র করা / উৎসর্গ করা)",
+                theme: { border: "border-fuchsia-600", text: "text-fuchsia-800" },
+                syn: { en: "Sanctify", pronunciation: "স্যাংটিফাই", bn: "(পবিত্র করা)", ex: "The priest will sanctify the new altar tomorrow.", exBn: "(পুরোহিত আগামীকাল নতুন বেদীটি পবিত্র করবেন।)" },
+                ant: { en: "Desecrate", pronunciation: "ডেসেক্রেট", bn: "(পবিত্রতা নষ্ট করা)", ex: "Vandals tried to desecrate the old graveyard.", exBn: "(ধ্বংসকারীরা পুরানো গোরস্থানের পবিত্রতা নষ্ট করার চেষ্টা করেছিল।)" },
+                origin: "ল্যাটিন 'consecrare' (con- 'একসাথে' + sacrare 'পবিত্র করা') থেকে এসেছে। ধর্মীয় উদ্দেশ্যে বা মহৎ কোনো কাজের জন্য আনুষ্ঠানিকভাবে কোনো কিছু উৎসর্গ করা।",
+                mnemonic: "'Secret' (পবিত্র বা গোপন)। কোনো সাধারণ জায়গাকে ধর্মীয় বা 'Secret' কাজে লাগানোর জন্য যে অনুষ্ঠান হয়, সেটাই Consecrate বা পবিত্র করা।",
+                sentences: [
+                    { en: "The new church was consecrated by the bishop.", bn: "(নতুন গির্জাটি বিশপ দ্বারা পবিত্র বা উৎসর্গ করা হয়েছিল।)" },
+                    { en: "He decided to consecrate his life to helping the poor.", bn: "(সে দরিদ্রদের সাহায্য করার জন্য তার জীবন উৎসর্গ করার সিদ্ধান্ত নিয়েছিল।)" },
+                    { en: "The burial ground was consecrated hundreds of years ago.", bn: "(কবরস্থানটি শত শত বছর আগে পবিত্র করা হয়েছিল।)" },
+                    { en: "They consecrated the monument to the fallen soldiers.", bn: "(তারা পতিত সৈন্যদের উদ্দেশ্যে স্মৃতিস্তম্ভটি উৎসর্গ করেছিল।)" },
+                    { en: "Water from the holy river is used to consecrate the temple.", bn: "(পবিত্র নদীর জল মন্দির পবিত্র করতে ব্যবহৃত হয়।)" }
+                ]
+            },
+            {
+                id: 17,
+                word: "Reconnaissance",
+                pronunciation: "রিকনেসেন্স / রিকানিসন্স",
+                bnTitle: "(সামরিক পর্যবেক্ষণ / প্রাথমিক অনুসন্ধান)",
+                theme: { border: "border-gray-800", text: "text-gray-900" },
+                syn: { en: "Inspection", pronunciation: "ইনস্পেকশন", bn: "(পরিদর্শন / পর্যবেক্ষণ)", ex: "The health officer conducted an inspection of the kitchen.", exBn: "(স্বাস্থ্য কর্মকর্তা রান্নাঘরের একটি পরিদর্শন পরিচালনা করেছিলেন।)" },
+                ant: { en: "Ignorance", pronunciation: "ইগনোরেন্স", bn: "(অজ্ঞতা / এড়িয়ে চলা)", ex: "His ignorance of the rules caused the accident.", exBn: "(নিয়ম সম্পর্কে তার অজ্ঞতা দুর্ঘটনার কারণ হয়েছিল।)" },
+                origin: "ফরাসি শব্দ 'reconnaître' (চিনতে পারা বা ঘুরে দেখা) থেকে এসেছে। সামরিক পরিভাষায় শত্রুর অবস্থান বা শক্তি যাচাই করার জন্য যে অনুসন্ধান চালানো হয়। (সংক্ষেপে একে 'Recon' বলা হয়)।",
+                mnemonic: "'Recognize' (চিনতে পারা) থেকে Reconnaissance। শত্রুর এলাকা Recognize করার জন্য বা চেনার জন্য যে সামরিক অনুসন্ধান করা হয়, তাই Reconnaissance।",
+                sentences: [
+                    { en: "The plane flew over the island on a reconnaissance mission.", bn: "(বিমানটি একটি সামরিক পর্যবেক্ষণ মিশনে দ্বীপের উপর দিয়ে উড়েছিল।)" },
+                    { en: "They sent a small team to do some aerial reconnaissance.", bn: "(তারা কিছু এরিয়াল বা বায়বীয় পর্যবেক্ষণ করার জন্য একটি ছোট দল পাঠিয়েছিল।)" },
+                    { en: "The general ordered a thorough reconnaissance of the enemy camp.", bn: "(সেনাপতি শত্রু শিবিরের পুঙ্খানুপুঙ্খ প্রাথমিক অনুসন্ধানের নির্দেশ দেন।)" },
+                    { en: "Gathering information through reconnaissance is vital for victory.", bn: "(সামরিক পর্যবেক্ষণের মাধ্যমে তথ্য সংগ্রহ করা বিজয়ের জন্য অত্যাবশ্যক।)" },
+                    { en: "He was awarded a medal for his dangerous reconnaissance work.", bn: "(তার বিপজ্জনক পর্যবেক্ষণ কাজের জন্য তাকে একটি পদক দেওয়া হয়েছিল।)" }
+                ]
+            }
+        ];
+
+        // --- STREAMING_CHUNK: Defining MCQs Data Array (40 Questions) ---
+        const mcqData = [
+            {
+                q: "What does the word 'Prerogative' mean?",
+                options: { a: "A severe punishment", b: "A right or privilege exclusive to a particular individual or class", c: "A type of dangerous animal", d: "A fake medical degree" },
+                correct: "b",
+                note: "'Prerogative' means a special right or privilege. For example, 'It is the president's prerogative to grant pardons.'"
+            },
+            {
+                q: "Which word correctly acts as an antonym for 'Stupendous'?",
+                options: { a: "Amazing", b: "Ordinary", c: "Colossal", d: "Huge" },
+                correct: "b",
+                note: "'Stupendous' means extremely impressive or large (amazing). Therefore, 'Ordinary' is the direct antonym."
+            },
+            {
+                q: "A person who falsely claims to have special knowledge or skill is a:",
+                options: { a: "Cardiologist", b: "Charlatan", c: "Philanthropist", d: "Demagogue" },
+                correct: "b",
+                note: "A 'Charlatan' is a fraud or quack, especially someone who pretends to have medical skills they lack."
+            },
+            {
+                q: "If someone is feeling 'Drowsy', they are feeling:",
+                options: { a: "Sleepy and lethargic", b: "Angry and hostile", c: "Alert and focused", d: "Hungry and thirsty" },
+                correct: "a",
+                note: "'Drowsy' means feeling sleepy or half-asleep, often caused by warm weather, heavy food, or certain medicines."
+            },
+            {
+                q: "Which word is an antonym for 'Erotic'?",
+                options: { a: "Sensual", b: "Romantic", c: "Chaste", d: "Passionate" },
+                correct: "c",
+                note: "'Erotic' relates to sexual desire or passion. 'Chaste' means pure, innocent, or refraining from sexual intercourse, making it the antonym."
+            },
+            {
+                q: "What describes a person who is 'Abstemious'?",
+                options: { a: "Drinking large amounts of alcohol", b: "Eating and drinking in moderation", c: "Always fighting and arguing", d: "Showing immense bravery" },
+                correct: "b",
+                note: "An 'Abstemious' person is someone who is moderate or sparing in eating and drinking."
+            },
+            {
+                q: "If a rebel group decides to 'Capitulate', what are they doing?",
+                options: { a: "Launching a surprise attack", b: "Surrendering under agreed conditions", c: "Recruiting new members", d: "Building a new fortress" },
+                correct: "b",
+                note: "'Capitulate' means to cease to resist an opponent or an unwelcome demand; to surrender."
+            },
+            {
+                q: "Which word is a synonym for 'Conundrum'?",
+                options: { a: "Solution", b: "Puzzle", c: "Agreement", d: "Treaty" },
+                correct: "b",
+                note: "A 'Conundrum' is a confusing and difficult problem or question, making 'Puzzle' its perfect synonym."
+            },
+            {
+                q: "If someone has an 'Ulterior' motive, their motive is:",
+                options: { a: "Obvious to everyone", b: "Selfless and caring", c: "Intentionally hidden", d: "Related to farming" },
+                correct: "c",
+                note: "An 'Ulterior' motive is a secret, hidden reason for doing something, often a selfish one."
+            },
+            {
+                q: "What does the government grant when it declares an 'Amnesty'?",
+                options: { a: "A new tax law", b: "A general pardon for offenses, especially political ones", c: "A declaration of war", d: "A strict curfew" },
+                correct: "b",
+                note: "'Amnesty' comes from the Greek word for 'forgetfulness' and means an official pardon for people who have been convicted of political offenses."
+            },
+            {
+                q: "What does an 'Effete' society look like?",
+                options: { a: "Vigorous and expanding", b: "Exhausted of vigor, weakened, and decadent", c: "Highly technological", d: "Pure and innocent" },
+                correct: "b",
+                note: "'Effete' describes something that has lost its character, vitality, or strength."
+            },
+            {
+                q: "What does the idiom 'To pour oil in troubled water' mean?",
+                options: { a: "To make a bad situation much worse", b: "To try to settle a dispute and calm a situation", c: "To start a fire in the ocean", d: "To waste valuable resources" },
+                correct: "b",
+                note: "This idiom means to pacify or calm a tense, volatile situation."
+            },
+            {
+                q: "If a manager gives a small bonus as 'A sop to Cerberus', he is:",
+                options: { a: "Giving a bribe to prevent trouble or appease someone", b: "Rewarding hard work fairly", c: "Punishing a lazy employee", d: "Feeding a mythological dog" },
+                correct: "a",
+                note: "A 'sop to Cerberus' is a concession or bribe given to appease someone who is demanding or dangerous."
+            },
+            {
+                q: "Which word is an antonym for 'Naivete'?",
+                options: { a: "Innocence", b: "Gullibility", c: "Experience", d: "Simplicity" },
+                correct: "c",
+                note: "'Naivete' is a lack of experience, wisdom, or judgment. Therefore, 'Experience' is its exact antonym."
+            },
+            {
+                q: "If a room is described as 'Immaculate', it is:",
+                options: { a: "Very dark and scary", b: "Perfectly clean, neat, or tidy", c: "Covered in mud and dust", d: "Filled with loud noises" },
+                correct: "b",
+                note: "'Immaculate' means completely spotless or free from flaws."
+            },
+            {
+                q: "Which word means 'to make or declare something sacred'?",
+                options: { a: "Desecrate", b: "Consecrate", c: "Capitulate", d: "Abolish" },
+                correct: "b",
+                note: "To 'Consecrate' is to formally dedicate something to a religious or divine purpose."
+            },
+            {
+                q: "What is the primary purpose of a 'Reconnaissance' mission?",
+                options: { a: "To destroy the enemy base directly", b: "To gather information about an enemy or terrain", c: "To negotiate a peace treaty", d: "To rescue wounded soldiers" },
+                correct: "b",
+                note: "'Reconnaissance' (often called recon) is military observation of a region to locate an enemy or ascertain strategic features."
+            },
+            {
+                q: "Analogy -> Gluttonous : Abstemious :: Desecrate : ?",
+                options: { a: "Consecrate", b: "Pollute", c: "Abolish", d: "Capitulate" },
+                correct: "a",
+                note: "Gluttonous and Abstemious are antonyms. The antonym of Desecrate (to violate) is Consecrate (to make holy)."
+            },
+            {
+                q: "Fill in the blank: The detective finally solved the complex ______ that had baffled the police for months.",
+                options: { a: "Amnesty", b: "Naivete", c: "Conundrum", d: "Prerogative" },
+                correct: "c",
+                note: "A baffling problem that requires solving is a 'Conundrum' (puzzle/mystery)."
+            },
+            {
+                q: "Which word shares its etymological root with the Latin word for 'to ask before'?",
+                options: { a: "Charlatan", b: "Prerogative", c: "Stupendous", d: "Effete" },
+                correct: "b",
+                note: "'Prerogative' comes from 'praerogativa', referring to the right to be asked to vote first in ancient Rome."
+            },
+            {
+                q: "Fill in the blank: Taking a warm bath usually makes me feel relaxed and _____.",
+                options: { a: "Drowsy", b: "Vigilant", c: "Pugnacious", d: "Immaculate" },
+                correct: "a",
+                note: "A warm bath induces sleepiness, which is the definition of 'Drowsy'."
+            },
+            {
+                q: "What is the relationship in the analogy 'Charlatan : Fraud'?",
+                options: { a: "They are antonyms", b: "They are synonyms", c: "One is a cause, the other an effect", d: "They relate to royalty" },
+                correct: "b",
+                note: "Both Charlatan and Fraud describe a person who deceives others by pretending to have skills they lack."
+            },
+            {
+                q: "Which word best completes the sentence? 'The general realized that his army was exhausted and out of food, so he decided to ______.'",
+                options: { a: "Consecrate", b: "Capitulate", c: "Reconnaissance", d: "Ignite" },
+                correct: "b",
+                note: "An exhausted, starving army has no choice but to surrender, or 'Capitulate'."
+            },
+            {
+                q: "What is the antonym of 'Effete'?",
+                options: { a: "Exhausted", b: "Vigorous", c: "Weak", d: "Decadent" },
+                correct: "b",
+                note: "Effete means exhausted or weakened. Vigorous means strong, healthy, and full of energy, making it the antonym."
+            },
+            {
+                q: "If someone is performing 'Reconnaissance', they are conducting an:",
+                options: { a: "Inspection", b: "Operation", c: "Amnesty", d: "Illusion" },
+                correct: "a",
+                note: "Reconnaissance involves surveying or inspecting an area to gather information."
+            },
+            {
+                q: "Fill in the blank: The politician offered a small tax cut as ______ to angry voters.",
+                options: { a: "a sop to Cerberus", b: "an immaculate act", c: "a stupendous lie", d: "a drowsy effort" },
+                correct: "a",
+                note: "Offering a small concession to appease an angry group fits the idiom 'a sop to Cerberus'."
+            },
+            {
+                q: "Which word describes a person who is easily fooled because they lack worldly experience?",
+                options: { a: "Abstemious", b: "Naive", c: "Erotic", d: "Charlatan" },
+                correct: "b",
+                note: "A person with 'Naivete' (or who is naive) lacks experience and is easily tricked."
+            },
+            {
+                q: "Analogy -> Obvious : Ulterior :: Punishment : ?",
+                options: { a: "Penalty", b: "Amnesty", c: "Crime", d: "Misdeed" },
+                correct: "b",
+                note: "Obvious and Ulterior (hidden) are antonyms. The antonym of Punishment is Amnesty (pardon)."
+            },
+            {
+                q: "If a chef is preparing an 'Abstemious' meal, it is likely to be:",
+                options: { a: "A massive, heavy feast", b: "A small, simple, and moderate portion", c: "Covered in rich, sugary sauces", d: "Extremely spicy" },
+                correct: "b",
+                note: "Abstemious means moderate or sparing, especially with food and drink."
+            },
+            {
+                q: "Fill in the blank: After washing the car for three hours, it looked absolutely ______.",
+                options: { a: "Effete", b: "Immaculate", c: "Drowsy", d: "Erotic" },
+                correct: "b",
+                note: "Washing a car for hours results in it being spotless and perfectly clean, which is 'Immaculate'."
+            },
+            {
+                q: "What is the synonym for 'Amnesty'?",
+                options: { a: "Pardon", b: "Conviction", c: "Sentence", d: "Arrest" },
+                correct: "a",
+                note: "Amnesty is an official pardon for people who have been convicted of offenses."
+            },
+            {
+                q: "Which idiom means to 'pacify' or 'calm down a tense situation'?",
+                options: { a: "A feather in your cap", b: "To pour oil in troubled water", c: "A sop to Cerberus", d: "Struck several bad patches" },
+                correct: "b",
+                note: "Pouring oil on troubled waters metaphorically calms the 'waves' of a dispute."
+            },
+            {
+                q: "Fill in the blank: The priest will ______ the new burial ground on Sunday morning.",
+                options: { a: "Consecrate", b: "Capitulate", c: "Abase", d: "Amalgamate" },
+                correct: "a",
+                note: "A priest makes a burial ground holy or sacred, which means to 'Consecrate' it."
+            },
+            {
+                q: "Which word is derived from the Greek god of love?",
+                options: { a: "Erotic", b: "Stupendous", c: "Conundrum", d: "Amnesty" },
+                correct: "a",
+                note: "Erotic is derived from 'Eros', the ancient Greek god of love and desire."
+            },
+            {
+                q: "If someone is wearing an 'Immaculate' white shirt, and they spill coffee on it, it becomes:",
+                options: { a: "Consecrated", b: "Stupendous", c: "Maculated/Dirty", d: "Abstemious" },
+                correct: "c",
+                note: "Immaculate means without a stain. Spilling coffee adds a stain (macula), making it dirty."
+            },
+            {
+                q: "What is the antonym of 'Ulterior'?",
+                options: { a: "Hidden", b: "Secret", c: "Obvious", d: "Underlying" },
+                correct: "c",
+                note: "Ulterior means hidden or unstated. Therefore, 'Obvious' (clear and open) is its antonym."
+            },
+            {
+                q: "Fill in the blank: The discovery of the new galaxy was a ______ achievement for the astronomers.",
+                options: { a: "Stupendous", b: "Drowsy", c: "Naivete", d: "Effete" },
+                correct: "a",
+                note: "Discovering a galaxy is a huge, amazing event, making 'Stupendous' the best fit."
+            },
+            {
+                q: "Which word would best describe a tired, outdated institution that can no longer perform its duties?",
+                options: { a: "Immaculate", b: "Effete", c: "Vigilant", d: "Able" },
+                correct: "b",
+                note: "An institution that has lost its vitality, effectiveness, and energy is described as 'Effete'."
+            },
+            {
+                q: "Analogy -> Naivete : Experience :: Resist : ?",
+                options: { a: "Fight", b: "Capitulate", c: "Defend", d: "Conquer" },
+                correct: "b",
+                note: "Naivete and Experience are antonyms. The antonym of Resist is Capitulate (surrender)."
+            },
+            {
+                q: "Fill in the blank: The manager was angry, but Sarah managed to ______ by apologizing politely.",
+                options: { a: "pour oil in troubled water", b: "be a charlatan", c: "consecrate the room", d: "create a conundrum" },
+                correct: "a",
+                note: "Apologizing politely calms an angry manager, which perfectly fits 'pouring oil in troubled water'."
+            }
+        ];
+
+        // --- STREAMING_CHUNK: Function to render the Word Breakdown ---
+        function renderWordBreakdown() {
+            const container = document.getElementById('word-breakdown-container');
+            let htmlContent = '';
+
+            wordData.forEach(data => {
+                let sentencesHtml = '';
+                data.sentences.forEach(s => {
+                    sentencesHtml += `
+                        <li>
+                            ${s.en}<br>
+                            <span class="text-xs text-black bn-text ml-5 block mt-0.5">${s.bn}</span>
+                        </li>
+                    `;
+                });
+
+                htmlContent += `
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 ${data.theme.border}">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold ${data.theme.text}">${data.id}. ${data.word} <span class="text-lg font-medium text-gray-500 ml-1">/${data.pronunciation}/</span> <span class="text-sm font-bold text-gray-700 bn-text ml-2">${data.bnTitle}</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: ${data.syn.en.split(' / ')[0]}</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: ${data.ant.en.split(' / ')[0]}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">${data.origin}</p>
+                    </div>
+
+                    <div class="mb-5 bg-emerald-50 p-4 rounded-xl border-l-4 border-emerald-400 shadow-sm">
+                        <h4 class="font-bold text-emerald-800 flex items-center gap-2 mb-1"><i class="fas fa-lightbulb text-emerald-500"></i> Mnemonic (স্মৃতিসূত্র)</h4>
+                        <p class="text-sm text-black font-bold bn-text leading-relaxed">${data.mnemonic}</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            ${sentencesHtml}
+                        </ul>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">${data.syn.en}</span> <span class="text-xs text-gray-500 ml-1">/${data.syn.pronunciation}/</span> <span class="bn-text text-sm font-bold text-black">${data.syn.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.syn.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.syn.exBn}</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">${data.ant.en}</span> <span class="text-xs text-gray-500 ml-1">/${data.ant.pronunciation}/</span> <span class="bn-text text-sm font-bold text-black">${data.ant.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.ant.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.ant.exBn}</p>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // --- STREAMING_CHUNK: Function to render the MCQs ---
+        function renderMCQs() {
+            const container = document.getElementById('mcq-container');
+            let htmlContent = '';
+
+            mcqData.forEach((mcq, index) => {
+                htmlContent += `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-lg text-black mb-3">${index + 1}. ${mcq.q}</h3>
+                    <ul class="space-y-2 mb-4 ml-2">
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">a.</span> ${mcq.options.a}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">b.</span> ${mcq.options.b}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">c.</span> ${mcq.options.c}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">d.</span> ${mcq.options.d}</li>
+                    </ul>
+                    
+                    <details class="group bg-emerald-50 rounded-lg outline-none border border-emerald-100">
+                        <summary class="cursor-pointer font-bold text-emerald-700 px-4 py-2 flex items-center justify-between select-none">
+                            <span class="flex items-center gap-2"><i class="fas fa-eye"></i> Show Answer</span>
+                            <i class="fas fa-chevron-down transform group-open:rotate-180 transition-transform duration-300"></i>
+                        </summary>
+                        <div class="px-4 pb-4 pt-1 border-t border-emerald-200 mt-1">
+                            <p class="text-black font-bold mb-2">Correct Answer: <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded uppercase">${mcq.correct}</span></p>
+                            <p class="text-sm text-black font-medium"><span class="font-bold">Note:</span> ${mcq.note}</p>
+                        </div>
+                    </details>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // --- STREAMING_CHUNK: Function to generate Summary List ---
+        function generateSummary() {
+            const summaryElement = document.getElementById('summaryText');
+            let summaryString = '';
+            wordData.forEach(data => {
+                let meaning = data.bnTitle.replace(/[()]/g, '');
+                let syn = data.syn.en.split(' / ')[0];
+                let ant = data.ant.en.split(' / ')[0];
+                summaryString += `${data.word}, ${meaning} - ${syn} @ ${ant};\n`;
+            });
+            summaryElement.innerText = summaryString;
+        }
+
+        // --- STREAMING_CHUNK: DOM Content Loaded initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderWordBreakdown();
+            renderMCQs();
+            generateSummary();
+        });
+
+        // --- STREAMING_CHUNK: Copy functionality ---
+        function copySummary() {
+            const summaryText = document.getElementById('summaryText').innerText;
+            copyTextToClipboard(summaryText, 'Summary list copied!');
+        }
+        
+        function copyStory() {
+            const storyTitle = document.getElementById('story-title').innerText.trim();
+            const storyParagraphs = document.querySelectorAll('#story-content p');
+            let storyText = storyTitle + '\n\n';
+            
+            storyParagraphs.forEach(p => {
+                storyText += p.innerText + '\n\n';
+            });
+            
+            copyTextToClipboard(storyText.trim(), 'Story copied!');
+        }
+
+        function copyMCQs() {
+            let copyText = '';
+            
+            mcqData.forEach((mcq, index) => {
+                copyText += `${index + 1}. ${mcq.q}\n`;
+                copyText += `a. ${mcq.options.a}\n`;
+                copyText += `b. ${mcq.options.b}\n`;
+                copyText += `c. ${mcq.options.c}\n`;
+                copyText += `d. ${mcq.options.d}\n`;
+                copyText += `correct answer: ${mcq.correct}\n`;
+                copyText += `Note: ${mcq.note}\n\n`;
+            });
+            
+            copyTextToClipboard(copyText.trim(), '40 MCQs copied exactly formatted!');
+        }
+
+        function copyTextToClipboard(text, successMessage) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(successMessage);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => showToast(successMessage)).catch(e => console.error("Clipboard API failed", e));
+                }
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toast-message");
+            toastMessage.innerText = message;
+            
+            toast.className = "show";
+            
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

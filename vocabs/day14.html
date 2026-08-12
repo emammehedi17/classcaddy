@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 14 - Systematic Vocabulary Batch</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            500: '#000000', 
+                            600: '#000000', 
+                            700: '#000000', 
+                            800: '#000000', 
+                            900: '#000000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #fdf2f8; /* pink-50 */
+            color: #000000; 
+        }
+        .bn-text {
+            font-family: 'Hind Siliguri', sans-serif;
+            color: #000000; 
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #db2777; /* pink-600 */
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-screen p-4 md:p-8 selection:bg-pink-200 selection:text-pink-900 text-black">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <header class="glass-card rounded-2xl shadow-lg p-6 md:p-8 mb-8 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-indigo-600 to-pink-500"></div>
+            
+            <div class="text-center md:text-left mb-6 md:mb-0 z-10">
+                <div class="inline-block px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-bold mb-3">
+                    <i class="fas fa-calendar-day mr-2"></i>Daily Vocabulary
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-2 bg-gradient-to-r from-indigo-700 to-pink-600 gradient-text pb-1">
+                    Day 14
+                </h1>
+                <p class="text-black font-semibold flex items-center justify-center md:justify-start gap-2">
+                    <i class="fas fa-pen-nib text-indigo-600"></i>
+                    Created by: 
+                    <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-indigo-700 hover:text-indigo-900 hover:underline transition-colors font-bold relative group">
+                        Emam Mehedi
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-indigo-600 transition-all group-hover:w-full"></span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex-shrink-0 z-10 bg-white p-2 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300 border-2 border-indigo-100">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-24 h-24 md:w-28 md:h-28 rounded-lg">
+                <p class="text-center text-xs text-black mt-1 font-bold">Scan Me</p>
+            </div>
+        </header>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-10 mb-8 border-t-4 border-t-indigo-500 relative">
+            <div class="absolute -top-4 -right-4 text-indigo-200 opacity-20">
+                <i class="fas fa-stamp text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 id="story-title" class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-magnifying-glass text-indigo-600"></i> ডাকটিকিট চুরির রহস্য (The Stolen Stamp Mystery)
+                </h2>
+                <button onclick="copyStory()" class="mt-4 md:mt-0 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold py-2 px-4 rounded-lg shadow-sm transition-all flex items-center gap-2 border border-indigo-300">
+                    <i class="fas fa-copy"></i> Copy Story
+                </button>
+            </div>
+            
+            <div id="story-content" class="bn-text text-lg md:text-xl text-black font-medium leading-relaxed space-y-4 bg-white/70 p-6 rounded-xl border border-indigo-100 shadow-inner">
+                <p>
+                    শহরের এক প্রান্তে বাস করতেন বিখ্যাত <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Philatelist</span> <span class="text-pink-700 font-bold">(ডাকটিকিট সংগ্রাহক)</span> মি. সমীর এবং তার পরম বন্ধু একজন <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Cartographer</span> <span class="text-pink-700 font-bold">(মানচিত্র প্রস্তুতকারক)</span>। একদিন সমীরের জীবনের সবচেয়ে দামি ডাকটিকিটটি চুরি হয়ে যায়। এই বিশাল ক্ষতি তাকে প্রায় চরম <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Penury</span> <span class="text-pink-700 font-bold">(চরম দারিদ্র্য)</span>-এর দিকে ঠেলে দেয়।
+                </p>
+                <p>
+                    সবার সন্দেহ গিয়ে পড়ে এক সাধারণ ও শান্ত কর্মচারীর ওপর। গ্রামের লোকেরা তাকে অকারণে <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Jeer</span> <span class="text-pink-700 font-bold">(উপহাস করা)</span> এবং <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Taunt</span> <span class="text-pink-700 font-bold">(কটূক্তি করা)</span> শুরু করে। এমনকি কিছু দুষ্ট লোক মিথ্যে গুজব ছড়িয়ে তাকে <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Traduce</span> <span class="text-pink-700 font-bold">(চরিত্রহনন করা / মিথ্যা নিন্দা করা)</span> করতেও ছাড়েনি। কিন্তু সেই কর্মচারীটি তার সত্যের পথে অত্যন্ত <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Steadfast</span> <span class="text-pink-700 font-bold">(অটল / দৃঢ়)</span> ছিল।
+                </p>
+                <p>
+                    প্রকৃত অপরাধী ছিল এক <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Ostentatious</span> <span class="text-pink-700 font-bold">(জাঁকজমকপূর্ণ / লোকদেখানো)</span> ব্যবসায়ী, যে তার ক্ষমতা ও অর্থ দিয়ে সবসময় সাধারণ মানুষকে <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Browbeat</span> <span class="text-pink-700 font-bold">(ভয় দেখানো / ধমকানো)</span> করত। কিন্তু মানচিত্র প্রস্তুতকারকের তৈরি একটি পুরনো ভৌগোলিক নকশা এই ঘটনার <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Catalyst</span> <span class="text-pink-700 font-bold">(অনুঘটক)</span> হিসেবে কাজ করল এবং আসল অপরাধীর লুকানো জায়গা উন্মোচন করে দিল।
+                </p>
+                <p>
+                    অবশেষে আদালতে বিচারক সেই অহংকারী ব্যবসায়ীকে শাস্তি দিলেন এবং নির্দোষ কর্মচারীকে সম্পূর্ণ বেকসুর <span class="font-bold text-indigo-800 bg-indigo-100 px-1.5 py-0.5 rounded shadow-sm">Acquit</span> <span class="text-pink-700 font-bold">(খালাস দেওয়া / দোষমুক্ত করা)</span> করলেন।
+                </p>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-black mb-6 flex items-center gap-3 px-2">
+                <i class="fas fa-layer-group text-indigo-600"></i> Word Breakdown
+            </h2>
+            
+            <div id="word-breakdown-container" class="grid grid-cols-1 gap-6">
+                <!-- Word cards will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="mb-8 mt-12 border-t-4 border-dashed border-indigo-200 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 px-2">
+                <h2 class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-tasks text-indigo-600"></i> Knowledge Check (30 MCQs)
+                </h2>
+                <button onclick="copyMCQs()" class="mt-4 md:mt-0 bg-white hover:bg-gray-50 text-indigo-700 font-bold py-2 px-4 rounded-lg shadow transition-all flex items-center gap-2 border border-indigo-200">
+                    <i class="fas fa-copy"></i> Copy MCQs
+                </button>
+            </div>
+            
+            <div id="mcq-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- MCQs will be dynamically injected here -->
+            </div>
+        </section>
+
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-8 bg-gradient-to-r from-indigo-900 to-pink-900 text-white relative overflow-hidden mt-8">
+            <div class="absolute -right-10 -bottom-10 opacity-10">
+                <i class="fas fa-clipboard-list text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-indigo-50">
+                    <i class="fas fa-list-check text-pink-400"></i> Summary List
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 bg-pink-500 hover:bg-pink-400 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 border border-pink-400">
+                    <i class="fas fa-copy"></i> Copy List
+                </button>
+            </div>
+            
+            <div class="bg-black/40 p-5 rounded-xl border border-pink-500/30 font-mono text-sm leading-relaxed overflow-x-auto z-10 relative bn-text">
+<pre id="summaryText" class="whitespace-pre-wrap text-pink-50 font-bold"></pre>
+            </div>
+        </section>
+
+        <!-- Navigation Buttons -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 mb-4">
+            <a href="https://classcaddy.netlify.app/vocabs/day13" class="w-full sm:w-auto text-center bg-white hover:bg-indigo-50 text-indigo-700 font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-indigo-200 hover:border-indigo-400 group">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Previous (Day-13)
+            </a>
+            <!-- Correctly points to Weekly-2 as Day 14 is the end of Week 2 -->
+            <a href="https://classcaddy.netlify.app/vocabs/weekly2" class="w-full sm:w-auto text-center bg-gradient-to-r from-indigo-600 to-pink-600 hover:from-indigo-700 hover:to-pink-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-transparent hover:shadow-lg transform hover:-translate-y-0.5 group">
+                Next (Weekly-2) <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-700 text-sm mt-8 pb-8 font-bold">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i id="toast-icon" class="fas fa-check-circle mr-2"></i><span id="toast-message">Copied!</span></div>
+
+    <script>
+        // --- STREAMING_CHUNK: Defining Word Data Array ---
+        const wordData = [
+            {
+                id: 1,
+                word: "Penury",
+                pronunciation: "পেনিউরি",
+                bnTitle: "(চরম দারিদ্র্য)",
+                theme: { border: "border-indigo-500", text: "text-indigo-700" },
+                syn: { en: "Destitution", pronunciation: "ডেস্টিটিউশন", bn: "(নিঃস্বতা / চরম অভাব)", ex: "The war left thousands in complete destitution.", exBn: "(যুদ্ধটি হাজার হাজার মানুষকে সম্পূর্ণ নিঃস্বতায় ফেলে দেয়।)" },
+                ant: { en: "Wealth", pronunciation: "ওয়েলথ", bn: "(সম্পদ / প্রাচুর্য)", ex: "He inherited a great deal of wealth.", exBn: "(সে প্রচুর সম্পদের উত্তরাধিকারী হয়েছিল।)" },
+                origin: "ল্যাটিন শব্দ 'penuria' থেকে উদ্ভূত, যার অর্থ অভাব বা প্রয়োজন। এটি এমন অবস্থাকে বোঝায় যখন কারও কাছে বেঁচে থাকার মতো ন্যূনতম অর্থও থাকে না।",
+                mnemonic: "'Penny' (পয়সা) দিয়ে মনে রাখুন। যার কাছে একটা Penny বা পয়সাও নেই, তার অবস্থা Penury বা চরম দারিদ্র্য।",
+                sentences: [
+                    { en: "He died in absolute penury after losing his business.", bn: "(ব্যবসা হারানোর পর সে চরম দারিদ্র্যের মধ্যে মারা যায়।)" },
+                    { en: "The old musician lived his last years in penury.", bn: "(বৃদ্ধ সুরকার তার শেষ বছরগুলো চরম দারিদ্র্যের মধ্যে কাটিয়েছিলেন।)" },
+                    { en: "They were rescued from a life of extreme penury.", bn: "(তাদের চরম দারিদ্র্যের জীবন থেকে উদ্ধার করা হয়েছিল।)" },
+                    { en: "Penury forced him to beg on the streets.", bn: "(চরম দারিদ্র্য তাকে রাস্তায় ভিক্ষা করতে বাধ্য করেছিল।)" },
+                    { en: "The disease spread quickly among people living in penury.", bn: "(চরম দারিদ্র্যে বসবাসকারী মানুষের মধ্যে রোগটি দ্রুত ছড়িয়ে পড়ে।)" }
+                ]
+            },
+            {
+                id: 2,
+                word: "Catalyst",
+                pronunciation: "ক্যাটালিস্ট",
+                bnTitle: "(অনুঘটক / পরিবর্তনের মাধ্যম)",
+                theme: { border: "border-pink-500", text: "text-pink-700" },
+                syn: { en: "Stimulus", pronunciation: "স্টিমুলাস", bn: "(উদ্দীপক)", ex: "The new tax policy acted as a stimulus for the economy.", exBn: "(নতুন কর নীতিটি অর্থনীতির জন্য একটি উদ্দীপক হিসেবে কাজ করেছিল।)" },
+                ant: { en: "Hindrance", pronunciation: "হিনড্রেন্স", bn: "(বাধা / প্রতিবন্ধক)", ex: "The bad weather was a major hindrance to our journey.", exBn: "(খারাপ আবহাওয়া আমাদের যাত্রার একটি বড় বাধা ছিল।)" },
+                origin: "গ্রীক শব্দ 'kataluein' (গলে যাওয়া বা ভেঙে ফেলা) থেকে রসায়নে এর উৎপত্তি। রূপক অর্থে এটি এমন কিছু বা কাউকে বোঝায় যা কোনো বড় পরিবর্তনের সূচনা করে।",
+                mnemonic: "'Cat' (বিড়াল) + 'List'। বিড়াল যদি কুকুরের লিস্টে ঢুকে পড়ে, তবে তা পুরো এলাকায় ঝগড়া ও পরিবর্তনের Catalyst বা অনুঘটক হিসেবে কাজ করবে।",
+                sentences: [
+                    { en: "His inspiring speech acted as a catalyst for social change.", bn: "(তার অনুপ্রেরণামূলক বক্তৃতা সামাজিক পরিবর্তনের জন্য একটি অনুঘটক হিসেবে কাজ করেছিল।)" },
+                    { en: "The protest became a catalyst for new government laws.", bn: "(প্রতিবাদটি নতুন সরকারি আইনের জন্য একটি পরিবর্তনের মাধ্যম হয়ে ওঠে।)" },
+                    { en: "Enzymes act as a catalyst in our digestive system.", bn: "(এনজাইমগুলো আমাদের পরিপাকতন্ত্রে অনুঘটক হিসেবে কাজ করে।)" },
+                    { en: "The invention of the internet was a major catalyst in communication.", bn: "(ইন্টারনেটের আবিষ্কার যোগাযোগে একটি বড় অনুঘটক ছিল।)" },
+                    { en: "She was the true catalyst behind the team's victory.", bn: "(সে ছিল দলের বিজয়ের পেছনে আসল অনুঘটক।)" }
+                ]
+            },
+            {
+                id: 3,
+                word: "Ostentatious",
+                pronunciation: "অস্টেনটেশাস",
+                bnTitle: "(জাঁকজমকপূর্ণ / লোকদেখানো)",
+                theme: { border: "border-purple-500", text: "text-purple-700" },
+                syn: { en: "Showy", pronunciation: "শোয়ি", bn: "(লোকদেখানো / জাঁকাল)", ex: "She wore a very showy diamond necklace.", exBn: "(সে একটি অত্যন্ত লোকদেখানো হীরার নেকলেস পরেছিল।)" },
+                ant: { en: "Modest", pronunciation: "মডেস্ট", bn: "(বিনয়ী / অনাড়ম্বর)", ex: "He lived a simple and modest life.", exBn: "(সে একটি সাধারণ এবং অনাড়ম্বর জীবনযাপন করত।)" },
+                origin: "ল্যাটিন 'ostentare' (প্রদর্শন করা বা দেখানো) থেকে এসেছে। সম্পদ বা ক্ষমতা দেখানোর জন্য মাত্রাতিরিক্ত জাঁকজমক করাকে বোঝায়।",
+                mnemonic: "'Osten' (অস্টিন/দামি গাড়ি) + 'Tent' (তাঁবু)। দামি অস্টিন গাড়ি নিয়ে তাঁবুতে এসে যে লোকদেখানো ভাব করে, সে Ostentatious।",
+                sentences: [
+                    { en: "He drives an ostentatious sports car to show off his wealth.", bn: "(সে তার সম্পদ দেখানোর জন্য একটি লোকদেখানো স্পোর্টস কার চালায়।)" },
+                    { en: "The wedding was an ostentatious display of money.", bn: "(বিয়েটি ছিল অর্থের একটি জাঁকজমকপূর্ণ প্রদর্শন।)" },
+                    { en: "She dislikes ostentatious jewelry and prefers simple rings.", bn: "(সে লোকদেখানো গহনা অপছন্দ করে এবং সাধারণ আংটি পছন্দ করে।)" },
+                    { en: "His ostentatious lifestyle made his neighbors jealous.", bn: "(তার জাঁকজমকপূর্ণ জীবনযাপন তার প্রতিবেশীদের ঈর্ষান্বিত করেছিল।)" },
+                    { en: "The king built an ostentatious palace filled with gold.", bn: "(রাজা সোনায় ভরা একটি জাঁকজমকপূর্ণ প্রাসাদ নির্মাণ করেছিলেন।)" }
+                ]
+            },
+            {
+                id: 4,
+                word: "Steadfast",
+                pronunciation: "স্টেডফাস্ট",
+                bnTitle: "(অটল / দৃঢ়)",
+                theme: { border: "border-teal-500", text: "text-teal-700" },
+                syn: { en: "Resolute", pronunciation: "রেজলিউট", bn: "(দৃঢ়প্রতিজ্ঞ)", ex: "She remained resolute in her decision to resign.", exBn: "(পদত্যাগের সিদ্ধান্তে সে দৃঢ়প্রতিজ্ঞ ছিল।)" },
+                ant: { en: "Unsteady", pronunciation: "আনস্টেডি", bn: "(অস্থির / টলটলায়মান)", ex: "The old bridge was very unsteady.", exBn: "(পুরোনো সেতুটি খুব অস্থির ছিল।)" },
+                origin: "পুরোনো ইংরেজি 'stedefæst' (স্থানে স্থির) থেকে এসেছে। লক্ষ্য বা বিশ্বাসের প্রতি অত্যন্ত দৃঢ় এবং অবিচলিত থাকাকে বোঝায়।",
+                mnemonic: "'Steady' (স্থির) + 'Fast' (দ্রুত)। যে কোনো কঠিন পরিস্থিতিতে স্থির (Steady) থেকে দ্রুত (Fast) নিজের লক্ষ্যে অটল থাকে, সে Steadfast।",
+                sentences: [
+                    { en: "He remained steadfast in his belief despite the criticism.", bn: "(সমালোচনা সত্ত্বেও সে তার বিশ্বাসে অটল ছিল।)" },
+                    { en: "A steadfast friend will never leave you in trouble.", bn: "(একজন দৃঢ় বন্ধু আপনাকে বিপদে কখনও ছেড়ে যাবে না।)" },
+                    { en: "The soldiers stood steadfast against the enemy attack.", bn: "(সৈন্যরা শত্রুর আক্রমণের বিরুদ্ধে অটল হয়ে দাঁড়িয়েছিল।)" },
+                    { en: "Her steadfast devotion to her work is inspiring.", bn: "(তার কাজের প্রতি তার দৃঢ় একাগ্রতা অনুপ্রেরণাদায়ক।)" },
+                    { en: "He made a steadfast promise to help the poor.", bn: "(সে গরিবদের সাহায্য করার একটি দৃঢ় প্রতিশ্রুতি দিয়েছিল।)" }
+                ]
+            },
+            {
+                id: 5,
+                word: "Jeer",
+                pronunciation: "জিয়ার",
+                bnTitle: "(উপহাস করা / বিদ্রূপ করা)",
+                theme: { border: "border-amber-600", text: "text-amber-800" },
+                syn: { en: "Mock", pronunciation: "মক", bn: "(ঠাট্টা করা / বিদ্রূপ করা)", ex: "It is wrong to mock people for their mistakes.", exBn: "(মানুষকে তাদের ভুলের জন্য ঠাট্টা করা ভুল।)" },
+                ant: { en: "Cheer", pronunciation: "চিয়ার", bn: "(উৎসাহ দেওয়া / উল্লাস করা)", ex: "The crowd started to cheer for the winning team.", exBn: "(জনতা বিজয়ী দলের জন্য উল্লাস করতে শুরু করল।)" },
+                origin: "সম্ভবত ডাচ শব্দ 'scheeren' (অপমান করা) থেকে এসেছে। কাউকে অপমান করার উদ্দেশ্যে জোরে হাসা বা চিৎকার করা।",
+                mnemonic: "'Cheer' (উৎসাহ দেওয়া) এর ঠিক উল্টো হলো 'Jeer' (উপহাস করা বা নিরুৎসাহিত করা)।",
+                sentences: [
+                    { en: "The angry crowd began to jeer at the corrupt politician.", bn: "(রাগান্বিত জনতা দুর্নীতিগ্রস্ত রাজনীতিবিদের দিকে উপহাস করতে শুরু করল।)" },
+                    { en: "Do not jeer at those who are trying their best.", bn: "(যারা চেষ্টা করছে তাদের বিদ্রূপ করবেন না।)" },
+                    { en: "He ignored the jeers and continued his speech.", bn: "(সে উপহাস উপেক্ষা করে তার বক্তৃতা চালিয়ে গেল।)" },
+                    { en: "The players had to face loud jeers from the opposing fans.", bn: "(খেলোয়াড়দের বিপক্ষ দলের ভক্তদের কাছ থেকে উচ্চস্বরে বিদ্রূপের মুখোমুখি হতে হয়েছিল।)" },
+                    { en: "It is easy to jeer, but hard to achieve something.", bn: "(উপহাস করা সহজ, কিন্তু কিছু অর্জন করা কঠিন।)" }
+                ]
+            },
+            {
+                id: 6,
+                word: "Acquit",
+                pronunciation: "অ্যাকুইট",
+                bnTitle: "(খালাস দেওয়া / দোষমুক্ত করা)",
+                theme: { border: "border-cyan-600", text: "text-cyan-800" },
+                syn: { en: "Clear", pronunciation: "ক্লিয়ার", bn: "(নির্দোষ প্রমাণ করা / মুক্ত করা)", ex: "The new evidence helped to clear his name.", exBn: "(নতুন প্রমাণ তার নাম নির্দোষ প্রমাণ করতে সাহায্য করেছিল।)" },
+                ant: { en: "Convict", pronunciation: "কনভিক্ট", bn: "(দোষী সাব্যস্ত করা)", ex: "The jury decided to convict him of the crime.", exBn: "(জুরি তাকে অপরাধের জন্য দোষী সাব্যস্ত করার সিদ্ধান্ত নিয়েছে।)" },
+                origin: "পুরোনো ফরাসি 'aquiter' (ঋণ পরিশোধ করা বা মুক্ত করা) থেকে এসেছে। আইনি পরিভাষায় এর অর্থ আদালতের বিচারে কাউকে নির্দোষ ঘোষণা করা।",
+                mnemonic: "'Quit' (ছেড়ে দেওয়া)। আদালত যখন কাউকে নির্দোষ বলে সসম্মানে ছেড়ে দেয় (quit), তখন তাকে Acquit করা বলে।",
+                sentences: [
+                    { en: "The judge decided to acquit the innocent man.", bn: "(বিচারক নির্দোষ লোকটিকে খালাস দেওয়ার সিদ্ধান্ত নিয়েছেন।)" },
+                    { en: "He was acquitted of all charges due to a lack of evidence.", bn: "(প্রমাণের অভাবে তাকে সব অভিযোগ থেকে দোষমুক্ত করা হয়েছিল।)" },
+                    { en: "The jury took only one hour to acquit her.", bn: "(জুরি তাকে খালাস দিতে মাত্র এক ঘণ্টা সময় নিয়েছিল।)" },
+                    { en: "A good lawyer can help to acquit a wrongly accused person.", bn: "(একজন ভালো আইনজীবী ভুলভাবে অভিযুক্ত ব্যক্তিকে দোষমুক্ত করতে সাহায্য করতে পারেন।)" },
+                    { en: "They celebrated when the court decided to acquit him.", bn: "(আদালত তাকে খালাস দেওয়ার সিদ্ধান্ত নিলে তারা উদযাপন করেছিল।)" }
+                ]
+            },
+            {
+                id: 7,
+                word: "Taunt",
+                pronunciation: "টন্ট",
+                bnTitle: "(তিরস্কার করা / কটূক্তি করা)",
+                theme: { border: "border-red-500", text: "text-red-700" },
+                syn: { en: "Insult", pronunciation: "ইনসাল্ট", bn: "(অপমান করা)", ex: "He felt deeply hurt by the cruel insult.", exBn: "(নিষ্ঠুর অপমানে সে গভীরভাবে আহত বোধ করেছিল।)" },
+                ant: { en: "Compliment", pronunciation: "কমপ্লিমেন্ট", bn: "(প্রশংসা করা)", ex: "She received a nice compliment on her dress.", exBn: "(সে তার পোশাকের জন্য একটি সুন্দর প্রশংসা পেয়েছিল।)" },
+                origin: "ফরাসি 'tanter' (প্রলুব্ধ করা বা উত্যক্ত করা) থেকে এসেছে। কাউকে রাগানোর জন্য বা ছোট করার জন্য ইচ্ছা করে কটু কথা বলা।",
+                mnemonic: "'Aunt' (আন্টি/খালা)। কিছু রাগী আন্টি (Aunt) কথায় কথায় ছেলেমেয়েদের Taunt (কটূক্তি) করেন।",
+                sentences: [
+                    { en: "The school bully used to taunt the smaller kids.", bn: "(স্কুলের বখাটে ছেলেটি ছোট বাচ্চাদের তিরস্কার করত।)" },
+                    { en: "He could not bear the bitter taunts of his enemies.", bn: "(সে তার শত্রুদের তিক্ত কটূক্তি সহ্য করতে পারেনি।)" },
+                    { en: "She refused to react to his childish taunts.", bn: "(সে তার শিশুসুলভ কটূক্তিতে প্রতিক্রিয়া দেখাতে অস্বীকার করেছিল।)" },
+                    { en: "They taunted him for failing the simple test.", bn: "(সহজ পরীক্ষায় অকৃতকার্য হওয়ার জন্য তারা তাকে তিরস্কার করেছিল।)" },
+                    { en: "A taunt can sometimes hurt more than a physical blow.", bn: "(একটি কটূক্তি কখনও কখনও শারীরিক আঘাতের চেয়েও বেশি কষ্ট দিতে পারে।)" }
+                ]
+            },
+            {
+                id: 8,
+                word: "Philatelist",
+                pronunciation: "ফিলাটেলিস্ট",
+                bnTitle: "(ডাকটিকিট সংগ্রাহক)",
+                theme: { border: "border-emerald-600", text: "text-emerald-800" },
+                syn: { en: "Stamp collector", pronunciation: "স্ট্যাম্প কালেক্টর", bn: "(ডাকটিকিট সংগ্রাহক)", ex: "The stamp collector showed me his rare album.", exBn: "(ডাকটিকিট সংগ্রাহক আমাকে তার বিরল অ্যালবামটি দেখিয়েছিলেন।)" },
+                ant: { en: "Wanderer", pronunciation: "ওয়ান্ডারার", bn: "(ভবঘুরে - যে শখ বা সংগ্রহ ছাড়া ঘোরে)", ex: "He lived as a wanderer with no fixed hobbies.", exBn: "(সে কোনো নির্দিষ্ট শখ ছাড়াই ভবঘুরে হিসেবে জীবনযাপন করত।)" },
+                origin: "ফরাসি 'philatélie' থেকে উদ্ভূত, যা গ্রীক 'philos' (ভালোবাসা) এবং 'ateleia' (পেমেন্ট থেকে অব্যাহতি, যা ডাকটিকিটের কাজ) নিয়ে গঠিত।",
+                mnemonic: "'Phil' (ভালোবাসা) + 'Tele' (টেলিগ্রাম বা চিঠি)। যে ব্যক্তি চিঠি বা ডাকটিকিট ভালোবাসে এবং সংগ্রহ করে, সে Philatelist।",
+                sentences: [
+                    { en: "The famous philatelist bought a very rare stamp yesterday.", bn: "(বিখ্যাত ডাকটিকিট সংগ্রাহক গতকাল একটি খুব বিরল ডাকটিকিট কিনেছিলেন।)" },
+                    { en: "As a philatelist, he has stamps from over fifty countries.", bn: "(ডাকটিকিট সংগ্রাহক হিসেবে তার কাছে পঞ্চাশটিরও বেশি দেশের ডাকটিকিট রয়েছে।)" },
+                    { en: "The local museum hosted a meeting for every philatelist in the city.", bn: "(স্থানীয় জাদুঘর শহরের প্রত্যেক ডাকটিকিট সংগ্রাহকের জন্য একটি সভার আয়োজন করেছিল।)" },
+                    { en: "She has been a passionate philatelist since her childhood.", bn: "(সে তার শৈশব থেকেই একজন আবেগী ডাকটিকিট সংগ্রাহক।)" },
+                    { en: "A philatelist spends hours organizing old letters and stamps.", bn: "(একজন ডাকটিকিট সংগ্রাহক পুরোনো চিঠি এবং ডাকটিকিট সাজাতে ঘণ্টার পর ঘণ্টা ব্যয় করেন।)" }
+                ]
+            },
+            {
+                id: 9,
+                word: "Cartographer",
+                pronunciation: "কার্টোগ্রাফার",
+                bnTitle: "(মানচিত্র প্রস্তুতকারক)",
+                theme: { border: "border-orange-500", text: "text-orange-700" },
+                syn: { en: "Mapmaker", pronunciation: "ম্যাপমেকার", bn: "(মানচিত্র নির্মাতা)", ex: "The ancient mapmaker drew the world as flat.", exBn: "(প্রাচীন মানচিত্র নির্মাতা বিশ্বকে সমতল হিসেবে এঁকেছিলেন।)" },
+                ant: { en: "Wanderer", pronunciation: "ওয়ান্ডারার", bn: "(ভবঘুরে - যে মানচিত্র ছাড়া ঘোরে)", ex: "The wanderer traveled without knowing his destination.", exBn: "(ভবঘুরে তার গন্তব্য না জেনেই ভ্রমণ করেছিল।)" },
+                origin: "ফরাসি 'carte' (মানচিত্র) এবং গ্রীক 'graphia' (অঙ্কন বা লেখা) থেকে এসেছে। যে ব্যক্তি বৈজ্ঞানিক ও শৈল্পিক উপায়ে মানচিত্র তৈরি করে।",
+                mnemonic: "'Cart' (গাড়ি) + 'Graph' (অঙ্কন)। গাড়িতে চড়ে যে ব্যক্তি বিভিন্ন জায়গার গ্রাফ বা মানচিত্র আঁকে, সে Cartographer।",
+                sentences: [
+                    { en: "The royal cartographer drew a detailed map of the kingdom.", bn: "(রাজকীয় মানচিত্র প্রস্তুতকারক রাজ্যের একটি বিশদ মানচিত্র এঁকেছিলেন।)" },
+                    { en: "A skilled cartographer must understand geography and art.", bn: "(একজন দক্ষ মানচিত্র প্রস্তুতকারককে অবশ্যই ভূগোল এবং শিল্পকলা বুঝতে হবে।)" },
+                    { en: "Early explorers heavily relied on the local cartographer.", bn: "(আগের যুগের অভিযাত্রীরা স্থানীয় মানচিত্র প্রস্তুতকারকের ওপর ব্যাপকভাবে নির্ভর করত।)" },
+                    { en: "She works as a digital cartographer for a tech company.", bn: "(সে একটি টেক কোম্পানির জন্য ডিজিটাল মানচিত্র প্রস্তুতকারক হিসেবে কাজ করে।)" },
+                    { en: "The cartographer included the newly discovered island on the map.", bn: "(মানচিত্র প্রস্তুতকারক নতুন আবিষ্কৃত দ্বীপটিকে মানচিত্রে অন্তর্ভুক্ত করেছিলেন।)" }
+                ]
+            },
+            {
+                id: 10,
+                word: "Traduce",
+                pronunciation: "ট্রাডিউস",
+                bnTitle: "(চরিত্রহনন করা / মিথ্যা নিন্দা করা)",
+                theme: { border: "border-fuchsia-600", text: "text-fuchsia-800" },
+                syn: { en: "Defame", pronunciation: "ডিফেম", bn: "(মানহানি করা)", ex: "The magazine tried to defame the famous actor.", exBn: "(ম্যাগাজিনটি বিখ্যাত অভিনেতার মানহানি করার চেষ্টা করেছিল।)" },
+                ant: { en: "Praise", pronunciation: "প্রেইজ", bn: "(প্রশংসা করা)", ex: "The teacher will praise the hardworking students.", exBn: "(শিক্ষক কঠোর পরিশ্রমী ছাত্রদের প্রশংসা করবেন।)" },
+                origin: "ল্যাটিন 'traducere' (নেতৃত্ব দেওয়া বা জনসমক্ষে উপহাসের পাত্র বানানো) থেকে এসেছে। উদ্দেশ্যপ্রণোদিতভাবে কারও সম্পর্কে মিথ্যা বলে তার সম্মান নষ্ট করা।",
+                mnemonic: "'Reduce' (কমানো) শব্দটির সাথে মিলিয়ে মনে রাখুন। মিথ্যা কথা বলে কারও সম্মান বা খ্যাতি Reduce করাকে Traduce বলে।",
+                sentences: [
+                    { en: "It is a crime to publicly traduce an innocent person.", bn: "(জনসমক্ষে কোনো নির্দোষ ব্যক্তির চরিত্রহনন করা একটি অপরাধ।)" },
+                    { en: "His political rivals attempted to traduce his good name.", bn: "(তার রাজনৈতিক প্রতিদ্বন্দ্বীরা তার সুখ্যাতির মিথ্যা নিন্দা করার চেষ্টা করেছিল।)" },
+                    { en: "She was traduced by jealous colleagues in the office.", bn: "(সে অফিসে ঈর্ষান্বিত সহকর্মীদের দ্বারা চরিত্রহননের শিকার হয়েছিল।)" },
+                    { en: "Do not let them traduce your family's honor.", bn: "(তাদেরকে আপনার পরিবারের সম্মানের মিথ্যা নিন্দা করতে দেবেন না।)" },
+                    { en: "The newspaper was sued for trying to traduce the mayor.", bn: "(মেয়রের চরিত্রহনন করার চেষ্টার জন্য পত্রিকাটির বিরুদ্ধে মামলা করা হয়েছিল।)" }
+                ]
+            },
+            {
+                id: 11,
+                word: "Browbeat",
+                pronunciation: "ব্রাউবিট",
+                bnTitle: "(ভয় দেখানো / ধমকানো)",
+                theme: { border: "border-gray-800", text: "text-gray-900" },
+                syn: { en: "Bully", pronunciation: "বুলি", bn: "(হুমকি দেওয়া / ভয় দেখানো)", ex: "The older boy tried to bully him into giving money.", exBn: "(বড় ছেলেটি তাকে টাকা দেওয়ার জন্য ভয় দেখানোর চেষ্টা করেছিল।)" },
+                ant: { en: "Coax", pronunciation: "কোক্স", bn: "(তোষামোদ করা / মিষ্টি কথায় রাজি করানো)", ex: "She had to coax her dog to take a bath.", exBn: "(তাকে তার কুকুরকে গোসল করার জন্য মিষ্টি কথায় রাজি করাতে হয়েছিল।)" },
+                origin: "ইংরেজি 'Brow' (ভুরু) এবং 'Beat' (মারা বা আঘাত করা) থেকে তৈরি। ভুরু কুঁচকে রাগী দৃষ্টিতে তাকিয়ে মানসিক চাপ সৃষ্টি করে কাউকে ভয় দেখানো।",
+                mnemonic: "'Brow' (ভুরু) + 'Beat' (মারা)। ভুরু কুঁচকে কাউকে মারার ভয় দেখানো বা ধমকানোই হলো Browbeat।",
+                sentences: [
+                    { en: "The aggressive boss tried to browbeat the staff into working late.", bn: "(আক্রমণাত্মক বস কর্মীদের ভয় দেখিয়ে দেরিতে কাজ করানোর চেষ্টা করেছিলেন।)" },
+                    { en: "Do not let anyone browbeat you into making a quick decision.", bn: "(কাউকে ভয় দেখিয়ে আপনাকে দ্রুত সিদ্ধান্ত নিতে বাধ্য করতে দেবেন না।)" },
+                    { en: "The lawyer attempted to browbeat the nervous witness.", bn: "(আইনজীবী নার্ভাস সাক্ষীকে ধমকানোর চেষ্টা করেছিলেন।)" },
+                    { en: "He was browbeaten into signing the unfair contract.", bn: "(ভয় দেখিয়ে তাকে অন্যায্য চুক্তিতে স্বাক্ষর করানো হয়েছিল।)" },
+                    { en: "A good leader inspires, rather than trying to browbeat people.", bn: "(একজন ভালো নেতা ভয় দেখানোর চেষ্টা না করে বরং অনুপ্রাণিত করেন।)" }
+                ]
+            }
+        ];
+
+        // --- STREAMING_CHUNK: Defining MCQs Data Array (30 Questions) ---
+        const mcqData = [
+            {
+                q: "What is the meaning of the word 'Penury'?",
+                options: { a: "A great amount of wealth", b: "A state of extreme poverty or destitution", c: "A type of dangerous animal", d: "A punishment given by a court" },
+                correct: "b",
+                note: "Penury refers to extreme poverty. For example, living without basic necessities."
+            },
+            {
+                q: "Which word correctly acts as a synonym for 'Catalyst'?",
+                options: { a: "Hindrance", b: "Stimulus", c: "Observer", d: "Victim" },
+                correct: "b",
+                note: "A catalyst is an agent that provokes or speeds up significant change or action, much like a stimulus."
+            },
+            {
+                q: "What describes an 'Ostentatious' person?",
+                options: { a: "Modest and humble", b: "Living in complete penury", c: "Characterized by vulgar or pretentious display to attract notice", d: "Always staying quiet in a corner" },
+                correct: "c",
+                note: "Ostentatious means showy and intended to attract admiration or notice, often regarding wealth."
+            },
+            {
+                q: "If a soldier is 'Steadfast' in his duty, he is:",
+                options: { a: "Resolutely or dutifully firm and unwavering", b: "Constantly changing his mind", c: "Running away from danger", d: "Sleeping during his shift" },
+                correct: "a",
+                note: "Steadfast means very devoted or loyal to a person, belief, or cause; not changing or faltering."
+            },
+            {
+                q: "Which word is an antonym for 'Jeer'?",
+                options: { a: "Mock", b: "Taunt", c: "Cheer", d: "Insult" },
+                correct: "c",
+                note: "To jeer means to make rude and mocking remarks. To cheer means to shout for joy or in encouragement, making it the exact antonym."
+            },
+            {
+                q: "When a judge decides to 'Acquit' a defendant, what happens?",
+                options: { a: "The defendant is sent to prison", b: "The defendant is forced to pay a fine", c: "The defendant is freed from a criminal charge by a verdict of not guilty", d: "The defendant is browbeaten" },
+                correct: "c",
+                note: "To acquit means to clear someone of charges, officially declaring them not guilty."
+            },
+            {
+                q: "What is the primary action of a 'Taunt'?",
+                options: { a: "To give someone a valuable gift", b: "To praise someone highly", c: "To provoke or challenge someone with insulting remarks", d: "To protect someone from harm" },
+                correct: "c",
+                note: "A taunt is a remark made in order to anger, wound, or provoke someone."
+            },
+            {
+                q: "A 'Philatelist' is a person who:",
+                options: { a: "Collects old coins", b: "Studies the stars", c: "Collects or studies postage stamps", d: "Makes geographical maps" },
+                correct: "c",
+                note: "Philately is the collection and study of postage stamps. Therefore, a philatelist collects stamps."
+            },
+            {
+                q: "If someone works as a 'Cartographer', their job involves:",
+                options: { a: "Driving a horse cart", b: "Drawing or producing maps", c: "Designing clothes", d: "Taking photographs" },
+                correct: "b",
+                note: "A cartographer is a person who creates maps, combining science, aesthetics, and technique."
+            },
+            {
+                q: "What does it mean to 'Traduce' someone?",
+                options: { a: "To speak badly of or tell lies about someone to damage their reputation", b: "To introduce someone to a crowd", c: "To promote someone to a higher rank", d: "To give someone money" },
+                correct: "a",
+                note: "Traduce means to defame, slander, or publicly disgrace someone."
+            },
+            {
+                q: "Which action best describes 'Browbeat'?",
+                options: { a: "To gently persuade someone", b: "To intimidate someone, typically into doing something, with stern or abusive words", c: "To physically hit someone on the forehead", d: "To ignore someone completely" },
+                correct: "b",
+                note: "To browbeat is to bully or intimidate someone into doing what you want using harsh words."
+            },
+            {
+                q: "Analogy -> Penury : Wealth :: Steadfast : ?",
+                options: { a: "Resolute", b: "Unsteady", c: "Loyal", d: "Brave" },
+                correct: "b",
+                note: "Penury and Wealth are antonyms. The antonym of Steadfast (firm) is Unsteady."
+            },
+            {
+                q: "Fill in the blank: The sudden crisis acted as a ______ for the company to finally upgrade its old technology.",
+                options: { a: "Philatelist", b: "Catalyst", c: "Jeer", d: "Penury" },
+                correct: "b",
+                note: "A crisis provokes change. A 'Catalyst' is something that causes or accelerates change."
+            },
+            {
+                q: "Which word is a synonym for 'Ostentatious'?",
+                options: { a: "Modest", b: "Showy", c: "Hidden", d: "Silent" },
+                correct: "b",
+                note: "Ostentatious means characterized by pretentious display, which is synonymous with 'Showy'."
+            },
+            {
+                q: "What is the antonym of 'Acquit'?",
+                options: { a: "Clear", b: "Free", c: "Convict", d: "Praise" },
+                correct: "c",
+                note: "To acquit is to declare innocent. To 'Convict' is to declare guilty, serving as the antonym."
+            },
+            {
+                q: "Fill in the blank: The opposing team began to ______ our players when they missed the easy goal.",
+                options: { a: "Jeer", b: "Acquit", c: "Traduce", d: "Browbeat" },
+                correct: "a",
+                note: "Missing an easy goal leads to mocking from opponents. 'Jeer' means to mock or make rude remarks."
+            },
+            {
+                q: "Which of the following would a 'Cartographer' most likely use daily?",
+                options: { a: "A stethoscope", b: "A magnifying glass for stamps", c: "Compass and drawing tools", d: "A cooking pan" },
+                correct: "c",
+                note: "A cartographer draws maps, so they would use tools related to geography and drafting."
+            },
+            {
+                q: "If a boss tries to 'Browbeat' his employees, he is:",
+                options: { a: "Offering them a raise", b: "Bullying them into submission", c: "Asking for their opinion respectfully", d: "Inviting them to dinner" },
+                correct: "b",
+                note: "Browbeating involves intimidation, bullying, and using a stern attitude to force compliance."
+            },
+            {
+                q: "Analogy -> Taunt : Insult :: Traduce : ?",
+                options: { a: "Defame", b: "Praise", c: "Support", d: "Ignore" },
+                correct: "a",
+                note: "Taunt is a synonym of Insult. Traduce is a synonym of Defame (to ruin someone's reputation)."
+            },
+            {
+                q: "Which word best completes the sentence? 'The old man lived in ______, barely able to afford one meal a day.'",
+                options: { a: "Catalyst", b: "Ostentation", c: "Penury", d: "Jeer" },
+                correct: "c",
+                note: "Barely affording a meal indicates extreme poverty, which is the definition of 'Penury'."
+            },
+            {
+                q: "What is the antonym of 'Steadfast'?",
+                options: { a: "Firm", b: "Unwavering", c: "Resolute", d: "Unsteady" },
+                correct: "d",
+                note: "Steadfast means fixed and firm. Unsteady means liable to fall or change, making it the antonym."
+            },
+            {
+                q: "A person who is 'Ostentatious' is LEAST likely to be:",
+                options: { a: "Wearing a huge diamond ring", b: "Driving a gold-plated car", c: "Living in a modest, simple house", d: "Bragging about their wealth" },
+                correct: "c",
+                note: "An ostentatious person loves to show off. Living modestly is the exact opposite of their behavior."
+            },
+            {
+                q: "Fill in the blank: The magazine faced a lawsuit after it published an article attempting to ______ the mayor's character.",
+                options: { a: "Acquit", b: "Traduce", c: "Browbeat", d: "Jeer" },
+                correct: "b",
+                note: "Publishing false articles to ruin a character is defamation. 'Traduce' means to speak badly of or slander."
+            },
+            {
+                q: "Analogy -> Doctor : Medicine :: Philatelist : ?",
+                options: { a: "Stamps", b: "Maps", c: "Coins", d: "Books" },
+                correct: "a",
+                note: "A doctor deals with medicine. A philatelist deals with and collects stamps."
+            },
+            {
+                q: "Which of the following is a synonym for 'Acquit'?",
+                options: { a: "Convict", b: "Clear", c: "Accuse", d: "Punish" },
+                correct: "b",
+                note: "To acquit someone means to clear them of charges."
+            },
+            {
+                q: "Fill in the blank: The general remained ______ in his defense of the fort, refusing to surrender.",
+                options: { a: "Ostentatious", b: "Steadfast", c: "Indigent", d: "Craven" },
+                correct: "b",
+                note: "Refusing to surrender indicates a firm and unwavering attitude, which matches 'Steadfast'."
+            },
+            {
+                q: "If someone gives you a 'Taunt', they want you to feel:",
+                options: { a: "Happy and confident", b: "Angry and provoked", c: "Rich and wealthy", d: "Sleepy and drowsy" },
+                correct: "b",
+                note: "A taunt is a provocative insult designed to anger or wound the recipient."
+            },
+            {
+                q: "Which word is derived from the Greek words for 'loving' and 'exemption from payment'?",
+                options: { a: "Philatelist", b: "Cartographer", c: "Catalyst", d: "Traduce" },
+                correct: "a",
+                note: "Philatelist comes from 'philos' (loving) and 'ateleia' (exemption from payment, which a stamp represents)."
+            },
+            {
+                q: "What is the antonym of 'Browbeat'?",
+                options: { a: "Bully", b: "Coax", c: "Intimidate", d: "Threaten" },
+                correct: "b",
+                note: "To browbeat is to bully roughly. To 'Coax' is to gently and persistently persuade someone, making it the antonym."
+            },
+            {
+                q: "Analogy -> Jeer : Mock :: Catalyst : ?",
+                options: { a: "Hindrance", b: "Stimulus", c: "Reaction", d: "Result" },
+                correct: "b",
+                note: "Jeer and Mock are synonyms. A Catalyst acts as a Stimulus to provoke change."
+            }
+        ];
+
+        // --- STREAMING_CHUNK: Function to render the Word Breakdown ---
+        function renderWordBreakdown() {
+            const container = document.getElementById('word-breakdown-container');
+            let htmlContent = '';
+
+            wordData.forEach(data => {
+                let sentencesHtml = '';
+                data.sentences.forEach(s => {
+                    sentencesHtml += `
+                        <li>
+                            ${s.en}<br>
+                            <span class="text-xs text-black bn-text ml-5 block mt-0.5">${s.bn}</span>
+                        </li>
+                    `;
+                });
+
+                htmlContent += `
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 ${data.theme.border}">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold ${data.theme.text}">${data.id}. ${data.word} <span class="text-lg font-medium text-gray-500 ml-1">/${data.pronunciation}/</span> <span class="text-sm font-bold text-gray-700 bn-text ml-2">${data.bnTitle}</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: ${data.syn.en.split(' / ')[0]}</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: ${data.ant.en.split(' / ')[0]}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">${data.origin}</p>
+                    </div>
+
+                    <div class="mb-5 bg-indigo-50 p-4 rounded-xl border-l-4 border-indigo-400 shadow-sm">
+                        <h4 class="font-bold text-indigo-800 flex items-center gap-2 mb-1"><i class="fas fa-lightbulb text-indigo-500"></i> Mnemonic (স্মৃতিসূত্র)</h4>
+                        <p class="text-sm text-black font-bold bn-text leading-relaxed">${data.mnemonic}</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            ${sentencesHtml}
+                        </ul>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">${data.syn.en}</span> <span class="text-xs text-gray-500 ml-1">/${data.syn.pronunciation}/</span> <span class="bn-text text-sm font-bold text-black">${data.syn.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.syn.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.syn.exBn}</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">${data.ant.en}</span> <span class="text-xs text-gray-500 ml-1">/${data.ant.pronunciation}/</span> <span class="bn-text text-sm font-bold text-black">${data.ant.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.ant.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.ant.exBn}</p>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // --- STREAMING_CHUNK: Function to render the MCQs ---
+        function renderMCQs() {
+            const container = document.getElementById('mcq-container');
+            let htmlContent = '';
+
+            mcqData.forEach((mcq, index) => {
+                htmlContent += `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-lg text-black mb-3">${index + 1}. ${mcq.q}</h3>
+                    <ul class="space-y-2 mb-4 ml-2">
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">a.</span> ${mcq.options.a}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">b.</span> ${mcq.options.b}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">c.</span> ${mcq.options.c}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">d.</span> ${mcq.options.d}</li>
+                    </ul>
+                    
+                    <details class="group bg-pink-50 rounded-lg outline-none border border-pink-100">
+                        <summary class="cursor-pointer font-bold text-pink-700 px-4 py-2 flex items-center justify-between select-none">
+                            <span class="flex items-center gap-2"><i class="fas fa-eye"></i> Show Answer</span>
+                            <i class="fas fa-chevron-down transform group-open:rotate-180 transition-transform duration-300"></i>
+                        </summary>
+                        <div class="px-4 pb-4 pt-1 border-t border-pink-200 mt-1">
+                            <p class="text-black font-bold mb-2">Correct Answer: <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded uppercase">${mcq.correct}</span></p>
+                            <p class="text-sm text-black font-medium"><span class="font-bold">Note:</span> ${mcq.note}</p>
+                        </div>
+                    </details>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // --- STREAMING_CHUNK: Function to generate Summary List ---
+        function generateSummary() {
+            const summaryElement = document.getElementById('summaryText');
+            let summaryString = '';
+            wordData.forEach(data => {
+                let meaning = data.bnTitle.replace(/[()]/g, '');
+                let syn = data.syn.en.split(' / ')[0];
+                let ant = data.ant.en.split(' / ')[0];
+                summaryString += `${data.word}, ${meaning} - ${syn} @ ${ant};\n`;
+            });
+            summaryElement.innerText = summaryString;
+        }
+
+        // --- STREAMING_CHUNK: DOM Content Loaded initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderWordBreakdown();
+            renderMCQs();
+            generateSummary();
+        });
+
+        // --- STREAMING_CHUNK: Copy functionality ---
+        function copySummary() {
+            const summaryText = document.getElementById('summaryText').innerText;
+            copyTextToClipboard(summaryText, 'Summary list copied!');
+        }
+        
+        function copyStory() {
+            const storyTitle = document.getElementById('story-title').innerText.trim();
+            const storyParagraphs = document.querySelectorAll('#story-content p');
+            let storyText = storyTitle + '\n\n';
+            
+            storyParagraphs.forEach(p => {
+                storyText += p.innerText + '\n\n';
+            });
+            
+            copyTextToClipboard(storyText.trim(), 'Story copied!');
+        }
+
+        function copyMCQs() {
+            let copyText = '';
+            
+            mcqData.forEach((mcq, index) => {
+                copyText += `${index + 1}. ${mcq.q}\n`;
+                copyText += `a. ${mcq.options.a}\n`;
+                copyText += `b. ${mcq.options.b}\n`;
+                copyText += `c. ${mcq.options.c}\n`;
+                copyText += `d. ${mcq.options.d}\n`;
+                copyText += `correct answer: ${mcq.correct}\n`;
+                copyText += `Note: ${mcq.note}\n\n`;
+            });
+            
+            copyTextToClipboard(copyText.trim(), '30 MCQs copied exactly formatted!');
+        }
+
+        function copyTextToClipboard(text, successMessage) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(successMessage);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => showToast(successMessage)).catch(e => console.error("Clipboard API failed", e));
+                }
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toast-message");
+            toastMessage.innerText = message;
+            
+            toast.className = "show";
+            
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
