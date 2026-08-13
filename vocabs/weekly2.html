@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 8-14 Weekly Mastery Practice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', 'Hind Siliguri', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.2); }
+        .gradient-text { background: linear-gradient(90deg, #f43f5e, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .bn-text { font-family: 'Hind Siliguri', sans-serif; }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        
+        /* Custom Scrollbar for the dark theme */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    </style>
+</head>
+<body class="antialiased p-4 md:p-8 selection:bg-rose-500/30">
+
+    <div class="max-w-6xl mx-auto space-y-10">
+        <header class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between border-t-4 border-t-rose-500">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-rose-600/10 rounded-full blur-3xl -z-10 transform translate-x-1/2 -translate-y-1/2"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-amber-600/10 rounded-full blur-3xl -z-10 transform -translate-x-1/2 translate-y-1/2"></div>
+            
+            <div class="z-10 text-center md:text-left mb-6 md:mb-0">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-800/80 rounded-full text-rose-300 font-bold mb-4 border border-rose-500/30">
+                    <i class="fas fa-crown text-amber-400"></i>
+                    <span>Weekly Review: Day 8 to 14</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold gradient-text mb-4 tracking-tight">The Master Practice</h1>
+                <p class="text-lg text-slate-300 font-medium mb-3">78 Words. Epic Story. 50 MCQs.</p>
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-lg text-slate-300 font-medium border border-slate-600 shadow-sm">
+                    <i class="fas fa-pen-nib text-amber-400"></i>
+                    <span>Created by: <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-rose-300 hover:text-rose-200 underline font-bold transition-colors">Emam Mehedi</a></span>
+                </div>
+            </div>
+            <div class="z-10 flex-shrink-0 bg-slate-800 p-2 rounded-2xl shadow-xl border border-slate-600 transform hover:scale-105 transition-transform duration-300">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-28 h-28 object-cover rounded-xl opacity-90 hover:opacity-100 transition-opacity">
+            </div>
+        </header>
+
+        <section class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl relative">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-700 pb-5">
+                <h2 id="story-title" class="text-3xl font-bold flex items-center gap-3 text-slate-100">
+                    <i class="fas fa-book-journal-whills text-rose-400"></i> জাইরিয়ন গ্রহের রহস্য (The Enigma of Zyrion)
+                </h2>
+                <button onclick="copyStory()" class="mt-4 md:mt-0 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-rose-300 rounded-xl font-bold transition-all flex items-center gap-2 border border-rose-500/30 shadow-lg hover:shadow-rose-500/20">
+                    <i class="far fa-copy"></i> Copy Epic Story
+                </button>
+            </div>
+            
+            <div id="story-content" class="text-slate-300 leading-relaxed text-lg md:text-xl text-justify font-medium bg-slate-900/50 p-6 md:p-8 rounded-2xl border border-slate-700/50 shadow-inner space-y-5 bn-text">
+                <p>
+                    বহুকাল আগে, 'জাইরিয়ন' নামক এক গ্রহে এক অদ্ভুত <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Enigma</span> (ধাঁধা/রহস্য) দেখা দিল। গ্রহের রাজা তার অঢেল <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Opulence</span> (প্রাচুর্য) নিয়ে অত্যন্ত <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Ostentatious</span> (জাঁকজমকপূর্ণ) জীবনযাপন করতেন। তার প্রাসাদে ছিল একটি <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Perpetual</span> (চিরস্থায়ী) শক্তির উৎস, যা পুরো গ্রহের অগ্রগতির জন্য একটি প্রধান <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Catalyst</span> (অনুঘটক) হিসেবে কাজ করত। কিন্তু একদিন, এক <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Nefarious</span> (জঘন্য) <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Charlatan</span> (ভণ্ড) সেই শক্তির উৎসটি চুরি করে বসল।
+                </p>
+                <p>
+                    এই ঘটনা গ্রহটিকে চরম <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Jeopardy</span> (বিপদ)-তে ফেলে দিল। রাজপরিবার রাতারাতি প্রায় <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Impecunious</span> (কপর্দকশূন্য) এবং <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Indigent</span> (দরিদ্র) হওয়ার পথে। চোরটি অত্যন্ত <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Pugnacious</span> (লড়াকু) এবং <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Loquacious</span> (বাচাল) প্রকৃতির ছিল। সে নিজেকে এক নতুন যুগের <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Harbinger</span> (অগ্রদূত) বলে দাবি করল। রাজ্যের <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Vigilant</span> (সতর্ক) সেনাপতিরা এই <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Conundrum</span> (জটিল সমস্যা) সমাধান করতে পারছিল না। তারা প্রায় <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Capitulate</span> (আত্মসমর্পণ) করতে বাধ্য হচ্ছিল, কারণ তাদের সৈন্যরা <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Effete</span> (দুর্বল) হয়ে পড়েছিল।
+                </p>
+                <p>
+                    অবশেষে, একজন <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Steadfast</span> (অটল) এবং <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Phlegmatic</span> (ধীরস্থির) গোয়েন্দা, যার নাম 'অর্ক', এই ঘটনার তদন্ত শুরু করল। সে কোনো <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Naivete</span> (সরলতা/অনভিজ্ঞতা) দেখায়নি। সে তার <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Perseverance</span> (অধ্যবসায়) দিয়ে চোরের <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Ulterior</span> (গোপন) উদ্দেশ্য বুঝতে পারল। চোরটি সাধারণ মানুষের মাঝে <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Ubiquitous</span> (সর্বব্যাপী) হয়ে লুকিয়ে ছিল।
+                </p>
+                <p>
+                    অর্ক একটি <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Stupendous</span> (বিস্ময়কর) ফাঁদ পাতল। চোর যখন তার <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Ostentatious</span> (জাঁকজমকপূর্ণ) জীবনযাপনের জন্য <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">A sop to Cerberus</span> (বিপদ এড়াতে ঘুষ) দেওয়ার চেষ্টা করল, তখন অর্ক তাকে হাতেনাতে ধরে ফেলল। বিচারে ভণ্ডকে শাস্তি দেওয়া হলো এবং যেসব নিরপরাধ লোকদের সে ফাঁসিয়েছিল তাদের সসম্মানে <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Acquit</span> (খালাস) করা হলো। গ্রহটিতে পুনরায় শান্তি ফিরে এলো এবং সবাই অর্কের নামে <span class="text-rose-300 font-bold bg-rose-900/30 px-1.5 rounded">Panegyric</span> (উচ্চ প্রশংসা) গাইতে লাগল।
+                </p>
+            </div>
+        </section>
+
+        <section class="space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-2">
+                <h2 class="text-3xl font-bold flex items-center gap-3 text-slate-100 ml-2">
+                    <i class="fas fa-layer-group text-amber-400"></i> Interactive Flashcards (78 Words)
+                </h2>
+                <p class="text-slate-400 font-medium text-sm hidden md:block">Hover to reveal details <i class="fas fa-hand-pointer ml-1"></i></p>
+            </div>
+            
+            <div id="flashcardContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <!-- JS will populate this with 78 flashcards -->
+            </div>
+        </section>
+
+        <section class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl border-t-4 border-t-amber-500">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-700 pb-5">
+                <h2 class="text-3xl font-bold flex items-center gap-3 text-slate-100">
+                    <i class="fas fa-tasks text-amber-400"></i> Grand Assessment (50 MCQs)
+                </h2>
+                <button onclick="copyMCQs()" class="mt-4 md:mt-0 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl font-bold transition-all flex items-center gap-2 border border-amber-500/30 shadow-lg hover:shadow-amber-500/20">
+                    <i class="far fa-copy"></i> Copy Assessment
+                </button>
+            </div>
+            <div id="mcqContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- JS will populate this with 50 MCQs -->
+            </div>
+        </section>
+
+        <section class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden bg-slate-900 border border-slate-700">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative border-b border-slate-700 pb-5">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-slate-100">
+                    <i class="fas fa-list-check text-rose-400"></i> Master Summary List
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 px-6 py-2.5 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white rounded-xl font-bold shadow-lg transition-all transform hover:scale-105 flex items-center gap-2">
+                    <i class="fas fa-copy"></i> Copy Full List
+                </button>
+            </div>
+            
+            <div class="bg-black/50 p-6 rounded-2xl border border-slate-700 font-mono text-sm leading-relaxed overflow-y-auto max-h-96 z-10 relative bn-text scrollbar-thin">
+                <pre id="summaryText" class="whitespace-pre-wrap text-slate-300 font-medium"></pre>
+            </div>
+        </section>
+
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-10 mb-4 z-10 relative">
+            <a href="https://classcaddy.netlify.app/vocabs/day14" class="w-full sm:w-auto text-center px-6 py-3 bg-slate-800 text-rose-300 border border-rose-500/30 rounded-xl font-bold shadow-lg hover:bg-slate-700 hover:border-rose-400 transition-all flex items-center justify-center gap-3 group">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Previous (Day-14)
+            </a>
+            <a href="https://classcaddy.netlify.app/vocabs/day15" class="w-full sm:w-auto text-center px-6 py-3 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 transform hover:-translate-y-1 group">
+                Next (Day-15) <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-slate-500 text-sm mt-8 pb-12 font-medium">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-4 rounded-xl shadow-2xl opacity-0 pointer-events-none transition-all duration-300 z-50 flex items-center gap-3 transform translate-y-4">
+        <i class="fas fa-check-circle text-xl"></i>
+        <span id="toastMsg" class="font-bold">Copied successfully!</span>
+    </div>
+
+    <script>
+        const allWords = [
+            { word: "Ablution", meaning: "প্রক্ষালন/ধৌতকরণ", syn: "Washing", ant: "Pollution" },
+            { word: "Conjecture", meaning: "অনুমান", syn: "Guess", ant: "Fact" },
+            { word: "Hypothetical", meaning: "অনুমানমূলক", syn: "Assumed", ant: "Real" },
+            { word: "Perishable", meaning: "পচনশীল", syn: "Temporary", ant: "Durable" },
+            { word: "Viable", meaning: "কার্যকর/টেকসই", syn: "Capable", ant: "Impossible" },
+            { word: "Amiable", meaning: "বন্ধুত্বপূর্ণ", syn: "Friendly", ant: "Unfriendly" },
+            { word: "Indigent", meaning: "দরিদ্র", syn: "Poor", ant: "Affluent" },
+            { word: "Denture", meaning: "কৃত্রিম দাঁত", syn: "False teeth", ant: "Natural teeth" },
+            { word: "Squint", meaning: "চোখ কুঁচকে দেখা", syn: "Peek", ant: "Stare" },
+            { word: "Memento", meaning: "স্মৃতিচিহ্ন", syn: "Souvenir", ant: "Oblivion" },
+            { word: "Abolish", meaning: "বাতিল করা", syn: "Cancel", ant: "Establish" },
+            { word: "Conjugal", meaning: "দাম্পত্য", syn: "Bridal", ant: "Single" },
+            { word: "Ignite", meaning: "প্রজ্জ্বলিত করা", syn: "Set fire", ant: "Extinguish" },
+            { word: "Perpetual", meaning: "চিরস্থায়ী", syn: "Everlasting", ant: "Temporary" },
+            { word: "Vigilant", meaning: "সতর্ক", syn: "Watchful", ant: "Careless" },
+            { word: "Ancestors", meaning: "পূর্বপুরুষ", syn: "Forefathers", ant: "Descendants" },
+            { word: "Infinite", meaning: "অসীম", syn: "Limitless", ant: "Limited" },
+            { word: "Devotee", meaning: "ভক্ত", syn: "Follower", ant: "Critic" },
+            { word: "Cluster", meaning: "গুচ্ছ", syn: "Group", ant: "Individual" },
+            { word: "Alien", meaning: "ভিনদেশী", syn: "Foreigner", ant: "Native" },
+            { word: "Mawkish", meaning: "অতিমাত্রায় ভাবালু", syn: "Sentimental", ant: "Unemotional" },
+            { word: "Psoriasis", meaning: "একধরনের চর্মরোগ", syn: "Dermatosis", ant: "Healthy skin" },
+            { word: "Xeric", meaning: "অত্যন্ত শুষ্ক", syn: "Arid", ant: "Humid" },
+            { word: "Zeitgeist", meaning: "যুগধর্ম", syn: "Trend", ant: "Tradition" },
+            { word: "Ubiquitous", meaning: "সর্বব্যাপী", syn: "Omnipresent", ant: "Rare" },
+            { word: "Pugnacious", meaning: "ঝগড়াটে", syn: "Combative", ant: "Peaceful" },
+            { word: "Palatable", meaning: "সুস্বাদু", syn: "Tasty", ant: "Tasteless" },
+            { word: "Ephemeral", meaning: "ক্ষণস্থায়ী", syn: "Transient", ant: "Permanent" },
+            { word: "Quibble", meaning: "তুচ্ছ বিষয়ে তর্ক করা", syn: "Argue", ant: "Agree" },
+            { word: "Cavil", meaning: "অযথা খুঁত ধরা", syn: "Complain", ant: "Praise" },
+            { word: "Perseverance", meaning: "অধ্যবসায়", syn: "Dedication", ant: "Apathy" },
+            { word: "Niche", meaning: "কুলুঙ্গি/উপযুক্ত স্থান", syn: "Specialty", ant: "General" },
+            { word: "Opulence", meaning: "প্রাচুর্য", syn: "Wealth", ant: "Poverty" },
+            { word: "Nefarious", meaning: "জঘন্য", syn: "Wicked", ant: "Virtuous" },
+            { word: "Phlegmatic", meaning: "ধীরস্থির", syn: "Calm", ant: "Excitable" },
+            { word: "Jeopardy", meaning: "বিপদ/ঝুঁকি", syn: "Danger", ant: "Safety" },
+            { word: "Panegyric", meaning: "স্তুতিবাদ/উচ্চ প্রশংসা", syn: "Tribute", ant: "Criticism" },
+            { word: "Loquacious", meaning: "বাচাল", syn: "Talkative", ant: "Silent" },
+            { word: "Impecunious", meaning: "কপর্দকশূন্য", syn: "Penniless", ant: "Wealthy" },
+            { word: "Struck several bad patches", meaning: "খারাপ সময়ের মধ্য দিয়ে যাওয়া", syn: "Suffer", ant: "Prosper" },
+            { word: "Harbinger", meaning: "অগ্রদূত", syn: "Forerunner", ant: "Follower" },
+            { word: "Sophist", meaning: "কুতর্ককারী", syn: "Deceiver", ant: "Truth-teller" },
+            { word: "Despise", meaning: "ঘৃণা করা", syn: "Hate", ant: "Admire" },
+            { word: "Stride", meaning: "লম্বা পা ফেলে হাঁটা", syn: "Pace", ant: "Stumble" },
+            { word: "Morose", meaning: "বিষণ্ণ", syn: "Gloomy", ant: "Cheerful" },
+            { word: "Seize the day", meaning: "বর্তমানের সদ্ব্যবহার করা", syn: "Carpe diem", ant: "Procrastinate" },
+            { word: "Incessant", meaning: "অবিরাম", syn: "Continuous", ant: "Intermittent" },
+            { word: "Pageantry", meaning: "জাঁকজমক", syn: "Spectacle", ant: "Simplicity" },
+            { word: "Enigma", meaning: "ধাঁধা/রহস্য", syn: "Mystery", ant: "Clarity" },
+            { word: "Haggard", meaning: "ক্লান্ত/জীর্ণশীর্ণ", syn: "Exhausted", ant: "Energetic" },
+            { word: "Prerogative", meaning: "বিশেষ অধিকার", syn: "Privilege", ant: "Restriction" },
+            { word: "Stupendous", meaning: "বিস্ময়কর", syn: "Amazing", ant: "Ordinary" },
+            { word: "Charlatan", meaning: "ভণ্ড", syn: "Fraud", ant: "Expert" },
+            { word: "Drowsy", meaning: "তন্দ্রাচ্ছন্ন", syn: "Sleepy", ant: "Alert" },
+            { word: "Erotic", meaning: "কামোদ্দীপক", syn: "Sensual", ant: "Chaste" },
+            { word: "Abstemious", meaning: "মিতাচারী", syn: "Moderate", ant: "Gluttonous" },
+            { word: "Capitulate", meaning: "আত্মসমর্পণ করা", syn: "Surrender", ant: "Resist" },
+            { word: "Conundrum", meaning: "ধাঁধা/জটিল সমস্যা", syn: "Puzzle", ant: "Solution" },
+            { word: "Ulterior", meaning: "গোপন", syn: "Hidden", ant: "Obvious" },
+            { word: "Amnesty", meaning: "সাধারণ ক্ষমা", syn: "Pardon", ant: "Punishment" },
+            { word: "Effete", meaning: "দুর্বল/ক্ষয়িষ্ণু", syn: "Exhausted", ant: "Vigorous" },
+            { word: "To pour oil in troubled water", meaning: "উত্তপ্ত পরিস্থিতি শান্ত করা", syn: "Pacify", ant: "Provoke" },
+            { word: "A sop to Cerberus", meaning: "বিপদ এড়াতে ঘুষ দেওয়া", syn: "Bribe", ant: "Punishment" },
+            { word: "Naivete", meaning: "সরলতা", syn: "Innocence", ant: "Experience" },
+            { word: "Immaculate", meaning: "নিখুঁত", syn: "Spotless", ant: "Dirty" },
+            { word: "Consecrate", meaning: "পবিত্র করা", syn: "Sanctify", ant: "Desecrate" },
+            { word: "Reconnaissance", meaning: "সামরিক পর্যবেক্ষণ", syn: "Inspection", ant: "Ignorance" },
+            { word: "Penury", meaning: "চরম দারিদ্র্য", syn: "Destitution", ant: "Wealth" },
+            { word: "Catalyst", meaning: "অনুঘটক", syn: "Stimulus", ant: "Hindrance" },
+            { word: "Ostentatious", meaning: "জাঁকজমকপূর্ণ", syn: "Showy", ant: "Modest" },
+            { word: "Steadfast", meaning: "অটল/দৃঢ়", syn: "Resolute", ant: "Unsteady" },
+            { word: "Jeer", meaning: "উপহাস করা", syn: "Mock", ant: "Cheer" },
+            { word: "Acquit", meaning: "খালাস দেওয়া", syn: "Clear", ant: "Convict" },
+            { word: "Taunt", meaning: "কটূক্তি করা", syn: "Insult", ant: "Compliment" },
+            { word: "Philatelist", meaning: "ডাকটিকিট সংগ্রাহক", syn: "Stamp collector", ant: "Wanderer" },
+            { word: "Cartographer", meaning: "মানচিত্র প্রস্তুতকারক", syn: "Mapmaker", ant: "Wanderer" },
+            { word: "Traduce", meaning: "চরিত্রহনন করা", syn: "Defame", ant: "Praise" },
+            { word: "Browbeat", meaning: "ভয় দেখানো", syn: "Bully", ant: "Coax" }
+        ];
+
+        const mcqs = [
+            { q: "What is the synonym of 'Abolish'?", opts: { a: "Establish", b: "Cancel", c: "Support", d: "Ignore" }, ans: "b", note: "Abolish means to formally put an end to a system or practice." },
+            { q: "What is the antonym of 'Perpetual'?", opts: { a: "Everlasting", b: "Constant", c: "Temporary", d: "Endless" }, ans: "c", note: "Perpetual means never ending. Temporary means lasting for a limited time." },
+            { q: "What does the word 'Conjecture' mean?", opts: { a: "Fact", b: "Proof", c: "Guess", d: "Truth" }, ans: "c", note: "Conjecture is an opinion or conclusion formed on the basis of incomplete information." },
+            { q: "What is a 'Memento'?", opts: { a: "A false memory", b: "A temporary phase", c: "A souvenir", d: "A bad dream" }, ans: "c", note: "A memento is an object kept as a reminder of a person or event." },
+            { q: "What is the antonym of 'Amiable'?", opts: { a: "Friendly", b: "Unfriendly", c: "Happy", d: "Polite" }, ans: "b", note: "Amiable means having or displaying a friendly and pleasant manner." },
+            { q: "Analogy -> Charlatan : Fraud :: Sophist : ?", opts: { a: "Deceiver", b: "Expert", c: "Leader", d: "Doctor" }, ans: "a", note: "A charlatan is a fraud. A sophist is a person who reasons with clever but fallacious arguments (deceiver)." },
+            { q: "What does 'Indigent' mean?", opts: { a: "Wealthy", b: "Angry", c: "Poor", d: "Happy" }, ans: "c", note: "Indigent means suffering from extreme poverty." },
+            { q: "What is the synonym of 'Vigilant'?", opts: { a: "Careless", b: "Watchful", c: "Sleepy", d: "Blind" }, ans: "b", note: "Vigilant means keeping careful watch for possible danger or difficulties." },
+            { q: "What does 'Mawkish' mean?", opts: { a: "Unemotional", b: "Sentimental", c: "Brave", d: "Cruel" }, ans: "b", note: "Mawkish means sentimental in a feeble or sickly way." },
+            { q: "If an environment is described as 'Xeric', it is:", opts: { a: "Humid", b: "Arid", c: "Wet", d: "Cold" }, ans: "b", note: "Xeric refers to an environment containing little moisture; very dry." },
+            { q: "The term 'Zeitgeist' refers to:", opts: { a: "A type of ghost", b: "The spirit or trend of the times", c: "A German car", d: "Ancient tradition" }, ans: "b", note: "Zeitgeist is the defining spirit or mood of a particular period." },
+            { q: "A 'Pugnacious' person is likely to be:", opts: { a: "Combative", b: "Peaceful", c: "Friendly", d: "Shy" }, ans: "a", note: "Pugnacious means eager or quick to argue, quarrel, or fight." },
+            { q: "What is the antonym of 'Ephemeral'?", opts: { a: "Transient", b: "Short-lived", c: "Permanent", d: "Quick" }, ans: "c", note: "Ephemeral means lasting for a very short time." },
+            { q: "What is the synonym of 'Niche'?", opts: { a: "General", b: "Broad", c: "Specialty", d: "Common" }, ans: "c", note: "A niche is a specialized segment of the market or a comfortable position." },
+            { q: "What does 'Nefarious' mean?", opts: { a: "Virtuous", b: "Wicked", c: "Holy", d: "Kind" }, ans: "b", note: "Nefarious means (typically of an action or activity) wicked or criminal." },
+            { q: "What is the synonym of 'Phlegmatic'?", opts: { a: "Excitable", b: "Calm", c: "Angry", d: "Nervous" }, ans: "b", note: "Phlegmatic means having an unemotional and stolidly calm disposition." },
+            { q: "Analogy -> Loquacious : Silent :: Opulence : ?", opts: { a: "Wealth", b: "Poverty", c: "Luxury", d: "Richness" }, ans: "b", note: "Loquacious and Silent are antonyms. The antonym of Opulence is Poverty." },
+            { q: "If someone 'Struck several bad patches', they:", opts: { a: "Won a lottery", b: "Experienced difficulties", c: "Found a treasure", d: "Bought new clothes" }, ans: "b", note: "A 'bad patch' is a difficult period or phase." },
+            { q: "What does 'Impecunious' mean?", opts: { a: "Wealthy", b: "Penniless", c: "Generous", d: "Stingy" }, ans: "b", note: "Impecunious means having little or no money." },
+            { q: "What is the synonym of 'Harbinger'?", opts: { a: "Follower", b: "Result", c: "Forerunner", d: "Conclusion" }, ans: "c", note: "A harbinger is a person or thing that announces or signals the approach of another." },
+            { q: "What is the synonym of 'Stride'?", opts: { a: "Stumble", b: "Pace", c: "Crawl", d: "Fall" }, ans: "b", note: "A stride is a long, decisive step." },
+            { q: "What is the antonym of 'Morose'?", opts: { a: "Gloomy", b: "Sad", c: "Cheerful", d: "Depressed" }, ans: "c", note: "Morose means sullen and ill-tempered." },
+            { q: "What does 'Incessant' mean?", opts: { a: "Intermittent", b: "Stopping", c: "Continuous", d: "Rare" }, ans: "c", note: "Incessant means (of something regarded as unpleasant) continuing without pause." },
+            { q: "What is the synonym of 'Enigma'?", opts: { a: "Clarity", b: "Mystery", c: "Answer", d: "Truth" }, ans: "b", note: "An enigma is a person or thing that is mysterious, puzzling, or difficult to understand." },
+            { q: "A 'Haggard' person looks:", opts: { a: "Energetic", b: "Exhausted", c: "Fresh", d: "Young" }, ans: "b", note: "Haggard means looking exhausted and unwell." },
+            { q: "What is the synonym of 'Prerogative'?", opts: { a: "Restriction", b: "Privilege", c: "Punishment", d: "Duty" }, ans: "b", note: "A prerogative is a right or privilege exclusive to a particular individual or class." },
+            { q: "What is the synonym of 'Stupendous'?", opts: { a: "Ordinary", b: "Amazing", c: "Normal", d: "Boring" }, ans: "b", note: "Stupendous means extremely impressive." },
+            { q: "What does 'Capitulate' mean?", opts: { a: "Resist", b: "Surrender", c: "Fight", d: "Win" }, ans: "b", note: "Capitulate means to cease to resist an opponent or an unwelcome demand." },
+            { q: "An 'Ulterior' motive is one that is:", opts: { a: "Obvious", b: "Hidden", c: "Clear", d: "Public" }, ans: "b", note: "Ulterior means existing beyond what is obvious or admitted; intentionally hidden." },
+            { q: "What does 'Amnesty' mean?", opts: { a: "Punishment", b: "Pardon", c: "Sentence", d: "Execution" }, ans: "b", note: "Amnesty is an official pardon for people who have been convicted of political offenses." },
+            { q: "The idiom 'To pour oil in troubled water' means to:", opts: { a: "Provoke", b: "Pacify", c: "Ignite", d: "Destroy" }, ans: "b", note: "This idiom means to try to settle a dispute and calm a situation." },
+            { q: "What does 'A sop to Cerberus' mean?", opts: { a: "A harsh punishment", b: "A bribe to prevent trouble", c: "A mythical dog", d: "A great reward" }, ans: "b", note: "A sop to Cerberus is a concession or bribe given to appease someone." },
+            { q: "What does 'Naivete' mean?", opts: { a: "Experience", b: "Innocence", c: "Wisdom", d: "Cunning" }, ans: "b", note: "Naivete is lack of experience, wisdom, or judgment." },
+            { q: "What is the antonym of 'Consecrate'?", opts: { a: "Sanctify", b: "Desecrate", c: "Bless", d: "Praise" }, ans: "b", note: "Consecrate means to make holy. Desecrate means to treat a sacred place with violent disrespect." },
+            { q: "What is the synonym of 'Reconnaissance'?", opts: { a: "Ignorance", b: "Inspection", c: "Neglect", d: "Avoidance" }, ans: "b", note: "Reconnaissance is military observation of a region to locate an enemy." },
+            { q: "What does 'Penury' mean?", opts: { a: "Wealth", b: "Destitution", c: "Luxury", d: "Opulence" }, ans: "b", note: "Penury means extreme poverty; destitution." },
+            { q: "What is the meaning of 'Catalyst'?", opts: { a: "Hindrance", b: "Stimulus", c: "Blockage", d: "Delay" }, ans: "b", note: "A catalyst is a substance or person that increases the rate of a chemical reaction or provokes change." },
+            { q: "What is the antonym of 'Ostentatious'?", opts: { a: "Showy", b: "Pretentious", c: "Modest", d: "Flashy" }, ans: "c", note: "Ostentatious means characterized by vulgar or pretentious display. Modest is its opposite." },
+            { q: "What is the synonym of 'Steadfast'?", opts: { a: "Unsteady", b: "Resolute", c: "Fickle", d: "Wavering" }, ans: "b", note: "Steadfast means resolutely or dutifully firm and unwavering." },
+            { q: "What does it mean to 'Acquit' someone?", opts: { a: "To convict them", b: "To clear them of charges", c: "To punish them", d: "To ignore them" }, ans: "b", note: "To acquit means to free someone from a criminal charge by a verdict of not guilty." },
+            { q: "What is the synonym of 'Traduce'?", opts: { a: "Praise", b: "Defame", c: "Honor", d: "Exalt" }, ans: "b", note: "Traduce means to speak badly of or tell lies about someone so as to damage their reputation." },
+            { q: "What is the synonym of 'Browbeat'?", opts: { a: "Coax", b: "Bully", c: "Persuade", d: "Comfort" }, ans: "b", note: "To browbeat is to intimidate someone, typically into doing something, with stern or abusive words." },
+            { q: "Analogy -> Cartographer : Map :: Philatelist : ?", opts: { a: "Coin", b: "Stamp", c: "Book", d: "Star" }, ans: "b", note: "A cartographer makes maps. A philatelist collects stamps." },
+            { q: "What does 'Effete' mean?", opts: { a: "Vigorous", b: "Exhausted or weak", c: "Strong", d: "Energetic" }, ans: "b", note: "Effete means affected, overrefined, and ineffectual; no longer capable of effective action." },
+            { q: "What is the meaning of 'Taunt'?", opts: { a: "Compliment", b: "Insult", c: "Praise", d: "Support" }, ans: "b", note: "A taunt is a remark made in order to anger, wound, or provoke someone." },
+            { q: "What does 'Drowsy' mean?", opts: { a: "Alert", b: "Sleepy", c: "Awake", d: "Active" }, ans: "b", note: "Drowsy means sleepy and lethargic." },
+            { q: "What does 'Erotic' mean?", opts: { a: "Chaste", b: "Sensual", c: "Pure", d: "Innocent" }, ans: "b", note: "Erotic relates to or tends to arouse sexual desire or excitement." },
+            { q: "What does 'Abstemious' mean?", opts: { a: "Gluttonous", b: "Moderate", c: "Greedy", d: "Excessive" }, ans: "b", note: "Abstemious means not self-indulgent, especially when eating and drinking." },
+            { q: "What is the meaning of 'Pageantry'?", opts: { a: "Simplicity", b: "Spectacle", c: "Plainness", d: "Boredom" }, ans: "b", note: "Pageantry refers to elaborate display or ceremony." },
+            { q: "What does 'Cavil' mean?", opts: { a: "Praise", b: "Complain", c: "Agree", d: "Support" }, ans: "b", note: "Cavil means to make petty or unnecessary objections." }
+        ];
+
+        function renderFlashcards() {
+            const container = document.getElementById('flashcardContainer');
+            let html = '';
+            
+            allWords.forEach((w) => {
+                let displayName = w.word.replace(/\(\d\)/g, '').trim();
+                
+                html += `
+                <div class="group relative bg-slate-800 rounded-xl shadow-lg border border-rose-500/30 h-28 cursor-pointer overflow-hidden flex flex-col items-center justify-center transition-all duration-300 hover:border-amber-400 hover:shadow-amber-500/20">
+                    <h3 class="font-bold text-[15px] text-rose-200 z-10 transition-transform duration-300 group-hover:-translate-y-4 text-center px-2">${displayName}</h3>
+                    <div class="absolute inset-0 bg-gradient-to-t from-amber-700 to-rose-800 flex flex-col justify-end items-center pb-3 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+                        <p class="font-bold bn-text text-[13px] mb-1">${w.meaning}</p>
+                        <p class="text-[10px] text-rose-100 font-medium tracking-wide">
+                            <span class="text-green-300 font-bold">Syn:</span> ${w.syn} <br>
+                            <span class="text-amber-300 font-bold">Ant:</span> ${w.ant}
+                        </p>
+                    </div>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderMCQs() {
+            const container = document.getElementById('mcqContainer');
+            let html = '';
+            
+            mcqs.forEach((mcq, index) => {
+                html += `
+                <div class="bg-slate-800/60 p-5 rounded-2xl border border-slate-700 shadow-sm hover:border-amber-500/50 transition-colors">
+                    <p class="font-bold text-lg text-slate-100 mb-4">${index + 1}. ${mcq.q}</p>
+                    <div class="space-y-2.5 ml-2 mb-5 text-slate-300 font-medium">
+                        <p class="flex items-start gap-2"><span class="text-amber-400 font-bold w-5">a.</span> ${mcq.opts.a}</p>
+                        <p class="flex items-start gap-2"><span class="text-amber-400 font-bold w-5">b.</span> ${mcq.opts.b}</p>
+                        <p class="flex items-start gap-2"><span class="text-amber-400 font-bold w-5">c.</span> ${mcq.opts.c}</p>
+                        <p class="flex items-start gap-2"><span class="text-amber-400 font-bold w-5">d.</span> ${mcq.opts.d}</p>
+                    </div>
+                    <details class="group cursor-pointer">
+                        <summary class="inline-flex items-center justify-between w-full text-rose-300 font-bold bg-slate-900/80 px-4 py-3 rounded-xl hover:bg-slate-700 transition-colors border border-slate-600 select-none">
+                            <span class="flex items-center gap-2"><i class="fas fa-eye text-amber-400"></i> Show Answer</span>
+                            <i class="fas fa-chevron-down transform group-open:rotate-180 transition-transform duration-300"></i>
+                        </summary>
+                        <div class="mt-2 p-4 bg-slate-900 border-l-4 border-green-500 rounded-r-xl rounded-bl-xl shadow-inner border-t border-r border-b border-slate-700">
+                            <p class="font-bold text-green-400 mb-2">Correct Answer: <span class="uppercase bg-green-500/20 px-2 py-0.5 rounded">${mcq.ans}</span></p>
+                            <p class="text-sm text-slate-300 leading-relaxed"><strong>Note:</strong> ${mcq.note}</p>
+                        </div>
+                    </details>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderSummary() {
+            const container = document.getElementById('summaryText');
+            let summaryText = allWords.map(w => {
+                let displayName = w.word.replace(/\(\d\)/g, '').trim();
+                return `${displayName}, ${w.meaning} - ${w.syn} @ ${w.ant};`;
+            }).join('\n');
+            container.textContent = summaryText;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+            setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4'), 2500);
+        }
+
+        function copyTextToClipboard(text, successMsg) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast(successMsg);
+            } catch (err) {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => showToast(successMsg)).catch(e => console.error("Clipboard failed", e));
+                }
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function copyStory() {
+            const title = document.getElementById('story-title').innerText.trim();
+            const paragraphs = document.querySelectorAll('#story-content p');
+            let text = title + '\n\n';
+            paragraphs.forEach(p => text += p.innerText + '\n\n');
+            copyTextToClipboard(text.trim(), "Epic Story copied to clipboard!");
+        }
+
+        function copySummary() {
+            const text = document.getElementById('summaryText').innerText;
+            copyTextToClipboard(text, "Master Summary copied to clipboard!");
+        }
+
+        function copyMCQs() {
+            let text = "";
+            mcqs.forEach((mcq, index) => {
+                text += `${index + 1}. ${mcq.q}\n`;
+                text += `a. ${mcq.opts.a}\n`;
+                text += `b. ${mcq.opts.b}\n`;
+                text += `c. ${mcq.opts.c}\n`;
+                text += `d. ${mcq.opts.d}\n`;
+                text += `correct answer: ${mcq.ans}\n`;
+                text += `Note: ${mcq.note}\n\n`;
+            });
+            copyTextToClipboard(text.trim(), "Grand Assessment copied to clipboard!");
+        }
+
+        window.onload = () => {
+            renderFlashcards();
+            renderMCQs();
+            renderSummary();
+        };
+    </script>
+</body>
+</html>
