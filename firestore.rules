@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default Deny All
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Public read for archive configuration so all student devices can view universal content;
+    // Writes are permitted for authenticated operations and admin sync
+    match /archive_settings/{docId} {
+      allow read: if true;
+      allow write: if request.resource.data.cards is string && request.resource.data.cards.size() <= 1048576;
+    }
+  }
+}

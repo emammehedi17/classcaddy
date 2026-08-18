@@ -1,0 +1,31 @@
+{
+  "entities": {
+    "ArchiveTree": {
+      "title": "ArchiveTree",
+      "description": "The global hierarchical tree structure containing all buttons, sub folders, and resources for the archives across all devices",
+      "type": "object",
+      "properties": {
+        "cards": {
+          "type": "string",
+          "description": "Serialized JSON array of ArchiveCardButton root nodes"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of last modification"
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Admin or user identifier"
+        }
+      },
+      "required": ["cards", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/archive_settings/{docId}": {
+      "schema": "ArchiveTree",
+      "description": "Global synchronized archive configuration document"
+    }
+  }
+}

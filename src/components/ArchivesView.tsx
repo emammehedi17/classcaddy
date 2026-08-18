@@ -1,0 +1,2230 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { ArchiveCardButton, ThemeMode } from '../types';
+import { db } from '../lib/firebase';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import {
+  GraduationCap,
+  BookOpen,
+  Award,
+  Briefcase,
+  FileText,
+  Sparkles,
+  Layers,
+  Compass,
+  Folder,
+  FolderTree,
+  FolderPlus,
+  ExternalLink,
+  Lock,
+  Unlock,
+  Plus,
+  Trash2,
+  Edit3,
+  Check,
+  X,
+  ArrowUp,
+  ArrowDown,
+  ArrowLeft,
+  Key,
+  ShieldCheck,
+  RotateCcw,
+  Settings,
+  Code2,
+  Upload,
+  Globe,
+  FileCode,
+  Eye,
+  Maximize2,
+  ChevronRight,
+  Home,
+  FolderOpen,
+  Cloud,
+  CloudCheck,
+  RefreshCw,
+} from 'lucide-react';
+
+interface ArchivesViewProps {
+  theme?: ThemeMode;
+}
+
+const STORAGE_KEY = 'class_caddy_archive_buttons';
+const DEV_AUTH_KEY = 'class_caddy_dev_auth';
+const ADMIN_TOKEN_KEY = 'class_caddy_admin_token';
+const FIRESTORE_DOC_PATH = 'global_tree'; // doc in archive_settings collection
+
+// SHA-256 hash of 'Mehedi@#23877' for secure standalone / static host (Netlify / GitHub Pages) verification
+const STATIC_ADMIN_HASH = '1f13769cce7fa4fc5b161405b0c9535dbf503df774d6c4295bb2d7a9657076a5';
+
+// Fast Browser-native SHA-256 helper using Web Crypto API
+async function sha256Hex(text: string): Promise<string> {
+  try {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  } catch {
+    return '';
+  }
+}
+
+const INITIAL_BCS_SUBFOLDERS: ArchiveCardButton[] = [
+  {
+    id: 'bcs-bangla-literature',
+    title: 'Bangla Literature',
+    subtitle: 'Ancient, Medieval & Modern Bengali Literature Notes & Questions',
+    targetType: 'folder',
+    children: [],
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Literature',
+    createdAt: 101,
+  },
+  {
+    id: 'bcs-bangla-grammar',
+    title: 'Bangla Grammar',
+    subtitle: 'Bengali Grammar Rules, Phonetics, Syntax & Vocabulary',
+    targetType: 'folder',
+    children: [],
+    iconName: 'FileText',
+    colorTheme: 'emerald',
+    badgeText: 'Grammar',
+    createdAt: 102,
+  },
+  {
+    id: 'bcs-english-literature',
+    title: 'English Literature',
+    subtitle: 'Literary Eras, Famous Authors, Dramas, Poetry & Key Quotes',
+    targetType: 'folder',
+    children: [],
+    iconName: 'BookOpen',
+    colorTheme: 'blue',
+    badgeText: 'Literature',
+    createdAt: 103,
+  },
+  {
+    id: 'bcs-english-grammar',
+    title: 'English Grammar',
+    subtitle: 'Parts of Speech, Tense, Voice, Narration, Idioms & Prepositions',
+    targetType: 'folder',
+    children: [],
+    iconName: 'FileText',
+    colorTheme: 'blue',
+    badgeText: 'Grammar',
+    createdAt: 104,
+  },
+  {
+    id: 'bcs-mathematics',
+    title: 'Mathematics',
+    subtitle: 'Arithmetic, Algebra, Geometry, Trigonometry & Shortcuts',
+    targetType: 'folder',
+    children: [],
+    iconName: 'Sparkles',
+    colorTheme: 'indigo',
+    badgeText: 'Math',
+    createdAt: 105,
+  },
+  {
+    id: 'bcs-science',
+    title: 'Science',
+    subtitle: 'General Science, Physics, Chemistry, Biology & Everyday Science',
+    targetType: 'folder',
+    children: [],
+    iconName: 'Compass',
+    colorTheme: 'purple',
+    badgeText: 'Science',
+    createdAt: 106,
+  },
+  {
+    id: 'bcs-ict',
+    title: 'ICT',
+    subtitle: 'Information and Communication Technology, Networks & Internet',
+    targetType: 'folder',
+    children: [],
+    iconName: 'Layers',
+    colorTheme: 'indigo',
+    badgeText: 'ICT',
+    createdAt: 107,
+  },
+  {
+    id: 'bcs-gk-bangladesh',
+    title: 'GK (Bangladesh)',
+    subtitle: 'History, Liberation War, Constitution, Economy & Current Affairs',
+    targetType: 'folder',
+    children: [],
+    iconName: 'Award',
+    colorTheme: 'rose',
+    badgeText: 'Affairs',
+    createdAt: 108,
+  },
+  {
+    id: 'bcs-gk-international',
+    title: 'GK (International)',
+    subtitle: 'World Geography, Treaties, Global Organizations & World News',
+    targetType: 'folder',
+    children: [],
+    iconName: 'Globe',
+    colorTheme: 'blue',
+    badgeText: 'Global',
+    createdAt: 109,
+  },
+  {
+    id: 'bcs-computer',
+    title: 'Computer',
+    subtitle: 'Hardware, Software, Operating Systems, Database & Cloud Concepts',
+    targetType: 'folder',
+    children: [],
+    iconName: 'Layers',
+    colorTheme: 'emerald',
+    badgeText: 'Tech',
+    createdAt: 110,
+  },
+  {
+    id: 'bcs-mental-ability',
+    title: 'Mental Ability',
+    subtitle: 'Logical Reasoning, Spatial Orientation, Verbal & Numerical Logic',
+    targetType: 'folder',
+    children: [],
+    iconName: 'Sparkles',
+    colorTheme: 'amber',
+    badgeText: 'Analytical',
+    createdAt: 111,
+  },
+  {
+    id: 'bcs-morality-governance',
+    title: 'Morality and Good Governance',
+    subtitle: 'Ethics, Morals, Integrity, Governance Principles & Values',
+    targetType: 'folder',
+    children: [],
+    iconName: 'GraduationCap',
+    colorTheme: 'purple',
+    badgeText: 'Ethics',
+    createdAt: 112,
+  },
+  {
+    id: 'bcs-geography',
+    title: 'Geography',
+    subtitle: 'Geography of Bangladesh and World, Environment & Disaster Mgmt',
+    targetType: 'folder',
+    children: [],
+    iconName: 'Compass',
+    colorTheme: 'emerald',
+    badgeText: 'Geography',
+    createdAt: 113,
+  },
+];
+
+const INITIAL_CARDS: ArchiveCardButton[] = [
+  {
+    id: 'bcs-card',
+    title: 'BCS',
+    subtitle: 'Bangladesh Civil Service Preliminary, Written & Viva Preparation Hub',
+    targetType: 'folder',
+    children: INITIAL_BCS_SUBFOLDERS,
+    iconName: 'Briefcase',
+    colorTheme: 'emerald',
+    badgeText: '13 Subjects',
+    createdAt: 1,
+  },
+  {
+    id: 'ssc-card',
+    title: 'SSC',
+    subtitle: 'Secondary School Certificate Board Questions, Syllabi & Notes',
+    link: 'https://dhakaeducationboard.gov.bd',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'blue',
+    badgeText: 'Board Exam',
+    createdAt: 2,
+  },
+];
+
+const THEME_STYLES: Record<
+  string,
+  {
+    dark: {
+      bg: string;
+      border: string;
+      hoverBorder: string;
+      iconBg: string;
+      iconColor: string;
+      badgeBg: string;
+      badgeText: string;
+      buttonBg: string;
+      buttonHover: string;
+      titleColor: string;
+      titleHover: string;
+    };
+    light: {
+      bg: string;
+      border: string;
+      hoverBorder: string;
+      iconBg: string;
+      iconColor: string;
+      badgeBg: string;
+      badgeText: string;
+      buttonBg: string;
+      buttonHover: string;
+      titleColor: string;
+      titleHover: string;
+    };
+  }
+> = {
+  emerald: {
+    dark: {
+      bg: 'from-emerald-950/40 via-gray-900 to-gray-900',
+      border: 'border-emerald-500/30',
+      hoverBorder: 'hover:border-emerald-400',
+      iconBg: 'bg-emerald-500/20',
+      iconColor: 'text-emerald-400',
+      badgeBg: 'bg-emerald-500/20 border-emerald-500/30',
+      badgeText: 'text-emerald-300',
+      buttonBg: 'bg-gray-800 border-gray-700 text-white',
+      buttonHover: 'group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500',
+      titleColor: 'text-white',
+      titleHover: 'group-hover:text-emerald-300',
+    },
+    light: {
+      bg: 'from-emerald-50/80 via-white to-slate-50/90',
+      border: 'border-emerald-200/90',
+      hoverBorder: 'hover:border-emerald-500',
+      iconBg: 'bg-emerald-100/90',
+      iconColor: 'text-emerald-700',
+      badgeBg: 'bg-emerald-100 border-emerald-300',
+      badgeText: 'text-emerald-800',
+      buttonBg: 'bg-slate-100 border-slate-200 text-slate-800',
+      buttonHover: 'group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600',
+      titleColor: 'text-slate-900',
+      titleHover: 'group-hover:text-emerald-700',
+    },
+  },
+  blue: {
+    dark: {
+      bg: 'from-blue-950/40 via-gray-900 to-gray-900',
+      border: 'border-blue-500/30',
+      hoverBorder: 'hover:border-blue-400',
+      iconBg: 'bg-blue-500/20',
+      iconColor: 'text-blue-400',
+      badgeBg: 'bg-blue-500/20 border-blue-500/30',
+      badgeText: 'text-blue-300',
+      buttonBg: 'bg-gray-800 border-gray-700 text-white',
+      buttonHover: 'group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-500',
+      titleColor: 'text-white',
+      titleHover: 'group-hover:text-blue-300',
+    },
+    light: {
+      bg: 'from-blue-50/80 via-white to-slate-50/90',
+      border: 'border-blue-200/90',
+      hoverBorder: 'hover:border-blue-500',
+      iconBg: 'bg-blue-100/90',
+      iconColor: 'text-blue-700',
+      badgeBg: 'bg-blue-100 border-blue-300',
+      badgeText: 'text-blue-800',
+      buttonBg: 'bg-slate-100 border-slate-200 text-slate-800',
+      buttonHover: 'group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600',
+      titleColor: 'text-slate-900',
+      titleHover: 'group-hover:text-blue-700',
+    },
+  },
+  indigo: {
+    dark: {
+      bg: 'from-indigo-950/40 via-gray-900 to-gray-900',
+      border: 'border-indigo-500/30',
+      hoverBorder: 'hover:border-indigo-400',
+      iconBg: 'bg-indigo-500/20',
+      iconColor: 'text-indigo-400',
+      badgeBg: 'bg-indigo-500/20 border-indigo-500/30',
+      badgeText: 'text-indigo-300',
+      buttonBg: 'bg-gray-800 border-gray-700 text-white',
+      buttonHover: 'group-hover:bg-indigo-500 group-hover:text-white group-hover:border-indigo-500',
+      titleColor: 'text-white',
+      titleHover: 'group-hover:text-indigo-300',
+    },
+    light: {
+      bg: 'from-indigo-50/80 via-white to-slate-50/90',
+      border: 'border-indigo-200/90',
+      hoverBorder: 'hover:border-indigo-500',
+      iconBg: 'bg-indigo-100/90',
+      iconColor: 'text-indigo-700',
+      badgeBg: 'bg-indigo-100 border-indigo-300',
+      badgeText: 'text-indigo-800',
+      buttonBg: 'bg-slate-100 border-slate-200 text-slate-800',
+      buttonHover: 'group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600',
+      titleColor: 'text-slate-900',
+      titleHover: 'group-hover:text-indigo-700',
+    },
+  },
+  purple: {
+    dark: {
+      bg: 'from-purple-950/40 via-gray-900 to-gray-900',
+      border: 'border-purple-500/30',
+      hoverBorder: 'hover:border-purple-400',
+      iconBg: 'bg-purple-500/20',
+      iconColor: 'text-purple-400',
+      badgeBg: 'bg-purple-500/20 border-purple-500/30',
+      badgeText: 'text-purple-300',
+      buttonBg: 'bg-gray-800 border-gray-700 text-white',
+      buttonHover: 'group-hover:bg-purple-500 group-hover:text-white group-hover:border-purple-500',
+      titleColor: 'text-white',
+      titleHover: 'group-hover:text-purple-300',
+    },
+    light: {
+      bg: 'from-purple-50/80 via-white to-slate-50/90',
+      border: 'border-purple-200/90',
+      hoverBorder: 'hover:border-purple-500',
+      iconBg: 'bg-purple-100/90',
+      iconColor: 'text-purple-700',
+      badgeBg: 'bg-purple-100 border-purple-300',
+      badgeText: 'text-purple-800',
+      buttonBg: 'bg-slate-100 border-slate-200 text-slate-800',
+      buttonHover: 'group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600',
+      titleColor: 'text-slate-900',
+      titleHover: 'group-hover:text-purple-700',
+    },
+  },
+  amber: {
+    dark: {
+      bg: 'from-amber-950/40 via-gray-900 to-gray-900',
+      border: 'border-amber-500/30',
+      hoverBorder: 'hover:border-amber-400',
+      iconBg: 'bg-amber-500/20',
+      iconColor: 'text-amber-400',
+      badgeBg: 'bg-amber-500/20 border-amber-500/30',
+      badgeText: 'text-amber-300',
+      buttonBg: 'bg-gray-800 border-gray-700 text-white',
+      buttonHover: 'group-hover:bg-amber-500 group-hover:text-white group-hover:border-amber-500',
+      titleColor: 'text-white',
+      titleHover: 'group-hover:text-amber-300',
+    },
+    light: {
+      bg: 'from-amber-50/80 via-white to-slate-50/90',
+      border: 'border-amber-200/90',
+      hoverBorder: 'hover:border-amber-500',
+      iconBg: 'bg-amber-100/90',
+      iconColor: 'text-amber-700',
+      badgeBg: 'bg-amber-100 border-amber-300',
+      badgeText: 'text-amber-800',
+      buttonBg: 'bg-slate-100 border-slate-200 text-slate-800',
+      buttonHover: 'group-hover:bg-amber-600 group-hover:text-white group-hover:border-amber-600',
+      titleColor: 'text-slate-900',
+      titleHover: 'group-hover:text-amber-700',
+    },
+  },
+  rose: {
+    dark: {
+      bg: 'from-rose-950/40 via-gray-900 to-gray-900',
+      border: 'border-rose-500/30',
+      hoverBorder: 'hover:border-rose-400',
+      iconBg: 'bg-rose-500/20',
+      iconColor: 'text-rose-400',
+      badgeBg: 'bg-rose-500/20 border-rose-500/30',
+      badgeText: 'text-rose-300',
+      buttonBg: 'bg-gray-800 border-gray-700 text-white',
+      buttonHover: 'group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500',
+      titleColor: 'text-white',
+      titleHover: 'group-hover:text-rose-300',
+    },
+    light: {
+      bg: 'from-rose-50/80 via-white to-slate-50/90',
+      border: 'border-rose-200/90',
+      hoverBorder: 'hover:border-rose-500',
+      iconBg: 'bg-rose-100/90',
+      iconColor: 'text-rose-700',
+      badgeBg: 'bg-rose-100 border-rose-300',
+      badgeText: 'text-rose-800',
+      buttonBg: 'bg-slate-100 border-slate-200 text-slate-800',
+      buttonHover: 'group-hover:bg-rose-600 group-hover:text-white group-hover:border-rose-600',
+      titleColor: 'text-slate-900',
+      titleHover: 'group-hover:text-rose-700',
+    },
+  },
+};
+
+// Helper: Deeply find a card by ID within a nested tree
+const findCardDeep = (cards: ArchiveCardButton[], id: string): ArchiveCardButton | null => {
+  for (const card of cards) {
+    if (card.id === id) return card;
+    if (card.children && card.children.length > 0) {
+      const found = findCardDeep(card.children, id);
+      if (found) return found;
+    }
+  }
+  return null;
+};
+
+// Helper: Get list of cards at the current folder path
+const getCardsAtPath = (rootCards: ArchiveCardButton[], folderPath: string[]): ArchiveCardButton[] => {
+  let currentList = rootCards;
+  for (const folderId of folderPath) {
+    const parent = currentList.find((c) => c.id === folderId);
+    if (parent && parent.children) {
+      currentList = parent.children;
+    } else {
+      return [];
+    }
+  }
+  return currentList;
+};
+
+// Helper: Deeply update cards at the specified folder path
+const updateCardsAtPath = (
+  rootCards: ArchiveCardButton[],
+  folderPath: string[],
+  newChildList: ArchiveCardButton[]
+): ArchiveCardButton[] => {
+  if (folderPath.length === 0) {
+    return newChildList;
+  }
+
+  const [currentId, ...restPath] = folderPath;
+  return rootCards.map((card) => {
+    if (card.id === currentId) {
+      const currentChildren = card.children || [];
+      const updatedChildren =
+        restPath.length === 0
+          ? newChildList
+          : updateCardsAtPath(currentChildren, restPath, newChildList);
+      return {
+        ...card,
+        children: updatedChildren,
+      };
+    }
+    return card;
+  });
+};
+
+export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) => {
+  const isDark = theme === 'dark';
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Full nested tree state
+  const [rootCards, setRootCards] = useState<ArchiveCardButton[]>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // If the existing stored BCS card has no children or was an old URL card, upgrade it to the new subfolders
+          const upgraded = parsed.map((card: ArchiveCardButton) => {
+            if (card.id === 'bcs-card' && (!card.children || card.children.length === 0)) {
+              return {
+                ...card,
+                targetType: 'folder',
+                children: INITIAL_BCS_SUBFOLDERS,
+                badgeText: card.badgeText || '13 Subjects',
+              };
+            }
+            return card;
+          });
+          return upgraded;
+        }
+      } catch (e) {
+        console.error('Error loading archive cards:', e);
+      }
+    }
+    return INITIAL_CARDS;
+  });
+
+  // Breadcrumb / Navigation Path State: array of folder Card IDs
+  const [folderPath, setFolderPath] = useState<string[]>([]);
+
+  // Calculate current folder's active card object (if in subfolder)
+  const currentFolderCard: ArchiveCardButton | null =
+    folderPath.length > 0
+      ? findCardDeep(rootCards, folderPath[folderPath.length - 1])
+      : null;
+
+  // Active cards currently displayed on the page
+  const currentCards = getCardsAtPath(rootCards, folderPath);
+
+  // Breadcrumb Trail Objects
+  const breadcrumbTrail = folderPath.map((id, index) => {
+    const card = findCardDeep(rootCards, id);
+    return {
+      id,
+      title: card?.title || 'Folder',
+      path: folderPath.slice(0, index + 1),
+    };
+  });
+
+  // Developer / Admin Mode State
+  const [isDeveloperMode, setIsDeveloperMode] = useState<boolean>(() => {
+    return sessionStorage.getItem(DEV_AUTH_KEY) === 'true';
+  });
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pinInput, setPinInput] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+
+  // HTML Viewer Modal State
+  const [viewingHtmlCard, setViewingHtmlCard] = useState<ArchiveCardButton | null>(null);
+
+  // Cloud Sync Status: 'idle' | 'syncing' | 'synced' | 'error'
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle');
+
+  // Real-time Firestore Cloud Sync: Listen for universal changes across all devices & sessions
+  useEffect(() => {
+    try {
+      const docRef = doc(db, 'archive_settings', FIRESTORE_DOC_PATH);
+      const unsubscribe = onSnapshot(
+        docRef,
+        (snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.data();
+            if (data && data.cards) {
+              try {
+                const cloudCards: ArchiveCardButton[] = JSON.parse(data.cards);
+                if (Array.isArray(cloudCards) && cloudCards.length > 0) {
+                  setRootCards(cloudCards);
+                  localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudCards));
+                  setSyncStatus('synced');
+                }
+              } catch (parseErr) {
+                console.error('Error parsing cloud archive tree:', parseErr);
+              }
+            }
+          } else {
+            // First time seeding to cloud if no document exists
+            const initialJson = JSON.stringify(rootCards);
+            setDoc(docRef, {
+              cards: initialJson,
+              updatedAt: new Date().toISOString(),
+              updatedBy: 'system-init',
+            }).catch((err) => {
+              console.warn('Initial cloud seed notice:', err);
+            });
+          }
+        },
+        (error) => {
+          console.warn('Firestore onSnapshot subscription notice:', error);
+          // Gracefully fallback to local storage
+        }
+      );
+
+      return () => unsubscribe();
+    } catch (err) {
+      console.warn('Firestore initialization notice:', err);
+    }
+  }, []);
+
+  // Validate active session token on mount (compatible with Netlify / Static and Express backends)
+  useEffect(() => {
+    const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
+    if (token) {
+      fetch('/api/admin/check-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error('Not available');
+          return res.json();
+        })
+        .then((data) => {
+          if (data && data.valid === false) {
+            setIsDeveloperMode(false);
+            sessionStorage.removeItem(DEV_AUTH_KEY);
+            sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+          } else {
+            setIsDeveloperMode(true);
+          }
+        })
+        .catch(() => {
+          // On Netlify / static hosts where /api endpoints return 404, retain the active session if DEV_AUTH_KEY is set
+          if (sessionStorage.getItem(DEV_AUTH_KEY) === 'true') {
+            setIsDeveloperMode(true);
+          }
+        });
+    } else {
+      if (sessionStorage.getItem(DEV_AUTH_KEY) !== 'true') {
+        setIsDeveloperMode(false);
+      }
+    }
+  }, []);
+
+  // Edit / Add Modal State
+  const [editingCard, setEditingCard] = useState<ArchiveCardButton | null>(null);
+  const [isAddMode, setIsAddMode] = useState(false);
+  const [formTitle, setFormTitle] = useState('');
+  const [formSubtitle, setFormSubtitle] = useState('');
+  const [formTargetType, setFormTargetType] = useState<'url' | 'html' | 'file' | 'folder'>('url');
+  const [formLink, setFormLink] = useState('');
+  const [formHtmlContent, setFormHtmlContent] = useState('');
+  const [formFileName, setFormFileName] = useState('');
+  const [formOpenInNewTab, setFormOpenInNewTab] = useState(true);
+  const [formIcon, setFormIcon] = useState<ArchiveCardButton['iconName']>('Briefcase');
+  const [formTheme, setFormTheme] = useState<ArchiveCardButton['colorTheme']>('emerald');
+  const [formBadge, setFormBadge] = useState('');
+  const [fileReadError, setFileReadError] = useState('');
+
+  // Save current view list to nested tree, local storage, and real-time Firestore cloud database
+  const saveCurrentCards = async (newCurrentList: ArchiveCardButton[]) => {
+    const updatedRoot = updateCardsAtPath(rootCards, folderPath, newCurrentList);
+    setRootCards(updatedRoot);
+    const serialized = JSON.stringify(updatedRoot);
+    localStorage.setItem(STORAGE_KEY, serialized);
+
+    // Universal cross-device persistence via Firestore
+    try {
+      setSyncStatus('syncing');
+      const docRef = doc(db, 'archive_settings', FIRESTORE_DOC_PATH);
+      await setDoc(
+        docRef,
+        {
+          cards: serialized,
+          updatedAt: new Date().toISOString(),
+          updatedBy: 'developer-admin',
+        },
+        { merge: true }
+      );
+      setSyncStatus('synced');
+    } catch (cloudErr) {
+      console.warn('Firestore cloud sync notice:', cloudErr);
+      setSyncStatus('error');
+    }
+  };
+
+  // Hybrid Admin Password Verification:
+  // 1. Attempts server-side endpoint (/api/admin/verify) for Express/Cloud Run.
+  // 2. Automatically falls back to client-side cryptographic SHA-256 hash comparison on Netlify, GitHub Pages, or offline.
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pinInput.trim()) return;
+
+    setIsAuthenticating(true);
+    setAuthError('');
+
+    try {
+      // 1. Try server backend endpoint if present
+      const response = await fetch('/api/admin/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pinInput }),
+      }).catch(() => null);
+
+      if (response && response.ok) {
+        const data = await response.json().catch(() => null);
+        if (data && data.success) {
+          setIsDeveloperMode(true);
+          sessionStorage.setItem(DEV_AUTH_KEY, 'true');
+          if (data.token) {
+            sessionStorage.setItem(ADMIN_TOKEN_KEY, data.token);
+          }
+          setShowAuthModal(false);
+          setPinInput('');
+          setAuthError('');
+          return;
+        } else if (data && data.message) {
+          setAuthError(data.message);
+          return;
+        }
+      }
+
+      // 2. Fallback: Netlify / Static Host Cryptographic SHA-256 verification
+      // Hashes the input password using Web Crypto API and compares against the admin SHA-256 hash
+      const inputHash = await sha256Hex(pinInput);
+      if (inputHash === STATIC_ADMIN_HASH || pinInput === 'Mehedi@#23877') {
+        setIsDeveloperMode(true);
+        sessionStorage.setItem(DEV_AUTH_KEY, 'true');
+        sessionStorage.setItem(ADMIN_TOKEN_KEY, `client-session-${Date.now()}`);
+        setShowAuthModal(false);
+        setPinInput('');
+        setAuthError('');
+      } else {
+        setAuthError('Incorrect administrator password. Please check and try again.');
+      }
+    } catch {
+      // Fallback direct check
+      if (pinInput === 'Mehedi@#23877') {
+        setIsDeveloperMode(true);
+        sessionStorage.setItem(DEV_AUTH_KEY, 'true');
+        setShowAuthModal(false);
+        setPinInput('');
+        setAuthError('');
+      } else {
+        setAuthError('Incorrect administrator password.');
+      }
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
+  const handleLogoutDeveloper = async () => {
+    const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
+    if (token) {
+      try {
+        await fetch('/api/admin/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        }).catch(() => null);
+      } catch {
+        // ignore
+      }
+    }
+    setIsDeveloperMode(false);
+    sessionStorage.removeItem(DEV_AUTH_KEY);
+    sessionStorage.removeItem(ADMIN_TOKEN_KEY);
+    setShowAdminPanel(false);
+    setEditingCard(null);
+  };
+
+  // Handle HTML File Selection from Computer or Phone
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setFileReadError('');
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      if (content) {
+        setFormHtmlContent(content);
+        setFormFileName(file.name);
+        if (!formTitle) {
+          const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+          setFormTitle(nameWithoutExt.toUpperCase());
+        }
+      }
+    };
+    reader.onerror = () => {
+      setFileReadError('Failed to read the selected file. Please try again.');
+    };
+    reader.readAsText(file);
+  };
+
+  // Open Edit Modal for a specific card
+  const handleOpenEdit = (card: ArchiveCardButton) => {
+    setEditingCard(card);
+    setIsAddMode(false);
+    setFormTitle(card.title);
+    setFormSubtitle(card.subtitle);
+    const resolvedType =
+      card.targetType ||
+      (card.children && card.children.length >= 0 ? 'folder' : card.htmlContent ? 'html' : 'url');
+    setFormTargetType(resolvedType);
+    setFormLink(card.link || '');
+    setFormHtmlContent(card.htmlContent || '');
+    setFormFileName(card.fileName || '');
+    setFormOpenInNewTab(card.openInNewTab ?? true);
+    setFormIcon(card.iconName || (resolvedType === 'folder' ? 'Folder' : 'Briefcase'));
+    setFormTheme(card.colorTheme || 'emerald');
+    setFormBadge(card.badgeText || '');
+    setFileReadError('');
+  };
+
+  // Open Add Modal
+  const handleOpenAdd = () => {
+    setEditingCard(null);
+    setIsAddMode(true);
+    setFormTitle('');
+    setFormSubtitle('');
+    setFormTargetType('url');
+    setFormLink('https://');
+    setFormHtmlContent('');
+    setFormFileName('');
+    setFormOpenInNewTab(true);
+    setFormIcon('BookOpen');
+    setFormTheme('emerald');
+    setFormBadge('');
+    setFileReadError('');
+  };
+
+  // Save Card (Add or Edit)
+  const handleSaveCard = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formTitle.trim()) return;
+
+    const targetType = formTargetType;
+    let finalLink = formLink.trim();
+    let finalHtml = formHtmlContent;
+
+    if (targetType === 'url') {
+      if (!finalLink) finalLink = 'https://';
+      finalHtml = '';
+    } else if (targetType === 'folder') {
+      finalLink = '';
+      finalHtml = '';
+    } else {
+      finalLink = '';
+    }
+
+    if (isAddMode) {
+      const newCard: ArchiveCardButton = {
+        id: `card-${Date.now()}`,
+        title: formTitle.trim(),
+        subtitle: formSubtitle.trim(),
+        targetType,
+        link: finalLink,
+        htmlContent: finalHtml,
+        fileName: formFileName.trim() || undefined,
+        children: targetType === 'folder' ? [] : undefined,
+        openInNewTab: formOpenInNewTab,
+        iconName: formIcon || (targetType === 'folder' ? 'Folder' : 'BookOpen'),
+        colorTheme: formTheme,
+        badgeText: formBadge.trim(),
+        createdAt: Date.now(),
+      };
+      const updated = [...currentCards, newCard];
+      saveCurrentCards(updated);
+    } else if (editingCard) {
+      const updated = currentCards.map((c) => {
+        if (c.id === editingCard.id) {
+          return {
+            ...c,
+            title: formTitle.trim(),
+            subtitle: formSubtitle.trim(),
+            targetType,
+            link: finalLink,
+            htmlContent: finalHtml,
+            fileName: formFileName.trim() || undefined,
+            children: targetType === 'folder' ? c.children || [] : undefined,
+            openInNewTab: formOpenInNewTab,
+            iconName: formIcon,
+            colorTheme: formTheme,
+            badgeText: formBadge.trim(),
+          };
+        }
+        return c;
+      });
+      saveCurrentCards(updated);
+    }
+
+    setEditingCard(null);
+    setIsAddMode(false);
+  };
+
+  // Delete Card
+  const handleDeleteCard = (id: string) => {
+    const cardToDelete = currentCards.find((c) => c.id === id);
+    const isFolder = cardToDelete?.targetType === 'folder';
+    const msg = isFolder
+      ? `Are you sure you want to delete this Sub folder "${cardToDelete?.title}" and all its internal buttons?`
+      : `Are you sure you want to delete "${cardToDelete?.title}"?`;
+
+    if (window.confirm(msg)) {
+      const updated = currentCards.filter((c) => c.id !== id);
+      saveCurrentCards(updated);
+    }
+  };
+
+  // Move Card Up/Down
+  const handleMoveCard = (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= currentCards.length) return;
+    const newCards = [...currentCards];
+    const temp = newCards[index];
+    newCards[index] = newCards[targetIndex];
+    newCards[targetIndex] = temp;
+    saveCurrentCards(newCards);
+  };
+
+  // Reset to Defaults
+  const handleResetDefaults = async () => {
+    if (window.confirm('Reset archive buttons to default BCS & SSC cards?')) {
+      setRootCards(INITIAL_CARDS);
+      setFolderPath([]);
+      const serialized = JSON.stringify(INITIAL_CARDS);
+      localStorage.setItem(STORAGE_KEY, serialized);
+
+      try {
+        setSyncStatus('syncing');
+        const docRef = doc(db, 'archive_settings', FIRESTORE_DOC_PATH);
+        await setDoc(
+          docRef,
+          {
+            cards: serialized,
+            updatedAt: new Date().toISOString(),
+            updatedBy: 'developer-admin-reset',
+          },
+          { merge: true }
+        );
+        setSyncStatus('synced');
+      } catch (err) {
+        console.warn('Reset sync notice:', err);
+      }
+    }
+  };
+
+  // Click card handler: Supports Sub folders, URL, HTML Code, and HTML Files
+  const handleCardClick = (card: ArchiveCardButton) => {
+    if (card.targetType === 'folder') {
+      setFolderPath([...folderPath, card.id]);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    const isHtml = card.targetType === 'html' || card.targetType === 'file' || Boolean(card.htmlContent);
+
+    if (isHtml && card.htmlContent) {
+      if (card.openInNewTab) {
+        const blob = new Blob([card.htmlContent], { type: 'text/html;charset=utf-8' });
+        const blobUrl = URL.createObjectURL(blob);
+        const newWindow = window.open(blobUrl, '_blank', 'noopener,noreferrer');
+        if (!newWindow) {
+          setViewingHtmlCard(card);
+        }
+      } else {
+        setViewingHtmlCard(card);
+      }
+      return;
+    }
+
+    // Standard URL
+    if (!card.link || card.link === '#') return;
+    if (card.openInNewTab) {
+      window.open(card.link, '_blank', 'noopener,noreferrer');
+    } else {
+      window.location.href = card.link;
+    }
+  };
+
+  return (
+    <div id="archives-section" className="container mx-auto px-4 md:px-6 py-8 max-w-6xl">
+      {/* Breadcrumb Trail & Sub-folder Navigation Header */}
+      {folderPath.length > 0 && (
+        <div className="mb-6 flex flex-wrap items-center gap-2 text-xs sm:text-sm font-medium animate-in fade-in duration-200">
+          <button
+            onClick={() => setFolderPath([])}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition ${
+              isDark
+                ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700'
+                : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border-slate-300 shadow-sm'
+            }`}
+          >
+            <Home className="w-3.5 h-3.5" />
+            <span>Archives Home</span>
+          </button>
+
+          {breadcrumbTrail.map((crumb, idx) => {
+            const isLast = idx === breadcrumbTrail.length - 1;
+            return (
+              <React.Fragment key={crumb.id}>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <button
+                  onClick={() => setFolderPath(crumb.path)}
+                  disabled={isLast}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition ${
+                    isLast
+                      ? isDark
+                        ? 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300 font-bold'
+                        : 'bg-emerald-50 border-emerald-300 text-emerald-800 font-bold shadow-sm'
+                      : isDark
+                      ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700'
+                      : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border-slate-300 shadow-sm'
+                  }`}
+                >
+                  <FolderOpen className="w-3.5 h-3.5" />
+                  <span>{crumb.title}</span>
+                </button>
+              </React.Fragment>
+            );
+          })}
+
+          <button
+            onClick={() => setFolderPath(folderPath.slice(0, -1))}
+            className={`ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition text-xs font-semibold ${
+              isDark
+                ? 'bg-gray-800 hover:bg-gray-700 text-emerald-400 border-gray-700'
+                : 'bg-white hover:bg-slate-50 text-emerald-700 border-slate-300 shadow-sm'
+            }`}
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to Parent</span>
+          </button>
+        </div>
+      )}
+
+      {/* Top Banner & Title Area */}
+      <div
+        className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b transition-colors ${
+          isDark ? 'border-gray-800' : 'border-slate-200'
+        }`}
+      >
+        <div>
+          <div className="flex items-center gap-2.5">
+            <h2
+              className={`text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2.5 ${
+                isDark ? 'text-white' : 'text-slate-900'
+              }`}
+            >
+              {currentFolderCard ? (
+                <>
+                  <Folder className="w-7 h-7 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                  <span>{currentFolderCard.title}</span>
+                </>
+              ) : (
+                'Archives & Resources'
+              )}
+            </h2>
+            <span
+              className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border ${
+                isDark
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                  : 'bg-emerald-100 text-emerald-800 border-emerald-200'
+              }`}
+            >
+              {currentCards.length} {currentCards.length === 1 ? 'Item' : 'Items'}
+            </span>
+          </div>
+          <p className={`text-sm mt-1.5 ${isDark ? 'text-gray-400' : 'text-slate-600'}`}>
+            {currentFolderCard?.subtitle ||
+              'Access curated examination portals, study materials, sub folders, and academic links.'}
+          </p>
+        </div>
+
+        {/* Developer Mode Action & Cloud Sync Indicator */}
+        <div className="flex items-center gap-2 self-end sm:self-auto flex-wrap justify-end">
+          {/* Universal Cloud Sync Badge */}
+          <div
+            className={`flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-full border transition ${
+              syncStatus === 'synced'
+                ? isDark
+                  ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-400'
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                : syncStatus === 'syncing'
+                ? isDark
+                  ? 'bg-blue-950/40 border-blue-800/60 text-blue-400'
+                  : 'bg-blue-50 border-blue-200 text-blue-700'
+                : isDark
+                ? 'bg-gray-800 border-gray-700 text-gray-400'
+                : 'bg-slate-100 border-slate-300 text-slate-600'
+            }`}
+            title="Real-time Universal Cloud Database Synchronization across all devices"
+          >
+            {syncStatus === 'syncing' ? (
+              <RefreshCw className="w-3 h-3 animate-spin text-blue-500" />
+            ) : (
+              <Cloud className="w-3 h-3 text-emerald-500" />
+            )}
+            <span>
+              {syncStatus === 'syncing'
+                ? 'Syncing to Cloud...'
+                : syncStatus === 'synced'
+                ? 'Universal Sync Active'
+                : 'Cloud Connected'}
+            </span>
+          </div>
+
+          {isDeveloperMode ? (
+            <div
+              className={`flex items-center gap-2 border rounded-full px-3 py-1.5 shadow-sm ${
+                isDark
+                  ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-300'
+                  : 'bg-emerald-50 border-emerald-300 text-emerald-800'
+              }`}
+            >
+              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 animate-pulse" />
+              <span className="text-xs font-semibold">Developer Mode Active</span>
+              <button
+                id="open-admin-panel-btn"
+                onClick={() => setShowAdminPanel(!showAdminPanel)}
+                className={`ml-2 px-2.5 py-1 text-xs text-white font-medium rounded-full transition shadow-sm ${
+                  isDark
+                    ? 'bg-emerald-600 hover:bg-emerald-500'
+                    : 'bg-emerald-700 hover:bg-emerald-800'
+                }`}
+                title="Open Admin Control Panel"
+              >
+                <Settings className="w-3.5 h-3.5 inline mr-1" />
+                Admin Panel
+              </button>
+              <button
+                id="lock-developer-mode-btn"
+                onClick={handleLogoutDeveloper}
+                className="p-1 hover:text-red-500 text-gray-400 transition"
+                title="Lock Developer Mode"
+              >
+                <Lock className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              id="developer-panel-auth-trigger-btn"
+              onClick={() => setShowAuthModal(true)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border transition ${
+                isDark
+                  ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-300'
+              }`}
+              title="Developer Access to edit cards, sub folders, and resources"
+            >
+              <Lock className={`w-3.5 h-3.5 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`} />
+              <span>Developer Panel</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Developer Quick Action Bar */}
+      {isDeveloperMode && (
+        <div
+          className={`mt-4 p-4 rounded-xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs ${
+            isDark
+              ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-200'
+              : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            <Unlock className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span>
+              <strong>Developer Mode Enabled</strong> in{' '}
+              <span className="font-bold underline">{currentFolderCard?.title || 'Archives Home'}</span>
+              : Add links, files, or sub folder pages below.
+            </span>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              id="quick-add-new-card-btn"
+              onClick={handleOpenAdd}
+              className={`px-3 py-1.5 text-white font-semibold rounded-lg shadow-sm transition flex items-center gap-1 ${
+                isDark
+                  ? 'bg-emerald-600 hover:bg-emerald-500'
+                  : 'bg-emerald-700 hover:bg-emerald-800'
+              }`}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Button / Sub Folder</span>
+            </button>
+            <button
+              id="toggle-admin-management-tray-btn"
+              onClick={() => setShowAdminPanel(!showAdminPanel)}
+              className={`px-3 py-1.5 rounded-lg border transition ${
+                isDark
+                  ? 'bg-gray-800 hover:bg-gray-700 border-gray-700 text-gray-200'
+                  : 'bg-white hover:bg-slate-50 border-slate-300 text-slate-800'
+              }`}
+            >
+              {showAdminPanel ? 'Hide Management Table' : 'Manage Page Buttons'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Panel Details Table (Collapsible) */}
+      {isDeveloperMode && showAdminPanel && (
+        <div
+          id="developer-management-table-container"
+          className={`mt-6 rounded-2xl border p-5 shadow-xl transition-colors ${
+            isDark
+              ? 'bg-gray-800/80 border-gray-700 text-white'
+              : 'bg-white border-slate-200 text-slate-900'
+          }`}
+        >
+          <div className="flex items-center justify-between pb-4 border-b border-gray-700/50 dark:border-gray-700">
+            <div>
+              <h3 className="font-bold text-base flex items-center gap-2">
+                <Settings className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                Button & Sub Folder Configuration ({currentFolderCard?.title || 'Root Level'})
+              </h3>
+              <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
+                Reorder, update titles, create sub folders, paste custom HTML, or delete buttons.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              {folderPath.length === 0 && (
+                <button
+                  onClick={handleResetDefaults}
+                  className={`px-2.5 py-1 text-xs rounded border transition flex items-center gap-1 ${
+                    isDark
+                      ? 'border-gray-700 text-gray-400 hover:text-white hover:bg-gray-700'
+                      : 'border-slate-300 text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                  title="Reset to default BCS & SSC cards"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  Reset Defaults
+                </button>
+              )}
+              <button
+                onClick={handleOpenAdd}
+                className={`px-3 py-1 text-xs text-white font-semibold rounded shadow-sm transition flex items-center gap-1 ${
+                  isDark
+                    ? 'bg-emerald-600 hover:bg-emerald-500'
+                    : 'bg-emerald-700 hover:bg-emerald-800'
+                }`}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Add Item
+              </button>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto mt-4">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr
+                  className={`border-b ${
+                    isDark
+                      ? 'border-gray-700 text-gray-400'
+                      : 'border-slate-200 text-slate-500 bg-slate-50'
+                  }`}
+                >
+                  <th className="py-2.5 px-3 font-semibold">Order</th>
+                  <th className="py-2.5 px-3 font-semibold">Title</th>
+                  <th className="py-2.5 px-3 font-semibold">Button Type</th>
+                  <th className="py-2.5 px-3 font-semibold">Destination / Sub items</th>
+                  <th className="py-2.5 px-3 font-semibold">Theme</th>
+                  <th className="py-2.5 px-3 font-semibold text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className={`divide-y ${isDark ? 'divide-gray-700/50' : 'divide-slate-200'}`}>
+                {currentCards.map((c, idx) => {
+                  const isFolder = c.targetType === 'folder';
+                  const isHtml = c.targetType === 'html' || c.targetType === 'file' || Boolean(c.htmlContent);
+                  return (
+                    <tr
+                      key={c.id}
+                      className={`transition ${
+                        isDark ? 'hover:bg-gray-700/30' : 'hover:bg-slate-50'
+                      }`}
+                    >
+                      <td className="py-2.5 px-3 font-mono">
+                        <div className="flex items-center gap-1">
+                          <button
+                            disabled={idx === 0}
+                            onClick={() => handleMoveCard(idx, 'up')}
+                            className="p-1 rounded hover:bg-gray-600/30 disabled:opacity-30"
+                            title="Move up"
+                          >
+                            <ArrowUp className="w-3 h-3" />
+                          </button>
+                          <button
+                            disabled={idx === currentCards.length - 1}
+                            onClick={() => handleMoveCard(idx, 'down')}
+                            className="p-1 rounded hover:bg-gray-600/30 disabled:opacity-30"
+                            title="Move down"
+                          >
+                            <ArrowDown className="w-3 h-3" />
+                          </button>
+                          <span className="ml-1 text-gray-500 font-bold">#{idx + 1}</span>
+                        </div>
+                      </td>
+                      <td className="py-2.5 px-3 font-bold">
+                        <div className="flex items-center gap-1.5">
+                          {isFolder ? (
+                            <Folder className="w-4 h-4 text-amber-500 shrink-0" />
+                          ) : isHtml ? (
+                            <FileCode className="w-4 h-4 text-purple-400 shrink-0" />
+                          ) : (
+                            <Globe className="w-4 h-4 text-blue-400 shrink-0" />
+                          )}
+                          <span>{c.title}</span>
+                          {c.badgeText && (
+                            <span
+                              className={`text-[10px] px-1.5 py-0.2 rounded border ${
+                                isDark
+                                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                                  : 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                              }`}
+                            >
+                              {c.badgeText}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-2.5 px-3">
+                        {isFolder ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                            <FolderTree className="w-3 h-3" /> Sub Folder
+                          </span>
+                        ) : isHtml ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                            {c.fileName ? (
+                              <>
+                                <Upload className="w-3 h-3" /> File
+                              </>
+                            ) : (
+                              <>
+                                <Code2 className="w-3 h-3" /> HTML Code
+                              </>
+                            )}
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                            <Globe className="w-3 h-3" /> Web Link
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3 max-w-xs truncate font-mono text-[11px]">
+                        {isFolder ? (
+                          <button
+                            onClick={() => handleCardClick(c)}
+                            className="hover:underline flex items-center gap-1 text-amber-400 font-semibold"
+                          >
+                            <FolderOpen className="w-3 h-3 shrink-0" />
+                            <span>Open folder ({c.children?.length || 0} sub-buttons)</span>
+                          </button>
+                        ) : isHtml ? (
+                          <button
+                            onClick={() => handleCardClick(c)}
+                            className="hover:underline flex items-center gap-1 text-purple-400"
+                          >
+                            <FileCode className="w-3 h-3 shrink-0" />
+                            <span className="truncate">
+                              {c.fileName ? `File: ${c.fileName}` : 'Embedded HTML Document'}
+                            </span>
+                          </button>
+                        ) : (
+                          <a
+                            href={c.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`hover:underline flex items-center gap-1 ${
+                              isDark ? 'text-emerald-400' : 'text-emerald-700'
+                            }`}
+                          >
+                            <span className="truncate">{c.link}</span>
+                            <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                          </a>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <span className="capitalize px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-700/50 dark:bg-gray-700 text-gray-300 border border-gray-600">
+                          {c.colorTheme || 'emerald'}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {isFolder && (
+                            <button
+                              onClick={() => handleCardClick(c)}
+                              className={`p-1.5 rounded transition ${
+                                isDark
+                                  ? 'hover:bg-amber-500/20 text-amber-400 hover:text-amber-300'
+                                  : 'hover:bg-amber-50 text-amber-700'
+                              }`}
+                              title="Enter Sub Folder"
+                            >
+                              <FolderOpen className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleOpenEdit(c)}
+                            className={`p-1.5 rounded transition ${
+                              isDark
+                                ? 'hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300'
+                                : 'hover:bg-emerald-50 text-emerald-700'
+                            }`}
+                            title="Edit item"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCard(c.id)}
+                            className="p-1.5 rounded hover:bg-red-500/20 text-red-400 hover:text-red-300 transition"
+                            title="Delete item"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Main Grid of Buttons & Cards (Empty State vs Grid) */}
+      {currentCards.length === 0 ? (
+        <div
+          className={`mt-10 p-12 rounded-3xl border-2 border-dashed text-center flex flex-col items-center justify-center gap-4 ${
+            isDark ? 'border-gray-800 bg-gray-900/40 text-gray-400' : 'border-slate-300 bg-slate-50 text-slate-600'
+          }`}
+        >
+          <FolderPlus className="w-12 h-12 text-emerald-500/60" />
+          <div>
+            <h3 className="font-bold text-lg text-slate-800 dark:text-white">This sub folder is currently empty</h3>
+            <p className="text-xs mt-1 max-w-sm">
+              Use Developer Mode to add buttons, upload HTML documents, web links, or create deeper nested sub folders.
+            </p>
+          </div>
+          {isDeveloperMode ? (
+            <button
+              onClick={handleOpenAdd}
+              className="mt-2 px-5 py-2.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow transition flex items-center gap-1.5"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add First Button in this Folder</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="mt-2 px-4 py-2 text-xs font-medium bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl border border-gray-700 transition flex items-center gap-1.5"
+            >
+              <Lock className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Login to Developer Panel to Add Content</span>
+            </button>
+          )}
+        </div>
+      ) : (
+        <div id="archives-cards-grid" className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          {currentCards.map((card) => {
+            const themeStyle =
+              THEME_STYLES[card.colorTheme || 'emerald'] || THEME_STYLES.emerald;
+            const styles = isDark ? themeStyle.dark : themeStyle.light;
+            const isFolder = card.targetType === 'folder';
+            const isHtml = card.targetType === 'html' || card.targetType === 'file' || Boolean(card.htmlContent);
+
+            const renderIcon = () => {
+              switch (card.iconName) {
+                case 'Folder':
+                  return <Folder className="w-7 h-7" />;
+                case 'FolderTree':
+                  return <FolderTree className="w-7 h-7" />;
+                case 'GraduationCap':
+                  return <GraduationCap className="w-7 h-7" />;
+                case 'BookOpen':
+                  return <BookOpen className="w-7 h-7" />;
+                case 'Award':
+                  return <Award className="w-7 h-7" />;
+                case 'Briefcase':
+                  return <Briefcase className="w-7 h-7" />;
+                case 'FileText':
+                  return <FileText className="w-7 h-7" />;
+                case 'Sparkles':
+                  return <Sparkles className="w-7 h-7" />;
+                case 'Layers':
+                  return <Layers className="w-7 h-7" />;
+                case 'Compass':
+                  return <Compass className="w-7 h-7" />;
+                case 'Globe':
+                  return <Globe className="w-7 h-7" />;
+                default:
+                  return isFolder ? <Folder className="w-7 h-7" /> : <Briefcase className="w-7 h-7" />;
+              }
+            };
+
+            return (
+              <div
+                key={card.id}
+                id={`archive-card-${card.id}`}
+                className={`group relative rounded-2xl border p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-gradient-to-br ${
+                  styles.bg
+                } ${styles.border} ${styles.hoverBorder}`}
+              >
+                {/* Developer Inline Edit Trigger on the card */}
+                {isDeveloperMode && (
+                  <div className="absolute top-3.5 right-3.5 flex items-center gap-1 z-20">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenEdit(card);
+                      }}
+                      className={`p-1.5 rounded-lg border backdrop-blur-md shadow transition ${
+                        isDark
+                          ? 'bg-gray-900/90 text-emerald-400 hover:bg-emerald-600 hover:text-white border-gray-700'
+                          : 'bg-white/90 text-emerald-700 hover:bg-emerald-600 hover:text-white border-slate-300'
+                      }`}
+                      title="Edit this card"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteCard(card.id);
+                      }}
+                      className={`p-1.5 rounded-lg border backdrop-blur-md shadow transition ${
+                        isDark
+                          ? 'bg-gray-900/90 text-red-400 hover:bg-red-600 hover:text-white border-gray-700'
+                          : 'bg-white/90 text-red-600 hover:bg-red-600 hover:text-white border-slate-300'
+                      }`}
+                      title="Delete this card"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Card Header Content */}
+                <div className="flex items-start gap-4">
+                  <div
+                    className={`p-3.5 rounded-xl border flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 shadow-sm ${
+                      styles.iconBg
+                    } ${styles.iconColor} ${styles.border}`}
+                  >
+                    {renderIcon()}
+                  </div>
+
+                  <div className="flex-1 pr-14 sm:pr-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3
+                        className={`text-xl sm:text-2xl font-bold tracking-tight transition-colors ${
+                          styles.titleColor
+                        } ${styles.titleHover}`}
+                      >
+                        {card.title}
+                      </h3>
+                      {card.badgeText && (
+                        <span
+                          className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${styles.badgeBg} ${styles.badgeText}`}
+                        >
+                          {card.badgeText}
+                        </span>
+                      )}
+                      {isFolder && (
+                        <span
+                          className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                            isDark
+                              ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                              : 'bg-amber-100 text-amber-800 border-amber-200'
+                          }`}
+                        >
+                          Sub Folder ({card.children?.length || 0})
+                        </span>
+                      )}
+                      {!isFolder && isHtml && (
+                        <span
+                          className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                            isDark
+                              ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                              : 'bg-purple-100 text-purple-800 border-purple-200'
+                          }`}
+                        >
+                          {card.fileName ? 'HTML File' : 'HTML Document'}
+                        </span>
+                      )}
+                    </div>
+
+                    <p
+                      className={`text-xs sm:text-sm mt-1.5 leading-relaxed ${
+                        isDark ? 'text-gray-300/90' : 'text-slate-600'
+                      }`}
+                    >
+                      {card.subtitle}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Card Bottom / Action Button */}
+                <div className="mt-6 pt-4 border-t border-gray-700/40 dark:border-gray-800 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-400">
+                    {isFolder ? (
+                      <>
+                        <FolderTree className="w-3.5 h-3.5 text-amber-500" />
+                        <span>Contains {card.children?.length || 0} sub-buttons</span>
+                      </>
+                    ) : isHtml ? (
+                      <>
+                        <FileCode className="w-3.5 h-3.5 text-purple-400" />
+                        <span>{card.fileName ? card.fileName : 'Interactive HTML view'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>{card.openInNewTab ? 'Opens in new tab' : 'Opens in same tab'}</span>
+                      </>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => handleCardClick(card)}
+                    className={`px-5 py-2 text-xs sm:text-sm font-semibold rounded-xl border shadow-sm transition-all duration-200 flex items-center gap-2 ${
+                      styles.buttonBg
+                    } ${styles.buttonHover}`}
+                  >
+                    <span>{isFolder ? `Open ${card.title} Folder` : `Open ${card.title}`}</span>
+                    {isFolder ? (
+                      <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    ) : isHtml ? (
+                      <Eye className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                    ) : (
+                      <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Embedded HTML Interactive Full-Screen Modal Viewer */}
+      {viewingHtmlCard && viewingHtmlCard.htmlContent && (
+        <div
+          id="html-modal-viewer"
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-150"
+        >
+          <div className="w-full h-full max-w-6xl max-h-[92vh] flex flex-col rounded-2xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden">
+            {/* Top Bar */}
+            <div className="flex items-center justify-between px-4 py-3 bg-gray-800 border-b border-gray-700 text-white">
+              <div className="flex items-center gap-2.5">
+                <FileCode className="w-5 h-5 text-emerald-400" />
+                <div>
+                  <h3 className="font-bold text-sm sm:text-base leading-tight">
+                    {viewingHtmlCard.title}
+                  </h3>
+                  <p className="text-[11px] text-gray-400">
+                    {viewingHtmlCard.fileName || 'Embedded HTML Document Viewer'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const blob = new Blob([viewingHtmlCard.htmlContent || ''], {
+                      type: 'text/html;charset=utf-8',
+                    });
+                    const url = URL.createObjectURL(blob);
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                  }}
+                  className="px-3 py-1.5 text-xs font-semibold bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center gap-1.5 transition"
+                  title="Open in separate tab"
+                >
+                  <Maximize2 className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Open in New Tab</span>
+                </button>
+                <button
+                  onClick={() => setViewingHtmlCard(null)}
+                  className="p-1.5 rounded-lg bg-gray-700/60 hover:bg-red-600 text-gray-300 hover:text-white transition"
+                  title="Close viewer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Iframe displaying the HTML content */}
+            <div className="flex-1 bg-white relative">
+              <iframe
+                title={viewingHtmlCard.title}
+                srcDoc={viewingHtmlCard.htmlContent}
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                className="w-full h-full border-0"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Developer PIN Authentication Modal */}
+      {showAuthModal && (
+        <div
+          id="developer-auth-modal"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150"
+        >
+          <div
+            className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl transition-all ${
+              isDark
+                ? 'bg-gray-900 border-gray-700 text-white'
+                : 'bg-white border-slate-200 text-slate-900'
+            }`}
+          >
+            <div className="flex items-center gap-3 pb-4 border-b border-gray-700/60 dark:border-gray-800">
+              <div
+                className={`p-2.5 rounded-xl ${
+                  isDark
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                    : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                }`}
+              >
+                <Key className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold">Admin Authentication</h3>
+                <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
+                  Enter administrator password to access the control panel
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleAuthSubmit} className="space-y-4 mt-5">
+              <div>
+                <label
+                  className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${
+                    isDark ? 'text-gray-300' : 'text-slate-700'
+                  }`}
+                >
+                  Admin Password
+                </label>
+                <input
+                  id="admin-password-input"
+                  type="password"
+                  value={pinInput}
+                  onChange={(e) => setPinInput(e.target.value)}
+                  placeholder="Enter administrator password"
+                  disabled={isAuthenticating}
+                  className={`w-full rounded-xl px-4 py-2.5 focus:outline-none text-sm border transition ${
+                    isDark
+                      ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:border-emerald-500'
+                      : 'bg-slate-50 border-slate-300 text-slate-900 placeholder-slate-400 focus:border-emerald-600'
+                  }`}
+                  autoFocus
+                />
+                {authError && <p className="text-xs text-red-500 mt-1.5 font-medium">{authError}</p>}
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAuthModal(false);
+                    setAuthError('');
+                    setPinInput('');
+                  }}
+                  disabled={isAuthenticating}
+                  className={`px-4 py-2 text-xs font-medium rounded-lg ${
+                    isDark ? 'text-gray-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Cancel
+                </button>
+                <button
+                  id="submit-auth-btn"
+                  type="submit"
+                  disabled={isAuthenticating || !pinInput.trim()}
+                  className={`px-5 py-2 text-xs font-semibold text-white rounded-lg shadow-md transition disabled:opacity-50 ${
+                    isDark
+                      ? 'bg-emerald-500 hover:bg-emerald-600'
+                      : 'bg-emerald-600 hover:bg-emerald-700'
+                  }`}
+                >
+                  {isAuthenticating ? 'Verifying...' : 'Authenticate'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit / Add Button Modal with Sub folder, URL, File, HTML Code */}
+      {(editingCard || isAddMode) && (
+        <div
+          id="edit-card-modal"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto"
+        >
+          <div
+            className={`w-full max-w-xl rounded-2xl border p-6 shadow-2xl my-8 transition-all ${
+              isDark
+                ? 'bg-gray-900 border-gray-700 text-white'
+                : 'bg-white border-slate-200 text-slate-900'
+            }`}
+          >
+            <div className="flex items-center justify-between pb-3.5 border-b border-gray-700/60 dark:border-gray-800">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <Edit3 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                {isAddMode
+                  ? `Add New Item to ${currentFolderCard?.title || 'Archives'}`
+                  : `Edit "${editingCard?.title}" Card`}
+              </h3>
+              <button
+                onClick={() => {
+                  setEditingCard(null);
+                  setIsAddMode(false);
+                }}
+                className="p-1 rounded-lg hover:bg-gray-700/40 text-gray-400 hover:text-white transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCard} className="space-y-4 mt-4 text-xs">
+              {/* Button Type Choice: Sub folder vs File / HTML / Web Link */}
+              <div>
+                <label className="block font-semibold uppercase tracking-wider mb-1.5 text-emerald-600 dark:text-emerald-400">
+                  Select Button Type *
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormTargetType('folder');
+                      if (formIcon === 'Briefcase' || formIcon === 'BookOpen') setFormIcon('Folder');
+                    }}
+                    className={`py-2 px-2 rounded-xl border flex flex-col items-center gap-1 transition ${
+                      formTargetType === 'folder'
+                        ? isDark
+                          ? 'bg-amber-600 text-white border-amber-500 shadow'
+                          : 'bg-amber-600 text-white border-amber-600 shadow'
+                        : isDark
+                        ? 'bg-gray-800 hover:bg-gray-750 text-gray-300 border-gray-700'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-300'
+                    }`}
+                  >
+                    <FolderTree className="w-4 h-4" />
+                    <span className="font-semibold text-xs">Sub Folder</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setFormTargetType('file')}
+                    className={`py-2 px-2 rounded-xl border flex flex-col items-center gap-1 transition ${
+                      formTargetType === 'file'
+                        ? isDark
+                          ? 'bg-emerald-600 text-white border-emerald-500 shadow'
+                          : 'bg-emerald-600 text-white border-emerald-600 shadow'
+                        : isDark
+                        ? 'bg-gray-800 hover:bg-gray-750 text-gray-300 border-gray-700'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-300'
+                    }`}
+                  >
+                    <Upload className="w-4 h-4" />
+                    <span className="font-semibold text-xs">HTML File</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setFormTargetType('html')}
+                    className={`py-2 px-2 rounded-xl border flex flex-col items-center gap-1 transition ${
+                      formTargetType === 'html'
+                        ? isDark
+                          ? 'bg-emerald-600 text-white border-emerald-500 shadow'
+                          : 'bg-emerald-600 text-white border-emerald-600 shadow'
+                        : isDark
+                        ? 'bg-gray-800 hover:bg-gray-750 text-gray-300 border-gray-700'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-300'
+                    }`}
+                  >
+                    <Code2 className="w-4 h-4" />
+                    <span className="font-semibold text-xs">Paste HTML</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setFormTargetType('url')}
+                    className={`py-2 px-2 rounded-xl border flex flex-col items-center gap-1 transition ${
+                      formTargetType === 'url'
+                        ? isDark
+                          ? 'bg-emerald-600 text-white border-emerald-500 shadow'
+                          : 'bg-emerald-600 text-white border-emerald-600 shadow'
+                        : isDark
+                        ? 'bg-gray-800 hover:bg-gray-750 text-gray-300 border-gray-700'
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-300'
+                    }`}
+                  >
+                    <Globe className="w-4 h-4" />
+                    <span className="font-semibold text-xs">Web URL</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Title & Badge */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold uppercase tracking-wider mb-1">
+                    {formTargetType === 'folder' ? 'Sub Folder Name *' : 'Card Title / Name *'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formTitle}
+                    onChange={(e) => setFormTitle(e.target.value)}
+                    placeholder={
+                      formTargetType === 'folder'
+                        ? 'e.g. 45th BCS, HSC 2026, Semester 1'
+                        : 'e.g. BCS, SSC, Syllabus, Notes'
+                    }
+                    className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none ${
+                      isDark
+                        ? 'bg-gray-800 border-gray-700 text-white focus:border-emerald-500'
+                        : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                    }`}
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold uppercase tracking-wider mb-1">
+                    Badge Pill (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={formBadge}
+                    onChange={(e) => setFormBadge(e.target.value)}
+                    placeholder="e.g. New Folder, Important, Cadre"
+                    className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none ${
+                      isDark
+                        ? 'bg-gray-800 border-gray-700 text-white focus:border-emerald-500'
+                        : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                    }`}
+                  />
+                </div>
+              </div>
+
+              {/* Subtitle / Description (becomes sub folder description) */}
+              <div>
+                <label className="block font-semibold uppercase tracking-wider mb-1">
+                  {formTargetType === 'folder'
+                    ? 'Sub Folder Description / Overview'
+                    : 'Description / Subtitle'}
+                </label>
+                <textarea
+                  rows={2}
+                  value={formSubtitle}
+                  onChange={(e) => setFormSubtitle(e.target.value)}
+                  placeholder={
+                    formTargetType === 'folder'
+                      ? 'e.g. Complete collection of preliminary tests, written question bank, and viva guide.'
+                      : 'e.g. Past Questions, Notes, and Examination Portal'
+                  }
+                  className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none resize-none ${
+                    isDark
+                      ? 'bg-gray-800 border-gray-700 text-white focus:border-emerald-500'
+                      : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                  }`}
+                />
+              </div>
+
+              {/* Specific Input for each type */}
+              {formTargetType === 'folder' && (
+                <div
+                  className={`p-3.5 rounded-xl border flex items-start gap-2.5 ${
+                    isDark
+                      ? 'bg-amber-950/30 border-amber-500/30 text-amber-200'
+                      : 'bg-amber-50 border-amber-200 text-amber-900'
+                  }`}
+                >
+                  <FolderTree className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-xs">Full Sub Folder Page</p>
+                    <p className="text-[11px] opacity-90 mt-0.5 leading-relaxed">
+                      Clicking this button will open a dedicated page titled with this button's name and description. Inside that page, you can add more buttons, upload files, or create unlimited nested sub folders.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {formTargetType === 'url' && (
+                <div>
+                  <label className="block font-semibold uppercase tracking-wider mb-1">
+                    Destination URL / Web Link *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required={formTargetType === 'url'}
+                      value={formLink}
+                      onChange={(e) => setFormLink(e.target.value)}
+                      placeholder="https://example.com or https://bpsc.gov.bd"
+                      className={`w-full rounded-xl pl-3 pr-8 py-2 text-sm border focus:outline-none font-mono ${
+                        isDark
+                          ? 'bg-gray-800 border-gray-700 text-white focus:border-emerald-500'
+                          : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                      }`}
+                    />
+                    <ExternalLink className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                  </div>
+                </div>
+              )}
+
+              {formTargetType === 'html' && (
+                <div>
+                  <label className="block font-semibold uppercase tracking-wider mb-1 flex items-center justify-between">
+                    <span>Direct HTML Code *</span>
+                    <span className="text-[10px] lowercase font-normal opacity-75">
+                      Full &lt;html&gt; documents or custom widgets
+                    </span>
+                  </label>
+                  <textarea
+                    rows={5}
+                    required={formTargetType === 'html'}
+                    value={formHtmlContent}
+                    onChange={(e) => setFormHtmlContent(e.target.value)}
+                    placeholder="<!DOCTYPE html><html><head><style>body { font-family: sans-serif; padding: 20px; }</style></head><body><h1>Welcome</h1><p>Your custom content here...</p></body></html>"
+                    className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none font-mono leading-relaxed resize-y ${
+                      isDark
+                        ? 'bg-gray-800 border-gray-700 text-emerald-300 focus:border-emerald-500'
+                        : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                    }`}
+                  />
+                </div>
+              )}
+
+              {formTargetType === 'file' && (
+                <div className="space-y-2">
+                  <label className="block font-semibold uppercase tracking-wider mb-1">
+                    Select HTML File from PC / Mobile *
+                  </label>
+
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept=".html,.htm,text/html"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center gap-2 ${
+                      isDark
+                        ? 'border-gray-700 hover:border-emerald-500 bg-gray-800/50 hover:bg-gray-800'
+                        : 'border-slate-300 hover:border-emerald-600 bg-slate-50 hover:bg-slate-100'
+                    }`}
+                  >
+                    <Upload className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                    <div>
+                      <p className="font-semibold text-xs">
+                        {formFileName ? (
+                          <span className="text-emerald-600 dark:text-emerald-400">
+                            Selected File: {formFileName}
+                          </span>
+                        ) : (
+                          'Click to Browse & Upload .html or .htm File'
+                        )}
+                      </p>
+                      <p className={`text-[10px] mt-0.5 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
+                        Works with files from your desktop computer, tablet, or phone
+                      </p>
+                    </div>
+                  </div>
+
+                  {fileReadError && (
+                    <p className="text-xs text-red-500 font-medium">{fileReadError}</p>
+                  )}
+
+                  {formHtmlContent && (
+                    <div className="mt-2">
+                      <div className="flex items-center justify-between text-[11px] mb-1 font-medium">
+                        <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                          <Check className="w-3.5 h-3.5" /> File Loaded ({formHtmlContent.length.toLocaleString()} characters)
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="hover:underline text-gray-400"
+                        >
+                          Change File
+                        </button>
+                      </div>
+                      <textarea
+                        rows={3}
+                        readOnly
+                        value={formHtmlContent}
+                        className={`w-full rounded-xl px-3 py-1.5 text-[11px] border font-mono opacity-80 ${
+                          isDark
+                            ? 'bg-gray-800/80 border-gray-700 text-gray-300'
+                            : 'bg-slate-100 border-slate-300 text-slate-700'
+                        }`}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Icon & Theme Choice */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label className="block font-semibold uppercase tracking-wider mb-1">
+                    Select Icon
+                  </label>
+                  <select
+                    value={formIcon}
+                    onChange={(e) =>
+                      setFormIcon(e.target.value as ArchiveCardButton['iconName'])
+                    }
+                    className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none ${
+                      isDark
+                        ? 'bg-gray-800 border-gray-700 text-white'
+                        : 'bg-slate-50 border-slate-300 text-slate-900'
+                    }`}
+                  >
+                    <option value="Folder">Folder (Sub-Folder)</option>
+                    <option value="FolderTree">Folder Tree (Directory)</option>
+                    <option value="Briefcase">Briefcase (Jobs / BCS)</option>
+                    <option value="GraduationCap">Graduation Cap (Academic)</option>
+                    <option value="BookOpen">Book Open (Study Notes)</option>
+                    <option value="Award">Award (Certificates)</option>
+                    <option value="FileText">File Text (Past Papers / HTML)</option>
+                    <option value="Sparkles">Sparkles (Special)</option>
+                    <option value="Layers">Layers (Multi-resource)</option>
+                    <option value="Compass">Compass (Guidance)</option>
+                    <option value="Globe">Globe (International / Web)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-semibold uppercase tracking-wider mb-1">
+                    Color Accent Theme
+                  </label>
+                  <select
+                    value={formTheme}
+                    onChange={(e) =>
+                      setFormTheme(e.target.value as ArchiveCardButton['colorTheme'])
+                    }
+                    className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none ${
+                      isDark
+                        ? 'bg-gray-800 border-gray-700 text-white'
+                        : 'bg-slate-50 border-slate-300 text-slate-900'
+                    }`}
+                  >
+                    <option value="emerald">Emerald Green (Official / Govt)</option>
+                    <option value="amber">Amber Gold (Sub-folders / Special)</option>
+                    <option value="blue">Royal Blue (Education Board)</option>
+                    <option value="indigo">Indigo (University)</option>
+                    <option value="purple">Purple (Advanced / Research)</option>
+                    <option value="rose">Rose Red (Important Notices)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Open In New Tab Checkbox (Only for URL/HTML/File) */}
+              {formTargetType !== 'folder' && (
+                <div className="flex items-center gap-2 pt-1">
+                  <input
+                    type="checkbox"
+                    id="form-open-in-new-tab"
+                    checked={formOpenInNewTab}
+                    onChange={(e) => setFormOpenInNewTab(e.target.checked)}
+                    className="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4"
+                  />
+                  <label
+                    htmlFor="form-open-in-new-tab"
+                    className={`text-xs cursor-pointer select-none ${
+                      isDark ? 'text-gray-300' : 'text-slate-700'
+                    }`}
+                  >
+                    Open in a new browser tab / window
+                  </label>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-700/50 dark:border-gray-800">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingCard(null);
+                    setIsAddMode(false);
+                  }}
+                  className={`px-4 py-2 font-medium rounded-lg ${
+                    isDark ? 'text-gray-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={
+                    !formTitle.trim() ||
+                    (formTargetType === 'html' && !formHtmlContent.trim()) ||
+                    (formTargetType === 'file' && !formHtmlContent.trim())
+                  }
+                  className={`px-5 py-2 text-white font-semibold rounded-lg shadow-md transition flex items-center gap-1.5 disabled:opacity-50 ${
+                    formTargetType === 'folder'
+                      ? 'bg-amber-600 hover:bg-amber-700'
+                      : isDark
+                      ? 'bg-emerald-500 hover:bg-emerald-600'
+                      : 'bg-emerald-600 hover:bg-emerald-700'
+                  }`}
+                >
+                  <Check className="w-4 h-4" />
+                  <span>
+                    {isAddMode
+                      ? formTargetType === 'folder'
+                        ? 'Create Sub Folder'
+                        : 'Create Button Card'
+                      : 'Save Changes'}
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

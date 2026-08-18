@@ -1,0 +1,6 @@
+{
+  "name": "Class Caddy",
+  "description": "Academic hub for Dhaka University course notes, study plans, Arabic poetry with audio karaoke, and learning resources.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
