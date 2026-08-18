@@ -609,7 +609,38 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
     }
   }, []);
 
-  // Validate active session token on mount (compatible with Netlify / Static and Express backends)
+  // Synchronize Sub Folder Navigation with Browser History (Hardware & Browser Back Button navigation)
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      if (e.state && Array.isArray(e.state.folderPath)) {
+        setFolderPath(e.state.folderPath);
+      } else {
+        setFolderPath([]);
+      }
+    };
+
+    // Ensure initial history state has folderPath
+    if (!window.history.state || !('folderPath' in window.history.state)) {
+      window.history.replaceState({ folderPath: [] }, '');
+    }
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Helper to navigate to a subfolder while recording history
+  const navigateToFolder = (newPath: string[]) => {
+    setFolderPath(newPath);
+    window.history.pushState({ folderPath: newPath }, '');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Helper to navigate back to parent folder
+  const navigateBackToParent = () => {
+    if (folderPath.length > 0) {
+      window.history.back();
+    }
+  };
   useEffect(() => {
     const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
     if (token) {
@@ -652,6 +683,8 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
   const [formLink, setFormLink] = useState('');
   const [formHtmlContent, setFormHtmlContent] = useState('');
   const [formFileName, setFormFileName] = useState('');
+  const [formFileType, setFormFileType] = useState('');
+  const [formFileData, setFormFileData] = useState('');
   const [formOpenInNewTab, setFormOpenInNewTab] = useState(true);
   const [formIcon, setFormIcon] = useState<ArchiveCardButton['iconName']>('Briefcase');
   const [formTheme, setFormTheme] = useState<ArchiveCardButton['colorTheme']>('emerald');
@@ -769,28 +802,52 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
     setEditingCard(null);
   };
 
-  // Handle HTML File Selection from Computer or Phone
+  // Handle File Selection for Any File Type (.html, .pdf, .docx, .png, .jpg, .zip, etc.)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     setFileReadError('');
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      if (content) {
-        setFormHtmlContent(content);
-        setFormFileName(file.name);
-        if (!formTitle) {
-          const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-          setFormTitle(nameWithoutExt.toUpperCase());
-        }
-      }
-    };
-    reader.onerror = () => {
-      setFileReadError('Failed to read the selected file. Please try again.');
-    };
-    reader.readAsText(file);
+    // Guard size limit (under 3MB for fast Firestore cloud sync)
+    if (file.size > 3 * 1024 * 1024) {
+      setFileReadError('File size exceeds 3MB. Please choose a file under 3MB for instant cloud synchronization.');
+      return;
+    }
+
+    setFormFileName(file.name);
+    setFormFileType(file.type || 'application/octet-stream');
+
+    if (!formTitle) {
+      const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+      setFormTitle(nameWithoutExt.toUpperCase());
+    }
+
+    const isTextHtml = file.type.includes('html') || file.name.endsWith('.html') || file.name.endsWith('.htm');
+
+    if (isTextHtml) {
+      const textReader = new FileReader();
+      textReader.onload = (event) => {
+        const text = event.target?.result as string;
+        setFormHtmlContent(text || '');
+        setFormFileData(text || '');
+      };
+      textReader.onerror = () => {
+        setFileReadError('Failed to read the HTML file. Please try again.');
+      };
+      textReader.readAsText(file);
+    } else {
+      // Binary files (PDF, images, doc, txt, zip, audio, etc.)
+      const dataUrlReader = new FileReader();
+      dataUrlReader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        setFormFileData(dataUrl || '');
+        setFormHtmlContent(''); // Non-HTML files use data URI
+      };
+      dataUrlReader.onerror = () => {
+        setFileReadError('Failed to read the selected file. Please try again.');
+      };
+      dataUrlReader.readAsDataURL(file);
+    }
   };
 
   // Open Edit Modal for a specific card
@@ -801,11 +858,13 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
     setFormSubtitle(card.subtitle);
     const resolvedType =
       card.targetType ||
-      (card.children && card.children.length >= 0 ? 'folder' : card.htmlContent ? 'html' : 'url');
+      (card.children && card.children.length >= 0 ? 'folder' : card.fileData || card.htmlContent ? 'file' : 'url');
     setFormTargetType(resolvedType);
     setFormLink(card.link || '');
     setFormHtmlContent(card.htmlContent || '');
     setFormFileName(card.fileName || '');
+    setFormFileType(card.fileType || '');
+    setFormFileData(card.fileData || card.htmlContent || '');
     setFormOpenInNewTab(card.openInNewTab ?? true);
     setFormIcon(card.iconName || (resolvedType === 'folder' ? 'Folder' : 'Briefcase'));
     setFormTheme(card.colorTheme || 'emerald');
@@ -823,6 +882,8 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
     setFormLink('https://');
     setFormHtmlContent('');
     setFormFileName('');
+    setFormFileType('');
+    setFormFileData('');
     setFormOpenInNewTab(true);
     setFormIcon('BookOpen');
     setFormTheme('emerald');
@@ -838,26 +899,34 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
     const targetType = formTargetType;
     let finalLink = formLink.trim();
     let finalHtml = formHtmlContent;
+    let finalFileData = formFileData;
 
     if (targetType === 'url') {
       if (!finalLink) finalLink = 'https://';
       finalHtml = '';
+      finalFileData = '';
     } else if (targetType === 'folder') {
       finalLink = '';
       finalHtml = '';
-    } else {
+      finalFileData = '';
+    } else if (targetType === 'html') {
+      finalLink = '';
+      finalFileData = formHtmlContent;
+    } else if (targetType === 'file') {
       finalLink = '';
     }
 
     if (isAddMode) {
       const newCard: ArchiveCardButton = {
-        id: `card-${Date.now()}`,
+        id: `card-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
         title: formTitle.trim(),
         subtitle: formSubtitle.trim(),
         targetType,
         link: finalLink,
         htmlContent: finalHtml,
         fileName: formFileName.trim() || undefined,
+        fileType: formFileType || undefined,
+        fileData: finalFileData || undefined,
         children: targetType === 'folder' ? [] : undefined,
         openInNewTab: formOpenInNewTab,
         iconName: formIcon || (targetType === 'folder' ? 'Folder' : 'BookOpen'),
@@ -878,6 +947,8 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
             link: finalLink,
             htmlContent: finalHtml,
             fileName: formFileName.trim() || undefined,
+            fileType: formFileType || undefined,
+            fileData: finalFileData || undefined,
             children: targetType === 'folder' ? c.children || [] : undefined,
             openInNewTab: formOpenInNewTab,
             iconName: formIcon,
@@ -946,24 +1017,75 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
     }
   };
 
-  // Click card handler: Supports Sub folders, URL, HTML Code, and HTML Files
+  // Click card handler: Supports Sub folders, URL, HTML Code, and Any Uploaded File (.pdf, .html, .docx, images, etc.)
   const handleCardClick = (card: ArchiveCardButton) => {
     if (card.targetType === 'folder') {
-      setFolderPath([...folderPath, card.id]);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      navigateToFolder([...folderPath, card.id]);
       return;
     }
 
-    const isHtml = card.targetType === 'html' || card.targetType === 'file' || Boolean(card.htmlContent);
-
-    if (isHtml && card.htmlContent) {
+    // Direct HTML code
+    if (card.targetType === 'html' && card.htmlContent) {
       if (card.openInNewTab) {
         const blob = new Blob([card.htmlContent], { type: 'text/html;charset=utf-8' });
         const blobUrl = URL.createObjectURL(blob);
-        const newWindow = window.open(blobUrl, '_blank', 'noopener,noreferrer');
-        if (!newWindow) {
+        window.open(blobUrl, '_blank', 'noopener,noreferrer');
+      } else {
+        setViewingHtmlCard(card);
+      }
+      return;
+    }
+
+    // Uploaded file (HTML, PDF, Document, Image, etc.)
+    if (card.targetType === 'file' && (card.fileData || card.htmlContent)) {
+      const isHtml = card.fileType?.includes('html') || card.fileName?.endsWith('.html') || card.fileName?.endsWith('.htm') || Boolean(card.htmlContent);
+
+      if (isHtml) {
+        const htmlStr = card.htmlContent || card.fileData || '';
+        if (card.openInNewTab) {
+          const blob = new Blob([htmlStr], { type: 'text/html;charset=utf-8' });
+          const blobUrl = URL.createObjectURL(blob);
+          window.open(blobUrl, '_blank', 'noopener,noreferrer');
+        } else {
           setViewingHtmlCard(card);
         }
+        return;
+      }
+
+      // Non-HTML files (PDF, image, docs, etc.)
+      const rawData = card.fileData || '';
+      if (rawData) {
+        if (card.openInNewTab) {
+          // Open binary data URL or Blob in new tab
+          const newWin = window.open(rawData, '_blank', 'noopener,noreferrer');
+          if (!newWin) {
+            // Trigger automatic download if popup is blocked
+            const downloadLink = document.createElement('a');
+            downloadLink.href = rawData;
+            downloadLink.download = card.fileName || 'download';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+          }
+        } else {
+          // Direct download or view
+          const downloadLink = document.createElement('a');
+          downloadLink.href = rawData;
+          downloadLink.download = card.fileName || 'download';
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+        }
+      }
+      return;
+    }
+
+    // Fallback if card has htmlContent from legacy data
+    if (card.htmlContent) {
+      if (card.openInNewTab) {
+        const blob = new Blob([card.htmlContent], { type: 'text/html;charset=utf-8' });
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank', 'noopener,noreferrer');
       } else {
         setViewingHtmlCard(card);
       }
@@ -985,7 +1107,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
       {folderPath.length > 0 && (
         <div className="mb-6 flex flex-wrap items-center gap-2 text-xs sm:text-sm font-medium animate-in fade-in duration-200">
           <button
-            onClick={() => setFolderPath([])}
+            onClick={() => navigateToFolder([])}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition ${
               isDark
                 ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700'
@@ -1002,7 +1124,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
               <React.Fragment key={crumb.id}>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
                 <button
-                  onClick={() => setFolderPath(crumb.path)}
+                  onClick={() => navigateToFolder(crumb.path)}
                   disabled={isLast}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition ${
                     isLast
@@ -1022,7 +1144,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
           })}
 
           <button
-            onClick={() => setFolderPath(folderPath.slice(0, -1))}
+            onClick={navigateBackToParent}
             className={`ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition text-xs font-semibold ${
               isDark
                 ? 'bg-gray-800 hover:bg-gray-700 text-emerald-400 border-gray-700'
@@ -1864,7 +1986,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
                     }`}
                   >
                     <Upload className="w-4 h-4" />
-                    <span className="font-semibold text-xs">HTML File</span>
+                    <span className="font-semibold text-xs">Upload File</span>
                   </button>
 
                   <button
@@ -2036,13 +2158,12 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
               {formTargetType === 'file' && (
                 <div className="space-y-2">
                   <label className="block font-semibold uppercase tracking-wider mb-1">
-                    Select HTML File from PC / Mobile *
+                    Select File from PC / Mobile (.pdf, .html, .docx, images, etc.) *
                   </label>
 
                   <input
                     type="file"
                     ref={fileInputRef}
-                    accept=".html,.htm,text/html"
                     onChange={handleFileChange}
                     className="hidden"
                   />
@@ -2063,11 +2184,11 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
                             Selected File: {formFileName}
                           </span>
                         ) : (
-                          'Click to Browse & Upload .html or .htm File'
+                          'Click to Browse & Upload Any File (.pdf, .html, .docx, images, etc.)'
                         )}
                       </p>
                       <p className={`text-[10px] mt-0.5 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
-                        Works with files from your desktop computer, tablet, or phone
+                        Supports PDF books, lecture slides, question papers, HTML documents, or images
                       </p>
                     </div>
                   </div>
@@ -2076,11 +2197,11 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
                     <p className="text-xs text-red-500 font-medium">{fileReadError}</p>
                   )}
 
-                  {formHtmlContent && (
+                  {(formFileData || formHtmlContent) && (
                     <div className="mt-2">
                       <div className="flex items-center justify-between text-[11px] mb-1 font-medium">
                         <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                          <Check className="w-3.5 h-3.5" /> File Loaded ({formHtmlContent.length.toLocaleString()} characters)
+                          <Check className="w-3.5 h-3.5" /> File Loaded: {formFileName || 'Uploaded Document'}
                         </span>
                         <button
                           type="button"
@@ -2090,16 +2211,15 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
                           Change File
                         </button>
                       </div>
-                      <textarea
-                        rows={3}
-                        readOnly
-                        value={formHtmlContent}
-                        className={`w-full rounded-xl px-3 py-1.5 text-[11px] border font-mono opacity-80 ${
+                      <div
+                        className={`w-full rounded-xl px-3 py-2 text-[11px] border font-mono truncate ${
                           isDark
                             ? 'bg-gray-800/80 border-gray-700 text-gray-300'
                             : 'bg-slate-100 border-slate-300 text-slate-700'
                         }`}
-                      />
+                      >
+                        {formFileType || 'application/octet-stream'} • Ready to open or download
+                      </div>
                     </div>
                   )}
                 </div>
@@ -2201,7 +2321,8 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
                   disabled={
                     !formTitle.trim() ||
                     (formTargetType === 'html' && !formHtmlContent.trim()) ||
-                    (formTargetType === 'file' && !formHtmlContent.trim())
+                    (formTargetType === 'file' && !formFileData.trim() && !formHtmlContent.trim()) ||
+                    (formTargetType === 'url' && !formLink.trim())
                   }
                   className={`px-5 py-2 text-white font-semibold rounded-lg shadow-md transition flex items-center gap-1.5 disabled:opacity-50 ${
                     formTargetType === 'folder'

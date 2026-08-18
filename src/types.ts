@@ -20,6 +20,8 @@ export interface ArchiveCardButton {
   targetType?: 'url' | 'html' | 'file' | 'folder';
   htmlContent?: string;
   fileName?: string;
+  fileType?: string;
+  fileData?: string; // base64 Data URL or string content for any file type (PDF, doc, img, etc)
   children?: ArchiveCardButton[];
   openInNewTab?: boolean;
   iconName?: 'GraduationCap' | 'BookOpen' | 'Award' | 'Briefcase' | 'FileText' | 'Sparkles' | 'Layers' | 'Compass' | 'Folder' | 'FolderTree' | 'Globe';
