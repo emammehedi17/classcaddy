@@ -570,16 +570,36 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
       const docRef = doc(db, 'archive_settings', FIRESTORE_DOC_PATH);
       const unsubscribe = onSnapshot(
         docRef,
-        (snapshot) => {
+        async (snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.data();
-            if (data && data.cards) {
+            if (data) {
               try {
-                const cloudCards: ArchiveCardButton[] = JSON.parse(data.cards);
-                if (Array.isArray(cloudCards) && cloudCards.length > 0) {
-                  setRootCards(cloudCards);
-                  localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudCards));
-                  setSyncStatus('synced');
+                let jsonString = '';
+                if (data.isChunked && typeof data.totalChunks === 'number') {
+                  // Fetch and assemble all chunks
+                  const chunkPromises = [];
+                  for (let i = 0; i < data.totalChunks; i++) {
+                    const chunkRef = doc(db, 'archive_settings', `tree_chunk_${i}`);
+                    chunkPromises.push(getDoc(chunkRef));
+                  }
+                  const chunkDocs = await Promise.all(chunkPromises);
+                  jsonString = chunkDocs.map((cDoc) => cDoc.data()?.data || '').join('');
+                } else if (data.cards) {
+                  jsonString = data.cards;
+                }
+
+                if (jsonString) {
+                  const cloudCards: ArchiveCardButton[] = JSON.parse(jsonString);
+                  if (Array.isArray(cloudCards) && cloudCards.length > 0) {
+                    setRootCards(cloudCards);
+                    try {
+                      localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudCards));
+                    } catch (lsErr) {
+                      console.warn('Local storage size notice:', lsErr);
+                    }
+                    setSyncStatus('synced');
+                  }
                 }
               } catch (parseErr) {
                 console.error('Error parsing cloud archive tree:', parseErr);
@@ -696,25 +716,66 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
     const updatedRoot = updateCardsAtPath(rootCards, folderPath, newCurrentList);
     setRootCards(updatedRoot);
     const serialized = JSON.stringify(updatedRoot);
-    localStorage.setItem(STORAGE_KEY, serialized);
+    
+    // Save to local cache immediately
+    try {
+      localStorage.setItem(STORAGE_KEY, serialized);
+    } catch (lsErr) {
+      console.warn('Local storage size warning:', lsErr);
+    }
 
     // Universal cross-device persistence via Firestore
     try {
       setSyncStatus('syncing');
-      const docRef = doc(db, 'archive_settings', FIRESTORE_DOC_PATH);
-      await setDoc(
-        docRef,
-        {
-          cards: serialized,
-          updatedAt: new Date().toISOString(),
-          updatedBy: 'developer-admin',
-        },
-        { merge: true }
-      );
+
+      // Check serialized size. If payload is within Firestore single document limit (< 1MB)
+      if (serialized.length < 950000) {
+        const docRef = doc(db, 'archive_settings', FIRESTORE_DOC_PATH);
+        await setDoc(
+          docRef,
+          {
+            cards: serialized,
+            updatedAt: new Date().toISOString(),
+            updatedBy: 'developer-admin',
+          },
+          { merge: true }
+        );
+      } else {
+        // For large trees with multiple uploaded PDF/binary files:
+        // We split the large tree into chunks or store file data in indexed collection docs
+        const chunkSize = 750000;
+        const totalChunks = Math.ceil(serialized.length / chunkSize);
+        
+        for (let i = 0; i < totalChunks; i++) {
+          const chunkData = serialized.slice(i * chunkSize, (i + 1) * chunkSize);
+          const chunkDocRef = doc(db, 'archive_settings', `tree_chunk_${i}`);
+          await setDoc(chunkDocRef, {
+            chunkIndex: i,
+            totalChunks,
+            data: chunkData,
+            updatedAt: new Date().toISOString(),
+          });
+        }
+
+        // Update root pointer
+        const docRef = doc(db, 'archive_settings', FIRESTORE_DOC_PATH);
+        await setDoc(
+          docRef,
+          {
+            isChunked: true,
+            totalChunks,
+            updatedAt: new Date().toISOString(),
+            updatedBy: 'developer-admin',
+          },
+          { merge: true }
+        );
+      }
+
       setSyncStatus('synced');
-    } catch (cloudErr) {
-      console.warn('Firestore cloud sync notice:', cloudErr);
+    } catch (cloudErr: any) {
+      console.error('Firestore cloud sync notice:', cloudErr);
       setSyncStatus('error');
+      alert(`Cloud sync notice: ${cloudErr?.message || 'Could not write file to cloud database. Please verify file size.'}`);
     }
   };
 

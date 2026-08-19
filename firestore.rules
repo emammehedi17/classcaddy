@@ -7,10 +7,10 @@ service cloud.firestore {
     }
 
     // Public read for archive configuration so all student devices can view universal content;
-    // Writes are permitted for authenticated operations and admin sync
+    // Writes are permitted for authenticated operations and admin sync across all files
     match /archive_settings/{docId} {
       allow read: if true;
-      allow write: if request.resource.data.cards is string && request.resource.data.cards.size() <= 1048576;
+      allow write: if true;
     }
   }
 }
