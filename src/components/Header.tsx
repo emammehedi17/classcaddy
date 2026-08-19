@@ -11,6 +11,7 @@ import {
   LogOut,
   Sun,
   Moon,
+  Monitor,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -21,6 +22,7 @@ interface HeaderProps {
   onOpenSignup: () => void;
   theme?: ThemeMode;
   toggleTheme?: () => void;
+  onToggleExplorerMode?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -31,6 +33,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSignup,
   theme = 'light',
   toggleTheme,
+  onToggleExplorerMode,
 }) => {
   const [academicDropdownOpen, setAcademicDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -374,8 +377,25 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
 
-          {/* Right Side: Theme Toggle + DU Logo & Sign Up / User Profile */}
+          {/* Right Side: Theme Toggle + Explorer Mode + DU Logo & Sign Up / User Profile */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Windows 11 File Explorer Toggle Button */}
+            {onToggleExplorerMode && (
+              <button
+                id="header-explorer-mode-toggle-btn"
+                onClick={onToggleExplorerMode}
+                className={`p-2 sm:px-3 sm:py-2 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 shadow-sm ${
+                  isDark
+                    ? 'bg-blue-950/60 hover:bg-blue-900/80 border-blue-800/80 text-blue-300 hover:text-white'
+                    : 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700 hover:text-blue-900'
+                }`}
+                title="Open Windows 11 File Explorer Full Screen Mode"
+              >
+                <Monitor className="w-4 h-4 text-blue-500" />
+                <span className="hidden lg:inline">Explorer</span>
+              </button>
+            )}
+
             {/* Dark / Light Mode Toggle Button */}
             {toggleTheme && (
               <button
@@ -531,6 +551,28 @@ export const Header: React.FC<HeaderProps> = ({
             >
               Archives & Resources
             </button>
+
+            {onToggleExplorerMode && (
+              <button
+                onClick={() => {
+                  onToggleExplorerMode();
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-between ${
+                  isDark
+                    ? 'bg-blue-950/40 text-blue-300 hover:bg-blue-900/60'
+                    : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Monitor className="w-4 h-4 text-blue-500" />
+                  <span>File Explorer Mode</span>
+                </span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 font-semibold uppercase">
+                  Full Screen
+                </span>
+              </button>
+            )}
 
             {/* Mobile Academic Toggle */}
             <div>

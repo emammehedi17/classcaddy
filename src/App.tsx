@@ -25,15 +25,35 @@ export default function App() {
     setIsExplorerMode((prev) => {
       const next = !prev;
       localStorage.setItem('class_caddy_explorer_mode', String(next));
+      
       if (next) {
-        // Request browser-level fullscreen to hide browser bars
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen?.().catch(() => {});
+        // Attempt native HTML5 Fullscreen API with vendor prefixes
+        try {
+          const docEl = document.documentElement as any;
+          const isDocFullscreen = document.fullscreenElement || (document as any).webkitFullscreenElement || (document as any).mozFullScreenElement || (document as any).msFullscreenElement;
+          if (!isDocFullscreen) {
+            const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+            if (req) {
+              req.call(docEl).catch((err: any) => {
+                console.warn('Native requestFullscreen notice (non-fatal, app uses CSS fixed full-screen layout):', err);
+              });
+            }
+          }
+        } catch (e) {
+          // Graceful fallback: the fixed CSS overlay takes care of full screen layout
         }
       } else {
-        // Exit browser-level fullscreen if active
-        if (document.fullscreenElement) {
-          document.exitFullscreen?.().catch(() => {});
+        // Exit native fullscreen if active
+        try {
+          const isDocFullscreen = document.fullscreenElement || (document as any).webkitFullscreenElement || (document as any).mozFullScreenElement || (document as any).msFullscreenElement;
+          if (isDocFullscreen) {
+            const exit = document.exitFullscreen || (document as any).webkitExitFullscreen || (document as any).mozCancelFullScreen || (document as any).msExitFullscreen;
+            if (exit) {
+              exit.call(document).catch(() => {});
+            }
+          }
+        } catch (e) {
+          // Ignore
         }
       }
       return next;
@@ -93,6 +113,7 @@ export default function App() {
           onOpenSignup={() => {}}
           theme={theme}
           toggleTheme={toggleTheme}
+          onToggleExplorerMode={toggleExplorerMode}
         />
       )}
 
