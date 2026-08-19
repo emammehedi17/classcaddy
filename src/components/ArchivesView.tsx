@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArchiveCardButton, ThemeMode } from '../types';
 import { db } from '../lib/firebase';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import {
   GraduationCap,
   BookOpen,
@@ -41,10 +41,15 @@ import {
   Cloud,
   CloudCheck,
   RefreshCw,
+  LayoutGrid,
+  Monitor,
 } from 'lucide-react';
+import { Windows11Explorer } from './Windows11Explorer';
 
 interface ArchivesViewProps {
   theme?: ThemeMode;
+  isExplorerMode?: boolean;
+  onToggleExplorerMode?: () => void;
 }
 
 const STORAGE_KEY = 'class_caddy_archive_buttons';
@@ -494,7 +499,11 @@ const updateCardsAtPath = (
   });
 };
 
-export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) => {
+export const ArchivesView: React.FC<ArchivesViewProps> = ({
+  theme = 'light',
+  isExplorerMode: propExplorerMode,
+  onToggleExplorerMode: propToggleExplorerMode,
+}) => {
   const isDark = theme === 'dark';
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -526,8 +535,20 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
     return INITIAL_CARDS;
   });
 
+  // Keep an active ref for rootCards and folderPath to guarantee async operations and deletions always use the latest snapshot
+  const rootCardsRef = useRef<ArchiveCardButton[]>(rootCards);
+  useEffect(() => {
+    rootCardsRef.current = rootCards;
+  }, [rootCards]);
+
+  const folderPathRef = useRef<string[]>([]);
+  const isSelfSavingRef = useRef<boolean>(false);
+
   // Breadcrumb / Navigation Path State: array of folder Card IDs
   const [folderPath, setFolderPath] = useState<string[]>([]);
+  useEffect(() => {
+    folderPathRef.current = folderPath;
+  }, [folderPath]);
 
   // Calculate current folder's active card object (if in subfolder)
   const currentFolderCard: ArchiveCardButton | null =
@@ -561,8 +582,28 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
   // HTML Viewer Modal State
   const [viewingHtmlCard, setViewingHtmlCard] = useState<ArchiveCardButton | null>(null);
 
+  // File Explorer View Toggle State (Saved in localStorage for both User and Admin)
+  const [internalExplorerMode, setInternalExplorerMode] = useState<boolean>(() => {
+    return localStorage.getItem('class_caddy_explorer_mode') === 'true';
+  });
+
+  const isExplorerMode = propExplorerMode !== undefined ? propExplorerMode : internalExplorerMode;
+
   // Cloud Sync Status: 'idle' | 'syncing' | 'synced' | 'error'
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle');
+
+  // Toggle Explorer Mode Helper
+  const handleToggleExplorerMode = () => {
+    if (propToggleExplorerMode) {
+      propToggleExplorerMode();
+    } else {
+      setInternalExplorerMode((prev) => {
+        const next = !prev;
+        localStorage.setItem('class_caddy_explorer_mode', String(next));
+        return next;
+      });
+    }
+  };
 
   // Real-time Firestore Cloud Sync: Listen for universal changes across all devices & sessions
   useEffect(() => {
@@ -571,6 +612,11 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
       const unsubscribe = onSnapshot(
         docRef,
         async (snapshot) => {
+          // If we just saved locally, ignore echo to prevent race conditions
+          if (isSelfSavingRef.current) {
+            return;
+          }
+
           if (snapshot.exists()) {
             const data = snapshot.data();
             if (data) {
@@ -585,13 +631,14 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
                   }
                   const chunkDocs = await Promise.all(chunkPromises);
                   jsonString = chunkDocs.map((cDoc) => cDoc.data()?.data || '').join('');
-                } else if (data.cards) {
+                } else if (typeof data.cards === 'string') {
                   jsonString = data.cards;
                 }
 
                 if (jsonString) {
                   const cloudCards: ArchiveCardButton[] = JSON.parse(jsonString);
-                  if (Array.isArray(cloudCards) && cloudCards.length > 0) {
+                  if (Array.isArray(cloudCards)) {
+                    rootCardsRef.current = cloudCards;
                     setRootCards(cloudCards);
                     try {
                       localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudCards));
@@ -607,7 +654,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
             }
           } else {
             // First time seeding to cloud if no document exists
-            const initialJson = JSON.stringify(rootCards);
+            const initialJson = JSON.stringify(rootCardsRef.current);
             setDoc(docRef, {
               cards: initialJson,
               updatedAt: new Date().toISOString(),
@@ -713,7 +760,12 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
 
   // Save current view list to nested tree, local storage, and real-time Firestore cloud database
   const saveCurrentCards = async (newCurrentList: ArchiveCardButton[]) => {
-    const updatedRoot = updateCardsAtPath(rootCards, folderPath, newCurrentList);
+    // Always use active ref states to ensure deletions never reference a stale closure
+    const currentRoot = rootCardsRef.current;
+    const currentPath = folderPathRef.current;
+    const updatedRoot = updateCardsAtPath(currentRoot, currentPath, newCurrentList);
+    
+    rootCardsRef.current = updatedRoot;
     setRootCards(updatedRoot);
     const serialized = JSON.stringify(updatedRoot);
     
@@ -726,23 +778,27 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
 
     // Universal cross-device persistence via Firestore
     try {
+      isSelfSavingRef.current = true;
       setSyncStatus('syncing');
 
-      // Check serialized size. If payload is within Firestore single document limit (< 1MB)
+      // Check serialized size. If payload is within Firestore single document limit (< 950KB)
       if (serialized.length < 950000) {
         const docRef = doc(db, 'archive_settings', FIRESTORE_DOC_PATH);
+        
+        // Clean up previous chunk document markers if tree shrunk after file deletion
         await setDoc(
           docRef,
           {
             cards: serialized,
+            isChunked: false,
+            totalChunks: 0,
             updatedAt: new Date().toISOString(),
             updatedBy: 'developer-admin',
-          },
-          { merge: true }
+          }
         );
       } else {
         // For large trees with multiple uploaded PDF/binary files:
-        // We split the large tree into chunks or store file data in indexed collection docs
+        // We split the large tree into chunks
         const chunkSize = 750000;
         const totalChunks = Math.ceil(serialized.length / chunkSize);
         
@@ -766,8 +822,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
             totalChunks,
             updatedAt: new Date().toISOString(),
             updatedBy: 'developer-admin',
-          },
-          { merge: true }
+          }
         );
       }
 
@@ -776,6 +831,11 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
       console.error('Firestore cloud sync notice:', cloudErr);
       setSyncStatus('error');
       alert(`Cloud sync notice: ${cloudErr?.message || 'Could not write file to cloud database. Please verify file size.'}`);
+    } finally {
+      // Re-enable snapshot listener after cloud write propagates
+      setTimeout(() => {
+        isSelfSavingRef.current = false;
+      }, 1000);
     }
   };
 
@@ -1031,7 +1091,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
     const cardToDelete = currentCards.find((c) => c.id === id);
     const isFolder = cardToDelete?.targetType === 'folder';
     const msg = isFolder
-      ? `Are you sure you want to delete this Sub folder "${cardToDelete?.title}" and all its internal buttons?`
+      ? `Are you sure you want to delete this Sub folder "${cardToDelete?.title}" and all its internal items?`
       : `Are you sure you want to delete "${cardToDelete?.title}"?`;
 
     if (window.confirm(msg)) {
@@ -1163,181 +1223,231 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
   };
 
   return (
-    <div id="archives-section" className="container mx-auto px-4 md:px-6 py-8 max-w-6xl">
-      {/* Breadcrumb Trail & Sub-folder Navigation Header */}
-      {folderPath.length > 0 && (
-        <div className="mb-6 flex flex-wrap items-center gap-2 text-xs sm:text-sm font-medium animate-in fade-in duration-200">
-          <button
-            onClick={() => navigateToFolder([])}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition ${
-              isDark
-                ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700'
-                : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border-slate-300 shadow-sm'
-            }`}
-          >
-            <Home className="w-3.5 h-3.5" />
-            <span>Archives Home</span>
-          </button>
-
-          {breadcrumbTrail.map((crumb, idx) => {
-            const isLast = idx === breadcrumbTrail.length - 1;
-            return (
-              <React.Fragment key={crumb.id}>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-                <button
-                  onClick={() => navigateToFolder(crumb.path)}
-                  disabled={isLast}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition ${
-                    isLast
-                      ? isDark
-                        ? 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300 font-bold'
-                        : 'bg-emerald-50 border-emerald-300 text-emerald-800 font-bold shadow-sm'
-                      : isDark
-                      ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700'
-                      : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border-slate-300 shadow-sm'
-                  }`}
-                >
-                  <FolderOpen className="w-3.5 h-3.5" />
-                  <span>{crumb.title}</span>
-                </button>
-              </React.Fragment>
-            );
-          })}
-
-          <button
-            onClick={navigateBackToParent}
-            className={`ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition text-xs font-semibold ${
-              isDark
-                ? 'bg-gray-800 hover:bg-gray-700 text-emerald-400 border-gray-700'
-                : 'bg-white hover:bg-slate-50 text-emerald-700 border-slate-300 shadow-sm'
-            }`}
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Parent</span>
-          </button>
+    <div
+      id="archives-section"
+      className={
+        isExplorerMode
+          ? 'w-full h-full p-0 m-0'
+          : 'container mx-auto px-4 md:px-6 py-8 max-w-6xl'
+      }
+    >
+      {/* If File Explorer Mode is Enabled: Render pure full screen Windows 11 Explorer interface */}
+      {isExplorerMode ? (
+        <div className="w-full h-full fixed inset-0 z-50 overflow-hidden animate-in fade-in duration-200">
+          <Windows11Explorer
+            cards={currentCards}
+            rootCards={rootCards}
+            folderPath={folderPath}
+            isDark={isDark}
+            isAdmin={isDeveloperMode}
+            onNavigateFolder={navigateToFolder}
+            onNavigateBack={navigateBackToParent}
+            onCardClick={handleCardClick}
+            onOpenAddModal={handleOpenAdd}
+            onOpenEditModal={handleOpenEdit}
+            onDeleteCard={handleDeleteCard}
+            onSaveCurrentCards={saveCurrentCards}
+            onOpenUpload={() => {
+              handleOpenAdd();
+              setFormTargetType('file');
+              setTimeout(() => {
+                fileInputRef.current?.click();
+              }, 150);
+            }}
+            onCloseExplorer={handleToggleExplorerMode}
+          />
         </div>
-      )}
-
-      {/* Top Banner & Title Area */}
-      <div
-        className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b transition-colors ${
-          isDark ? 'border-gray-800' : 'border-slate-200'
-        }`}
-      >
-        <div>
-          <div className="flex items-center gap-2.5">
-            <h2
-              className={`text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2.5 ${
-                isDark ? 'text-white' : 'text-slate-900'
-              }`}
-            >
-              {currentFolderCard ? (
-                <>
-                  <Folder className="w-7 h-7 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span>{currentFolderCard.title}</span>
-                </>
-              ) : (
-                'Archives & Resources'
-              )}
-            </h2>
-            <span
-              className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border ${
-                isDark
-                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                  : 'bg-emerald-100 text-emerald-800 border-emerald-200'
-              }`}
-            >
-              {currentCards.length} {currentCards.length === 1 ? 'Item' : 'Items'}
-            </span>
-          </div>
-          <p className={`text-sm mt-1.5 ${isDark ? 'text-gray-400' : 'text-slate-600'}`}>
-            {currentFolderCard?.subtitle ||
-              'Access curated examination portals, study materials, sub folders, and academic links.'}
-          </p>
-        </div>
-
-        {/* Developer Mode Action & Cloud Sync Indicator */}
-        <div className="flex items-center gap-2 self-end sm:self-auto flex-wrap justify-end">
-          {/* Universal Cloud Sync Badge */}
-          <div
-            className={`flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-full border transition ${
-              syncStatus === 'synced'
-                ? isDark
-                  ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-400'
-                  : 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                : syncStatus === 'syncing'
-                ? isDark
-                  ? 'bg-blue-950/40 border-blue-800/60 text-blue-400'
-                  : 'bg-blue-50 border-blue-200 text-blue-700'
-                : isDark
-                ? 'bg-gray-800 border-gray-700 text-gray-400'
-                : 'bg-slate-100 border-slate-300 text-slate-600'
-            }`}
-            title="Real-time Universal Cloud Database Synchronization across all devices"
-          >
-            {syncStatus === 'syncing' ? (
-              <RefreshCw className="w-3 h-3 animate-spin text-blue-500" />
-            ) : (
-              <Cloud className="w-3 h-3 text-emerald-500" />
-            )}
-            <span>
-              {syncStatus === 'syncing'
-                ? 'Syncing to Cloud...'
-                : syncStatus === 'synced'
-                ? 'Universal Sync Active'
-                : 'Cloud Connected'}
-            </span>
-          </div>
-
-          {isDeveloperMode ? (
-            <div
-              className={`flex items-center gap-2 border rounded-full px-3 py-1.5 shadow-sm ${
-                isDark
-                  ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-300'
-                  : 'bg-emerald-50 border-emerald-300 text-emerald-800'
-              }`}
-            >
-              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 animate-pulse" />
-              <span className="text-xs font-semibold">Developer Mode Active</span>
+      ) : (
+        <>
+          {/* Breadcrumb Trail & Sub-folder Navigation Header */}
+          {folderPath.length > 0 && (
+            <div className="mb-6 flex flex-wrap items-center gap-2 text-xs sm:text-sm font-medium animate-in fade-in duration-200">
               <button
-                id="open-admin-panel-btn"
-                onClick={() => setShowAdminPanel(!showAdminPanel)}
-                className={`ml-2 px-2.5 py-1 text-xs text-white font-medium rounded-full transition shadow-sm ${
+                onClick={() => navigateToFolder([])}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition ${
                   isDark
-                    ? 'bg-emerald-600 hover:bg-emerald-500'
-                    : 'bg-emerald-700 hover:bg-emerald-800'
+                    ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700'
+                    : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border-slate-300 shadow-sm'
                 }`}
-                title="Open Admin Control Panel"
               >
-                <Settings className="w-3.5 h-3.5 inline mr-1" />
-                Admin Panel
+                <Home className="w-3.5 h-3.5" />
+                <span>Archives Home</span>
               </button>
+
+              {breadcrumbTrail.map((crumb, idx) => {
+                const isLast = idx === breadcrumbTrail.length - 1;
+                return (
+                  <React.Fragment key={crumb.id}>
+                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <button
+                      onClick={() => navigateToFolder(crumb.path)}
+                      disabled={isLast}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition ${
+                        isLast
+                          ? isDark
+                            ? 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300 font-bold'
+                            : 'bg-emerald-50 border-emerald-300 text-emerald-800 font-bold shadow-sm'
+                          : isDark
+                          ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700'
+                          : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border-slate-300 shadow-sm'
+                      }`}
+                    >
+                      <FolderOpen className="w-3.5 h-3.5" />
+                      <span>{crumb.title}</span>
+                    </button>
+                  </React.Fragment>
+                );
+              })}
+
               <button
-                id="lock-developer-mode-btn"
-                onClick={handleLogoutDeveloper}
-                className="p-1 hover:text-red-500 text-gray-400 transition"
-                title="Lock Developer Mode"
+                onClick={navigateBackToParent}
+                className={`ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition text-xs font-semibold ${
+                  isDark
+                    ? 'bg-gray-800 hover:bg-gray-700 text-emerald-400 border-gray-700'
+                    : 'bg-white hover:bg-slate-50 text-emerald-700 border-slate-300 shadow-sm'
+                }`}
               >
-                <Lock className="w-3.5 h-3.5" />
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back to Parent</span>
               </button>
             </div>
-          ) : (
-            <button
-              id="developer-panel-auth-trigger-btn"
-              onClick={() => setShowAuthModal(true)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border transition ${
-                isDark
-                  ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700'
-                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-300'
-              }`}
-              title="Developer Access to edit cards, sub folders, and resources"
-            >
-              <Lock className={`w-3.5 h-3.5 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`} />
-              <span>Developer Panel</span>
-            </button>
           )}
-        </div>
-      </div>
+
+          {/* Top Banner & Title Area */}
+          <div
+            className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b transition-colors ${
+              isDark ? 'border-gray-800' : 'border-slate-200'
+            }`}
+          >
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h2
+                  className={`text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2.5 ${
+                    isDark ? 'text-white' : 'text-slate-900'
+                  }`}
+                >
+                  {currentFolderCard ? (
+                    <>
+                      <Folder className="w-7 h-7 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <span>{currentFolderCard.title}</span>
+                    </>
+                  ) : (
+                    'Archives & Resources'
+                  )}
+                </h2>
+                <span
+                  className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border ${
+                    isDark
+                      ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                      : 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                  }`}
+                >
+                  {currentCards.length} {currentCards.length === 1 ? 'Item' : 'Items'}
+                </span>
+              </div>
+              <p className={`text-sm mt-1.5 ${isDark ? 'text-gray-400' : 'text-slate-600'}`}>
+                {currentFolderCard?.subtitle ||
+                  'Access curated examination portals, study materials, sub folders, and academic links.'}
+              </p>
+            </div>
+
+            {/* Developer Mode Action, Explorer Mode Toggle, & Cloud Sync Indicator */}
+            <div className="flex items-center gap-2 self-end sm:self-auto flex-wrap justify-end">
+              {/* Windows 11 File Explorer View Toggle Button (For Both Admin and Students/Users) */}
+              <button
+                id="toggle-windows-file-explorer-btn"
+                onClick={handleToggleExplorerMode}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full border transition shadow-sm ${
+                  isDark
+                    ? 'bg-blue-600/30 hover:bg-blue-600 text-blue-300 hover:text-white border-blue-500/50'
+                    : 'bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border-blue-300'
+                }`}
+                title="Switch to Windows 11 File Explorer Full Screen Mode"
+              >
+                <Monitor className="w-3.5 h-3.5 text-blue-400" />
+                <span>File Explorer View</span>
+              </button>
+
+              {/* Universal Cloud Sync Badge */}
+              <div
+                className={`flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-full border transition ${
+                  syncStatus === 'synced'
+                    ? isDark
+                      ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-400'
+                      : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                    : syncStatus === 'syncing'
+                    ? isDark
+                      ? 'bg-blue-950/40 border-blue-800/60 text-blue-400'
+                      : 'bg-blue-50 border-blue-200 text-blue-700'
+                    : isDark
+                    ? 'bg-gray-800 border-gray-700 text-gray-400'
+                    : 'bg-slate-100 border-slate-300 text-slate-600'
+                }`}
+                title="Real-time Universal Cloud Database Synchronization across all devices"
+              >
+                {syncStatus === 'syncing' ? (
+                  <RefreshCw className="w-3 h-3 animate-spin text-blue-500" />
+                ) : (
+                  <Cloud className="w-3 h-3 text-emerald-500" />
+                )}
+                <span>
+                  {syncStatus === 'syncing'
+                    ? 'Syncing to Cloud...'
+                    : syncStatus === 'synced'
+                    ? 'Universal Sync Active'
+                    : 'Cloud Connected'}
+                </span>
+              </div>
+
+              {isDeveloperMode ? (
+                <div
+                  className={`flex items-center gap-2 border rounded-full px-3 py-1.5 shadow-sm ${
+                    isDark
+                      ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-300'
+                      : 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                  }`}
+                >
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 animate-pulse" />
+                  <span className="text-xs font-semibold">Developer Mode Active</span>
+                  <button
+                    id="open-admin-panel-btn"
+                    onClick={() => setShowAdminPanel(!showAdminPanel)}
+                    className={`ml-2 px-2.5 py-1 text-xs text-white font-medium rounded-full transition shadow-sm ${
+                      isDark
+                        ? 'bg-emerald-600 hover:bg-emerald-500'
+                        : 'bg-emerald-700 hover:bg-emerald-800'
+                    }`}
+                    title="Open Admin Control Panel"
+                  >
+                    <Settings className="w-3.5 h-3.5 inline mr-1" />
+                    Admin Panel
+                  </button>
+                  <button
+                    id="lock-developer-mode-btn"
+                    onClick={handleLogoutDeveloper}
+                    className="p-1 hover:text-red-500 text-gray-400 transition"
+                    title="Lock Developer Mode"
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  id="developer-panel-auth-trigger-btn"
+                  onClick={() => setShowAuthModal(true)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border transition ${
+                    isDark
+                      ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700'
+                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border-slate-300'
+                  }`}
+                  title="Developer Access to edit cards, sub folders, and resources"
+                >
+                  <Lock className={`w-3.5 h-3.5 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                  <span>Developer Panel</span>
+                </button>
+              )}
+            </div>
+          </div>
 
       {/* Developer Quick Action Bar */}
       {isDeveloperMode && (
@@ -1611,7 +1721,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
         </div>
       )}
 
-      {/* Main Grid of Buttons & Cards (Empty State vs Grid) */}
+      {/* Main View: Standard Card Grid (when not in explorer mode) */}
       {currentCards.length === 0 ? (
         <div
           className={`mt-10 p-12 rounded-3xl border-2 border-dashed text-center flex flex-col items-center justify-center gap-4 ${
@@ -1824,6 +1934,8 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
             );
           })}
         </div>
+      )}
+        </>
       )}
 
       {/* Embedded HTML Interactive Full-Screen Modal Viewer */}
@@ -2364,44 +2476,63 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({ theme = 'light' }) =
               )}
 
               {/* Actions */}
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-gray-700/50 dark:border-gray-800">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingCard(null);
-                    setIsAddMode(false);
-                  }}
-                  className={`px-4 py-2 font-medium rounded-lg ${
-                    isDark ? 'text-gray-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={
-                    !formTitle.trim() ||
-                    (formTargetType === 'html' && !formHtmlContent.trim()) ||
-                    (formTargetType === 'file' && !formFileData.trim() && !formHtmlContent.trim()) ||
-                    (formTargetType === 'url' && !formLink.trim())
-                  }
-                  className={`px-5 py-2 text-white font-semibold rounded-lg shadow-md transition flex items-center gap-1.5 disabled:opacity-50 ${
-                    formTargetType === 'folder'
-                      ? 'bg-amber-600 hover:bg-amber-700'
-                      : isDark
-                      ? 'bg-emerald-500 hover:bg-emerald-600'
-                      : 'bg-emerald-600 hover:bg-emerald-700'
-                  }`}
-                >
-                  <Check className="w-4 h-4" />
-                  <span>
-                    {isAddMode
-                      ? formTargetType === 'folder'
-                        ? 'Create Sub Folder'
-                        : 'Create Button Card'
-                      : 'Save Changes'}
-                  </span>
-                </button>
+              <div className="flex items-center justify-between gap-2 pt-3 border-t border-gray-700/50 dark:border-gray-800">
+                <div>
+                  {!isAddMode && editingCard && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const idToDelete = editingCard.id;
+                        setEditingCard(null);
+                        handleDeleteCard(idToDelete);
+                      }}
+                      className="px-3 py-2 text-xs font-semibold rounded-lg bg-red-100 hover:bg-red-600 dark:bg-red-950/60 dark:hover:bg-red-600 text-red-600 dark:text-red-300 hover:text-white transition flex items-center gap-1.5"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete</span>
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingCard(null);
+                      setIsAddMode(false);
+                    }}
+                    className={`px-4 py-2 font-medium rounded-lg ${
+                      isDark ? 'text-gray-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={
+                      !formTitle.trim() ||
+                      (formTargetType === 'html' && !formHtmlContent.trim()) ||
+                      (formTargetType === 'file' && !formFileData.trim() && !formHtmlContent.trim()) ||
+                      (formTargetType === 'url' && !formLink.trim())
+                    }
+                    className={`px-5 py-2 text-white font-semibold rounded-lg shadow-md transition flex items-center gap-1.5 disabled:opacity-50 ${
+                      formTargetType === 'folder'
+                        ? 'bg-amber-600 hover:bg-amber-700'
+                        : isDark
+                        ? 'bg-emerald-500 hover:bg-emerald-600'
+                        : 'bg-emerald-600 hover:bg-emerald-700'
+                    }`}
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>
+                      {isAddMode
+                        ? formTargetType === 'folder'
+                          ? 'Create Sub Folder'
+                          : 'Create Button Card'
+                        : 'Save Changes'}
+                    </span>
+                  </button>
+                </div>
               </div>
             </form>
           </div>

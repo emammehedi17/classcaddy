@@ -16,6 +16,30 @@ export default function App() {
     return savedTheme === 'dark' ? 'dark' : 'light';
   });
 
+  // Windows 11 File Explorer Full-Screen Mode
+  const [isExplorerMode, setIsExplorerMode] = useState<boolean>(() => {
+    return localStorage.getItem('class_caddy_explorer_mode') === 'true';
+  });
+
+  const toggleExplorerMode = () => {
+    setIsExplorerMode((prev) => {
+      const next = !prev;
+      localStorage.setItem('class_caddy_explorer_mode', String(next));
+      if (next) {
+        // Request browser-level fullscreen to hide browser bars
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen?.().catch(() => {});
+        }
+      } else {
+        // Exit browser-level fullscreen if active
+        if (document.fullscreenElement) {
+          document.exitFullscreen?.().catch(() => {});
+        }
+      }
+      return next;
+    });
+  };
+
   const [user, setUser] = useState<UserProfile>(() => {
     const saved = localStorage.getItem('class_caddy_user');
     if (saved) {
@@ -56,35 +80,50 @@ export default function App() {
         isDark ? 'bg-gray-900 text-white' : 'bg-slate-50 text-slate-900'
       }`}
     >
-      {/* Header */}
-      <Header
-        currentPage={currentPage}
-        setCurrentPage={(page) => {
-          setCurrentPage(page);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        user={user}
-        onLogout={handleLogout}
-        onOpenSignup={() => {}}
-        theme={theme}
-        toggleTheme={toggleTheme}
-      />
+      {/* Header (Hidden when File Explorer Fullscreen Mode is active) */}
+      {!isExplorerMode && (
+        <Header
+          currentPage={currentPage}
+          setCurrentPage={(page) => {
+            setCurrentPage(page);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          user={user}
+          onLogout={handleLogout}
+          onOpenSignup={() => {}}
+          theme={theme}
+          toggleTheme={toggleTheme}
+        />
+      )}
 
       {/* Main Content Area */}
-      <main id="main-content" className="flex-grow pt-24 pb-16">
+      <main
+        id="main-content"
+        className={`flex-grow ${
+          isExplorerMode
+            ? 'p-0 m-0 w-screen h-screen fixed inset-0 z-50 overflow-hidden'
+            : 'pt-24 pb-16'
+        }`}
+      >
         {(currentPage === 'archives' || currentPage === 'home') && (
-          <ArchivesView theme={theme} />
+          <ArchivesView
+            theme={theme}
+            isExplorerMode={isExplorerMode}
+            onToggleExplorerMode={toggleExplorerMode}
+          />
         )}
       </main>
 
-      {/* Footer */}
-      <Footer
-        onNavigate={(page) => {
-          setCurrentPage(page);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        theme={theme}
-      />
+      {/* Footer (Hidden when File Explorer Fullscreen Mode is active) */}
+      {!isExplorerMode && (
+        <Footer
+          onNavigate={(page) => {
+            setCurrentPage(page);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          theme={theme}
+        />
+      )}
     </div>
   );
 }
