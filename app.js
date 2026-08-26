@@ -456,20 +456,6 @@
                 console.log("User logged in:", userId);
                 console.log("Is Guest Mode:", isGuestMode); 
 
-                // Sync with global localStorage for other pages
-                const userProfile = {
-                    uid: user.uid,
-                    name: user.displayName || (isGuestMode ? 'Guest Learner' : 'User'),
-                    displayName: user.displayName || (isGuestMode ? 'Guest Learner' : 'User'),
-                    email: user.email || (user.isAnonymous ? 'Guest' : ''),
-                    photoURL: user.photoURL || null,
-                    isLoggedIn: true
-                };
-                try {
-                    localStorage.setItem('cc_auth_user', JSON.stringify(userProfile));
-                    localStorage.setItem('class_caddy_user', JSON.stringify(userProfile));
-                } catch(e) {}
-
                 loginPrompt.style.display = 'none';
                 userInfo.classList.remove('hidden');
                 userDisplay.textContent = user.displayName || 'User';
@@ -543,10 +529,6 @@
                 currentUser = null;
                 userId = null;
                 window._currentUserId = null;
-                try {
-                    localStorage.removeItem('cc_auth_user');
-                    localStorage.removeItem('class_caddy_user');
-                } catch(e) {}
                 // Clear streak/goal/history data so next account starts fresh
                 ['studyStreak_v1', 'studyDailyGoal_v1', 'studyDayHistory_v1'].forEach(base => {
                     Object.keys(localStorage).filter(k => k.startsWith(base)).forEach(k => localStorage.removeItem(k));
@@ -9904,7 +9886,7 @@ if (viewMcqFullscreenBtn && viewMcqModalContent) {
 
 // 1. Global State
 let globalSettings = {
-    darkMode: (localStorage.getItem('class_caddy_theme') === 'dark' || document.documentElement.classList.contains('dark')),
+    darkMode: false,
     fontSize: 16
 };
 
@@ -9933,24 +9915,8 @@ function initSettingsSync(userId) {
 // 3. Apply Settings to Screen
 function applySettingsToDom() {
     // Dark Mode
-    if (globalSettings.darkMode) {
-        document.body.classList.add('dark-mode');
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('class_caddy_theme', 'dark');
-    } else {
-        document.body.classList.remove('dark-mode');
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('class_caddy_theme', 'light');
-    }
-    
-    // Update global dark mode button icon if present
-    const darkBtn = document.getElementById('global-dark-mode-btn');
-    if (darkBtn) {
-        darkBtn.innerHTML = globalSettings.darkMode 
-            ? '<i class="fas fa-sun text-2xl text-amber-400"></i>' 
-            : '<i class="fas fa-moon text-2xl text-yellow-400"></i>';
-        darkBtn.title = globalSettings.darkMode ? "Switch to Light Mode" : "Switch to Dark Mode";
-    }
+    if (globalSettings.darkMode) document.body.classList.add('dark-mode');
+    else document.body.classList.remove('dark-mode');
 
     // Font Size (Apply to Study & View modals)
     ['mcq-study-content', 'view-mcq-content'].forEach(id => {
@@ -9988,15 +9954,9 @@ async function saveUserPreferences() {
 // 5. Global Dark Mode Button Listener
 const globalDarkBtn = document.getElementById('global-dark-mode-btn');
 if (globalDarkBtn) {
-    globalDarkBtn.addEventListener('click', (e) => {
-        if (e) e.preventDefault();
-        if (typeof window.toggleGlobalTheme === 'function') {
-            window.toggleGlobalTheme();
-            globalSettings.darkMode = document.documentElement.classList.contains('dark');
-        } else {
-            globalSettings.darkMode = !globalSettings.darkMode;
-            applySettingsToDom();
-        }
+    globalDarkBtn.addEventListener('click', () => {
+        globalSettings.darkMode = !globalSettings.darkMode;
+        applySettingsToDom();
         saveUserPreferences();
     });
 }
