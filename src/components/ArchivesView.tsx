@@ -43,12 +43,8 @@ import {
   RefreshCw,
   LayoutGrid,
   Monitor,
-  Files,
-  UploadCloud,
-  AlertCircle,
 } from 'lucide-react';
 import { Windows11Explorer } from './Windows11Explorer';
-import { getArchiveTreeFromIDB, saveArchiveTreeToIDB } from '../lib/idbCache';
 
 interface ArchivesViewProps {
   theme?: ThemeMode;
@@ -595,27 +591,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
 
   // Cloud Sync Status: 'idle' | 'syncing' | 'synced' | 'error'
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle');
-  const [isCloudSyncing, setIsCloudSyncing] = useState<boolean>(true);
-
-  // High-performance asynchronous cache load from IndexedDB (ideal for iOS Safari / WebKit persistence)
-  useEffect(() => {
-    let isMounted = true;
-    getArchiveTreeFromIDB()
-      .then((cachedCards) => {
-        if (isMounted && cachedCards && Array.isArray(cachedCards) && cachedCards.length > 0) {
-          rootCardsRef.current = cachedCards;
-          setRootCards(cachedCards);
-          setIsCloudSyncing(false);
-        }
-      })
-      .catch((err) => {
-        console.warn('IndexedDB initial load notice:', err);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   // Toggle Explorer Mode Helper
   const handleToggleExplorerMode = () => {
@@ -665,20 +640,16 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                   if (Array.isArray(cloudCards)) {
                     rootCardsRef.current = cloudCards;
                     setRootCards(cloudCards);
-                    // Persist to both IndexedDB (unlimited reliable storage on iOS Safari) and localStorage
-                    saveArchiveTreeToIDB(cloudCards);
                     try {
                       localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudCards));
                     } catch (lsErr) {
                       console.warn('Local storage size notice:', lsErr);
                     }
                     setSyncStatus('synced');
-                    setIsCloudSyncing(false);
                   }
                 }
               } catch (parseErr) {
                 console.error('Error parsing cloud archive tree:', parseErr);
-                setIsCloudSyncing(false);
               }
             }
           } else {
@@ -691,20 +662,17 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
             }).catch((err) => {
               console.warn('Initial cloud seed notice:', err);
             });
-            setIsCloudSyncing(false);
           }
         },
         (error) => {
           console.warn('Firestore onSnapshot subscription notice:', error);
-          // Gracefully fallback to local storage / IDB
-          setIsCloudSyncing(false);
+          // Gracefully fallback to local storage
         }
       );
 
       return () => unsubscribe();
     } catch (err) {
       console.warn('Firestore initialization notice:', err);
-      setIsCloudSyncing(false);
     }
   }, []);
 
@@ -790,26 +758,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
   const [formBadge, setFormBadge] = useState('');
   const [fileReadError, setFileReadError] = useState('');
 
-  // Multi-File Batch Upload Modal State (Admin can upload multiple files at once, each separately created)
-  const [showMultiUploadModal, setShowMultiUploadModal] = useState(false);
-  const [multiUploadFiles, setMultiUploadFiles] = useState<
-    Array<{
-      file: File;
-      id: string;
-      title: string;
-      subtitle: string;
-      status: 'pending' | 'reading' | 'ready' | 'error';
-      errorMsg?: string;
-      fileData?: string;
-      fileType?: string;
-      fileName?: string;
-      iconName: ArchiveCardButton['iconName'];
-      colorTheme: ArchiveCardButton['colorTheme'];
-    }>
-  >([]);
-  const [isBatchUploading, setIsBatchUploading] = useState(false);
-  const multiFileInputRef = useRef<HTMLInputElement | null>(null);
-
   // Save current view list to nested tree, local storage, and real-time Firestore cloud database
   const saveCurrentCards = async (newCurrentList: ArchiveCardButton[]) => {
     // Always use active ref states to ensure deletions never reference a stale closure
@@ -821,9 +769,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
     setRootCards(updatedRoot);
     const serialized = JSON.stringify(updatedRoot);
     
-    // Save to high-capacity IndexedDB cache immediately (bypasses iOS Safari 5MB localStorage limit)
-    saveArchiveTreeToIDB(updatedRoot);
-
     // Save to local cache immediately
     try {
       localStorage.setItem(STORAGE_KEY, serialized);
@@ -978,166 +923,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
     setEditingCard(null);
   };
 
-  // Infer default icon for a given filename
-  const getFileIconName = (fileName: string, mimeType?: string): ArchiveCardButton['iconName'] => {
-    const ext = fileName.split('.').pop()?.toLowerCase() || '';
-    if (ext === 'pdf') return 'BookOpen';
-    if (['doc', 'docx', 'txt', 'rtf', 'odt', 'pages'].includes(ext)) return 'FileText';
-    if (['html', 'htm', 'json', 'xml', 'js', 'css', 'ts', 'jsx', 'tsx'].includes(ext)) return 'Sparkles';
-    if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp'].includes(ext)) return 'Sparkles';
-    if (['xls', 'xlsx', 'csv'].includes(ext)) return 'Layers';
-    if (['ppt', 'pptx'].includes(ext)) return 'GraduationCap';
-    if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) return 'Briefcase';
-    if (mimeType?.includes('html')) return 'Sparkles';
-    return 'FileText';
-  };
-
-  // Handle Multi-File Selection & Reading
-  const handleMultiFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    const fileList: File[] = Array.from(files);
-    
-    // Initial entries with pending status
-    const newEntries = fileList.map((file: File, idx: number) => {
-      const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-      const defaultIcon = getFileIconName(file.name, file.type);
-      return {
-        file,
-        id: `batch-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 5)}`,
-        title: nameWithoutExt.toUpperCase(),
-        subtitle: `${(file.size / 1024).toFixed(1)} KB • ${file.type || file.name.split('.').pop()?.toUpperCase() || 'File'}`,
-        status: (file.size > 3 * 1024 * 1024 ? 'error' : 'pending') as 'pending' | 'reading' | 'ready' | 'error',
-        errorMsg: file.size > 3 * 1024 * 1024 ? 'Exceeds 3MB limit for fast cloud sync' : undefined,
-        fileName: file.name,
-        fileType: file.type || 'application/octet-stream',
-        iconName: defaultIcon,
-        colorTheme: 'emerald' as ArchiveCardButton['colorTheme'],
-      };
-    });
-
-    setMultiUploadFiles((prev) => [...prev, ...newEntries]);
-    setShowMultiUploadModal(true);
-
-    // Read each file asynchronously
-    newEntries.forEach((entry) => {
-      if (entry.status === 'error') return;
-
-      const file: File = entry.file;
-      const isTextHtml = file.type.includes('html') || file.name.endsWith('.html') || file.name.endsWith('.htm');
-
-      if (isTextHtml) {
-        const textReader = new FileReader();
-        textReader.onload = (event) => {
-          const text = (event.target?.result as string) || '';
-          setMultiUploadFiles((curr) =>
-            curr.map((item) =>
-              item.id === entry.id
-                ? { ...item, status: 'ready', fileData: text }
-                : item
-            )
-          );
-        };
-        textReader.onerror = () => {
-          setMultiUploadFiles((curr) =>
-            curr.map((item) =>
-              item.id === entry.id
-                ? { ...item, status: 'error', errorMsg: 'Failed to read file' }
-                : item
-            )
-          );
-        };
-        textReader.readAsText(file);
-      } else {
-        const dataUrlReader = new FileReader();
-        dataUrlReader.onload = (event) => {
-          const dataUrl = (event.target?.result as string) || '';
-          setMultiUploadFiles((curr) =>
-            curr.map((item) =>
-              item.id === entry.id
-                ? { ...item, status: 'ready', fileData: dataUrl }
-                : item
-            )
-          );
-        };
-        dataUrlReader.onerror = () => {
-          setMultiUploadFiles((curr) =>
-            curr.map((item) =>
-              item.id === entry.id
-                ? { ...item, status: 'error', errorMsg: 'Failed to read file' }
-                : item
-            )
-          );
-        };
-        dataUrlReader.readAsDataURL(file);
-      }
-    });
-
-    // Reset native input so user can choose again if needed
-    if (e.target) {
-      e.target.value = '';
-    }
-  };
-
-  // Remove a single item from the batch upload queue
-  const handleRemoveMultiUploadFile = (id: string) => {
-    setMultiUploadFiles((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  // Update a field for a single batch item (e.g. title, theme, icon)
-  const handleUpdateMultiUploadItem = (
-    id: string,
-    updates: Partial<(typeof multiUploadFiles)[0]>
-  ) => {
-    setMultiUploadFiles((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, ...updates } : item))
-    );
-  };
-
-  // Confirm and upload all valid files in the batch queue as separate cards
-  const handleConfirmBatchUpload = async () => {
-    const readyItems = multiUploadFiles.filter(
-      (item) => item.status === 'ready' && item.fileData && item.title.trim()
-    );
-
-    if (readyItems.length === 0) return;
-
-    setIsBatchUploading(true);
-
-    const now = Date.now();
-    const newCards: ArchiveCardButton[] = readyItems.map((item, index) => {
-      const isHtml =
-        item.fileType?.includes('html') ||
-        item.fileName?.endsWith('.html') ||
-        item.fileName?.endsWith('.htm');
-
-      return {
-        id: `card-${now + index}-${Math.random().toString(36).substr(2, 6)}`,
-        title: item.title.trim(),
-        subtitle: item.subtitle.trim(),
-        targetType: isHtml ? 'html' : 'file',
-        htmlContent: isHtml ? item.fileData : undefined,
-        fileName: item.fileName,
-        fileType: item.fileType,
-        fileData: item.fileData,
-        openInNewTab: true,
-        iconName: item.iconName,
-        colorTheme: item.colorTheme,
-        badgeText: '',
-        createdAt: now + index,
-      };
-    });
-
-    const updatedList = [...currentCards, ...newCards];
-    await saveCurrentCards(updatedList);
-
-    setIsBatchUploading(false);
-    setShowMultiUploadModal(false);
-    setMultiUploadFiles([]);
-  };
-
-  // Handle File Selection for Single File Edit/Add Modal
+  // Handle File Selection for Any File Type (.html, .pdf, .docx, .png, .jpg, .zip, etc.)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     setFileReadError('');
@@ -1454,7 +1240,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
             folderPath={folderPath}
             isDark={isDark}
             isAdmin={isDeveloperMode}
-            isCloudSyncing={isCloudSyncing}
             onNavigateFolder={navigateToFolder}
             onNavigateBack={navigateBackToParent}
             onCardClick={handleCardClick}
@@ -1468,9 +1253,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
               setTimeout(() => {
                 fileInputRef.current?.click();
               }, 150);
-            }}
-            onOpenMultiUpload={() => {
-              multiFileInputRef.current?.click();
             }}
             onCloseExplorer={handleToggleExplorerMode}
           />
@@ -1589,29 +1371,27 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
               {/* Universal Cloud Sync Badge */}
               <div
                 className={`flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-full border transition ${
-                  isCloudSyncing || syncStatus === 'syncing'
-                    ? isDark
-                      ? 'bg-blue-950/40 border-blue-800/60 text-blue-400'
-                      : 'bg-blue-50 border-blue-200 text-blue-700'
-                    : syncStatus === 'synced'
+                  syncStatus === 'synced'
                     ? isDark
                       ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-400'
                       : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                    : syncStatus === 'syncing'
+                    ? isDark
+                      ? 'bg-blue-950/40 border-blue-800/60 text-blue-400'
+                      : 'bg-blue-50 border-blue-200 text-blue-700'
                     : isDark
                     ? 'bg-gray-800 border-gray-700 text-gray-400'
                     : 'bg-slate-100 border-slate-300 text-slate-600'
                 }`}
                 title="Real-time Universal Cloud Database Synchronization across all devices"
               >
-                {isCloudSyncing || syncStatus === 'syncing' ? (
+                {syncStatus === 'syncing' ? (
                   <RefreshCw className="w-3 h-3 animate-spin text-blue-500" />
                 ) : (
                   <Cloud className="w-3 h-3 text-emerald-500" />
                 )}
                 <span>
-                  {isCloudSyncing
-                    ? 'Loading Cloud Data...'
-                    : syncStatus === 'syncing'
+                  {syncStatus === 'syncing'
                     ? 'Syncing to Cloud...'
                     : syncStatus === 'synced'
                     ? 'Universal Sync Active'
@@ -1697,20 +1477,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
               }`}
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Add Item</span>
-            </button>
-            <button
-              id="quick-multi-upload-files-btn"
-              onClick={() => multiFileInputRef.current?.click()}
-              className={`px-3 py-1.5 text-white font-semibold rounded-lg shadow-sm transition flex items-center gap-1 ${
-                isDark
-                  ? 'bg-purple-600 hover:bg-purple-500'
-                  : 'bg-purple-700 hover:bg-purple-800'
-              }`}
-              title="Upload multiple files at once as individual cards"
-            >
-              <Files className="w-3.5 h-3.5" />
-              <span>Upload Multiple Files</span>
+              <span>Add Button / Sub Folder</span>
             </button>
             <button
               id="toggle-admin-management-tray-btn"
@@ -1954,31 +1721,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
         </div>
       )}
 
-      {/* Real-time Cloud Sync Banner if currently synchronizing */}
-      {isCloudSyncing && folderPath.length === 0 && (
-        <div
-          id="cloud-sync-status-banner"
-          className={`mt-6 p-3.5 rounded-2xl border flex items-center justify-between gap-3 text-xs shadow-sm animate-in fade-in duration-300 ${
-            isDark
-              ? 'bg-blue-950/30 border-blue-800/40 text-blue-300'
-              : 'bg-blue-50/80 border-blue-200 text-blue-800'
-          }`}
-        >
-          <div className="flex items-center gap-2.5">
-            <RefreshCw className="w-4 h-4 text-blue-500 animate-spin shrink-0" />
-            <div>
-              <span className="font-semibold">Loading cloud folders & archive items...</span>
-              <p className="text-[11px] opacity-75 mt-0.5">
-                Loaded initial cache. Synchronizing full folder hierarchy from the cloud database.
-              </p>
-            </div>
-          </div>
-          <span className="text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded bg-blue-500/20 text-blue-400">
-            Syncing
-          </span>
-        </div>
-      )}
-
       {/* Main View: Standard Card Grid (when not in explorer mode) */}
       {currentCards.length === 0 ? (
         <div
@@ -2191,52 +1933,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
               </div>
             );
           })}
-
-          {/* Skeleton Loaders if initial cloud sync is pending and only default cards exist */}
-          {isCloudSyncing && currentCards.length <= 2 && (
-            <>
-              <div
-                className={`rounded-2xl border p-6 sm:p-7 shadow-sm animate-pulse flex flex-col justify-between min-h-[190px] ${
-                  isDark
-                    ? 'bg-gray-850/50 border-gray-800/80'
-                    : 'bg-slate-50/80 border-slate-200/80'
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-gray-700/20 dark:bg-gray-700/40 shrink-0" />
-                  <div className="flex-1 space-y-2.5 pt-1">
-                    <div className="h-5 bg-gray-700/20 dark:bg-gray-700/40 rounded w-1/3" />
-                    <div className="h-3.5 bg-gray-700/15 dark:bg-gray-700/30 rounded w-4/5" />
-                    <div className="h-3 bg-gray-700/10 dark:bg-gray-700/25 rounded w-2/3" />
-                  </div>
-                </div>
-                <div className="mt-6 pt-4 border-t border-gray-700/20 dark:border-gray-800 flex items-center justify-between">
-                  <div className="h-3 bg-gray-700/15 dark:bg-gray-700/30 rounded w-24" />
-                  <div className="h-8 bg-gray-700/20 dark:bg-gray-700/40 rounded-xl w-28" />
-                </div>
-              </div>
-              <div
-                className={`rounded-2xl border p-6 sm:p-7 shadow-sm animate-pulse flex flex-col justify-between min-h-[190px] ${
-                  isDark
-                    ? 'bg-gray-850/50 border-gray-800/80'
-                    : 'bg-slate-50/80 border-slate-200/80'
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-gray-700/20 dark:bg-gray-700/40 shrink-0" />
-                  <div className="flex-1 space-y-2.5 pt-1">
-                    <div className="h-5 bg-gray-700/20 dark:bg-gray-700/40 rounded w-2/5" />
-                    <div className="h-3.5 bg-gray-700/15 dark:bg-gray-700/30 rounded w-3/4" />
-                    <div className="h-3 bg-gray-700/10 dark:bg-gray-700/25 rounded w-1/2" />
-                  </div>
-                </div>
-                <div className="mt-6 pt-4 border-t border-gray-700/20 dark:border-gray-800 flex items-center justify-between">
-                  <div className="h-3 bg-gray-700/15 dark:bg-gray-700/30 rounded w-20" />
-                  <div className="h-8 bg-gray-700/20 dark:bg-gray-700/40 rounded-xl w-28" />
-                </div>
-              </div>
-            </>
-          )}
         </div>
       )}
         </>
@@ -2634,23 +2330,9 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
 
               {formTargetType === 'file' && (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="block font-semibold uppercase tracking-wider text-xs">
-                      Select File from PC / Mobile (.pdf, .html, .docx, images, etc.) *
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingCard(null);
-                        setIsAddMode(false);
-                        multiFileInputRef.current?.click();
-                      }}
-                      className="text-[11px] text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 font-medium"
-                    >
-                      <Files className="w-3 h-3" />
-                      <span>Upload Multiple Files Instead</span>
-                    </button>
-                  </div>
+                  <label className="block font-semibold uppercase tracking-wider mb-1">
+                    Select File from PC / Mobile (.pdf, .html, .docx, images, etc.) *
+                  </label>
 
                   <input
                     type="file"
@@ -2853,252 +2535,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                 </div>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-      {/* Hidden Multi-file input for Batch Uploading Multiple Files at once */}
-      <input
-        type="file"
-        ref={multiFileInputRef}
-        onChange={handleMultiFilesSelected}
-        multiple
-        className="hidden"
-      />
-
-      {/* Batch Multi-File Upload Management Modal */}
-      {showMultiUploadModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div
-            className={`w-full max-w-3xl rounded-2xl border shadow-2xl p-6 max-h-[90vh] flex flex-col ${
-              isDark ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-slate-200 text-slate-900'
-            }`}
-          >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between border-b pb-4 mb-4 dark:border-gray-800">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
-                  <UploadCloud className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg leading-tight">Batch File Upload</h3>
-                  <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
-                    Upload multiple files at once. Each file will be created as an independent, separate card (not zipped).
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  if (!isBatchUploading) {
-                    setShowMultiUploadModal(false);
-                    setMultiUploadFiles([]);
-                  }
-                }}
-                disabled={isBatchUploading}
-                className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 hover:text-gray-900 dark:hover:text-white transition disabled:opacity-50"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Upload Area / Add More */}
-            <div className="mb-4">
-              <div
-                onClick={() => multiFileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-xl p-3.5 text-center cursor-pointer transition flex items-center justify-center gap-3 ${
-                  isDark
-                    ? 'border-purple-800/60 hover:border-purple-500 bg-purple-950/20 hover:bg-purple-950/30'
-                    : 'border-purple-300 hover:border-purple-600 bg-purple-50 hover:bg-purple-100/70'
-                }`}
-              >
-                <Files className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                <span className="text-xs font-semibold text-purple-700 dark:text-purple-300">
-                  + Add More Files to this Upload Batch (PDF, DOCX, HTML, Images, etc. under 3MB)
-                </span>
-              </div>
-            </div>
-
-            {/* Selected Files List */}
-            <div className="flex-1 overflow-y-auto space-y-3 pr-1 mb-4 max-h-[48vh]">
-              {multiUploadFiles.length === 0 ? (
-                <div className="text-center py-8 text-xs text-gray-500">
-                  No files selected. Click above to select multiple files.
-                </div>
-              ) : (
-                multiUploadFiles.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`p-3.5 rounded-xl border transition ${
-                      item.status === 'error'
-                        ? isDark
-                          ? 'bg-red-950/20 border-red-800/60 text-red-300'
-                          : 'bg-red-50 border-red-200 text-red-900'
-                        : isDark
-                        ? 'bg-gray-800/70 border-gray-700 text-white'
-                        : 'bg-slate-50 border-slate-200 text-slate-900'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3 justify-between">
-                      <div className="flex-1 space-y-2">
-                        {/* Title input and status */}
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            value={item.title}
-                            onChange={(e) =>
-                              handleUpdateMultiUploadItem(item.id, { title: e.target.value })
-                            }
-                            placeholder="Card Title"
-                            className={`flex-1 px-2.5 py-1 text-xs font-bold rounded-lg border focus:outline-none ${
-                              isDark
-                                ? 'bg-gray-900 border-gray-700 text-white focus:border-purple-500'
-                                : 'bg-white border-slate-300 text-slate-900 focus:border-purple-600'
-                            }`}
-                          />
-                          {item.status === 'ready' && (
-                            <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">
-                              <Check className="w-3.5 h-3.5" /> Ready
-                            </span>
-                          )}
-                          {(item.status === 'pending' || item.status === 'reading') && (
-                            <span className="flex items-center gap-1 text-[11px] font-semibold text-amber-500 shrink-0">
-                              <RefreshCw className="w-3 h-3 animate-spin" /> Reading...
-                            </span>
-                          )}
-                          {item.status === 'error' && (
-                            <span className="flex items-center gap-1 text-[11px] font-semibold text-red-500 shrink-0">
-                              <AlertCircle className="w-3.5 h-3.5" /> Error
-                            </span>
-                          )}
-                        </div>
-
-                        {/* File metadata row */}
-                        <div className="flex items-center gap-3 text-[11px] opacity-75 flex-wrap">
-                          <span className="font-mono">{item.fileName}</span>
-                          <span>•</span>
-                          <span>{item.subtitle}</span>
-                          {item.errorMsg && (
-                            <span className="text-red-500 font-semibold">{item.errorMsg}</span>
-                          )}
-                        </div>
-
-                        {/* Customization Options: Color & Icon */}
-                        {item.status === 'ready' && (
-                          <div className="flex items-center gap-3 pt-1 text-[11px]">
-                            <div className="flex items-center gap-1.5">
-                              <span className="opacity-70">Theme:</span>
-                              <select
-                                value={item.colorTheme}
-                                onChange={(e) =>
-                                  handleUpdateMultiUploadItem(item.id, {
-                                    colorTheme: e.target.value as ArchiveCardButton['colorTheme'],
-                                  })
-                                }
-                                className={`px-2 py-0.5 rounded text-[11px] border focus:outline-none ${
-                                  isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-slate-300'
-                                }`}
-                              >
-                                <option value="emerald">Emerald</option>
-                                <option value="blue">Blue</option>
-                                <option value="purple">Purple</option>
-                                <option value="amber">Amber</option>
-                                <option value="rose">Rose</option>
-                                <option value="cyan">Cyan</option>
-                                <option value="indigo">Indigo</option>
-                              </select>
-                            </div>
-
-                            <div className="flex items-center gap-1.5">
-                              <span className="opacity-70">Icon:</span>
-                              <select
-                                value={item.iconName}
-                                onChange={(e) =>
-                                  handleUpdateMultiUploadItem(item.id, {
-                                    iconName: e.target.value as ArchiveCardButton['iconName'],
-                                  })
-                                }
-                                className={`px-2 py-0.5 rounded text-[11px] border focus:outline-none ${
-                                  isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-slate-300'
-                                }`}
-                              >
-                                <option value="FileText">File Text</option>
-                                <option value="BookOpen">Book Open</option>
-                                <option value="Sparkles">Sparkles / Image / HTML</option>
-                                <option value="Briefcase">Briefcase</option>
-                                <option value="GraduationCap">Graduation Cap</option>
-                                <option value="Layers">Layers</option>
-                                <option value="Compass">Compass</option>
-                                <option value="Award">Award</option>
-                                <option value="Globe">Globe</option>
-                              </select>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Remove Button */}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveMultiUploadFile(item.id)}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-500/10 transition"
-                        title="Remove from batch"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {/* Modal Actions Footer */}
-            <div className="flex items-center justify-between pt-3 border-t dark:border-gray-800 text-xs">
-              <div className="text-xs text-gray-500">
-                <span>
-                  <strong>{multiUploadFiles.filter((i) => i.status === 'ready').length}</strong> of{' '}
-                  <strong>{multiUploadFiles.length}</strong> file(s) ready to create separately.
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMultiUploadModal(false);
-                    setMultiUploadFiles([]);
-                  }}
-                  disabled={isBatchUploading}
-                  className={`px-4 py-2 font-medium rounded-lg ${
-                    isDark ? 'text-gray-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirmBatchUpload}
-                  disabled={
-                    isBatchUploading ||
-                    multiUploadFiles.filter((i) => i.status === 'ready').length === 0
-                  }
-                  className={`px-5 py-2 text-white font-semibold rounded-lg shadow-md transition flex items-center gap-1.5 disabled:opacity-50 ${
-                    isDark ? 'bg-purple-600 hover:bg-purple-500' : 'bg-purple-700 hover:bg-purple-800'
-                  }`}
-                >
-                  {isBatchUploading ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Saving to Cloud...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4" />
-                      <span>
-                        Upload {multiUploadFiles.filter((i) => i.status === 'ready').length} Separate Cards
-                      </span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       )}
