@@ -73,6 +73,339 @@ async function sha256Hex(text: string): Promise<string> {
   }
 }
 
+const INITIAL_POEMS_SUBFOLDERS: ArchiveCardButton[] = [
+  {
+    id: 'poem-aghmid',
+    title: 'Aghmid Jufunaka Tubshir (أغمض جفونك تبصر)',
+    subtitle: 'Mikhail Naimy • Modern Poetry Analysis & Audio Recitation',
+    link: 'poem-aghmid.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Poem 1',
+    createdAt: 201,
+  },
+  {
+    id: 'poem-aghniya',
+    title: 'Ughniyat al-Layl (أغنية الليل)',
+    subtitle: 'Elias Abu Shabaka • Romantic Symbolism & Stanza Breakdown',
+    link: 'poem-aghniya.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Poem 2',
+    createdAt: 202,
+  },
+  {
+    id: 'poem-akhi',
+    title: 'Akhi (أخي)',
+    subtitle: 'Mikhail Naimy • Humanistic Post-War Reflections & Metrics',
+    link: 'poem-akhi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Poem 3',
+    createdAt: 203,
+  },
+  {
+    id: 'poem-anqa',
+    title: "Ta'ir al-Anqa (طائر العنقاء)",
+    subtitle: 'Badr Shakir al-Sayyab • Free Verse Mythological Realism',
+    link: 'poem-anqa.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'blue',
+    badgeText: 'Poem 4',
+    createdAt: 204,
+  },
+  {
+    id: 'poem-eid',
+    title: 'Eid al-Shuhada (عيد الشهداء)',
+    subtitle: 'Elia Abu Madi • Mahjar Patriotic Elegiac Ode',
+    link: 'poem-eid.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'amber',
+    badgeText: 'Poem 5',
+    createdAt: 205,
+  },
+  {
+    id: 'poem-ina',
+    title: 'Ana (أنا)',
+    subtitle: 'Nazik al-Malaika • Pioneering Arabic Free Verse Revolution',
+    link: 'poem-ina.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'purple',
+    badgeText: 'Poem 6',
+    createdAt: 206,
+  },
+  {
+    id: 'poem-nahr',
+    title: 'Al-Nahr al-Mutajammid (النهر المتجمد)',
+    subtitle: 'Mikhail Naimy • Meditative Nature & Spiritual Allegory',
+    link: 'poem-nahr.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'indigo',
+    badgeText: 'Poem 7',
+    createdAt: 207,
+  },
+  {
+    id: 'poem-nihaya',
+    title: 'Nihayat al-Mataf (نهاية المطاف)',
+    subtitle: 'Abd al-Rahman Shukri • Diwan School Philosophical Introspection',
+    link: 'poem-nihaya.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'rose',
+    badgeText: 'Poem 8',
+    createdAt: 208,
+  },
+  {
+    id: 'poem-usfur',
+    title: "Usfur al-Jannah (عصفور الجنة)",
+    subtitle: 'Abd al-Rahman Shukri • Lyric Romanticism & Nature Dialogue',
+    link: 'poem-usfur.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Poem 9',
+    createdAt: 209,
+  },
+  {
+    id: 'poem-summaries',
+    title: 'All Poem Summaries (ملخص القصائد)',
+    subtitle: 'Comprehensive 8th Semester Modern Poetry Master Summary Sheet',
+    link: 'poem-summaries.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'FileText',
+    colorTheme: 'emerald',
+    badgeText: 'Master Sheet',
+    createdAt: 210,
+  },
+];
+
+const INITIAL_BIOGRAPHIES_SUBFOLDERS: ArchiveCardButton[] = [
+  {
+    id: 'bio-abu-madi',
+    title: 'Elia Abu Madi (إيليا أبو ماضي)',
+    subtitle: 'Life, Mahjar Literary League & Major Works',
+    link: 'biography-abu-madi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'amber',
+    badgeText: 'Biography',
+    createdAt: 211,
+  },
+  {
+    id: 'bio-abu-shabaka',
+    title: 'Elias Abu Shabaka (إلياس أبو شبكة)',
+    subtitle: 'Romantic Pioneer, Life and Critical Legacy',
+    link: 'biography-abu-shabaka.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'rose',
+    badgeText: 'Biography',
+    createdAt: 212,
+  },
+  {
+    id: 'bio-badr-shakir',
+    title: 'Badr Shakir al-Sayyab (بدر شاكر السياب)',
+    subtitle: 'Free Verse Icon, Rain Song & Modern Poetics',
+    link: 'biography-badr-shakir.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'blue',
+    badgeText: 'Biography',
+    createdAt: 213,
+  },
+  {
+    id: 'bio-mikhail',
+    title: 'Mikhail Naimy (ميخائيل نعيمة)',
+    subtitle: 'The Book of Mirdad Author, Pen League Philosopher',
+    link: 'biography-mikhail.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'emerald',
+    badgeText: 'Biography',
+    createdAt: 214,
+  },
+  {
+    id: 'bio-najik',
+    title: 'Nazik al-Malaika (نازك الملائكة)',
+    subtitle: 'Pioneer of Modern Arabic Metre & Critical Theory',
+    link: 'biography-najik.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'purple',
+    badgeText: 'Biography',
+    createdAt: 215,
+  },
+  {
+    id: 'bio-shukri',
+    title: 'Abd al-Rahman Shukri (عبد الرحمن شكري)',
+    subtitle: 'Diwan School Founder, Psychology of Modern Arabic Poetry',
+    link: 'biography-shukri.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'indigo',
+    badgeText: 'Biography',
+    createdAt: 216,
+  },
+];
+
+const INITIAL_COURSE_405_CHILDREN: ArchiveCardButton[] = [
+  {
+    id: 'course-405-interactive',
+    title: 'Course-405 Interactive Reader',
+    subtitle: 'Modern Poetry II with Line-by-Line Audio Karaoke, Notes & Vocabulary',
+    link: 'course-405.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Sparkles',
+    colorTheme: 'emerald',
+    badgeText: 'Interactive Reader',
+    createdAt: 220,
+  },
+  {
+    id: 'course-405-poems-folder',
+    title: 'Syllabus Poems (القصائد المقررة)',
+    subtitle: '9 Selected Classical & Modern Poems with Bengali Translation',
+    targetType: 'folder',
+    children: INITIAL_POEMS_SUBFOLDERS,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: '9 Poems',
+    createdAt: 221,
+  },
+  {
+    id: 'course-405-biographies-folder',
+    title: 'Poet Biographies (تراجم الشعراء)',
+    subtitle: 'Detailed Academic Profiles of 6 Master Arabic Poets',
+    targetType: 'folder',
+    children: INITIAL_BIOGRAPHIES_SUBFOLDERS,
+    iconName: 'GraduationCap',
+    colorTheme: 'blue',
+    badgeText: '6 Biographies',
+    createdAt: 222,
+  },
+];
+
+const INITIAL_ACADEMIC_SUBFOLDERS: ArchiveCardButton[] = [
+  {
+    id: 'academic-course-405',
+    title: 'Course-405: Modern Poetry II',
+    subtitle: 'Al-Shi‘r al-Hadith • Interactive Karaoke, Poems & Biographies',
+    targetType: 'folder',
+    children: INITIAL_COURSE_405_CHILDREN,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Modern Poetry',
+    createdAt: 301,
+  },
+  {
+    id: 'academic-course-406',
+    title: 'Course-406: Terminology through Translation',
+    subtitle: 'At-Tarjamah • Arabic-Bengali-English Trilingual Terminology Bank & Exercises',
+    link: 'course-406.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Layers',
+    colorTheme: 'blue',
+    badgeText: 'Translation',
+    createdAt: 302,
+  },
+  {
+    id: 'academic-course-407',
+    title: 'Course-407: Arabic Literary Criticism',
+    subtitle: 'Naqd al-Adab • Critical Movements, Modern Schools & Special Note 4',
+    link: 'course-407.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'FileText',
+    colorTheme: 'purple',
+    badgeText: 'Criticism',
+    createdAt: 303,
+  },
+  {
+    id: 'academic-course-408',
+    title: 'Course-408 (B): Social Research & Project',
+    subtitle: 'Manhaj al-Baḥth • Research Methodology, DU Project Guidelines & Tools',
+    link: 'course-408.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Compass',
+    colorTheme: 'indigo',
+    badgeText: 'Research',
+    createdAt: 304,
+  },
+  {
+    id: 'academic-pq-2017-21',
+    title: 'Previous Questions (2017–2021)',
+    subtitle: '8th Semester Complete Question Collection PDF Archive',
+    link: 'https://drive.google.com/file/d/1I9fn2ROCa7a-jrNZ9U0KXK8jKznh378D/view?usp=sharing',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Award',
+    colorTheme: 'rose',
+    badgeText: 'Drive PDF',
+    createdAt: 305,
+  },
+  {
+    id: 'academic-pq-2021-23',
+    title: 'Previous Questions (2021–2023)',
+    subtitle: '8th Semester Recent Examination Papers PDF Archive',
+    link: 'https://drive.google.com/file/d/1A6asIfVsu2LiVqg0lozhS075gF-GvT_-/view?usp=sharing',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Award',
+    colorTheme: 'rose',
+    badgeText: 'Drive PDF',
+    createdAt: 306,
+  },
+  {
+    id: 'academic-overview-full',
+    title: 'All Academic Courses & Notices',
+    subtitle: 'All-in-One 8th Semester Academic Portal & Department Notice Board',
+    link: 'academic.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'emerald',
+    badgeText: 'Full Page',
+    createdAt: 307,
+  },
+];
+
+const INITIAL_ACADEMIC_CARD: ArchiveCardButton = {
+  id: 'academic-card',
+  title: 'Academic',
+  subtitle: '8th Semester Department of Arabic • Syllabi, Modern Poetry, Translation, Criticism & Past Papers',
+  targetType: 'folder',
+  children: INITIAL_ACADEMIC_SUBFOLDERS,
+  iconName: 'GraduationCap',
+  colorTheme: 'emerald',
+  badgeText: 'DU Arabic',
+  createdAt: 0,
+};
+
 const INITIAL_BCS_SUBFOLDERS: ArchiveCardButton[] = [
   {
     id: 'bcs-bangla-literature',
@@ -220,6 +553,7 @@ const INITIAL_BCS_SUBFOLDERS: ArchiveCardButton[] = [
 ];
 
 const INITIAL_CARDS: ArchiveCardButton[] = [
+  INITIAL_ACADEMIC_CARD,
   {
     id: 'bcs-card',
     title: 'BCS',
@@ -514,8 +848,8 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // If the existing stored BCS card has no children or was an old URL card, upgrade it to the new subfolders
-          const upgraded = parsed.map((card: ArchiveCardButton) => {
+          const hasAcademic = parsed.some((c: ArchiveCardButton) => c.id === 'academic-card' || c.title?.toLowerCase() === 'academic');
+          let upgraded = parsed.map((card: ArchiveCardButton) => {
             if (card.id === 'bcs-card' && (!card.children || card.children.length === 0)) {
               return {
                 ...card,
@@ -524,8 +858,14 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                 badgeText: card.badgeText || '13 Subjects',
               };
             }
+            if ((card.id === 'academic-card' || card.title?.toLowerCase() === 'academic') && (!card.children || card.children.length === 0)) {
+              return INITIAL_ACADEMIC_CARD;
+            }
             return card;
           });
+          if (!hasAcademic) {
+            upgraded = [INITIAL_ACADEMIC_CARD, ...upgraded];
+          }
           return upgraded;
         }
       } catch (e) {

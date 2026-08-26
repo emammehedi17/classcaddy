@@ -35,11 +35,8 @@ export const Header: React.FC<HeaderProps> = ({
   toggleTheme,
   onToggleExplorerMode,
 }) => {
-  const [academicDropdownOpen, setAcademicDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileAcademicOpen, setMobileAcademicOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const dropdownTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const isDark = theme === 'dark';
 
@@ -50,21 +47,6 @@ export const Header: React.FC<HeaderProps> = ({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const handleMouseEnterAcademic = () => {
-    if (dropdownTimerRef.current) clearTimeout(dropdownTimerRef.current);
-    setAcademicDropdownOpen(true);
-  };
-
-  const handleMouseLeaveAcademic = () => {
-    dropdownTimerRef.current = setTimeout(() => {
-      setAcademicDropdownOpen(false);
-    }, 400);
-  };
-
-  const isAcademicActive =
-    currentPage === 'academic' ||
-    currentPage.startsWith('course-');
 
   return (
     <header
@@ -176,7 +158,7 @@ export const Header: React.FC<HeaderProps> = ({
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
-                currentPage === 'archives'
+                currentPage === 'archives' || currentPage === 'academic' || currentPage.startsWith('course-')
                   ? isDark
                     ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20 font-semibold'
                     : 'bg-emerald-600 text-white shadow-sm font-semibold'
@@ -187,146 +169,6 @@ export const Header: React.FC<HeaderProps> = ({
             >
               Archives
             </button>
-
-            {/* Academic Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={handleMouseEnterAcademic}
-              onMouseLeave={handleMouseLeaveAcademic}
-            >
-              <button
-                id="nav-tab-academic"
-                onClick={() => setCurrentPage('academic')}
-                className={`px-5 py-2 text-sm font-semibold rounded-full transition-all duration-200 flex items-center gap-1.5 ${
-                  isAcademicActive
-                    ? isDark
-                      ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20'
-                      : 'bg-emerald-600 text-white shadow-sm'
-                    : isDark
-                    ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
-                }`}
-              >
-                <span>Academic</span>
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform duration-200 ${
-                    academicDropdownOpen ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-
-              {/* Dropdown Menu */}
-              {academicDropdownOpen && (
-                <div
-                  className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 backdrop-blur-lg rounded-xl shadow-2xl overflow-hidden py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 border ${
-                    isDark
-                      ? 'bg-gray-800/95 border-gray-700 text-gray-200'
-                      : 'bg-white/95 border-slate-200 text-slate-800'
-                  }`}
-                >
-                  <div
-                    className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider border-b ${
-                      isDark
-                        ? 'text-emerald-400 border-gray-700/60'
-                        : 'text-emerald-700 border-slate-200 bg-slate-50'
-                    }`}
-                  >
-                    8th Semester Courses
-                  </div>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-405');
-                      setAcademicDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors ${
-                      isDark
-                        ? 'text-gray-200 hover:bg-emerald-600/20 hover:text-emerald-300'
-                        : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-800'
-                    }`}
-                  >
-                    <span>Course-405 (Modern Poetry II)</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-406');
-                      setAcademicDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors ${
-                      isDark
-                        ? 'text-gray-200 hover:bg-emerald-600/20 hover:text-emerald-300'
-                        : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-800'
-                    }`}
-                  >
-                    <span>Course-406 (Translation)</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-407');
-                      setAcademicDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors ${
-                      isDark
-                        ? 'text-gray-200 hover:bg-emerald-600/20 hover:text-emerald-300'
-                        : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-800'
-                    }`}
-                  >
-                    <span>Course-407 (Criticism)</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-408');
-                      setAcademicDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors ${
-                      isDark
-                        ? 'text-gray-200 hover:bg-emerald-600/20 hover:text-emerald-300'
-                        : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-800'
-                    }`}
-                  >
-                    <span>Course-408 (B) (Research)</span>
-                  </button>
-                  <div
-                    className={`border-t my-1 ${
-                      isDark ? 'border-gray-700/60' : 'border-slate-200'
-                    }`}
-                  ></div>
-                  <a
-                    href="https://drive.google.com/file/d/1I9fn2ROCa7a-jrNZ9U0KXK8jKznh378D/view?usp=sharing"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`w-full text-left px-4 py-2 text-xs flex items-center gap-2 transition-colors ${
-                      isDark
-                        ? 'text-gray-400 hover:bg-gray-700/60 hover:text-white'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                    }`}
-                  >
-                    <BookOpen
-                      className={`w-3.5 h-3.5 ${
-                        isDark ? 'text-emerald-400' : 'text-emerald-600'
-                      }`}
-                    />
-                    <span>Previous Questions (2017-21)</span>
-                  </a>
-                  <a
-                    href="https://drive.google.com/file/d/1A6asIfVsu2LiVqg0lozhS075gF-GvT_-/view?usp=sharing"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`w-full text-left px-4 py-2 text-xs flex items-center gap-2 transition-colors ${
-                      isDark
-                        ? 'text-gray-400 hover:bg-gray-700/60 hover:text-white'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                    }`}
-                  >
-                    <BookOpen
-                      className={`w-3.5 h-3.5 ${
-                        isDark ? 'text-emerald-400' : 'text-emerald-600'
-                      }`}
-                    />
-                    <span>Previous Questions (2021-23)</span>
-                  </a>
-                </div>
-              )}
-            </div>
 
             <button
               id="nav-tab-study-plan"
@@ -540,16 +382,16 @@ export const Header: React.FC<HeaderProps> = ({
                 setMobileMenuOpen(false);
               }}
               className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium ${
-                currentPage === 'archives'
+                currentPage === 'archives' || currentPage === 'academic' || currentPage.startsWith('course-')
                   ? isDark
-                    ? 'bg-emerald-500 text-white'
+                    ? 'bg-emerald-500 text-white font-semibold'
                     : 'bg-emerald-600 text-white font-semibold'
                   : isDark
                   ? 'text-gray-300 hover:bg-gray-700'
                   : 'text-slate-700 hover:bg-slate-100'
               }`}
             >
-              Archives & Resources
+              Archives
             </button>
 
             {onToggleExplorerMode && (
@@ -573,103 +415,6 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               </button>
             )}
-
-            {/* Mobile Academic Toggle */}
-            <div>
-              <button
-                onClick={() => setMobileAcademicOpen(!mobileAcademicOpen)}
-                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-sm font-medium ${
-                  isDark
-                    ? 'text-gray-300 hover:bg-gray-700'
-                    : 'text-slate-700 hover:bg-slate-100'
-                }`}
-              >
-                <span>Academic Courses</span>
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    mobileAcademicOpen
-                      ? isDark
-                        ? 'rotate-180 text-emerald-400'
-                        : 'rotate-180 text-emerald-600'
-                      : ''
-                  }`}
-                />
-              </button>
-
-              {mobileAcademicOpen && (
-                <div
-                  className={`pl-4 pr-2 py-2 mt-1 rounded-xl space-y-1 ${
-                    isDark ? 'bg-gray-900/60' : 'bg-slate-50'
-                  }`}
-                >
-                  <button
-                    onClick={() => {
-                      setCurrentPage('academic');
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs font-semibold rounded ${
-                      isDark
-                        ? 'text-emerald-400 hover:bg-gray-800'
-                        : 'text-emerald-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    View All Academic Overview
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-405');
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs rounded ${
-                      isDark
-                        ? 'text-gray-300 hover:bg-gray-800'
-                        : 'text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    Course-405: Modern Poetry II
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-406');
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs rounded ${
-                      isDark
-                        ? 'text-gray-300 hover:bg-gray-800'
-                        : 'text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    Course-406: Terminology through Translation
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-407');
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs rounded ${
-                      isDark
-                        ? 'text-gray-300 hover:bg-gray-800'
-                        : 'text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    Course-407: Arabic Literary Criticism
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-408');
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs rounded ${
-                      isDark
-                        ? 'text-gray-300 hover:bg-gray-800'
-                        : 'text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    Course-408 (B): Social Research & Project
-                  </button>
-                </div>
-              )}
-            </div>
 
             <button
               onClick={() => {

@@ -8,6 +8,10 @@ import { PageView, UserProfile, ThemeMode } from './types';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { ArchivesView } from './components/ArchivesView';
+import { AboutView } from './components/AboutView';
+import { ContactView } from './components/ContactView';
+import { StudyPlanView } from './components/StudyPlanView';
+import { CourseDetailView } from './components/CourseDetailView';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<PageView>('archives');
@@ -131,6 +135,22 @@ export default function App() {
             theme={theme}
             isExplorerMode={isExplorerMode}
             onToggleExplorerMode={toggleExplorerMode}
+          />
+        )}
+        {currentPage === 'about' && <AboutView />}
+        {currentPage === 'contact' && <ContactView />}
+        {currentPage === 'study-plan' && <StudyPlanView />}
+        {(currentPage === 'academic' || currentPage.startsWith('course-')) && (
+          <CourseDetailView
+            courseId={currentPage.startsWith('course-') ? currentPage : 'course-405'}
+            onBack={() => {
+              setCurrentPage('archives');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onNavigateCourse={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
           />
         )}
       </main>
