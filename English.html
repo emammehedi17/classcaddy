@@ -222,12 +222,61 @@
 </head>
 <body>
 
-<header>
-    <div class="container">
-        <h1>Masterpieces of English Literature</h1>
-        <p>Explore the lives and works of 59 great authors across literary history</p>
+<!-- =================== HEADER START =================== -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200 main-website-ui shadow-sm text-gray-800">
+    <div class="container mx-auto px-6 py-3">
+        <nav class="flex justify-between items-center">
+            <!-- Left Side: Profile & Title -->
+            <div class="flex items-center gap-4">
+                <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
+                    <img src="images/profile.jpg" alt="Profile" class="h-10 w-10 rounded-full border-2 border-emerald-500 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/ffffff/059669?text=CC';">
+                </a>
+                <a href="index.html">
+                    <h1 class="text-xl font-bold text-gray-800">Class Caddy</h1>
+                </a>
+            </div>
+
+            <!-- Center: Desktop Navigation (hidden on mobile) -->
+            <div class="hidden md:flex items-center gap-1 bg-gray-100/50 border border-gray-200 rounded-full p-1 text-sm">
+                <a href="index.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Home</a>
+                <a href="https://classcaddy.netlify.app/archives.html" class="px-5 py-1.5 font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full transition-colors">Archives</a>
+                <a href="study_plan.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Study Plan</a>
+                <a href="about.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">About</a>
+                <a href="contact.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Contact</a>
+            </div>
+
+            <!-- Right Side: DU Logo & Sign Up (hidden on mobile) -->
+            <div class="hidden md:flex items-center gap-4">
+                <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
+                    <img src="images/du_logo.png" alt="DU Logo" class="h-10 w-10 rounded-full border border-gray-200 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/eeeeee/111827?text=DU';">
+                </a>
+                <div id="auth-container-desktop" class="auth-container text-sm">
+                    <a href="index.html#signup" class="px-5 py-2 font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors signup-button shadow-sm">Sign Up</a>
+                </div>
+            </div>
+
+            <!-- Mobile Hamburger Menu Button -->
+            <div class="md:hidden flex items-center">
+                <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 -mx-6 mt-3 shadow-md">
+            <a href="index.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Home</a>
+            <a href="https://classcaddy.netlify.app/archives.html" class="block px-6 py-3 text-sm font-semibold text-emerald-600 hover:bg-gray-100 transition-colors">Archives</a>
+            <a href="study_plan.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Study Plan</a>
+            <a href="about.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">About</a>
+            <a href="contact.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Contact</a>
+            <div id="auth-container-mobile" class="auth-container px-6 py-4 border-t border-gray-200">
+                <a href="index.html#signup" class="block w-full text-center text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full py-2 transition-colors signup-button">Sign Up</a>
+            </div>
+        </div>
     </div>
 </header>
+<!-- =================== HEADER END =================== -->
 
 <div class="container" id="periods-container">
     <!-- Content will be injected by JavaScript -->
