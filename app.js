@@ -456,6 +456,20 @@
                 console.log("User logged in:", userId);
                 console.log("Is Guest Mode:", isGuestMode); 
 
+                // Sync with global localStorage for other pages
+                const userProfile = {
+                    uid: user.uid,
+                    name: user.displayName || (isGuestMode ? 'Guest Learner' : 'User'),
+                    displayName: user.displayName || (isGuestMode ? 'Guest Learner' : 'User'),
+                    email: user.email || (user.isAnonymous ? 'Guest' : ''),
+                    photoURL: user.photoURL || null,
+                    isLoggedIn: true
+                };
+                try {
+                    localStorage.setItem('cc_auth_user', JSON.stringify(userProfile));
+                    localStorage.setItem('class_caddy_user', JSON.stringify(userProfile));
+                } catch(e) {}
+
                 loginPrompt.style.display = 'none';
                 userInfo.classList.remove('hidden');
                 userDisplay.textContent = user.displayName || 'User';
@@ -529,6 +543,10 @@
                 currentUser = null;
                 userId = null;
                 window._currentUserId = null;
+                try {
+                    localStorage.removeItem('cc_auth_user');
+                    localStorage.removeItem('class_caddy_user');
+                } catch(e) {}
                 // Clear streak/goal/history data so next account starts fresh
                 ['studyStreak_v1', 'studyDailyGoal_v1', 'studyDayHistory_v1'].forEach(base => {
                     Object.keys(localStorage).filter(k => k.startsWith(base)).forEach(k => localStorage.removeItem(k));

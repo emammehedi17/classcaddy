@@ -12,9 +12,21 @@ import { AboutView } from './components/AboutView';
 import { ContactView } from './components/ContactView';
 import { StudyPlanView } from './components/StudyPlanView';
 import { CourseDetailView } from './components/CourseDetailView';
+import { FloatingActionButtons } from './components/FloatingActionButtons';
+import { auth } from './lib/firebase';
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<PageView>('archives');
+  const [currentPage, setCurrentPage] = useState<PageView>(() => {
+    const path = window.location.pathname.toLowerCase();
+    const hash = window.location.hash.toLowerCase();
+    if (path.includes('study_plan') || hash.includes('study-plan') || hash.includes('study_plan')) return 'study-plan';
+    if (path.includes('about') || hash.includes('about')) return 'about';
+    if (path.includes('contact') || hash.includes('contact')) return 'contact';
+    if (path.includes('academic') || hash.includes('academic')) return 'academic';
+    if (hash.includes('course-')) return hash.replace('#', '') as PageView;
+    return 'archives';
+  });
   const [theme, setTheme] = useState<ThemeMode>(() => {
     const savedTheme = localStorage.getItem('class_caddy_theme') as ThemeMode | null;
     return savedTheme === 'dark' ? 'dark' : 'light';
@@ -65,13 +77,28 @@ export default function App() {
   };
 
   const [user, setUser] = useState<UserProfile>(() => {
+    const ccAuth = localStorage.getItem('cc_auth_user');
+    if (ccAuth) {
+      try {
+        const parsed = JSON.parse(ccAuth);
+        if (parsed && (parsed.isLoggedIn || parsed.uid)) {
+          return {
+            name: parsed.displayName || parsed.name || 'User',
+            email: parsed.email || '',
+            photoURL: parsed.photoURL || '',
+            isLoggedIn: true,
+          };
+        }
+      } catch (e) {}
+    }
     const saved = localStorage.getItem('class_caddy_user');
     if (saved) {
       try {
-        return JSON.parse(saved);
-      } catch (e) {
-        // ignore
-      }
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.isLoggedIn) {
+          return parsed;
+        }
+      } catch (e) {}
     }
     return { name: '', email: '', isLoggedIn: false };
   });
@@ -80,19 +107,115 @@ export default function App() {
     localStorage.setItem('class_caddy_theme', theme);
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
+      document.body.classList.add('dark-mode');
     } else {
       document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark-mode');
     }
   }, [theme]);
+
+  // Firebase Auth State Listener & Sync
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        const profile: UserProfile = {
+          name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+          email: firebaseUser.email || '',
+          photoURL: firebaseUser.photoURL || undefined,
+          isLoggedIn: true,
+        };
+        setUser(profile);
+        localStorage.setItem('cc_auth_user', JSON.stringify({
+          uid: firebaseUser.uid,
+          displayName: profile.name,
+          email: profile.email,
+          photoURL: profile.photoURL,
+          isLoggedIn: true,
+        }));
+        localStorage.setItem('class_caddy_user', JSON.stringify(profile));
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Sync auth & theme changes across windows / localStorage
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'cc_auth_user' || e.key === 'class_caddy_user') {
+        const ccAuth = localStorage.getItem('cc_auth_user');
+        if (ccAuth) {
+          try {
+            const parsed = JSON.parse(ccAuth);
+            if (parsed && (parsed.isLoggedIn || parsed.uid)) {
+              setUser({
+                name: parsed.displayName || parsed.name || 'User',
+                email: parsed.email || '',
+                photoURL: parsed.photoURL || '',
+                isLoggedIn: true,
+              });
+              return;
+            }
+          } catch (err) {}
+        }
+        const saved = localStorage.getItem('class_caddy_user');
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            if (parsed && parsed.isLoggedIn) {
+              setUser(parsed);
+              return;
+            }
+          } catch (err) {}
+        }
+        setUser({ name: '', email: '', isLoggedIn: false });
+      } else if (e.key === 'class_caddy_theme' && e.newValue) {
+        setTheme(e.newValue === 'dark' ? 'dark' : 'light');
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
 
-  const handleLogout = () => {
+  const handleGoogleSignIn = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      if (result && result.user) {
+        const profile: UserProfile = {
+          name: result.user.displayName || result.user.email?.split('@')[0] || 'User',
+          email: result.user.email || '',
+          photoURL: result.user.photoURL || undefined,
+          isLoggedIn: true,
+        };
+        setUser(profile);
+        localStorage.setItem('cc_auth_user', JSON.stringify({
+          uid: result.user.uid,
+          displayName: profile.name,
+          email: profile.email,
+          photoURL: profile.photoURL,
+          isLoggedIn: true,
+        }));
+        localStorage.setItem('class_caddy_user', JSON.stringify(profile));
+      }
+    } catch (error) {
+      console.error('Google Sign-In Error:', error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (e) {}
     const guestUser: UserProfile = { name: '', email: '', isLoggedIn: false };
     setUser(guestUser);
     localStorage.removeItem('class_caddy_user');
+    localStorage.removeItem('cc_auth_user');
   };
 
   const isDark = theme === 'dark';
@@ -101,7 +224,7 @@ export default function App() {
     <div
       id="app-root-container"
       className={`min-h-screen flex flex-col font-sans transition-colors duration-200 selection:bg-emerald-500 selection:text-white ${
-        isDark ? 'bg-gray-900 text-white' : 'bg-slate-50 text-slate-900'
+        isDark ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-800'
       }`}
     >
       {/* Header (Hidden when File Explorer Fullscreen Mode is active) */}
@@ -115,6 +238,7 @@ export default function App() {
           user={user}
           onLogout={handleLogout}
           onOpenSignup={() => {}}
+          onGoogleSignIn={handleGoogleSignIn}
           theme={theme}
           toggleTheme={toggleTheme}
           onToggleExplorerMode={toggleExplorerMode}
@@ -154,6 +278,11 @@ export default function App() {
           />
         )}
       </main>
+
+      {/* Floating Action Buttons (Scroll Toggle and Dark Mode) */}
+      {!isExplorerMode && (
+        <FloatingActionButtons theme={theme} toggleTheme={toggleTheme} />
+      )}
 
       {/* Footer (Hidden when File Explorer Fullscreen Mode is active) */}
       {!isExplorerMode && (

@@ -2,12 +2,22 @@
    1. General & Global Styles
    ========================================================================== */
 
-/* Apply Poppins font and dark theme to all pages */
+/* Apply Poppins font and light theme by default matching Study Plan, dark theme on dark-mode */
+html {
+    scroll-behavior: smooth;
+}
+
 body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #111827; /* Dark background */
-    color: white;
+    font-family: 'Poppins', 'Inter', sans-serif;
+    background-color: #f3f4f6; /* Study Plan light bg */
+    color: #1f2937; /* Study Plan text-gray-800 */
     overflow-x: hidden;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+body.dark-mode, html.dark body, html.dark {
+    background-color: #111827 !important; /* Dark background */
+    color: #f3f4f6 !important;
 }
 
 /* Static background gradients */
@@ -47,20 +57,87 @@ body {
     opacity: 0.7;
 }
 
-
 /* ==========================================================================
-   2. Header & Navigation Styles
+   2. Header & Navigation Styles (Adaptive Light & Dark Mode)
    ========================================================================== */
 
-header {
+header,
+header.main-website-ui {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 50;
-    background-color: rgba(17, 24, 39, 0.8);
-    backdrop-filter: blur(4px);
-    border-bottom: 1px solid #374151; /* gray-700 */
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid #e5e7eb; /* gray-200 */
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+header h1,
+header.main-website-ui h1,
+header .text-gray-800 {
+    color: #1f2937;
+}
+
+/* Dark mode header overrides */
+body.dark-mode header,
+body.dark-mode header.main-website-ui,
+html.dark header,
+html.dark header.main-website-ui {
+    background-color: rgba(17, 24, 39, 0.95) !important;
+    border-bottom-color: #374151 !important;
+}
+
+body.dark-mode header h1,
+body.dark-mode header.main-website-ui h1,
+body.dark-mode header .text-gray-800,
+body.dark-mode header .text-gray-900,
+html.dark header h1,
+html.dark header.main-website-ui h1 {
+    color: #f9fafb !important;
+}
+
+body.dark-mode header .bg-gray-100\/50,
+body.dark-mode header .bg-gray-100,
+html.dark header .bg-gray-100\/50,
+html.dark header .bg-gray-100 {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+}
+
+body.dark-mode header nav a.text-gray-600,
+body.dark-mode header nav a.text-gray-700,
+body.dark-mode header nav button.text-gray-600,
+body.dark-mode header nav button.text-gray-700,
+html.dark header nav a.text-gray-600 {
+    color: #e5e7eb !important;
+}
+
+body.dark-mode header nav a.hover\:bg-gray-200:hover,
+body.dark-mode header nav button.hover\:bg-gray-200:hover,
+html.dark header nav a.hover\:bg-gray-200:hover {
+    background-color: #4b5563 !important;
+    color: #ffffff !important;
+}
+
+/* Mobile Menu Dark & Light */
+body.dark-mode #mobile-menu,
+html.dark #mobile-menu {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode #mobile-menu a,
+html.dark #mobile-menu a {
+    color: #e5e7eb !important;
+}
+
+body.dark-mode #mobile-menu a:hover,
+html.dark #mobile-menu a:hover {
+    background-color: #374151 !important;
+    color: #ffffff !important;
 }
 
 /* Dropdown menu styles */
@@ -73,6 +150,103 @@ header {
 .dropdown-menu.is-open {
     opacity: 1;
     visibility: visible;
+}
+
+body.dark-mode .dropdown-menu,
+html.dark .dropdown-menu {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+}
+
+/* ==========================================================================
+   2b. Dark Mode Global Utilities & Overrides for Page Components
+   ========================================================================== */
+body.dark-mode .bg-white,
+html.dark .bg-white {
+    background-color: #1f2937 !important;
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode .bg-gray-50,
+html.dark .bg-gray-50 {
+    background-color: #111827 !important;
+}
+
+body.dark-mode .bg-gray-100,
+html.dark .bg-gray-100 {
+    background-color: #1f2937 !important;
+}
+
+body.dark-mode .text-gray-900,
+html.dark .text-gray-900,
+body.dark-mode .text-gray-800,
+html.dark .text-gray-800 {
+    color: #f9fafb !important;
+}
+
+body.dark-mode .text-gray-700,
+html.dark .text-gray-700 {
+    color: #e5e7eb !important;
+}
+
+body.dark-mode .text-gray-600,
+html.dark .text-gray-600 {
+    color: #d1d5db !important;
+}
+
+body.dark-mode .text-gray-500,
+html.dark .text-gray-500 {
+    color: #9ca3af !important;
+}
+
+body.dark-mode .border-gray-200,
+html.dark .border-gray-200,
+body.dark-mode .border-gray-300,
+html.dark .border-gray-300 {
+    border-color: #374151 !important;
+}
+
+body.dark-mode .card,
+html.dark .card,
+body.dark-mode .content-card,
+html.dark .content-card,
+body.dark-mode .modal-content,
+html.dark .modal-content {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode input:not([type="checkbox"]):not([type="radio"]),
+html.dark input:not([type="checkbox"]):not([type="radio"]),
+body.dark-mode textarea,
+html.dark textarea,
+body.dark-mode select,
+html.dark select {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+    border-color: #4b5563 !important;
+}
+
+body.dark-mode .header-google-signin-btn,
+html.dark .header-google-signin-btn,
+body.dark-mode #header-signin-btn,
+html.dark #header-signin-btn,
+body.dark-mode #google-login-btn,
+html.dark #google-login-btn {
+    background-color: #1f2937 !important;
+    color: #f3f4f6 !important;
+    border-color: #4b5563 !important;
+}
+
+body.dark-mode .header-google-signin-btn:hover,
+html.dark .header-google-signin-btn:hover,
+body.dark-mode #header-signin-btn:hover,
+html.dark #header-signin-btn:hover,
+body.dark-mode #google-login-btn:hover,
+html.dark #google-login-btn:hover {
+    background-color: #374151 !important;
 }
 
 

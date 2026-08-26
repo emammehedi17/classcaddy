@@ -51,8 +51,8 @@
                 </div>
                 <div class="hidden md:flex items-center gap-1 bg-gray-100/50 border border-gray-200 rounded-full p-1 text-sm">
                     <a href="index.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Home</a>
-                    <a href="https://classcaddy.netlify.app/archives.html" class="px-5 py-1.5 font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full transition-colors">Archives</a>
-                    <a href="study_plan.html" class="px-5 py-1.5 bg-emerald-500 text-white rounded-full transition-colors">Study Plan</a>
+                    <a href="archives.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Archives</a>
+                    <a href="study_plan.html" class="px-5 py-1.5 bg-emerald-500 text-white rounded-full transition-colors font-medium">Study Plan</a>
                     <a href="about.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">About</a>
                     <a href="contact.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Contact</a>
                 </div>
@@ -61,7 +61,7 @@
                         <img src="images/du_logo.png" alt="DU Logo" class="h-10 w-10 rounded-full border border-gray-200 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/eeeeee/111827?text=DU';">
                     </a>
                      <div id="auth-container-desktop" class="auth-container text-sm">
-                         <a href="index.html#signup" class="px-5 py-2 font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors signup-button">Sign Up</a>
+                         <a href="index.html#signup" class="px-5 py-2 font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors signup-button shadow-sm">Sign Up</a>
                     </div>
                 </div>
                  <div class="md:hidden flex items-center">
@@ -72,7 +72,7 @@
             </nav>
              <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 -mx-6 mt-3 shadow-md">
                 <a href="index.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Home</a>
-                <a href="https://classcaddy.netlify.app/archives.html" class="block px-6 py-3 text-sm font-semibold text-emerald-600 hover:bg-gray-100 transition-colors">Archives</a>
+                <a href="archives.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Archives</a>
                 <a href="study_plan.html" class="block px-6 py-3 text-sm font-semibold text-emerald-600 bg-emerald-50 transition-colors">Study Plan</a>
                 <a href="about.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">About</a>
                 <a href="contact.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Contact</a>
@@ -1124,5 +1124,15 @@
     </div>
 	
 	<script type="module" src="app.js?v=2026070901" defer></script>
+	<script src="script.js"></script>
+
+    <!-- Floating Action Buttons (Scroll to Bottom/Top & Global Dark Mode) -->
+    <button id="scroll-toggle-btn" class="fixed bottom-32 right-5 z-[100] w-12 h-12 bg-gray-700 hover:bg-gray-900 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100" title="Scroll to Bottom" aria-label="Scroll to Bottom">
+        <i class="fas fa-arrow-down"></i>
+    </button>
+
+    <button id="global-dark-mode-btn" class="fixed bottom-6 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-lg border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 transition-transform" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
+        <i class="fas fa-moon text-2xl"></i>
+    </button>
 </body>
 </html>

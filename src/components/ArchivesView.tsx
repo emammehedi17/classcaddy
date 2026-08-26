@@ -308,6 +308,123 @@ const INITIAL_COURSE_405_CHILDREN: ArchiveCardButton[] = [
   },
 ];
 
+const INITIAL_COURSE_406_CHILDREN: ArchiveCardButton[] = [
+  {
+    id: 'course-406-portal',
+    title: 'Course-406 Interactive Bank & Exercises',
+    subtitle: 'At-Tarjamah • Arabic-Bengali-English Trilingual Terminology Bank',
+    link: 'course-406.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Layers',
+    colorTheme: 'blue',
+    badgeText: 'Portal',
+    createdAt: 310,
+  },
+  {
+    id: 'nure-alam-steps',
+    title: 'Steps of Translation by Dr. Nure Alam',
+    subtitle: 'Core Methodology, Rules & Structural Principles for Arabic-Bengali Translation',
+    link: 'sub-pages/Nure Alam sir - Steps of Translation.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'FileText',
+    colorTheme: 'blue',
+    badgeText: 'Lecture Note',
+    createdAt: 311,
+  },
+  {
+    id: 'nure-alam-academic-steps',
+    title: 'Steps of Academic Translation by Dr. Nure Alam',
+    subtitle: 'Advanced Academic Terminology & Translation Techniques Guide',
+    link: 'sub-pages/Nure Alam sir - Steps of Academic Translation.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'FileText',
+    colorTheme: 'blue',
+    badgeText: 'Lecture Note',
+    createdAt: 312,
+  },
+  {
+    id: 'ehsan-post-mid-notes',
+    title: 'Dr. Ehsan Post-Mid Lecture Notes (1–3)',
+    subtitle: 'Comprehensive Terminology, Sentence Translation Drills & Analysis',
+    link: 'sub-pages/Ehsan-sir-after-mid-1-3-notes.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'indigo',
+    badgeText: 'Lecture Note',
+    createdAt: 313,
+  },
+  {
+    id: 'monkeypox-translation',
+    title: 'Monkeypox Clinical Translation',
+    subtitle: 'Specialized Medical & Scientific Article Arabic Translation Exercise',
+    link: 'sub-pages/Translation - Monkeypox.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'FileText',
+    colorTheme: 'purple',
+    badgeText: 'Translation',
+    createdAt: 314,
+  },
+];
+
+const INITIAL_COURSE_407_CHILDREN: ArchiveCardButton[] = [
+  {
+    id: 'course-407-portal',
+    title: 'Course-407: Arabic Literary Criticism Portal',
+    subtitle: 'Naqd al-Adab • Critical Schools, Theories & Department Syllabus',
+    link: 'course-407.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'FileText',
+    colorTheme: 'purple',
+    badgeText: 'Portal',
+    createdAt: 320,
+  },
+  {
+    id: 'course-407-note-4',
+    title: 'Special Note 4: Naqd al-Adab (Modern Arabic Criticism)',
+    subtitle: 'In-Depth Analysis of Modern Arabic Literary Criticism Movements & Concepts',
+    link: 'course-407-note-4.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'FileText',
+    colorTheme: 'purple',
+    badgeText: 'Special Note',
+    createdAt: 321,
+  },
+];
+
+const INITIAL_COURSE_408_CHILDREN: ArchiveCardButton[] = [
+  {
+    id: 'course-408-portal',
+    title: 'Course-408 (B): Social Research & Project Portal',
+    subtitle: 'Manhaj al-Baḥth • Research Methodology, DU Project Guidelines & Tools',
+    link: 'course-408.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Compass',
+    colorTheme: 'indigo',
+    badgeText: 'Portal',
+    createdAt: 330,
+  },
+  {
+    id: 'du-academic-project-guide',
+    title: 'DU Academic Social Research Project Guide',
+    subtitle: 'Complete Formatting, Proposal Submission & Thesis Methodology Manual',
+    link: 'project-DU.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Award',
+    colorTheme: 'indigo',
+    badgeText: 'Project Guide',
+    createdAt: 331,
+  },
+];
+
 const INITIAL_ACADEMIC_SUBFOLDERS: ArchiveCardButton[] = [
   {
     id: 'academic-course-405',
@@ -323,10 +440,9 @@ const INITIAL_ACADEMIC_SUBFOLDERS: ArchiveCardButton[] = [
   {
     id: 'academic-course-406',
     title: 'Course-406: Terminology through Translation',
-    subtitle: 'At-Tarjamah • Arabic-Bengali-English Trilingual Terminology Bank & Exercises',
-    link: 'course-406.html',
-    targetType: 'url',
-    openInNewTab: true,
+    subtitle: 'At-Tarjamah • Nure Alam & Ehsan Notes, Monkeypox & Terminology Bank',
+    targetType: 'folder',
+    children: INITIAL_COURSE_406_CHILDREN,
     iconName: 'Layers',
     colorTheme: 'blue',
     badgeText: 'Translation',
@@ -336,9 +452,8 @@ const INITIAL_ACADEMIC_SUBFOLDERS: ArchiveCardButton[] = [
     id: 'academic-course-407',
     title: 'Course-407: Arabic Literary Criticism',
     subtitle: 'Naqd al-Adab • Critical Movements, Modern Schools & Special Note 4',
-    link: 'course-407.html',
-    targetType: 'url',
-    openInNewTab: true,
+    targetType: 'folder',
+    children: INITIAL_COURSE_407_CHILDREN,
     iconName: 'FileText',
     colorTheme: 'purple',
     badgeText: 'Criticism',
@@ -348,9 +463,8 @@ const INITIAL_ACADEMIC_SUBFOLDERS: ArchiveCardButton[] = [
     id: 'academic-course-408',
     title: 'Course-408 (B): Social Research & Project',
     subtitle: 'Manhaj al-Baḥth • Research Methodology, DU Project Guidelines & Tools',
-    link: 'course-408.html',
-    targetType: 'url',
-    openInNewTab: true,
+    targetType: 'folder',
+    children: INITIAL_COURSE_408_CHILDREN,
     iconName: 'Compass',
     colorTheme: 'indigo',
     badgeText: 'Research',
@@ -394,16 +508,420 @@ const INITIAL_ACADEMIC_SUBFOLDERS: ArchiveCardButton[] = [
   },
 ];
 
+const INITIAL_ENGLISH_POETS_SUBFOLDERS: ArchiveCardButton[] = [
+  {
+    id: 'english-archive-portal',
+    title: 'English Literature Archive Portal',
+    subtitle: 'Comprehensive Literary Periods, Master Authors, Analyses & MCQs',
+    link: 'EnglishPoets/english_literature_archive.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'blue',
+    badgeText: 'Portal',
+    createdAt: 401,
+  },
+  {
+    id: 'poet-shakespeare',
+    title: 'William Shakespeare (উইলিয়াম শেকসপিয়র)',
+    subtitle: 'The Bard of Avon • Complete Life, 38 Plays, 154 Sonnets & Quotes',
+    link: 'EnglishPoets/note_on_william_shakespeare_emam_mehedi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'purple',
+    badgeText: 'Master Note',
+    createdAt: 402,
+  },
+  {
+    id: 'poet-milton',
+    title: 'John Milton (জন মিল্টন)',
+    subtitle: 'Paradise Lost, Epic Poetry, Biography & Literary Contribution',
+    link: 'EnglishPoets/John Milton.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'blue',
+    badgeText: 'Biography',
+    createdAt: 403,
+  },
+  {
+    id: 'poet-milton-mcq',
+    title: 'John Milton MCQ Quiz',
+    subtitle: 'Practice Questions, Model Tests & BCS Exam Preparation',
+    link: 'EnglishPoets/John Milton mcq.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Sparkles',
+    colorTheme: 'blue',
+    badgeText: 'Quiz Test',
+    createdAt: 404,
+  },
+  {
+    id: 'poet-yeats',
+    title: 'W.B. Yeats (ডব্লিউ বি ইয়েটস)',
+    subtitle: 'Irish Literary Revival, Modernist Poetry, Nobel Laureate Profile',
+    link: 'EnglishPoets/W.B. Yeats.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Biography',
+    createdAt: 405,
+  },
+  {
+    id: 'poet-yeats-mcq',
+    title: 'W.B. Yeats MCQ Quiz',
+    subtitle: 'Interactive Model Test, Past Questions & Analytical Solutions',
+    link: 'EnglishPoets/W.B. Yeats MCQ.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Sparkles',
+    colorTheme: 'emerald',
+    badgeText: 'Quiz Test',
+    createdAt: 406,
+  },
+  {
+    id: 'poet-keats',
+    title: 'John Keats (জন কিটস)',
+    subtitle: 'Romantic Ode Master • Beauty is Truth, Life & Major Works',
+    link: 'EnglishPoets/note_on_john_keats_emam_mehedi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'rose',
+    badgeText: 'Master Note',
+    createdAt: 407,
+  },
+  {
+    id: 'poet-wordsworth',
+    title: 'William Wordsworth (উইলিয়াম ওয়ার্ডসওয়ার্থ)',
+    subtitle: 'Poet of Nature, Lyrical Ballads, Romantic Era Pioneer',
+    link: 'EnglishPoets/note_on_william_wordsworth_emam_mehedi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Master Note',
+    createdAt: 408,
+  },
+  {
+    id: 'poet-shelley',
+    title: 'P.B. Shelley (পি বি শেলি)',
+    subtitle: 'Ode to the West Wind, Revolutionary Idealism & Romantic Spirit',
+    link: 'EnglishPoets/note_on_p_b_shelley_emam_mehedi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'indigo',
+    badgeText: 'Master Note',
+    createdAt: 409,
+  },
+  {
+    id: 'poet-byron',
+    title: 'Lord Byron (লর্ড বায়রন)',
+    subtitle: 'Byronic Hero, Don Juan, Romanticism & Dramatic Life',
+    link: 'EnglishPoets/note_on_lord_byron_emam_mehedi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'purple',
+    badgeText: 'Master Note',
+    createdAt: 410,
+  },
+  {
+    id: 'poet-eliot',
+    title: 'T.S. Eliot (টি এস এলিয়ট)',
+    subtitle: 'The Waste Land, Modernist Revolution, Objective Correlative',
+    link: 'EnglishPoets/note_on_t_s_eliot_emam_mehedi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'blue',
+    badgeText: 'Master Note',
+    createdAt: 411,
+  },
+  {
+    id: 'poet-browning',
+    title: 'Robert Browning (রবার্ট ব্রাউনিং)',
+    subtitle: 'Dramatic Monologue Pioneer, Victorian Era Master Profile',
+    link: 'EnglishPoets/Robert Browning.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'amber',
+    badgeText: 'Biography',
+    createdAt: 412,
+  },
+  {
+    id: 'poets-all-hub',
+    title: 'All 50+ English Poets Directory',
+    subtitle: 'Complete Chronological List of English & American Literary Masters',
+    link: 'EnglishPoets.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'blue',
+    badgeText: '50+ Poets',
+    createdAt: 413,
+  },
+];
+
+const INITIAL_VOCABULARY_SUBFOLDERS: ArchiveCardButton[] = [
+  {
+    id: 'vocab-day-1',
+    title: 'Day 01: Daily Vocabulary',
+    subtitle: 'Trilingual Vocabulary Bank with Pronunciation, Meaning & Usage',
+    link: 'vocabs/day1.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 01',
+    createdAt: 501,
+  },
+  {
+    id: 'vocab-day-2',
+    title: 'Day 02: Daily Vocabulary',
+    subtitle: 'Key Academic & Everyday Words with Sentence Examples',
+    link: 'vocabs/day2.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 02',
+    createdAt: 502,
+  },
+  {
+    id: 'vocab-day-3',
+    title: 'Day 03: Daily Vocabulary',
+    subtitle: 'Synonyms, Antonyms & Contextual Usage Drills',
+    link: 'vocabs/day3.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 03',
+    createdAt: 503,
+  },
+  {
+    id: 'vocab-day-4',
+    title: 'Day 04: Daily Vocabulary',
+    subtitle: 'Arabic-Bengali-English Trilingual Study Flashcards',
+    link: 'vocabs/day4.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 04',
+    createdAt: 504,
+  },
+  {
+    id: 'vocab-day-5',
+    title: 'Day 05: Daily Vocabulary',
+    subtitle: 'Competitive Exam & BCS High-Frequency Words',
+    link: 'vocabs/day5.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 05',
+    createdAt: 505,
+  },
+  {
+    id: 'vocab-day-6',
+    title: 'Day 06: Daily Vocabulary',
+    subtitle: 'Idiomatic Expressions & Common Collocations',
+    link: 'vocabs/day6.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 06',
+    createdAt: 506,
+  },
+  {
+    id: 'vocab-day-7',
+    title: 'Day 07: Daily Vocabulary',
+    subtitle: 'Comprehensive Daily Language Vocabulary Lesson',
+    link: 'vocabs/day7.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 07',
+    createdAt: 507,
+  },
+  {
+    id: 'vocab-day-8',
+    title: 'Day 08: Daily Vocabulary',
+    subtitle: 'Modern Linguistic Vocabulary and Definitions',
+    link: 'vocabs/day8.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 08',
+    createdAt: 508,
+  },
+  {
+    id: 'vocab-day-9',
+    title: 'Day 09: Daily Vocabulary',
+    subtitle: 'Grammar and Syntax Focused Vocabulary Practice',
+    link: 'vocabs/day9.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 09',
+    createdAt: 509,
+  },
+  {
+    id: 'vocab-day-10',
+    title: 'Day 10: Daily Vocabulary',
+    subtitle: 'Advanced Academic Vocabulary Drills',
+    link: 'vocabs/day10.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 10',
+    createdAt: 510,
+  },
+  {
+    id: 'vocab-day-11',
+    title: 'Day 11: Daily Vocabulary',
+    subtitle: 'Reading Comprehension Vocabulary Boosters',
+    link: 'vocabs/day11.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 11',
+    createdAt: 511,
+  },
+  {
+    id: 'vocab-day-12',
+    title: 'Day 12: Daily Vocabulary',
+    subtitle: 'Root Words, Prefixes and Suffixes',
+    link: 'vocabs/day12.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 12',
+    createdAt: 512,
+  },
+  {
+    id: 'vocab-day-13',
+    title: 'Day 13: Daily Vocabulary',
+    subtitle: 'Interactive Vocabulary Drills and Translations',
+    link: 'vocabs/day13.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 13',
+    createdAt: 513,
+  },
+  {
+    id: 'vocab-day-14',
+    title: 'Day 14: Daily Vocabulary',
+    subtitle: 'Fortnight Word Review & Self-Assessment Exercises',
+    link: 'vocabs/day14.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 14',
+    createdAt: 514,
+  },
+  {
+    id: 'vocab-weekly-1',
+    title: 'Weekly Vocabulary Review 01',
+    subtitle: 'Cumulative Quiz, Synonyms-Antonyms Bank & Solutions',
+    link: 'vocabs/weekly1.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Sparkles',
+    colorTheme: 'indigo',
+    badgeText: 'Review 01',
+    createdAt: 515,
+  },
+  {
+    id: 'vocab-weekly-2',
+    title: 'Weekly Vocabulary Review 02',
+    subtitle: 'Full 2-Week Vocabulary Assessment & Model Test',
+    link: 'vocabs/weekly2.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Sparkles',
+    colorTheme: 'indigo',
+    badgeText: 'Review 02',
+    createdAt: 516,
+  },
+];
+
 const INITIAL_ACADEMIC_CARD: ArchiveCardButton = {
   id: 'academic-card',
   title: 'Academic',
-  subtitle: '8th Semester Department of Arabic • Syllabi, Modern Poetry, Translation, Criticism & Past Papers',
+  subtitle: '8th Semester Department of Arabic • Modern Poetry, Translation, Criticism, Research & Question Papers',
   targetType: 'folder',
   children: INITIAL_ACADEMIC_SUBFOLDERS,
   iconName: 'GraduationCap',
   colorTheme: 'emerald',
   badgeText: 'DU Arabic',
   createdAt: 0,
+};
+
+const INITIAL_ENGLISH_POETS_CARD: ArchiveCardButton = {
+  id: 'english-poets-card',
+  title: 'English Literature & Poets',
+  subtitle: '50+ English Literary Masters • Shakespeare, Milton, Yeats, Keats, Wordsworth, MCQs & Notes',
+  targetType: 'folder',
+  children: INITIAL_ENGLISH_POETS_SUBFOLDERS,
+  iconName: 'BookOpen',
+  colorTheme: 'blue',
+  badgeText: '50+ Poets',
+  createdAt: 10,
+};
+
+const INITIAL_VOCABULARY_CARD: ArchiveCardButton = {
+  id: 'vocabulary-card',
+  title: 'Daily Vocabularies',
+  subtitle: 'Day 1–14 Daily Lessons, Weekly Reviews & Trilingual Language Bank',
+  targetType: 'folder',
+  children: INITIAL_VOCABULARY_SUBFOLDERS,
+  iconName: 'BookOpen',
+  colorTheme: 'emerald',
+  badgeText: '14 Days',
+  createdAt: 20,
+};
+
+const INITIAL_ICT_PERIPHERALS_CARD: ArchiveCardButton = {
+  id: 'ict-peripherals-card',
+  title: 'ICT & Computer Peripherals',
+  subtitle: 'Input/Output Devices, Computer Architecture, Motherboard, Networking & Tech Notes',
+  link: 'ict_peripherals.html',
+  targetType: 'url',
+  openInNewTab: true,
+  iconName: 'Layers',
+  colorTheme: 'indigo',
+  badgeText: 'ICT Hub',
+  createdAt: 30,
+};
+
+const INITIAL_SSC_CARD: ArchiveCardButton = {
+  id: 'ssc-card',
+  title: 'Educational Resources & SSC',
+  subtitle: 'SSC Syllabi, Secondary School Board Questions, Textbooks & Educational Resources Hub',
+  link: 'Resources.html',
+  targetType: 'url',
+  openInNewTab: true,
+  iconName: 'GraduationCap',
+  colorTheme: 'amber',
+  badgeText: 'Resources',
+  createdAt: 40,
 };
 
 const INITIAL_BCS_SUBFOLDERS: ArchiveCardButton[] = [
@@ -552,32 +1070,107 @@ const INITIAL_BCS_SUBFOLDERS: ArchiveCardButton[] = [
   },
 ];
 
+const INITIAL_BCS_CARD: ArchiveCardButton = {
+  id: 'bcs-card',
+  title: 'BCS',
+  subtitle: 'Bangladesh Civil Service Preliminary, Written & Viva Preparation Hub',
+  targetType: 'folder',
+  children: INITIAL_BCS_SUBFOLDERS,
+  iconName: 'Briefcase',
+  colorTheme: 'emerald',
+  badgeText: '13 Subjects',
+  createdAt: 1,
+};
+
 const INITIAL_CARDS: ArchiveCardButton[] = [
   INITIAL_ACADEMIC_CARD,
-  {
-    id: 'bcs-card',
-    title: 'BCS',
-    subtitle: 'Bangladesh Civil Service Preliminary, Written & Viva Preparation Hub',
-    targetType: 'folder',
-    children: INITIAL_BCS_SUBFOLDERS,
-    iconName: 'Briefcase',
-    colorTheme: 'emerald',
-    badgeText: '13 Subjects',
-    createdAt: 1,
-  },
-  {
-    id: 'ssc-card',
-    title: 'SSC',
-    subtitle: 'Secondary School Certificate Board Questions, Syllabi & Notes',
-    link: 'https://dhakaeducationboard.gov.bd',
-    targetType: 'url',
-    openInNewTab: true,
-    iconName: 'GraduationCap',
-    colorTheme: 'blue',
-    badgeText: 'Board Exam',
-    createdAt: 2,
-  },
+  INITIAL_ENGLISH_POETS_CARD,
+  INITIAL_VOCABULARY_CARD,
+  INITIAL_BCS_CARD,
+  INITIAL_ICT_PERIPHERALS_CARD,
+  INITIAL_SSC_CARD,
 ];
+
+// Helper to make sure all core cards and folders exist
+function ensureCompleteTree(cards: ArchiveCardButton[]): ArchiveCardButton[] {
+  if (!Array.isArray(cards) || cards.length === 0) {
+    return INITIAL_CARDS;
+  }
+
+  let result = [...cards];
+
+  // 1. Ensure Academic Card is present with valid children
+  const academicIdx = result.findIndex(
+    (c) => c.id === 'academic-card' || c.title?.trim().toLowerCase() === 'academic'
+  );
+  if (academicIdx === -1) {
+    result.unshift(INITIAL_ACADEMIC_CARD);
+  } else {
+    const existing = result[academicIdx];
+    if (!existing.children || existing.children.length === 0) {
+      result[academicIdx] = {
+        ...INITIAL_ACADEMIC_CARD,
+        ...existing,
+        children: INITIAL_ACADEMIC_SUBFOLDERS,
+        targetType: 'folder',
+      };
+    }
+  }
+
+  // 2. Ensure English Poets Card
+  const englishIdx = result.findIndex(
+    (c) =>
+      c.id === 'english-poets-card' ||
+      c.title?.toLowerCase().includes('english poet') ||
+      c.title?.toLowerCase().includes('english literature')
+  );
+  if (englishIdx === -1) {
+    result.push(INITIAL_ENGLISH_POETS_CARD);
+  }
+
+  // 3. Ensure Vocabulary Card
+  const vocabIdx = result.findIndex(
+    (c) => c.id === 'vocabulary-card' || c.title?.toLowerCase().includes('vocabulary')
+  );
+  if (vocabIdx === -1) {
+    result.push(INITIAL_VOCABULARY_CARD);
+  }
+
+  // 4. Ensure BCS Card
+  const bcsIdx = result.findIndex(
+    (c) => c.id === 'bcs-card' || c.title?.trim().toLowerCase() === 'bcs'
+  );
+  if (bcsIdx === -1) {
+    result.push(INITIAL_BCS_CARD);
+  } else if (!result[bcsIdx].children || result[bcsIdx].children.length === 0) {
+    result[bcsIdx] = {
+      ...result[bcsIdx],
+      targetType: 'folder',
+      children: INITIAL_BCS_SUBFOLDERS,
+    };
+  }
+
+  // 5. Ensure ICT Peripherals Card
+  const ictIdx = result.findIndex(
+    (c) => c.id === 'ict-peripherals-card' || c.title?.toLowerCase().includes('ict')
+  );
+  if (ictIdx === -1) {
+    result.push(INITIAL_ICT_PERIPHERALS_CARD);
+  }
+
+  // 6. Ensure SSC / Resources Card
+  const sscIdx = result.findIndex(
+    (c) =>
+      c.id === 'ssc-card' ||
+      c.title?.toLowerCase() === 'ssc' ||
+      c.title?.toLowerCase().includes('resource')
+  );
+  if (sscIdx === -1) {
+    result.push(INITIAL_SSC_CARD);
+  }
+
+  return result;
+}
 
 const THEME_STYLES: Record<
   string,
@@ -848,25 +1441,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const hasAcademic = parsed.some((c: ArchiveCardButton) => c.id === 'academic-card' || c.title?.toLowerCase() === 'academic');
-          let upgraded = parsed.map((card: ArchiveCardButton) => {
-            if (card.id === 'bcs-card' && (!card.children || card.children.length === 0)) {
-              return {
-                ...card,
-                targetType: 'folder',
-                children: INITIAL_BCS_SUBFOLDERS,
-                badgeText: card.badgeText || '13 Subjects',
-              };
-            }
-            if ((card.id === 'academic-card' || card.title?.toLowerCase() === 'academic') && (!card.children || card.children.length === 0)) {
-              return INITIAL_ACADEMIC_CARD;
-            }
-            return card;
-          });
-          if (!hasAcademic) {
-            upgraded = [INITIAL_ACADEMIC_CARD, ...upgraded];
-          }
-          return upgraded;
+          return ensureCompleteTree(parsed);
         }
       } catch (e) {
         console.error('Error loading archive cards:', e);
@@ -978,10 +1553,11 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                 if (jsonString) {
                   const cloudCards: ArchiveCardButton[] = JSON.parse(jsonString);
                   if (Array.isArray(cloudCards)) {
-                    rootCardsRef.current = cloudCards;
-                    setRootCards(cloudCards);
+                    const completeTree = ensureCompleteTree(cloudCards);
+                    rootCardsRef.current = completeTree;
+                    setRootCards(completeTree);
                     try {
-                      localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudCards));
+                      localStorage.setItem(STORAGE_KEY, JSON.stringify(completeTree));
                     } catch (lsErr) {
                       console.warn('Local storage size notice:', lsErr);
                     }

@@ -65,5 +65,6 @@ export interface CourseMaterial {
 export interface UserProfile {
   name: string;
   email: string;
+  photoURL?: string;
   isLoggedIn: boolean;
 }
