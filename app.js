@@ -9904,7 +9904,7 @@ if (viewMcqFullscreenBtn && viewMcqModalContent) {
 
 // 1. Global State
 let globalSettings = {
-    darkMode: false,
+    darkMode: (localStorage.getItem('class_caddy_theme') === 'dark' || document.documentElement.classList.contains('dark')),
     fontSize: 16
 };
 
@@ -9933,8 +9933,24 @@ function initSettingsSync(userId) {
 // 3. Apply Settings to Screen
 function applySettingsToDom() {
     // Dark Mode
-    if (globalSettings.darkMode) document.body.classList.add('dark-mode');
-    else document.body.classList.remove('dark-mode');
+    if (globalSettings.darkMode) {
+        document.body.classList.add('dark-mode');
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('class_caddy_theme', 'dark');
+    } else {
+        document.body.classList.remove('dark-mode');
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('class_caddy_theme', 'light');
+    }
+    
+    // Update global dark mode button icon if present
+    const darkBtn = document.getElementById('global-dark-mode-btn');
+    if (darkBtn) {
+        darkBtn.innerHTML = globalSettings.darkMode 
+            ? '<i class="fas fa-sun text-2xl text-amber-400"></i>' 
+            : '<i class="fas fa-moon text-2xl text-yellow-400"></i>';
+        darkBtn.title = globalSettings.darkMode ? "Switch to Light Mode" : "Switch to Dark Mode";
+    }
 
     // Font Size (Apply to Study & View modals)
     ['mcq-study-content', 'view-mcq-content'].forEach(id => {
@@ -9972,9 +9988,15 @@ async function saveUserPreferences() {
 // 5. Global Dark Mode Button Listener
 const globalDarkBtn = document.getElementById('global-dark-mode-btn');
 if (globalDarkBtn) {
-    globalDarkBtn.addEventListener('click', () => {
-        globalSettings.darkMode = !globalSettings.darkMode;
-        applySettingsToDom();
+    globalDarkBtn.addEventListener('click', (e) => {
+        if (e) e.preventDefault();
+        if (typeof window.toggleGlobalTheme === 'function') {
+            window.toggleGlobalTheme();
+            globalSettings.darkMode = document.documentElement.classList.contains('dark');
+        } else {
+            globalSettings.darkMode = !globalSettings.darkMode;
+            applySettingsToDom();
+        }
         saveUserPreferences();
     });
 }

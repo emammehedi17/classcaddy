@@ -561,20 +561,44 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    window.toggleGlobalTheme = function () {
+        const isCurrentlyDark = document.documentElement.classList.contains('dark') || document.body.classList.contains('dark-mode');
+        const nextIsDark = !isCurrentlyDark;
+        applyGlobalTheme(nextIsDark);
+        localStorage.setItem('class_caddy_theme', nextIsDark ? 'dark' : 'light');
+        try {
+            const sp = JSON.parse(localStorage.getItem('studyPlanSettings') || '{}');
+            sp.darkMode = nextIsDark;
+            localStorage.setItem('studyPlanSettings', JSON.stringify(sp));
+        } catch (e) {}
+        try {
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: 'class_caddy_theme',
+                newValue: nextIsDark ? 'dark' : 'light'
+            }));
+        } catch (e) {}
+    };
+
     // Apply theme immediately to prevent flash
     const initialThemeIsDark = getStoredTheme() === 'dark';
     if (initialThemeIsDark) {
         document.documentElement.classList.add('dark');
+        document.body.classList.add('dark-mode');
     }
 
     // 2. Ensure Floating Action Buttons exist on DOM
     function ensureFloatingButtons() {
+        // If this page mounts React App with FloatingActionButtons, do not inject duplicate HTML buttons
+        if (document.getElementById('root')) {
+            return;
+        }
+
         // Scroll Toggle Button
         let scrollBtn = document.getElementById('scroll-toggle-btn');
-        if (!scrollBtn && !document.getElementById('root')) {
+        if (!scrollBtn) {
             scrollBtn = document.createElement('button');
             scrollBtn.id = 'scroll-toggle-btn';
-            scrollBtn.className = 'fixed bottom-32 right-5 z-[999] w-12 h-12 bg-gray-700 hover:bg-gray-900 text-white rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100 cursor-pointer border border-gray-600/30';
+            scrollBtn.className = 'fixed bottom-24 right-5 z-[999] w-12 h-12 bg-gray-700 hover:bg-gray-900 text-white rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100 cursor-pointer border border-gray-600/30';
             scrollBtn.title = 'Scroll to Bottom';
             scrollBtn.setAttribute('aria-label', 'Scroll to Bottom');
             scrollBtn.innerHTML = '<i class="fas fa-arrow-down"></i>';
@@ -585,7 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const updateScrollIcon = () => {
                 const icon = scrollBtn.querySelector('i');
                 if (!icon) return;
-                const scrollPos = window.scrollY || window.pageYOffset;
+                const scrollPos = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
                 if (scrollPos > 300) {
                     icon.className = 'fas fa-arrow-up';
                     scrollBtn.title = "Scroll to Top";
@@ -601,19 +625,28 @@ document.addEventListener('DOMContentLoaded', () => {
             window.addEventListener('scroll', updateScrollIcon, { passive: true });
             updateScrollIcon();
 
-            scrollBtn.onclick = () => {
-                const scrollPos = window.scrollY || window.pageYOffset;
+            scrollBtn.onclick = (e) => {
+                if (e) e.preventDefault();
+                const scrollPos = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
                 if (scrollPos > 300) {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
-                    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+                    const maxScroll = Math.max(
+                        document.body.scrollHeight,
+                        document.documentElement.scrollHeight,
+                        document.body.offsetHeight,
+                        document.documentElement.offsetHeight,
+                        document.body.clientHeight,
+                        document.documentElement.clientHeight
+                    );
+                    window.scrollTo({ top: maxScroll, behavior: 'smooth' });
                 }
             };
         }
 
         // Global Dark Mode Button
         let darkBtn = document.getElementById('global-dark-mode-btn');
-        if (!darkBtn && !document.getElementById('root')) {
+        if (!darkBtn) {
             darkBtn = document.createElement('button');
             darkBtn.id = 'global-dark-mode-btn';
             darkBtn.className = 'fixed bottom-6 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-2xl border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 transition-transform cursor-pointer';
@@ -626,18 +659,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (darkBtn) {
-            darkBtn.onclick = () => {
-                const currentIsDark = document.body.classList.contains('dark-mode') || document.documentElement.classList.contains('dark');
-                const nextIsDark = !currentIsDark;
-                applyGlobalTheme(nextIsDark);
-                localStorage.setItem('class_caddy_theme', nextIsDark ? 'dark' : 'light');
-                
-                // Keep studyPlanSettings synced as well
-                try {
-                    const sp = JSON.parse(localStorage.getItem('studyPlanSettings') || '{}');
-                    sp.darkMode = nextIsDark;
-                    localStorage.setItem('studyPlanSettings', JSON.stringify(sp));
-                } catch (e) {}
+            darkBtn.onclick = (e) => {
+                if (e) e.preventDefault();
+                window.toggleGlobalTheme();
             };
         }
     }
@@ -648,34 +672,38 @@ document.addEventListener('DOMContentLoaded', () => {
         let activePage = 'home';
         if (path.includes('study_plan') || path.includes('study-plan')) {
             activePage = 'study_plan';
-        } else if (path.includes('archives') || path.includes('academic') || path.includes('course-')) {
+        } else if (path.includes('archives')) {
             activePage = 'archives';
         } else if (path.includes('about')) {
             activePage = 'about';
         } else if (path.includes('contact')) {
             activePage = 'contact';
+        } else if (path.includes('academic') || path.includes('course-')) {
+            activePage = 'archives';
         } else if (path.includes('index') || path === '/' || path.endsWith('/')) {
             activePage = 'home';
         }
 
-        // Desktop nav links
-        const navLinks = document.querySelectorAll('header nav a');
-        navLinks.forEach(link => {
+        // Desktop center nav links
+        const desktopNavLinks = document.querySelectorAll('#header-desktop-nav-tabs a, header nav .hidden.md\\:flex a, header nav div.md\\:flex a');
+        desktopNavLinks.forEach(link => {
             const href = (link.getAttribute('href') || '').toLowerCase();
+            if (link.closest('#auth-container-desktop') || link.closest('#auth-container-mobile') || link.classList.contains('signup-button') || href.includes('facebook') || href.includes('du.ac.bd') || link.querySelector('img')) {
+                return;
+            }
             const isMatch = 
                 (activePage === 'home' && (href === 'index.html' || href === '/' || href === '')) ||
-                (activePage === 'archives' && (href.includes('archives') || href.includes('academic'))) ||
+                (activePage === 'archives' && (href === 'archives.html' || href.includes('archives.html'))) ||
                 (activePage === 'study_plan' && href.includes('study_plan')) ||
                 (activePage === 'about' && href.includes('about')) ||
                 (activePage === 'contact' && href.includes('contact'));
 
-            // Reset any conflicting classes
-            link.classList.remove('bg-emerald-500', 'text-white', 'text-emerald-600', 'bg-emerald-50', 'text-gray-600', 'text-gray-700');
+            link.classList.remove('bg-emerald-500', 'text-white', 'font-medium', 'shadow-sm', 'text-emerald-600', 'bg-emerald-50', 'text-gray-600', 'text-gray-700', 'text-gray-300');
             
             if (isMatch) {
                 link.classList.add('bg-emerald-500', 'text-white', 'font-medium', 'shadow-sm');
             } else {
-                link.classList.add('text-gray-600');
+                link.classList.add('text-gray-600', 'dark:text-gray-300');
             }
         });
 
@@ -683,18 +711,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const mobileLinks = document.querySelectorAll('#mobile-menu a');
         mobileLinks.forEach(link => {
             const href = (link.getAttribute('href') || '').toLowerCase();
+            if (link.closest('#auth-container-desktop') || link.closest('#auth-container-mobile') || link.classList.contains('signup-button')) {
+                return;
+            }
             const isMatch = 
                 (activePage === 'home' && (href === 'index.html' || href === '/' || href === '')) ||
-                (activePage === 'archives' && (href.includes('archives') || href.includes('academic'))) ||
+                (activePage === 'archives' && href.includes('archives')) ||
                 (activePage === 'study_plan' && href.includes('study_plan')) ||
                 (activePage === 'about' && href.includes('about')) ||
                 (activePage === 'contact' && href.includes('contact'));
 
-            link.classList.remove('text-emerald-600', 'bg-emerald-50', 'text-gray-700', 'font-semibold');
+            link.classList.remove('text-emerald-600', 'bg-emerald-50', 'dark:bg-emerald-950/40', 'text-gray-700', 'text-gray-300', 'font-semibold');
             if (isMatch) {
-                link.classList.add('text-emerald-600', 'bg-emerald-50', 'font-semibold');
+                link.classList.add('text-emerald-600', 'bg-emerald-50', 'dark:bg-emerald-950/40', 'font-semibold');
             } else {
-                link.classList.add('text-gray-700');
+                link.classList.add('text-gray-700', 'dark:text-gray-300');
             }
         });
     }
@@ -795,7 +826,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const googleSvgData = "data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=";
 
     function syncAuthUI() {
-        // Attempt to read logged-in user profile from localStorage
         let user = null;
         try {
             const raw1 = localStorage.getItem('cc_auth_user');
@@ -819,68 +849,63 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (e) {}
         }
 
-        // On study_plan.html, let app.js handle its own auth UI if it's already attached
-        const isStudyPlanPage = (window.location.pathname || '').includes('study_plan');
-
-        // Update Desktop and Mobile Auth Containers
+        // Update Desktop and Mobile Auth Containers on all pages
         const authDesktop = document.getElementById('auth-container-desktop');
         const authMobile = document.getElementById('auth-container-mobile');
 
-        if (!isStudyPlanPage) {
-            if (user && user.isLoggedIn) {
-                const displayName = user.displayName || user.name || user.email?.split('@')[0] || 'User';
-                const avatar = user.photoURL 
-                    ? `<img src="${user.photoURL}" alt="${displayName}" class="w-7 h-7 rounded-full object-cover border border-emerald-500 inline-block mr-2" onerror="this.src='https://placehold.co/28x28/059669/ffffff?text=${displayName.charAt(0).toUpperCase()}';" />`
-                    : `<span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-bold inline-flex items-center justify-center mr-2 text-xs shadow-sm">${displayName.charAt(0).toUpperCase()}</span>`;
+        if (user && user.isLoggedIn) {
+            const displayName = user.displayName || user.name || user.email?.split('@')[0] || 'User';
+            const avatar = user.photoURL 
+                ? `<img src="${user.photoURL}" alt="${displayName}" class="w-7 h-7 rounded-full object-cover border border-emerald-500 inline-block mr-2" onerror="this.src='https://placehold.co/28x28/059669/ffffff?text=${displayName.charAt(0).toUpperCase()}';" />`
+                : `<span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-bold inline-flex items-center justify-center mr-2 text-xs shadow-sm">${displayName.charAt(0).toUpperCase()}</span>`;
 
-                if (authDesktop) {
-                    authDesktop.innerHTML = `
-                        <div class="flex items-center gap-2">
-                            <a href="study_plan.html" class="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 hover:bg-emerald-50 dark:hover:bg-gray-700 border border-emerald-500/40 rounded-full transition shadow-sm group" title="Open Study Plan">
-                                ${avatar}
-                                <div class="text-left max-w-[120px]">
-                                    <p class="text-xs font-semibold text-gray-800 dark:text-gray-200 group-hover:text-emerald-500 transition truncate">${displayName}</p>
-                                    <p class="text-[10px] text-gray-400 truncate">${user.email || 'My Study Plan'}</p>
-                                </div>
-                            </a>
-                            <button onclick="window.triggerGoogleSignOutGlobal()" class="p-1.5 rounded-full hover:bg-red-500/10 text-gray-400 hover:text-red-500 transition cursor-pointer" title="Logout">
-                                <i class="fas fa-sign-out-alt"></i>
-                            </button>
-                        </div>
-                    `;
-                }
-
-                if (authMobile) {
-                    authMobile.innerHTML = `
-                        <div class="flex items-center justify-between">
-                            <a href="study_plan.html" class="flex items-center gap-2 text-sm font-medium text-emerald-500">
-                                ${avatar}
-                                <span>${displayName}</span>
-                            </a>
-                            <button onclick="window.triggerGoogleSignOutGlobal()" class="text-xs font-medium text-red-500 hover:underline px-2 py-1 cursor-pointer">
-                                Log out
-                            </button>
-                        </div>
-                    `;
-                }
-            } else {
-                if (authDesktop) {
-                    authDesktop.innerHTML = `
-                        <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="header-google-signin-btn flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-700 rounded-full transition-all duration-200 text-sm font-medium shadow-sm hover:shadow cursor-pointer">
-                            <img src="${googleSvgData}" alt="Google" class="w-4 h-4 flex-shrink-0" />
-                            <span>Sign In</span>
+            if (authDesktop) {
+                authDesktop.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <a href="study_plan.html" class="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 hover:bg-emerald-50 dark:hover:bg-gray-700 border border-emerald-500/40 rounded-full transition shadow-sm group" title="Open Study Plan">
+                            ${avatar}
+                            <div class="text-left max-w-[120px]">
+                                <p class="text-xs font-semibold text-gray-800 dark:text-gray-200 group-hover:text-emerald-500 transition truncate">${displayName}</p>
+                                <p class="text-[10px] text-gray-400 truncate">${user.email || 'My Study Plan'}</p>
+                            </div>
+                        </a>
+                        <button onclick="window.triggerGoogleSignOutGlobal()" class="p-1.5 rounded-full hover:bg-red-500/10 text-gray-400 hover:text-red-500 transition cursor-pointer" title="Logout">
+                            <i class="fas fa-sign-out-alt"></i>
                         </button>
-                    `;
-                }
+                    </div>
+                `;
+            }
 
-                if (authMobile) {
-                    authMobile.innerHTML = `
-                        <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="flex items-center justify-center gap-2.5 w-full py-2.5 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-700 rounded-full transition text-sm font-medium shadow-sm cursor-pointer">
-                            <img src="${googleSvgData}" alt="Google" class="w-4 h-4 flex-shrink-0" />
-                            <span>Sign in with Google</span>
+            if (authMobile) {
+                authMobile.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <a href="study_plan.html" class="flex items-center gap-2 text-sm font-medium text-emerald-500">
+                            ${avatar}
+                            <span>${displayName}</span>
+                        </a>
+                        <button onclick="window.triggerGoogleSignOutGlobal()" class="text-xs font-medium text-red-500 hover:underline px-2 py-1 cursor-pointer">
+                            Log out
                         </button>
-                    `;
-                }
+                    </div>
+                `;
+            }
+        } else {
+            if (authDesktop) {
+                authDesktop.innerHTML = `
+                    <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="header-google-signin-btn flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-700 rounded-full transition-all duration-200 text-sm font-medium shadow-sm hover:shadow cursor-pointer">
+                        <img src="${googleSvgData}" alt="Google" class="w-4 h-4 flex-shrink-0" />
+                        <span>Sign In</span>
+                    </button>
+                `;
+            }
+
+            if (authMobile) {
+                authMobile.innerHTML = `
+                    <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="flex items-center justify-center gap-2.5 w-full py-2.5 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-700 rounded-full transition text-sm font-medium shadow-sm cursor-pointer">
+                        <img src="${googleSvgData}" alt="Google" class="w-4 h-4 flex-shrink-0" />
+                        <span>Sign in with Google</span>
+                    </button>
+                `;
             }
         }
 

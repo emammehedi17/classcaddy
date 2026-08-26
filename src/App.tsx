@@ -25,6 +25,8 @@ export default function App() {
     if (path.includes('contact') || hash.includes('contact')) return 'contact';
     if (path.includes('academic') || hash.includes('academic')) return 'academic';
     if (hash.includes('course-')) return hash.replace('#', '') as PageView;
+    if (path.includes('archives') || hash.includes('archives')) return 'archives';
+    if (path.includes('index') || path === '/' || path.endsWith('/')) return 'home';
     return 'archives';
   });
   const [theme, setTheme] = useState<ThemeMode>(() => {
