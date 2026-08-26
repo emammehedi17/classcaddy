@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 15 - Systematic Vocabulary Batch</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            500: '#000000', 
+                            600: '#000000', 
+                            700: '#000000', 
+                            800: '#000000', 
+                            900: '#000000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f3ff; /* violet-50 */
+            color: #000000; 
+        }
+        .bn-text {
+            font-family: 'Hind Siliguri', sans-serif;
+            color: #000000; 
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #8b5cf6; /* violet-500 */
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 16px;
+            position: fixed;
+            z-index: 50;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s, visibility 0.3s;
+        }
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-violet-50 via-emerald-50 to-purple-50 min-h-screen p-4 md:p-8 selection:bg-violet-200 selection:text-violet-900 text-black">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <!-- Header -->
+        <header class="glass-card rounded-2xl shadow-lg p-6 md:p-8 mb-8 flex flex-col md:flex-row justify-between items-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-violet-600 to-emerald-500"></div>
+            
+            <div class="text-center md:text-left mb-6 md:mb-0 z-10">
+                <div class="inline-block px-3 py-1 bg-violet-100 text-violet-800 rounded-full text-sm font-bold mb-3">
+                    <i class="fas fa-calendar-day mr-2"></i>Daily Vocabulary
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-2 bg-gradient-to-r from-violet-700 to-emerald-700 gradient-text pb-1">
+                    Day 15
+                </h1>
+                <p class="text-black font-semibold flex items-center justify-center md:justify-start gap-2">
+                    <i class="fas fa-pen-nib text-violet-600"></i>
+                    Created by: 
+                    <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-violet-700 hover:text-violet-900 hover:underline transition-colors font-bold relative group">
+                        Emam Mehedi
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-600 transition-all group-hover:w-full"></span>
+                    </a>
+                </p>
+            </div>
+
+            <div class="flex-shrink-0 z-10 bg-white p-2 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-300 border-2 border-violet-100">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-24 h-24 md:w-28 md:h-28 rounded-lg">
+                <p class="text-center text-xs text-black mt-1 font-bold">Scan Me</p>
+            </div>
+        </header>
+
+        <!-- Story Section -->
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-10 mb-8 border-t-4 border-t-violet-500 relative">
+            <div class="absolute -top-4 -right-4 text-violet-200 opacity-20">
+                <i class="fas fa-building text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 id="story-title" class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-user-secret text-violet-600"></i> রাতের আধাঁরে ষড়যন্ত্র (The Corporate Conspiracy)
+                </h2>
+                <button onclick="copyStory()" class="mt-4 md:mt-0 bg-violet-100 hover:bg-violet-200 text-violet-800 font-bold py-2 px-4 rounded-lg shadow-sm transition-all flex items-center gap-2 border border-violet-300">
+                    <i class="fas fa-copy"></i> Copy Story
+                </button>
+            </div>
+            
+            <div id="story-content" class="bn-text text-lg md:text-xl text-black font-medium leading-relaxed space-y-4 bg-white/70 p-6 rounded-xl border border-violet-100 shadow-inner">
+                <p>
+                    শহরের এক নামকরা কোম্পানিতে <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">White collar job</span> <span class="text-emerald-700 font-bold">(দাপ্তরিক কাজ / অফিসিয়াল কাজ)</span> করত রবিন। তার কাজ ছিল মূলত কোম্পানির <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Tertiary</span> <span class="text-emerald-700 font-bold">(তৃতীয় পর্যায়ের)</span> ডেটা বিশ্লেষণ করা। সে তার কাজ খুব ভালোভাবে <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Get on</span> <span class="text-emerald-700 font-bold">(মানিয়ে চলা / চালিয়ে নেওয়া)</span> করছিল। কিন্তু একদিন রাতে কোম্পানির প্রধান অফিসে হঠাৎ আগুন লেগে পুরো ভবনটি <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Ablaze</span> <span class="text-emerald-700 font-bold">(জ্বলন্ত / প্রজ্বলিত)</span> হয়ে গেল। রবিন জানত এটি কোনো সাধারণ দুর্ঘটনা নয়।
+                </p>
+                <p>
+                    সে সাহস করে পুলিশের কাছে একটি অভিযোগ <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Lodge</span> <span class="text-emerald-700 font-bold">(দায়ের করা)</span> করল। মামলার দায়িত্ব পেলেন ইন্সপেক্টর কবির, যিনি ছিলেন অত্যন্ত <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Sober</span> <span class="text-emerald-700 font-bold">(ধীরস্থির / মদ্যপ নয় এমন)</span> এবং <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Disinterested</span> <span class="text-emerald-700 font-bold">(পক্ষপাতহীন / স্বার্থহীন)</span> একজন মানুষ। তিনি তদন্তে নেমে সিসিটিভি ফুটেজে অবাক করা একটি দৃশ্য দেখলেন। 
+                </p>
+                <p>
+                    কোম্পানির এক উচ্চপদস্থ কর্মকর্তা রাতে <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Somnambulist</span> <span class="text-emerald-700 font-bold">(ঘুমন্ত অবস্থায় হাঁটার রোগী)</span>-এর মতো অভিনয় করে এই আগুন লাগিয়েছিলেন, যাতে কোম্পানির বিশাল ব্যাংক ঋণ <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Write off</span> <span class="text-emerald-700 font-bold">(বাতিল বলে গণ্য করা / মওকুফ করা)</span> করা যায়।
+                </p>
+                <p>
+                    অপরাধী যখন বুঝতে পারল রবিন সব জানে, তখন সে রবিনের বিরুদ্ধে পত্রিকায় একটি <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Slanderous</span> <span class="text-emerald-700 font-bold">(মানহানিকর / কুৎসামূলক)</span> প্রতিবেদন ছাপাল। কিন্তু ইন্সপেক্টর কবির সঠিক সময়ে আদালতে প্রমাণ হাজির করে রবিনের মিথ্যা জেলযাত্রা <span class="font-bold text-violet-800 bg-violet-100 px-1.5 py-0.5 rounded shadow-sm">Obviate</span> <span class="text-emerald-700 font-bold">(দূর করা / এড়ানো)</span> করতে সক্ষম হলেন এবং আসল অপরাধী ধরা পড়ল।
+                </p>
+            </div>
+        </section>
+
+        <!-- Word Breakdown Section -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-black mb-6 flex items-center gap-3 px-2">
+                <i class="fas fa-layer-group text-violet-600"></i> Word Breakdown
+            </h2>
+            
+            <div id="word-breakdown-container" class="grid grid-cols-1 gap-6">
+                <!-- Word cards dynamically injected here -->
+            </div>
+        </section>
+
+        <!-- MCQs Section -->
+        <section class="mb-8 mt-12 border-t-4 border-dashed border-violet-200 pt-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 px-2">
+                <h2 class="text-2xl font-bold text-black flex items-center gap-3">
+                    <i class="fas fa-tasks text-violet-600"></i> Knowledge Check (25 MCQs)
+                </h2>
+                <button onclick="copyMCQs()" class="mt-4 md:mt-0 bg-white hover:bg-gray-50 text-violet-700 font-bold py-2 px-4 rounded-lg shadow transition-all flex items-center gap-2 border border-violet-200">
+                    <i class="fas fa-copy"></i> Copy MCQs
+                </button>
+            </div>
+            
+            <div id="mcq-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- MCQs dynamically injected here -->
+            </div>
+        </section>
+
+        <!-- Summary List -->
+        <section class="glass-card rounded-2xl shadow-lg p-6 md:p-8 bg-gradient-to-r from-violet-900 to-emerald-900 text-white relative overflow-hidden mt-8">
+            <div class="absolute -right-10 -bottom-10 opacity-10">
+                <i class="fas fa-clipboard-list text-9xl"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-violet-50">
+                    <i class="fas fa-list-check text-emerald-400"></i> Summary List
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2 border border-emerald-400">
+                    <i class="fas fa-copy"></i> Copy List
+                </button>
+            </div>
+            
+            <div class="bg-black/40 p-5 rounded-xl border border-emerald-500/30 font-mono text-sm leading-relaxed overflow-x-auto z-10 relative bn-text">
+<pre id="summaryText" class="whitespace-pre-wrap text-emerald-50 font-bold"></pre>
+            </div>
+        </section>
+
+        <!-- Navigation Buttons -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8 mb-4">
+            <a href="https://classcaddy.netlify.app/vocabs/weekly2" class="w-full sm:w-auto text-center bg-white hover:bg-violet-50 text-violet-700 font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-violet-200 hover:border-violet-400 group">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Previous (Weekly-2)
+            </a>
+            <a href="https://classcaddy.netlify.app/vocabs/day16" class="w-full sm:w-auto text-center bg-gradient-to-r from-violet-600 to-emerald-600 hover:from-violet-700 hover:to-emerald-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-3 border-2 border-transparent hover:shadow-lg transform hover:-translate-y-0.5 group">
+                Next (Day-16) <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-gray-700 text-sm mt-8 pb-8 font-bold">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i id="toast-icon" class="fas fa-check-circle mr-2"></i><span id="toast-message">Copied!</span></div>
+
+    <script>
+        // --- STREAMING_CHUNK: Defining Word Data Array ---
+        const wordData = [
+            {
+                id: 1,
+                word: "Get on",
+                pronunciation: "গেট অন",
+                bnTitle: "(পরিচালনা করা / মানিয়ে চলা / চালিয়ে নেওয়া)",
+                theme: { border: "border-violet-500", text: "text-violet-700" },
+                syn: { en: "Manage", pronunciation: "ম্যানেজ", bn: "(সামলানো / মানিয়ে নেওয়া)", ex: "She manages to get on with her small salary.", exBn: "(সে তার সামান্য বেতনে মানিয়ে নিতে সক্ষম হয়।)" },
+                ant: { en: "Struggle", pronunciation: "স্ট্রাগল", bn: "(কষ্ট করা / সংগ্রাম করা)", ex: "He struggles to get along with his new boss.", exBn: "(সে তার নতুন বসের সাথে মানিয়ে চলতে সংগ্রাম করে।)" },
+                origin: "এটি একটি ইংরেজি Phrasal Verb। 'Get' (পাওয়া) এবং 'On' (চলমান থাকা) মিলে এর অর্থ দাঁড়ায় কোনো কঠিন পরিস্থিতি বা কাজের মধ্যে নিজেকে টিকিয়ে রাখা বা মানিয়ে নেওয়া।",
+                mnemonic: "'Get' (পাওয়া) + 'On' (উপরে)। অনেক সমস্যার 'On' (উপরে) উঠেও যে নিজের কাজ 'Get' বা আদায় করে নিতে পারে, সে ভালো Get on বা মানিয়ে নিতে পারে।",
+                sentences: [
+                    { en: "How are you getting on with your new job?", bn: "(তোমার নতুন চাকরির সাথে তুমি কীভাবে মানিয়ে নিচ্ছ?)" },
+                    { en: "We can get on perfectly well without his help.", bn: "(তার সাহায্য ছাড়াই আমরা খুব ভালোভাবে চালিয়ে নিতে পারব।)" },
+                    { en: "Despite the difficulties, she managed to get on with her life.", bn: "(অসুবিধা সত্ত্বেও, সে তার জীবনের সাথে মানিয়ে নিতে সক্ষম হয়েছিল।)" },
+                    { en: "He is getting on very well at school.", bn: "(সে স্কুলে খুব ভালোভাবে মানিয়ে চলছে।)" },
+                    { en: "They don't get on with each other.", bn: "(তারা একে অপরের সাথে মানিয়ে চলতে পারে না।)" }
+                ]
+            },
+            {
+                id: 2,
+                word: "Tertiary",
+                pronunciation: "টার্শিয়ারি",
+                bnTitle: "(তৃতীয় পর্যায়ের)",
+                theme: { border: "border-emerald-500", text: "text-emerald-700" },
+                syn: { en: "Third", pronunciation: "থার্ড", bn: "(তৃতীয়)", ex: "He is studying in the third level of education.", exBn: "(সে শিক্ষার তৃতীয় স্তরে পড়াশোনা করছে।)" },
+                ant: { en: "Primary", pronunciation: "প্রাইমারি", bn: "(প্রাথমিক / প্রথম পর্যায়ের)", ex: "Primary education is crucial for children.", exBn: "(প্রাথমিক শিক্ষা শিশুদের জন্য অত্যন্ত গুরুত্বপূর্ণ।)" },
+                origin: "ল্যাটিন শব্দ 'tertiarius' (তৃতীয় অংশ ধারণকারী) থেকে এসেছে। এটি Primary (প্রথম) এবং Secondary (দ্বিতীয়) এর পরের পর্যায়কে নির্দেশ করে।",
+                mnemonic: "Primary (প্রথম), Secondary (দ্বিতীয়), Tertiary (তৃতীয়)। 'T' দিয়ে Third এবং 'T' দিয়ে Tertiary মনে রাখুন।",
+                sentences: [
+                    { en: "He teaches at a tertiary education institution.", bn: "(তিনি একটি তৃতীয় পর্যায়ের শিক্ষাপ্রতিষ্ঠানে (যেমন বিশ্ববিদ্যালয়) পড়ান।)" },
+                    { en: "The tertiary sector of the economy includes services like banking.", bn: "(অর্থনীতির তৃতীয় খাতে ব্যাংকিংয়ের মতো পরিষেবা অন্তর্ভুক্ত রয়েছে।)" },
+                    { en: "They provide tertiary medical care for severe diseases.", bn: "(তারা গুরুতর রোগের জন্য তৃতীয় পর্যায়ের (উন্নত) চিকিৎসা সেবা প্রদান করে।)" },
+                    { en: "The issue is of tertiary importance to us right now.", bn: "(সমস্যাটি এই মুহূর্তে আমাদের কাছে তৃতীয় পর্যায়ের (খুব কম) গুরুত্বপূর্ণ।)" },
+                    { en: "Tertiary colors are made by mixing primary and secondary colors.", bn: "(তৃতীয় পর্যায়ের রঙগুলো প্রাথমিক এবং মাধ্যমিক রং মিশিয়ে তৈরি করা হয়।)" }
+                ]
+            },
+            {
+                id: 3,
+                word: "Ablaze",
+                pronunciation: "অ্যাব্লেজ",
+                bnTitle: "(জ্বলন্ত / প্রজ্বলিত)",
+                theme: { border: "border-orange-500", text: "text-orange-700" },
+                syn: { en: "Burning", pronunciation: "বার্নিং", bn: "(জ্বলন্ত)", ex: "The entire building was burning fiercely.", exBn: "(পুরো ভবনটি তীব্রভাবে জ্বলছিল।)" },
+                ant: { en: "Extinguished", pronunciation: "এক্সটিংগুইশড", bn: "(নেভানো)", ex: "The fire was successfully extinguished by morning.", exBn: "(সকালের মধ্যে আগুন সফলভাবে নিভিয়ে ফেলা হয়েছিল।)" },
+                origin: "ইংরেজি উপসর্গ 'a-' (অবস্থায়) এবং 'blaze' (শিখা) মিলে গঠিত। এর অর্থ আগুনে পুড়ছে এমন বা তীব্র আলোতে জ্বলজ্বল করছে এমন কিছু।",
+                mnemonic: "'A' + 'Blaze' (শিখা)। যেখানে দাউদাউ করে আগুনের শিখা জ্বলছে, সেটাই Ablaze বা জ্বলন্ত।",
+                sentences: [
+                    { en: "By the time the fire engines arrived, the house was ablaze.", bn: "(ফায়ার ইঞ্জিন আসার আগেই বাড়িটি জ্বলন্ত অবস্থায় ছিল।)" },
+                    { en: "The sky was ablaze with the colors of the sunset.", bn: "(সূর্যাস্তের রঙে আকাশ প্রজ্বলিত হয়ে উঠেছিল।)" },
+                    { en: "His eyes were ablaze with anger.", bn: "(রাগে তার চোখ জ্বলজ্বল করছিল।)" },
+                    { en: "The whole forest was set ablaze by a single match.", bn: "(একটি মাত্র দেশলাই দিয়ে পুরো জঙ্গলে আগুন লাগিয়ে (জ্বলন্ত করে) দেওয়া হয়েছিল।)" },
+                    { en: "The city center was ablaze with neon lights at night.", bn: "(রাতের বেলা শহরের কেন্দ্রস্থল নিয়ন আলোতে প্রজ্বলিত ছিল।)" }
+                ]
+            },
+            {
+                id: 4,
+                word: "White collar job",
+                pronunciation: "হোয়াইট কলার জব",
+                bnTitle: "(দাপ্তরিক কাজ / অফিসিয়াল কাজ)",
+                theme: { border: "border-blue-500", text: "text-blue-700" },
+                syn: { en: "Clerical job", pronunciation: "ক্ল্যারিকাল জব", bn: "(অফিসের কাজ)", ex: "She left her clerical job to start a business.", exBn: "(সে ব্যবসা শুরু করার জন্য তার অফিসের কাজ ছেড়ে দিয়েছিল।)" },
+                ant: { en: "Blue-collar job", pronunciation: "ব্লু-কলার জব", bn: "(কায়িক শ্রমের কাজ)", ex: "Factory workers usually have blue-collar jobs.", exBn: "(কারখানার শ্রমিকদের সাধারণত কায়িক শ্রমের কাজ থাকে।)" },
+                origin: "বিশ শতকের শুরুতে শব্দটি জনপ্রিয় হয়। অফিসে কাজ করা মানুষেরা সাধারণত পরিষ্কার সাদা শার্ট (White collar) পরত, অন্যদিকে কারখানার শ্রমিকরা ময়লা ঢাকতে নীল শার্ট (Blue collar) পরত।",
+                mnemonic: "অফিসে যারা কাজ করে তারা পরিষ্কার 'White Collar' বা সাদা কলারের শার্ট পরে, তাই অফিসিয়াল বা দাপ্তরিক কাজকে White collar job বলে।",
+                sentences: [
+                    { en: "He always wanted a comfortable white collar job.", bn: "(সে সবসময় একটি আরামদায়ক দাপ্তরিক কাজ বা অফিসের চাকরি চেয়েছিল।)" },
+                    { en: "Many graduates are looking for white collar jobs in the city.", bn: "(অনেক স্নাতক শহরে অফিসিয়াল চাকরি খুঁজছেন।)" },
+                    { en: "White collar workers usually earn a fixed monthly salary.", bn: "(অফিসের কর্মীরা সাধারণত একটি নির্দিষ্ট মাসিক বেতন উপার্জন করেন।)" },
+                    { en: "The software industry provides highly paid white collar jobs.", bn: "(সফটওয়্যার শিল্প উচ্চ বেতনের দাপ্তরিক কাজ প্রদান করে।)" },
+                    { en: "He quit his white collar job to become a farmer.", bn: "(সে কৃষক হওয়ার জন্য তার অফিসের কাজ ছেড়ে দিয়েছিল।)" }
+                ]
+            },
+            {
+                id: 5,
+                word: "Lodge",
+                pronunciation: "লজ",
+                bnTitle: "(অভিযোগ দায়ের করা / বাসা বা থাকার জায়গা)",
+                theme: { border: "border-red-500", text: "text-red-700" },
+                syn: { en: "File / Register", pronunciation: "ফাইল / রেজিস্টার", bn: "(দায়ের করা / নথিভুক্ত করা)", ex: "I am going to file a complaint against him.", exBn: "(আমি তার বিরুদ্ধে একটি অভিযোগ দায়ের করতে যাচ্ছি।)" },
+                ant: { en: "Withdraw", pronunciation: "উইথড্র", bn: "(প্রত্যাহার করা)", ex: "She decided to withdraw her complaint.", exBn: "(সে তার অভিযোগ প্রত্যাহার করার সিদ্ধান্ত নিয়েছে।)" },
+                origin: "পুরানো ফরাসি শব্দ 'loge' থেকে এসেছে, যার অর্থ 'আশ্রয়' বা 'ছোট ঘর'। আইনি বা আনুষ্ঠানিক পরিভাষায় এর অর্থ কোনো কর্তৃপক্ষের কাছে অভিযোগ রাখা বা দায়ের করা।",
+                mnemonic: "পুলিশের কাছে বা কোনো 'Lodge' (থাকার জায়গা) এ গিয়ে নিজের অভিযোগ 'Lodge' (দায়ের) করা।",
+                sentences: [
+                    { en: "I would like to lodge a formal complaint with the manager.", bn: "(আমি ম্যানেজারের কাছে একটি আনুষ্ঠানিক অভিযোগ দায়ের করতে চাই।)" },
+                    { en: "They lodged the money securely in the bank.", bn: "(তারা ব্যাংকে নিরাপদে টাকা গচ্ছিত রেখেছিল।)" },
+                    { en: "A fish bone got lodged in his throat.", bn: "(তার গলায় একটি মাছের কাঁটা আটকে (দায়ের হয়ে) গিয়েছিল।)" },
+                    { en: "We stayed at a hunting lodge in the mountains.", bn: "(আমরা পাহাড়ে একটি শিকারিদের থাকার জায়গায় (লজে) ছিলাম।)" },
+                    { en: "The lawyers will lodge an appeal tomorrow.", bn: "(আইনজীবীরা আগামীকাল একটি আপিল দায়ের করবেন।)" }
+                ]
+            },
+            {
+                id: 6,
+                word: "Somnambulist",
+                pronunciation: "সমন্যামবুলিস্ট",
+                bnTitle: "(ঘুমন্ত অবস্থায় হাঁটার রোগী)",
+                theme: { border: "border-purple-600", text: "text-purple-800" },
+                syn: { en: "Sleepwalker", pronunciation: "স্লিপওয়াকার", bn: "(যে ঘুমে হাঁটে)", ex: "The sleepwalker was found wandering in the garden.", exBn: "(ঘুমে হাঁটা লোকটিকে বাগানে ঘুরতে দেখা গিয়েছিল।)" },
+                ant: { en: "Awake", pronunciation: "অ্যাওয়েক", bn: "(জাগ্রত ব্যক্তি)", ex: "You must stay awake during the entire shift.", exBn: "(আপনাকে পুরো শিফটের সময় জেগে থাকতে হবে।)" },
+                origin: "ল্যাটিন 'somnus' (ঘুম) এবং 'ambulare' (হাঁটা) থেকে এসেছে। যে ব্যক্তি ঘুমের মধ্যে বিছানা থেকে উঠে হাঁটাহাঁটি করে।",
+                mnemonic: "'Somnus' মানে ঘুম আর 'Amble' মানে হাঁটা। যে ঘুমের মধ্যে Amble বা হাঁটে, সে Somnambulist বা ঘুমন্ত অবস্থায় হাঁটার রোগী।",
+                sentences: [
+                    { en: "As a somnambulist, he sometimes unlocks the front door at night.", bn: "(ঘুমন্ত অবস্থায় হাঁটার রোগী হওয়ায় সে মাঝে মাঝে রাতে সদর দরজার তালা খুলে দেয়।)" },
+                    { en: "It is dangerous to suddenly wake up a somnambulist.", bn: "(ঘুমন্ত অবস্থায় হাঁটার রোগীকে হঠাৎ জাগিয়ে তোলা বিপজ্জনক।)" },
+                    { en: "The somnambulist walked into the kitchen while fast asleep.", bn: "(ঘুমন্ত রোগী গভীর ঘুমের মধ্যে রান্নাঘরে হেঁটে গিয়েছিল।)" },
+                    { en: "Doctors are treating her for being a somnambulist.", bn: "(ডাক্তাররা তাকে ঘুমে হাঁটার রোগী হিসেবে চিকিৎসা করছেন।)" },
+                    { en: "The movie features a creepy somnambulist wandering the halls.", bn: "(সিনেমাটিতে হলঘরে ঘুরে বেড়ানো এক ভীতিকর ঘুমে হাঁটা রোগীর দৃশ্য রয়েছে।)" }
+                ]
+            },
+            {
+                id: 7,
+                word: "Disinterested",
+                pronunciation: "ডিসইন্টারেস্টেড",
+                bnTitle: "(পক্ষপাতহীন / নিরাসক্ত / স্বার্থহীন)",
+                theme: { border: "border-teal-600", text: "text-teal-800" },
+                syn: { en: "Impartial", pronunciation: "ইমপার্শিয়াল", bn: "(নিরপেক্ষ)", ex: "A judge must remain completely impartial.", exBn: "(একজন বিচারককে অবশ্যই সম্পূর্ণ নিরপেক্ষ থাকতে হবে।)" },
+                ant: { en: "Biased", pronunciation: "বায়াসড", bn: "(পক্ষপাতদুষ্ট)", ex: "His decision was biased and unfair.", exBn: "(তার সিদ্ধান্তটি ছিল পক্ষপাতদুষ্ট এবং অন্যায্য।)" },
+                origin: "'Dis-' (না) এবং 'interested' (ব্যক্তিগতভাবে লাভবান হওয়ার আগ্রহ)। এর অর্থ অনাগ্রহী নয়, বরং এর অর্থ হলো কোনো বিচারে নিজের কোনো ব্যক্তিগত স্বার্থ বা পক্ষপাত না থাকা।",
+                mnemonic: "'Dis' (না) + 'Interest' (স্বার্থ)। কোনো বিচারে যার নিজের কোনো Interest বা ব্যক্তিগত স্বার্থ নেই, সে Disinterested বা পক্ষপাতহীন। (Note: এটি uninterested বা অনাগ্রহী থেকে ভিন্ন!)",
+                sentences: [
+                    { en: "We need a disinterested third party to resolve this dispute.", bn: "(এই বিরোধ সমাধানের জন্য আমাদের একজন পক্ষপাতহীন তৃতীয় পক্ষের প্রয়োজন।)" },
+                    { en: "A good leader gives disinterested advice for the company's benefit.", bn: "(একজন ভালো নেতা কোম্পানির সুবিধার্থে স্বার্থহীন বা পক্ষপাতহীন পরামর্শ দেন।)" },
+                    { en: "The banker offered disinterested financial guidance to the clients.", bn: "(ব্যাংকার গ্রাহকদের পক্ষপাতহীন আর্থিক দিকনির্দেশনা দিয়েছিলেন।)" },
+                    { en: "He performed a purely disinterested act of charity.", bn: "(সে সম্পূর্ণ স্বার্থহীন একটি দাতব্য কাজ করেছিল।)" },
+                    { en: "The referee must be a disinterested observer of the game.", bn: "(রেফারিকে অবশ্যই খেলার একজন পক্ষপাতহীন পর্যবেক্ষক হতে হবে।)" }
+                ]
+            },
+            {
+                id: 8,
+                word: "Obviate",
+                pronunciation: "অবভিয়েট",
+                bnTitle: "(দূর করা / এড়ানো)",
+                theme: { border: "border-cyan-600", text: "text-cyan-800" },
+                syn: { en: "Prevent", pronunciation: "প্রিভেন্ট", bn: "(প্রতিরোধ করা)", ex: "Vaccines help prevent serious diseases.", exBn: "(ভ্যাকসিন গুরুতর রোগ প্রতিরোধ করতে সাহায্য করে।)" },
+                ant: { en: "Necessitate", pronunciation: "নেসেসিটেট", bn: "(অপরিহার্য করা / প্রয়োজন সৃষ্টি করা)", ex: "The bad weather will necessitate a change of plans.", exBn: "(খারাপ আবহাওয়া পরিকল্পনার পরিবর্তন অপরিহার্য করে তুলবে।)" },
+                origin: "ল্যাটিন 'obviare' থেকে এসেছে, যার অর্থ 'পথে বাধা দেওয়া' (ob- 'বিরুদ্ধে' + via 'পথ')। এর অর্থ হলো কোনো সমস্যা বা প্রয়োজনের পথ আগে থেকেই বন্ধ করে তা দূর করা।",
+                mnemonic: "'Ob' (অব) + 'viate' (via / পথ)। কোনো বিপদ আসার আগেই তার 'via' বা পথ বন্ধ করে তাকে দূর করাই হলো Obviate।",
+                sentences: [
+                    { en: "The new bridge will obviate the need for a ferry.", bn: "(নতুন সেতুটি ফেরির প্রয়োজনীয়তা দূর করবে।)" },
+                    { en: "A peaceful agreement obviated the threat of war.", bn: "(একটি শান্তিপূর্ণ চুক্তি যুদ্ধের হুমকি এড়াতে সাহায্য করেছিল।)" },
+                    { en: "Proper planning can obviate many future problems.", bn: "(সঠিক পরিকল্পনা ভবিষ্যতের অনেক সমস্যা দূর করতে পারে।)" },
+                    { en: "This new medical treatment obviates the need for surgery.", bn: "(এই নতুন চিকিৎসা পদ্ধতিটি সার্জারির প্রয়োজনীয়তা দূর করে।)" },
+                    { en: "He wore a helmet to obviate any risk of head injury.", bn: "(মাথায় আঘাতের ঝুঁকি এড়াতে সে একটি হেলমেট পরেছিল।)" }
+                ]
+            },
+            {
+                id: 9,
+                word: "Slanderous",
+                pronunciation: "স্ল্যান্ডারাস",
+                bnTitle: "(মানহানিকর / কুৎসামূলক)",
+                theme: { border: "border-fuchsia-600", text: "text-fuchsia-800" },
+                syn: { en: "Defamatory", pronunciation: "ডিফ্যামেটরি", bn: "(মানহানিকর)", ex: "The magazine published a defamatory article about the actor.", exBn: "(ম্যাগাজিনটি অভিনেতার সম্পর্কে একটি মানহানিকর নিবন্ধ প্রকাশ করেছিল।)" },
+                ant: { en: "Complimentary", pronunciation: "কমপ্লিমেন্টারি", bn: "(প্রশংসামূলক)", ex: "She made complimentary remarks about his cooking.", exBn: "(সে তার রান্নার বিষয়ে প্রশংসামূলক মন্তব্য করেছিল।)" },
+                origin: "'Slander' (মৌখিকভাবে কারও সম্মান নষ্ট করা) শব্দটির বিশেষণ রূপ। এর অর্থ হলো কারও সম্পর্কে মিথ্যা এবং ক্ষতিকারক কথা বলা।",
+                mnemonic: "'Slander' (কুৎসা রটানো) থেকে এসেছে। যে কথা অন্যের সম্মান নষ্ট করে বা মানহানিকর, তাই Slanderous। (কাউকে 'Slap' বা থাপ্পড় মারলে যেমন সম্মান যায়, তেমনি Slanderous কথা বলেও সম্মান নষ্ট করা হয়।)",
+                sentences: [
+                    { en: "He sued the newspaper for printing slanderous accusations.", bn: "(মানহানিকর অভিযোগ ছাপানোর জন্য সে সংবাদপত্রের বিরুদ্ধে মামলা করেছিল।)" },
+                    { en: "The politician's speech was full of slanderous remarks.", bn: "(রাজনীতিবিদের বক্তৃতাটি কুৎসামূলক মন্তব্যে পূর্ণ ছিল।)" },
+                    { en: "Spreading slanderous rumors can ruin a person's life.", bn: "(মানহানিকর গুজব ছড়ানো একজন মানুষের জীবন ধ্বংস করে দিতে পারে।)" },
+                    { en: "I will not listen to these slanderous lies.", bn: "(আমি এই মানহানিকর মিথ্যা কথাগুলো শুনব না।)" },
+                    { en: "She strongly denied the slanderous claims made against her.", bn: "(সে তার বিরুদ্ধে আনা কুৎসামূলক দাবিগুলো দৃঢ়ভাবে অস্বীকার করেছিল।)" }
+                ]
+            },
+            {
+                id: 10,
+                word: "Write off",
+                pronunciation: "রাইট অফ",
+                bnTitle: "(বাতিল বলে গণ্য করা / হিসাব থেকে বাদ দেওয়া)",
+                theme: { border: "border-rose-600", text: "text-rose-800" },
+                syn: { en: "Cancel", pronunciation: "ক্যান্সেল", bn: "(বাতিল করা)", ex: "The bank had to cancel his enormous debt.", exBn: "(ব্যাংকটিকে তার বিশাল ঋণ বাতিল করতে হয়েছিল।)" },
+                ant: { en: "Retain", pronunciation: "রিটেইন", bn: "(ধরে রাখা / সংরক্ষণ করা)", ex: "The company decided to retain its old employees.", exBn: "(কোম্পানিটি তার পুরোনো কর্মচারীদের ধরে রাখার সিদ্ধান্ত নিয়েছে।)" },
+                origin: "এটি একটি Phrasal Verb। হিসাববিজ্ঞানে এটি এমন একটি ঋণ বা সম্পদকে বোঝায় যার আর কোনো মূল্য নেই বলে হিসাবের খাতা থেকে 'কেটে বাদ দেওয়া' (written off) হয়।",
+                mnemonic: "খাতায় কিছু 'Write' (লিখে) সেটা 'Off' (কেটে) দেওয়া, অর্থাৎ কোনো কিছুকে মূল্যহীন বা বাতিল বলে গণ্য করা (Write off)।",
+                sentences: [
+                    { en: "The bank agreed to write off his $10,000 debt.", bn: "(ব্যাংক তার ১০,০০০ ডলারের ঋণ বাতিল বলে গণ্য করতে (মওকুফ করতে) রাজি হয়েছিল।)" },
+                    { en: "After the severe crash, the car was a complete write-off.", bn: "(ভয়াবহ দুর্ঘটনার পর গাড়িটি সম্পূর্ণ বাতিল বলে গণ্য হয়েছিল।)" },
+                    { en: "Do not write off his ideas just because he is young.", bn: "(সে তরুণ বলেই তার ধারণাগুলোকে বাতিল বলে গণ্য করবেন না।)" },
+                    { en: "The team had a bad start, but don't write them off yet.", bn: "(দলটি খারাপ শুরু করেছিল, কিন্তু এখনই তাদের হিসাব থেকে বাদ দেবেন না।)" },
+                    { en: "The company had to write off millions in bad investments.", bn: "(খারাপ বিনিয়োগের কারণে কোম্পানিকে লক্ষ লক্ষ টাকা হিসাব থেকে বাদ দিতে হয়েছিল।)" }
+                ]
+            },
+            {
+                id: 11,
+                word: "Sober",
+                pronunciation: "সোবার",
+                bnTitle: "(মদ্যপ নয় এমন / ধীরস্থির / সংযত)",
+                theme: { border: "border-gray-800", text: "text-gray-900" },
+                syn: { en: "Serious / Abstinent", pronunciation: "সিরিয়াস / অ্যাবস্টিনেন্ট", bn: "(গম্ভীর / সংযমী)", ex: "He had a very serious and thoughtful expression.", exBn: "(তার একটি খুব গম্ভীর এবং চিন্তাশীল অভিব্যক্তি ছিল।)" },
+                ant: { en: "Drunk", pronunciation: "ড্রাংক", bn: "(মাতাল)", ex: "The drunk driver was arrested by the police.", exBn: "(মাতাল চালকটিকে পুলিশ গ্রেপ্তার করেছিল।)" },
+                origin: "ল্যাটিন 'sobrius' থেকে এসেছে, যার অর্থ 'মদ্যপ নয়' (se- 'ছাড়া' + ebrius 'মাতাল')। এটি নেশামুক্ত অবস্থা, অথবা অত্যন্ত গম্ভীর এবং বাস্তববাদী মানসিকতাকে বোঝায়।",
+                mnemonic: "'Robber' (ডাকাত) মদ খেয়ে মাতাল হয়, কিন্তু ভালো মানুষরা 'Sober' (ধীরস্থির, সংযত ও মদ্যপ নয় এমন) থাকে।",
+                sentences: [
+                    { en: "He has been completely sober for five years.", bn: "(সে পাঁচ বছর ধরে সম্পূর্ণ মদ্যপান থেকে বিরত বা সোবার আছে।)" },
+                    { en: "The doctor gave a sober assessment of the patient's health.", bn: "(ডাক্তার রোগীর স্বাস্থ্যের একটি ধীরস্থির এবং বাস্তবসম্মত মূল্যায়ন দিয়েছিলেন।)" },
+                    { en: "Please make sure you are sober before driving the car.", bn: "(গাড়ি চালানোর আগে দয়া করে নিশ্চিত করুন যে আপনি মদ্যপ নন।)" },
+                    { en: "The funeral was a very sober and quiet event.", bn: "(অন্ত্যেষ্টিক্রিয়াটি একটি অত্যন্ত গম্ভীর এবং শান্ত অনুষ্ঠান ছিল।)" },
+                    { en: "Her sudden illness was a sober reminder of life's fragility.", bn: "(তার আকস্মিক অসুস্থতা ছিল জীবনের ভঙ্গুরতা সম্পর্কে একটি ধীরস্থির বা গম্ভীর অনুস্মারক।)" }
+                ]
+            }
+        ];
+
+        // --- STREAMING_CHUNK: Defining MCQs Data Array (25 Questions) ---
+        const mcqData = [
+            {
+                q: "What does the phrasal verb 'Get on' mean in the context of managing?",
+                options: { a: "To ride a horse", b: "To cope or manage successfully in a difficult situation", c: "To fall down completely", d: "To wait for a long time" },
+                correct: "b",
+                note: "'Get on' means to manage or cope with a situation. For example, 'How are you getting on with your new job?'"
+            },
+            {
+                q: "Which word correctly acts as a synonym for 'Tertiary'?",
+                options: { a: "First", b: "Primary", c: "Third", d: "Initial" },
+                correct: "c",
+                note: "Tertiary refers to the third level or stage. Primary is first, secondary is second, and tertiary is third."
+            },
+            {
+                q: "What does the word 'Ablaze' mean?",
+                options: { a: "Completely frozen", b: "Burning fiercely or brightly", c: "Hidden in the dark", d: "Moving very slowly" },
+                correct: "b",
+                note: "Ablaze means burning or on fire. It can also metaphorically mean full of bright light or emotion."
+            },
+            {
+                q: "What kind of profession is a 'White collar job'?",
+                options: { a: "A job involving heavy manual labor", b: "A job that requires working in a coal mine", c: "A clerical, administrative, or professional office job", d: "A job that requires farming" },
+                correct: "c",
+                note: "White collar jobs are office-based, professional jobs. They are contrasted with 'blue-collar' jobs, which involve manual labor."
+            },
+            {
+                q: "If you 'Lodge' a complaint with the police, what are you doing?",
+                options: { a: "Withdrawing it", b: "Ignoring it completely", c: "Filing or registering it officially", d: "Hiding it from everyone" },
+                correct: "c",
+                note: "To lodge a complaint means to officially present or file a formal complaint with an authority."
+            },
+            {
+                q: "A person who is a 'Somnambulist' frequently does what?",
+                options: { a: "Talks too much", b: "Eats while sleeping", c: "Walks while deeply asleep", d: "Stays awake all night" },
+                correct: "c",
+                note: "A somnambulist is a sleepwalker. 'Somnus' means sleep and 'ambulare' means to walk."
+            },
+            {
+                q: "What does the word 'Disinterested' mean?",
+                options: { a: "Bored and unenthusiastic", b: "Impartial and not influenced by personal advantage", c: "Hateful and aggressive", d: "Eager to make a profit" },
+                correct: "b",
+                note: "Disinterested does NOT mean bored (that's uninterested). It means unbiased, impartial, and having no personal stake in the matter."
+            },
+            {
+                q: "If a new invention will 'Obviate' the need for hard labor, it will:",
+                options: { a: "Increase the need for it", b: "Prevent or remove the need for it", c: "Make it much harder", d: "Explain it clearly" },
+                correct: "b",
+                note: "To obviate means to remove a need or difficulty, or to prevent it from happening."
+            },
+            {
+                q: "Which of the following describes a 'Slanderous' remark?",
+                options: { a: "A highly complimentary and kind statement", b: "A false, malicious, and defamatory spoken statement", c: "A scientifically proven fact", d: "A loud musical sound" },
+                correct: "b",
+                note: "Slanderous means defamatory. It refers to speaking false and damaging things about someone's reputation."
+            },
+            {
+                q: "What does the phrasal verb 'Write off' mean?",
+                options: { a: "To write a long essay", b: "To cancel a debt or dismiss someone/something as insignificant", c: "To turn off the lights", d: "To preserve carefully" },
+                correct: "b",
+                note: "To write off a debt means to cancel it. To write off a person or team means to dismiss them as having no value or chance of success."
+            },
+            {
+                q: "Which word is an antonym for 'Sober'?",
+                options: { a: "Drunk", b: "Serious", c: "Calm", d: "Steady" },
+                correct: "a",
+                note: "Sober means not affected by alcohol (or having a serious attitude). Therefore, 'Drunk' is its direct antonym."
+            },
+            {
+                q: "Analogy -> Primary : First :: Tertiary : ?",
+                options: { a: "Second", b: "Third", c: "Last", d: "Initial" },
+                correct: "b",
+                note: "Primary corresponds to first. Tertiary corresponds to the third level or order."
+            },
+            {
+                q: "Fill in the blank: The entire forest was set ______ by a single lightning strike.",
+                options: { a: "Disinterested", b: "Sober", c: "Ablaze", d: "Tertiary" },
+                correct: "c",
+                note: "Ablaze means burning fiercely, which fits perfectly with a forest catching fire from lightning."
+            },
+            {
+                q: "Which word represents the antonym of 'Disinterested'?",
+                options: { a: "Impartial", b: "Neutral", c: "Biased", d: "Fair" },
+                correct: "c",
+                note: "Disinterested means impartial and unbiased. Therefore, 'Biased' (having a personal stake or prejudice) is the antonym."
+            },
+            {
+                q: "Fill in the blank: The bank finally decided to ______ his massive $50,000 loan since he was bankrupt.",
+                options: { a: "Lodge", b: "Write off", c: "Get on", d: "Obviate" },
+                correct: "b",
+                note: "Banks 'write off' loans when they realize the debt can never be collected."
+            },
+            {
+                q: "Analogy -> Blue collar : Factory :: White collar : ?",
+                options: { a: "Farm", b: "Mine", c: "Office", d: "Construction" },
+                correct: "c",
+                note: "Blue-collar jobs are typically in factories or manual labor. White-collar jobs are typically in offices or administrative settings."
+            },
+            {
+                q: "If a judge is completely 'Disinterested' in a court case, she is:",
+                options: { a: "Falling asleep on the bench", b: "Impartial and fair, having no personal bias", c: "Taking bribes from the defendant", d: "Refusing to hear the evidence" },
+                correct: "b",
+                note: "Again, disinterested means unbiased. A judge MUST be disinterested to ensure a fair trial."
+            },
+            {
+                q: "What is the primary action of a 'Somnambulist'?",
+                options: { a: "Talking while eating", b: "Walking while sleeping", c: "Singing while crying", d: "Running while awake" },
+                correct: "b",
+                note: "A somnambulist is someone who walks in their sleep."
+            },
+            {
+                q: "Which word is a synonym for 'Obviate'?",
+                options: { a: "Necessitate", b: "Create", c: "Prevent", d: "Require" },
+                correct: "c",
+                note: "To obviate a problem is to prevent it or remove the need for it."
+            },
+            {
+                q: "Analogy -> Slanderous : Defamatory :: Sober : ?",
+                options: { a: "Drunk", b: "Serious", c: "Playful", d: "Loud" },
+                correct: "b",
+                note: "Slanderous and Defamatory are synonyms. Sober and Serious (or abstinent) are synonyms."
+            },
+            {
+                q: "Fill in the blank: Despite her low income, she manages to ______ quite well and feed her family.",
+                options: { a: "Get on", b: "Write off", c: "Obviate", d: "Lodge" },
+                correct: "a",
+                note: "'Get on' means to manage or cope successfully, which fits the context of surviving on a low income."
+            },
+            {
+                q: "If a politician makes 'Slanderous' claims about an opponent, they are:",
+                options: { a: "Praising their hard work", b: "Spreading false, damaging lies about them", c: "Asking for their advice", d: "Offering them a job" },
+                correct: "b",
+                note: "Slanderous claims are malicious, false statements meant to damage someone's reputation."
+            },
+            {
+                q: "Which of the following describes a 'Sober' reality?",
+                options: { a: "A highly amusing and funny joke", b: "A serious, sensible, and solemn situation", c: "A wild party with lots of dancing", d: "A confusing puzzle" },
+                correct: "b",
+                note: "Sober can mean free from alcohol, but as an adjective describing reality or a thought, it means serious, solemn, and sensible."
+            },
+            {
+                q: "Fill in the blank: I need to go to the customer service desk to ______ a formal complaint about my broken TV.",
+                options: { a: "Obviate", b: "Lodge", c: "Write off", d: "Get on" },
+                correct: "b",
+                note: "You 'lodge' a complaint when you officially submit or register it with an authority or company."
+            },
+            {
+                q: "Which word is derived from the Latin words for 'against' and 'way/path'?",
+                options: { a: "Somnambulist", b: "Obviate", c: "Ablaze", d: "Tertiary" },
+                correct: "b",
+                note: "Obviate comes from Latin 'obviare' (ob- 'against' + via 'way'). It means meeting and resolving a difficulty in its path to prevent it."
+            }
+        ];
+
+        // --- STREAMING_CHUNK: Function to render the Word Breakdown ---
+        function renderWordBreakdown() {
+            const container = document.getElementById('word-breakdown-container');
+            let htmlContent = '';
+
+            wordData.forEach(data => {
+                let sentencesHtml = '';
+                data.sentences.forEach(s => {
+                    sentencesHtml += `
+                        <li>
+                            ${s.en}<br>
+                            <span class="text-xs text-black bn-text ml-5 block mt-0.5">${s.bn}</span>
+                        </li>
+                    `;
+                });
+
+                htmlContent += `
+                <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 border-l-4 ${data.theme.border}">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-gray-200">
+                        <h3 class="text-2xl font-extrabold ${data.theme.text}">${data.id}. ${data.word} <span class="text-lg font-medium text-gray-500 ml-1">/${data.pronunciation}/</span> <span class="text-sm font-bold text-gray-700 bn-text ml-2">${data.bnTitle}</span></h3>
+                        <div class="mt-2 md:mt-0 flex gap-2">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold"><i class="fas fa-check-circle mr-1"></i>Syn: ${data.syn.en.split(' / ')[0]}</span>
+                            <span class="px-3 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold"><i class="fas fa-times-circle mr-1"></i>Ant: ${data.ant.en.split(' / ')[0]}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-history text-gray-500"></i> Origin & Evolution</h4>
+                        <p class="text-sm text-black font-medium leading-relaxed bn-text">${data.origin}</p>
+                    </div>
+
+                    <div class="mb-5 bg-violet-50 p-4 rounded-xl border-l-4 border-violet-400 shadow-sm">
+                        <h4 class="font-bold text-violet-800 flex items-center gap-2 mb-1"><i class="fas fa-lightbulb text-violet-500"></i> Mnemonic (স্মৃতিসূত্র)</h4>
+                        <p class="text-sm text-black font-bold bn-text leading-relaxed">${data.mnemonic}</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="font-bold text-black flex items-center gap-2 mb-2"><i class="fas fa-list-ul text-gray-500"></i> 5 Sentences</h4>
+                        <ul class="list-disc list-inside text-sm text-black font-medium space-y-3 ml-2">
+                            ${sentencesHtml}
+                        </ul>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-gray-100 p-4 rounded-xl">
+                        <div>
+                            <span class="font-extrabold text-green-700">Synonym:</span> <span class="font-bold text-black">${data.syn.en}</span> <span class="text-xs text-gray-500 ml-1">/${data.syn.pronunciation}/</span> <span class="bn-text text-sm font-bold text-black">${data.syn.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.syn.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.syn.exBn}</p>
+                        </div>
+                        <div>
+                            <span class="font-extrabold text-red-600">Antonym:</span> <span class="font-bold text-black">${data.ant.en}</span> <span class="text-xs text-gray-500 ml-1">/${data.ant.pronunciation}/</span> <span class="bn-text text-sm font-bold text-black">${data.ant.bn}</span>
+                            <p class="text-sm text-black font-semibold mt-1">${data.ant.ex}</p>
+                            <p class="text-xs text-black bn-text font-bold mt-0.5">${data.ant.exBn}</p>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // --- STREAMING_CHUNK: Function to render the MCQs ---
+        function renderMCQs() {
+            const container = document.getElementById('mcq-container');
+            let htmlContent = '';
+
+            mcqData.forEach((mcq, index) => {
+                htmlContent += `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-lg text-black mb-3">${index + 1}. ${mcq.q}</h3>
+                    <ul class="space-y-2 mb-4 ml-2">
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">a.</span> ${mcq.options.a}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">b.</span> ${mcq.options.b}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">c.</span> ${mcq.options.c}</li>
+                        <li class="flex items-start gap-2 text-black font-medium"><span class="font-bold text-gray-500 w-5">d.</span> ${mcq.options.d}</li>
+                    </ul>
+                    
+                    <details class="group bg-violet-50 rounded-lg outline-none border border-violet-100">
+                        <summary class="cursor-pointer font-bold text-violet-700 px-4 py-2 flex items-center justify-between select-none">
+                            <span class="flex items-center gap-2"><i class="fas fa-eye"></i> Show Answer</span>
+                            <i class="fas fa-chevron-down transform group-open:rotate-180 transition-transform duration-300"></i>
+                        </summary>
+                        <div class="px-4 pb-4 pt-1 border-t border-violet-200 mt-1">
+                            <p class="text-black font-bold mb-2">Correct Answer: <span class="bg-green-100 text-green-800 px-2 py-0.5 rounded uppercase">${mcq.correct}</span></p>
+                            <p class="text-sm text-black font-medium"><span class="font-bold">Note:</span> ${mcq.note}</p>
+                        </div>
+                    </details>
+                </div>
+                `;
+            });
+
+            container.innerHTML = htmlContent;
+        }
+
+        // --- STREAMING_CHUNK: Function to generate Summary List ---
+        function generateSummary() {
+            const summaryElement = document.getElementById('summaryText');
+            let summaryString = '';
+            wordData.forEach(data => {
+                let meaning = data.bnTitle.replace(/[()]/g, '');
+                let syn = data.syn.en.split(' / ')[0];
+                let ant = data.ant.en.split(' / ')[0];
+                summaryString += `${data.word}, ${meaning} - ${syn} @ ${ant};\n`;
+            });
+            summaryElement.innerText = summaryString;
+        }
+
+        // --- STREAMING_CHUNK: DOM Content Loaded initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderWordBreakdown();
+            renderMCQs();
+            generateSummary();
+        });
+
+        // --- STREAMING_CHUNK: Copy functionality ---
+        function copySummary() {
+            const summaryText = document.getElementById('summaryText').innerText;
+            copyTextToClipboard(summaryText, 'Summary list copied!');
+        }
+        
+        function copyStory() {
+            const storyTitle = document.getElementById('story-title').innerText.trim();
+            const storyParagraphs = document.querySelectorAll('#story-content p');
+            let storyText = storyTitle + '\n\n';
+            
+            storyParagraphs.forEach(p => {
+                storyText += p.innerText + '\n\n';
+            });
+            
+            copyTextToClipboard(storyText.trim(), 'Story copied!');
+        }
+
+        function copyMCQs() {
+            let copyText = '';
+            
+            mcqData.forEach((mcq, index) => {
+                copyText += `${index + 1}. ${mcq.q}\n`;
+                copyText += `a. ${mcq.options.a}\n`;
+                copyText += `b. ${mcq.options.b}\n`;
+                copyText += `c. ${mcq.options.c}\n`;
+                copyText += `d. ${mcq.options.d}\n`;
+                copyText += `correct answer: ${mcq.correct}\n`;
+                copyText += `Note: ${mcq.note}\n\n`;
+            });
+            
+            copyTextToClipboard(copyText.trim(), '25 MCQs copied exactly formatted!');
+        }
+
+        function copyTextToClipboard(text, successMessage) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(successMessage);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => showToast(successMessage)).catch(e => console.error("Clipboard API failed", e));
+                }
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toast-message");
+            toastMessage.innerText = message;
+            
+            toast.className = "show";
+            
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

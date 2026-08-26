@@ -48,6 +48,7 @@ import {
   Square,
   Minimize2,
   Columns3,
+  Files,
 } from 'lucide-react';
 
 export type ExplorerLayout = 'large-icons' | 'medium-icons' | 'small-icons' | 'list' | 'details' | 'tiles';
@@ -60,6 +61,7 @@ interface Windows11ExplorerProps {
   folderPath: string[];
   isDark: boolean;
   isAdmin: boolean;
+  isCloudSyncing?: boolean;
   onNavigateFolder: (path: string[]) => void;
   onNavigateBack: () => void;
   onCardClick: (card: ArchiveCardButton) => void;
@@ -68,6 +70,7 @@ interface Windows11ExplorerProps {
   onDeleteCard: (id: string) => void;
   onSaveCurrentCards: (updated: ArchiveCardButton[]) => void;
   onOpenUpload: () => void;
+  onOpenMultiUpload?: () => void;
   onCloseExplorer: () => void;
 }
 
@@ -77,6 +80,7 @@ export const Windows11Explorer: React.FC<Windows11ExplorerProps> = ({
   folderPath,
   isDark,
   isAdmin,
+  isCloudSyncing = false,
   onNavigateFolder,
   onNavigateBack,
   onCardClick,
@@ -85,6 +89,7 @@ export const Windows11Explorer: React.FC<Windows11ExplorerProps> = ({
   onDeleteCard,
   onSaveCurrentCards,
   onOpenUpload,
+  onOpenMultiUpload,
   onCloseExplorer,
 }) => {
   // View mode and sorting state
@@ -584,11 +589,26 @@ export const Windows11Explorer: React.FC<Windows11ExplorerProps> = ({
                     ? 'bg-blue-950/40 hover:bg-blue-900/60 text-blue-300 border-blue-800/60'
                     : 'bg-blue-50 hover:bg-blue-100 text-blue-900 border-blue-300'
                 }`}
-                title="Direct Upload File from PC/Mobile"
+                title="Upload Single File from PC/Mobile"
               >
                 <Upload className="w-4 h-4 text-blue-500" />
-                <span>Upload</span>
+                <span>Upload File</span>
               </button>
+
+              {onOpenMultiUpload && (
+                <button
+                  onClick={onOpenMultiUpload}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition shadow-sm ${
+                    isDark
+                      ? 'bg-purple-950/40 hover:bg-purple-900/60 text-purple-300 border-purple-800/60'
+                      : 'bg-purple-50 hover:bg-purple-100 text-purple-900 border-purple-300'
+                  }`}
+                  title="Upload Multiple Files at Once (Separate Files, Not Zipped)"
+                >
+                  <Files className="w-4 h-4 text-purple-500" />
+                  <span>Upload Multiple Files</span>
+                </button>
+              )}
 
               <div className={`h-5 w-[1px] mx-1 ${isDark ? 'bg-gray-700' : 'bg-slate-300'}`} />
 
@@ -1297,6 +1317,12 @@ export const Windows11Explorer: React.FC<Windows11ExplorerProps> = ({
               1 item selected
             </span>
           )}
+          {isCloudSyncing && (
+            <span className="flex items-center gap-1 text-blue-500 font-medium animate-pulse">
+              <RefreshCw className="w-3 h-3 animate-spin" />
+              <span>Syncing cloud folders...</span>
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <span>Windows 11 File Explorer Mode</span>
@@ -1412,6 +1438,18 @@ export const Windows11Explorer: React.FC<Windows11ExplorerProps> = ({
                 <Upload className="w-3.5 h-3.5 text-blue-500" />
                 <span>Upload File</span>
               </button>
+              {onOpenMultiUpload && (
+                <button
+                  onClick={() => {
+                    onOpenMultiUpload();
+                    setContextMenu(null);
+                  }}
+                  className="w-full px-3 py-1.5 flex items-center gap-2 text-left hover:bg-purple-600 hover:text-white transition"
+                >
+                  <Files className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Upload Multiple Files</span>
+                </button>
+              )}
               {clipboardItem && (
                 <>
                   <div className="border-t border-gray-700/50 my-1" />
