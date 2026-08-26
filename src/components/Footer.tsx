@@ -58,13 +58,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, theme = 'light' }) =
                       : 'text-slate-600 hover:text-emerald-700'
                   }`}
                 >
-                  Archives
+                  Archives & Academic
                 </button>
               </li>
               <li>
                 <button
                   onClick={() => {
-                    onNavigate('academic');
+                    onNavigate('study-plan');
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                   className={`transition ${
@@ -73,7 +73,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, theme = 'light' }) =
                       : 'text-slate-600 hover:text-emerald-700'
                   }`}
                 >
-                  Courses
+                  Study Plan
                 </button>
               </li>
               <li>

@@ -20,6 +20,7 @@ interface HeaderProps {
   user: UserProfile;
   onLogout: () => void;
   onOpenSignup: () => void;
+  onGoogleSignIn?: () => void;
   theme?: ThemeMode;
   toggleTheme?: () => void;
   onToggleExplorerMode?: () => void;
@@ -31,15 +32,13 @@ export const Header: React.FC<HeaderProps> = ({
   user,
   onLogout,
   onOpenSignup,
+  onGoogleSignIn,
   theme = 'light',
   toggleTheme,
   onToggleExplorerMode,
 }) => {
-  const [academicDropdownOpen, setAcademicDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileAcademicOpen, setMobileAcademicOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const dropdownTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const isDark = theme === 'dark';
 
@@ -51,720 +50,323 @@ export const Header: React.FC<HeaderProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleMouseEnterAcademic = () => {
-    if (dropdownTimerRef.current) clearTimeout(dropdownTimerRef.current);
-    setAcademicDropdownOpen(true);
+  const getNavClass = (tab: PageView) => {
+    const isActive = currentPage === tab;
+    if (isActive) {
+      return 'px-5 py-1.5 rounded-full transition-colors bg-emerald-500 text-white font-medium shadow-sm';
+    }
+    return isDark
+      ? 'px-5 py-1.5 rounded-full transition-colors text-gray-300 hover:text-white hover:bg-gray-700 font-normal'
+      : 'px-5 py-1.5 rounded-full transition-colors text-gray-600 hover:text-gray-900 hover:bg-gray-200 font-normal';
   };
 
-  const handleMouseLeaveAcademic = () => {
-    dropdownTimerRef.current = setTimeout(() => {
-      setAcademicDropdownOpen(false);
-    }, 400);
+  const getMobileNavClass = (tab: PageView) => {
+    const isActive = currentPage === tab;
+    if (isActive) {
+      return 'block w-full text-left px-6 py-3 text-sm font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 transition-colors';
+    }
+    return isDark
+      ? 'block w-full text-left px-6 py-3 text-sm text-gray-300 hover:bg-gray-800 transition-colors'
+      : 'block w-full text-left px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors';
   };
 
-  const isAcademicActive =
-    currentPage === 'academic' ||
-    currentPage.startsWith('course-');
+  const googleIconSvg = (
+    <img
+      src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4="
+      alt="Google"
+      className="w-4 h-4 flex-shrink-0"
+    />
+  );
 
   return (
     <header
       id="main-navigation-header"
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b transition-all duration-200 ${
         isDark
-          ? isScrolled
-            ? 'bg-gray-900/95 backdrop-blur-md shadow-lg border-b border-gray-800 text-white'
-            : 'bg-gray-900/80 backdrop-blur-sm border-b border-gray-800/80 text-white'
-          : isScrolled
-          ? 'bg-white/95 backdrop-blur-md shadow-md border-b border-slate-200 text-slate-800'
-          : 'bg-white/85 backdrop-blur-sm border-b border-slate-200/80 text-slate-800'
+          ? 'bg-gray-900/95 border-gray-800 text-gray-100'
+          : 'bg-white/95 border-gray-200 text-gray-800 shadow-sm'
       }`}
     >
-      <div className="container mx-auto px-4 md:px-6 py-3">
+      <div className="container mx-auto px-6 py-3">
         <nav className="flex justify-between items-center">
           {/* Left: Profile & Brand Title */}
-          <div className="flex items-center gap-3 md:gap-4">
+          <div className="flex items-center gap-4">
             <a
               id="header-founder-profile"
               href="https://facebook.com/emammehedi17"
               target="_blank"
               rel="noopener noreferrer"
-              className="relative group block"
+              className="block flex-shrink-0"
               title="Emam Mehedi - Class Caddy Founder"
             >
-              <div
-                className={`h-10 w-10 md:h-12 md:w-12 rounded-full border-2 overflow-hidden flex items-center justify-center shadow-sm transition-all ${
-                  isDark
-                    ? 'border-emerald-400 bg-gray-800 group-hover:border-emerald-300'
-                    : 'border-emerald-600 bg-emerald-50 group-hover:border-emerald-700'
-                }`}
-              >
-                <span
-                  className={`font-bold text-base md:text-lg ${
-                    isDark ? 'text-emerald-400' : 'text-emerald-700'
-                  }`}
-                >
-                  CC
-                </span>
-              </div>
-              <span
-                className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 ${
-                  isDark
-                    ? 'bg-emerald-500 border-gray-900'
-                    : 'bg-emerald-600 border-white'
-                }`}
-              ></span>
+              <img
+                src="images/profile.jpg"
+                alt="Profile"
+                className="h-10 w-10 rounded-full border-2 border-emerald-500 object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = 'https://placehold.co/40x40/ffffff/059669?text=CC';
+                }}
+              />
             </a>
-            <button
-              id="header-brand-title-btn"
-              onClick={() => {
-                setCurrentPage('home');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className="text-left focus:outline-none group"
+            <a
+              id="header-brand-title-link"
+              href="index.html"
+              className="text-left focus:outline-none"
             >
-              <h1
-                className={`text-xl md:text-2xl font-bold tracking-tight transition-colors ${
-                  isDark
-                    ? 'text-white group-hover:text-emerald-400'
-                    : 'text-slate-900 group-hover:text-emerald-700'
-                }`}
-              >
+              <h1 className={`text-xl font-bold transition-colors ${
+                isDark ? 'text-gray-100 hover:text-emerald-400' : 'text-gray-800 hover:text-emerald-600'
+              }`}>
                 Class Caddy
               </h1>
-              <p
-                className={`text-[10px] uppercase font-semibold tracking-wider hidden sm:block ${
-                  isDark ? 'text-emerald-400/80' : 'text-emerald-700'
-                }`}
-              >
-                Academic Learning Hub
-              </p>
-            </button>
+            </a>
           </div>
 
-          {/* Center: Desktop Navigation */}
+          {/* Center: Desktop Navigation Tabs */}
           <div
             id="header-desktop-nav-tabs"
-            className={`hidden lg:flex items-center gap-1 backdrop-blur-md rounded-full p-1.5 shadow-inner transition-colors ${
-              isDark
-                ? 'bg-gray-800/60 border border-gray-700/70'
-                : 'bg-slate-100/90 border border-slate-200'
+            className={`hidden md:flex items-center gap-1 border rounded-full p-1 text-sm ${
+              isDark ? 'bg-gray-800/80 border-gray-700' : 'bg-gray-100/70 border-gray-200'
             }`}
           >
-            <button
+            <a
               id="nav-tab-home"
-              onClick={() => {
-                setCurrentPage('home');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
-                currentPage === 'home'
-                  ? isDark
-                    ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20 font-semibold'
-                    : 'bg-emerald-600 text-white shadow-sm font-semibold'
-                  : isDark
-                  ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
-              }`}
+              href="index.html"
+              className={getNavClass('home')}
             >
               Home
-            </button>
+            </a>
 
-            <button
+            <a
               id="nav-tab-archives"
-              onClick={() => {
-                setCurrentPage('archives');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
-                currentPage === 'archives'
-                  ? isDark
-                    ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20 font-semibold'
-                    : 'bg-emerald-600 text-white shadow-sm font-semibold'
-                  : isDark
-                  ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
-              }`}
+              href="archives.html"
+              className={getNavClass('archives')}
             >
               Archives
-            </button>
+            </a>
 
-            {/* Academic Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={handleMouseEnterAcademic}
-              onMouseLeave={handleMouseLeaveAcademic}
-            >
-              <button
-                id="nav-tab-academic"
-                onClick={() => setCurrentPage('academic')}
-                className={`px-5 py-2 text-sm font-semibold rounded-full transition-all duration-200 flex items-center gap-1.5 ${
-                  isAcademicActive
-                    ? isDark
-                      ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20'
-                      : 'bg-emerald-600 text-white shadow-sm'
-                    : isDark
-                    ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
-                }`}
-              >
-                <span>Academic</span>
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform duration-200 ${
-                    academicDropdownOpen ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-
-              {/* Dropdown Menu */}
-              {academicDropdownOpen && (
-                <div
-                  className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 backdrop-blur-lg rounded-xl shadow-2xl overflow-hidden py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150 border ${
-                    isDark
-                      ? 'bg-gray-800/95 border-gray-700 text-gray-200'
-                      : 'bg-white/95 border-slate-200 text-slate-800'
-                  }`}
-                >
-                  <div
-                    className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider border-b ${
-                      isDark
-                        ? 'text-emerald-400 border-gray-700/60'
-                        : 'text-emerald-700 border-slate-200 bg-slate-50'
-                    }`}
-                  >
-                    8th Semester Courses
-                  </div>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-405');
-                      setAcademicDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors ${
-                      isDark
-                        ? 'text-gray-200 hover:bg-emerald-600/20 hover:text-emerald-300'
-                        : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-800'
-                    }`}
-                  >
-                    <span>Course-405 (Modern Poetry II)</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-406');
-                      setAcademicDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors ${
-                      isDark
-                        ? 'text-gray-200 hover:bg-emerald-600/20 hover:text-emerald-300'
-                        : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-800'
-                    }`}
-                  >
-                    <span>Course-406 (Translation)</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-407');
-                      setAcademicDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors ${
-                      isDark
-                        ? 'text-gray-200 hover:bg-emerald-600/20 hover:text-emerald-300'
-                        : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-800'
-                    }`}
-                  >
-                    <span>Course-407 (Criticism)</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-408');
-                      setAcademicDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between transition-colors ${
-                      isDark
-                        ? 'text-gray-200 hover:bg-emerald-600/20 hover:text-emerald-300'
-                        : 'text-slate-700 hover:bg-emerald-50 hover:text-emerald-800'
-                    }`}
-                  >
-                    <span>Course-408 (B) (Research)</span>
-                  </button>
-                  <div
-                    className={`border-t my-1 ${
-                      isDark ? 'border-gray-700/60' : 'border-slate-200'
-                    }`}
-                  ></div>
-                  <a
-                    href="https://drive.google.com/file/d/1I9fn2ROCa7a-jrNZ9U0KXK8jKznh378D/view?usp=sharing"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`w-full text-left px-4 py-2 text-xs flex items-center gap-2 transition-colors ${
-                      isDark
-                        ? 'text-gray-400 hover:bg-gray-700/60 hover:text-white'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                    }`}
-                  >
-                    <BookOpen
-                      className={`w-3.5 h-3.5 ${
-                        isDark ? 'text-emerald-400' : 'text-emerald-600'
-                      }`}
-                    />
-                    <span>Previous Questions (2017-21)</span>
-                  </a>
-                  <a
-                    href="https://drive.google.com/file/d/1A6asIfVsu2LiVqg0lozhS075gF-GvT_-/view?usp=sharing"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`w-full text-left px-4 py-2 text-xs flex items-center gap-2 transition-colors ${
-                      isDark
-                        ? 'text-gray-400 hover:bg-gray-700/60 hover:text-white'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                    }`}
-                  >
-                    <BookOpen
-                      className={`w-3.5 h-3.5 ${
-                        isDark ? 'text-emerald-400' : 'text-emerald-600'
-                      }`}
-                    />
-                    <span>Previous Questions (2021-23)</span>
-                  </a>
-                </div>
-              )}
-            </div>
-
-            <button
+            <a
               id="nav-tab-study-plan"
-              onClick={() => setCurrentPage('study-plan')}
-              className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
-                currentPage === 'study-plan'
-                  ? isDark
-                    ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20 font-semibold'
-                    : 'bg-emerald-600 text-white shadow-sm font-semibold'
-                  : isDark
-                  ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
-              }`}
+              href="study_plan.html"
+              className={getNavClass('study-plan')}
             >
               Study Plan
-            </button>
+            </a>
 
-            <button
+            <a
               id="nav-tab-about"
-              onClick={() => setCurrentPage('about')}
-              className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
-                currentPage === 'about'
-                  ? isDark
-                    ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20 font-semibold'
-                    : 'bg-emerald-600 text-white shadow-sm font-semibold'
-                  : isDark
-                  ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
-              }`}
+              href="about.html"
+              className={getNavClass('about')}
             >
               About
-            </button>
+            </a>
 
-            <button
+            <a
               id="nav-tab-contact"
-              onClick={() => setCurrentPage('contact')}
-              className={`px-5 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
-                currentPage === 'contact'
-                  ? isDark
-                    ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20 font-semibold'
-                    : 'bg-emerald-600 text-white shadow-sm font-semibold'
-                  : isDark
-                  ? 'text-gray-300 hover:text-white hover:bg-gray-700/50'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
-              }`}
+              href="contact.html"
+              className={getNavClass('contact')}
             >
               Contact
-            </button>
+            </a>
           </div>
 
-          {/* Right Side: Theme Toggle + Explorer Mode + DU Logo & Sign Up / User Profile */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Windows 11 File Explorer Toggle Button */}
-            {onToggleExplorerMode && (
-              <button
-                id="header-explorer-mode-toggle-btn"
-                onClick={onToggleExplorerMode}
-                className={`p-2 sm:px-3 sm:py-2 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-all duration-200 shadow-sm ${
-                  isDark
-                    ? 'bg-blue-950/60 hover:bg-blue-900/80 border-blue-800/80 text-blue-300 hover:text-white'
-                    : 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700 hover:text-blue-900'
-                }`}
-                title="Open Windows 11 File Explorer Full Screen Mode"
-              >
-                <Monitor className="w-4 h-4 text-blue-500" />
-                <span className="hidden lg:inline">Explorer</span>
-              </button>
-            )}
-
-            {/* Dark / Light Mode Toggle Button */}
-            {toggleTheme && (
-              <button
-                id="theme-mode-toggle-btn"
-                onClick={toggleTheme}
-                className={`p-2 sm:px-3 sm:py-2 rounded-full border text-xs font-semibold flex items-center gap-2 transition-all duration-200 shadow-sm ${
-                  isDark
-                    ? 'bg-gray-800 hover:bg-gray-700 border-gray-700 text-amber-300 hover:text-amber-200 shadow-gray-950/40'
-                    : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700 hover:text-emerald-700 shadow-slate-200/60'
-                }`}
-                title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              >
-                {isDark ? (
-                  <>
-                    <Sun className="w-4 h-4 text-amber-400 transition-transform hover:rotate-45" />
-                    <span className="hidden md:inline text-xs text-amber-200">Light Mode</span>
-                  </>
-                ) : (
-                  <>
-                    <Moon className="w-4 h-4 text-slate-700 transition-transform hover:-rotate-12" />
-                    <span className="hidden md:inline text-xs text-slate-700">Dark Mode</span>
-                  </>
-                )}
-              </button>
-            )}
-
-            {/* DU Portal Link */}
+          {/* Right Side: DU Logo & Sign Up / User Profile */}
+          <div className="hidden md:flex items-center gap-4">
             <a
               id="du-portal-header-link"
               href="https://du.ac.bd/"
               target="_blank"
               rel="noopener noreferrer"
-              className={`hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full border transition ${
-                isDark
-                  ? 'bg-gray-800/60 hover:bg-gray-700/80 border-gray-700 text-gray-300'
-                  : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'
-              }`}
+              className="block flex-shrink-0"
               title="Dhaka University Official Portal"
             >
-              <div
-                className={`w-7 h-7 rounded-full border flex items-center justify-center text-xs font-bold ${
-                  isDark
-                    ? 'bg-emerald-500/20 border-emerald-400 text-emerald-300'
-                    : 'bg-emerald-100 border-emerald-300 text-emerald-800'
+              <img
+                src="images/du_logo.png"
+                alt="DU Logo"
+                className={`h-10 w-10 rounded-full border object-cover ${
+                  isDark ? 'border-gray-700' : 'border-gray-200'
                 }`}
-              >
-                DU
-              </div>
-              <span className="text-xs font-medium">DU Portal</span>
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = 'https://placehold.co/40x40/eeeeee/111827?text=DU';
+                }}
+              />
             </a>
 
-            {/* User Login / Profile / Sign up */}
             {user.isLoggedIn ? (
               <div
-                className={`flex items-center gap-2 border rounded-full pl-3 pr-2 py-1 ${
-                  isDark
-                    ? 'bg-gray-800/80 border-emerald-500/40'
-                    : 'bg-slate-100 border-emerald-600/40'
-                }`}
+                id="auth-container-desktop"
+                className="auth-container flex items-center gap-2"
               >
-                <span
-                  className={`text-xs font-semibold truncate max-w-[100px] sm:max-w-[120px] ${
-                    isDark ? 'text-emerald-400' : 'text-emerald-700'
+                <a
+                  id="header-user-profile-link"
+                  href="study_plan.html"
+                  className={`flex items-center gap-2.5 px-3 py-1.5 border rounded-full transition shadow-sm group ${
+                    isDark
+                      ? 'bg-gray-800 hover:bg-gray-700 border-emerald-500/40 text-gray-200'
+                      : 'bg-gray-50 hover:bg-emerald-50 border-emerald-500/40 text-gray-800'
                   }`}
+                  title={`Logged in as ${user.name || user.email || 'User'} - Open Study Plan`}
                 >
-                  {user.name || user.email.split('@')[0]}
-                </span>
+                  {user.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt={user.name || 'User'}
+                      className="w-7 h-7 rounded-full object-cover border border-emerald-500"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = 'https://placehold.co/28x28/059669/ffffff?text=' + (user.name ? user.name.charAt(0).toUpperCase() : 'U');
+                      }}
+                    />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                      {(user.name || 'U').charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <div className="text-left max-w-[120px]">
+                    <p className={`text-xs font-semibold group-hover:text-emerald-500 transition truncate ${
+                      isDark ? 'text-gray-200' : 'text-gray-800'
+                    }`}>
+                      {user.name || user.email.split('@')[0] || 'User'}
+                    </p>
+                    <p className="text-[10px] text-gray-400 truncate">
+                      {user.email || 'My Study Plan'}
+                    </p>
+                  </div>
+                </a>
                 <button
                   id="header-user-logout-btn"
                   onClick={onLogout}
-                  className="p-1.5 rounded-full hover:bg-red-500/20 text-gray-400 hover:text-red-500 transition"
+                  className="p-1.5 rounded-full hover:bg-red-500/10 text-gray-400 hover:text-red-500 transition cursor-pointer"
                   title="Logout"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
               </div>
             ) : (
-              <button
-                id="header-signup-btn"
-                onClick={onOpenSignup}
-                className={`hidden sm:flex items-center gap-1.5 px-4 sm:px-5 py-2 text-xs sm:text-sm font-semibold rounded-full transition-all shadow-md active:scale-95 ${
-                  isDark
-                    ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/25'
-                    : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/25'
-                }`}
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>Sign Up</span>
-              </button>
+              <div id="auth-container-desktop" className="auth-container text-sm">
+                <button
+                  id="header-signin-btn"
+                  type="button"
+                  onClick={onGoogleSignIn}
+                  className={`header-google-signin-btn flex items-center gap-2 px-4 py-2 border rounded-full transition-all duration-200 text-sm font-medium shadow-sm hover:shadow cursor-pointer ${
+                    isDark
+                      ? 'bg-gray-800 hover:bg-gray-700 text-gray-200 border-gray-700'
+                      : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300'
+                  }`}
+                  title="Sign In with Google"
+                >
+                  {googleIconSvg}
+                  <span>Sign In</span>
+                </button>
+              </div>
             )}
+          </div>
 
-            {/* Mobile Hamburger Button */}
-            <div className="lg:hidden flex items-center gap-1.5">
-              <button
-                id="header-mobile-menu-toggle-btn"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`p-2 rounded-lg border transition ${
-                  isDark
-                    ? 'bg-gray-800 text-gray-300 hover:text-white hover:bg-gray-700 border-gray-700'
-                    : 'bg-slate-100 text-slate-700 hover:text-slate-900 hover:bg-slate-200 border-slate-200'
-                }`}
-                aria-label="Toggle navigation menu"
-              >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </button>
-            </div>
+          {/* Mobile Hamburger Button */}
+          <div className="md:hidden flex items-center">
+            <button
+              id="mobile-menu-button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`focus:outline-none p-1 ${isDark ? 'text-gray-200' : 'text-gray-700'}`}
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </nav>
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
           <div
-            id="mobile-navigation-drawer"
-            className={`lg:hidden mt-3 backdrop-blur-xl border rounded-2xl p-4 space-y-2 shadow-2xl animate-in fade-in duration-150 ${
-              isDark
-                ? 'bg-gray-800/95 border-gray-700 text-gray-200'
-                : 'bg-white/95 border-slate-200 text-slate-800'
+            id="mobile-menu"
+            className={`md:hidden border-t -mx-6 mt-3 shadow-md py-2 ${
+              isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
             }`}
           >
-            <button
-              onClick={() => {
-                setCurrentPage('home');
-                setMobileMenuOpen(false);
-              }}
-              className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium ${
-                currentPage === 'home'
-                  ? isDark
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-emerald-600 text-white font-semibold'
-                  : isDark
-                  ? 'text-gray-300 hover:bg-gray-700'
-                  : 'text-slate-700 hover:bg-slate-100'
-              }`}
+            <a
+              href="index.html"
+              className={getMobileNavClass('home')}
             >
               Home
-            </button>
+            </a>
 
-            <button
-              onClick={() => {
-                setCurrentPage('archives');
-                setMobileMenuOpen(false);
-              }}
-              className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium ${
-                currentPage === 'archives'
-                  ? isDark
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-emerald-600 text-white font-semibold'
-                  : isDark
-                  ? 'text-gray-300 hover:bg-gray-700'
-                  : 'text-slate-700 hover:bg-slate-100'
-              }`}
+            <a
+              href="archives.html"
+              className={getMobileNavClass('archives')}
             >
-              Archives & Resources
-            </button>
+              Archives
+            </a>
 
-            {onToggleExplorerMode && (
-              <button
-                onClick={() => {
-                  onToggleExplorerMode();
-                  setMobileMenuOpen(false);
-                }}
-                className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-between ${
-                  isDark
-                    ? 'bg-blue-950/40 text-blue-300 hover:bg-blue-900/60'
-                    : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <Monitor className="w-4 h-4 text-blue-500" />
-                  <span>File Explorer Mode</span>
-                </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 font-semibold uppercase">
-                  Full Screen
-                </span>
-              </button>
-            )}
-
-            {/* Mobile Academic Toggle */}
-            <div>
-              <button
-                onClick={() => setMobileAcademicOpen(!mobileAcademicOpen)}
-                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-sm font-medium ${
-                  isDark
-                    ? 'text-gray-300 hover:bg-gray-700'
-                    : 'text-slate-700 hover:bg-slate-100'
-                }`}
-              >
-                <span>Academic Courses</span>
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform ${
-                    mobileAcademicOpen
-                      ? isDark
-                        ? 'rotate-180 text-emerald-400'
-                        : 'rotate-180 text-emerald-600'
-                      : ''
-                  }`}
-                />
-              </button>
-
-              {mobileAcademicOpen && (
-                <div
-                  className={`pl-4 pr-2 py-2 mt-1 rounded-xl space-y-1 ${
-                    isDark ? 'bg-gray-900/60' : 'bg-slate-50'
-                  }`}
-                >
-                  <button
-                    onClick={() => {
-                      setCurrentPage('academic');
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs font-semibold rounded ${
-                      isDark
-                        ? 'text-emerald-400 hover:bg-gray-800'
-                        : 'text-emerald-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    View All Academic Overview
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-405');
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs rounded ${
-                      isDark
-                        ? 'text-gray-300 hover:bg-gray-800'
-                        : 'text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    Course-405: Modern Poetry II
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-406');
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs rounded ${
-                      isDark
-                        ? 'text-gray-300 hover:bg-gray-800'
-                        : 'text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    Course-406: Terminology through Translation
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-407');
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs rounded ${
-                      isDark
-                        ? 'text-gray-300 hover:bg-gray-800'
-                        : 'text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    Course-407: Arabic Literary Criticism
-                  </button>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('course-408');
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs rounded ${
-                      isDark
-                        ? 'text-gray-300 hover:bg-gray-800'
-                        : 'text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    Course-408 (B): Social Research & Project
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <button
-              onClick={() => {
-                setCurrentPage('study-plan');
-                setMobileMenuOpen(false);
-              }}
-              className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium ${
-                currentPage === 'study-plan'
-                  ? isDark
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-emerald-600 text-white font-semibold'
-                  : isDark
-                  ? 'text-gray-300 hover:bg-gray-700'
-                  : 'text-slate-700 hover:bg-slate-100'
-              }`}
+            <a
+              href="study_plan.html"
+              className={getMobileNavClass('study-plan')}
             >
               Study Plan
-            </button>
+            </a>
 
-            <button
-              onClick={() => {
-                setCurrentPage('about');
-                setMobileMenuOpen(false);
-              }}
-              className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium ${
-                currentPage === 'about'
-                  ? isDark
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-emerald-600 text-white font-semibold'
-                  : isDark
-                  ? 'text-gray-300 hover:bg-gray-700'
-                  : 'text-slate-700 hover:bg-slate-100'
-              }`}
+            <a
+              href="about.html"
+              className={getMobileNavClass('about')}
             >
               About
-            </button>
+            </a>
 
-            <button
-              onClick={() => {
-                setCurrentPage('contact');
-                setMobileMenuOpen(false);
-              }}
-              className={`w-full text-left px-4 py-2.5 rounded-lg text-sm font-medium ${
-                currentPage === 'contact'
-                  ? isDark
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-emerald-600 text-white font-semibold'
-                  : isDark
-                  ? 'text-gray-300 hover:bg-gray-700'
-                  : 'text-slate-700 hover:bg-slate-100'
-              }`}
+            <a
+              href="contact.html"
+              className={getMobileNavClass('contact')}
             >
               Contact
-            </button>
+            </a>
 
-            <div
-              className={`pt-3 border-t flex flex-col gap-2 ${
-                isDark ? 'border-gray-700/60' : 'border-slate-200'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <a
-                  href="https://eco.du.ac.bd/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`text-xs font-semibold hover:underline ${
-                    isDark ? 'text-emerald-400' : 'text-emerald-700'
+            <div id="auth-container-mobile" className={`auth-container px-6 py-4 border-t ${
+              isDark ? 'border-gray-800' : 'border-gray-200'
+            }`}>
+              {!user.isLoggedIn ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onGoogleSignIn?.();
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`flex items-center justify-center gap-2.5 w-full py-2.5 border rounded-full transition text-sm font-medium shadow-sm cursor-pointer ${
+                    isDark
+                      ? 'bg-gray-800 hover:bg-gray-700 text-gray-200 border-gray-700'
+                      : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300'
                   }`}
                 >
-                  DU Student Portal &rarr;
-                </a>
-                {!user.isLoggedIn ? (
-                  <button
-                    onClick={() => {
-                      onOpenSignup();
-                      setMobileMenuOpen(false);
-                    }}
-                    className={`px-3 py-1 text-xs font-semibold rounded-full text-white ${
-                      isDark ? 'bg-emerald-500' : 'bg-emerald-600'
-                    }`}
+                  {googleIconSvg}
+                  <span>Sign in with Google</span>
+                </button>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <a
+                    href="study_plan.html"
+                    className="flex items-center gap-2 text-sm font-medium text-emerald-500"
                   >
-                    Sign Up
-                  </button>
-                ) : (
+                    {user.photoURL ? (
+                      <img
+                        src={user.photoURL}
+                        alt="User"
+                        className="w-6 h-6 rounded-full object-cover border border-emerald-500"
+                      />
+                    ) : null}
+                    <span>{user.name || 'User'}</span>
+                  </a>
                   <button
                     onClick={() => {
                       onLogout();
                       setMobileMenuOpen(false);
                     }}
-                    className="text-xs text-red-500 hover:underline"
+                    className="text-xs font-medium text-red-500 hover:underline px-2 py-1 cursor-pointer"
                   >
-                    Log out ({user.name || 'User'})
+                    Log out
                   </button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         )}

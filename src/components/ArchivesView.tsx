@@ -43,12 +43,8 @@ import {
   RefreshCw,
   LayoutGrid,
   Monitor,
-  Files,
-  UploadCloud,
-  AlertCircle,
 } from 'lucide-react';
 import { Windows11Explorer } from './Windows11Explorer';
-import { getArchiveTreeFromIDB, saveArchiveTreeToIDB } from '../lib/idbCache';
 
 interface ArchivesViewProps {
   theme?: ThemeMode;
@@ -76,6 +72,857 @@ async function sha256Hex(text: string): Promise<string> {
     return '';
   }
 }
+
+const INITIAL_POEMS_SUBFOLDERS: ArchiveCardButton[] = [
+  {
+    id: 'poem-aghmid',
+    title: 'Aghmid Jufunaka Tubshir (أغمض جفونك تبصر)',
+    subtitle: 'Mikhail Naimy • Modern Poetry Analysis & Audio Recitation',
+    link: 'poem-aghmid.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Poem 1',
+    createdAt: 201,
+  },
+  {
+    id: 'poem-aghniya',
+    title: 'Ughniyat al-Layl (أغنية الليل)',
+    subtitle: 'Elias Abu Shabaka • Romantic Symbolism & Stanza Breakdown',
+    link: 'poem-aghniya.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Poem 2',
+    createdAt: 202,
+  },
+  {
+    id: 'poem-akhi',
+    title: 'Akhi (أخي)',
+    subtitle: 'Mikhail Naimy • Humanistic Post-War Reflections & Metrics',
+    link: 'poem-akhi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Poem 3',
+    createdAt: 203,
+  },
+  {
+    id: 'poem-anqa',
+    title: "Ta'ir al-Anqa (طائر العنقاء)",
+    subtitle: 'Badr Shakir al-Sayyab • Free Verse Mythological Realism',
+    link: 'poem-anqa.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'blue',
+    badgeText: 'Poem 4',
+    createdAt: 204,
+  },
+  {
+    id: 'poem-eid',
+    title: 'Eid al-Shuhada (عيد الشهداء)',
+    subtitle: 'Elia Abu Madi • Mahjar Patriotic Elegiac Ode',
+    link: 'poem-eid.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'amber',
+    badgeText: 'Poem 5',
+    createdAt: 205,
+  },
+  {
+    id: 'poem-ina',
+    title: 'Ana (أنا)',
+    subtitle: 'Nazik al-Malaika • Pioneering Arabic Free Verse Revolution',
+    link: 'poem-ina.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'purple',
+    badgeText: 'Poem 6',
+    createdAt: 206,
+  },
+  {
+    id: 'poem-nahr',
+    title: 'Al-Nahr al-Mutajammid (النهر المتجمد)',
+    subtitle: 'Mikhail Naimy • Meditative Nature & Spiritual Allegory',
+    link: 'poem-nahr.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'indigo',
+    badgeText: 'Poem 7',
+    createdAt: 207,
+  },
+  {
+    id: 'poem-nihaya',
+    title: 'Nihayat al-Mataf (نهاية المطاف)',
+    subtitle: 'Abd al-Rahman Shukri • Diwan School Philosophical Introspection',
+    link: 'poem-nihaya.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'rose',
+    badgeText: 'Poem 8',
+    createdAt: 208,
+  },
+  {
+    id: 'poem-usfur',
+    title: "Usfur al-Jannah (عصفور الجنة)",
+    subtitle: 'Abd al-Rahman Shukri • Lyric Romanticism & Nature Dialogue',
+    link: 'poem-usfur.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Poem 9',
+    createdAt: 209,
+  },
+  {
+    id: 'poem-summaries',
+    title: 'All Poem Summaries (ملخص القصائد)',
+    subtitle: 'Comprehensive 8th Semester Modern Poetry Master Summary Sheet',
+    link: 'poem-summaries.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'FileText',
+    colorTheme: 'emerald',
+    badgeText: 'Master Sheet',
+    createdAt: 210,
+  },
+];
+
+const INITIAL_BIOGRAPHIES_SUBFOLDERS: ArchiveCardButton[] = [
+  {
+    id: 'bio-abu-madi',
+    title: 'Elia Abu Madi (إيليا أبو ماضي)',
+    subtitle: 'Life, Mahjar Literary League & Major Works',
+    link: 'biography-abu-madi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'amber',
+    badgeText: 'Biography',
+    createdAt: 211,
+  },
+  {
+    id: 'bio-abu-shabaka',
+    title: 'Elias Abu Shabaka (إلياس أبو شبكة)',
+    subtitle: 'Romantic Pioneer, Life and Critical Legacy',
+    link: 'biography-abu-shabaka.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'rose',
+    badgeText: 'Biography',
+    createdAt: 212,
+  },
+  {
+    id: 'bio-badr-shakir',
+    title: 'Badr Shakir al-Sayyab (بدر شاكر السياب)',
+    subtitle: 'Free Verse Icon, Rain Song & Modern Poetics',
+    link: 'biography-badr-shakir.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'blue',
+    badgeText: 'Biography',
+    createdAt: 213,
+  },
+  {
+    id: 'bio-mikhail',
+    title: 'Mikhail Naimy (ميخائيل نعيمة)',
+    subtitle: 'The Book of Mirdad Author, Pen League Philosopher',
+    link: 'biography-mikhail.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'emerald',
+    badgeText: 'Biography',
+    createdAt: 214,
+  },
+  {
+    id: 'bio-najik',
+    title: 'Nazik al-Malaika (نازك الملائكة)',
+    subtitle: 'Pioneer of Modern Arabic Metre & Critical Theory',
+    link: 'biography-najik.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'purple',
+    badgeText: 'Biography',
+    createdAt: 215,
+  },
+  {
+    id: 'bio-shukri',
+    title: 'Abd al-Rahman Shukri (عبد الرحمن شكري)',
+    subtitle: 'Diwan School Founder, Psychology of Modern Arabic Poetry',
+    link: 'biography-shukri.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'indigo',
+    badgeText: 'Biography',
+    createdAt: 216,
+  },
+];
+
+const INITIAL_COURSE_405_CHILDREN: ArchiveCardButton[] = [
+  {
+    id: 'course-405-interactive',
+    title: 'Course-405 Interactive Reader',
+    subtitle: 'Modern Poetry II with Line-by-Line Audio Karaoke, Notes & Vocabulary',
+    link: 'course-405.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Sparkles',
+    colorTheme: 'emerald',
+    badgeText: 'Interactive Reader',
+    createdAt: 220,
+  },
+  {
+    id: 'course-405-poems-folder',
+    title: 'Syllabus Poems (القصائد المقررة)',
+    subtitle: '9 Selected Classical & Modern Poems with Bengali Translation',
+    targetType: 'folder',
+    children: INITIAL_POEMS_SUBFOLDERS,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: '9 Poems',
+    createdAt: 221,
+  },
+  {
+    id: 'course-405-biographies-folder',
+    title: 'Poet Biographies (تراجم الشعراء)',
+    subtitle: 'Detailed Academic Profiles of 6 Master Arabic Poets',
+    targetType: 'folder',
+    children: INITIAL_BIOGRAPHIES_SUBFOLDERS,
+    iconName: 'GraduationCap',
+    colorTheme: 'blue',
+    badgeText: '6 Biographies',
+    createdAt: 222,
+  },
+];
+
+const INITIAL_COURSE_406_CHILDREN: ArchiveCardButton[] = [
+  {
+    id: 'course-406-portal',
+    title: 'Course-406 Interactive Bank & Exercises',
+    subtitle: 'At-Tarjamah • Arabic-Bengali-English Trilingual Terminology Bank',
+    link: 'course-406.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Layers',
+    colorTheme: 'blue',
+    badgeText: 'Portal',
+    createdAt: 310,
+  },
+  {
+    id: 'nure-alam-steps',
+    title: 'Steps of Translation by Dr. Nure Alam',
+    subtitle: 'Core Methodology, Rules & Structural Principles for Arabic-Bengali Translation',
+    link: 'sub-pages/Nure Alam sir - Steps of Translation.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'FileText',
+    colorTheme: 'blue',
+    badgeText: 'Lecture Note',
+    createdAt: 311,
+  },
+  {
+    id: 'nure-alam-academic-steps',
+    title: 'Steps of Academic Translation by Dr. Nure Alam',
+    subtitle: 'Advanced Academic Terminology & Translation Techniques Guide',
+    link: 'sub-pages/Nure Alam sir - Steps of Academic Translation.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'FileText',
+    colorTheme: 'blue',
+    badgeText: 'Lecture Note',
+    createdAt: 312,
+  },
+  {
+    id: 'ehsan-post-mid-notes',
+    title: 'Dr. Ehsan Post-Mid Lecture Notes (1–3)',
+    subtitle: 'Comprehensive Terminology, Sentence Translation Drills & Analysis',
+    link: 'sub-pages/Ehsan-sir-after-mid-1-3-notes.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'indigo',
+    badgeText: 'Lecture Note',
+    createdAt: 313,
+  },
+  {
+    id: 'monkeypox-translation',
+    title: 'Monkeypox Clinical Translation',
+    subtitle: 'Specialized Medical & Scientific Article Arabic Translation Exercise',
+    link: 'sub-pages/Translation - Monkeypox.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'FileText',
+    colorTheme: 'purple',
+    badgeText: 'Translation',
+    createdAt: 314,
+  },
+];
+
+const INITIAL_COURSE_407_CHILDREN: ArchiveCardButton[] = [
+  {
+    id: 'course-407-portal',
+    title: 'Course-407: Arabic Literary Criticism Portal',
+    subtitle: 'Naqd al-Adab • Critical Schools, Theories & Department Syllabus',
+    link: 'course-407.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'FileText',
+    colorTheme: 'purple',
+    badgeText: 'Portal',
+    createdAt: 320,
+  },
+  {
+    id: 'course-407-note-4',
+    title: 'Special Note 4: Naqd al-Adab (Modern Arabic Criticism)',
+    subtitle: 'In-Depth Analysis of Modern Arabic Literary Criticism Movements & Concepts',
+    link: 'course-407-note-4.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'FileText',
+    colorTheme: 'purple',
+    badgeText: 'Special Note',
+    createdAt: 321,
+  },
+];
+
+const INITIAL_COURSE_408_CHILDREN: ArchiveCardButton[] = [
+  {
+    id: 'course-408-portal',
+    title: 'Course-408 (B): Social Research & Project Portal',
+    subtitle: 'Manhaj al-Baḥth • Research Methodology, DU Project Guidelines & Tools',
+    link: 'course-408.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Compass',
+    colorTheme: 'indigo',
+    badgeText: 'Portal',
+    createdAt: 330,
+  },
+  {
+    id: 'du-academic-project-guide',
+    title: 'DU Academic Social Research Project Guide',
+    subtitle: 'Complete Formatting, Proposal Submission & Thesis Methodology Manual',
+    link: 'project-DU.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Award',
+    colorTheme: 'indigo',
+    badgeText: 'Project Guide',
+    createdAt: 331,
+  },
+];
+
+const INITIAL_ACADEMIC_SUBFOLDERS: ArchiveCardButton[] = [
+  {
+    id: 'academic-course-405',
+    title: 'Course-405: Modern Poetry II',
+    subtitle: 'Al-Shi‘r al-Hadith • Interactive Karaoke, Poems & Biographies',
+    targetType: 'folder',
+    children: INITIAL_COURSE_405_CHILDREN,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Modern Poetry',
+    createdAt: 301,
+  },
+  {
+    id: 'academic-course-406',
+    title: 'Course-406: Terminology through Translation',
+    subtitle: 'At-Tarjamah • Nure Alam & Ehsan Notes, Monkeypox & Terminology Bank',
+    targetType: 'folder',
+    children: INITIAL_COURSE_406_CHILDREN,
+    iconName: 'Layers',
+    colorTheme: 'blue',
+    badgeText: 'Translation',
+    createdAt: 302,
+  },
+  {
+    id: 'academic-course-407',
+    title: 'Course-407: Arabic Literary Criticism',
+    subtitle: 'Naqd al-Adab • Critical Movements, Modern Schools & Special Note 4',
+    targetType: 'folder',
+    children: INITIAL_COURSE_407_CHILDREN,
+    iconName: 'FileText',
+    colorTheme: 'purple',
+    badgeText: 'Criticism',
+    createdAt: 303,
+  },
+  {
+    id: 'academic-course-408',
+    title: 'Course-408 (B): Social Research & Project',
+    subtitle: 'Manhaj al-Baḥth • Research Methodology, DU Project Guidelines & Tools',
+    targetType: 'folder',
+    children: INITIAL_COURSE_408_CHILDREN,
+    iconName: 'Compass',
+    colorTheme: 'indigo',
+    badgeText: 'Research',
+    createdAt: 304,
+  },
+  {
+    id: 'academic-pq-2017-21',
+    title: 'Previous Questions (2017–2021)',
+    subtitle: '8th Semester Complete Question Collection PDF Archive',
+    link: 'https://drive.google.com/file/d/1I9fn2ROCa7a-jrNZ9U0KXK8jKznh378D/view?usp=sharing',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Award',
+    colorTheme: 'rose',
+    badgeText: 'Drive PDF',
+    createdAt: 305,
+  },
+  {
+    id: 'academic-pq-2021-23',
+    title: 'Previous Questions (2021–2023)',
+    subtitle: '8th Semester Recent Examination Papers PDF Archive',
+    link: 'https://drive.google.com/file/d/1A6asIfVsu2LiVqg0lozhS075gF-GvT_-/view?usp=sharing',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Award',
+    colorTheme: 'rose',
+    badgeText: 'Drive PDF',
+    createdAt: 306,
+  },
+  {
+    id: 'academic-overview-full',
+    title: 'All Academic Courses & Notices',
+    subtitle: 'All-in-One 8th Semester Academic Portal & Department Notice Board',
+    link: 'academic.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'emerald',
+    badgeText: 'Full Page',
+    createdAt: 307,
+  },
+];
+
+const INITIAL_ENGLISH_POETS_SUBFOLDERS: ArchiveCardButton[] = [
+  {
+    id: 'english-archive-portal',
+    title: 'English Literature Archive Portal',
+    subtitle: 'Comprehensive Literary Periods, Master Authors, Analyses & MCQs',
+    link: 'EnglishPoets/english_literature_archive.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'blue',
+    badgeText: 'Portal',
+    createdAt: 401,
+  },
+  {
+    id: 'poet-shakespeare',
+    title: 'William Shakespeare (উইলিয়াম শেকসপিয়র)',
+    subtitle: 'The Bard of Avon • Complete Life, 38 Plays, 154 Sonnets & Quotes',
+    link: 'EnglishPoets/note_on_william_shakespeare_emam_mehedi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'purple',
+    badgeText: 'Master Note',
+    createdAt: 402,
+  },
+  {
+    id: 'poet-milton',
+    title: 'John Milton (জন মিল্টন)',
+    subtitle: 'Paradise Lost, Epic Poetry, Biography & Literary Contribution',
+    link: 'EnglishPoets/John Milton.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'blue',
+    badgeText: 'Biography',
+    createdAt: 403,
+  },
+  {
+    id: 'poet-milton-mcq',
+    title: 'John Milton MCQ Quiz',
+    subtitle: 'Practice Questions, Model Tests & BCS Exam Preparation',
+    link: 'EnglishPoets/John Milton mcq.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Sparkles',
+    colorTheme: 'blue',
+    badgeText: 'Quiz Test',
+    createdAt: 404,
+  },
+  {
+    id: 'poet-yeats',
+    title: 'W.B. Yeats (ডব্লিউ বি ইয়েটস)',
+    subtitle: 'Irish Literary Revival, Modernist Poetry, Nobel Laureate Profile',
+    link: 'EnglishPoets/W.B. Yeats.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Biography',
+    createdAt: 405,
+  },
+  {
+    id: 'poet-yeats-mcq',
+    title: 'W.B. Yeats MCQ Quiz',
+    subtitle: 'Interactive Model Test, Past Questions & Analytical Solutions',
+    link: 'EnglishPoets/W.B. Yeats MCQ.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Sparkles',
+    colorTheme: 'emerald',
+    badgeText: 'Quiz Test',
+    createdAt: 406,
+  },
+  {
+    id: 'poet-keats',
+    title: 'John Keats (জন কিটস)',
+    subtitle: 'Romantic Ode Master • Beauty is Truth, Life & Major Works',
+    link: 'EnglishPoets/note_on_john_keats_emam_mehedi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'rose',
+    badgeText: 'Master Note',
+    createdAt: 407,
+  },
+  {
+    id: 'poet-wordsworth',
+    title: 'William Wordsworth (উইলিয়াম ওয়ার্ডসওয়ার্থ)',
+    subtitle: 'Poet of Nature, Lyrical Ballads, Romantic Era Pioneer',
+    link: 'EnglishPoets/note_on_william_wordsworth_emam_mehedi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Master Note',
+    createdAt: 408,
+  },
+  {
+    id: 'poet-shelley',
+    title: 'P.B. Shelley (পি বি শেলি)',
+    subtitle: 'Ode to the West Wind, Revolutionary Idealism & Romantic Spirit',
+    link: 'EnglishPoets/note_on_p_b_shelley_emam_mehedi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'indigo',
+    badgeText: 'Master Note',
+    createdAt: 409,
+  },
+  {
+    id: 'poet-byron',
+    title: 'Lord Byron (লর্ড বায়রন)',
+    subtitle: 'Byronic Hero, Don Juan, Romanticism & Dramatic Life',
+    link: 'EnglishPoets/note_on_lord_byron_emam_mehedi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'purple',
+    badgeText: 'Master Note',
+    createdAt: 410,
+  },
+  {
+    id: 'poet-eliot',
+    title: 'T.S. Eliot (টি এস এলিয়ট)',
+    subtitle: 'The Waste Land, Modernist Revolution, Objective Correlative',
+    link: 'EnglishPoets/note_on_t_s_eliot_emam_mehedi.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'blue',
+    badgeText: 'Master Note',
+    createdAt: 411,
+  },
+  {
+    id: 'poet-browning',
+    title: 'Robert Browning (রবার্ট ব্রাউনিং)',
+    subtitle: 'Dramatic Monologue Pioneer, Victorian Era Master Profile',
+    link: 'EnglishPoets/Robert Browning.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'amber',
+    badgeText: 'Biography',
+    createdAt: 412,
+  },
+  {
+    id: 'poets-all-hub',
+    title: 'All 50+ English Poets Directory',
+    subtitle: 'Complete Chronological List of English & American Literary Masters',
+    link: 'EnglishPoets.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'GraduationCap',
+    colorTheme: 'blue',
+    badgeText: '50+ Poets',
+    createdAt: 413,
+  },
+];
+
+const INITIAL_VOCABULARY_SUBFOLDERS: ArchiveCardButton[] = [
+  {
+    id: 'vocab-day-1',
+    title: 'Day 01: Daily Vocabulary',
+    subtitle: 'Trilingual Vocabulary Bank with Pronunciation, Meaning & Usage',
+    link: 'vocabs/day1.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 01',
+    createdAt: 501,
+  },
+  {
+    id: 'vocab-day-2',
+    title: 'Day 02: Daily Vocabulary',
+    subtitle: 'Key Academic & Everyday Words with Sentence Examples',
+    link: 'vocabs/day2.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 02',
+    createdAt: 502,
+  },
+  {
+    id: 'vocab-day-3',
+    title: 'Day 03: Daily Vocabulary',
+    subtitle: 'Synonyms, Antonyms & Contextual Usage Drills',
+    link: 'vocabs/day3.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 03',
+    createdAt: 503,
+  },
+  {
+    id: 'vocab-day-4',
+    title: 'Day 04: Daily Vocabulary',
+    subtitle: 'Arabic-Bengali-English Trilingual Study Flashcards',
+    link: 'vocabs/day4.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 04',
+    createdAt: 504,
+  },
+  {
+    id: 'vocab-day-5',
+    title: 'Day 05: Daily Vocabulary',
+    subtitle: 'Competitive Exam & BCS High-Frequency Words',
+    link: 'vocabs/day5.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 05',
+    createdAt: 505,
+  },
+  {
+    id: 'vocab-day-6',
+    title: 'Day 06: Daily Vocabulary',
+    subtitle: 'Idiomatic Expressions & Common Collocations',
+    link: 'vocabs/day6.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 06',
+    createdAt: 506,
+  },
+  {
+    id: 'vocab-day-7',
+    title: 'Day 07: Daily Vocabulary',
+    subtitle: 'Comprehensive Daily Language Vocabulary Lesson',
+    link: 'vocabs/day7.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 07',
+    createdAt: 507,
+  },
+  {
+    id: 'vocab-day-8',
+    title: 'Day 08: Daily Vocabulary',
+    subtitle: 'Modern Linguistic Vocabulary and Definitions',
+    link: 'vocabs/day8.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 08',
+    createdAt: 508,
+  },
+  {
+    id: 'vocab-day-9',
+    title: 'Day 09: Daily Vocabulary',
+    subtitle: 'Grammar and Syntax Focused Vocabulary Practice',
+    link: 'vocabs/day9.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 09',
+    createdAt: 509,
+  },
+  {
+    id: 'vocab-day-10',
+    title: 'Day 10: Daily Vocabulary',
+    subtitle: 'Advanced Academic Vocabulary Drills',
+    link: 'vocabs/day10.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 10',
+    createdAt: 510,
+  },
+  {
+    id: 'vocab-day-11',
+    title: 'Day 11: Daily Vocabulary',
+    subtitle: 'Reading Comprehension Vocabulary Boosters',
+    link: 'vocabs/day11.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 11',
+    createdAt: 511,
+  },
+  {
+    id: 'vocab-day-12',
+    title: 'Day 12: Daily Vocabulary',
+    subtitle: 'Root Words, Prefixes and Suffixes',
+    link: 'vocabs/day12.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 12',
+    createdAt: 512,
+  },
+  {
+    id: 'vocab-day-13',
+    title: 'Day 13: Daily Vocabulary',
+    subtitle: 'Interactive Vocabulary Drills and Translations',
+    link: 'vocabs/day13.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 13',
+    createdAt: 513,
+  },
+  {
+    id: 'vocab-day-14',
+    title: 'Day 14: Daily Vocabulary',
+    subtitle: 'Fortnight Word Review & Self-Assessment Exercises',
+    link: 'vocabs/day14.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'BookOpen',
+    colorTheme: 'emerald',
+    badgeText: 'Lesson 14',
+    createdAt: 514,
+  },
+  {
+    id: 'vocab-weekly-1',
+    title: 'Weekly Vocabulary Review 01',
+    subtitle: 'Cumulative Quiz, Synonyms-Antonyms Bank & Solutions',
+    link: 'vocabs/weekly1.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Sparkles',
+    colorTheme: 'indigo',
+    badgeText: 'Review 01',
+    createdAt: 515,
+  },
+  {
+    id: 'vocab-weekly-2',
+    title: 'Weekly Vocabulary Review 02',
+    subtitle: 'Full 2-Week Vocabulary Assessment & Model Test',
+    link: 'vocabs/weekly2.html',
+    targetType: 'url',
+    openInNewTab: true,
+    iconName: 'Sparkles',
+    colorTheme: 'indigo',
+    badgeText: 'Review 02',
+    createdAt: 516,
+  },
+];
+
+const INITIAL_ACADEMIC_CARD: ArchiveCardButton = {
+  id: 'academic-card',
+  title: 'Academic',
+  subtitle: '8th Semester Department of Arabic • Modern Poetry, Translation, Criticism, Research & Question Papers',
+  targetType: 'folder',
+  children: INITIAL_ACADEMIC_SUBFOLDERS,
+  iconName: 'GraduationCap',
+  colorTheme: 'emerald',
+  badgeText: 'DU Arabic',
+  createdAt: 0,
+};
+
+const INITIAL_ENGLISH_POETS_CARD: ArchiveCardButton = {
+  id: 'english-poets-card',
+  title: 'English Literature & Poets',
+  subtitle: '50+ English Literary Masters • Shakespeare, Milton, Yeats, Keats, Wordsworth, MCQs & Notes',
+  targetType: 'folder',
+  children: INITIAL_ENGLISH_POETS_SUBFOLDERS,
+  iconName: 'BookOpen',
+  colorTheme: 'blue',
+  badgeText: '50+ Poets',
+  createdAt: 10,
+};
+
+const INITIAL_VOCABULARY_CARD: ArchiveCardButton = {
+  id: 'vocabulary-card',
+  title: 'Daily Vocabularies',
+  subtitle: 'Day 1–14 Daily Lessons, Weekly Reviews & Trilingual Language Bank',
+  targetType: 'folder',
+  children: INITIAL_VOCABULARY_SUBFOLDERS,
+  iconName: 'BookOpen',
+  colorTheme: 'emerald',
+  badgeText: '14 Days',
+  createdAt: 20,
+};
+
+const INITIAL_ICT_PERIPHERALS_CARD: ArchiveCardButton = {
+  id: 'ict-peripherals-card',
+  title: 'ICT & Computer Peripherals',
+  subtitle: 'Input/Output Devices, Computer Architecture, Motherboard, Networking & Tech Notes',
+  link: 'ict_peripherals.html',
+  targetType: 'url',
+  openInNewTab: true,
+  iconName: 'Layers',
+  colorTheme: 'indigo',
+  badgeText: 'ICT Hub',
+  createdAt: 30,
+};
+
+const INITIAL_SSC_CARD: ArchiveCardButton = {
+  id: 'ssc-card',
+  title: 'Educational Resources & SSC',
+  subtitle: 'SSC Syllabi, Secondary School Board Questions, Textbooks & Educational Resources Hub',
+  link: 'Resources.html',
+  targetType: 'url',
+  openInNewTab: true,
+  iconName: 'GraduationCap',
+  colorTheme: 'amber',
+  badgeText: 'Resources',
+  createdAt: 40,
+};
 
 const INITIAL_BCS_SUBFOLDERS: ArchiveCardButton[] = [
   {
@@ -223,31 +1070,107 @@ const INITIAL_BCS_SUBFOLDERS: ArchiveCardButton[] = [
   },
 ];
 
+const INITIAL_BCS_CARD: ArchiveCardButton = {
+  id: 'bcs-card',
+  title: 'BCS',
+  subtitle: 'Bangladesh Civil Service Preliminary, Written & Viva Preparation Hub',
+  targetType: 'folder',
+  children: INITIAL_BCS_SUBFOLDERS,
+  iconName: 'Briefcase',
+  colorTheme: 'emerald',
+  badgeText: '13 Subjects',
+  createdAt: 1,
+};
+
 const INITIAL_CARDS: ArchiveCardButton[] = [
-  {
-    id: 'bcs-card',
-    title: 'BCS',
-    subtitle: 'Bangladesh Civil Service Preliminary, Written & Viva Preparation Hub',
-    targetType: 'folder',
-    children: INITIAL_BCS_SUBFOLDERS,
-    iconName: 'Briefcase',
-    colorTheme: 'emerald',
-    badgeText: '13 Subjects',
-    createdAt: 1,
-  },
-  {
-    id: 'ssc-card',
-    title: 'SSC',
-    subtitle: 'Secondary School Certificate Board Questions, Syllabi & Notes',
-    link: 'https://dhakaeducationboard.gov.bd',
-    targetType: 'url',
-    openInNewTab: true,
-    iconName: 'GraduationCap',
-    colorTheme: 'blue',
-    badgeText: 'Board Exam',
-    createdAt: 2,
-  },
+  INITIAL_ACADEMIC_CARD,
+  INITIAL_ENGLISH_POETS_CARD,
+  INITIAL_VOCABULARY_CARD,
+  INITIAL_BCS_CARD,
+  INITIAL_ICT_PERIPHERALS_CARD,
+  INITIAL_SSC_CARD,
 ];
+
+// Helper to make sure all core cards and folders exist
+function ensureCompleteTree(cards: ArchiveCardButton[]): ArchiveCardButton[] {
+  if (!Array.isArray(cards) || cards.length === 0) {
+    return INITIAL_CARDS;
+  }
+
+  let result = [...cards];
+
+  // 1. Ensure Academic Card is present with valid children
+  const academicIdx = result.findIndex(
+    (c) => c.id === 'academic-card' || c.title?.trim().toLowerCase() === 'academic'
+  );
+  if (academicIdx === -1) {
+    result.unshift(INITIAL_ACADEMIC_CARD);
+  } else {
+    const existing = result[academicIdx];
+    if (!existing.children || existing.children.length === 0) {
+      result[academicIdx] = {
+        ...INITIAL_ACADEMIC_CARD,
+        ...existing,
+        children: INITIAL_ACADEMIC_SUBFOLDERS,
+        targetType: 'folder',
+      };
+    }
+  }
+
+  // 2. Ensure English Poets Card
+  const englishIdx = result.findIndex(
+    (c) =>
+      c.id === 'english-poets-card' ||
+      c.title?.toLowerCase().includes('english poet') ||
+      c.title?.toLowerCase().includes('english literature')
+  );
+  if (englishIdx === -1) {
+    result.push(INITIAL_ENGLISH_POETS_CARD);
+  }
+
+  // 3. Ensure Vocabulary Card
+  const vocabIdx = result.findIndex(
+    (c) => c.id === 'vocabulary-card' || c.title?.toLowerCase().includes('vocabulary')
+  );
+  if (vocabIdx === -1) {
+    result.push(INITIAL_VOCABULARY_CARD);
+  }
+
+  // 4. Ensure BCS Card
+  const bcsIdx = result.findIndex(
+    (c) => c.id === 'bcs-card' || c.title?.trim().toLowerCase() === 'bcs'
+  );
+  if (bcsIdx === -1) {
+    result.push(INITIAL_BCS_CARD);
+  } else if (!result[bcsIdx].children || result[bcsIdx].children.length === 0) {
+    result[bcsIdx] = {
+      ...result[bcsIdx],
+      targetType: 'folder',
+      children: INITIAL_BCS_SUBFOLDERS,
+    };
+  }
+
+  // 5. Ensure ICT Peripherals Card
+  const ictIdx = result.findIndex(
+    (c) => c.id === 'ict-peripherals-card' || c.title?.toLowerCase().includes('ict')
+  );
+  if (ictIdx === -1) {
+    result.push(INITIAL_ICT_PERIPHERALS_CARD);
+  }
+
+  // 6. Ensure SSC / Resources Card
+  const sscIdx = result.findIndex(
+    (c) =>
+      c.id === 'ssc-card' ||
+      c.title?.toLowerCase() === 'ssc' ||
+      c.title?.toLowerCase().includes('resource')
+  );
+  if (sscIdx === -1) {
+    result.push(INITIAL_SSC_CARD);
+  }
+
+  return result;
+}
 
 const THEME_STYLES: Record<
   string,
@@ -518,19 +1441,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // If the existing stored BCS card has no children or was an old URL card, upgrade it to the new subfolders
-          const upgraded = parsed.map((card: ArchiveCardButton) => {
-            if (card.id === 'bcs-card' && (!card.children || card.children.length === 0)) {
-              return {
-                ...card,
-                targetType: 'folder',
-                children: INITIAL_BCS_SUBFOLDERS,
-                badgeText: card.badgeText || '13 Subjects',
-              };
-            }
-            return card;
-          });
-          return upgraded;
+          return ensureCompleteTree(parsed);
         }
       } catch (e) {
         console.error('Error loading archive cards:', e);
@@ -595,27 +1506,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
 
   // Cloud Sync Status: 'idle' | 'syncing' | 'synced' | 'error'
   const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle');
-  const [isCloudSyncing, setIsCloudSyncing] = useState<boolean>(true);
-
-  // High-performance asynchronous cache load from IndexedDB (ideal for iOS Safari / WebKit persistence)
-  useEffect(() => {
-    let isMounted = true;
-    getArchiveTreeFromIDB()
-      .then((cachedCards) => {
-        if (isMounted && cachedCards && Array.isArray(cachedCards) && cachedCards.length > 0) {
-          rootCardsRef.current = cachedCards;
-          setRootCards(cachedCards);
-          setIsCloudSyncing(false);
-        }
-      })
-      .catch((err) => {
-        console.warn('IndexedDB initial load notice:', err);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   // Toggle Explorer Mode Helper
   const handleToggleExplorerMode = () => {
@@ -663,22 +1553,19 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                 if (jsonString) {
                   const cloudCards: ArchiveCardButton[] = JSON.parse(jsonString);
                   if (Array.isArray(cloudCards)) {
-                    rootCardsRef.current = cloudCards;
-                    setRootCards(cloudCards);
-                    // Persist to both IndexedDB (unlimited reliable storage on iOS Safari) and localStorage
-                    saveArchiveTreeToIDB(cloudCards);
+                    const completeTree = ensureCompleteTree(cloudCards);
+                    rootCardsRef.current = completeTree;
+                    setRootCards(completeTree);
                     try {
-                      localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudCards));
+                      localStorage.setItem(STORAGE_KEY, JSON.stringify(completeTree));
                     } catch (lsErr) {
                       console.warn('Local storage size notice:', lsErr);
                     }
                     setSyncStatus('synced');
-                    setIsCloudSyncing(false);
                   }
                 }
               } catch (parseErr) {
                 console.error('Error parsing cloud archive tree:', parseErr);
-                setIsCloudSyncing(false);
               }
             }
           } else {
@@ -691,20 +1578,17 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
             }).catch((err) => {
               console.warn('Initial cloud seed notice:', err);
             });
-            setIsCloudSyncing(false);
           }
         },
         (error) => {
           console.warn('Firestore onSnapshot subscription notice:', error);
-          // Gracefully fallback to local storage / IDB
-          setIsCloudSyncing(false);
+          // Gracefully fallback to local storage
         }
       );
 
       return () => unsubscribe();
     } catch (err) {
       console.warn('Firestore initialization notice:', err);
-      setIsCloudSyncing(false);
     }
   }, []);
 
@@ -790,26 +1674,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
   const [formBadge, setFormBadge] = useState('');
   const [fileReadError, setFileReadError] = useState('');
 
-  // Multi-File Batch Upload Modal State (Admin can upload multiple files at once, each separately created)
-  const [showMultiUploadModal, setShowMultiUploadModal] = useState(false);
-  const [multiUploadFiles, setMultiUploadFiles] = useState<
-    Array<{
-      file: File;
-      id: string;
-      title: string;
-      subtitle: string;
-      status: 'pending' | 'reading' | 'ready' | 'error';
-      errorMsg?: string;
-      fileData?: string;
-      fileType?: string;
-      fileName?: string;
-      iconName: ArchiveCardButton['iconName'];
-      colorTheme: ArchiveCardButton['colorTheme'];
-    }>
-  >([]);
-  const [isBatchUploading, setIsBatchUploading] = useState(false);
-  const multiFileInputRef = useRef<HTMLInputElement | null>(null);
-
   // Save current view list to nested tree, local storage, and real-time Firestore cloud database
   const saveCurrentCards = async (newCurrentList: ArchiveCardButton[]) => {
     // Always use active ref states to ensure deletions never reference a stale closure
@@ -821,9 +1685,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
     setRootCards(updatedRoot);
     const serialized = JSON.stringify(updatedRoot);
     
-    // Save to high-capacity IndexedDB cache immediately (bypasses iOS Safari 5MB localStorage limit)
-    saveArchiveTreeToIDB(updatedRoot);
-
     // Save to local cache immediately
     try {
       localStorage.setItem(STORAGE_KEY, serialized);
@@ -978,166 +1839,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
     setEditingCard(null);
   };
 
-  // Infer default icon for a given filename
-  const getFileIconName = (fileName: string, mimeType?: string): ArchiveCardButton['iconName'] => {
-    const ext = fileName.split('.').pop()?.toLowerCase() || '';
-    if (ext === 'pdf') return 'BookOpen';
-    if (['doc', 'docx', 'txt', 'rtf', 'odt', 'pages'].includes(ext)) return 'FileText';
-    if (['html', 'htm', 'json', 'xml', 'js', 'css', 'ts', 'jsx', 'tsx'].includes(ext)) return 'Sparkles';
-    if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp'].includes(ext)) return 'Sparkles';
-    if (['xls', 'xlsx', 'csv'].includes(ext)) return 'Layers';
-    if (['ppt', 'pptx'].includes(ext)) return 'GraduationCap';
-    if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) return 'Briefcase';
-    if (mimeType?.includes('html')) return 'Sparkles';
-    return 'FileText';
-  };
-
-  // Handle Multi-File Selection & Reading
-  const handleMultiFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    const fileList: File[] = Array.from(files);
-    
-    // Initial entries with pending status
-    const newEntries = fileList.map((file: File, idx: number) => {
-      const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-      const defaultIcon = getFileIconName(file.name, file.type);
-      return {
-        file,
-        id: `batch-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 5)}`,
-        title: nameWithoutExt.toUpperCase(),
-        subtitle: `${(file.size / 1024).toFixed(1)} KB • ${file.type || file.name.split('.').pop()?.toUpperCase() || 'File'}`,
-        status: (file.size > 3 * 1024 * 1024 ? 'error' : 'pending') as 'pending' | 'reading' | 'ready' | 'error',
-        errorMsg: file.size > 3 * 1024 * 1024 ? 'Exceeds 3MB limit for fast cloud sync' : undefined,
-        fileName: file.name,
-        fileType: file.type || 'application/octet-stream',
-        iconName: defaultIcon,
-        colorTheme: 'emerald' as ArchiveCardButton['colorTheme'],
-      };
-    });
-
-    setMultiUploadFiles((prev) => [...prev, ...newEntries]);
-    setShowMultiUploadModal(true);
-
-    // Read each file asynchronously
-    newEntries.forEach((entry) => {
-      if (entry.status === 'error') return;
-
-      const file: File = entry.file;
-      const isTextHtml = file.type.includes('html') || file.name.endsWith('.html') || file.name.endsWith('.htm');
-
-      if (isTextHtml) {
-        const textReader = new FileReader();
-        textReader.onload = (event) => {
-          const text = (event.target?.result as string) || '';
-          setMultiUploadFiles((curr) =>
-            curr.map((item) =>
-              item.id === entry.id
-                ? { ...item, status: 'ready', fileData: text }
-                : item
-            )
-          );
-        };
-        textReader.onerror = () => {
-          setMultiUploadFiles((curr) =>
-            curr.map((item) =>
-              item.id === entry.id
-                ? { ...item, status: 'error', errorMsg: 'Failed to read file' }
-                : item
-            )
-          );
-        };
-        textReader.readAsText(file);
-      } else {
-        const dataUrlReader = new FileReader();
-        dataUrlReader.onload = (event) => {
-          const dataUrl = (event.target?.result as string) || '';
-          setMultiUploadFiles((curr) =>
-            curr.map((item) =>
-              item.id === entry.id
-                ? { ...item, status: 'ready', fileData: dataUrl }
-                : item
-            )
-          );
-        };
-        dataUrlReader.onerror = () => {
-          setMultiUploadFiles((curr) =>
-            curr.map((item) =>
-              item.id === entry.id
-                ? { ...item, status: 'error', errorMsg: 'Failed to read file' }
-                : item
-            )
-          );
-        };
-        dataUrlReader.readAsDataURL(file);
-      }
-    });
-
-    // Reset native input so user can choose again if needed
-    if (e.target) {
-      e.target.value = '';
-    }
-  };
-
-  // Remove a single item from the batch upload queue
-  const handleRemoveMultiUploadFile = (id: string) => {
-    setMultiUploadFiles((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  // Update a field for a single batch item (e.g. title, theme, icon)
-  const handleUpdateMultiUploadItem = (
-    id: string,
-    updates: Partial<(typeof multiUploadFiles)[0]>
-  ) => {
-    setMultiUploadFiles((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, ...updates } : item))
-    );
-  };
-
-  // Confirm and upload all valid files in the batch queue as separate cards
-  const handleConfirmBatchUpload = async () => {
-    const readyItems = multiUploadFiles.filter(
-      (item) => item.status === 'ready' && item.fileData && item.title.trim()
-    );
-
-    if (readyItems.length === 0) return;
-
-    setIsBatchUploading(true);
-
-    const now = Date.now();
-    const newCards: ArchiveCardButton[] = readyItems.map((item, index) => {
-      const isHtml =
-        item.fileType?.includes('html') ||
-        item.fileName?.endsWith('.html') ||
-        item.fileName?.endsWith('.htm');
-
-      return {
-        id: `card-${now + index}-${Math.random().toString(36).substr(2, 6)}`,
-        title: item.title.trim(),
-        subtitle: item.subtitle.trim(),
-        targetType: isHtml ? 'html' : 'file',
-        htmlContent: isHtml ? item.fileData : undefined,
-        fileName: item.fileName,
-        fileType: item.fileType,
-        fileData: item.fileData,
-        openInNewTab: true,
-        iconName: item.iconName,
-        colorTheme: item.colorTheme,
-        badgeText: '',
-        createdAt: now + index,
-      };
-    });
-
-    const updatedList = [...currentCards, ...newCards];
-    await saveCurrentCards(updatedList);
-
-    setIsBatchUploading(false);
-    setShowMultiUploadModal(false);
-    setMultiUploadFiles([]);
-  };
-
-  // Handle File Selection for Single File Edit/Add Modal
+  // Handle File Selection for Any File Type (.html, .pdf, .docx, .png, .jpg, .zip, etc.)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     setFileReadError('');
@@ -1454,7 +2156,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
             folderPath={folderPath}
             isDark={isDark}
             isAdmin={isDeveloperMode}
-            isCloudSyncing={isCloudSyncing}
             onNavigateFolder={navigateToFolder}
             onNavigateBack={navigateBackToParent}
             onCardClick={handleCardClick}
@@ -1468,9 +2169,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
               setTimeout(() => {
                 fileInputRef.current?.click();
               }, 150);
-            }}
-            onOpenMultiUpload={() => {
-              multiFileInputRef.current?.click();
             }}
             onCloseExplorer={handleToggleExplorerMode}
           />
@@ -1589,29 +2287,27 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
               {/* Universal Cloud Sync Badge */}
               <div
                 className={`flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium rounded-full border transition ${
-                  isCloudSyncing || syncStatus === 'syncing'
-                    ? isDark
-                      ? 'bg-blue-950/40 border-blue-800/60 text-blue-400'
-                      : 'bg-blue-50 border-blue-200 text-blue-700'
-                    : syncStatus === 'synced'
+                  syncStatus === 'synced'
                     ? isDark
                       ? 'bg-emerald-950/40 border-emerald-800/60 text-emerald-400'
                       : 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                    : syncStatus === 'syncing'
+                    ? isDark
+                      ? 'bg-blue-950/40 border-blue-800/60 text-blue-400'
+                      : 'bg-blue-50 border-blue-200 text-blue-700'
                     : isDark
                     ? 'bg-gray-800 border-gray-700 text-gray-400'
                     : 'bg-slate-100 border-slate-300 text-slate-600'
                 }`}
                 title="Real-time Universal Cloud Database Synchronization across all devices"
               >
-                {isCloudSyncing || syncStatus === 'syncing' ? (
+                {syncStatus === 'syncing' ? (
                   <RefreshCw className="w-3 h-3 animate-spin text-blue-500" />
                 ) : (
                   <Cloud className="w-3 h-3 text-emerald-500" />
                 )}
                 <span>
-                  {isCloudSyncing
-                    ? 'Loading Cloud Data...'
-                    : syncStatus === 'syncing'
+                  {syncStatus === 'syncing'
                     ? 'Syncing to Cloud...'
                     : syncStatus === 'synced'
                     ? 'Universal Sync Active'
@@ -1697,20 +2393,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
               }`}
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Add Item</span>
-            </button>
-            <button
-              id="quick-multi-upload-files-btn"
-              onClick={() => multiFileInputRef.current?.click()}
-              className={`px-3 py-1.5 text-white font-semibold rounded-lg shadow-sm transition flex items-center gap-1 ${
-                isDark
-                  ? 'bg-purple-600 hover:bg-purple-500'
-                  : 'bg-purple-700 hover:bg-purple-800'
-              }`}
-              title="Upload multiple files at once as individual cards"
-            >
-              <Files className="w-3.5 h-3.5" />
-              <span>Upload Multiple Files</span>
+              <span>Add Button / Sub Folder</span>
             </button>
             <button
               id="toggle-admin-management-tray-btn"
@@ -1954,31 +2637,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
         </div>
       )}
 
-      {/* Real-time Cloud Sync Banner if currently synchronizing */}
-      {isCloudSyncing && folderPath.length === 0 && (
-        <div
-          id="cloud-sync-status-banner"
-          className={`mt-6 p-3.5 rounded-2xl border flex items-center justify-between gap-3 text-xs shadow-sm animate-in fade-in duration-300 ${
-            isDark
-              ? 'bg-blue-950/30 border-blue-800/40 text-blue-300'
-              : 'bg-blue-50/80 border-blue-200 text-blue-800'
-          }`}
-        >
-          <div className="flex items-center gap-2.5">
-            <RefreshCw className="w-4 h-4 text-blue-500 animate-spin shrink-0" />
-            <div>
-              <span className="font-semibold">Loading cloud folders & archive items...</span>
-              <p className="text-[11px] opacity-75 mt-0.5">
-                Loaded initial cache. Synchronizing full folder hierarchy from the cloud database.
-              </p>
-            </div>
-          </div>
-          <span className="text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded bg-blue-500/20 text-blue-400">
-            Syncing
-          </span>
-        </div>
-      )}
-
       {/* Main View: Standard Card Grid (when not in explorer mode) */}
       {currentCards.length === 0 ? (
         <div
@@ -2191,52 +2849,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
               </div>
             );
           })}
-
-          {/* Skeleton Loaders if initial cloud sync is pending and only default cards exist */}
-          {isCloudSyncing && currentCards.length <= 2 && (
-            <>
-              <div
-                className={`rounded-2xl border p-6 sm:p-7 shadow-sm animate-pulse flex flex-col justify-between min-h-[190px] ${
-                  isDark
-                    ? 'bg-gray-850/50 border-gray-800/80'
-                    : 'bg-slate-50/80 border-slate-200/80'
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-gray-700/20 dark:bg-gray-700/40 shrink-0" />
-                  <div className="flex-1 space-y-2.5 pt-1">
-                    <div className="h-5 bg-gray-700/20 dark:bg-gray-700/40 rounded w-1/3" />
-                    <div className="h-3.5 bg-gray-700/15 dark:bg-gray-700/30 rounded w-4/5" />
-                    <div className="h-3 bg-gray-700/10 dark:bg-gray-700/25 rounded w-2/3" />
-                  </div>
-                </div>
-                <div className="mt-6 pt-4 border-t border-gray-700/20 dark:border-gray-800 flex items-center justify-between">
-                  <div className="h-3 bg-gray-700/15 dark:bg-gray-700/30 rounded w-24" />
-                  <div className="h-8 bg-gray-700/20 dark:bg-gray-700/40 rounded-xl w-28" />
-                </div>
-              </div>
-              <div
-                className={`rounded-2xl border p-6 sm:p-7 shadow-sm animate-pulse flex flex-col justify-between min-h-[190px] ${
-                  isDark
-                    ? 'bg-gray-850/50 border-gray-800/80'
-                    : 'bg-slate-50/80 border-slate-200/80'
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-gray-700/20 dark:bg-gray-700/40 shrink-0" />
-                  <div className="flex-1 space-y-2.5 pt-1">
-                    <div className="h-5 bg-gray-700/20 dark:bg-gray-700/40 rounded w-2/5" />
-                    <div className="h-3.5 bg-gray-700/15 dark:bg-gray-700/30 rounded w-3/4" />
-                    <div className="h-3 bg-gray-700/10 dark:bg-gray-700/25 rounded w-1/2" />
-                  </div>
-                </div>
-                <div className="mt-6 pt-4 border-t border-gray-700/20 dark:border-gray-800 flex items-center justify-between">
-                  <div className="h-3 bg-gray-700/15 dark:bg-gray-700/30 rounded w-20" />
-                  <div className="h-8 bg-gray-700/20 dark:bg-gray-700/40 rounded-xl w-28" />
-                </div>
-              </div>
-            </>
-          )}
         </div>
       )}
         </>
@@ -2634,23 +3246,9 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
 
               {formTargetType === 'file' && (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="block font-semibold uppercase tracking-wider text-xs">
-                      Select File from PC / Mobile (.pdf, .html, .docx, images, etc.) *
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingCard(null);
-                        setIsAddMode(false);
-                        multiFileInputRef.current?.click();
-                      }}
-                      className="text-[11px] text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 font-medium"
-                    >
-                      <Files className="w-3 h-3" />
-                      <span>Upload Multiple Files Instead</span>
-                    </button>
-                  </div>
+                  <label className="block font-semibold uppercase tracking-wider mb-1">
+                    Select File from PC / Mobile (.pdf, .html, .docx, images, etc.) *
+                  </label>
 
                   <input
                     type="file"
@@ -2853,252 +3451,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                 </div>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-      {/* Hidden Multi-file input for Batch Uploading Multiple Files at once */}
-      <input
-        type="file"
-        ref={multiFileInputRef}
-        onChange={handleMultiFilesSelected}
-        multiple
-        className="hidden"
-      />
-
-      {/* Batch Multi-File Upload Management Modal */}
-      {showMultiUploadModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div
-            className={`w-full max-w-3xl rounded-2xl border shadow-2xl p-6 max-h-[90vh] flex flex-col ${
-              isDark ? 'bg-gray-900 border-gray-700 text-white' : 'bg-white border-slate-200 text-slate-900'
-            }`}
-          >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between border-b pb-4 mb-4 dark:border-gray-800">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
-                  <UploadCloud className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg leading-tight">Batch File Upload</h3>
-                  <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
-                    Upload multiple files at once. Each file will be created as an independent, separate card (not zipped).
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  if (!isBatchUploading) {
-                    setShowMultiUploadModal(false);
-                    setMultiUploadFiles([]);
-                  }
-                }}
-                disabled={isBatchUploading}
-                className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-500 hover:text-gray-900 dark:hover:text-white transition disabled:opacity-50"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Upload Area / Add More */}
-            <div className="mb-4">
-              <div
-                onClick={() => multiFileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-xl p-3.5 text-center cursor-pointer transition flex items-center justify-center gap-3 ${
-                  isDark
-                    ? 'border-purple-800/60 hover:border-purple-500 bg-purple-950/20 hover:bg-purple-950/30'
-                    : 'border-purple-300 hover:border-purple-600 bg-purple-50 hover:bg-purple-100/70'
-                }`}
-              >
-                <Files className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                <span className="text-xs font-semibold text-purple-700 dark:text-purple-300">
-                  + Add More Files to this Upload Batch (PDF, DOCX, HTML, Images, etc. under 3MB)
-                </span>
-              </div>
-            </div>
-
-            {/* Selected Files List */}
-            <div className="flex-1 overflow-y-auto space-y-3 pr-1 mb-4 max-h-[48vh]">
-              {multiUploadFiles.length === 0 ? (
-                <div className="text-center py-8 text-xs text-gray-500">
-                  No files selected. Click above to select multiple files.
-                </div>
-              ) : (
-                multiUploadFiles.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`p-3.5 rounded-xl border transition ${
-                      item.status === 'error'
-                        ? isDark
-                          ? 'bg-red-950/20 border-red-800/60 text-red-300'
-                          : 'bg-red-50 border-red-200 text-red-900'
-                        : isDark
-                        ? 'bg-gray-800/70 border-gray-700 text-white'
-                        : 'bg-slate-50 border-slate-200 text-slate-900'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3 justify-between">
-                      <div className="flex-1 space-y-2">
-                        {/* Title input and status */}
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="text"
-                            value={item.title}
-                            onChange={(e) =>
-                              handleUpdateMultiUploadItem(item.id, { title: e.target.value })
-                            }
-                            placeholder="Card Title"
-                            className={`flex-1 px-2.5 py-1 text-xs font-bold rounded-lg border focus:outline-none ${
-                              isDark
-                                ? 'bg-gray-900 border-gray-700 text-white focus:border-purple-500'
-                                : 'bg-white border-slate-300 text-slate-900 focus:border-purple-600'
-                            }`}
-                          />
-                          {item.status === 'ready' && (
-                            <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 shrink-0">
-                              <Check className="w-3.5 h-3.5" /> Ready
-                            </span>
-                          )}
-                          {(item.status === 'pending' || item.status === 'reading') && (
-                            <span className="flex items-center gap-1 text-[11px] font-semibold text-amber-500 shrink-0">
-                              <RefreshCw className="w-3 h-3 animate-spin" /> Reading...
-                            </span>
-                          )}
-                          {item.status === 'error' && (
-                            <span className="flex items-center gap-1 text-[11px] font-semibold text-red-500 shrink-0">
-                              <AlertCircle className="w-3.5 h-3.5" /> Error
-                            </span>
-                          )}
-                        </div>
-
-                        {/* File metadata row */}
-                        <div className="flex items-center gap-3 text-[11px] opacity-75 flex-wrap">
-                          <span className="font-mono">{item.fileName}</span>
-                          <span>•</span>
-                          <span>{item.subtitle}</span>
-                          {item.errorMsg && (
-                            <span className="text-red-500 font-semibold">{item.errorMsg}</span>
-                          )}
-                        </div>
-
-                        {/* Customization Options: Color & Icon */}
-                        {item.status === 'ready' && (
-                          <div className="flex items-center gap-3 pt-1 text-[11px]">
-                            <div className="flex items-center gap-1.5">
-                              <span className="opacity-70">Theme:</span>
-                              <select
-                                value={item.colorTheme}
-                                onChange={(e) =>
-                                  handleUpdateMultiUploadItem(item.id, {
-                                    colorTheme: e.target.value as ArchiveCardButton['colorTheme'],
-                                  })
-                                }
-                                className={`px-2 py-0.5 rounded text-[11px] border focus:outline-none ${
-                                  isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-slate-300'
-                                }`}
-                              >
-                                <option value="emerald">Emerald</option>
-                                <option value="blue">Blue</option>
-                                <option value="purple">Purple</option>
-                                <option value="amber">Amber</option>
-                                <option value="rose">Rose</option>
-                                <option value="cyan">Cyan</option>
-                                <option value="indigo">Indigo</option>
-                              </select>
-                            </div>
-
-                            <div className="flex items-center gap-1.5">
-                              <span className="opacity-70">Icon:</span>
-                              <select
-                                value={item.iconName}
-                                onChange={(e) =>
-                                  handleUpdateMultiUploadItem(item.id, {
-                                    iconName: e.target.value as ArchiveCardButton['iconName'],
-                                  })
-                                }
-                                className={`px-2 py-0.5 rounded text-[11px] border focus:outline-none ${
-                                  isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-slate-300'
-                                }`}
-                              >
-                                <option value="FileText">File Text</option>
-                                <option value="BookOpen">Book Open</option>
-                                <option value="Sparkles">Sparkles / Image / HTML</option>
-                                <option value="Briefcase">Briefcase</option>
-                                <option value="GraduationCap">Graduation Cap</option>
-                                <option value="Layers">Layers</option>
-                                <option value="Compass">Compass</option>
-                                <option value="Award">Award</option>
-                                <option value="Globe">Globe</option>
-                              </select>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Remove Button */}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveMultiUploadFile(item.id)}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-500/10 transition"
-                        title="Remove from batch"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {/* Modal Actions Footer */}
-            <div className="flex items-center justify-between pt-3 border-t dark:border-gray-800 text-xs">
-              <div className="text-xs text-gray-500">
-                <span>
-                  <strong>{multiUploadFiles.filter((i) => i.status === 'ready').length}</strong> of{' '}
-                  <strong>{multiUploadFiles.length}</strong> file(s) ready to create separately.
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMultiUploadModal(false);
-                    setMultiUploadFiles([]);
-                  }}
-                  disabled={isBatchUploading}
-                  className={`px-4 py-2 font-medium rounded-lg ${
-                    isDark ? 'text-gray-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleConfirmBatchUpload}
-                  disabled={
-                    isBatchUploading ||
-                    multiUploadFiles.filter((i) => i.status === 'ready').length === 0
-                  }
-                  className={`px-5 py-2 text-white font-semibold rounded-lg shadow-md transition flex items-center gap-1.5 disabled:opacity-50 ${
-                    isDark ? 'bg-purple-600 hover:bg-purple-500' : 'bg-purple-700 hover:bg-purple-800'
-                  }`}
-                >
-                  {isBatchUploading ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Saving to Cloud...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4" />
-                      <span>
-                        Upload {multiUploadFiles.filter((i) => i.status === 'ready').length} Separate Cards
-                      </span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       )}

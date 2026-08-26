@@ -2,12 +2,22 @@
    1. General & Global Styles
    ========================================================================== */
 
-/* Apply Poppins font and dark theme to all pages */
+/* Apply Poppins font and light theme by default matching Study Plan, dark theme on dark-mode */
+html {
+    scroll-behavior: smooth;
+}
+
 body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #111827; /* Dark background */
-    color: white;
+    font-family: 'Poppins', 'Inter', sans-serif;
+    background-color: #f8fafc; /* Clean crisp modern light bg */
+    color: #1e293b; /* Deep slate high contrast */
     overflow-x: hidden;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+body.dark-mode, html.dark body, html.dark {
+    background-color: #0f172a !important; /* Dark slate background */
+    color: #f1f5f9 !important;
 }
 
 /* Static background gradients */
@@ -17,10 +27,11 @@ body {
     left: 0;
     width: 24rem;
     height: 24rem;
-    background-color: rgba(168, 85, 247, 0.125);
+    background-color: rgba(168, 85, 247, 0.1);
     border-radius: 9999px;
     filter: blur(3rem);
     opacity: 0.7;
+    pointer-events: none;
 }
 
 .bg-gradient-emerald {
@@ -29,10 +40,11 @@ body {
     right: 0;
     width: 24rem;
     height: 24rem;
-    background-color: rgba(16, 185, 129, 0.125);
+    background-color: rgba(16, 185, 129, 0.1);
     border-radius: 9999px;
     filter: blur(3rem);
     opacity: 0.7;
+    pointer-events: none;
 }
 
 .bg-gradient-red {
@@ -41,26 +53,94 @@ body {
     right: 25%;
     width: 18rem;
     height: 18rem;
-    background-color: rgba(239, 68, 68, 0.0625);
+    background-color: rgba(239, 68, 68, 0.05);
     border-radius: 9999px;
     filter: blur(3rem);
     opacity: 0.7;
+    pointer-events: none;
 }
 
-
 /* ==========================================================================
-   2. Header & Navigation Styles
+   2. Header & Navigation Styles (Adaptive Light & Dark Mode)
    ========================================================================== */
 
-header {
+header,
+header.main-website-ui {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 50;
-    background-color: rgba(17, 24, 39, 0.8);
-    backdrop-filter: blur(4px);
-    border-bottom: 1px solid #374151; /* gray-700 */
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #e2e8f0; /* slate-200 */
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+header h1,
+header.main-website-ui h1,
+header .text-gray-800 {
+    color: #0f172a;
+}
+
+/* Dark mode header overrides */
+body.dark-mode header,
+body.dark-mode header.main-website-ui,
+html.dark header,
+html.dark header.main-website-ui {
+    background-color: rgba(15, 23, 42, 0.95) !important;
+    border-bottom-color: #334155 !important;
+}
+
+body.dark-mode header h1,
+body.dark-mode header.main-website-ui h1,
+body.dark-mode header .text-gray-800,
+body.dark-mode header .text-gray-900,
+html.dark header h1,
+html.dark header.main-website-ui h1 {
+    color: #f8fafc !important;
+}
+
+body.dark-mode header .bg-gray-100\/50,
+body.dark-mode header .bg-gray-100,
+html.dark header .bg-gray-100\/50,
+html.dark header .bg-gray-100 {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+}
+
+body.dark-mode header nav a.text-gray-600,
+body.dark-mode header nav a.text-gray-700,
+body.dark-mode header nav button.text-gray-600,
+body.dark-mode header nav button.text-gray-700,
+html.dark header nav a.text-gray-600 {
+    color: #e5e7eb !important;
+}
+
+body.dark-mode header nav a.hover\:bg-gray-200:hover,
+body.dark-mode header nav button.hover\:bg-gray-200:hover,
+html.dark header nav a.hover\:bg-gray-200:hover {
+    background-color: #4b5563 !important;
+    color: #ffffff !important;
+}
+
+/* Mobile Menu Dark & Light */
+body.dark-mode #mobile-menu,
+html.dark #mobile-menu {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+}
+
+body.dark-mode #mobile-menu a,
+html.dark #mobile-menu a {
+    color: #e5e7eb !important;
+}
+
+body.dark-mode #mobile-menu a:hover,
+html.dark #mobile-menu a:hover {
+    background-color: #374151 !important;
+    color: #ffffff !important;
 }
 
 /* Dropdown menu styles */
@@ -73,6 +153,107 @@ header {
 .dropdown-menu.is-open {
     opacity: 1;
     visibility: visible;
+}
+
+body.dark-mode .dropdown-menu,
+html.dark .dropdown-menu {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #f3f4f6 !important;
+}
+
+/* ==========================================================================
+   2b. Dark Mode Global Utilities & Overrides for Page Components
+   ========================================================================== */
+body.dark-mode .bg-white:not(.poem-page):not(.header-google-signin-btn):not(.preserve-white):not([class*="bg-emerald-"]):not([class*="bg-indigo-"]):not([class*="bg-amber-"]):not([class*="bg-rose-"]),
+html.dark .bg-white:not(.poem-page):not(.header-google-signin-btn):not(.preserve-white):not([class*="bg-emerald-"]):not([class*="bg-indigo-"]):not([class*="bg-amber-"]):not([class*="bg-rose-"]) {
+    background-color: #1e293b !important;
+    color: #f8fafc;
+}
+
+body.dark-mode .bg-gray-50,
+html.dark .bg-gray-50,
+body.dark-mode .bg-slate-50,
+html.dark .bg-slate-50 {
+    background-color: #0f172a !important;
+}
+
+body.dark-mode .bg-gray-100,
+html.dark .bg-gray-100,
+body.dark-mode .bg-slate-100,
+html.dark .bg-slate-100 {
+    background-color: #1e293b !important;
+}
+
+body.dark-mode .text-gray-900,
+html.dark .text-gray-900,
+body.dark-mode .text-gray-800,
+html.dark .text-gray-800 {
+    color: #f8fafc !important;
+}
+
+body.dark-mode .text-gray-700,
+html.dark .text-gray-700 {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .text-gray-600,
+html.dark .text-gray-600 {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .text-gray-500,
+html.dark .text-gray-500 {
+    color: #64748b !important;
+}
+
+body.dark-mode .border-gray-200,
+html.dark .border-gray-200,
+body.dark-mode .border-gray-300,
+html.dark .border-gray-300 {
+    border-color: #334155 !important;
+}
+
+body.dark-mode .card,
+html.dark .card,
+body.dark-mode .content-card,
+html.dark .content-card,
+body.dark-mode .modal-content,
+html.dark .modal-content {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode input:not([type="checkbox"]):not([type="radio"]),
+html.dark input:not([type="checkbox"]):not([type="radio"]),
+body.dark-mode textarea,
+html.dark textarea,
+body.dark-mode select,
+html.dark select {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+    border-color: #4b5563 !important;
+}
+
+body.dark-mode .header-google-signin-btn,
+html.dark .header-google-signin-btn,
+body.dark-mode #header-signin-btn,
+html.dark #header-signin-btn,
+body.dark-mode #google-login-btn,
+html.dark #google-login-btn {
+    background-color: #1f2937 !important;
+    color: #f3f4f6 !important;
+    border-color: #4b5563 !important;
+}
+
+body.dark-mode .header-google-signin-btn:hover,
+html.dark .header-google-signin-btn:hover,
+body.dark-mode #header-signin-btn:hover,
+html.dark #header-signin-btn:hover,
+body.dark-mode #google-login-btn:hover,
+html.dark #google-login-btn:hover {
+    background-color: #374151 !important;
 }
 
 
@@ -108,12 +289,75 @@ header {
 /* Glow effect for login/signup forms and announcement cards */
 .login-glow-card {
     position: relative;
-    background-color: rgba(31, 41, 55, 0.5);
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
     backdrop-filter: blur(12px);
     border-radius: 1rem;
     padding: 1.5rem;
-    box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.25);
-    transition: box-shadow 0.3s ease-in-out;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease-in-out;
+}
+
+body.dark-mode .login-glow-card,
+html.dark .login-glow-card {
+    background-color: rgba(30, 41, 59, 0.85) !important;
+    border-color: #334155 !important;
+    box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Adaptive feedback section */
+.feedback-section {
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    color: #0f172a;
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+body.dark-mode .feedback-section,
+html.dark .feedback-section {
+    background-color: #0f172a !important;
+    border-top-color: #1e293b !important;
+    color: #f8fafc !important;
+}
+
+body.dark-mode .feedback-section h2,
+html.dark .feedback-section h2 {
+    color: #ffffff !important;
+}
+
+body.dark-mode .feedback-section p,
+html.dark .feedback-section p {
+    color: #94a3b8 !important;
+}
+
+/* Adaptive footer */
+footer {
+    background-color: #f1f5f9;
+    border-top: 1px solid #e2e8f0;
+    color: #334155;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+body.dark-mode footer,
+html.dark footer {
+    background-color: #0b1120 !important;
+    border-top-color: #1e293b !important;
+    color: #94a3b8 !important;
+}
+
+body.dark-mode footer h3,
+html.dark footer h3 {
+    color: #f8fafc !important;
+}
+
+body.dark-mode footer a,
+html.dark footer a {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode footer a:hover,
+html.dark footer a:hover {
+    color: #34d399 !important;
 }
 
 /* Container for the animated glow border */
