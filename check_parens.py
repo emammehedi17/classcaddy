@@ -27,4 +27,4 @@ def check_file(filename):
     else:
         print("All parentheses matched!")
 
-check_file('study-plan-styles.css.bak')
+check_file('study-plan-styles.css')

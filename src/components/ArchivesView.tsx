@@ -1499,20 +1499,10 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
   const isSuperAdmin = user?.email === 'emammehedi17@gmail.com';
 
   const handleOpenDeveloperAuth = () => {
-    if (isSuperAdmin) {
-      setIsDeveloperMode(true);
-      sessionStorage.setItem(DEV_AUTH_KEY, 'true');
-    } else {
-      setShowAuthModal(true);
-    }
+    setShowAuthModal(true);
   };
 
-  useEffect(() => {
-    if (isSuperAdmin) {
-      setIsDeveloperMode(true);
-      sessionStorage.setItem(DEV_AUTH_KEY, 'true');
-    }
-  }, [isSuperAdmin]);
+
 
   // HTML Viewer Modal State
   const [viewingHtmlCard, setViewingHtmlCard] = useState<ArchiveCardButton | null>(null);
@@ -3018,6 +3008,30 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                   {isAuthenticating ? 'Verifying...' : 'Authenticate'}
                 </button>
               </div>
+              {isSuperAdmin && (
+                <div className="mt-4 pt-4 border-t border-gray-700/60 dark:border-gray-800 text-center">
+                  <p className={`text-xs mb-2 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
+                    You are logged in as admin. You can bypass the password.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsDeveloperMode(true);
+                      sessionStorage.setItem(DEV_AUTH_KEY, 'true');
+                      setShowAuthModal(false);
+                      setAuthError('');
+                      setPinInput('');
+                    }}
+                    className={`w-full px-4 py-2 text-xs font-semibold rounded-lg border transition ${
+                      isDark
+                        ? 'bg-gray-800 hover:bg-gray-700 text-emerald-400 border-gray-700'
+                        : 'bg-slate-100 hover:bg-slate-200 text-emerald-700 border-slate-300'
+                    }`}
+                  >
+                    Bypass with Admin Email
+                  </button>
+                </div>
+              )}
             </form>
           </div>
         </div>
