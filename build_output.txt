@@ -1,0 +1,18 @@
+
+> react-example@0.0.0 build
+> vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs
+
+vite v6.4.3 building for production...
+transforming...
+✓ 39 modules transformed.
+✗ Build failed in 911ms
+error during build:
+[@tailwindcss/vite:generate:build] Missing opening {
+file: /app/applet/study-plan-styles.css
+    at Te (file:///app/applet/node_modules/tailwindcss/dist/lib.mjs:3:5093)
+    at zf (file:///app/applet/node_modules/tailwindcss/dist/lib.mjs:38:1384)
+    at fu (file:///app/applet/node_modules/@tailwindcss/node/dist/index.mjs:10:3464)
+    at z.generate (file:///app/applet/node_modules/@tailwindcss/vite/dist/index.mjs:1:6019)
+    at Object.handler (file:///app/applet/node_modules/@tailwindcss/vite/dist/index.mjs:1:4675)
+    at Object.handler (file:///app/applet/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:46667:15)
+    at file:///app/applet/node_modules/rollup/dist/es/shared/node-entry.js:22916:40
