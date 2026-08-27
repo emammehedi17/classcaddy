@@ -49,14 +49,22 @@
                         <h1 class="text-xl font-bold text-gray-800">Class Caddy</h1>
                     </a>
                 </div>
-                <!-- Center: Desktop Navigation (hidden on mobile) -->
-            <div class="hidden md:flex items-center gap-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-1 text-sm">
-                <a href="index.html" class="px-5 py-1.5 bg-emerald-500 text-white rounded-full transition-colors font-medium shadow-sm">Home</a>
-                <a href="archives.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Archives</a>
-                <a href="study_plan.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Study Plan</a>
-                <a href="about.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">About</a>
-                <a href="contact.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Contact</a>
-            </div>
+                <div class="hidden md:flex items-center gap-1 bg-gray-100/50 border border-gray-200 rounded-full p-1 text-sm">
+                    <a href="index.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Home</a>
+                    <div id="academic-dropdown" class="relative">
+                        <button id="academic-button" class="px-5 py-1.5 font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors flex items-center">
+                            <a href="academic.html" class="flex items-center">Academic <svg class="w-4 h-4 ml-1 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></a>
+                        </button>
+                        <div id="academic-menu" class="dropdown-menu absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg hidden">
+                            <a href="course-405.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Course 405</a>
+                            <a href="course-406.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Course 406</a>
+                            <a href="course-407.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Course 407</a>
+                            <a href="course-408.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Course 408 (B)</a>
+                        </div>
+                    </div>
+                     <a href="study_plan.html" class="px-5 py-1.5 bg-emerald-500 text-white rounded-full transition-colors">Study Plan</a> <a href="about.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">About</a>
+                    <a href="contact.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Contact</a>
+                </div>
                  <div class="hidden md:flex items-center gap-4">
                     <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
                         <img src="images/du_logo.png" alt="DU Logo" class="h-10 w-10 rounded-full border border-gray-200 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/eeeeee/111827?text=DU';">
