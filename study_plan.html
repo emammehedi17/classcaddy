@@ -50,9 +50,9 @@
                 </div>
                 <!-- Center: Desktop Navigation (hidden on mobile) -->
             <div class="hidden md:flex items-center gap-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-1 text-sm">
-                <a href="index.html" class="px-5 py-1.5 bg-emerald-500 text-white rounded-full transition-colors font-medium shadow-sm">Home</a>
+                <a href="index.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Home</a>
                 <a href="archives.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Archives</a>
-                <a href="study_plan.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Study Plan</a>
+                <a href="study_plan.html" class="px-5 py-1.5 bg-emerald-500 text-white rounded-full transition-colors font-medium shadow-sm">Study Plan</a>
                 <a href="about.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">About</a>
                 <a href="contact.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Contact</a>
             </div>
@@ -163,7 +163,7 @@
 
                         <!-- Goal Setting -->
                         <div class="goal-section">
-                            <span class="goal-label">📅 Daily study goal:</span>
+                            <span class="goal-label"><i class="fas fa-calendar-check text-emerald-500 mr-1.5"></i> Daily study goal:</span>
                             <div class="goal-input-wrapper">
                                 <input
                                     type="number"
@@ -179,14 +179,14 @@
                                 <span class="goal-unit">hrs / day</span>
                             </div>
                             <button class="goal-save-btn" id="goal-save-btn" onclick="saveGoal()">
-                                Save goal
+                                <i class="fas fa-check mr-1 text-xs"></i> Save goal
                             </button>
-                            <span class="goal-saved-msg" id="goal-saved-msg">✓ Saved!</span>
+                            <span class="goal-saved-msg" id="goal-saved-msg"><i class="fas fa-check-circle mr-1"></i> Saved!</span>
                         </div>
 
                         <!-- Streak Counter -->
                         <div class="streak-section">
-                            <span class="streak-flame-icon">🔥</span>
+                            <span class="streak-flame-icon"><i class="fas fa-fire text-orange-500"></i></span>
                             <div class="streak-count-block">
                                 <span class="streak-number" id="streak-number">0</span>
                                 <span class="streak-sublabel">day streak</span>

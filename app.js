@@ -10402,7 +10402,7 @@ function renderWidget(studiedMin, goalMin, streak, hist) {
             if (ofTextEl) {
                 const goalLabel = formatMinutes(goalMin);
                 if (studiedMin >= goalMin) {
-                    ofTextEl.innerHTML = ` / ${goalLabel} — <span class="goal-complete-text">🎉 Goal complete!</span>`;
+                    ofTextEl.innerHTML = ` / ${goalLabel} — <span class="goal-complete-text"><i class="fas fa-trophy text-amber-400 mr-1"></i> Goal complete!</span>`;
                 } else {
                     ofTextEl.textContent = ` / ${goalLabel} goal`;
                 }
@@ -10506,8 +10506,17 @@ function renderWidget(studiedMin, goalMin, streak, hist) {
 
         const dot = document.createElement('div');
         dot.className = dotClass;
-        if (hasData && !goalMet) dot.textContent = shortLabel ? shortLabel[0].toUpperCase() : '';
-        else if (!hasData) dot.textContent = shortLabel ? shortLabel[0].toUpperCase() : (offset > 0 ? `+${offset}` : '');
+        if (hasData && goalMet) {
+            dot.innerHTML = '<i class="fas fa-check"></i>';
+        } else if (hasData && !goalMet) {
+            if (dotClass.includes('dot-missed')) {
+                dot.innerHTML = '<i class="fas fa-times"></i>';
+            } else {
+                dot.textContent = shortLabel ? shortLabel[0].toUpperCase() : '';
+            }
+        } else if (!hasData) {
+            dot.textContent = shortLabel ? shortLabel[0].toUpperCase() : (offset > 0 ? `+${offset}` : '');
+        }
 
         dot.title = isToday
             ? `Today — ${studiedLabel} studied`
