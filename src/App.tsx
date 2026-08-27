@@ -261,6 +261,7 @@ export default function App() {
             theme={theme}
             isExplorerMode={isExplorerMode}
             onToggleExplorerMode={toggleExplorerMode}
+            user={user}
           />
         )}
         {currentPage === 'about' && <AboutView />}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArchiveCardButton, ThemeMode } from '../types';
+import { ArchiveCardButton, ThemeMode, UserProfile } from '../types';
 import { db } from '../lib/firebase';
 import { doc, getDoc, setDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import {
@@ -50,6 +50,7 @@ interface ArchivesViewProps {
   theme?: ThemeMode;
   isExplorerMode?: boolean;
   onToggleExplorerMode?: () => void;
+  user?: UserProfile | null;
 }
 
 const STORAGE_KEY = 'class_caddy_archive_buttons';
@@ -58,7 +59,7 @@ const ADMIN_TOKEN_KEY = 'class_caddy_admin_token';
 const FIRESTORE_DOC_PATH = 'global_tree'; // doc in archive_settings collection
 
 // SHA-256 hash of 'Mehedi@#23877' for secure standalone / static host (Netlify / GitHub Pages) verification
-const STATIC_ADMIN_HASH = '1d649e216d2c4959e0477a4c008e6adfee1b610a0e2df9e13e1ee664aee37e1b';
+const STATIC_ADMIN_HASH = '1f13769cce7fa4fc5b161405b0c9535dbf503df774d6c4295bb2d7a9657076a5';
 
 // Fast Browser-native SHA-256 helper using Web Crypto API
 async function sha256Hex(text: string): Promise<string> {
@@ -1430,6 +1431,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
   theme = 'light',
   isExplorerMode: propExplorerMode,
   onToggleExplorerMode: propToggleExplorerMode,
+  user,
 }) => {
   const isDark = theme === 'dark';
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -1493,6 +1495,24 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
   const [pinInput, setPinInput] = useState('');
   const [authError, setAuthError] = useState('');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+
+  const isSuperAdmin = user?.email === 'emammehedi17@gmail.com';
+
+  const handleOpenDeveloperAuth = () => {
+    if (isSuperAdmin) {
+      setIsDeveloperMode(true);
+      sessionStorage.setItem(DEV_AUTH_KEY, 'true');
+    } else {
+      setShowAuthModal(true);
+    }
+  };
+
+  useEffect(() => {
+    if (isSuperAdmin) {
+      setIsDeveloperMode(true);
+      sessionStorage.setItem(DEV_AUTH_KEY, 'true');
+    }
+  }, [isSuperAdmin]);
 
   // HTML Viewer Modal State
   const [viewingHtmlCard, setViewingHtmlCard] = useState<ArchiveCardButton | null>(null);
@@ -2350,7 +2370,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
               ) : (
                 <button
                   id="developer-panel-auth-trigger-btn"
-                  onClick={() => setShowAuthModal(true)}
+                  onClick={handleOpenDeveloperAuth}
                   className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border transition ${
                     isDark
                       ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700'
@@ -2661,7 +2681,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
             </button>
           ) : (
             <button
-              onClick={() => setShowAuthModal(true)}
+              onClick={handleOpenDeveloperAuth}
               className="mt-2 px-4 py-2 text-xs font-medium bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl border border-gray-700 transition flex items-center gap-1.5"
             >
               <Lock className="w-3.5 h-3.5 text-emerald-400" />
