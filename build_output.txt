@@ -4,15 +4,86 @@
 
 vite v6.4.3 building for production...
 transforming...
-✓ 39 modules transformed.
-✗ Build failed in 911ms
-error during build:
-[@tailwindcss/vite:generate:build] Missing opening {
-file: /app/applet/study-plan-styles.css
-    at Te (file:///app/applet/node_modules/tailwindcss/dist/lib.mjs:3:5093)
-    at zf (file:///app/applet/node_modules/tailwindcss/dist/lib.mjs:38:1384)
-    at fu (file:///app/applet/node_modules/@tailwindcss/node/dist/index.mjs:10:3464)
-    at z.generate (file:///app/applet/node_modules/@tailwindcss/vite/dist/index.mjs:1:6019)
-    at Object.handler (file:///app/applet/node_modules/@tailwindcss/vite/dist/index.mjs:1:4675)
-    at Object.handler (file:///app/applet/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:46667:15)
-    at file:///app/applet/node_modules/rollup/dist/es/shared/node-entry.js:22916:40
+"signInAnonymously" and "signInWithRedirect" are imported from external module "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js" but never used in "app.js?v=2026070901".
+"arrayRemove" is imported from external module "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js" but never used in "app.js?v=2026070901".
+✓ 1760 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/archives.html                                   1.59 kB │ gzip:   0.77 kB
+dist/contact.html                                    1.61 kB │ gzip:   0.76 kB
+dist/about.html                                      1.61 kB │ gzip:   0.77 kB
+dist/assets/Mukadir sign-B1BLjHk4.jpg                5.88 kB
+dist/assets/ehsan-CcitaFcv.jpg                      10.63 kB
+dist/assets/du_logo-DnFnXQS7.png                    12.13 kB
+dist/Resources.html                                 13.93 kB │ gzip:   3.57 kB
+dist/assets/Saima 300x300-BTATGfuN.jpg              14.26 kB
+dist/project-DU.html                                14.44 kB │ gzip:   3.47 kB
+dist/academic.html                                  26.33 kB │ gzip:   5.95 kB
+dist/course-408.html                                27.61 kB │ gzip:   6.97 kB
+dist/assets/naim-lreTdJnb.jpg                       28.17 kB
+dist/poem-aghmid.html                               28.69 kB │ gzip:   6.67 kB
+dist/assets/Muktadir 300x300-DKQd0PCw.jpg           28.92 kB
+dist/course-406.html                                31.97 kB │ gzip:   7.54 kB
+dist/course-407.html                                33.47 kB │ gzip:   7.93 kB
+dist/biography-mikhail.html                         34.58 kB │ gzip:   8.77 kB
+dist/biography-shukri.html                          35.07 kB │ gzip:   8.83 kB
+dist/biography-badr-shakir.html                     35.82 kB │ gzip:   9.07 kB
+dist/cv.html                                        37.29 kB │ gzip:   9.85 kB
+dist/biography-abu-shabaka.html                     37.58 kB │ gzip:   9.44 kB
+dist/EnglishPoets.html                              38.02 kB │ gzip:  11.65 kB
+dist/assets/footer-YlpvbM6d.png                     39.12 kB
+dist/assets/Mehedi picture 600x600-BFfMle2w.jpg     39.24 kB
+dist/biography-najik.html                           39.92 kB │ gzip:   9.76 kB
+dist/study.html                                     40.07 kB │ gzip:  10.59 kB
+dist/biography-abu-madi.html                        40.79 kB │ gzip:  10.40 kB
+dist/assets/nure-B1Qq4Ngo.jpg                       41.08 kB
+dist/course-407-note-4.html                         41.63 kB │ gzip:   9.26 kB
+dist/course-405.html                                42.61 kB │ gzip:   8.00 kB
+dist/assets/ruhul-DpWPkbTu.jpg                      43.59 kB
+dist/assets/imran-BngA6zqY.jpg                      43.60 kB
+dist/index.html                                     44.66 kB │ gzip:   7.77 kB
+dist/poem-eid.html                                  45.65 kB │ gzip:   8.03 kB
+dist/assets/amin-DdwyxICN.jpg                       45.88 kB
+dist/poem-summaries.html                            52.44 kB │ gzip:  12.23 kB
+dist/poem-akhi.html                                 53.46 kB │ gzip:   9.35 kB
+dist/poem-nihaya.html                               57.71 kB │ gzip:  10.23 kB
+dist/database.html                                  60.15 kB │ gzip:   8.45 kB
+dist/cover.html                                     63.35 kB │ gzip:  14.56 kB
+dist/poem-usfur.html                                65.57 kB │ gzip:  10.09 kB
+dist/study_plan.html                                69.33 kB │ gzip:  13.71 kB
+dist/English.html                                   73.70 kB │ gzip:  19.33 kB
+dist/ict_peripherals.html                           75.42 kB │ gzip:  17.87 kB
+dist/poem-nahr.html                                 77.57 kB │ gzip:  12.73 kB
+dist/poem-aghniya.html                              77.70 kB │ gzip:  13.73 kB
+dist/poem-ina.html                                  82.70 kB │ gzip:  11.02 kB
+dist/poem-anqa.html                                104.77 kB │ gzip:  16.21 kB
+dist/assets/fozlu-TBRwewXN.jpg                     127.77 kB
+dist/assets/cc-icon-full-qjRh0efW.png              167.63 kB
+dist/assets/qr-DT963Mxg.png                        231.04 kB
+dist/assets/profile-T4_jkPRm.jpg                 1,182.65 kB
+dist/assets/poem-aghmid-BJma54N_.mp3             1,416.27 kB
+dist/assets/poem-usfur-BJgRJI3g.mp3              3,004.69 kB
+dist/assets/poem-akhi-B1O-DPLu.mp3               3,257.08 kB
+dist/assets/poem-nihayat--O-msWAv.mp3            5,048.86 kB
+dist/assets/poem-aghniya-BT3CMGd3.mp3            5,058.30 kB
+dist/assets/poem-anqa-BZDPDhag.mp3               7,828.36 kB
+dist/assets/poem-nahr-CRJgpPBk.mp3               9,116.73 kB
+dist/assets/style-D5nmHSKc.css                      16.50 kB │ gzip:   3.66 kB
+dist/assets/main-BpDzxGJS.css                      212.77 kB │ gzip:  27.88 kB
+dist/assets/study_plan-DV3BLKI-.css                520.93 kB │ gzip: 360.03 kB
+dist/assets/modulepreload-polyfill-B5Qt9EMX.js       0.71 kB │ gzip:   0.40 kB
+dist/assets/Resources-DCig6nXs.js                    4.36 kB │ gzip:   1.65 kB
+dist/assets/script-CxSdRVbi.js                      25.07 kB │ gzip:   7.85 kB
+dist/assets/study_plan-CHmky4Gu.js                 235.99 kB │ gzip:  61.95 kB
+dist/assets/main-DZWA1NCl.js                     1,360.46 kB │ gzip: 339.14 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 8.82s
+
+  dist/server.cjs      5.9kb
+  dist/server.cjs.map  9.4kb
+
+⚡ Done in 7ms
