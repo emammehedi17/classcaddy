@@ -9886,7 +9886,7 @@ if (viewMcqFullscreenBtn && viewMcqModalContent) {
 
 // 1. Global State
 let globalSettings = {
-    darkMode: false,
+    darkMode: (localStorage.getItem('class_caddy_theme') === 'dark' || document.documentElement.classList.contains('dark')),
     fontSize: 16
 };
 
@@ -9915,8 +9915,15 @@ function initSettingsSync(userId) {
 // 3. Apply Settings to Screen
 function applySettingsToDom() {
     // Dark Mode
-    if (globalSettings.darkMode) document.body.classList.add('dark-mode');
-    else document.body.classList.remove('dark-mode');
+    if (globalSettings.darkMode) {
+        document.body.classList.add('dark-mode');
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('class_caddy_theme', 'dark');
+    } else {
+        document.body.classList.remove('dark-mode');
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('class_caddy_theme', 'light');
+    }
 
     // Font Size (Apply to Study & View modals)
     ['mcq-study-content', 'view-mcq-content'].forEach(id => {
