@@ -3191,3 +3191,506 @@ body.dark-mode .circular {
     background-color: #111827 !important;
     border-color: #374151 !important;
 }
+
+/* ============================================================
+   STREAK TRACKER & DAILY GOAL WIDGET STYLES
+   ============================================================ */
+
+.streak-goal-widget {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* TOP ROW */
+.streak-goal-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+/* GOAL SECTION */
+.goal-section {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.goal-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.goal-input-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    padding: 3px 8px;
+    transition: border-color 0.2s;
+}
+
+.goal-input-wrapper:focus-within {
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.goal-hours-input {
+    width: 44px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border: none;
+    background: transparent;
+    color: #111827;
+    outline: none;
+    padding: 0;
+    -moz-appearance: textfield;
+}
+
+.goal-hours-input::-webkit-outer-spin-button,
+.goal-hours-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.goal-unit {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.goal-save-btn {
+    background-color: #10b981;
+    color: #ffffff;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.goal-save-btn:hover {
+    background-color: #059669;
+}
+
+.goal-save-btn:active {
+    transform: scale(0.97);
+}
+
+.goal-saved-msg {
+    display: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #059669;
+    margin-left: 0.25rem;
+}
+
+.goal-saved-msg.visible {
+    display: inline;
+}
+
+/* STREAK SECTION */
+.streak-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
+}
+
+.streak-flame-icon {
+    font-size: 1.75rem;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(249, 115, 22, 0.25));
+}
+
+.streak-count-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.1;
+}
+
+.streak-number {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #ea580c;
+}
+
+.streak-number.streak-zero {
+    color: #9ca3af;
+}
+
+.streak-sublabel {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.streak-best-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    white-space: nowrap;
+}
+
+/* PROGRESS SECTION */
+.goal-progress-section {
+    margin-bottom: 1.25rem;
+}
+
+.goal-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    margin-bottom: 0.45rem;
+}
+
+.goal-progress-title {
+    font-weight: 600;
+    color: #374151;
+}
+
+.goal-progress-status {
+    font-size: 0.825rem;
+    color: #4b5563;
+}
+
+.goal-progress-status .time-studied {
+    font-weight: 700;
+    color: #059669;
+}
+
+.goal-complete-text {
+    font-weight: 700;
+    color: #059669;
+}
+
+.goal-progress-bar-track {
+    position: relative;
+    width: 100%;
+    height: 10px;
+    background-color: #e5e7eb;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.goal-progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    border-radius: 9999px;
+    transition: width 0.4s ease;
+}
+
+.goal-progress-bar-fill.goal-hit {
+    background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.goal-progress-bar-fill.goal-over {
+    background: linear-gradient(90deg, #059669, #047857);
+}
+
+/* 7-DAY DOT ROW */
+.streak-days-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding: 6px 2px;
+}
+
+.streak-day-dot-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 44px;
+}
+
+.streak-day-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.streak-day-dot.dot-complete {
+    background-color: #10b981;
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25);
+}
+
+.streak-day-dot.dot-missed {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.streak-day-dot.dot-today {
+    border: 2px solid #3b82f6;
+    outline: 2px solid rgba(59, 130, 246, 0.2);
+    font-weight: 800;
+}
+
+.streak-day-dot.dot-today.dot-complete {
+    background-color: #10b981;
+    color: #ffffff;
+    border-color: #059669;
+    outline: 2px solid rgba(16, 185, 129, 0.3);
+}
+
+.streak-day-dot.dot-no-data {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    border: 1px dashed #d1d5db;
+}
+
+.streak-dot-label {
+    font-size: 0.725rem;
+    font-weight: 600;
+    color: #4b5563;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.streak-dot-label.label-today {
+    color: #2563eb;
+    font-weight: 700;
+}
+
+.streak-dot-date {
+    font-size: 0.65rem;
+    color: #9ca3af;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* SKELETON LOADERS */
+.streak-skeleton-dots {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.5rem;
+}
+
+.streak-skeleton-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #e5e7eb;
+}
+
+.goal-progress-skeleton {
+    width: 100%;
+    height: 100%;
+    background-color: #e5e7eb;
+}
+
+/* ============================================================
+   DARK MODE STYLES FOR STREAK & DAILY GOAL WIDGET
+   ============================================================ */
+
+body.dark-mode .streak-goal-widget {
+    background-color: #1f2937;
+    border-color: #374151;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .goal-label {
+    color: #e5e7eb;
+}
+
+body.dark-mode .goal-input-wrapper {
+    background-color: #374151;
+    border-color: #4b5563;
+}
+
+body.dark-mode .goal-input-wrapper:focus-within {
+    border-color: #10b981;
+}
+
+body.dark-mode .goal-hours-input {
+    color: #f9fafb;
+}
+
+body.dark-mode .goal-unit {
+    color: #9ca3af;
+}
+
+body.dark-mode .goal-save-btn {
+    background-color: #059669;
+    color: #ffffff;
+}
+
+body.dark-mode .goal-save-btn:hover {
+    background-color: #10b981;
+}
+
+body.dark-mode .goal-saved-msg {
+    color: #34d399;
+}
+
+body.dark-mode .streak-number {
+    color: #fb923c;
+}
+
+body.dark-mode .streak-number.streak-zero {
+    color: #6b7280;
+}
+
+body.dark-mode .streak-sublabel {
+    color: #9ca3af;
+}
+
+body.dark-mode .streak-best-badge {
+    background-color: #78350f;
+    color: #fef3c7;
+    border-color: #b45309;
+}
+
+body.dark-mode .goal-progress-title {
+    color: #e5e7eb;
+}
+
+body.dark-mode .goal-progress-status {
+    color: #d1d5db;
+}
+
+body.dark-mode .goal-progress-status .time-studied {
+    color: #34d399;
+}
+
+body.dark-mode .goal-complete-text {
+    color: #34d399;
+}
+
+body.dark-mode .goal-progress-bar-track {
+    background-color: #374151;
+}
+
+body.dark-mode .streak-day-dot.dot-complete {
+    background-color: #059669;
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(5, 150, 105, 0.4);
+}
+
+body.dark-mode .streak-day-dot.dot-missed {
+    background-color: #450a0a;
+    color: #f87171;
+    border-color: #7f1d1d;
+}
+
+body.dark-mode .streak-day-dot.dot-today {
+    border-color: #60a5fa;
+    outline-color: rgba(96, 165, 250, 0.3);
+}
+
+body.dark-mode .streak-day-dot.dot-today.dot-complete {
+    background-color: #059669;
+    color: #ffffff;
+    border-color: #34d399;
+    outline-color: rgba(52, 211, 153, 0.4);
+}
+
+body.dark-mode .streak-day-dot.dot-no-data {
+    background-color: #374151;
+    color: #6b7280;
+    border-color: #4b5563;
+}
+
+body.dark-mode .streak-dot-label {
+    color: #d1d5db;
+}
+
+body.dark-mode .streak-dot-label.label-today {
+    color: #60a5fa;
+}
+
+body.dark-mode .streak-dot-date {
+    color: #9ca3af;
+}
+
+body.dark-mode .streak-skeleton-dot,
+body.dark-mode .goal-progress-skeleton {
+    background-color: #374151;
+}
+
+/* ============================================================
+   RESPONSIVE MOBILE STYLES FOR STREAK & DAILY GOAL WIDGET
+   ============================================================ */
+
+@media (max-width: 640px) {
+    .streak-goal-widget {
+        padding: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .streak-goal-top-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .goal-section {
+        justify-content: flex-start;
+    }
+
+    .streak-section {
+        margin-left: 0;
+        justify-content: flex-start;
+        padding-top: 0.5rem;
+        border-top: 1px dashed #e5e7eb;
+    }
+
+    body.dark-mode .streak-section {
+        border-top-color: #374151;
+    }
+
+    .streak-days-row {
+        gap: 0.35rem;
+        padding-bottom: 4px;
+    }
+
+    .streak-day-dot-wrapper {
+        min-width: 38px;
+    }
+
+    .streak-day-dot {
+        width: 32px;
+        height: 32px;
+        font-size: 0.75rem;
+    }
+}
+
