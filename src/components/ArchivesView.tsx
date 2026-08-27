@@ -58,7 +58,7 @@ const ADMIN_TOKEN_KEY = 'class_caddy_admin_token';
 const FIRESTORE_DOC_PATH = 'global_tree'; // doc in archive_settings collection
 
 // SHA-256 hash of 'Mehedi@#23877' for secure standalone / static host (Netlify / GitHub Pages) verification
-const STATIC_ADMIN_HASH = '1f13769cce7fa4fc5b161405b0c9535dbf503df774d6c4295bb2d7a9657076a5';
+const STATIC_ADMIN_HASH = '1d649e216d2c4959e0477a4c008e6adfee1b610a0e2df9e13e1ee664aee37e1b';
 
 // Fast Browser-native SHA-256 helper using Web Crypto API
 async function sha256Hex(text: string): Promise<string> {
