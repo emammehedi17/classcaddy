@@ -22,7 +22,7 @@
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
     </style>
 </head>
-<body class="antialiased p-4 md:p-8 selection:bg-rose-500/30">
+<body class="bg-gray-100 text-gray-800 antialiased p-4 md:p-8 selection:bg-rose-500/30">
 
     <div class="max-w-6xl mx-auto space-y-10">
         <header class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between border-t-4 border-t-rose-500">
@@ -387,5 +387,16 @@
             renderSummary();
         };
     </script>
+
+    <!-- Floating Action Buttons (Scroll to Bottom/Top & Global Dark Mode) -->
+    <button id="scroll-toggle-btn" class="fixed bottom-32 right-5 z-[100] w-12 h-12 bg-gray-700 hover:bg-gray-900 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100" title="Scroll to Bottom" aria-label="Scroll to Bottom">
+        <i class="fas fa-arrow-down"></i>
+    </button>
+
+    <button id="global-dark-mode-btn" class="fixed bottom-6 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-lg border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 transition-transform" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
+        <i class="fas fa-moon text-2xl"></i>
+    </button>
+
+<script src="../script.js"></script>
 </body>
 </html>

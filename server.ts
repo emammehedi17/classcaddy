@@ -150,8 +150,17 @@ async function startServer() {
     res.json({ success: true });
   });
 
+
+
   // Vite development middleware or static production serving
   if (process.env.NODE_ENV !== 'production') {
+    app.use((req, res, next) => {
+      // Very basic extensionless to .html rewrite for development
+      if (!req.url.includes('.') && req.url !== '/' && !req.url.startsWith('/api')) {
+        req.url += '.html';
+      }
+      next();
+    });
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
@@ -159,7 +168,7 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
+    app.use(express.static(distPath, { extensions: ["html"] }));
     app.get('*', (_req: Request, res: Response) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });

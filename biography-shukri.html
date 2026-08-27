@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="style.css">
 	<link rel="icon" href="https://eco.du.ac.bd//assets/images/fab_icon.ico" type="image/x-icon">
 </head>
-<body class="bg-gray-900 text-white">
+<body class="bg-gray-100 text-gray-800">
 
 <!-- =================== HEADER & BREADCRUMBS START =================== -->
 <!-- =================== HEADER START =================== -->
@@ -41,7 +41,7 @@
             <!-- Center: Desktop Navigation (hidden on mobile) -->
             <div class="hidden md:flex items-center gap-1 bg-gray-100/50 border border-gray-200 rounded-full p-1 text-sm">
                 <a href="index.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Home</a>
-                <a href="https://classcaddy.netlify.app/archives.html" class="px-5 py-1.5 font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full transition-colors">Archives</a>
+                <a href="archives.html" class="px-5 py-1.5 font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full transition-colors">Archives</a>
                 <a href="study_plan.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Study Plan</a>
                 <a href="about.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">About</a>
                 <a href="contact.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Contact</a>
@@ -68,7 +68,7 @@
         <!-- Mobile Menu Panel -->
         <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 -mx-6 mt-3 shadow-md">
             <a href="index.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Home</a>
-            <a href="https://classcaddy.netlify.app/archives.html" class="block px-6 py-3 text-sm font-semibold text-emerald-600 hover:bg-gray-100 transition-colors">Archives</a>
+            <a href="archives.html" class="block px-6 py-3 text-sm font-semibold text-emerald-600 hover:bg-gray-100 transition-colors">Archives</a>
             <a href="study_plan.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Study Plan</a>
             <a href="about.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">About</a>
             <a href="contact.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Contact</a>
@@ -369,5 +369,15 @@
         }
     });
 </script>
+
+    <!-- Floating Action Buttons (Scroll to Bottom/Top & Global Dark Mode) -->
+    <button id="scroll-toggle-btn" class="fixed bottom-32 right-5 z-[100] w-12 h-12 bg-gray-700 hover:bg-gray-900 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100" title="Scroll to Bottom" aria-label="Scroll to Bottom">
+        <i class="fas fa-arrow-down"></i>
+    </button>
+
+    <button id="global-dark-mode-btn" class="fixed bottom-6 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-lg border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 transition-transform" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
+        <i class="fas fa-moon text-2xl"></i>
+    </button>
+
 </body>
 </html>
