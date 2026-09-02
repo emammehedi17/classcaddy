@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 16-20 Master Practice Note</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', 'Hind Siliguri', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.2); }
+        .gradient-text { background: linear-gradient(90deg, #10b981, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .bn-text { font-family: 'Hind Siliguri', sans-serif; }
+        
+        /* Custom Scrollbar for the dark theme */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+    </style>
+</head>
+<body class="antialiased p-4 md:p-8 selection:bg-emerald-500/30">
+
+    <div class="max-w-7xl mx-auto space-y-10">
+        
+        <!-- Header -->
+        <header class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between border-t-4 border-t-emerald-500">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-600/10 rounded-full blur-3xl -z-10 transform translate-x-1/2 -translate-y-1/2"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-cyan-600/10 rounded-full blur-3xl -z-10 transform -translate-x-1/2 translate-y-1/2"></div>
+            
+            <div class="z-10 text-center md:text-left mb-6 md:mb-0">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-800/80 rounded-full text-emerald-300 font-bold mb-4 border border-emerald-500/30">
+                    <i class="fas fa-crown text-amber-400"></i>
+                    <span>Master Review: Day 16 to 20</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-extrabold gradient-text mb-4 tracking-tight">The Master Practice</h1>
+                <p class="text-lg text-slate-300 font-medium mb-3">Vocabs 1-62. Epic Story. 50 MCQs.</p>
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-lg text-slate-300 font-medium border border-slate-600 shadow-sm">
+                    <i class="fas fa-pen-nib text-cyan-400"></i>
+                    <span>Created by: <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="text-emerald-400 hover:text-emerald-300 underline font-bold transition-colors">Emam Mehedi</a></span>
+                </div>
+            </div>
+            <div class="z-10 flex-shrink-0 bg-slate-800 p-2 rounded-2xl shadow-xl border border-slate-600 transform hover:scale-105 transition-transform duration-300">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" class="w-28 h-28 object-cover rounded-xl opacity-90 hover:opacity-100 transition-opacity">
+            </div>
+        </header>
+
+        <!-- Epic Story Section -->
+        <section class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl relative">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-700 pb-5">
+                <h2 id="story-title" class="text-3xl font-bold flex items-center gap-3 text-slate-100">
+                    <i class="fas fa-book-journal-whills text-emerald-400"></i> ছায়া রাজ্যের পতন (Fall of the Shadow Realm)
+                </h2>
+                <button onclick="copyStory()" class="mt-4 md:mt-0 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 rounded-xl font-bold transition-all flex items-center gap-2 border border-emerald-500/30 shadow-lg hover:shadow-emerald-500/20">
+                    <i class="far fa-copy"></i> Copy Epic Story
+                </button>
+            </div>
+            
+            <div id="story-content" class="text-slate-300 leading-relaxed text-lg md:text-xl text-justify font-medium bg-slate-900/50 p-6 md:p-8 rounded-2xl border border-slate-700/50 shadow-inner space-y-5 bn-text">
+                <p>
+                    একসময়, মহাবিশ্বের এক প্রান্তে একটি <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Autonomous</span> (স্বায়ত্তশাসিত) রাজ্য ছিল। রাজ্যের রাজা ছিলেন অত্যন্ত <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Affectionate</span> (স্নেহময়) এবং প্রজাদের প্রতি দয়ালু। তার রাজ্যে কোনো <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Enmity</span> (শত্রুতা) ছিল না। কিন্তু হঠাৎ একদিন রাজ্যের উপর একটি ভয়ঙ্কর <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Blight</span> (ক্ষতিকর প্রভাব) নেমে আসে। 
+                </p>
+                <p>
+                    এক <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Crafty</span> (ধূর্ত) জাদুকর, যার মনে ছিল প্রবল <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Boldness</span> (সাহসিকতা), রাজ্যের শান্তি <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Destroy</span> (ধ্বংস করা) করতে চেয়েছিল। সে রাজাকে চরম <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Dismay</span> (আতঙ্ক)-এর মধ্যে ফেলে দেয়। জাদুকরটি তার জাদুর মাধ্যমে পুরো রাজ্যের আবহাওয়াকে <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Deteriorate</span> (অবনতি ঘটা) করতে শুরু করে। 
+                </p>
+                <p>
+                    রাজা বুঝতে পারলেন, এভাবে চলতে থাকলে পুরো রাজ্য <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Bankrupt</span> (দেউলিয়া) হয়ে যাবে। তিনি তার সবচেয়ে <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Educated</span> (শিক্ষিত) এবং বিশ্বস্ত সেনাপতিকে ডাকলেন। সেনাপতি সিদ্ধান্ত নিলেন যে, তিনি যেকোনো মূল্যে রাজ্যকে <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Defend</span> (রক্ষা করা) করবেন। তিনি তার সৈন্যদের <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Concentrated</span> (কেন্দ্রীভূত) করেন এবং জাদুকরের গুহার উদ্দেশ্যে একটি বিপদজনক <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Adventure</span> (অভিযান) <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Commence</span> (আরম্ভ করা) করেন।
+                </p>
+                <p>
+                    পথে তাদের অনেক <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Difficult</span> (কঠিন) বাধা পার হতে হয়। কিন্তু সেনাপতি কোনো <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Delay</span> (বিলম্ব) না করে മുന്നে এগিয়ে যান। জাদুকরের গুহায় পৌঁছে এক ভয়ানক <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Brawl</span> (তুমুল ঝগড়া/লড়াই) শুরু হয়। সেনাপতি জাদুকরকে পরাস্ত করে তার জাদুর স্ফটিকটি <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Conceal</span> (গোপন করা) থেকে উদ্ধার করেন এবং সেটিকে ধ্বংস করেন। 
+                </p>
+                <p>
+                    জাদুকরের পতন নিশ্চিত হওয়ার পর, রাজা একটি বিশাল উৎসব <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Celebrate</span> (উদযাপন করা) করেন। তিনি সেনাপতিকে <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Acclaim</span> (প্রশংসা করা) করেন এবং রাজ্যে পুনরায় <span class="text-emerald-300 font-bold bg-emerald-900/30 px-1.5 rounded">Eternal</span> (চিরন্তন) শান্তি ফিরে আসে।
+                </p>
+            </div>
+        </section>
+
+        <!-- Interactive Flashcards -->
+        <section class="space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-2">
+                <h2 class="text-3xl font-bold flex items-center gap-3 text-slate-100 ml-2">
+                    <i class="fas fa-layer-group text-cyan-400"></i> Interactive Mastery Cards (Vocab 1-62)
+                </h2>
+            </div>
+            
+            <div id="flashcardContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- JS will populate this with 62 detailed flashcards -->
+            </div>
+        </section>
+
+        <!-- Grand Assessment -->
+        <section class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl border-t-4 border-t-cyan-500 mt-12">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-700 pb-5">
+                <h2 class="text-3xl font-bold flex items-center gap-3 text-slate-100">
+                    <i class="fas fa-tasks text-cyan-400"></i> Grand Assessment (50 MCQs)
+                </h2>
+                <button onclick="copyMCQs()" class="mt-4 md:mt-0 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 rounded-xl font-bold transition-all flex items-center gap-2 border border-cyan-500/30 shadow-lg hover:shadow-cyan-500/20">
+                    <i class="far fa-copy"></i> Copy Assessment
+                </button>
+            </div>
+            
+            <div id="mcqContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- JS will populate this with 50 MCQs -->
+            </div>
+        </section>
+
+        <!-- Summary List -->
+        <section class="glass-panel rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden bg-slate-900 border border-slate-700 mt-12">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 z-10 relative border-b border-slate-700 pb-5">
+                <h2 class="text-2xl font-bold flex items-center gap-3 text-slate-100">
+                    <i class="fas fa-list-check text-emerald-400"></i> Master Summary List (1-62)
+                </h2>
+                <button onclick="copySummary()" class="mt-4 md:mt-0 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white rounded-xl font-bold shadow-lg transition-all transform hover:scale-105 flex items-center gap-2">
+                    <i class="fas fa-copy"></i> Copy Full List
+                </button>
+            </div>
+            
+            <div class="bg-black/50 p-6 rounded-2xl border border-slate-700 font-mono text-sm leading-relaxed overflow-y-auto max-h-96 z-10 relative bn-text scrollbar-thin">
+                <pre id="summaryText" class="whitespace-pre-wrap text-slate-300 font-medium"></pre>
+            </div>
+        </section>
+
+        <!-- Navigation Buttons -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-10 mb-4 z-10 relative">
+            <a href="https://classcaddy.netlify.app/vocabs/day15" class="w-full sm:w-auto text-center px-6 py-3 bg-slate-800 text-emerald-300 border border-emerald-500/30 rounded-xl font-bold shadow-lg hover:bg-slate-700 hover:border-emerald-400 transition-all flex items-center justify-center gap-3 group">
+                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i> Previous (Day-15)
+            </a>
+            <a href="https://classcaddy.netlify.app/vocabs/day21" class="w-full sm:w-auto text-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 transform hover:-translate-y-1 group">
+                Next (Day-21) <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center text-slate-500 text-sm mt-8 pb-12 font-medium">
+            <p>&copy; 2026 ClassCaddy Notes | Designed for effective learning.</p>
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-gradient-to-r from-emerald-600 to-cyan-600 text-white px-6 py-4 rounded-xl shadow-2xl opacity-0 pointer-events-none transition-all duration-300 z-50 flex items-center gap-3 transform translate-y-4">
+        <i class="fas fa-check-circle text-xl"></i>
+        <span id="toastMsg" class="font-bold">Copied successfully!</span>
+    </div>
+
+    <script>
+        const wordsData = [
+            {
+                w: "Absolute", p: "অ্যাবসলিউট", m: "সম্পূর্ণ / পরোৎকৃষ্ট / অসীম", syn: "Unconditional", sp: "আনকন্ডিশনাল", ant: "Relative", ap: "রিলেটিভ",
+                o: "ল্যাটিন 'absolutus' থেকে উদ্ভূত, যার আক্ষরিক অর্থ 'মুক্ত করা' বা 'বন্ধনহীন'। এটি এমন কিছুকে নির্দেশ করে যা কোনো শর্ত বা সীমার অধীন নয়।",
+                s: [
+                    { en: "He demanded absolute silence in the room.", bn: "(তিনি ঘরে সম্পূর্ণ নীরবতা দাবি করেছিলেন।)" },
+                    { en: "The king ruled his country with absolute power.", bn: "(রাজা অসীম ক্ষমতার সাথে তার দেশ শাসন করতেন।)" }
+                ]
+            },
+            {
+                w: "Accidental", p: "অ্যাক্সিডেন্টাল", m: "আপতিক / আকস্মিক", syn: "Fortuitous", sp: "ফর্টুইটাস", ant: "Intentional", ap: "ইনটেনশনাল",
+                o: "ল্যাটিন 'accidere' (ঘটা, পতিত হওয়া) থেকে আগত। যা উদ্দেশ্যপ্রণোদিত নয়, বরং ভাগ্য বা আকস্মিক ঘটনার ফল।",
+                s: [
+                    { en: "The discovery of penicillin was an accidental event.", bn: "(পেনিসিলিনের আবিষ্কার ছিল একটি আকস্মিক ঘটনা।)" },
+                    { en: "His death was ruled as an accidental drowning.", bn: "(তার মৃত্যুকে একটি আকস্মিক ডুবে যাওয়া হিসেবে রায় দেওয়া হয়েছিল।)" }
+                ]
+            },
+            {
+                w: "Acclaim", p: "অ্যাক্লেইম", m: "প্রশংসা করা / জয়ধ্বনি", syn: "Applaud", sp: "অ্যাপ্লড", ant: "Criticize", ap: "ক্রিটিসাইজ",
+                o: "ল্যাটিন 'acclamare' (জোরে চিৎকার করা) থেকে এসেছে। কাউকে জনসমক্ষে উচ্চস্বরে প্রশংসা বা সমর্থন জানানো।",
+                s: [
+                    { en: "The new movie received wide critical acclaim.", bn: "(নতুন সিনেমাটি ব্যাপক সমালোচনামূলক প্রশংসা পেয়েছে।)" },
+                    { en: "She was acclaimed as the best writer of the year.", bn: "(তিনি বছরের সেরা লেখক হিসেবে প্রশংসিত হয়েছেন।)" }
+                ]
+            },
+            {
+                w: "Acclaimed", p: "অ্যাক্লেইমড", m: "প্রশংসিত / সম্মানিত", syn: "Renowned", sp: "রিনাউন্ড", ant: "Ignored", ap: "ইগনোরড",
+                o: "'Acclaim' শব্দের বিশেষণ রূপ। যে ব্যক্তি বা বস্তু ব্যাপকভাবে প্রশংসিত এবং সকলের দ্বারা সম্মানিত।",
+                s: [
+                    { en: "He is a highly acclaimed author in our country.", bn: "(তিনি আমাদের দেশের একজন অত্যন্ত প্রশংসিত লেখক।)" },
+                    { en: "The restaurant is acclaimed for its delicious seafood.", bn: "(রেস্তোরাঁটি এর সুস্বাদু সামুদ্রিক খাবারের জন্য সম্মানিত।)" }
+                ]
+            },
+            {
+                w: "Adventure", p: "অ্যাডভেঞ্চার", m: "অভিযান / ঝুঁকি", syn: "Expedition", sp: "এক্সপেডিশন", ant: "Routine", ap: "রুটিন",
+                o: "ল্যাটিন 'adventura' (যা ঘটতে যাচ্ছে) থেকে উদ্ভূত। এটি এমন কোনো কাজ বা ভ্রমণ যা রোমাঞ্চকর, অজানা এবং ঝুঁকিপূর্ণ।",
+                s: [
+                    { en: "They went on a thrilling adventure in the dark jungle.", bn: "(তারা অন্ধকার জঙ্গলে একটি রোমাঞ্চকর অভিযানে গিয়েছিল।)" },
+                    { en: "Life itself is a great and unpredictable adventure.", bn: "(জীবন নিজেই একটি মহান এবং অপ্রত্যাশিত অভিযান।)" }
+                ]
+            },
+            {
+                w: "Affectionate", p: "অ্যাফেকশনেট", m: "স্নেহময় / মমতাময়", syn: "Tender", sp: "টেন্ডার", ant: "Apathetic", ap: "অ্যাপ্যাথেটিক",
+                o: "ল্যাটিন 'affectio' (অনুরাগ বা মানসিক অবস্থা) থেকে। অন্যের প্রতি গভীর স্নেহ, মমতা বা ভালোবাসা প্রদর্শনকারী।",
+                s: [
+                    { en: "She gave her little brother an affectionate hug.", bn: "(সে তার ছোট ভাইকে একটি স্নেহময় আলিঙ্গন দিল।)" },
+                    { en: "Dogs are known to be very affectionate pets.", bn: "(কুকুর খুব মমতাময় পোষা প্রাণী হিসেবে পরিচিত।)" }
+                ]
+            },
+            {
+                w: "Aid", p: "এইড", m: "সাহায্য / সহায়তা", syn: "Assistance", sp: "অ্যাসিস্ট্যান্স", ant: "Hindrance", ap: "হিনড্রেন্স",
+                o: "ল্যাটিন 'adiuvare' (সাহায্য করা) থেকে উদ্ভূত। বিপদ, অভাব বা প্রয়োজনের সময় কাউকে সমর্থন বা সাহায্য প্রদান করা।",
+                s: [
+                    { en: "They sent food and medical aid to the earthquake victims.", bn: "(তারা ভূমিকম্পে ক্ষতিগ্রস্তদের খাদ্য ও চিকিৎসা সহায়তা পাঠিয়েছে।)" },
+                    { en: "He immediately came to my aid when I needed it.", bn: "(আমার যখন প্রয়োজন ছিল তখন সে সাথে সাথে আমার সাহায্যে এগিয়ে এসেছিল।)" }
+                ]
+            },
+            {
+                w: "Anxiety", p: "অ্যাংজাইটি", m: "উদ্বেগ / দুশ্চিন্তা", syn: "Trepidation", sp: "ট্রেপিডেশন", ant: "Serenity", ap: "সেরেনিটি",
+                o: "ল্যাটিন 'anxietas' (উদ্বিগ্ন অবস্থা) থেকে এসেছে। কোনো অনিশ্চিত ভবিষ্যৎ বা বিপদের আশঙ্কায় সৃষ্ট মানসিক অস্বস্তি বা দুশ্চিন্তা।",
+                s: [
+                    { en: "Waiting for the exam results caused her great anxiety.", bn: "(পরীক্ষার ফলাফলের জন্য অপেক্ষা করা তার মধ্যে চরম উদ্বেগের সৃষ্টি করেছিল।)" },
+                    { en: "He suffers from extreme social anxiety in large crowds.", bn: "(সে বড় ভিড়ের মধ্যে চরম সামাজিক দুশ্চিন্তায় ভোগে।)" }
+                ]
+            },
+            {
+                w: "Appreciate", p: "অ্যাপ্রিশিয়েট", m: "সঠিকভাবে মূল্যায়ন করা", syn: "Value", sp: "ভ্যালু", ant: "Neglect", ap: "নেগলেক্ট",
+                o: "ল্যাটিন 'appretiare' (মূল্য নির্ধারণ করা) থেকে। কারও কাজ বা গুণের সঠিক মূল্য বোঝা এবং তার প্রতি কৃতজ্ঞতা প্রকাশ করা।",
+                s: [
+                    { en: "I really appreciate your help with this difficult project.", bn: "(এই কঠিন প্রকল্পে আপনার সহায়তার আমি সত্যিই মূল্যায়ন করি।)" },
+                    { en: "We should appreciate the beauty of nature around us.", bn: "(আমাদের চারপাশের প্রকৃতির সৌন্দর্যকে আমাদের সঠিকভাবে মূল্যায়ন করা উচিত।)" }
+                ]
+            },
+            {
+                w: "Approbation", p: "অ্যাপ্রোবেশন", m: "অনুমোদন / সমর্থন", syn: "Assent", sp: "অ্যাসেন্ট", ant: "Refusal", ap: "রিফিউজাল",
+                o: "ল্যাটিন 'approbare' (অনুমোদন করা) থেকে উদ্ভূত। আনুষ্ঠানিক বা জনসমক্ষে কারো কাজের প্রতি দৃঢ় সমর্থন বা প্রশংসা প্রদান।",
+                s: [
+                    { en: "The plan received the unanimous approbation of the committee.", bn: "(পরিকল্পনাটি কমিটির সর্বসম্মত অনুমোদন লাভ করেছে।)" },
+                    { en: "He smiled confidently, seeking his father's approbation.", bn: "(সে আত্মবিশ্বাসের সাথে হাসল, তার বাবার সমর্থন চেয়ে।)" }
+                ]
+            },
+            {
+                w: "Artist", p: "আর্টিস্ট", m: "শিল্পী / স্রষ্টা", syn: "Creator", sp: "ক্রিয়েটর", ant: "Amateur", ap: "অ্যামেচার",
+                o: "ল্যাটিন 'ars' (শিল্প, দক্ষতা) থেকে উদ্ভূত। যে ব্যক্তি সৃজনশীল দক্ষতা ব্যবহার করে চিত্রকলা, ভাস্কর্য বা অন্য কোনো শিল্পকর্ম তৈরি করে।",
+                s: [
+                    { en: "The artist painted a beautiful landscape on the canvas.", bn: "(শিল্পী ক্যানভাসে একটি সুন্দর প্রাকৃতিক দৃশ্য আঁকলেন।)" },
+                    { en: "She is a highly talented makeup artist in the city.", bn: "(সে শহরের একজন অত্যন্ত প্রতিভাবান মেকআপ শিল্পী।)" }
+                ]
+            },
+            {
+                w: "Assist", p: "অ্যাসিস্ট", m: "সহায়তা করা", syn: "Facilitate", sp: "ফ্যাসিলিটেট", ant: "Hinder", ap: "হিন্ডার",
+                o: "ল্যাটিন 'assistere' (পাশে দাঁড়ানো) থেকে। কারও কাজে সাহায্য করা বা তার দায়িত্ব পালনে প্রত্যক্ষ সমর্থন দেওয়া।",
+                s: [
+                    { en: "The nurse will assist the doctor during the complex surgery.", bn: "(সার্জারির সময় নার্স ডাক্তারকে সহায়তা করবেন।)" },
+                    { en: "Can I assist you with carrying those heavy bags?", bn: "(আমি কি আপনাকে সেই ভারী ব্যাগগুলো বহন করতে সহায়তা করতে পারি?)" }
+                ]
+            },
+            {
+                w: "Attachment", p: "অ্যাটাচমেন্ট", m: "সংযোজন / মায়া", syn: "Appendage", sp: "অ্যাপেন্ডেজ", ant: "Detachment", ap: "ডিটাচমেন্ট",
+                o: "ফরাসি 'attacher' (যুক্ত করা বা বাঁধা) থেকে। কোনো কিছুর সাথে শারীরিকভাবে যুক্ত থাকা অথবা কারও প্রতি গভীর মানসিক মায়া থাকা।",
+                s: [
+                    { en: "I sent the financial report as an email attachment.", bn: "(আমি আর্থিক প্রতিবেদনটি ইমেইল সংযোজন হিসেবে পাঠিয়েছি।)" },
+                    { en: "She has a strong emotional attachment to her childhood home.", bn: "(শৈশবের বাড়ির প্রতি তার গভীর আবেগপূর্ণ মায়া রয়েছে।)" }
+                ]
+            },
+            {
+                w: "Autonomous", p: "অটোনোমাস", m: "স্বায়ত্তশাসিত / স্বাধীন", syn: "Independent", sp: "ইনডিপেনডেন্ট", ant: "Dependent", ap: "ডিপেনডেন্ট",
+                o: "গ্রীক 'auto' (নিজ) এবং 'nomos' (আইন) থেকে গঠিত। যে প্রতিষ্ঠান বা অঞ্চল নিজের দ্বারা শাসিত এবং বাইরের নিয়ন্ত্রণের বাইরে।",
+                s: [
+                    { en: "The university operates as a fully autonomous institution.", bn: "(বিশ্ববিদ্যালয়টি একটি সম্পূর্ণ স্বায়ত্তশাসিত প্রতিষ্ঠান হিসেবে কাজ করে।)" },
+                    { en: "Tech companies are developing autonomous vehicles for the future.", bn: "(প্রযুক্তি কোম্পানিগুলো ভবিষ্যতের জন্য স্বায়ত্তশাসিত বা চালবিহীন যানবাহন তৈরি করছে।)" }
+                ]
+            },
+            {
+                w: "Awkward", p: "অকওয়ার্ড", m: "বেমানান / বিব্রতকর / অদক্ষ", syn: "Clumsy", sp: "ক্ল্যামজি", ant: "Graceful", ap: "গ্রেসফুল",
+                o: "প্রাচীন নর্স শব্দ 'afug' (বিপরীত বা ভুল দিকে ঘোরানো) থেকে। যা বেমানান, অস্বস্তিকর, বা করতে গেলে অস্বস্তি বোধ হয়।",
+                s: [
+                    { en: "There was an awkward silence in the room after his joke.", bn: "(তার কৌতুকের পর ঘরে একটি বিব্রতকর নীরবতা নেমে এসেছিল।)" },
+                    { en: "He felt very awkward dancing in front of everyone.", bn: "(সবার সামনে নাচতে তার খুব বেমানান বা অস্বস্তি লাগছিল।)" }
+                ]
+            },
+            {
+                w: "Bankrupt", p: "ব্যাংক্রাপ্ট", m: "দেউলিয়া / ঋণ পরিশোধে অক্ষম", syn: "Insolvent", sp: "ইনসলভেন্ট", ant: "Wealthy", ap: "ওয়েলদি",
+                o: "ইতালীয় 'banca rotta' (ভাঙা বেঞ্চ) থেকে। আগে ঋণ পরিশোধে ব্যর্থ ব্যবসায়ীর বেঞ্চ ভেঙে দেওয়া হতো। এর অর্থ আর্থিকভাবে নিঃস্ব।",
+                s: [
+                    { en: "The company went bankrupt last year due to poor management.", bn: "(অদক্ষ ব্যবস্থাপনার কারণে কোম্পানিটি গত বছর দেউলিয়া হয়ে গেছে।)" },
+                    { en: "He was declared bankrupt after accumulating heavy gambling debts.", bn: "(প্রচুর জুয়ার ঋণ জমার কারণে তাকে দেউলিয়া ঘোষণা করা হয়েছিল।)" }
+                ]
+            },
+            {
+                w: "Blemish", p: "ব্লেমিশ", m: "দাগ / ত্রুটি / কলঙ্ক", syn: "Defect", sp: "ডিফেক্ট", ant: "Perfection", ap: "পারফেকশন",
+                o: "পুরানো ফরাসি 'blemiss-' (ফ্যাকাশে করা বা দাগ ফেলা) থেকে। বাহ্যিক বা চারিত্রিক কোনো ত্রুটি যা সৌন্দর্য বা সম্মান নষ্ট করে।",
+                s: [
+                    { en: "The red apple has a small blemish on its smooth skin.", bn: "(লাল আপেলটির মসৃণ ত্বকে একটি ছোট দাগ রয়েছে।)" },
+                    { en: "One mistake cannot blemish his perfect career record.", bn: "(একটি মাত্র ভুল তার নিখুঁত ক্যারিয়ার রেকর্ডে কলঙ্ক ফেলতে পারে না।)" }
+                ]
+            },
+            {
+                w: "Blight", p: "ব্লাইট", m: "ক্ষতিকর প্রভাব / ধ্বংস", syn: "Scourge", sp: "স্কর্জ", ant: "Blessing", ap: "ব্লেসিং",
+                o: "সপ্তদশ শতাব্দীর একটি কৃষি পরিভাষা, যা উদ্ভিদের মড়ক বা রোগ বোঝাতো। রূপক অর্থে যা কিছু ধ্বংস বা ক্ষতিকর প্রভাব বয়ে আনে।",
+                s: [
+                    { en: "The sudden potato blight destroyed the entire crop that year.", bn: "(হঠাৎ আলুর মড়ক সে বছর পুরো ফসল ধ্বংস করে দিয়েছিল।)" },
+                    { en: "Corruption is a severe blight on the development of our society.", bn: "(দুর্নীতি আমাদের সমাজের উন্নয়নে একটি মারাত্মক ক্ষতিকর প্রভাব।)" }
+                ]
+            },
+            {
+                w: "Boldness", p: "বোল্ডনেস", m: "সাহসিকতা / স্পর্ধা", syn: "Audacity", sp: "অডাসিটি", ant: "Timidity", ap: "টিমিডিটি",
+                o: "প্রাচীন ইংরেজি 'beald' (সাহসী) থেকে উদ্ভূত। চরম বিপদ, ঝুঁকি বা ভয়ের সামনে দৃঢ়, স্পষ্ট ও নির্ভীক আচরণ প্রদর্শন করা।",
+                s: [
+                    { en: "Her boldness in the face of danger surprised all of us.", bn: "(বিপদের মুখে তার সাহসিকতা আমাদের সবাইকে অবাক করেছিল।)" },
+                    { en: "It takes great boldness to speak the truth against power.", bn: "(ক্ষমতার বিরুদ্ধে সত্য কথা বলতে প্রচুর সাহসিকতা বা স্পর্ধার প্রয়োজন হয়।)" }
+                ]
+            },
+            {
+                w: "Bondage", p: "বন্ডেজ", m: "দাসত্ব / বন্দীদশা", syn: "Servitude", sp: "সার্ভিটিউড", ant: "Freedom", ap: "ফ্রিডম",
+                o: "অ্যাংলো-ল্যাটিন 'bondagium' থেকে এসেছে। স্বাধীনতা হারিয়ে কারও দাসত্ব করা বা কোনো শৃঙ্খলে, নিয়মে বা ঋণে বন্দী থাকার অবস্থা।",
+                s: [
+                    { en: "The slaves finally escaped their years of terrible bondage.", bn: "(ক্রীতদাসরা অবশেষে তাদের বছরের পর বছর ধরে চলা ভয়ানক দাসত্ব থেকে পালিয়েছে।)" },
+                    { en: "Education can free people from the bondage of poverty.", bn: "(শিক্ষা মানুষকে দারিদ্র্যের বন্দীদশা থেকে মুক্ত করতে পারে।)" }
+                ]
+            },
+            {
+                w: "Brawl", p: "ব্রল", m: "তুমুল ঝগড়া / হাতাহাতি", syn: "Scuffle", sp: "স্কাফল", ant: "Lull", ap: "লাল",
+                o: "ফরাসি 'brawler' (চিৎকার করা) থেকে আগত। সাধারণত প্রকাশ্য স্থানে উচ্চস্বরে চিৎকার এবং তুমুল হাতাহাতি বা মারামারি।",
+                s: [
+                    { en: "A violent brawl broke out outside the football stadium.", bn: "(ফুটবল স্টেডিয়ামের বাইরে একটি হিংসাত্মক মারামারি শুরু হয়েছিল।)" },
+                    { en: "He was arrested by the police for starting a street brawl.", bn: "(রাস্তায় তুমুল ঝগড়া শুরু করার কারণে তাকে পুলিশ গ্রেপ্তার করেছিল।)" }
+                ]
+            },
+            {
+                w: "Broken", p: "ব্রোকেন", m: "ভগ্ন / বিধ্বস্ত", syn: "Shattered", sp: "শ্যাটার্ড", ant: "Intact", ap: "ইনট্যাক্ট",
+                o: "ইংরেজি 'break' (ভাঙা) শব্দের পাস্ট পার্টিসিপল। যা ভেঙে টুকরো হয়ে গেছে, কাজ করছে না, বা মানসিকভাবে গভীরভাবে বিধ্বস্ত।",
+                s: [
+                    { en: "Be careful, there is broken glass scattered on the floor.", bn: "(সাবধান, মেঝেতে ভাঙা কাঁচ ছড়িয়ে আছে।)" },
+                    { en: "She tried to comfort him after his dreams were broken.", bn: "(তার স্বপ্ন বিধ্বস্ত হওয়ার পর সে তাকে সান্ত্বনা দেওয়ার চেষ্টা করেছিল।)" }
+                ]
+            },
+            {
+                w: "Celebrate", p: "সেলিব্রেট", m: "উদযাপন করা", syn: "Commemorate", sp: "কোমেমোরেট", ant: "Ignore", ap: "ইগনোর",
+                o: "ল্যাটিন 'celebrare' (সম্মান করা, সমবেত হওয়া) থেকে। কোনো বিশেষ ঘটনা, অর্জন বা আনন্দের দিন উৎসবের মাধ্যমে পালন করা।",
+                s: [
+                    { en: "We will celebrate his birthday tomorrow with a big party.", bn: "(আমরা কাল একটি বড় পার্টির মাধ্যমে তার জন্মদিন উদযাপন করব।)" },
+                    { en: "The whole city gathered to celebrate the national victory.", bn: "(পুরো শহর জাতীয় বিজয় উদযাপন করতে জড়ো হয়েছিল।)" }
+                ]
+            },
+            {
+                w: "Close", p: "ক্লোজ", m: "কাছাকাছি / অন্তরঙ্গ", syn: "Intimate", sp: "ইনটিমেট", ant: "Distant", ap: "ডিসট্যান্ট",
+                o: "ল্যাটিন 'claudere' (বন্ধ করা) থেকে এসেছে। এর অর্থ শুধু বন্ধ করাই নয়, বরং মানসিক বা শারীরিকভাবে অত্যন্ত কাছাকাছি বা অন্তরঙ্গ থাকা।",
+                s: [
+                    { en: "She is a very close friend of mine since childhood.", bn: "(সে আমার শৈশব থেকে খুব অন্তরঙ্গ একজন বন্ধু।)" },
+                    { en: "Please stand close to me so we don't get lost.", bn: "(দয়া করে আমার কাছাকাছি দাঁড়ান যাতে আমরা হারিয়ে না যাই।)" }
+                ]
+            },
+            {
+                w: "Commence", p: "কমেন্স", m: "আরম্ভ করা / শুরু করা", syn: "Initiate", sp: "ইনিশিয়েট", ant: "Terminate", ap: "টার্মিনেট",
+                o: "পুরানো ফরাসি 'comencier' থেকে, যার মূল ল্যাটিন 'cominitiare'। কোনো কাজ, প্রকল্প বা আনুষ্ঠানিক প্রক্রিয়া শুরু বা আরম্ভ করা।",
+                s: [
+                    { en: "The graduation ceremony will commence exactly at noon.", bn: "(স্নাতক অনুষ্ঠান ঠিক দুপুরে শুরু হবে।)" },
+                    { en: "They decided to commence the construction project immediately.", bn: "(তারা অবিলম্বে নির্মাণ প্রকল্পটি আরম্ভ করার সিদ্ধান্ত নিয়েছে।)" }
+                ]
+            },
+            {
+                w: "Conceal", p: "কনসিল", m: "গোপন করা / লুকিয়ে রাখা", syn: "Hide", sp: "হাইড", ant: "Reveal", ap: "রিভিল",
+                o: "ল্যাটিন 'concelare' (লুকানো) থেকে উদ্ভূত। কোনো কিছু চোখের আড়ালে বা অন্যের জ্ঞান থেকে সম্পূর্ণ গোপন করে রাখা।",
+                s: [
+                    { en: "He tried to conceal the bitter truth from his parents.", bn: "(সে তার বাবা-মায়ের কাছ থেকে তিক্ত সত্যটি গোপন করার চেষ্টা করেছিল।)" },
+                    { en: "She wore large sunglasses to conceal her tears.", bn: "(তার কান্না লুকিয়ে রাখার জন্য সে বড় সানগ্লাস পরেছিল।)" }
+                ]
+            },
+            {
+                w: "Concentrated", p: "কনসেনট্রেটেড", m: "কেন্দ্রীভূত / ঘন", syn: "Condensed", sp: "কন্ডেন্সড", ant: "Scattered", ap: "স্ক্যাটার্ড",
+                o: "Concentrate এর বিশেষণ রূপ। যখন কোনো কিছু একটি নির্দিষ্ট স্থানে জড়ো করা হয় বা কোনো তরল থেকে জলীয় অংশ কমিয়ে ঘন করা হয়।",
+                s: [
+                    { en: "He poured a glass of highly concentrated orange juice.", bn: "(সে এক গ্লাস অত্যন্ত ঘন কমলার রস ঢালল।)" },
+                    { en: "The enemy troops were concentrated near the northern border.", bn: "(শত্রু সৈন্যরা উত্তরের সীমান্তের কাছে কেন্দ্রীভূত ছিল।)" }
+                ]
+            },
+            {
+                w: "Conclude", p: "কনক্লুড", m: "শেষ করা / উপসংহার টানা", syn: "Determine", sp: "ডিটারমিন", ant: "Begin", ap: "বিগিন",
+                o: "ল্যাটিন 'concludere' (বন্ধ করা বা শেষ করা) থেকে। কোনো আলোচনা, কাজ বা লেখার শেষে এসে চূড়ান্ত সিদ্ধান্তে বা উপসংহারে পৌঁছানো।",
+                s: [
+                    { en: "Let me conclude this speech by thanking everyone for coming.", bn: "(আসার জন্য সবাইকে ধন্যবাদ জানিয়ে আমাকে এই বক্তৃতাটি শেষ করতে দিন।)" },
+                    { en: "The police concluded that the fire was merely an accident.", bn: "(পুলিশ উপসংহার টেনেছে যে আগুনটি নিছক একটি দুর্ঘটনা ছিল।)" }
+                ]
+            },
+            {
+                w: "Confuse", p: "কনফিউজ", m: "বিভ্রান্ত করা / অস্পষ্ট করা", syn: "Perplex", sp: "পারপ্লেক্স", ant: "Clear", ap: "ক্লিয়ার",
+                o: "ল্যাটিন 'confundere' (একসাথে মেশানো) থেকে। চিন্তা বা ধারণাকে এমনভাবে মিশিয়ে ফেলা যাতে স্পষ্ট কিছু বোঝা না যায় এবং বিভ্রান্তি সৃষ্টি হয়।",
+                s: [
+                    { en: "Do not confuse the main issue with irrelevant facts.", bn: "(অপ্রাসঙ্গিক তথ্য দিয়ে মূল বিষয়টিকে বিভ্রান্ত করবেন না।)" },
+                    { en: "The complicated instructions only confused me even more.", bn: "(জটিল নির্দেশনাগুলো আমাকে আরও বেশি বিভ্রান্ত করেছিল।)" }
+                ]
+            },
+            {
+                w: "Consistent", p: "কনসিসটেন্ট", m: "সঙ্গতিপূর্ণ / নিয়মিত", syn: "Steady", sp: "স্টেডি", ant: "Inconsistent", ap: "ইনকনসিসটেন্ট",
+                o: "ল্যাটিন 'consistere' (স্থির হয়ে দাঁড়িয়ে থাকা) থেকে। সময়ের সাথে সাথে একই আচরণ, মান বা নীতি বজায় রাখা এবং পরিবর্তন না হওয়া।",
+                s: [
+                    { en: "He is a very consistent player who always scores well.", bn: "(তিনি একজন খুব নিয়মিত খেলোয়াড় যিনি সর্বদা ভালো স্কোর করেন।)" },
+                    { en: "Your current actions are not consistent with your previous words.", bn: "(আপনার বর্তমান কাজগুলো আপনার আগের কথার সাথে সঙ্গতিপূর্ণ নয়।)" }
+                ]
+            },
+            {
+                w: "Contract", p: "কনট্র্যাক্ট", m: "সংকুচিত করা / চুক্তি করা", syn: "Shrink", sp: "শ্রিংক", ant: "Expand", ap: "এক্সপ্যান্ড",
+                o: "ল্যাটিন 'contractus' (একসাথে টানা) থেকে। এটি আইনি চুক্তি বোঝাতে পারে, অথবা আকারে ছোট বা সংকুচিত হওয়া বোঝাতে পারে।",
+                s: [
+                    { en: "Metal tends to contract and shrink in cold weather.", bn: "(ঠান্ডা আবহাওয়ায় ধাতু সংকুচিত ও ছোট হয়ে যাওয়ার প্রবণতা দেখায়।)" },
+                    { en: "They signed a highly profitable one-year business contract.", bn: "(তারা একটি অত্যন্ত লাভজনক এক বছরের ব্যবসায়িক চুক্তি স্বাক্ষর করেছে।)" }
+                ]
+            },
+            {
+                w: "Contrast", p: "কনট্রাস্ট", m: "বৈসাদৃশ্য / পার্থক্য", syn: "Disparity", sp: "ডিসপ্যারিটি", ant: "Similarity", ap: "সিমিলারিটি",
+                o: "ল্যাটিন 'contra' (বিরুদ্ধে) এবং 'stare' (দাঁড়ানো) থেকে। দুটি জিনিসের মধ্যে বিশাল পার্থক্য ফুটিয়ে তোলার জন্য তাদের পাশাপাশি রাখা।",
+                s: [
+                    { en: "There is a huge contrast between his sweet words and harsh actions.", bn: "(তার মিষ্টি কথা এবং কঠোর কাজের মধ্যে একটি বিশাল বৈসাদৃশ্য রয়েছে।)" },
+                    { en: "The white dress stood in sharp contrast to the dark background.", bn: "(সাদা পোশাকটি অন্ধকার পটভূমির বিপরীতে তীব্র বৈসাদৃশ্যে দাঁড়িয়েছিল।)" }
+                ]
+            },
+            {
+                w: "Controvert", p: "কনট্রোভার্ট", m: "বিরোধিতা করা / অস্বীকার করা", syn: "Dispute", sp: "ডিসপিউট", ant: "Agree", ap: "এগ্রি",
+                o: "ল্যাটিন 'contra' (বিপরীত) এবং 'vertere' (ঘোরানো) থেকে গঠিত। কোনো মতবাদ, প্রমাণ বা বক্তব্যের তীব্র বিরোধিতা করা বা অস্বীকার করা।",
+                s: [
+                    { en: "It is extremely difficult to controvert the solid scientific evidence.", bn: "(কঠিন বৈজ্ঞানিক প্রমাণের বিরোধিতা করা অত্যন্ত কঠিন।)" },
+                    { en: "He attempted to controvert the false claims made by the opposition.", bn: "(তিনি বিরোধীদের করা মিথ্যা দাবিগুলো অস্বীকার করার চেষ্টা করেছিলেন।)" }
+                ]
+            },
+            {
+                w: "Crafty", p: "ক্রাফটি", m: "ধূর্ত / কৌশলী", syn: "Sly", sp: "স্লাই", ant: "Naive", ap: "নাইভ",
+                o: "প্রাচীন ইংরেজি 'cræftig' (দক্ষ) থেকে। বর্তমানে এটি এমন ব্যক্তিকে বোঝায় যে নিজের স্বার্থ হাসিলের জন্য ছলনা বা চাতুর্যের আশ্রয় নেয়।",
+                s: [
+                    { en: "The crafty fox stole the chicken while the farmer slept.", bn: "(কৃষক যখন ঘুমাচ্ছিল তখন ধূর্ত শিয়ালটি মুরগি চুরি করেছিল।)" },
+                    { en: "He used a crafty and manipulative plan to win the game.", bn: "(সে গেমটি জেতার জন্য একটি কৌশলী এবং নিপুণ পরিকল্পনা ব্যবহার করেছিল।)" }
+                ]
+            },
+            {
+                w: "Crude", p: "ক্রুড", m: "অশোধিত / অপরিবর্তিত", syn: "Raw", sp: "র", ant: "Refined", ap: "রিফাইন্ড",
+                o: "ল্যাটিন 'crudus' (কাঁচা বা অমার্জিত) থেকে। যা অপরিশোধিত, কাঁচা অবস্থায় আছে বা যার মধ্যে পরিশীলন বা ভদ্রতার অভাব রয়েছে।",
+                s: [
+                    { en: "The country exports large amounts of unrefined crude oil.", bn: "(দেশটি বিপুল পরিমাণে অশোধিত অপরিশোধিত তেল রপ্তানি করে।)" },
+                    { en: "His crude and impolite remarks offended many people in the room.", bn: "(তার অমার্জিত এবং অভদ্র মন্তব্য ঘরের অনেক মানুষকে ক্ষুব্ধ করেছিল।)" }
+                ]
+            },
+            {
+                w: "Declare", p: "ডিক্লেয়ার", m: "ঘোষণা করা / বিজ্ঞাত করা", syn: "Proclaim", sp: "প্রোক্লেইম", ant: "Conceal", ap: "কনসিল",
+                o: "ল্যাটিন 'declarare' (পরিষ্কার করা বা প্রকাশ করা) থেকে। আনুষ্ঠানিক, আইনি বা জনসমক্ষে স্পষ্টভাবে কোনো কিছু ঘোষণা করা।",
+                s: [
+                    { en: "The government decided to declare a nationwide state of emergency.", bn: "(সরকার দেশব্যাপী জরুরি অবস্থা ঘোষণা করার সিদ্ধান্ত নিয়েছে।)" },
+                    { en: "He proudly declared his eternal love for her in front of everyone.", bn: "(সবার সামনে সে গর্বের সাথে তার প্রতি তার চিরন্তন ভালোবাসা ঘোষণা করেছিল।)" }
+                ]
+            },
+            {
+                w: "Decoration", p: "ডেকোরেশন", m: "অলংকরণ / সাজসজ্জা", syn: "Ornament", sp: "অর্ণামেন্ট", ant: "Plainness", ap: "প্লেইননেস",
+                o: "ল্যাটিন 'decoratio' থেকে উদ্ভূত, যার অর্থ অলংকৃত করা। কোনো স্থান বা বস্তুকে সুন্দর দেখানোর জন্য অতিরিক্ত কিছু যুক্ত করা।",
+                s: [
+                    { en: "The colorful Christmas decoration looked beautiful in the living room.", bn: "(রঙিন বড়দিনের সাজসজ্জা বসার ঘরে সুন্দর দেখাচ্ছিল।)" },
+                    { en: "She has a great natural talent for interior decoration.", bn: "(অভ্যন্তরীণ অলংকরণের জন্য তার দুর্দান্ত প্রাকৃতিক প্রতিভা রয়েছে।)" }
+                ]
+            },
+            {
+                w: "Defective", p: "ডিফেক্টিভ", m: "ত্রুটিপূর্ণ / অপূর্ণ", syn: "Faulty", sp: "ফল্টি", ant: "Perfect", ap: "পারফেক্ট",
+                o: "ল্যাটিন 'defectivus' থেকে। কোনো যন্ত্র, বস্তু বা ধারণার মধ্যে এমন ত্রুটি থাকা যার কারণে তা সঠিকভাবে কাজ করে না।",
+                s: [
+                    { en: "The electronics shop quickly replaced my defective television.", bn: "(ইলেকট্রনিক্সের দোকান দ্রুত আমার ত্রুটিপূর্ণ টেলিভিশনটি বদলে দিয়েছে।)" },
+                    { en: "The machine was returned to the factory because of a defective part.", bn: "(একটি ত্রুটিপূর্ণ অংশের কারণে যন্ত্রটি কারখানায় ফেরত পাঠানো হয়েছিল।)" }
+                ]
+            },
+            {
+                w: "Defend", p: "ডিফেন্ড", m: "রক্ষা করা / আত্মরক্ষা করা", syn: "Shield", sp: "শিল্ড", ant: "Attack", ap: "অ্যাটাক",
+                o: "ল্যাটিন 'defendere' (বাধা দেওয়া বা প্রতিহত করা) থেকে। আক্রমণ বা সমালোচনার হাত থেকে নিজেকে, অন্যকে বা নিজের বিশ্বাসকে রক্ষা করা।",
+                s: [
+                    { en: "The brave soldiers fought hard to defend their beloved country.", bn: "(সাহসী সৈন্যরা তাদের প্রিয় দেশকে রক্ষা করার জন্য কঠোর লড়াই করেছিল।)" },
+                    { en: "He hired a top lawyer to defend him in the court case.", bn: "(আদালতের মামলায় তাকে রক্ষা করার জন্য তিনি একজন শীর্ষ আইনজীবী নিয়োগ করেছিলেন।)" }
+                ]
+            },
+            {
+                w: "Defiance", p: "ডিফায়েন্স", m: "অবাধ্যতা / অবজ্ঞা", syn: "Insubordination", sp: "ইনসাবঅর্ডিনেশন", ant: "Obedience", ap: "ওবিডিয়েন্স",
+                o: "ফরাসি 'defiance' (চ্যালেঞ্জ বা অবাধ্যতা) থেকে। কোনো আইন, নিয়ম বা কর্তৃপক্ষের বিরুদ্ধে প্রকাশ্য এবং সাহসী অবাধ্যতা।",
+                s: [
+                    { en: "He acted in open defiance of the strict school rules.", bn: "(সে স্কুলের কঠোর নিয়মের প্রকাশ্য অবাধ্যতায় কাজ করেছিল।)" },
+                    { en: "The angry workers went on strike in defiance of the management.", bn: "(রাগান্বিত শ্রমিকরা কর্তৃপক্ষের অবজ্ঞায় ধর্মঘটে গিয়েছিল।)" }
+                ]
+            },
+            {
+                w: "Delay", p: "ডিলে", m: "বিলম্ব করা / দেরি করা", syn: "Retard", sp: "রিটার্ড", ant: "Hasten", ap: "হেস্টেন",
+                o: "ফরাসি 'delaier' থেকে। কোনো কাজ নির্দিষ্ট সময়ের চেয়ে পরে করা বা কোনো ঘটনা ঘটতে স্বাভাবিকের চেয়ে বেশি সময় লাগা।",
+                s: [
+                    { en: "The heavy rain caused a long delay in the flight schedule.", bn: "(ভারী বৃষ্টির কারণে ফ্লাইটের সময়সূচীতে দীর্ঘ বিলম্ব হয়েছে।)" },
+                    { en: "Please do not delay your important decision any further.", bn: "(অনুগ্রহ করে আপনার গুরুত্বপূর্ণ সিদ্ধান্তটি আর দেরি করবেন না।)" }
+                ]
+            },
+            {
+                w: "Demonstrate", p: "ডেমনস্ট্রেট", m: "প্রদর্শন করা / প্রমাণ করা", syn: "Exhibit", sp: "এক্সহিবিত", ant: "Conceal", ap: "কনসিল",
+                o: "ল্যাটিন 'demonstrare' (আঙুল দিয়ে দেখানো) থেকে। প্রমাণসহ বা বাস্তবে করে দেখানোর মাধ্যমে কোনো কিছু স্পষ্ট করে তোলা।",
+                s: [
+                    { en: "The teacher will demonstrate how the complex machine works.", bn: "(জটিল যন্ত্রটি কীভাবে কাজ করে তা শিক্ষক প্রদর্শন করবেন।)" },
+                    { en: "The citizens gathered to demonstrate against the new tax law.", bn: "(নাগরিকরা নতুন কর আইনের বিরুদ্ধে প্রদর্শন (বিক্ষোভ) করতে জড়ো হয়েছিল।)" }
+                ]
+            },
+            {
+                w: "Dependent", p: "ডিপেনডেন্ট", m: "নির্ভরশীল / সাপেক্ষ", syn: "Reliant", sp: "রিল্যায়ান্ট", ant: "Independent", ap: "ইনডিপেনডেন্ট",
+                o: "ল্যাটিন 'dependere' (ঝুলানো বা নির্ভর করা) থেকে। বেঁচে থাকার জন্য বা সহায়তার জন্য সম্পূর্ণরূপে অন্য কারও উপর নির্ভরশীল হওয়া।",
+                s: [
+                    { en: "Young children are entirely dependent on their parents for survival.", bn: "(ছোট শিশুরা বেঁচে থাকার জন্য সম্পূর্ণ তাদের পিতামাতার ওপর নির্ভরশীল।)" },
+                    { en: "Our final success is highly dependent on your hard work.", bn: "(আমাদের চূড়ান্ত সাফল্য আপনার কঠোর পরিশ্রমের ওপর অত্যন্ত নির্ভরশীল।)" }
+                ]
+            },
+            {
+                w: "Destroy", p: "ডেস্ট্রয়", m: "ধ্বংস করা / নষ্ট করা", syn: "Obliterate", sp: "অবলিটারেট", ant: "Preserve", ap: "প্রিজার্ভ",
+                o: "ল্যাটিন 'destruere' (ভেঙে ফেলা) থেকে। কোনো কিছুকে এমনভাবে আঘাত করা বা ভেঙে ফেলা যাতে তা আর ব্যবহারযোগ্য না থাকে।",
+                s: [
+                    { en: "A massive earthquake can destroy a whole city in minutes.", bn: "(একটি বিশাল ভূমিকম্প কয়েক মিনিটের মধ্যে একটি পুরো শহর ধ্বংস করতে পারে।)" },
+                    { en: "Do not let your uncontrollable anger destroy your relationships.", bn: "(আপনার অনিয়ন্ত্রিত রাগকে আপনার সম্পর্কগুলো ধ্বংস করতে দেবেন না।)" }
+                ]
+            },
+            {
+                w: "Deteriorate", p: "ডিটেরিওরেট", m: "অবনতি ঘটা / খারাপ হওয়া", syn: "Worsen", sp: "ওরসেন", ant: "Improve", ap: "ইমপ্রুভ",
+                o: "ল্যাটিন 'deteriorare' (খারাপ করা) থেকে। সময়ের সাথে সাথে কোনো কিছুর মান, অবস্থা বা স্বাস্থ্যের ক্রমাগত অবনতি ঘটা।",
+                s: [
+                    { en: "Without medicine, his health began to deteriorate rapidly.", bn: "(ওষুধ ছাড়া, তার স্বাস্থ্যের দ্রুত অবনতি হতে শুরু করে।)" },
+                    { en: "The sunny weather will deteriorate into a severe storm in the evening.", bn: "(রৌদ্রোজ্জ্বল আবহাওয়া সন্ধ্যায় একটি তীব্র ঝড়ে অবনতি ঘটবে।)" }
+                ]
+            },
+            {
+                w: "Detest", p: "ডিটেস্ট", m: "তীব্র ঘৃণা করা", syn: "Abhor", sp: "অ্যাবহার", ant: "Adore", ap: "অ্যাডোর",
+                o: "ল্যাটিন 'detestari' (অভিশাপ দেওয়া বা তীব্রভাবে অপছন্দ করা) থেকে। কোনো ব্যক্তি বা বস্তুর প্রতি মনের ভেতর তীব্র ঘৃণা পোষণ করা।",
+                s: [
+                    { en: "I absolutely detest people who constantly lie to me.", bn: "(আমি প্রতিনিয়ত যারা আমাকে মিথ্যা বলে তাদের তীব্র ঘৃণা করি।)" },
+                    { en: "She detests waking up early in the freezing winter morning.", bn: "(হিমশীতল শীতের সকালে তাড়াতাড়ি ঘুম থেকে ওঠা সে ঘৃণা করে।)" }
+                ]
+            },
+            {
+                w: "Difficult", p: "ডিফিকাল্ট", m: "কঠিন / দুঃসাধ্য", syn: "Arduous", sp: "আর্ডুয়াস", ant: "Easy", ap: "ইজি",
+                o: "ল্যাটিন 'difficultas' থেকে উদ্ভূত। যা করতে, বুঝতে বা সম্পন্ন করতে অনেক বেশি প্রচেষ্টা, দক্ষতা বা বুদ্ধির প্রয়োজন হয়।",
+                s: [
+                    { en: "It was a very difficult math exam that challenged everyone.", bn: "(এটি একটি খুব কঠিন গণিত পরীক্ষা ছিল যা সবাইকে চ্যালেঞ্জ করেছিল।)" },
+                    { en: "She is going through a difficult and stressful time in her life.", bn: "(সে তার জীবনে একটি কঠিন এবং চাপযুক্ত সময়ের মধ্য দিয়ে যাচ্ছে।)" }
+                ]
+            },
+            {
+                w: "Disappointment", p: "ডিসঅ্যাপয়েন্টমেন্ট", m: "হতাশা / নিরাশা", syn: "Frustration", sp: "ফ্রাস্ট্রেশন", ant: "Satisfaction", ap: "স্যাটিসফেকশন",
+                o: "Disappoint (আশা ভঙ্গ করা) এর বিশেষ্য রূপ। নিজের প্রত্যাশা বা আশা অনুযায়ী কোনো কিছু না ঘটলে মনের যে হতাশা তৈরি হয়।",
+                s: [
+                    { en: "He could not hide his bitter disappointment after losing the final game.", bn: "(ফাইনাল খেলায় হেরে যাওয়ার পর সে তার তিক্ত হতাশা লুকাতে পারেনি।)" },
+                    { en: "To her fans, the highly anticipated new movie was a huge disappointment.", bn: "(তার ভক্তদের কাছে, অত্যন্ত প্রত্যাশিত নতুন সিনেমাটি একটি বিশাল হতাশা ছিল।)" }
+                ]
+            },
+            {
+                w: "Disgusting", p: "ডিসগাস্টিং", m: "বিরক্তিকর / জঘন্য", syn: "Repulsive", sp: "রিপালসিভ", ant: "Appealing", ap: "অ্যাপিলিং",
+                o: "ফরাসি 'desgouster' (স্বাদ নষ্ট হওয়া) থেকে। যা দেখলে বা যার গন্ধে মনে তীব্র বিরক্তি বা গা-গোলানো ভাব তৈরি হয়।",
+                s: [
+                    { en: "The awful smell of the rotten food was absolutely disgusting.", bn: "(পচা খাবারের ভয়ানক গন্ধ একেবারে জঘন্য ছিল।)" },
+                    { en: "I found his rude and disrespectful behavior completely disgusting.", bn: "(আমি তার অভদ্র এবং অসম্মানজনক আচরণ সম্পূর্ণ বিরক্তিকর বলে মনে করেছি।)" }
+                ]
+            },
+            {
+                w: "Dismay", p: "ডিসমে", m: "হতাশা / আতঙ্ক", syn: "Consternation", sp: "কন্সটারনেশন", ant: "Confidence", ap: "কনফিডেন্স",
+                o: "পুরানো ফরাসি 'desmaier' থেকে। কোনো খারাপ বা অপ্রত্যাশিত খবর শুনে মনে যে প্রবল হতাশা ও আতঙ্কের সৃষ্টি হয়।",
+                s: [
+                    { en: "To his great dismay, he realized he had lost his expensive wallet.", bn: "(চরম আতঙ্কের সাথে, সে বুঝতে পারল যে সে তার দামি মানিব্যাগটি হারিয়েছে।)" },
+                    { en: "The helpless residents watched in dismay as the old building burned.", bn: "(অসহায় বাসিন্দারা আতঙ্কের সাথে পুরানো ভবনটি পুড়তে দেখল।)" }
+                ]
+            },
+            {
+                w: "Display", p: "ডিসপ্লে", m: "প্রদর্শন করা / জাহির করা", syn: "Exhibit", sp: "এক্সহিবিত", ant: "Hide", ap: "হাইড",
+                o: "পুরানো ফরাসি 'despleier' (উন্মোচিত করা বা ছড়িয়ে দেওয়া) থেকে। মানুষ যেন দেখতে পায় তার জন্য কোনো কিছু সাজিয়ে বা মেলে রাখা।",
+                s: [
+                    { en: "The jewelry store has a beautiful window display catching everyone's eye.", bn: "(গহনার দোকানের একটি সুন্দর উইন্ডো ডিসপ্লে রয়েছে যা সবার নজর কাড়ছে।)" },
+                    { en: "He constantly tried to display his artistic skills to impress her.", bn: "(তাকে মুগ্ধ করার জন্য সে ক্রমাগত তার শৈল্পিক দক্ষতা প্রদর্শন করার চেষ্টা করত।)" }
+                ]
+            },
+            {
+                w: "Distance", p: "ডিসটেন্স", m: "দূরত্ব / ব্যবধান", syn: "Interval", sp: "ইন্টারভ্যাল", ant: "Closeness", ap: "ক্লোজনেস",
+                o: "ল্যাটিন 'distantia' (আলাদা দাঁড়ানো) থেকে। দুটি স্থান, বস্তু বা সময়ের মধ্যকার যে শারীরিক বা মানসিক ব্যবধান বা দূরত্ব।",
+                s: [
+                    { en: "They live at a long distance from the noisy and crowded city.", bn: "(তারা কোলাহলপূর্ণ এবং ভিড়যুক্ত শহর থেকে অনেক দূরে বসবাস করে।)" },
+                    { en: "Please maintain a safe distance from the burning fire.", bn: "(দয়া করে জ্বলন্ত আগুন থেকে নিরাপদ দূরত্ব বজায় রাখুন।)" }
+                ]
+            },
+            {
+                w: "Drip", p: "ড্রিপ", m: "ফোঁটায় ফোঁটায় পড়া", syn: "Droplet", sp: "ড্রপলেট", ant: "Pour", ap: "পোর",
+                o: "প্রাচীন ইংরেজি 'dryppan' থেকে আগত। কোনো তরল পদার্থ একটানা ধারায় না পড়ে ফোঁটায় ফোঁটায় পতিত হওয়া।",
+                s: [
+                    { en: "Water continues to drip slowly from the broken kitchen pipe.", bn: "(রান্নাঘরের ভাঙা পাইপ থেকে ধীরে ধীরে জল ফোঁটায় ফোঁটায় পড়ছে।)" },
+                    { en: "She watched the cold rain drip gently from the green leaves.", bn: "(সে দেখল সবুজ পাতা থেকে ঠান্ডা বৃষ্টি আলতো করে ফোঁটায় ফোঁটায় পড়ছে।)" }
+                ]
+            },
+            {
+                w: "Drunk", p: "ড্রাংক", m: "মাতাল / মদোন্মত্ত", syn: "Inebriated", sp: "ইনইব্রিয়েটেড", ant: "Sober", ap: "সোবার",
+                o: "ইংরেজি 'Drink' শব্দের পাস্ট পার্টিসিপল। অতিরিক্ত অ্যালকোহল পান করার ফলে যখন মানুষের নিজের ওপর কোনো শারীরিক বা মানসিক নিয়ন্ত্রণ থাকে না।",
+                s: [
+                    { en: "He was arrested by the police for reckless and drunk driving.", bn: "(বেপরোয়া এবং মাতাল অবস্থায় গাড়ি চালানোর জন্য তাকে পুলিশ গ্রেপ্তার করেছিল।)" },
+                    { en: "The heavily drunk man fell asleep right on the dirty sidewalk.", bn: "(প্রচণ্ড মাতাল লোকটি নোংরা ফুটপাতেই ঘুমিয়ে পড়েছিল।)" }
+                ]
+            },
+            {
+                w: "Educated", p: "এডুকেটেড", m: "শিক্ষিত / সুশিক্ষিত", syn: "Learned", sp: "লার্নড", ant: "Ignorant", ap: "ইগনোরেন্ট",
+                o: "ল্যাটিন 'educatus' (পালন-পালন করা বা প্রশিক্ষণ দেওয়া) থেকে। যে ব্যক্তি প্রাতিষ্ঠানিক শিক্ষা বা পড়াশোনার মাধ্যমে জ্ঞান অর্জন করেছে।",
+                s: [
+                    { en: "He comes from a highly educated and cultured family background.", bn: "(তিনি একটি অত্যন্ত শিক্ষিত এবং সংস্কৃতিবান পারিবারিক পটভূমি থেকে এসেছেন।)" },
+                    { en: "An educated society can make better decisions for its future.", bn: "(একটি শিক্ষিত সমাজ তার ভবিষ্যতের জন্য ভালো সিদ্ধান্ত নিতে পারে।)" }
+                ]
+            },
+            {
+                w: "Effluence", p: "ইফ্লুয়েন্স", m: "নির্গমন / প্রবাহ", syn: "Emission", sp: "এমিশন", ant: "Influx", ap: "ইনফ্লাক্স",
+                o: "ল্যাটিন 'effluere' (বাইরে প্রবাহিত হওয়া) থেকে উদ্ভূত। বিশেষ করে কলকারখানা বা নর্দমা থেকে ক্ষতিকর তরল বর্জ্যের নির্গমন বা প্রবাহ।",
+                s: [
+                    { en: "The chemical factory's effluence severely polluted the nearby river water.", bn: "(রাসায়নিক কারখানার নির্গমন বা বর্জ্য কাছের নদীর জলকে মারাত্মকভাবে দূষিত করেছে।)" },
+                    { en: "Strict environmental laws are needed to control toxic effluence.", bn: "(বিষাক্ত নির্গমন নিয়ন্ত্রণের জন্য কঠোর পরিবেশগত আইন প্রয়োজন।)" }
+                ]
+            },
+            {
+                w: "Enmity", p: "এনমিটি", m: "শত্রুতা / বিদ্বেষ", syn: "Hostility", sp: "হস্টিলিটি", ant: "Amity", ap: "অ্যামিটি",
+                o: "ল্যাটিন 'inimicus' (শত্রু) থেকে আগত। দুই বা ততোধিক ব্যক্তি বা দলের মধ্যে থাকা দীর্ঘস্থায়ী এবং গভীর মানসিক বা প্রকাশ্য শত্রুতা।",
+                s: [
+                    { en: "There is a long history of bitter enmity between the two tribes.", bn: "(দুটি উপজাতির মধ্যে তিক্ত শত্রুতার একটি দীর্ঘ ইতিহাস রয়েছে।)" },
+                    { en: "Despite the competition, he has no personal enmity towards his rivals.", bn: "(প্রতিযোগিতা সত্ত্বেও, তার প্রতিদ্বন্দ্বীদের প্রতি তার কোনো ব্যক্তিগত শত্রুতা নেই।)" }
+                ]
+            },
+            {
+                w: "Entertain", p: "এন্টারটেইন", m: "আনন্দ দেওয়া / আপ্যায়ন করা", syn: "Amuse", sp: "অ্যামিউজ", ant: "Bore", ap: "বোর",
+                o: "ফরাসি 'entretenir' (ধরে রাখা) থেকে। গান, গল্প বা অভিনয়ের মাধ্যমে অন্যের মনোযোগ ধরে রাখা এবং তাদের আনন্দ প্রদান করা।",
+                s: [
+                    { en: "The funny clown tried his best to entertain the crying kids.", bn: "(মজার ক্লাউনটি কাঁদরত বাচ্চাদের আনন্দ দেওয়ার জন্য যথাসাধ্য চেষ্টা করেছিল।)" },
+                    { en: "We hired a live band to entertain the guests at the party.", bn: "(পার্টিতে অতিথিদের আনন্দ দেওয়ার জন্য আমরা একটি লাইভ ব্যান্ড ভাড়া করেছিলাম।)" }
+                ]
+            },
+            {
+                w: "Enthusiastic", p: "এনথুসিয়াস্টিক", m: "অত্যুৎসাহী / প্রবল উৎসাহী", syn: "Zealous", sp: "জেলাস", ant: "Apathetic", ap: "অ্যাপ্যাথেটিক",
+                o: "গ্রীক 'enthousiasmos' (ঈশ্বরের দ্বারা অনুপ্রাণিত) থেকে। কোনো কাজে বা বিষয়ে প্রবল আগ্রহ, উত্তেজনা এবং উদ্দীপনা দেখানো।",
+                s: [
+                    { en: "The loyal fans gave an enthusiastic response to the famous singer.", bn: "(অনুগত ভক্তরা বিখ্যাত গায়ককে একটি প্রবল উৎসাহী প্রতিক্রিয়া জানিয়েছিল।)" },
+                    { en: "She is very enthusiastic about learning exciting new languages.", bn: "(সে নতুন উত্তেজনাপূর্ণ ভাষা শেখার ব্যাপারে খুবই উৎসাহী।)" }
+                ]
+            },
+            {
+                w: "Eternal", p: "ইটারনাল", m: "চিরন্তন / আদি-অন্তহীন", syn: "Perpetual", sp: "পারপেচুয়াল", ant: "Temporary", ap: "টেম্পোরারি",
+                o: "ল্যাটিন 'aeternus' (স্থায়ী) থেকে। যার কোনো শুরু বা শেষ নেই, যা চিরকাল ধরে অবিনশ্বরভাবে বিদ্যমান থাকে।",
+                s: [
+                    { en: "Many religions firmly believe in the concept of eternal life after death.", bn: "(অনেক ধর্ম মৃত্যুর পর চিরন্তন জীবনের ধারণায় দৃঢ়ভাবে বিশ্বাস করে।)" },
+                    { en: "He lovingly promised her his eternal love and devotion.", bn: "(সে ভালোবেসে তাকে তার চিরন্তন ভালোবাসা এবং ভক্তির প্রতিশ্রুতি দিয়েছিল।)" }
+                ]
+            },
+            {
+                w: "Expand", p: "এক্সপ্যান্ড", m: "প্রসারিত করা / বাড়ানো", syn: "Augment", sp: "অগমেন্ট", ant: "Contract", ap: "কনট্র্যাক্ট",
+                o: "ল্যাটিন 'expandere' (ছড়িয়ে দেওয়া) থেকে। কোনো কিছুর আয়তন, আকার বা পরিধি আগের তুলনায় বৃদ্ধি করা বা চারদিকে প্রসারিত করা।",
+                s: [
+                    { en: "Heat naturally causes solid metal to expand in size.", bn: "(তাপ প্রাকৃতিকভাবে কঠিন ধাতুকে আকারে প্রসারিত করে।)" },
+                    { en: "The ambitious company plans to expand its business into Europe.", bn: "(উচ্চাভিলাষী কোম্পানিটি ইউরোপে তার ব্যবসা প্রসারিত করার পরিকল্পনা করেছে।)" }
+                ]
+            },
+            {
+                w: "Facilitate", p: "ফ্যাসিলিটেট", m: "সহজ করা / লাঘব করা", syn: "Simplify", sp: "সিম্পলিফাই", ant: "Hinder", ap: "হিন্ডার",
+                o: "ফরাসি 'faciliter' (সহজ করা) থেকে, যা ল্যাটিন 'facilis' (সহজ) থেকে উদ্ভূত। কোনো কাজ বা প্রক্রিয়াকে বাধা দূর করে সহজতর করা।",
+                s: [
+                    { en: "The new advanced software will facilitate the complex editing process.", bn: "(নতুন উন্নত সফটওয়্যারটি জটিল সম্পাদনা প্রক্রিয়াটিকে সহজতর করবে।)" },
+                    { en: "A good teacher should facilitate learning, not just give long lectures.", bn: "(একজন ভালো শিক্ষকের শুধু দীর্ঘ বক্তৃতা দেওয়া উচিত নয়, বরং শেখাটাকে সহজ করা উচিত।)" }
+                ]
+            }
+        ];
+
+        const mcqsData = [
+            { q: "Which word means 'complete and not limited in any way'?", opts: { a: "Absolute", b: "Accidental", c: "Awkward", d: "Crude" }, ans: "a", note: "Absolute means complete, total, and without restrictions." },
+            { q: "What is the antonym of 'Affectionate'?", opts: { a: "Tender", b: "Apathetic", c: "Loving", d: "Kind" }, ans: "b", note: "Affectionate means showing love (tender). Apathetic means showing no feeling or interest, making it the antonym." },
+            { q: "Analogy -> Delay : Hasten :: Destroy : ?", opts: { a: "Obliterate", b: "Preserve", c: "Ruin", d: "Deteriorate" }, ans: "b", note: "Delay and Hasten are antonyms. Destroy and Preserve are antonyms." },
+            { q: "If something happens without intention, it is:", opts: { a: "Calculated", b: "Accidental", c: "Autonomous", d: "Concentrated" }, ans: "b", note: "Accidental means happening by chance or unintentionally." },
+            { q: "Which word means 'to publicly praise'?", opts: { a: "Controvert", b: "Detest", c: "Acclaim", d: "Conceal" }, ans: "c", note: "Acclaim refers to enthusiastic and public praise." },
+            { q: "A person who creates paintings or sculptures is an:", opts: { a: "Artist", b: "Amateur", c: "Approbation", d: "Awkward" }, ans: "a", note: "An artist is someone who produces art." },
+            { q: "What does 'Autonomous' mean?", opts: { a: "Dependent", b: "Controlled", c: "Self-governing", d: "Subordinate" }, ans: "c", note: "Autonomous means having the freedom to govern itself or control its own affairs (independent)." },
+            { q: "Which of the following is a synonym for 'Bankrupt'?", opts: { a: "Solvent", b: "Wealthy", c: "Insolvent", d: "Affluent" }, ans: "c", note: "Bankrupt and Insolvent both mean financially ruined and unable to pay debts." },
+            { q: "Fill in the blank: The disease acted as a ______ on the crops, killing them all.", opts: { a: "Blight", b: "Blessing", c: "Blemish", d: "Bondage" }, ans: "a", note: "Blight is a disease that damages plants, or a harmful/destructive force." },
+            { q: "What is the antonym of 'Boldness'?", opts: { a: "Audacity", b: "Timidity", c: "Fearlessness", d: "Intrepidity" }, ans: "b", note: "Boldness is bravery. Timidity is the lack of courage or confidence, making it the antonym." },
+            { q: "A noisy, rough, uncontrolled fight is called a:", opts: { a: "Brawl", b: "Lull", c: "Bondage", d: "Decoration" }, ans: "a", note: "A brawl is a noisy physical fight or scuffle." },
+            { q: "Which word means 'to hide something'?", opts: { a: "Commence", b: "Conceal", c: "Demonstrate", d: "Declare" }, ans: "b", note: "To conceal means to keep from sight or to hide." },
+            { q: "What is the synonym for 'Commence'?", opts: { a: "Initiate", b: "Terminate", c: "Conclude", d: "Halt" }, ans: "a", note: "Both Commence and Initiate mean to begin or start." },
+            { q: "If you 'Appreciate' something, you:", opts: { a: "Neglect it", b: "Devalue it", c: "Value it highly", d: "Destroy it" }, ans: "c", note: "To appreciate is to recognize the full worth of something." },
+            { q: "Which word means 'to bring to an end'?", opts: { a: "Commence", b: "Conclude", c: "Expand", d: "Delay" }, ans: "b", note: "To conclude is to bring something to an end or to finish." },
+            { q: "Analogy -> Confuse : Perplex :: Contract : ?", opts: { a: "Shrink", b: "Expand", c: "Enlarge", d: "Amplify" }, ans: "a", note: "Confuse is a synonym of Perplex. Contract (in size) is a synonym of Shrink." },
+            { q: "What is the antonym of 'Consistent'?", opts: { a: "Steady", b: "Uniform", c: "Inconsistent", d: "Unwavering" }, ans: "c", note: "Consistent means acting the same way over time. Inconsistent means the opposite." },
+            { q: "If you show the differences between two things, you ______ them.", opts: { a: "Amalgamate", b: "Contrast", c: "Conceal", d: "Concentrate" }, ans: "b", note: "To contrast is to compare in order to show unlikeness or differences." },
+            { q: "What does 'Crafty' mean?", opts: { a: "Naive", b: "Honest", c: "Deceitful or sly", d: "Guileless" }, ans: "c", note: "A crafty person is clever at achieving aims by indirect or deceitful methods." },
+            { q: "Unrefined oil in its natural state is called ______ oil.", opts: { a: "Crude", b: "Sophisticated", c: "Cultivated", d: "Polished" }, ans: "a", note: "Crude means in a natural or raw state; not yet processed." },
+            { q: "Which word is a synonym for 'Defective'?", opts: { a: "Perfect", b: "Faulty", c: "Intact", d: "Flawless" }, ans: "b", note: "Defective means imperfect or faulty." },
+            { q: "If a person shows 'Defiance', they are showing:", opts: { a: "Compliance", b: "Obedience", c: "Open resistance or disobedience", d: "Submission" }, ans: "c", note: "Defiance is bold disobedience or open resistance." },
+            { q: "To 'Demonstrate' is to:", opts: { a: "Hide the evidence", b: "Show clearly and provide evidence", c: "Confuse the audience", d: "Destroy the presentation" }, ans: "b", note: "To demonstrate means to clearly show the existence or truth of something by giving proof." },
+            { q: "What is the antonym of 'Deteriorate'?", opts: { a: "Worsen", b: "Decline", c: "Improve", d: "Degenerate" }, ans: "c", note: "Deteriorate means to become progressively worse. Improve is the direct antonym." },
+            { q: "If you 'Detest' something, you:", opts: { a: "Love it", b: "Adore it", c: "Hate it very much", d: "Admire it" }, ans: "c", note: "Detest means to dislike intensely or abhor." },
+            { q: "Fill in the blank: The tragic news filled her heart with ______.", opts: { a: "Approbation", b: "Dismay", c: "Boldness", d: "Acclaim" }, ans: "b", note: "Dismay refers to a feeling of shock, distress, or consternation." },
+            { q: "A feeling of frustration when things don't go as planned is:", opts: { a: "Disappointment", b: "Satisfaction", c: "Contentment", d: "Happiness" }, ans: "a", note: "Disappointment is the feeling of sadness caused by the nonfulfillment of one's hopes." },
+            { q: "If food is 'Disgusting', it is:", opts: { a: "Appealing", b: "Repulsive", c: "Inviting", d: "Pleasant" }, ans: "b", note: "Disgusting means arousing revulsion or strong indignation (repulsive)." },
+            { q: "Analogy -> Display : Exhibit :: Distance : ?", opts: { a: "Proximity", b: "Closeness", c: "Interval", d: "Adjacency" }, ans: "c", note: "Display and Exhibit are synonyms. Distance and Interval are synonyms." },
+            { q: "A small drop of liquid falling is a:", opts: { a: "Spurt", b: "Gush", c: "Drip", d: "Ocean" }, ans: "c", note: "To drip means to fall in small drops." },
+            { q: "What is the antonym of 'Drunk'?", opts: { a: "Inebriated", b: "Intoxicated", c: "Sober", d: "Besotted" }, ans: "c", note: "Drunk means intoxicated with alcohol. Sober means not affected by alcohol." },
+            { q: "A person with extensive academic learning is:", opts: { a: "Educated", b: "Illiterate", c: "Ignorant", d: "Crude" }, ans: "a", note: "An educated person has received schooling and possesses knowledge." },
+            { q: "What does 'Enmity' mean?", opts: { a: "Deep-seated friendship", b: "Hostility or animosity", c: "A type of animal", d: "A legal contract" }, ans: "b", note: "Enmity is the state or feeling of being actively opposed or hostile to someone." },
+            { q: "To provide amusement to guests is to ______ them.", opts: { a: "Bore", b: "Annoy", c: "Entertain", d: "Disturb" }, ans: "c", note: "To entertain means to provide someone with amusement or enjoyment." },
+            { q: "Someone who is highly eager and interested is:", opts: { a: "Apathetic", b: "Indifferent", c: "Enthusiastic", d: "Uninterested" }, ans: "c", note: "Enthusiastic means having or showing intense and eager enjoyment." },
+            { q: "Which word means 'lasting forever'?", opts: { a: "Temporary", b: "Eternal", c: "Transient", d: "Ephemeral" }, ans: "b", note: "Eternal means lasting or existing forever; without end." },
+            { q: "What is the antonym of 'Expand'?", opts: { a: "Augment", b: "Amplify", c: "Contract", d: "Proliferate" }, ans: "c", note: "Expand means to increase in size. Contract means to decrease in size." },
+            { q: "To make an action or process easier is to ______ it.", opts: { a: "Hinder", b: "Obstruct", c: "Facilitate", d: "Complicate" }, ans: "c", note: "Facilitate means to make an action or process easier." },
+            { q: "Analogy -> Aid : Assistance :: Anxiety : ?", opts: { a: "Calmness", b: "Trepidation", c: "Serenity", d: "Confidence" }, ans: "b", note: "Aid and Assistance are synonyms. Anxiety and Trepidation are synonyms." },
+            { q: "If someone is given formal 'Approbation', they receive:", opts: { a: "Approval", b: "Refusal", c: "Criticism", d: "Repudiation" }, ans: "a", note: "Approbation is approval or praise, often given by an official group." },
+            { q: "Which of the following describes 'Attachment'?", opts: { a: "Separation", b: "Indifference", c: "An emotional bond or extra part", d: "Detachment" }, ans: "c", note: "Attachment can mean an emotional connection or an extra physical part added to something." },
+            { q: "A situation causing embarrassment and inconvenience is:", opts: { a: "Adept", b: "Graceful", c: "Awkward", d: "Smooth" }, ans: "c", note: "Awkward means causing difficulty, embarrassment, or inconvenience." },
+            { q: "A mark that spoils the appearance of something is a:", opts: { a: "Perfection", b: "Blemish", c: "Purity", d: "Decoration" }, ans: "b", note: "A blemish is a small mark or flaw which spoils the appearance of something." },
+            { q: "Which word best completes the sentence? 'The slaves finally escaped their years of ______.'", opts: { a: "Autonomy", b: "Freedom", c: "Bondage", d: "Liberation" }, ans: "c", note: "Bondage means the state of being a slave (servitude)." },
+            { q: "What is the antonym of 'Broken'?", opts: { a: "Shattered", b: "Ruptured", c: "Fractured", d: "Intact" }, ans: "d", note: "Broken means damaged or in pieces. Intact means whole and not damaged." },
+            { q: "To acknowledge a significant event with joy is to:", opts: { a: "Mourn", b: "Ignore", c: "Celebrate", d: "Conceal" }, ans: "c", note: "To celebrate is to publicly acknowledge a significant or happy day/event." },
+            { q: "Analogy -> Distance : Far :: Close : ?", opts: { a: "Remote", b: "Near", c: "Distant", d: "Separate" }, ans: "b", note: "Distance relates to being Far. Close relates to being Near." },
+            { q: "If juice is 'Concentrated', it is:", opts: { a: "Scattered everywhere", b: "Diluted with water", c: "Gathered into a dense or strong form", d: "Purified completely" }, ans: "c", note: "Concentrated means present in a high proportion relative to other substances (dense/gathered)." },
+            { q: "If someone is 'Dependent', they:", opts: { a: "Rely on someone else for support", b: "Are completely self-sufficient", c: "Are autonomous", d: "Govern themselves" }, ans: "a", note: "Dependent means requiring someone or something for financial or emotional support." },
+            { q: "What is the synonym for 'Effluence'?", opts: { a: "Inflow", b: "Emission", c: "Influx", d: "Inrush" }, ans: "b", note: "Effluence is a substance that flows out from something (an outflow or emission)." }
+        ];
+
+        function renderCards() {
+            const container = document.getElementById('flashcardContainer');
+            let html = '';
+            
+            wordsData.forEach((w, index) => {
+                html += `
+                <div class="group relative bg-slate-800 rounded-2xl shadow-lg border border-cyan-500/20 p-5 hover:border-emerald-400 hover:shadow-emerald-500/10 transition-all duration-300 flex flex-col h-full">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="font-extrabold text-xl text-emerald-300">${index + 1}. ${w.w}</h3>
+                            <p class="text-xs text-slate-400 font-medium tracking-wide bn-text">/${w.p}/</p>
+                        </div>
+                    </div>
+                    
+                    <p class="font-bold text-slate-100 bn-text text-[15px] mb-4">${w.m}</p>
+                    
+                    <div class="space-y-1.5 mb-4">
+                        <div class="bg-emerald-900/30 px-3 py-2 rounded-lg border border-emerald-500/20">
+                            <p class="text-xs text-emerald-200 font-bold uppercase tracking-wider mb-0.5"><i class="fas fa-check-circle mr-1"></i>Synonym</p>
+                            <p class="text-sm font-bold text-slate-100">${w.syn} <span class="text-xs font-normal text-emerald-300/70 bn-text ml-1">/${w.sp}/</span></p>
+                        </div>
+                        <div class="bg-rose-900/30 px-3 py-2 rounded-lg border border-rose-500/20">
+                            <p class="text-xs text-rose-300 font-bold uppercase tracking-wider mb-0.5"><i class="fas fa-times-circle mr-1"></i>Antonym</p>
+                            <p class="text-sm font-bold text-slate-100">${w.ant} <span class="text-xs font-normal text-rose-300/70 bn-text ml-1">/${w.ap}/</span></p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 bg-slate-900/60 p-3 rounded-xl border-l-4 border-emerald-500/60 shadow-sm">
+                        <h4 class="font-bold text-emerald-400 flex items-center gap-2 mb-1 text-[11px] uppercase tracking-wider"><i class="fas fa-history text-emerald-500"></i> Origin</h4>
+                        <p class="text-xs text-slate-300 font-medium leading-relaxed bn-text">${w.o}</p>
+                    </div>
+
+                    <div class="mt-auto pt-4 border-t border-slate-700/50">
+                        <h4 class="font-bold text-cyan-400 flex items-center gap-2 mb-2 text-[11px] uppercase tracking-wider"><i class="fas fa-list-ul"></i> Examples</h4>
+                        <ul class="list-disc list-inside text-xs text-slate-200 font-medium space-y-3 ml-1">
+                            ${w.s.map(sentence => `
+                                <li class="leading-relaxed">
+                                    ${sentence.en}<br>
+                                    <span class="text-[11px] text-slate-400 bn-text ml-4 block mt-0.5">${sentence.bn}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderMCQs() {
+            const container = document.getElementById('mcqContainer');
+            let html = '';
+            
+            mcqsData.forEach((mcq, index) => {
+                html += `
+                <div class="bg-slate-800/60 p-5 rounded-2xl border border-slate-700 shadow-sm hover:border-emerald-500/50 transition-colors">
+                    <p class="font-bold text-lg text-slate-100 mb-4">${index + 1}. ${mcq.q}</p>
+                    <div class="space-y-2.5 ml-2 mb-5 text-slate-300 font-medium">
+                        <p class="flex items-start gap-2"><span class="text-emerald-400 font-bold w-5">a.</span> ${mcq.opts.a}</p>
+                        <p class="flex items-start gap-2"><span class="text-emerald-400 font-bold w-5">b.</span> ${mcq.opts.b}</p>
+                        <p class="flex items-start gap-2"><span class="text-emerald-400 font-bold w-5">c.</span> ${mcq.opts.c}</p>
+                        <p class="flex items-start gap-2"><span class="text-emerald-400 font-bold w-5">d.</span> ${mcq.opts.d}</p>
+                    </div>
+                    <details class="group cursor-pointer outline-none">
+                        <summary class="inline-flex items-center justify-between w-full text-cyan-300 font-bold bg-slate-900/80 px-4 py-3 rounded-xl hover:bg-slate-700 transition-colors border border-slate-600 select-none">
+                            <span class="flex items-center gap-2"><i class="fas fa-eye text-emerald-400"></i> Show Answer</span>
+                            <i class="fas fa-chevron-down transform group-open:rotate-180 transition-transform duration-300 opacity-70"></i>
+                        </summary>
+                        <div class="mt-2 p-4 bg-slate-900 border-l-4 border-green-500 rounded-r-xl rounded-bl-xl shadow-inner border-t border-r border-b border-slate-700">
+                            <p class="font-bold text-green-400 mb-2">Correct Answer: <span class="uppercase bg-green-500/20 px-2 py-0.5 rounded">${mcq.ans}</span></p>
+                            <p class="text-sm text-slate-300 leading-relaxed font-medium"><strong>Note:</strong> ${mcq.note}</p>
+                        </div>
+                    </details>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderSummary() {
+            const container = document.getElementById('summaryText');
+            let summaryString = wordsData.map(w => `${w.w}, ${w.m.replace(/[()]/g, '')} - ${w.syn} @ ${w.ant};`).join('\n');
+            container.textContent = summaryString;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+            setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4'), 2500);
+        }
+
+        function copyTextToClipboard(text, successMsg) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast(successMsg);
+            } catch (err) {
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => showToast(successMsg)).catch(e => console.error("Clipboard failed", e));
+                }
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function copyStory() {
+            const title = document.getElementById('story-title').innerText.trim();
+            const paragraphs = document.querySelectorAll('#story-content p');
+            let text = title + '\n\n';
+            paragraphs.forEach(p => text += p.innerText + '\n\n');
+            copyTextToClipboard(text.trim(), "Epic Story copied to clipboard!");
+        }
+
+        function copySummary() {
+            const text = document.getElementById('summaryText').innerText;
+            copyTextToClipboard(text, "Master Summary copied to clipboard!");
+        }
+
+        function copyMCQs() {
+            let text = "";
+            mcqsData.forEach((mcq, index) => {
+                text += `${index + 1}. ${mcq.q}\n`;
+                text += `a. ${mcq.opts.a}\n`;
+                text += `b. ${mcq.opts.b}\n`;
+                text += `c. ${mcq.opts.c}\n`;
+                text += `d. ${mcq.opts.d}\n`;
+                text += `correct answer: ${mcq.ans}\n`;
+                text += `Note: ${mcq.note}\n\n`;
+            });
+            copyTextToClipboard(text.trim(), "Grand Assessment copied to clipboard!");
+        }
+
+        window.onload = () => {
+            renderCards();
+            renderMCQs();
+            renderSummary();
+        };
+    </script>
+</body>
+</html>
