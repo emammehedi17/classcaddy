@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>50 Idioms & Phrases with Origins</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Hind Siliguri', sans-serif;
+            background-color: #f8fafc;
+        }
+        .creator-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(251, 191, 36, 0.1);
+            color: #fbbf24;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            transition: all 0.3s ease;
+        }
+        .creator-badge:hover {
+            background: rgba(251, 191, 36, 0.2);
+        }
+        .qr-code {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            border: 2px solid #fbbf24;
+            padding: 2px;
+            background: white;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .idiom-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .idiom-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen pb-12">
+
+    <header class="bg-indigo-600 text-white py-12 px-4 shadow-lg relative overflow-hidden">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between relative z-10 gap-6">
+            <div class="mb-6 md:mb-0 max-w-2xl">
+                <h1 class="text-3xl md:text-4xl font-bold mb-3 tracking-tight">Top 50 Idioms & Phrases</h1>
+                <p class="text-indigo-100 text-lg mb-4">Master English Idioms with their true Origins</p>
+                
+                <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="creator-badge mb-6">
+                    <i class="fa-solid fa-pen-nib"></i> নোট প্রস্তুতকরণে: ইমাম মেহেদি
+                </a>
+                
+                <div class="bg-indigo-700/50 p-4 rounded-xl border border-indigo-400/30 shadow-inner">
+                    <h3 class="font-semibold text-yellow-300 mb-1 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Note / বিঃদ্রঃ
+                    </h3>
+                    <p class="text-sm text-indigo-50 leading-relaxed font-light">
+                        কোনো Idiom কীভাবে তৈরি হয়েছে (Origin) তা জানলে এর অর্থ মুখস্থ না করেই সারাজীবন মনে রাখা যায়। এখানে Live MCQ পিডিএফ থেকে নেওয়া প্রথম ৫০টি Idiom-এর পেছনের গল্প বাংলায় দেওয়া হলো। প্রতিটি Idiom এর সাথে ২টি করে বাক্য রচনা করে দেওয়া হয়েছে।
+                    </p>
+                </div>
+            </div>
+
+            <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR" class="qr-code">
+        </div>
+        
+        <!-- Decorative Background Elements -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 opacity-10 pointer-events-none">
+            <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-white blur-3xl"></div>
+            <div class="absolute bottom-0 right-0 w-64 h-64 rounded-full bg-indigo-300 blur-2xl"></div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto mt-10 px-4">
+        
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-bold text-slate-700">Idioms Collection (1-50)</h2>
+            <div class="relative">
+                <input type="text" id="searchInput" placeholder="Search idioms..." class="pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm w-full md:w-64 transition-shadow">
+                <svg class="w-5 h-5 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+        </div>
+
+        <div id="idiomsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Content will be rendered here by JS -->
+        </div>
+    </main>
+
+    <script>
+        const idiomsData = [
+            {
+                id: 1,
+                idiom: "(Get) by-heart",
+                meaning: "মুখস্থ করা",
+                origin: "প্রাচীনকালে গ্রিকরা বিশ্বাস করত যে মানুষের স্মৃতি ও আবেগের অবস্থান মস্তিষ্কে নয়, বরং হৃদয়ে (heart)। তাই 'হৃদয় দিয়ে কিছু ধারণ করা' কথাটির অর্থ দাঁড়ায় পুরোপুরি মুখস্থ করা।",
+                sentences: [
+                    "To be successful in the BCS exam we have to get a lot of information by heart.",
+                    "My father can still recite the poems he learned by heart at school."
+                ]
+            },
+            {
+                id: 2,
+                idiom: "A (or one's) bounden duty",
+                meaning: "অবশ্য পালনীয় / কর্তব্য",
+                origin: "'Bounden' শব্দটি 'bind' বা বাঁধা শব্দ থেকে এসেছে। যে দায়িত্ব বা কর্তব্যের সাথে একজন মানুষ সামাজিকভাবে বা নৈতিকভাবে আষ্টেপৃষ্ঠে বাঁধা থাকে, তাকেই Bounden duty বলে।",
+                sentences: [
+                    "It is our bounden duty to respect the teachers.",
+                    "He felt it was his bounden duty to report the crime to the police."
+                ]
+            },
+            {
+                id: 3,
+                idiom: "A bed of roses",
+                meaning: "আরামদায়ক বা সুখকর অবস্থা",
+                origin: "গোলাপের বিছানা যেমন নরম ও সুগন্ধযুক্ত হয়, ঠিক তেমনি জীবনের কোনো আরামদায়ক, শান্তিময় বা বিলাসবহুল পরিস্থিতি বোঝাতে এই প্রবাদটি ব্যবহৃত হয়।",
+                sentences: [
+                    "Farming is no bed of roses; it requires hard labor.",
+                    "Do not expect your new job to be a bed of roses."
+                ]
+            },
+            {
+                id: 4,
+                idiom: "A bed of thorns",
+                meaning: "কঠিন পরিস্থিতি / কণ্টকশয্যা",
+                origin: "কাঁটার (thorns) বিছানায় ঘুমানো যেমন প্রচণ্ড যন্ত্রণাদায়ক, তেমনি জীবনে দুঃখ, কষ্ট ও ঝামেলায় ভরা পরিস্থিতি বোঝাতে এটি ব্যবহৃত হয়।",
+                sentences: [
+                    "Life is not so easy; it is a bed of thorns.",
+                    "After losing his business, his daily life became a bed of thorns."
+                ]
+            },
+            {
+                id: 5,
+                idiom: "A bird's eye view",
+                meaning: "উপর থেকে এক নজরে দেখা / সার্বিক ভাসা ভাসা দেখা",
+                origin: "উড়ন্ত একটি পাখি আকাশ থেকে যেমন নিচের পুরো এলাকার একটি বিস্তৃত দৃশ্য এক নজরে দেখতে পায়, তেমনি কোনো বিষয়ের সার্বিক বা সাধারণ ধারণা পাওয়াকে এটি বোঝায়।",
+                sentences: [
+                    "Climb to the top of the Eiffel Tower if you want a bird's eye view of Paris.",
+                    "The manager gave us a bird's eye view of the upcoming project."
+                ]
+            },
+            {
+                id: 6,
+                idiom: "A black sheep",
+                meaning: "দুশ্চরিত্র, কুলাঙ্গার",
+                origin: "সাধারণত ভেড়ার পশম সাদা হয় যা সহজেই বিভিন্ন রঙে রাঙানো যায়। কিন্তু কালো ভেড়ার পশম রঙ করা যায় না বলে বাণিজ্যিকভাবে এদের দাম কম ছিল এবং পালে এদের বেমানান ভাবা হতো। সেখান থেকেই পরিবারের কুলাঙ্গার বোঝাতে এর উৎপত্তি।",
+                sentences: [
+                    "Jonny is the black sheep, he brought disgrace to his family.",
+                    "Every family has a black sheep, and I guess I was the one for ours."
+                ]
+            },
+            {
+                id: 7,
+                idiom: "A bolt from the blue",
+                meaning: "অপ্রত্যাশিত ঘটনা বা খবর",
+                origin: "'Blue' বলতে পরিষ্কার নীল আকাশ এবং 'bolt' বলতে বজ্রপাত (Thunderbolt) বোঝায়। মেঘমুক্ত নীল আকাশ থেকে হঠাৎ বজ্রপাত হওয়া যেমন অসম্ভব ও অপ্রত্যাশিত, তেমনি কোনো অনাকাঙ্ক্ষিত খবর।",
+                sentences: [
+                    "The news of his accident was like a bolt from the blue.",
+                    "The sudden resignation of the CEO came as a bolt from the blue."
+                ]
+            },
+            {
+                id: 8,
+                idiom: "A close shave",
+                meaning: "অল্পের জন্য বেঁচে যাওয়া",
+                origin: "দাড়ি কামানোর সময় ক্ষুর বা ব্লেড চামড়ার খুব কাছ দিয়ে যায়, একটু এদিক ওদিক হলেই কেটে যাওয়ার বিপদ। সেখান থেকে খুব কাছাকাছি বিপদ থেকে রক্ষা পাওয়াকে 'Close shave' বলা হয়।",
+                sentences: [
+                    "The passengers in the jeep had a close shave when a mine exploded nearby.",
+                    "I had a close shave this morning when a speeding car almost hit me."
+                ]
+            },
+            {
+                id: 9,
+                idiom: "A cog in the machine",
+                meaning: "বড় প্রতিষ্ঠানের অগুরুত্বপূর্ণ ব্যক্তি",
+                origin: "'Cog' হলো যন্ত্রের চাকার খাঁজ বা ছোট দাঁত। বিশাল একটি যন্ত্রে একটি ছোট দাঁতের যেমন আলাদা কোনো গুরুত্ব বা পরিচিতি থাকে না, তেমনি বিশাল প্রতিষ্ঠানের একজন সাধারণ কর্মীকে বোঝাতে এটি ব্যবহৃত হয়।",
+                sentences: [
+                    "Running your own organization is a big change from just being a cog in the machine.",
+                    "He quit his corporate job because he felt like just another cog in the machine."
+                ]
+            },
+            {
+                id: 10,
+                idiom: "A dark horse",
+                meaning: "স্বল্প পরিচিত প্রতিযোগী যে অপ্রত্যাশিতভাবে ভালো করে",
+                origin: "ঘোড়দৌড়ের ক্ষেত্রে যে ঘোড়াটি সম্পর্কে দর্শকদের আগে থেকে তেমন কোনো ধারণা থাকে না (অপরিচিত/অন্ধকার), কিন্তু প্রতিযোগিতায় নেমে হঠাৎ সবাইকে চমকে দিয়ে জিতে যায়।",
+                sentences: [
+                    "Bangladesh cricket team could be the dark horse for the upcoming World Cup.",
+                    "No one expected him to win, he was truly a dark horse in the election."
+                ]
+            },
+            {
+                id: 11,
+                idiom: "Be a far cry from / far cry",
+                meaning: "উল্লেখযোগ্য পরিমাণ পার্থক্য / বিশাল ব্যবধান",
+                origin: "প্রাচীনকালে দূরত্ব মাপার একটি উপায় ছিল মানুষের চিৎকার (cry)। যেখান থেকে চিৎকার করলেও আর শোনা যায় না, সেটাই 'far cry' বা অনেক দূরের পার্থক্য।",
+                sentences: [
+                    "This flat is a far cry from the house they had before.",
+                    "His current polite behavior is a far cry from how he used to act."
+                ]
+            },
+            {
+                id: 12,
+                idiom: "A fish out of water",
+                meaning: "অস্বস্তিকর অবস্থা / বেকায়দা অবস্থা",
+                origin: "একটি মাছকে পানি থেকে ডাঙায় তুলে আনলে সে যেমন ছটফট করে ও চরম অস্বস্তিতে পড়ে, ঠিক তেমনি কোনো মানুষ সম্পূর্ণ অপরিচিত বা প্রতিকূল পরিবেশে গেলে তার অবস্থাও এমন হয়।",
+                sentences: [
+                    "I felt like a fish out of water at my new school.",
+                    "Without his smartphone, he feels like a fish out of water."
+                ]
+            },
+            {
+                id: 13,
+                idiom: "A fool's paradise",
+                meaning: "বোকার স্বর্গ / ভ্রান্ত সুখ",
+                origin: "বোকা মানুষরা ভবিষ্যৎ বিপদ সম্পর্কে অজ্ঞ থেকে নিজেদের তৈরি করা কাল্পনিক সুখের জগতে মেতে থাকে। বাস্তবকে অস্বীকার করে সাময়িক আনন্দে থাকার এই অবস্থাকে বোকার স্বর্গ বলা হয়।",
+                sentences: [
+                    "They were living in a fool's paradise, refusing to accept they were in debt.",
+                    "Thinking that you can pass the exam without studying is living in a fool's paradise."
+                ]
+            },
+            {
+                id: 14,
+                idiom: "A forgone conclusion",
+                meaning: "অবশ্যম্ভাবী, পূর্ব নির্ধারিত ফলাফল",
+                origin: "যখন কোনো বিষয়ের ফলাফল বা উপসংহার (conclusion) আগে থেকেই এমনভাবে জানা থাকে যে, তা আর পরিবর্তন হওয়ার কোনো সম্ভাবনা থাকে না।",
+                sentences: [
+                    "The result of the election seems to be a foregone conclusion.",
+                    "His promotion was a foregone conclusion given his excellent track record."
+                ]
+            },
+            {
+                id: 15,
+                idiom: "A hard/tough nut to crack",
+                meaning: "দূরূহ সমস্যা / হার না মানা ব্যক্তি",
+                origin: "শক্ত খোসাওয়ালা বাদাম (nut) ভাঙা (crack) যেমন অত্যন্ত কঠিন ও শ্রমসাধ্য কাজ, ঠিক তেমনি কোনো কঠিন সমস্যার সমাধান করা বা ঘাড়ত্যাড়া মানুষকে বোঝানো।",
+                sentences: [
+                    "Beating Australia in cricket is a hard nut to crack.",
+                    "The complex mathematical puzzle proved to be a tough nut to crack."
+                ]
+            },
+            {
+                id: 16,
+                idiom: "A jaundiced eye",
+                meaning: "ঈর্ষাপরবশ, পরশ্রীকাতর বা পক্ষপাতদুষ্ট দৃষ্টি",
+                origin: "জন্ডিস রোগে আক্রান্ত হলে মানুষের চোখ হলুদ হয়ে যায় এবং সে সবকিছু হলুদ দেখে। তেমনি ঈর্ষা বা কুসংস্কারে আক্রান্ত ব্যক্তি সবকিছুকে নেতিবাচক বা সন্দেহজনক দৃষ্টিতে দেখে।",
+                sentences: [
+                    "He seems to have had a jaundiced eye after the divorce.",
+                    "You should not look at their success with a jaundiced eye."
+                ]
+            },
+            {
+                id: 17,
+                idiom: "A lame excuse",
+                meaning: "বাজে বা দুর্বল অজুহাত",
+                origin: "'Lame' মানে খোঁড়া বা পঙ্গু। একজন খোঁড়া মানুষ যেমন সোজা হয়ে দাঁড়াতে বা ঠিকমতো হাঁটতে পারে না, তেমনি যে অজুহাত একেবারেই ধোপে টেকে না, তাকে খোঁড়া বা lame excuse বলে।",
+                sentences: [
+                    "However, that is no doubt a lame excuse.",
+                    "Saying that the dog ate your homework is a very lame excuse."
+                ]
+            },
+            {
+                id: 18,
+                idiom: "A lot of",
+                meaning: "প্রচুর পরিমাণে",
+                origin: "আগেকার দিনে নিলাম বা কেনাবেচায় 'lot' বলতে একসাথে অনেকগুলো জিনিসের একটি নির্দিষ্ট গুচ্ছকে বোঝাতো। সেখান থেকে 'প্রচুর' বা বিশাল পরিমাণ অর্থে এর উৎপত্তি।",
+                sentences: [
+                    "Ifty gave Shihab a lot of money.",
+                    "She has a lot of responsibilities to handle at the new office."
+                ]
+            },
+            {
+                id: 19,
+                idiom: "A man of letters",
+                meaning: "পণ্ডিত / বিদ্বান / লেখক",
+                origin: "প্রাচীন ও মধ্যযুগে সাধারণ মানুষ নিরক্ষর ছিল। তখন যারা অক্ষরজ্ঞান সম্পন্ন (letters) ছিলেন বা সাহিত্য লিখতে-পড়তে পারতেন, সমাজে তাদের অনেক সম্মান করা হতো।",
+                sentences: [
+                    "Dr. Shahidullah was a man of letters.",
+                    "Besides being a successful politician, he is also a man of letters."
+                ]
+            },
+            {
+                id: 20,
+                idiom: "A man of many parts",
+                meaning: "অত্যন্ত দক্ষ / বহুমুখী প্রতিভার অধিকারী",
+                origin: "এখানে 'Parts' বলতে মানুষের বিভিন্ন গুণাবলি বা যোগ্যতাকে বোঝানো হয়েছে। যার চরিত্রে ও কাজে অনেকগুলো ভালো গুণ বা দক্ষতার সমন্বয় ঘটেছে।",
+                sentences: [
+                    "Your brother is a man of parts in this matter.",
+                    "Leonardo da Vinci was truly a man of many parts."
+                ]
+            },
+            {
+                id: 21,
+                idiom: "A man of straw",
+                meaning: "দুর্বল চিত্তের বা চরিত্রের লোক",
+                origin: "খড় (straw) দিয়ে তৈরি কাকতাড়ুয়া বা পুতুলের যেমন নিজস্ব কোনো শক্তি, ওজন বা মেরুদণ্ড থাকে না, তেমনি দুর্বল চিত্তের মানুষের নিজস্ব কোনো দৃঢ়তা বা প্রভাব থাকে না।",
+                sentences: [
+                    "He was accused by his opponents of being a man of straw.",
+                    "You cannot depend on him during a crisis; he is a man of straw."
+                ]
+            },
+            {
+                id: 22,
+                idiom: "A piece of cake",
+                meaning: "সহজসাধ্য কাজ",
+                origin: "১৯৩০ এর দশকে আফ্রিকান-আমেরিকানদের একটি নাচের প্রতিযোগিতায় পুরস্কার হিসেবে কেক দেওয়া হতো। নাচটি এতোই সহজ ও মজার ছিল যে সেখান থেকেই 'খুব সহজ' বোঝাতে এর ব্যবহার শুরু।",
+                sentences: [
+                    "The exam was a piece of cake.",
+                    "Fixing this minor software bug will be a piece of cake for her."
+                ]
+            },
+            {
+                id: 23,
+                idiom: "A rainy day",
+                meaning: "অভাবের দিন / দুর্দিন",
+                origin: "কৃষিভিত্তিক সমাজে বৃষ্টির দিনে কৃষকরা বাইরে কাজ করতে পারত না বলে তাদের দৈনিক আয় বন্ধ থাকত। সেই আয়হীন অভাবের দিনগুলো থেকেই ভবিষ্যতের দুর্দিন বোঝাতে এর উৎপত্তি।",
+                sentences: [
+                    "She had saved some money for a rainy day.",
+                    "It is always wise to keep some funds aside for a rainy day."
+                ]
+            },
+            {
+                id: 24,
+                idiom: "A sitting duck",
+                meaning: "সহজ লক্ষ্যবস্তু",
+                origin: "শিকারিরা যখন বন্দুক দিয়ে হাঁস শিকার করে, তখন উড়ন্ত হাঁসের চেয়ে পানিতে স্থির বসে থাকা হাঁস (sitting duck) শিকার করা অনেক বেশি সহজ। সেখান থেকেই 'সহজ শিকার' বা লক্ষ্যবস্তু।",
+                sentences: [
+                    "With their bullets all gone, the soldiers were sitting ducks for the enemy.",
+                    "Walking alone in that dark alley makes you a sitting duck for muggers."
+                ]
+            },
+            {
+                id: 25,
+                idiom: "A slow coach",
+                meaning: "খুবই অলস বা ধীর গতির ব্যক্তি",
+                origin: "আগেকার দিনে ঘোড়ায় টানা যাত্রীবাহী গাড়িকে 'coach' বলা হতো। কোনো কোনো গাড়ি খুব ধীরে চলতো। সেখান থেকে ধীর গতির বা অলস মানুষকে বোঝায়।",
+                sentences: [
+                    "A slow coach can't shine in life.",
+                    "Come on, don't be such a slow coach, we are getting late!"
+                ]
+            },
+            {
+                id: 26,
+                idiom: "A snake in the grass",
+                meaning: "গোপন শত্রু / অবিশ্বস্ত ব্যক্তি",
+                origin: "লম্বা ঘাসের ভেতর সাপ লুকিয়ে থাকলে তা খালি চোখে দেখা যায় না, কিন্তু অসাবধানতাবশত পা দিলেই তা অত্যন্ত মারাত্মক ছোবল মারে। ঠিক তেমনি বন্ধুবেশী আড়ালে থাকা শত্রু।",
+                sentences: [
+                    "A snake in the grass is very dangerous.",
+                    "I trusted him with my secrets, but he turned out to be a snake in the grass."
+                ]
+            },
+            {
+                id: 27,
+                idiom: "A square peg in a round hole",
+                meaning: "অনুপযুক্ত / বেমানান ব্যক্তি",
+                origin: "একটি গোলাকার গর্তে (round hole) যদি কেউ চারকোনা একটি কাঠের টুকরো (square peg) জোর করে ঢোকানোর চেষ্টা করে, তবে তা কখনোই খাপ খাবে না।",
+                sentences: [
+                    "He never quite fitted in here; he was always a bit of a square peg.",
+                    "An artist working in a strict corporate office is like a square peg in a round hole."
+                ]
+            },
+            {
+                id: 28,
+                idiom: "A storm in a teacup",
+                meaning: "তুচ্ছ বিষয় নিয়ে তুমুল হট্টগোল",
+                origin: "চায়ের কাপের মতো ছোট্ট একটি জায়গায় যদি ঝড় ওঠে, তবে তা যেমন অত্যন্ত হাস্যকর ও বাস্তবে ভিত্তিহীন, তেমনি সামান্য বিষয়ে বড় ধরনের ঝগড়া করা।",
+                sentences: [
+                    "It wasn't corruption, but it wasn't a storm in a teacup either.",
+                    "Their argument over which movie to watch was just a storm in a teacup."
+                ]
+            },
+            {
+                id: 29,
+                idiom: "A strong stomach",
+                meaning: "দৃঢ় চিত্ত / অপ্রীতিকর কিছু সহ্য করার ক্ষমতা",
+                origin: "যে ব্যক্তির পাকস্থলী শক্তিশালী, সে যেকোনো বাজে খাবার হজম করতে পারে। তেমনি মানসিকভাবে যে মানুষ রক্তারক্তি বা অত্যন্ত জঘন্য দৃশ্য বমি না করে সহ্য করতে পারে।",
+                sentences: [
+                    "You need a strong stomach to watch that horror movie.",
+                    "Surgeons must have a strong stomach to operate on severe injuries daily."
+                ]
+            },
+            {
+                id: 30,
+                idiom: "A tall order",
+                meaning: "অযৌক্তিক আবদার বা দুরূহ চাহিদা",
+                origin: "উনিশ শতকে আমেরিকায় 'tall' শব্দটি 'অতিরিক্ত' বা 'বিশাল' অর্থে ব্যবহৃত হতো। খুব বড় বা বিশাল তালিকা ধরে কোনো কাজের নির্দেশ (order) দিলে তা পালন করা খুব কঠিন হয়ে দাঁড়ায়।",
+                sentences: [
+                    "It's a bit of a tall order to complete this within a day.",
+                    "Asking the team to double their sales in one month is a tall order."
+                ]
+            },
+            {
+                id: 31,
+                idiom: "A thorn in the flesh",
+                meaning: "সর্বদাই বিরক্তি বা সমস্যা উৎপাদনকারী / কাবাবে হাড্ডি",
+                origin: "বাইবেল থেকে আগত একটি ফ্রেজ। শরীরের মাংসে একটি ছোট কাঁটা ফুটে থাকলে তা যেমন সারাক্ষণ অস্বস্তি ও বিরক্তিকর ব্যথা দিতে থাকে, তেমনি কোনো বিরক্তিকর ব্যক্তি।",
+                sentences: [
+                    "His presence in our group is like a thorn in the flesh.",
+                    "That aggressive competitor has been a thorn in the flesh for our business."
+                ]
+            },
+            {
+                id: 32,
+                idiom: "A trying time",
+                meaning: "কঠিন সময়",
+                origin: "'Trying' শব্দটি trial বা পরীক্ষা থেকে এসেছে। যে দুঃসময় মানুষের ধৈর্য, সাহস ও সহ্যশক্তির চরম পরীক্ষা নেয়, সেটাই কঠিন বা trying time।",
+                sentences: [
+                    "They have had a very trying time indeed.",
+                    "The pandemic was a trying time for small business owners worldwide."
+                ]
+            },
+            {
+                id: 33,
+                idiom: "A vicious circle",
+                meaning: "দুষ্টচক্র",
+                origin: "লজিক বা যুক্তিশাস্ত্রে 'vicious circle' হলো এমন একটি পরিস্থিতি যেখানে একটি খারাপ ঘটনা আরেকটি খারাপ ঘটনার জন্ম দেয় এবং তা চক্রাকারে অন্তহীনভাবে চলতে থাকে।",
+                sentences: [
+                    "Many people get trapped in a vicious circle of dieting and weight gain.",
+                    "Poverty and lack of education often form a vicious circle."
+                ]
+            },
+            {
+                id: 34,
+                idiom: "ABC",
+                meaning: "প্রাথমিক জ্ঞান / খুবই সহজ",
+                origin: "ইংরেজি বর্ণমালার প্রথম তিনটি অক্ষর A, B, C। ভাষা শিক্ষার প্রাথমিক ধাপ এটি। তাই যেকোনো বিষয়ের একদম শুরুর বা প্রাথমিক জ্ঞানকে ABC বলা হয়।",
+                sentences: [
+                    "He doesn't even know the ABC of cooking.",
+                    "For a tech expert, fixing this router issue is as simple as ABC."
+                ]
+            },
+            {
+                id: 35,
+                idiom: "Above all",
+                meaning: "সর্বোপরি / প্রধানত",
+                origin: "অনেকগুলো বিষয়ের মধ্যে অন্য সবকিছুর উপরে (above) যাকে স্থান দেওয়া হয় বা যেটিকে সবচেয়ে বেশি গুরুত্বপূর্ণ হিসেবে বিবেচনা করা হয়।",
+                sentences: [
+                    "Above all, take good care of your health.",
+                    "He is smart, hardworking, and above all, fiercely loyal."
+                ]
+            },
+            {
+                id: 36,
+                idiom: "Above board",
+                meaning: "সন্দেহাতীত / সততার ক্ষেত্রে বিতর্কের ঊর্ধ্বে",
+                origin: "তাস খেলায় জুয়াড়িরা অনেক সময় টেবিলের নিচে হাত রেখে তাস লুকাতো। কেউ যদি টেবিলের উপরে (board-এর উপরে) হাত রেখে খেলে, তবে সে চিটিং করতে পারে না। সেখান থেকেই সততা বোঝায়।",
+                sentences: [
+                    "The deal was completely open and above board.",
+                    "We need to ensure that all our financial transactions are strictly above board."
+                ]
+            },
+            {
+                id: 37,
+                idiom: "Above one's station",
+                meaning: "সামর্থ্যের বাইরে / নিজের অবস্থানের চেয়ে বেশি কিছু চাওয়া",
+                origin: "সামন্ততান্ত্রিক সমাজে একজন মানুষের যে সামাজিক অবস্থান বা মর্যাদা (station) নির্দিষ্ট ছিল, তার চেয়ে উঁচু স্তরের মানুষের মতো আচরণ করার চেষ্টা করাকে এটি বোঝাতো।",
+                sentences: [
+                    "Helping you is above my station right now.",
+                    "The servant was scolded for acting above his station."
+                ]
+            },
+            {
+                id: 38,
+                idiom: "Achilles heel",
+                meaning: "দুর্বল বা ঝুঁকিপূর্ণ স্থান",
+                origin: "গ্রিক পুরাণের অমর বীর একিলিসের শরীরের একমাত্র দুর্বল স্থান ছিল তার পায়ের গোড়ালি (heel)। সেই গোড়ালিতে বিষাক্ত তীর বিদ্ধ হয়েই তার মৃত্যু হয়। সেখান থেকেই 'একমাত্র দুর্বলতা' অর্থে এটি ব্যবহৃত।",
+                sentences: [
+                    "Maths has always been my Achilles heel.",
+                    "The company is highly profitable, but poor customer service is their Achilles heel."
+                ]
+            },
+            {
+                id: 39,
+                idiom: "Acid test",
+                meaning: "অগ্নিপরীক্ষা / মূল পরীক্ষা",
+                origin: "সোনার খনিতে পাওয়া কোনো বস্তু আসলেই খাঁটি সোনা কিনা, তা যাচাই করতে শক্তিশালী নাইট্রিক এসিড ব্যবহার করা হতো। সেখান থেকেই যেকোনো জিনিসের চূড়ান্ত পরীক্ষা বোঝাতে এর ব্যবহার।",
+                sentences: [
+                    "Last group stage match was an acid test for Bangladesh.",
+                    "The upcoming debate will be the acid test for the new political leader."
+                ]
+            },
+            {
+                id: 40,
+                idiom: "Add fuel to the fire",
+                meaning: "বাজে পরিস্থিতি আরও ঘোলাটে করা (আগুনে ঘি ঢালা)",
+                origin: "জ্বলন্ত আগুনে নতুন করে কাঠ বা জ্বালানি (fuel) দিলে আগুন যেমন আরও তীব্র আকার ধারণ করে, তেমনি আগে থেকেই খারাপ থাকা কোনো পরিস্থিতিকে উসকে দেওয়া।",
+                sentences: [
+                    "My request for help added fuel to the fire of his anger.",
+                    "Don't talk to her right now; you'll just add fuel to the fire."
+                ]
+            },
+            {
+                id: 41,
+                idiom: "Add insult to injury",
+                meaning: "কাঁটা ঘায়ে নুনের ছিটা / খারাপ অবস্থাকে আরও খারাপ করা",
+                origin: "কেউ শারীরিকভাবে আহত (injury) হওয়ার পর তাকে সাহায্য বা সান্ত্বনা না দিয়ে যদি উল্টো গালাগালি বা অপমান (insult) করা হয়, তবে তার কষ্ট বহুগুণ বেড়ে যায়।",
+                sentences: [
+                    "Asking the employees to accept a pay cut adds insult to their injury.",
+                    "First my car broke down, and to add insult to injury, it started pouring rain."
+                ]
+            },
+            {
+                id: 42,
+                idiom: "After all",
+                meaning: "সর্বোপরি / সবকিছু বিবেচনা সাপেক্ষে",
+                origin: "একটি ঘটনা বা তর্কের সমস্ত দিক বিবেচনা করার পর (after all the things are considered) যে চূড়ান্ত সিদ্ধান্তে আসা হয়।",
+                sentences: [
+                    "He is after all an honest man.",
+                    "Don't be too hard on him; he is only a child after all."
+                ]
+            },
+            {
+                id: 43,
+                idiom: "After one's own heart",
+                meaning: "মনের মত / চিন্তাভাবনা এবং রুচির মিল আছে এমন",
+                origin: "যে ব্যক্তি বা বস্তু নিজের হৃদয়ের (heart) আকাঙ্ক্ষা, পছন্দ বা রুচির সাথে হুবহু মিলে যায়। বাইবেলে রাজা ডেভিডকে 'a man after God's own heart' বলা হয়েছিল।",
+                sentences: [
+                    "She's a woman after my own heart.",
+                    "He loves classical music; he is a man after my own heart."
+                ]
+            },
+            {
+                id: 44,
+                idiom: "Against the clock",
+                meaning: "দ্রুততার সাথে কাজ করা (সময়ের সাথে পাল্লা দিয়ে)",
+                origin: "ঘড়ির কাঁটা পার হয়ে যাওয়ার আগেই বা ডেডলাইনের আগে তাড়াহুড়ো করে কোনো কাজ শেষ করার চেষ্টা। স্পোর্টস থেকে এর উৎপত্তি যেখানে ঘড়ির কাঁটার বিপরীতে রেস করা হয়।",
+                sentences: [
+                    "I had to work against the clock to submit the project within the deadline.",
+                    "The doctors operated against the clock to save the accident victim."
+                ]
+            },
+            {
+                id: 45,
+                idiom: "Alive and kicking",
+                meaning: "সুস্বাস্থ্য ও প্রাণ শক্তিতে পূর্ণ",
+                origin: "মৎস্য বিক্রেতারা সতেজ মাছ বোঝাতে বলত যে মাছগুলো এখনো লাফিয়ে বেড়াচ্ছে (kicking)। অথবা নবজাতক শিশু মায়ের গর্ভে পা ছুঁড়লে সুস্থতার লক্ষণ মানা হয়।",
+                sentences: [
+                    "The seventy-three year old Arnold Schwarzenegger is still alive and kicking.",
+                    "Despite the rumors of its closure, the local bookstore is alive and kicking."
+                ]
+            },
+            {
+                id: 46,
+                idiom: "All along",
+                meaning: "সর্বদা / শুরু থেকেই",
+                origin: "কোনো একটি রাস্তার পুরোটা পথ (along the way) পাড়ি দেওয়ার ধারণা থেকে এর উৎপত্তি। যার অর্থ কোনো ঘটনার শুরু থেকে একেবারে শেষ পর্যন্ত সর্বদা।",
+                sentences: [
+                    "The teacher has all along advised us to be diligent.",
+                    "I knew all along that he was hiding the real truth from us."
+                ]
+            },
+            {
+                id: 47,
+                idiom: "All and sundry",
+                meaning: "সকল স্তরের মানুষ / সকলেই",
+                origin: "'All' মানে সবাই এবং 'sundry' মানে বিভিন্ন ধরনের লোক। অর্থাৎ ধনী-গরিব, পরিচিত-অপরিচিত নির্বিশেষে সমাজের সব স্তরের মানুষকে একসাথে বোঝাতে ব্যবহৃত।",
+                sentences: [
+                    "I don't want all and sundry knowing about our problems.",
+                    "The rich man invited all and sundry to his grand wedding feast."
+                ]
+            },
+            {
+                id: 48,
+                idiom: "All at once",
+                meaning: "অপ্রত্যাশিতভাবে এবং হঠাৎ করে",
+                origin: "সব কিছু যখন কোনো পূর্ব প্রস্তুতি ছাড়াই একেবারে একসঙ্গে (at once) ঘটে যায়, যা মানুষকে চমকে দেয়।",
+                sentences: [
+                    "All at once a tiger came out of the forest.",
+                    "The clear sky darkened and all at once it started raining heavily."
+                ]
+            },
+            {
+                id: 49,
+                idiom: "All but",
+                meaning: "প্রায় (Almost)",
+                origin: "সবকিছুই হয়েছে শুধু একটি বিষয় ছাড়া (all is done but this)। অর্থাৎ কাজটি প্রায় শেষ পর্যায়ে চলে এসেছে।",
+                sentences: [
+                    "The villagers are all but ruined.",
+                    "The ancient manuscript is all but completely destroyed by moisture."
+                ]
+            },
+            {
+                id: 50,
+                idiom: "All ears",
+                meaning: "খুব মনযোগী হয়ে শোনা",
+                origin: "যখন কেউ তার সমস্ত মনযোগ শুধুমাত্র শোনার দিকে নিবদ্ধ করে, যেন তার পুরো শরীরটাই কান (ears) হয়ে গেছে অন্য কোনো দিকে খেয়াল নেই।",
+                sentences: [
+                    "Kids in my class were all ears when I was telling them the story.",
+                    "Tell me about your travel adventures; I am all ears!"
+                ]
+            }
+        ];
+
+        function renderIdioms(data) {
+            const container = document.getElementById('idiomsGrid');
+            container.innerHTML = ''; // clear
+
+            if (data.length === 0) {
+                container.innerHTML = `<div class="col-span-1 md:col-span-2 text-center py-10 text-slate-500 font-medium">No idioms found matching your search.</div>`;
+                return;
+            }
+
+            data.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-2xl p-6 idiom-card flex flex-col h-full';
+                
+                let sentencesHtml = '';
+                item.sentences.forEach((sentence, idx) => {
+                    sentencesHtml += `
+                        <div class="flex items-start mt-2">
+                            <span class="bg-indigo-100 text-indigo-700 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold mr-2 flex-shrink-0 mt-0.5">${idx + 1}</span>
+                            <p class="text-sm text-slate-700 italic">"${sentence}"</p>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-3 border-b border-slate-100 pb-3">
+                        <div>
+                            <span class="text-xs font-bold text-indigo-500 tracking-wider uppercase mb-1 block">Idiom #${item.id}</span>
+                            <h3 class="text-xl font-bold text-slate-800">${item.idiom}</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <span class="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold mb-3 border border-green-200">
+                            ${item.meaning}
+                        </span>
+                    </div>
+
+                    <div class="bg-amber-50 p-4 rounded-xl border border-amber-100 mb-4 flex-grow">
+                        <h4 class="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                            Origin (উৎপত্তি)
+                        </h4>
+                        <p class="text-sm text-slate-800 leading-relaxed font-medium">${item.origin}</p>
+                    </div>
+
+                    <div class="mt-auto">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Example Sentences:</h4>
+                        ${sentencesHtml}
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderIdioms(idiomsData);
+
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const filteredData = idiomsData.filter(item => 
+                    item.idiom.toLowerCase().includes(searchTerm) || 
+                    item.meaning.toLowerCase().includes(searchTerm)
+                );
+                renderIdioms(filteredData);
+            });
+        });
+    </script>
+</body>
+</html>
