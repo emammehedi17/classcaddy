@@ -471,9 +471,12 @@
                                     </p>
                                 </div>
 
-                                <!-- Footer Institution Text -->
-                                <div class="w-full flex flex-col items-center justify-center pt-2 min-h-[40px]">
-                                    <p class="text-sm font-bold uppercase tracking-widest text-center opacity-75 outline-none px-2" contenteditable="true" id="preview-footer-text">
+                                <!-- Footer Institution Section (Dynamic: Image for Arabic, Text for others) -->
+                                <div id="preview-footer-container" class="w-full flex flex-col items-center justify-center pt-2 min-h-[46px]">
+                                    <div id="preview-footer-img-wrapper" class="flex items-center justify-center transition-all duration-200">
+                                        <img id="preview-footer-img" src="footer.png" alt="Department of Arabic, University of Dhaka" class="h-10 md:h-12 max-h-14 w-auto max-w-[85%] object-contain select-none pointer-events-none" />
+                                    </div>
+                                    <p class="hidden text-lg md:text-xl font-bold uppercase tracking-wider text-center outline-none px-2 transition-all duration-200" contenteditable="true" id="preview-footer-text" style="color: var(--text-color);">
                                         Department of Arabic, University of Dhaka
                                     </p>
                                 </div>
@@ -763,8 +766,93 @@
             teacherTitle: document.getElementById('preview-teacher-title'),
             teacherDept: document.getElementById('preview-teacher-dept'),
             teacherUni: document.getElementById('preview-teacher-uni'),
-            footerText: document.getElementById('preview-footer-text')
+            footerText: document.getElementById('preview-footer-text'),
+            footerImgWrapper: document.getElementById('preview-footer-img-wrapper')
         };
+
+        function isArabicDepartment(deptStr) {
+            if (!deptStr || typeof deptStr !== 'string') return false;
+            const trimmed = deptStr.trim();
+            if (!trimmed) return false;
+
+            // Direct check for variations specified by user
+            const specifiedMatches = [
+                "Arabic",
+                "Department of Arabic",
+                "Dept. of Arabic",
+                "Dept. Of Arabic",
+                "Department of arabic",
+                "Dept of Arabic",
+                "Dept. of arabic",
+                "Dept of arabic",
+                "department of arabic",
+                "arabic"
+            ];
+            if (specifiedMatches.includes(trimmed)) {
+                return true;
+            }
+
+            // Normalized check (ignoring punctuation like commas/periods, extra spaces, and case)
+            const normalized = trimmed.toLowerCase().replace(/[.,;:]/g, ' ').replace(/\s+/g, ' ').trim();
+            if (normalized === 'arabic' || normalized === 'department of arabic' || normalized === 'dept of arabic') {
+                return true;
+            }
+
+            // Support Bengali and Arabic language versions
+            if (trimmed.includes('আরবী বিভাগ') || trimmed.includes('قسم اللغة العربية') || trimmed.includes('اللغة العربية')) {
+                return true;
+            }
+
+            return false;
+        }
+
+        function updateFooter(deptVal, uniVal) {
+            const footerText = previews.footerText || document.getElementById('preview-footer-text');
+            const footerImgWrapper = previews.footerImgWrapper || document.getElementById('preview-footer-img-wrapper');
+
+            // Find effective department and university values
+            const activeDept = (deptVal !== undefined && deptVal !== null && deptVal.trim() !== '')
+                ? deptVal.trim()
+                : ((inputs.teacherDept && inputs.teacherDept.value.trim()) || (previews.teacherDept ? previews.teacherDept.textContent.trim() : ''));
+
+            const activeUni = (uniVal !== undefined && uniVal !== null && uniVal.trim() !== '')
+                ? uniVal.trim()
+                : ((inputs.teacherUni && inputs.teacherUni.value.trim()) || (previews.teacherUni ? previews.teacherUni.textContent.trim() : ''));
+
+            const isArabic = isArabicDepartment(activeDept);
+
+            if (isArabic) {
+                // Arabic department: transform footer name with the image footer.png
+                if (footerImgWrapper) {
+                    footerImgWrapper.classList.remove('hidden');
+                    footerImgWrapper.style.display = 'flex';
+                }
+                if (footerText) {
+                    footerText.classList.add('hidden');
+                    footerText.style.display = 'none';
+                }
+            } else {
+                // Other departments: display as text with increased font size
+                if (footerImgWrapper) {
+                    footerImgWrapper.classList.add('hidden');
+                    footerImgWrapper.style.display = 'none';
+                }
+                if (footerText) {
+                    footerText.classList.remove('hidden');
+                    footerText.style.display = 'block';
+
+                    const parts = [];
+                    if (activeDept) parts.push(activeDept.replace(/[,.]/g, '').trim());
+                    if (activeUni) parts.push(activeUni.replace(/[,.]/g, '').trim());
+
+                    if (parts.length > 0) {
+                        footerText.textContent = parts.join(', ');
+                    } else {
+                        footerText.textContent = 'Department of Arabic, University of Dhaka';
+                    }
+                }
+            }
+        }
 
         function showModal(message) {
             const msgEl = document.getElementById('modal-message');
@@ -851,13 +939,8 @@
                 previews.teacherUni.textContent = teacherUniVal;
             }
 
-            // Sync footer if custom dept/uni entered
-            if (previews.footerText && (teacherDeptVal || teacherUniVal)) {
-                const parts = [];
-                if (teacherDeptVal) parts.push(teacherDeptVal.replace(/[,.]/g, '').trim());
-                if (teacherUniVal) parts.push(teacherUniVal.replace(/[,.]/g, '').trim());
-                previews.footerText.textContent = parts.join(', ');
-            }
+            // Conditional footer: image for Arabic, enlarged text for other departments
+            updateFooter(teacherDeptVal, teacherUniVal);
         }
 
         // Attach input listeners to all form controls
@@ -891,8 +974,10 @@
                     inputs.teacherTitle.value = target.textContent.trim();
                 } else if (target === previews.teacherDept && inputs.teacherDept) {
                     inputs.teacherDept.value = target.textContent.trim();
+                    updateFooter(target.textContent.trim(), inputs.teacherUni ? inputs.teacherUni.value : '');
                 } else if (target === previews.teacherUni && inputs.teacherUni) {
                     inputs.teacherUni.value = target.textContent.trim();
+                    updateFooter(inputs.teacherDept ? inputs.teacherDept.value : '', target.textContent.trim());
                 } else if (target === previews.submissionDate && inputs.submissionDate) {
                     inputs.submissionDate.value = target.textContent.trim();
                 }
