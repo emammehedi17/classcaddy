@@ -6,6 +6,19 @@
     <title>Assignment Cover Page Generator</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'Inter', 'sans-serif'],
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="stylesheet" href="style.css">
     <!-- html-to-image and jsPDF for perfect native Arabic rendering -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -23,7 +36,183 @@
 
         body {
             background-color: #f3f4f6;
-            transition: all 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* --- Full Dark Mode Support for cover.html --- */
+        html.dark, html.dark body, body.dark-mode {
+            background-color: #0f172a !important;
+            color: #f8fafc !important;
+        }
+
+        /* Header Dark Mode */
+        html.dark header.main-website-ui,
+        body.dark-mode header.main-website-ui {
+            background-color: rgba(15, 23, 42, 0.95) !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        html.dark header.main-website-ui h1,
+        body.dark-mode header.main-website-ui h1 {
+            color: #f8fafc !important;
+        }
+
+        html.dark header.main-website-ui .md\:flex.items-center.gap-1,
+        body.dark-mode header.main-website-ui .md\:flex.items-center.gap-1 {
+            background-color: rgba(30, 41, 59, 0.8) !important;
+            border-color: #334155 !important;
+        }
+
+        html.dark header.main-website-ui a.text-gray-600,
+        body.dark-mode header.main-website-ui a.text-gray-600 {
+            color: #94a3b8 !important;
+        }
+
+        html.dark header.main-website-ui a.text-gray-600:hover,
+        body.dark-mode header.main-website-ui a.text-gray-600:hover {
+            color: #f8fafc !important;
+            background-color: #334155 !important;
+        }
+
+        html.dark #mobile-menu,
+        body.dark-mode #mobile-menu {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        html.dark #mobile-menu a,
+        body.dark-mode #mobile-menu a {
+            color: #cbd5e1 !important;
+        }
+
+        html.dark #mobile-menu a:hover,
+        body.dark-mode #mobile-menu a:hover {
+            background-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        /* Form Container and Sidebar Cards in Dark Mode */
+        html.dark .w-full.lg\:w-1\/3 .bg-white,
+        body.dark-mode .w-full.lg\:w-1\/3 .bg-white {
+            background-color: #1e293b !important;
+            border: 1px solid #334155 !important;
+            color: #f8fafc !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        html.dark .w-full.lg\:w-1\/3 h2,
+        body.dark-mode .w-full.lg\:w-1\/3 h2 {
+            color: #f8fafc !important;
+        }
+
+        html.dark .w-full.lg\:w-1\/3 label,
+        body.dark-mode .w-full.lg\:w-1\/3 label {
+            color: #cbd5e1 !important;
+        }
+
+        html.dark .w-full.lg\:w-1\/3 p.uppercase,
+        body.dark-mode .w-full.lg\:w-1\/3 p.uppercase {
+            color: #94a3b8 !important;
+        }
+
+        html.dark .w-full.lg\:w-1\/3 .border-t,
+        body.dark-mode .w-full.lg\:w-1\/3 .border-t,
+        html.dark .w-full.lg\:w-1\/3 .border-b,
+        body.dark-mode .w-full.lg\:w-1\/3 .border-b {
+            border-color: #334155 !important;
+        }
+
+        /* Inputs, Textareas, Selects in Dark Mode */
+        html.dark #cover-form input,
+        body.dark-mode #cover-form input,
+        html.dark #cover-form textarea,
+        body.dark-mode #cover-form textarea {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            color: #f8fafc !important;
+        }
+
+        html.dark #cover-form input:focus,
+        body.dark-mode #cover-form input:focus,
+        html.dark #cover-form textarea:focus,
+        body.dark-mode #cover-form textarea:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25) !important;
+        }
+
+        html.dark #styleSelector,
+        body.dark-mode #styleSelector {
+            background-color: #0f172a !important;
+            border-color: #4f46e5 !important;
+            color: #f8fafc !important;
+        }
+
+        /* Direct Edit Hint Banner */
+        html.dark .bg-blue-50,
+        body.dark-mode .bg-blue-50 {
+            background-color: rgba(30, 58, 138, 0.3) !important;
+            border-color: #1e40af !important;
+            color: #bfdbfe !important;
+        }
+        html.dark .bg-blue-50 i,
+        body.dark-mode .bg-blue-50 i {
+            color: #60a5fa !important;
+        }
+
+        /* Print Button in Dark Mode */
+        html.dark button[onclick="window.print()"],
+        body.dark-mode button[onclick="window.print()"] {
+            background-color: #334155 !important;
+            border-color: #475569 !important;
+            color: #f8fafc !important;
+        }
+        html.dark button[onclick="window.print()"]:hover,
+        body.dark-mode button[onclick="window.print()"]:hover {
+            background-color: #475569 !important;
+        }
+
+        /* Preview Workspace Container */
+        html.dark #preview-container,
+        body.dark-mode #preview-container {
+            background-color: #0b1120 !important;
+            border-color: #1e293b !important;
+        }
+
+        /* The Authentic A4 Paper Sheet (Always Preserves Paper Color) */
+        .preserve-white,
+        html.dark .preserve-white,
+        body.dark-mode .preserve-white {
+            background-color: var(--bg-color, #ffffff) !important;
+            color: var(--text-color, #1e293b) !important;
+        }
+
+        /* Custom Modal in Dark Mode */
+        html.dark #custom-modal > div,
+        body.dark-mode #custom-modal > div {
+            background-color: #1e293b !important;
+            border: 1px solid #334155 !important;
+            color: #f8fafc !important;
+        }
+        html.dark #custom-modal h3,
+        body.dark-mode #custom-modal h3 {
+            color: #f8fafc !important;
+        }
+        html.dark #custom-modal p,
+        body.dark-mode #custom-modal p {
+            color: #cbd5e1 !important;
+        }
+
+        /* Floating action buttons */
+        #global-dark-mode-btn {
+            cursor: pointer !important;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #scroll-toggle-btn {
+            cursor: pointer !important;
+            user-select: none;
         }
 
         /* Apply Hind Siliguri to the entire body when lang is bn */
@@ -409,7 +598,7 @@
             <div class="w-full lg:w-2/3 overflow-x-auto bg-gray-200 rounded-xl p-4 flex justify-center items-start border border-gray-300" id="preview-container">
                 
                 <!-- Actual A4 Paper DOM -->
-                <div id="cover-page-preview" class="a4-paper bg-white p-[12mm]" dir="ltr" lang="en">
+                <div id="cover-page-preview" class="a4-paper bg-white preserve-white p-[12mm]" dir="ltr" lang="en">
                     <!-- Outer & Inner Academic Style Border -->
                     <div class="theme-outer-border h-full w-full p-1 box-border">
                         <div class="theme-inner-border h-full w-full flex flex-col justify-between relative px-8 py-8 md:px-12 md:py-10 box-border">
@@ -1055,14 +1244,103 @@
                 showModal("Could not generate PDF. Please try again or use the Print button to save as PDF.");
             });
         }
+
+        // --- 5. GLOBAL DARK MODE SYNC & TOGGLE LOGIC ---
+        function updateCoverDarkModeUI(isDark) {
+            const darkBtn = document.getElementById('global-dark-mode-btn');
+            if (darkBtn) {
+                darkBtn.innerHTML = isDark 
+                    ? '<i class="fas fa-sun text-2xl text-amber-400"></i>' 
+                    : '<i class="fas fa-moon text-2xl text-yellow-400"></i>';
+                darkBtn.title = isDark ? "Switch to Light Mode" : "Switch to Dark Mode";
+                darkBtn.setAttribute('aria-label', isDark ? "Switch to Light Mode" : "Switch to Dark Mode");
+            }
+        }
+
+        window.toggleCoverDarkMode = function () {
+            if (typeof window.toggleGlobalTheme === 'function') {
+                window.toggleGlobalTheme();
+                const isDark = document.documentElement.classList.contains('dark') || document.body.classList.contains('dark-mode');
+                updateCoverDarkModeUI(isDark);
+                return;
+            }
+            // Direct robust fallback
+            const isCurrentlyDark = document.documentElement.classList.contains('dark') || document.body.classList.contains('dark-mode');
+            const nextIsDark = !isCurrentlyDark;
+            if (nextIsDark) {
+                document.documentElement.classList.add('dark');
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('class_caddy_theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('class_caddy_theme', 'light');
+            }
+            try {
+                const sp = JSON.parse(localStorage.getItem('studyPlanSettings') || '{}');
+                sp.darkMode = nextIsDark;
+                localStorage.setItem('studyPlanSettings', JSON.stringify(sp));
+            } catch (e) {}
+
+            try {
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: 'class_caddy_theme',
+                    newValue: nextIsDark ? 'dark' : 'light'
+                }));
+            } catch (e) {}
+
+            updateCoverDarkModeUI(nextIsDark);
+        };
+
+        function initCoverTheme() {
+            let isDark = false;
+            const directTheme = localStorage.getItem('class_caddy_theme');
+            if (directTheme === 'dark') {
+                isDark = true;
+            } else if (directTheme === 'light') {
+                isDark = false;
+            } else {
+                try {
+                    const sp = JSON.parse(localStorage.getItem('studyPlanSettings') || '{}');
+                    if (sp && sp.darkMode) isDark = true;
+                } catch(e) {}
+            }
+
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.body.classList.add('dark-mode');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.body.classList.remove('dark-mode');
+            }
+            updateCoverDarkModeUI(isDark);
+        }
+
+        // Initialize theme immediately
+        initCoverTheme();
+
+        // Listen for cross-tab or script storage updates
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'class_caddy_theme') {
+                const isDark = e.newValue === 'dark';
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    document.body.classList.remove('dark-mode');
+                }
+                updateCoverDarkModeUI(isDark);
+            }
+        });
     </script>
 
     <!-- Floating Action Buttons (Scroll to Bottom/Top & Global Dark Mode) -->
-    <button id="scroll-toggle-btn" class="fixed bottom-32 right-5 z-[100] w-12 h-12 bg-gray-700 hover:bg-gray-900 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100" title="Scroll to Bottom" aria-label="Scroll to Bottom">
+    <button id="scroll-toggle-btn" class="fixed bottom-24 right-5 z-[100] w-12 h-12 bg-gray-700 hover:bg-gray-900 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100 cursor-pointer" title="Scroll to Bottom" aria-label="Scroll to Bottom">
         <i class="fas fa-arrow-down"></i>
     </button>
 
-    <button id="global-dark-mode-btn" class="fixed bottom-6 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-lg border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 transition-transform" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
+    <button id="global-dark-mode-btn" onclick="toggleCoverDarkMode()" class="fixed bottom-6 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-lg border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 transition-transform cursor-pointer" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
         <i class="fas fa-moon text-2xl"></i>
     </button>
 
