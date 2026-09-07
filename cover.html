@@ -132,6 +132,22 @@
             border-style: var(--title-border-style);
         }
 
+        /* In-place Editable Hover and Focus Styling */
+        [contenteditable="true"] {
+            cursor: text;
+            transition: background-color 0.15s ease, outline 0.15s ease;
+            outline: 1px dashed transparent;
+            border-radius: 3px;
+        }
+        [contenteditable="true"]:hover {
+            outline: 1px dashed rgba(59, 130, 246, 0.6);
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+        [contenteditable="true"]:focus {
+            outline: 2px solid #2563eb;
+            background-color: rgba(59, 130, 246, 0.08);
+        }
+
         /* Perfect Native PDF Print Setup */
         @media print {
             @page {
@@ -147,8 +163,12 @@
                 overflow: hidden !important;
             }
             /* Hide UI Elements */
-            header, #app-container > div:first-child, #custom-modal {
+            header, #app-container > div:first-child, #custom-modal, #scroll-toggle-btn, #global-dark-mode-btn {
                 display: none !important;
+            }
+            [contenteditable="true"], [contenteditable="true"]:hover, [contenteditable="true"]:focus {
+                outline: none !important;
+                background-color: transparent !important;
             }
             #preview-container {
                 width: 210mm !important;
@@ -236,7 +256,7 @@
 </header>
 <!-- =================== HEADER END =================== -->
 
-    <div class="container mx-auto px-4 py-8 max-w-7xl" id="app-container">
+    <div class="container mx-auto px-4 pt-24 md:pt-28 pb-12 max-w-7xl" id="app-container">
         <div class="flex flex-col lg:flex-row gap-8">
             
             <!-- Left Side: Form Input Section -->
@@ -246,17 +266,17 @@
                 <div class="bg-white rounded-xl shadow-md p-4 flex justify-between items-center gap-2">
                     <span class="text-sm font-bold text-gray-600" data-i18n="langLabel">Language:</span>
                     <div class="flex gap-2">
-                        <button onclick="changeLanguage('bn')" class="px-3 py-1.5 text-sm font-bold rounded-md bg-green-100 text-green-800 hover:bg-green-200 border border-green-300 transition shadow-sm" style="font-family: 'Hind Siliguri', sans-serif;">বাংলা</button>
-                        <button onclick="changeLanguage('en')" class="px-3 py-1.5 text-sm font-bold rounded-md bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-300 transition shadow-sm">English</button>
-                        <button onclick="changeLanguage('ar')" class="px-3 py-1.5 text-sm font-bold rounded-md bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-300 transition shadow-sm font-arabic">العربية</button>
+                        <button type="button" onclick="changeLanguage('bn')" class="px-3 py-1.5 text-sm font-bold rounded-md bg-green-100 text-green-800 hover:bg-green-200 border border-green-300 transition shadow-sm" style="font-family: 'Hind Siliguri', sans-serif;">বাংলা</button>
+                        <button type="button" onclick="changeLanguage('en')" class="px-3 py-1.5 text-sm font-bold rounded-md bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-300 transition shadow-sm">English</button>
+                        <button type="button" onclick="changeLanguage('ar')" class="px-3 py-1.5 text-sm font-bold rounded-md bg-amber-100 text-amber-800 hover:bg-amber-200 border border-amber-300 transition shadow-sm font-arabic">العربية</button>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-24">
+                <div class="bg-white rounded-xl shadow-lg p-6">
                     <h2 class="text-xl font-bold mb-4 text-gray-800" data-i18n="enterDetails">Enter Assignment Details</h2>
                     
                     <!-- Style Selector -->
-                    <div class="mb-6 border-b-2 border-gray-100 pb-4">
+                    <div class="mb-5 border-b border-gray-100 pb-4">
                         <label for="styleSelector" class="block text-sm font-bold text-indigo-700 mb-1 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 10.243v3.999z" clip-rule="evenodd" />
@@ -269,65 +289,115 @@
                     </div>
 
                     <form id="cover-form" class="space-y-4">
-                        <!-- 1. Class Roll -->
+                        <!-- Direct Edit Hint -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800 flex items-start gap-2">
+                            <i class="fa-solid fa-pen-to-square text-blue-600 mt-0.5 text-sm"></i>
+                            <span><strong data-i18n="hintUniversal">Universal & Fully Editable:</strong> <span data-i18n="hintDesc">Fill in the fields below or click directly on any text in the preview to edit it!</span></span>
+                        </div>
+
+                        <!-- 1. Assignment Title -->
                         <div>
-                            <label for="classRoll" class="block text-sm font-semibold text-gray-700 mb-1 truncate"><span data-i18n="l_classRoll">1. Class Roll (New 4 digit)</span> <span class="text-red-500">*</span></label>
-                            <input type="text" id="classRoll" required pattern="\d{4}" maxlength="4" data-i18n-placeholder="p_classRoll"
+                            <label for="assignmentTitle" class="block text-sm font-semibold text-gray-700 mb-1 flex items-center justify-between">
+                                <span data-i18n="l_assignmentTitle">Assignment Title / Topic</span>
+                                <span class="text-xs text-blue-600 font-normal" data-i18n="editableBadge">Editable in preview</span>
+                            </label>
+                            <textarea id="assignmentTitle" rows="2" data-i18n-placeholder="p_assignmentTitle"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
-                                placeholder="e.g. 1045" title="Please enter exactly 4 digits">
+                                placeholder="Assignment on the Translation and Literary Analysis"></textarea>
                         </div>
 
-                        <!-- 2. Name -->
+                        <!-- 2. Submission Date -->
                         <div>
-                            <label for="studentName" class="block text-sm font-semibold text-gray-700 mb-1 truncate"><span data-i18n="l_name">2. Name</span> <span class="text-red-500">*</span></label>
-                            <input type="text" id="studentName" required data-i18n-placeholder="p_name"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
-                                placeholder="e.g. Md. Abdullah">
-                        </div>
-
-                        <!-- 3. Exam Roll -->
-                        <div>
-                            <label for="examRoll" class="block text-sm font-semibold text-gray-700 mb-1 truncate"><span data-i18n="l_examRoll">3. Exam Roll</span> <span class="text-red-500">*</span></label>
-                            <input type="text" id="examRoll" required data-i18n-placeholder="p_examRoll"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
-                                placeholder="e.g. 502134">
-                        </div>
-
-                        <!-- 4. Book Name -->
-                        <div>
-                            <label for="bookName" class="block text-sm font-semibold text-gray-700 mb-1 truncate"><span data-i18n="l_book">4. Book Name</span> <span class="text-red-500">*</span></label>
-                            <select id="bookName" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition font-arabic text-sm lg:text-lg" dir="auto">
-                                <option value="" disabled selected data-i18n="p_book">Select a book</option>
-                                <option value="قصة لكرامات الصحابة والصحابيات">1. قصة لكرامات الصحابة والصحابيات</option>
-                                <option value="انبياء.. و معجزات">2. انبياء.. و معجزات</option>
-                                <option value="مهمة الإسلام في العالم">3. مهمة الإسلام في العالم</option>
-                            </select>
-                        </div>
-
-                        <!-- 5. Page Numbers -->
-                        <div>
-                            <label for="pageNumbers" class="block text-sm font-semibold text-gray-700 mb-1 truncate"><span data-i18n="l_pages">5. Page numbers</span> <span class="text-red-500">*</span></label>
-                            <input type="text" id="pageNumbers" required data-i18n-placeholder="p_pages"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
-                                placeholder="e.g. 15-30">
-                        </div>
-
-                        <!-- 6. Date of submission -->
-                        <div>
-                            <label for="submissionDate" class="block text-sm font-semibold text-gray-700 mb-1 truncate"><span data-i18n="l_date">6. Date of submission</span></label>
+                            <label for="submissionDate" class="block text-sm font-semibold text-gray-700 mb-1">
+                                <span data-i18n="l_date">Date of Submission</span>
+                            </label>
                             <input type="text" id="submissionDate" value="20.05.2026" data-i18n-placeholder="p_date"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm">
                         </div>
 
-                        <!-- Action Button -->
-                        <div class="pt-4 mt-6 border-t">
+                        <!-- Section: Submitted By (Student) -->
+                        <div class="border-t border-gray-200 pt-3">
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2" data-i18n="subBy">Submitted by (Student)</p>
+                            
+                            <div class="space-y-3">
+                                <div>
+                                    <label for="studentName" class="block text-sm font-semibold text-gray-700 mb-1"><span data-i18n="l_name">Student Name</span></label>
+                                    <input type="text" id="studentName" data-i18n-placeholder="p_name"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
+                                        placeholder="Md. Abdullah">
+                                </div>
+
+                                <div>
+                                    <label for="studentRoll" class="block text-sm font-semibold text-gray-700 mb-1"><span data-i18n="l_roll">Roll</span></label>
+                                    <input type="text" id="studentRoll" data-i18n-placeholder="p_roll"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
+                                        placeholder="502134">
+                                </div>
+
+                                <div>
+                                    <label for="studentProgram" class="block text-sm font-semibold text-gray-700 mb-1"><span data-i18n="l_program">Program / Semester</span></label>
+                                    <input type="text" id="studentProgram" data-i18n-placeholder="p_program"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
+                                        placeholder="M.A. (Lit.) 1st Semester.">
+                                </div>
+
+                                <div>
+                                    <label for="studentSession" class="block text-sm font-semibold text-gray-700 mb-1"><span data-i18n="l_session">Session</span></label>
+                                    <input type="text" id="studentSession" data-i18n-placeholder="p_session"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
+                                        placeholder="2024-25">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section: Submitted To (Teacher) -->
+                        <div class="border-t border-gray-200 pt-3">
+                            <p class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2" data-i18n="subTo">Submitted to (Teacher)</p>
+                            
+                            <div class="space-y-3">
+                                <div>
+                                    <label for="teacherName" class="block text-sm font-semibold text-gray-700 mb-1"><span data-i18n="l_teacherName">Teacher Name</span></label>
+                                    <input type="text" id="teacherName" data-i18n-placeholder="p_teacherName"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
+                                        placeholder="Dr. Abu Jamal Md. Qutubul Islam Numani">
+                                </div>
+
+                                <div>
+                                    <label for="teacherTitle" class="block text-sm font-semibold text-gray-700 mb-1"><span data-i18n="l_teacherTitle">Designation / Title</span></label>
+                                    <input type="text" id="teacherTitle" data-i18n-placeholder="p_teacherTitle"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
+                                        placeholder="Professor,">
+                                </div>
+
+                                <div>
+                                    <label for="teacherDept" class="block text-sm font-semibold text-gray-700 mb-1"><span data-i18n="l_teacherDept">Department</span></label>
+                                    <input type="text" id="teacherDept" data-i18n-placeholder="p_teacherDept"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
+                                        placeholder="Department of Arabic,">
+                                </div>
+
+                                <div>
+                                    <label for="teacherUni" class="block text-sm font-semibold text-gray-700 mb-1"><span data-i18n="l_teacherUni">University / Institution</span></label>
+                                    <input type="text" id="teacherUni" data-i18n-placeholder="p_teacherUni"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm"
+                                        placeholder="University of Dhaka.">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="pt-4 mt-6 border-t border-gray-200 space-y-2">
                             <button type="button" onclick="downloadCoverPage()"
                                 class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-200 flex justify-center items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                   <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
                                 <span data-i18n="btnDownload">Download Cover Page</span>
+                            </button>
+                            <button type="button" onclick="window.print()"
+                                class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 px-4 rounded-lg border border-gray-300 transition duration-200 flex justify-center items-center gap-2 text-sm">
+                                <i class="fa-solid fa-print"></i>
+                                <span data-i18n="btnPrint">Print Cover Page</span>
                             </button>
                             <p class="text-xs text-center text-gray-500 mt-2" data-i18n="btnHelp">Downloads an A4 size PDF automatically.</p>
                         </div>
@@ -342,32 +412,23 @@
                 <div id="cover-page-preview" class="a4-paper bg-white p-[12mm]" dir="ltr" lang="en">
                     <!-- Outer & Inner Academic Style Border -->
                     <div class="theme-outer-border h-full w-full p-1 box-border">
-                        <div class="theme-inner-border h-full w-full flex flex-col relative px-10 py-12 box-border">
+                        <div class="theme-inner-border h-full w-full flex flex-col justify-between relative px-8 py-8 md:px-12 md:py-10 box-border">
                             
                             <!-- Header / Bismillah -->
                             <div class="text-center w-full shrink-0">
-                                <span class="font-arabic text-4xl leading-normal" data-i18n="bismillah" style="color: var(--text-color);">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span>
+                                <span class="font-arabic text-3xl md:text-4xl leading-normal inline-block outline-none" contenteditable="true" spellcheck="false" data-i18n="bismillah" id="preview-bismillah" style="color: var(--text-color);">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span>
                             </div>
 
-                            <!-- Title Area pushed further down using padding-top (pt-28) -->
-                            <div class="flex-grow w-full flex flex-col items-center justify-center pt-28">
-                                <div class="theme-title-border py-6 w-full text-center">
-                                    
-                                    <div class="text-2xl font-bold mb-3">
-                                        <span class="block text-2xl font-bold title-lang-adaptive" data-i18n="assignmentOn">Assignment on the Translation of</span>
-                                    </div>
-                                    
-                                    <div dir="rtl" class="w-full text-center mb-4 whitespace-nowrap">
-                                        <span id="preview-book" class="font-arabic text-3xl font-bold inline-block" style="color: var(--text-color); direction: rtl;"></span>
-                                    </div>
-                                    
-                                    <div class="text-lg font-semibold mt-2 whitespace-nowrap">
-                                        <span data-i18n="coverPages">Pages:</span> <span id="preview-pages" class="border-b border-dashed min-w-[50px] inline-block px-2 text-center bn-number" style="border-color: var(--text-color);"></span>
+                            <!-- Title Area (Optically Centered, Flexible) -->
+                            <div class="my-auto w-full flex flex-col items-center justify-center py-6">
+                                <div class="theme-title-border py-6 px-4 w-full text-center">
+                                    <div id="preview-assignment-title" class="text-2xl md:text-3xl font-bold leading-relaxed outline-none transition px-2 py-1 title-lang-adaptive" contenteditable="true" spellcheck="false" style="color: var(--text-color);">
+                                        Assignment on the Translation and Literary Analysis
                                     </div>
                                 </div>
 
-                                <!-- Small Decorative Design -->
-                                <div class="w-full flex justify-center mt-8 relative">
+                                <!-- Decorative Ornament Divider -->
+                                <div class="w-full flex justify-center mt-6 relative">
                                     <svg width="70" height="35" viewBox="0 0 100 50" fill="none" style="stroke: var(--primary-color); stroke-width: 2.5;">
                                         <path d="M20,25 Q40,25 50,10 Q60,25 80,25 Q60,25 50,40 Q40,25 20,25 Z" style="fill: var(--primary-color); opacity: 0.2; stroke: none;"/>
                                         <path d="M20,25 Q40,25 50,10 Q60,25 80,25 Q60,25 50,40 Q40,25 20,25 Z" fill="none" style="opacity: 0.8;"/>
@@ -377,43 +438,44 @@
                             </div>
 
                             <!-- Bottom Sections -->
-                            <div class="shrink-0 w-full mt-4">
+                            <div class="shrink-0 w-full mt-2 space-y-6">
                                 <!-- Submitted Details -->
-                                <div class="flex justify-between w-full text-[17px] leading-relaxed rtl-flip">
+                                <div class="flex justify-between w-full text-[16px] md:text-[17px] leading-relaxed rtl-flip gap-6">
                                     <!-- Submitted To -->
-                                    <div class="w-1/2 pr-4 text-left rtl-flip-pr" id="submitted-to-box">
-                                        <p class="mb-1 font-semibold" data-i18n="subTo">Submitted to:</p>
-                                        <p class="font-bold" data-i18n="profName">Dr. Abu Jamal Md. Qutubul Islam Numani</p>
-                                        <p data-i18n="profTitle">Professor,</p>
-                                        <p data-i18n="profDept">Department of Arabic,</p>
-                                        <p data-i18n="profUni">University of Dhaka.</p>
+                                    <div class="w-1/2 pr-3 text-left rtl-flip-pr" id="submitted-to-box">
+                                        <p class="mb-1 font-semibold outline-none" contenteditable="true" id="preview-subto-label" data-i18n="subTo">Submitted to:</p>
+                                        <p class="font-bold outline-none" contenteditable="true" id="preview-teacher-name">Dr. Abu Jamal Md. Qutubul Islam Numani</p>
+                                        <p class="outline-none" contenteditable="true" id="preview-teacher-title">Professor,</p>
+                                        <p class="outline-none" contenteditable="true" id="preview-teacher-dept">Department of Arabic,</p>
+                                        <p class="outline-none" contenteditable="true" id="preview-teacher-uni">University of Dhaka.</p>
                                     </div>
                                     
                                     <!-- Submitted By -->
-                                    <div class="w-1/2 pl-8 text-left rtl-flip-pl border-l border-transparent" id="submitted-by-box" style="border-left-color: rgba(0,0,0,0.1);">
-                                        <p class="mb-1 font-semibold" data-i18n="subBy">Submitted by:</p>
-                                        <p class="font-bold min-h-[28px]" id="preview-name"></p>
-                                        <p><span data-i18n="cRoll">Class Roll:</span> <span id="preview-class-roll" class="font-bold bn-number"></span></p>
-                                        <p><span data-i18n="eRoll">Exam Roll:</span> <span id="preview-exam-roll" class="font-bold bn-number"></span></p>
-                                        <p class="mt-1" data-i18n="semester">M.A. (Lit.) 1st Semester.</p>
-                                        <p><span data-i18n="session">Session:</span> <span class="bn-number" data-i18n="sessionVal">2024-25</span></p>
+                                    <div class="w-1/2 pl-6 text-left rtl-flip-pl border-l border-gray-200" id="submitted-by-box" style="border-left-color: rgba(0,0,0,0.15);">
+                                        <p class="mb-1 font-semibold outline-none" contenteditable="true" id="preview-subby-label" data-i18n="subBy">Submitted by:</p>
+                                        <p class="font-bold min-h-[26px] outline-none" contenteditable="true" id="preview-student-name">Md. Abdullah</p>
+                                        <p class="outline-none" contenteditable="true" id="preview-roll-row">
+                                            <span id="preview-roll-label" data-i18n="rollLabel">Roll:</span> <span id="preview-roll" class="font-bold bn-number">502134</span>
+                                        </p>
+                                        <p class="outline-none" contenteditable="true" id="preview-student-program">M.A. (Lit.) 1st Semester.</p>
+                                        <p class="outline-none" contenteditable="true" id="preview-session-row">
+                                            <span id="preview-session-label" data-i18n="session">Session:</span> <span id="preview-session" class="bn-number">2024-25</span>
+                                        </p>
                                     </div>
                                 </div>
 
                                 <!-- Bottom Section (Date) -->
-                                <div class="w-full text-center mt-12 mb-4">
-                                    <p class="text-lg font-semibold"><span data-i18n="dateSub">Date of Submission:</span> <span id="preview-date" class="bn-number"></span></p>
+                                <div class="w-full text-center">
+                                    <p class="text-[17px] font-semibold outline-none inline-block" contenteditable="true" id="preview-date-row">
+                                        <span id="preview-date-label" data-i18n="dateSub">Date of Submission:</span> <span id="preview-date" class="bn-number font-bold">20.05.2026</span>
+                                    </p>
                                 </div>
 
-                                <!-- Footer Image / Fallback -->
-                                <div class="mt-4 w-full flex flex-col items-center justify-center pt-2 min-h-[90px]">
-                                    <img id="footer-logo" src="footer.png" alt="Department Footer" class="max-h-[90px] object-contain" 
-                                        onerror="this.style.display='none'; document.getElementById('footer-fallback').style.display='flex';">
-                                    
-                                    <div id="footer-fallback" class="hidden flex-col items-center justify-center w-full border-t border-gray-400 pt-4 opacity-50">
-                                        <p class="text-sm font-bold uppercase tracking-widest" data-i18n="footerTxt">Department of Arabic, University of Dhaka</p>
-                                        <p class="text-xs italic mt-1">(Replace with footer.png)</p>
-                                    </div>
+                                <!-- Footer Institution Text -->
+                                <div class="w-full flex flex-col items-center justify-center pt-2 min-h-[40px]">
+                                    <p class="text-sm font-bold uppercase tracking-widest text-center opacity-75 outline-none px-2" contenteditable="true" id="preview-footer-text">
+                                        Department of Arabic, University of Dhaka
+                                    </p>
                                 </div>
                             </div>
 
@@ -449,129 +511,135 @@
         // --- 1. LANGUAGE AND TRANSLATION LOGIC ---
         const translations = {
             en: {
-                appTitle: "Cover Page Generator By",
-                headerSub: "Department of Arabic",
+                appTitle: "Cover Page Generator",
+                headerSub: "Universal Academic Tool",
                 langLabel: "Language:",
                 enterDetails: "Enter Assignment Details",
                 styleLabel: "Choose Cover Style",
-                l_classRoll: "1. Class Roll (New 4 digit)",
-                p_classRoll: "e.g. 1045",
-                l_name: "2. Name",
+                hintUniversal: "Universal & Fully Editable:",
+                hintDesc: "Fill in the fields below or click directly on any text in the preview to edit it!",
+                editableBadge: "Editable in preview",
+                l_assignmentTitle: "Assignment Title / Topic",
+                p_assignmentTitle: "e.g. Assignment on Modern Literature and Criticism",
+                l_date: "Date of Submission",
+                p_date: "dd.mm.yyyy",
+                subBy: "Submitted by (Student)",
+                l_name: "Student Name",
                 p_name: "e.g. Md. Abdullah",
-                l_examRoll: "3. Exam Roll",
-                p_examRoll: "e.g. 502134",
-                l_book: "4. Book Name",
-                p_book: "Select a book",
-                l_pages: "5. Page numbers",
-                p_pages: "e.g. 15-30",
-                l_date: "6. Date of submission",
-                p_date: "dd/mm/yyyy",
+                l_roll: "Roll",
+                p_roll: "e.g. 502134",
+                rollLabel: "Roll:",
+                l_program: "Program / Semester",
+                p_program: "e.g. M.A. (Lit.) 1st Semester.",
+                l_session: "Session",
+                p_session: "e.g. 2024-25",
+                session: "Session:",
+                subTo: "Submitted to (Teacher)",
+                l_teacherName: "Teacher Name",
+                p_teacherName: "e.g. Dr. Abu Jamal Md. Qutubul Islam Numani",
+                l_teacherTitle: "Designation / Title",
+                p_teacherTitle: "e.g. Professor,",
+                l_teacherDept: "Department",
+                p_teacherDept: "e.g. Department of Arabic,",
+                l_teacherUni: "University / Institution",
+                p_teacherUni: "e.g. University of Dhaka.",
                 btnDownload: "Download Cover Page",
+                btnPrint: "Print Cover Page",
                 btnHelp: "Downloads an A4 size PDF automatically.",
                 bismillah: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
-                assignmentOn: "Assignment on the Translation of",
-                coverPages: "Pages:",
-                subTo: "Submitted to:",
-                profName: "Dr. Abu Jamal Md. Qutubul Islam Numani",
-                profTitle: "Professor,",
-                profDept: "Department of Arabic,",
-                profUni: "University of Dhaka.",
-                subBy: "Submitted by:",
-                cRoll: "Class Roll:",
-                eRoll: "Exam Roll:",
                 dateSub: "Date of Submission:",
-                footerTxt: "Department of Arabic, University of Dhaka",
-                noticeTitle: "Notice",
-                semester: "M.A. (Lit.) 1st Semester.",
-                session: "Session:",
-                sessionVal: "2024-25"
+                noticeTitle: "Notice"
             },
             bn: {
-                appTitle: "কভার পেজ জেনারেটর - তৈরি করেছেন",
-                headerSub: "আরবী বিভাগ",
+                appTitle: "কভার পেজ জেনারেটর",
+                headerSub: "সার্বজনীন অ্যাকাডেমিক টুল",
                 langLabel: "ভাষা:",
                 enterDetails: "অ্যাসাইনমেন্টের তথ্য দিন",
                 styleLabel: "কভার স্টাইল নির্বাচন করুন",
-                l_classRoll: "১. ক্লাস রোল (নতুন ৪ ডিজিট)",
-                p_classRoll: "যেমন: ১০৪৫",
-                l_name: "২. নাম",
+                hintUniversal: "সার্বজনীন ও সরাসরি পরিবর্তনযোগ্য:",
+                hintDesc: "নিচের ফিল্ডগুলো পূরণ করুন অথবা প্রিভিউয়ের যে কোনো লেখায় ক্লিক করে সরাসরি এডিট করুন!",
+                editableBadge: "প্রিভিউতে এডিটেবল",
+                l_assignmentTitle: "অ্যাসাইনমেন্টের শিরোনাম / বিষয়",
+                p_assignmentTitle: "যেমন: আধুনিক সাহিত্যের ধারা ও প্রকৃতি",
+                l_date: "জমা দেওয়ার তারিখ",
+                p_date: "দিন.মাস.বছর",
+                subBy: "জমা প্রদানকারী (শিক্ষার্থী)",
+                l_name: "শিক্ষার্থীর নাম",
                 p_name: "যেমন: মোঃ আব্দুল্লাহ",
-                l_examRoll: "৩. পরীক্ষার রোল",
-                p_examRoll: "যেমন: ৫০২১৩৪",
-                l_book: "৪. বইয়ের নাম",
-                p_book: "একটি বই নির্বাচন করুন",
-                l_pages: "৫. পৃষ্ঠা নম্বর",
-                p_pages: "যেমন: ১৫-৩০",
-                l_date: "৬. জমা দেওয়ার তারিখ",
-                p_date: "দিন/মাস/বছর",
-                btnDownload: "কভার পেজ ডাউনলোড করুন",
-                btnHelp: "এটি স্বয়ংক্রিয়ভাবে A4 সাইজের PDF ডাউনলোড করবে।",
-                bismillah: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
-                assignmentOn: "অনুবাদ অ্যাসাইনমেন্ট:",
-                coverPages: "পৃষ্ঠা:",
-                subTo: "জমা গ্রহণকারী:",
-                profName: "ড. আবু জামাল মো. কুতুবুল ইসলাম নোমানী",
-                profTitle: "অধ্যাপক,",
-                profDept: "আরবী বিভাগ,",
-                profUni: "ঢাকা বিশ্ববিদ্যালয়।",
-                subBy: "জমা প্রদানকারী:",
-                cRoll: "ক্লাস রোল:",
-                eRoll: "পরীক্ষার রোল:",
-                dateSub: "জমা দেওয়ার তারিখ:",
-                footerTxt: "আরবী বিভাগ, ঢাকা বিশ্ববিদ্যালয়",
-                noticeTitle: "নোটিশ",
-                semester: "এম.এ. (লিট.) ১ম সেমিস্টার।",
+                l_roll: "রোল",
+                p_roll: "যেমন: ৫০২১৩৪",
+                rollLabel: "রোল:",
+                l_program: "প্রোগ্রাম / সেমিস্টার",
+                p_program: "যেমন: এম.এ. (লিট.) ১ম সেমিস্টার।",
+                l_session: "সেশন",
+                p_session: "যেমন: ২০২৪-২৫",
                 session: "সেশন:",
-                sessionVal: "২০২৪-২৫"
+                subTo: "জমা গ্রহণকারী (শিক্ষক)",
+                l_teacherName: "শিক্ষকের নাম",
+                p_teacherName: "যেমন: ড. আবু জামাল মো. কুতুবুল ইসলাম নোমানী",
+                l_teacherTitle: "পদবী",
+                p_teacherTitle: "যেমন: অধ্যাপক,",
+                l_teacherDept: "বিভাগ",
+                p_teacherDept: "যেমন: আরবী বিভাগ,",
+                l_teacherUni: "বিশ্ববিদ্যালয় / প্রতিষ্ঠান",
+                p_teacherUni: "যেমন: ঢাকা বিশ্ববিদ্যালয়।",
+                btnDownload: "কভার পেজ ডাউনলোড করুন",
+                btnPrint: "কভার পেজ প্রিন্ট করুন",
+                btnHelp: "স্বয়ংক্রিয়ভাবে A4 সাইজের PDF ডাউনলোড হবে।",
+                bismillah: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+                dateSub: "জমা দেওয়ার তারিখ:",
+                noticeTitle: "নোটিশ"
             },
             ar: {
-                appTitle: "منشئ صفحة الغلاف بواسطة",
-                headerSub: "قسم اللغة العربية",
-                langLabel: "لغة:",
-                enterDetails: "أدخل تفاصيل التعيين",
+                appTitle: "منشئ صفحة الغلاف",
+                headerSub: "أداة أكاديمية شاملة",
+                langLabel: "اللغة:",
+                enterDetails: "أدخل تفاصيل البحث / التكليف",
                 styleLabel: "اختر نمط الغلاف",
-                l_classRoll: "١. رقم الفصل (٤ أرقام)",
-                p_classRoll: "مثال: ١٠٤٥",
-                l_name: "٢. الاسم",
+                hintUniversal: "شامل وقابل للتعديل المباشر:",
+                hintDesc: "املأ الحقول أدناه أو اضغط على أي نص في المعاينة لتعديله مباشرة!",
+                editableBadge: "قابل للتعديل في المعاينة",
+                l_assignmentTitle: "عنوان البحث / التكليف",
+                p_assignmentTitle: "مثال: دراسات نقدية في الأدب العربي المعاصر",
+                l_date: "تاريخ التقديم",
+                p_date: "يوم.شهر.سنة",
+                subBy: "مقدم من (الطالب)",
+                l_name: "اسم الطالب",
                 p_name: "مثال: محمد عبد الله",
-                l_examRoll: "٣. رقم الامتحان",
-                p_examRoll: "مثال: ٥٠٢١٣٤",
-                l_book: "٤. اسم الكتاب",
-                p_book: "اختر كتابا",
-                l_pages: "٥. أرقام الصفحات",
-                p_pages: "مثال: ١٥-٣٠",
-                l_date: "٦. تاريخ التقديم",
-                p_date: "يوم/شهر/سنة",
+                l_roll: "الرقم / رول",
+                p_roll: "مثال: ٥٠٢١٣٤",
+                rollLabel: "الرقم:",
+                l_program: "البرنامج / الفصل الدراسي",
+                p_program: "مثال: الماجستير (الأدب) الفصل الدراسي الأول.",
+                l_session: "العام الدراسي / الدورة",
+                p_session: "مثال: ٢٠٢٤-٢٥",
+                session: "العام الدراسي:",
+                subTo: "مقدم إلى (الأستاذ)",
+                l_teacherName: "اسم الأستاذ / المعلم",
+                p_teacherName: "مثال: الدكتور أبو جمال محمد قطب الإسلام النعماني",
+                l_teacherTitle: "الرتبة العلمية",
+                p_teacherTitle: "مثال: أستاذ،",
+                l_teacherDept: "القسم",
+                p_teacherDept: "مثال: قسم اللغة العربية،",
+                l_teacherUni: "الجامعة / الكلية",
+                p_teacherUni: "مثال: جامعة دكا.",
                 btnDownload: "تحميل صفحة الغلاف",
+                btnPrint: "طباعة صفحة الغلاف",
                 btnHelp: "يتم تحميل ملف PDF بحجم A4 تلقائيًا.",
                 bismillah: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
-                assignmentOn: "مهمة ترجمة عن كتاب",
-                coverPages: "الصفحات:",
-                subTo: "مقدم إلى:",
-                profName: "الدكتور أبو جمال محمد قطب الإسلام النعماني",
-                profTitle: "أستاذ،",
-                profDept: "قسم اللغة العربية،",
-                profUni: "جامعة دكا.",
-                subBy: "مقدم من:",
-                cRoll: "رقم الفصل:",
-                eRoll: "رقم الامتحان:",
                 dateSub: "تاريخ التقديم:",
-                footerTxt: "قسم اللغة العربية، جامعة دكا",
-                noticeTitle: "إشعار",
-                semester: "الماجستير (الأدب) الفصل الدراسي الأول.",
-                session: "الدورة:",
-                sessionVal: "٢٠٢٤-٢٥"
+                noticeTitle: "إشعار"
             }
         };
 
         function convertToBanglaNumber(str) {
             const banglaDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
-            return String(str).replace(/[0-9]/g, w => banglaDigits[w]);
+            return String(str || '').replace(/[0-9]/g, w => banglaDigits[w]);
         }
 
         function convertToArabicNumber(str) {
             const arabicDigits = {'0': '٠', '1': '١', '2': '٢', '3': '٣', '4': '٤', '5': '٥', '6': '٦', '7': '٧', '8': '٨', '9': '٩'};
-            return String(str).replace(/[0-9]/g, w => arabicDigits[w]);
+            return String(str || '').replace(/[0-9]/g, w => arabicDigits[w]);
         }
 
         function changeLanguage(lang) {
@@ -580,14 +648,14 @@
             
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[lang][key]) {
+                if (translations[lang] && translations[lang][key]) {
                     el.textContent = translations[lang][key];
                 }
             });
 
             document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
                 const key = el.getAttribute('data-i18n-placeholder');
-                if (translations[lang][key]) {
+                if (translations[lang] && translations[lang][key]) {
                     el.placeholder = translations[lang][key];
                 }
             });
@@ -670,235 +738,186 @@
             root.style.setProperty('--bg-color', style.bg);
         }
 
-        // --- 3. FORM AND PREVIEW LOGIC ---
+        // --- 3. UNIVERSAL FORM AND PREVIEW LOGIC ---
         const inputs = {
-            classRoll: document.getElementById('classRoll'),
-            name: document.getElementById('studentName'),
-            examRoll: document.getElementById('examRoll'),
-            bookName: document.getElementById('bookName'),
-            pageNumbers: document.getElementById('pageNumbers'),
-            submissionDate: document.getElementById('submissionDate')
+            assignmentTitle: document.getElementById('assignmentTitle'),
+            submissionDate: document.getElementById('submissionDate'),
+            studentName: document.getElementById('studentName'),
+            studentRoll: document.getElementById('studentRoll'),
+            studentProgram: document.getElementById('studentProgram'),
+            studentSession: document.getElementById('studentSession'),
+            teacherName: document.getElementById('teacherName'),
+            teacherTitle: document.getElementById('teacherTitle'),
+            teacherDept: document.getElementById('teacherDept'),
+            teacherUni: document.getElementById('teacherUni')
         };
 
         const previews = {
-            name: document.getElementById('preview-name'),
-            classRoll: document.getElementById('preview-class-roll'),
-            examRoll: document.getElementById('preview-exam-roll'),
-            bookName: document.getElementById('preview-book'),
-            pageNumbers: document.getElementById('preview-pages'),
-            submissionDate: document.getElementById('preview-date')
+            assignmentTitle: document.getElementById('preview-assignment-title'),
+            submissionDate: document.getElementById('preview-date'),
+            studentName: document.getElementById('preview-student-name'),
+            studentRoll: document.getElementById('preview-roll'),
+            studentProgram: document.getElementById('preview-student-program'),
+            studentSession: document.getElementById('preview-session'),
+            teacherName: document.getElementById('preview-teacher-name'),
+            teacherTitle: document.getElementById('preview-teacher-title'),
+            teacherDept: document.getElementById('preview-teacher-dept'),
+            teacherUni: document.getElementById('preview-teacher-uni'),
+            footerText: document.getElementById('preview-footer-text')
         };
-
-        // Student Database for Auto-fill functionality
-        const studentDatabase = {
-            "1064": { name: "Md. Misbah Uddin", book: "قصة لكرامات الصحابة والصحابيات", pages: "1-8" },
-            "1076": { name: "Md. Jahidul Islam", book: "قصة لكرامات الصحابة والصحابيات", pages: "9-16" },
-            "2720": { name: "Md. Misbahul Mukarrabin Tahmid", book: "قصة لكرامات الصحابة والصحابيات", pages: "17-24" },
-            "2722": { name: "Abdur Rahman", book: "قصة لكرامات الصحابة والصحابيات", pages: "25-32" },
-            "2723": { name: "Kazi Mohaiminul Islam", book: "قصة لكرامات الصحابة والصحابيات", pages: "33-40" },
-            "2730": { name: "Ammarah", book: "قصة لكرامات الصحابة والصحابيات", pages: "41-48" },
-            "2740": { name: "Imam Mahadi Hasan Mahadi", book: "قصة لكرامات الصحابة والصحابيات", pages: "49-56" },
-            "2748": { name: "Mohammad Rahmat Ullah", book: "قصة لكرامات الصحابة والصحابيات", pages: "57-64" },
-            "2749": { name: "Md. Fajlul Kadir", book: "قصة لكرامات الصحابة والصحابيات", pages: "65-72" },
-            "2754": { name: "Fatematuz Zahura", book: "قصة لكرامات الصحابة والصحابيات", pages: "73-80" },
-            "2762": { name: "Mohammad Nasrullah", book: "قصة لكرامات الصحابة والصحابيات", pages: "81-88" },
-            "2772": { name: "Tasfia Tasnim", book: "قصة لكرامات الصحابة والصحابيات", pages: "89-96" },
-            "2773": { name: "Miskatul Jannat Mim", book: "قصة لكرامات الصحابة والصحابيات", pages: "97-104" },
-            "2774": { name: "Farita Jannat Mim", book: "قصة لكرامات الصحابة والصحابيات", pages: "105-112" },
-            "2775": { name: "Md. Masum Billah", book: "قصة لكرامات الصحابة والصحابيات", pages: "113-120" },
-            "2776": { name: "Muhammad Imran Hossain", book: "قصة لكرامات الصحابة والصحابيات", pages: "121-128" },
-            "2780": { name: "Humyra Sadia", book: "قصة لكرامات الصحابة والصحابيات", pages: "129-136" },
-            "2781": { name: "Md. Rasel Mahmud", book: "قصة لكرامات الصحابة والصحابيات", pages: "137-144" },
-            "2782": { name: "Hadiul Ahmed", book: "قصة لكرامات الصحابة والصحابيات", pages: "145-152" },
-            "2783": { name: "Md. Shamim Hossain", book: "قصة لكرامات الصحابة والصحابيات", pages: "153-160" },
-            "2784": { name: "Junayed Hossain", book: "قصة لكرامات الصحابة والصحابيات", pages: "161-168" },
-            "2789": { name: "Md. Habib Ullah", book: "قصة لكرامات الصحابة والصحابيات", pages: "169-176" },
-            "2790": { name: "Jafor Ullah", book: "قصة لكرامات الصحابة والصحابيات", pages: "177-184" },
-            "2806": { name: "Md. Yasir Khan", book: "قصة لكرامات الصحابة والصحابيات", pages: "185-192" },
-            "2812": { name: "Mohammad Ullah", book: "قصة لكرامات الصحابة والصحابيات", pages: "193-200" },
-            "2814": { name: "Mohammad Mohsin", book: "قصة لكرامات الصحابة والصحابيات", pages: "201-208" },
-            "2830": { name: "Abu Ubaida", book: "قصة لكرامات الصحابة والصحابيات", pages: "209-212" },
-            "2832": { name: "Sawkat Jahan Rifat", book: "انبياء.. و معجزات", pages: "4-10" },
-            "2834": { name: "Asma Afroz Noshin", book: "انبياء.. و معجزات", pages: "11-17" },
-            "2842": { name: "Shaquiq Abdullah Isha", book: "انبياء.. و معجزات", pages: "18-24" },
-            "2843": { name: "Abdullah", book: "انبياء.. و معجزات", pages: "25-31" },
-            "2844": { name: "Abdullah Al-Mamun", book: "انبياء.. و معجزات", pages: "32-38" },
-            "2852": { name: "Md. Rezaur Rahman Fuad", book: "انبياء.. و معجزات", pages: "39-45" },
-            "2853": { name: "Md. Aminur Rahman", book: "انبياء.. و معجزات", pages: "46-52" },
-            "2854": { name: "Md. Tazkerul Islam", book: "انبياء.. و معجزات", pages: "53-59" },
-            "2855": { name: "Md. Fahim Shahriar", book: "انبياء.. و معجزات", pages: "60-66" },
-            "2856": { name: "Zahangir Alam", book: "انبياء.. و معجزات", pages: "67-73" },
-            "2857": { name: "Chamiya Binte Belal", book: "انبياء.. و معجزات", pages: "74-80" },
-            "2863": { name: "Md. Abdul Muktadir", book: "انبياء.. و معجزات", pages: "81-87" },
-            "2864": { name: "Md. Khalid Saifullah", book: "انبياء.. و معجزات", pages: "88-94" },
-            "2865": { name: "Md. Azizur Rahman Murad", book: "انبياء.. و معجزات", pages: "95-101" },
-            "2866": { name: "Saima Ali", book: "انبياء.. و معجزات", pages: "102-108" },
-            "2867": { name: "Umme Sadia Margoba", book: "انبياء.. و معجزات", pages: "109-115" },
-            "2869": { name: "Anisa Tabassum", book: "انبياء.. و معجزات", pages: "116-122" },
-            "2872": { name: "Arif Hasan", book: "انبياء.. و معجزات", pages: "123-129" },
-            "2873": { name: "Hafsa Khanam", book: "انبياء.. و معجزات", pages: "130-136" },
-            "2874": { name: "Masuma", book: "انبياء.. و معجزات", pages: "137-143" },
-            "2876": { name: "Masura Khatun", book: "انبياء.. و معجزات", pages: "144-150" },
-            "2877": { name: "Al Jubaere", book: "انبياء.. و معجزات", pages: "151-157" },
-            "2878": { name: "Md. Emam Mehedi", book: "انبياء.. و معجزات", pages: "158-164" },
-            "2881": { name: "Md. Baker Hossen", book: "انبياء.. و معجزات", pages: "165-171" },
-            "2883": { name: "Aklima Akter", book: "انبياء.. و معجزات", pages: "172-178" },
-            "2884": { name: "Md. Mehedy Hasan", book: "انبياء.. و معجزات", pages: "179-185" },
-            "2885": { name: "Abdullah Md. Minhaz", book: "انبياء.. و معجزات", pages: "186-192" },
-            "2887": { name: "Md. Mahamudul Hasan Mahdi", book: "انبياء.. و معجزات", pages: "193-199" },
-            "2888": { name: "Md. Mujahidul Islam", book: "انبياء.. و معجزات", pages: "200-206" },
-            "2889": { name: "Md. Parvej Hawlader", book: "انبياء.. و معجزات", pages: "207-213" },
-            "2890": { name: "Mohammad Ibrahim Khallil", book: "انبياء.. و معجزات", pages: "214-220" },
-            "2891": { name: "Md. Tarazul Islam Tusar", book: "انبياء.. و معجزات", pages: "221-227" },
-            "2893": { name: "Mofazzal Hosain", book: "انبياء.. و معجزات", pages: "228-234" },
-            "2894": { name: "Md. Shahin Alom", book: "انبياء.. و معجزات", pages: "235-241" },
-            "2895": { name: "Md. Abdul Kader", book: "انبياء.. و معجزات", pages: "242-248" },
-            "2896": { name: "Md. Imran Hossain", book: "انبياء.. و معجزات", pages: "249-255" },
-            "2897": { name: "Miraz", book: "انبياء.. و معجزات", pages: "256-262" },
-            "2898": { name: "Md. Masud Alam", book: "انبياء.. و معجزات", pages: "263-269" },
-            "2899": { name: "Md. Diluar Hossen", book: "انبياء.. و معجزات", pages: "270-276" },
-            "2900": { name: "Abdul Muhit Ekram", book: "انبياء.. و معجزات", pages: "277-283" },
-            "2901": { name: "Jubayer Ahmed", book: "انبياء.. و معجزات", pages: "284-290" },
-            "2902": { name: "Rayhana Akter", book: "مهمة الإسلام في العالم", pages: "121-122" },
-            "2903": { name: "Mahiya Binte Mamun", book: "مهمة الإسلام في العالم", pages: "123-129" },
-            "2909": { name: "Md. Riadul Islam", book: "مهمة الإسلام في العالم", pages: "130-136" },
-            "2911": { name: "Rakib Hossain", book: "مهمة الإسلام في العالم", pages: "137-143" },
-            "2917": { name: "Md. Jahidul Islam", book: "مهمة الإسلام في العالم", pages: "144-150" },
-            "2918": { name: "Md. Tawfiql Islam", book: "مهمة الإسلام في العالم", pages: "151-157" },
-            "2919": { name: "Md. Hasanuzzaman", book: "مهمة الإسلام في العالم", pages: "158-164" },
-            "2920": { name: "Mohammad Azizur Rahman Manik", book: "مهمة الإسلام في العالم", pages: "165-171" },
-            "2922": { name: "Mohammad Younus Shamim", book: "مهمة الإسلام في العالم", pages: "172-178" },
-            "2923": { name: "Ahmmod Ullah", book: "مهمة الإسلام في العالم", pages: "179-185" },
-            "2924": { name: "Abdullah", book: "مهمة الإسلام في العالم", pages: "186-192" },
-            "2925": { name: "Md. Rafiqul Hasan Shahed", book: "مهمة الإسلام في العالم", pages: "193-199" },
-            "2926": { name: "Md. Shahriar Rahman", book: "مهمة الإسلام في العالم", pages: "200-206" },
-            "2927": { name: "Mohammad Saidul Islam", book: "مهمة الإسلام في العالم", pages: "207-213" },
-            "2928": { name: "Md. Khalid Hasan", book: "مهمة الإسلام في العالم", pages: "214-220" },
-            "2929": { name: "Md. Shah Alam", book: "مهمة الإسلام في العالم", pages: "221-227" },
-            "2930": { name: "Md. Rayhan Shikdar", book: "مهمة الإسلام في العالم", pages: "228-234" },
-            "2934": { name: "Morium Akter", book: "مهمة الإسلام في العالم", pages: "235-241" },
-            "2935": { name: "Rubiea Akter", book: "مهمة الإسلام في العالم", pages: "242-248" },
-            "2936": { name: "Mahmuda Akter", book: "مهمة الإسلام في العالم", pages: "249-255" },
-            "2973": { name: "Ahmed Al Sabah", book: "مهمة الإسلام في العالم", pages: "256-262" },
-            "2986": { name: "Anju Mia", book: "مهمة الإسلام في العالم", pages: "263-269" },
-            "2999": { name: "Md. Abu Talab", book: "مهمة الإسلام في العالم", pages: "270-276" },
-            "3004": { name: "Mohammad Mojahidul Islam Irfan", book: "مهمة الإسلام في العالم", pages: "277-283" },
-            "3003": { name: "Md. Arafat Ali", book: "مهمة الإسلام في العالم", pages: "284-290" },
-            "3006": { name: "Md. Shakibul Islam", book: "مهمة الإسلام في العالم", pages: "291-297" }
-        };
-
-        // Handle auto-filling fields when roll number is inputted
-        let wasAutoFilled = false; // Track if fields were auto-filled by database
-
-        ['input', 'change'].forEach(evt => {
-            if(inputs.classRoll) {
-                inputs.classRoll.addEventListener(evt, (e) => {
-                    const roll = e.target.value.trim();
-                    const student = roll.length === 4 ? studentDatabase[roll] : null;
-                    
-                    if (student) {
-                        inputs.name.value = student.name;
-                        inputs.bookName.value = student.book;
-                        inputs.pageNumbers.value = student.pages;
-                        wasAutoFilled = true; // Mark as auto-filled
-                        updatePreview(); // immediately reflect on preview
-                    } else if (wasAutoFilled) {
-                        // Only clear fields if they were previously auto-filled, 
-                        // so we don't destroy manual input by mistake.
-                        inputs.name.value = "";
-                        inputs.bookName.value = "";
-                        inputs.pageNumbers.value = "";
-                        wasAutoFilled = false;
-                        updatePreview();
-                    }
-                });
-            }
-        });
 
         function showModal(message) {
-            document.getElementById('modal-message').textContent = message;
+            const msgEl = document.getElementById('modal-message');
+            if (msgEl) msgEl.textContent = message;
             const modal = document.getElementById('custom-modal');
-            modal.classList.remove('hidden');
+            if (modal) modal.classList.remove('hidden');
         }
 
         function closeModal() {
             const modal = document.getElementById('custom-modal');
-            modal.classList.add('hidden');
+            if (modal) modal.classList.add('hidden');
         }
+
+        let isUpdatingFromPreview = false;
 
         function updatePreview() {
-            // Determine active language safely
+            if (isUpdatingFromPreview) return;
+
             const coverPreview = document.getElementById('cover-page-preview');
-            if (!coverPreview) return; // safeguard against null error
+            if (!coverPreview) return;
             
             const lang = coverPreview.getAttribute('lang') || 'en';
-            
-            const defName = lang === 'bn' ? '[আপনার নাম]' : (lang === 'ar' ? '[اسمك]' : '[Your Name]');
-            // Removed default date, will be left empty if no user input
-            const defDate = "";
 
-            // Safely get input values
-            let pName = inputs.name ? inputs.name.value || defName : defName;
-            let pClassRoll = inputs.classRoll ? inputs.classRoll.value || '____' : '____';
-            let pExamRoll = inputs.examRoll ? inputs.examRoll.value || '______' : '______';
-            let pPageNums = inputs.pageNumbers ? inputs.pageNumbers.value || '________' : '________';
-            let pDate = inputs.submissionDate ? inputs.submissionDate.value || defDate : defDate;
+            const defaultTitle = lang === 'bn' 
+                ? 'অনুবাদ ও সাহিত্য বিশ্লেষণ সম্পর্কিত অ্যাসাইনমেন্ট' 
+                : (lang === 'ar' ? 'مهمة دراسية وتحليل أدبي' : 'Assignment on Modern Literature and Criticism');
 
-            // Convert numbers to Bengali digits if language is Bengali
+            let titleVal = inputs.assignmentTitle ? inputs.assignmentTitle.value : '';
+            let dateVal = inputs.submissionDate ? inputs.submissionDate.value : '20.05.2026';
+            let studentNameVal = inputs.studentName ? inputs.studentName.value : '';
+            let studentRollVal = inputs.studentRoll ? inputs.studentRoll.value : '';
+            let studentProgramVal = inputs.studentProgram ? inputs.studentProgram.value : '';
+            let studentSessionVal = inputs.studentSession ? inputs.studentSession.value : '';
+
+            let teacherNameVal = inputs.teacherName ? inputs.teacherName.value : '';
+            let teacherTitleVal = inputs.teacherTitle ? inputs.teacherTitle.value : '';
+            let teacherDeptVal = inputs.teacherDept ? inputs.teacherDept.value : '';
+            let teacherUniVal = inputs.teacherUni ? inputs.teacherUni.value : '';
+
+            // Digits conversion for numbers
+            let formattedRoll = studentRollVal;
+            let formattedSession = studentSessionVal;
+            let formattedDate = dateVal;
+
             if (lang === 'bn') {
-                pClassRoll = convertToBanglaNumber(pClassRoll);
-                pExamRoll = convertToBanglaNumber(pExamRoll);
-                pPageNums = convertToBanglaNumber(pPageNums);
-                pDate = convertToBanglaNumber(pDate);
-            } 
-            // Convert numbers to Arabic digits if language is Arabic
-            else if (lang === 'ar') {
-                pClassRoll = convertToArabicNumber(pClassRoll);
-                pExamRoll = convertToArabicNumber(pExamRoll);
-                pPageNums = convertToArabicNumber(pPageNums);
-                pDate = convertToArabicNumber(pDate);
+                formattedRoll = convertToBanglaNumber(formattedRoll);
+                formattedSession = convertToBanglaNumber(formattedSession);
+                formattedDate = convertToBanglaNumber(formattedDate);
+            } else if (lang === 'ar') {
+                formattedRoll = convertToArabicNumber(formattedRoll);
+                formattedSession = convertToArabicNumber(formattedSession);
+                formattedDate = convertToArabicNumber(formattedDate);
             }
 
-            if(previews.name) previews.name.textContent = pName;
-            if(previews.classRoll) previews.classRoll.textContent = pClassRoll;
-            if(previews.examRoll) previews.examRoll.textContent = pExamRoll;
-            
-            if(previews.bookName && inputs.bookName) {
-                previews.bookName.textContent = inputs.bookName.value || '';
-                if(!inputs.bookName.value) {
-                    previews.bookName.innerHTML = "&nbsp;";
-                }
+            if (previews.assignmentTitle) {
+                previews.assignmentTitle.textContent = titleVal || defaultTitle;
+            }
+            if (previews.submissionDate) {
+                previews.submissionDate.textContent = formattedDate || '20.05.2026';
+            }
+            if (previews.studentName && studentNameVal) {
+                previews.studentName.textContent = studentNameVal;
+            }
+            if (previews.studentRoll) {
+                previews.studentRoll.textContent = formattedRoll || '502134';
+            }
+            if (previews.studentProgram && studentProgramVal) {
+                previews.studentProgram.textContent = studentProgramVal;
+            }
+            if (previews.studentSession && studentSessionVal) {
+                previews.studentSession.textContent = formattedSession || '2024-25';
             }
 
-            if(previews.pageNumbers) previews.pageNumbers.textContent = pPageNums;
-            if(previews.submissionDate) previews.submissionDate.textContent = pDate;
+            if (previews.teacherName && teacherNameVal) {
+                previews.teacherName.textContent = teacherNameVal;
+            }
+            if (previews.teacherTitle && teacherTitleVal) {
+                previews.teacherTitle.textContent = teacherTitleVal;
+            }
+            if (previews.teacherDept && teacherDeptVal) {
+                previews.teacherDept.textContent = teacherDeptVal;
+            }
+            if (previews.teacherUni && teacherUniVal) {
+                previews.teacherUni.textContent = teacherUniVal;
+            }
+
+            // Sync footer if custom dept/uni entered
+            if (previews.footerText && (teacherDeptVal || teacherUniVal)) {
+                const parts = [];
+                if (teacherDeptVal) parts.push(teacherDeptVal.replace(/[,.]/g, '').trim());
+                if (teacherUniVal) parts.push(teacherUniVal.replace(/[,.]/g, '').trim());
+                previews.footerText.textContent = parts.join(', ');
+            }
         }
 
-        // Safely attach event listeners
+        // Attach input listeners to all form controls
         Object.values(inputs).forEach(input => {
-            if(input) {
+            if (input) {
                 input.addEventListener('input', updatePreview);
                 input.addEventListener('change', updatePreview);
             }
         });
 
+        // Enable Bidirectional Editing: editing preview directly syncs back to form inputs
+        const previewContainer = document.getElementById('cover-page-preview');
+        if (previewContainer) {
+            previewContainer.addEventListener('input', (e) => {
+                const target = e.target;
+                isUpdatingFromPreview = true;
+
+                if (target === previews.assignmentTitle && inputs.assignmentTitle) {
+                    inputs.assignmentTitle.value = target.textContent.trim();
+                } else if (target === previews.studentName && inputs.studentName) {
+                    inputs.studentName.value = target.textContent.trim();
+                } else if (target === previews.studentRoll && inputs.studentRoll) {
+                    inputs.studentRoll.value = target.textContent.trim();
+                } else if (target === previews.studentProgram && inputs.studentProgram) {
+                    inputs.studentProgram.value = target.textContent.trim();
+                } else if (target === previews.studentSession && inputs.studentSession) {
+                    inputs.studentSession.value = target.textContent.trim();
+                } else if (target === previews.teacherName && inputs.teacherName) {
+                    inputs.teacherName.value = target.textContent.trim();
+                } else if (target === previews.teacherTitle && inputs.teacherTitle) {
+                    inputs.teacherTitle.value = target.textContent.trim();
+                } else if (target === previews.teacherDept && inputs.teacherDept) {
+                    inputs.teacherDept.value = target.textContent.trim();
+                } else if (target === previews.teacherUni && inputs.teacherUni) {
+                    inputs.teacherUni.value = target.textContent.trim();
+                } else if (target === previews.submissionDate && inputs.submissionDate) {
+                    inputs.submissionDate.value = target.textContent.trim();
+                }
+
+                setTimeout(() => {
+                    isUpdatingFromPreview = false;
+                }, 50);
+            });
+        }
+
         // Initialize defaults
         updatePreview();
         applyStyle(0);
 
-        // --- 4. PDF DOWNLOAD LOGIC ---
+        // --- 4. HIGH-RESOLUTION PDF DOWNLOAD LOGIC ---
         function downloadCoverPage() {
-            const form = document.getElementById('cover-form');
-            
-            if (form && !form.checkValidity()) {
-                form.reportValidity();
-                return;
+            // Blur any focused editable element so no focus outline or cursor is captured
+            if (document.activeElement && document.activeElement.blur) {
+                document.activeElement.blur();
             }
 
             const element = document.getElementById('cover-page-preview');
-            const downloadBtn = document.querySelector('button[type="button"]');
+            const downloadBtn = document.querySelector('button[onclick="downloadCoverPage()"]');
             
-            if(!element || !downloadBtn) return;
+            if (!element || !downloadBtn) return;
             
             const originalBtnHtml = downloadBtn.innerHTML;
             
@@ -911,27 +930,25 @@
             `;
             downloadBtn.disabled = true;
 
-            const rollValue = inputs.classRoll ? inputs.classRoll.value : 'Roll';
-            const nameValue = inputs.name ? inputs.name.value.replace(/\s+/g, '_') : 'Name';
+            const rollValue = (inputs.studentRoll && inputs.studentRoll.value.trim()) || 'Roll';
+            const nameValue = (inputs.studentName && inputs.studentName.value.trim().replace(/\s+/g, '_')) || 'Student';
             const filename = `Cover_Page_${rollValue}_${nameValue}.pdf`;
 
-            // Temporarily remove styling that might interfere with rendering
+            // Temporarily disable box-shadow and transform
             const originalShadow = element.style.boxShadow;
             const originalTransform = element.style.transform;
             element.style.boxShadow = 'none';
             element.style.transform = 'none';
 
-            // Use html-to-image to generate a high quality PNG natively from the DOM
+            // Generate clean PNG via html-to-image
             htmlToImage.toPng(element, { 
                 pixelRatio: 2, 
                 backgroundColor: '#ffffff'
             })
             .then(function (dataUrl) {
-                // Restore styling
                 element.style.boxShadow = originalShadow;
                 element.style.transform = originalTransform;
                 
-                // Use jsPDF to place the image into an A4 document
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -945,13 +962,12 @@
             })
             .catch(function (error) {
                 console.error("PDF Error: ", error);
-                // Restore styling
                 element.style.boxShadow = originalShadow;
                 element.style.transform = originalTransform;
                 
                 downloadBtn.innerHTML = originalBtnHtml;
                 downloadBtn.disabled = false;
-                showModal("Something went wrong with PDF generation. Please try again.");
+                showModal("Could not generate PDF. Please try again or use the Print button to save as PDF.");
             });
         }
     </script>
