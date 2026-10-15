@@ -70,11 +70,19 @@
 			let quizSettings = {
 				timePerQuestion: 30, // seconds
 				negativeMark: 0.25,
-				showAnswersInstantly: true // <-- NEW
+				showAnswersInstantly: true,
+				shuffleQuestions: true
 			};
 			// Load from LocalStorage if exists
 			if(localStorage.getItem('cc_quiz_settings')) {
-				quizSettings = JSON.parse(localStorage.getItem('cc_quiz_settings'));
+				try {
+					quizSettings = { ...quizSettings, ...JSON.parse(localStorage.getItem('cc_quiz_settings')) };
+					if (quizSettings.shuffleQuestions === undefined) {
+						quizSettings.shuffleQuestions = true;
+					}
+				} catch (e) {
+					console.warn("Could not parse saved quiz settings:", e);
+				}
 			}
 
 
@@ -174,7 +182,15 @@
                 }
 
                 // 2. Set them as the new quiz questions
-                currentQuizQuestions = weakQuestions;
+                currentSerialQuestions = weakQuestions.map(q => ({
+                    ...q,
+                    userAnswer: null,
+                    isCorrect: null,
+                    options: getProcessedOptions(q.options)
+                }));
+                currentQuizQuestions = (quizSettings.shuffleQuestions !== false)
+                    ? shuffleArray(currentSerialQuestions.map(q => ({ ...q })))
+                    : currentSerialQuestions.map(q => ({ ...q }));
                 
                 // 3. Set the flag
                 isWeaknessTest = true;
@@ -196,33 +212,89 @@
     const quizSettingsForm = document.getElementById('quiz-settings-form');
     const quizSettingsDisplay = document.getElementById('quiz-settings-display');
     const settingTimeInput = document.getElementById('setting-time-input');
-    const settingNegInput = document.getElementById('setting-neg-input');
-    const settingShowAnswers = document.getElementById('setting-show-answers');
+    const settingNegInput = document.getElementById('setting-neg-input');
+    const settingShowAnswers = document.getElementById('setting-show-answers');
+    const settingShuffleQuestions = document.getElementById('setting-shuffle-questions');
+    const displayToggleShuffle = document.getElementById('display-toggle-shuffle');
+    const displayShuffleBadge = document.getElementById('display-shuffle-mode-badge');
 
-    if (quizEditBtn) {
-        // Init Inputs with current values
-        settingTimeInput.value = quizSettings.timePerQuestion;
-        settingNegInput.value = quizSettings.negativeMark;
-        if(settingShowAnswers) settingShowAnswers.checked = quizSettings.showAnswersInstantly;
+    function updateShuffleQuestionsUI(isShuffled) {
+        if (settingShuffleQuestions) settingShuffleQuestions.checked = isShuffled;
+        if (displayToggleShuffle) displayToggleShuffle.checked = isShuffled;
+        if (displayShuffleBadge) {
+            if (isShuffled) {
+                displayShuffleBadge.textContent = 'ON';
+                displayShuffleBadge.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700';
+            } else {
+                displayShuffleBadge.textContent = 'OFF (Serial)';
+                displayShuffleBadge.className = 'text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800';
+            }
+        }
+    }
 
-        quizEditBtn.addEventListener('click', () => {
-            const isHidden = quizSettingsForm.classList.contains('hidden');
-            if (isHidden) {
-                quizSettingsForm.classList.remove('hidden');
-                quizSettingsDisplay.classList.add('opacity-50'); // Dim display
-            } else {
-                quizSettingsForm.classList.add('hidden');
-                quizSettingsDisplay.classList.remove('opacity-50');
-            }
-        });
+    function setShuffleQuestionsState(enabled) {
+        quizSettings.shuffleQuestions = enabled;
+        try {
+            localStorage.setItem('cc_quiz_settings', JSON.stringify(quizSettings));
+        } catch (e) {
+            console.warn('Could not save quiz settings:', e);
+        }
+        updateShuffleQuestionsUI(enabled);
 
-        quizSaveBtn.addEventListener('click', () => {
-            const newTime = parseInt(settingTimeInput.value) || 30;
-            const newNeg = parseFloat(settingNegInput.value) || 0;
+        // If questions are loaded, reorder them live so Start Quiz uses the selected mode
+        if (currentSerialQuestions && currentSerialQuestions.length > 0 && !isWeaknessTest) {
+            const freshList = currentSerialQuestions.map(q => ({
+                ...q,
+                options: getProcessedOptions(q.options),
+                userAnswer: null,
+                isCorrect: null
+            }));
+            currentQuizQuestions = enabled ? shuffleArray(freshList) : freshList;
+        }
+    }
 
-            quizSettings.timePerQuestion = newTime;
-            quizSettings.negativeMark = newNeg;
-            if(settingShowAnswers) quizSettings.showAnswersInstantly = settingShowAnswers.checked;
+    if (displayToggleShuffle) {
+        displayToggleShuffle.addEventListener('change', (e) => {
+            setShuffleQuestionsState(e.target.checked);
+        });
+    }
+
+    if (settingShuffleQuestions) {
+        settingShuffleQuestions.addEventListener('change', (e) => {
+            setShuffleQuestionsState(e.target.checked);
+        });
+    }
+
+    if (quizEditBtn) {
+        // Init Inputs with current values
+        settingTimeInput.value = quizSettings.timePerQuestion;
+        settingNegInput.value = quizSettings.negativeMark;
+        if(settingShowAnswers) settingShowAnswers.checked = quizSettings.showAnswersInstantly;
+        updateShuffleQuestionsUI(quizSettings.shuffleQuestions !== false);
+
+        quizEditBtn.addEventListener('click', () => {
+            const isHidden = quizSettingsForm.classList.contains('hidden');
+            if (isHidden) {
+                quizSettingsForm.classList.remove('hidden');
+                quizSettingsDisplay.classList.add('opacity-50'); // Dim display
+                if (settingShuffleQuestions) {
+                    settingShuffleQuestions.checked = quizSettings.shuffleQuestions !== false;
+                }
+            } else {
+                quizSettingsForm.classList.add('hidden');
+                quizSettingsDisplay.classList.remove('opacity-50');
+            }
+        });
+
+        quizSaveBtn.addEventListener('click', () => {
+            const newTime = parseInt(settingTimeInput.value) || 30;
+            const newNeg = parseFloat(settingNegInput.value) || 0;
+            const newShuffle = settingShuffleQuestions ? settingShuffleQuestions.checked : true;
+
+            quizSettings.timePerQuestion = newTime;
+            quizSettings.negativeMark = newNeg;
+            if(settingShowAnswers) quizSettings.showAnswersInstantly = settingShowAnswers.checked;
+            setShuffleQuestionsState(newShuffle);
 
             // Save to Storage
             localStorage.setItem('cc_quiz_settings', JSON.stringify(quizSettings));
@@ -242,6 +314,9 @@
         const displayTimeQ = document.getElementById('display-time-per-q');
         const displayTotal = document.getElementById('display-total-time');
         
+        // Ensure shuffle UI is in sync
+        updateShuffleQuestionsUI(quizSettings.shuffleQuestions !== false);
+
         // Calculate total time based on currently loaded (or pending) questions
         const qCount = (typeof window._pendingQuizQuestionCount === 'number')
             ? window._pendingQuizQuestionCount
@@ -289,6 +364,7 @@
         let currentMcqData = []; // NEW variable for MCQ quizzes
 		let currentOptionPool = null;
         let currentQuizQuestions = [];
+        let currentSerialQuestions = []; // Stores questions in pristine serial (sequential) order
         let currentQuizQuestionIndex = 0;
         let currentQuizScore = 0;
 		let quizTimerInterval = null;
@@ -5102,8 +5178,9 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
             }
 
+            currentSerialQuestions = questions.map(q => ({ ...q }));
             // --- 4. Final shuffle ---
-            return shuffleArray(questions);
+            return (quizSettings.shuffleQuestions !== false) ? shuffleArray(questions) : questions;
         }
 
         
@@ -5143,22 +5220,33 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             }
             // -----------------------------------------------------
 
-            // --- FIX: Reset & Shuffle Questions AND Options for Retry ---
-            if (currentQuizQuestions && currentQuizQuestions.length > 0) {
+            // --- Reset & Shuffle Questions AND Options for Start/Retry ---
+            if (currentSerialQuestions && currentSerialQuestions.length > 0 && !isWeaknessTest) {
+                const freshList = currentSerialQuestions.map(q => ({
+                    ...q,
+                    options: getProcessedOptions(q.options),
+                    userAnswer: null,
+                    isCorrect: null
+                }));
+                currentQuizQuestions = (quizSettings.shuffleQuestions !== false)
+                    ? shuffleArray(freshList)
+                    : freshList;
+            } else if (currentQuizQuestions && currentQuizQuestions.length > 0) {
                 currentQuizQuestions.forEach(q => {
                     // 1. Reset Answer State
                     q.userAnswer = null;
                     q.isCorrect = null;
                     
-                    // 2. RESHUFFLE OPTIONS (The missing piece!)
-                    // This ensures options change position every time you restart
+                    // 2. RESHUFFLE OPTIONS
                     if (q.options) {
                         q.options = getProcessedOptions(q.options);
                     }
                 });
 
-                // 3. Shuffle the order of questions
-                currentQuizQuestions = shuffleArray(currentQuizQuestions);
+                // 3. Shuffle only if shuffleQuestions is ON
+                if (quizSettings.shuffleQuestions !== false) {
+                    currentQuizQuestions = shuffleArray(currentQuizQuestions);
+                }
             }
             // ------------------------------------------------
 
@@ -6846,8 +6934,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 
                 currentMcqData = mcqData;
                 currentVocabData = null;
-                // ADDED shuffleArray HERE
-				currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({
+                const rawList = currentMcqData.map(mcq => ({
 					question: mcq.question,
 					options: getProcessedOptions(mcq.options),
 					correctAnswer: mcq.correctAnswer,
@@ -6855,7 +6942,11 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 					note: mcq.note || null,
 					userAnswer: null,
 					isCorrect: null
-				})));
+				}));
+                currentSerialQuestions = rawList;
+				currentQuizQuestions = (quizSettings.shuffleQuestions !== false)
+                    ? shuffleArray(rawList.map(q => ({ ...q })))
+                    : rawList.map(q => ({ ...q }));
                 
                 const totalQuestions = currentQuizQuestions.length;
                 const totalTimeInSeconds = totalQuestions * quizSettings.timePerQuestion;
@@ -7094,8 +7185,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 
                 currentMcqData = aggregatedMcqs; 
                 currentVocabData = null;
-                // ADDED shuffleArray HERE
-				currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
+                const rawList = currentMcqData.map(mcq => ({ 
 					question: mcq.question,
 					options: getProcessedOptions(mcq.options),
 					correctAnswer: mcq.correctAnswer,
@@ -7103,7 +7193,11 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 					note: mcq.note || null,
 					userAnswer: null,
 					isCorrect: null
-				})));
+				}));
+                currentSerialQuestions = rawList;
+				currentQuizQuestions = (quizSettings.shuffleQuestions !== false)
+                    ? shuffleArray(rawList.map(q => ({ ...q })))
+                    : rawList.map(q => ({ ...q }));
                 
                 const totalQuestions = currentQuizQuestions.length;
                 const totalTimeInSeconds = totalQuestions * quizSettings.timePerQuestion;
@@ -9538,9 +9632,7 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
     // 5. Prepare Questions
     currentMcqData = mcqData;
     currentVocabData = null;
-    
-    // ADDED shuffleArray HERE
-	currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
+    const rawList = currentMcqData.map(mcq => ({ 
 		question: mcq.question,
 		options: getProcessedOptions(mcq.options),
 		correctAnswer: mcq.correctAnswer,
@@ -9548,7 +9640,11 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
 		note: mcq.note || null,
 		userAnswer: null,
 		isCorrect: null
-	})));
+	}));
+    currentSerialQuestions = rawList;
+	currentQuizQuestions = (quizSettings.shuffleQuestions !== false)
+        ? shuffleArray(rawList.map(q => ({ ...q })))
+        : rawList.map(q => ({ ...q }));
 
     // 6. Calculate Time
     const totalQuestions = currentQuizQuestions.length;
@@ -9739,8 +9835,7 @@ if (viewMcqTestBtn) {
 
             currentMcqData = mcqData;
             currentVocabData = null;
-            // ADDED shuffleArray HERE
-            currentQuizQuestions = shuffleArray(currentMcqData.map(mcq => ({ 
+            const rawList = currentMcqData.map(mcq => ({ 
                 question: mcq.question, 
                 options: getProcessedOptions(mcq.options), 
                 correctAnswer: mcq.correctAnswer, 
@@ -9748,7 +9843,11 @@ if (viewMcqTestBtn) {
                 note: mcq.note || null, 
                 userAnswer: null, 
                 isCorrect: null 
-            })));
+            }));
+            currentSerialQuestions = rawList;
+            currentQuizQuestions = (quizSettings.shuffleQuestions !== false)
+                ? shuffleArray(rawList.map(q => ({ ...q })))
+                : rawList.map(q => ({ ...q }));
 
             const totalTime = currentQuizQuestions.length * quizSettings.timePerQuestion;
             const warningP = document.getElementById('quiz-total-time-warning');

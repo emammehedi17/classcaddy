@@ -286,6 +286,59 @@ html.dark #google-login-btn:hover {
    4. Main Page Component Styles (Index, Academic, Course)
    ========================================================================== */
 
+/* Quiz Toggle Switch */
+.quiz-toggle-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+.quiz-toggle-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+.quiz-toggle-track {
+    width: 38px;
+    height: 22px;
+    background-color: #cbd5e1;
+    border-radius: 9999px;
+    position: relative;
+    transition: background-color 0.2s ease-in-out;
+}
+.quiz-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background-color: #ffffff;
+    border-radius: 9999px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease-in-out;
+}
+.quiz-toggle-input:checked + .quiz-toggle-track {
+    background-color: #4f46e5;
+}
+.quiz-toggle-input:checked + .quiz-toggle-track .quiz-toggle-thumb {
+    transform: translateX(16px);
+}
+body.dark-mode .quiz-toggle-track,
+html.dark .quiz-toggle-track {
+    background-color: #475569;
+}
+body.dark-mode .quiz-toggle-input:checked + .quiz-toggle-track,
+html.dark .quiz-toggle-input:checked + .quiz-toggle-track {
+    background-color: #6366f1;
+}
+
 /* Glow effect for login/signup forms and announcement cards */
 .login-glow-card {
     position: relative;

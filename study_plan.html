@@ -521,6 +521,21 @@
                         Time per Question: <span id="display-time-per-q" class="font-bold">60s</span> 
                         (Total: <span id="display-total-time" class="font-bold">00:00</span>)
                     </p>
+                    
+                    <!-- Direct Shuffle Toggle on Start Screen -->
+                    <div class="mt-3 pt-2.5 border-t border-indigo-200/70 flex items-center justify-between">
+                        <label class="flex items-center gap-2 text-xs font-bold text-indigo-900 cursor-pointer" for="display-toggle-shuffle">
+                            <i class="fas fa-random text-indigo-600 text-xs"></i>
+                            <span>Shuffle Questions</span>
+                            <span id="display-shuffle-mode-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">ON</span>
+                        </label>
+                        <label class="quiz-toggle-wrapper" title="Toggle Shuffle Questions" for="display-toggle-shuffle">
+                            <input type="checkbox" id="display-toggle-shuffle" checked class="quiz-toggle-input">
+                            <div class="quiz-toggle-track">
+                                <div class="quiz-toggle-thumb"></div>
+                            </div>
+                        </label>
+                    </div>
                 </div>
 
                 <div id="quiz-settings-form" class="hidden mt-2 pt-3 border-t border-indigo-200">
@@ -533,6 +548,20 @@
                             <label class="block text-xs font-bold text-gray-600 mb-1">Negative Marking</label>
                             <input type="number" id="setting-neg-input" class="w-full p-1.5 border border-gray-300 rounded text-sm text-center" value="0.25" step="0.05" min="0">
                         </div>
+                    </div>
+
+                    <!-- Shuffle Questions Toggle inside Settings Form -->
+                    <div class="w-full mb-3 flex items-center justify-between border border-indigo-100 bg-white/70 p-2 rounded">
+                        <label class="block text-xs font-bold text-indigo-700 cursor-pointer flex items-center gap-1.5" for="setting-shuffle-questions">
+                            <i class="fas fa-random text-indigo-500 text-xs"></i>
+                            <span>Shuffle Questions</span>
+                        </label>
+                        <label class="quiz-toggle-wrapper" for="setting-shuffle-questions">
+                            <input type="checkbox" id="setting-shuffle-questions" checked class="quiz-toggle-input">
+                            <div class="quiz-toggle-track">
+                                <div class="quiz-toggle-thumb"></div>
+                            </div>
+                        </label>
                     </div>
                     
                     <div class="w-full mb-3 flex items-center justify-between border border-indigo-100 bg-indigo-50 p-2 rounded">
