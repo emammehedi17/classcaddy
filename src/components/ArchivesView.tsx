@@ -1464,9 +1464,7 @@ export const getCardShareableUrl = (
   root: ArchiveCardButton[]
 ): string => {
   const origin =
-    typeof window !== 'undefined' && window.location.hostname.includes('netlify.app')
-      ? 'https://classcaddy.netlify.app'
-      : typeof window !== 'undefined' && window.location.origin
+    typeof window !== 'undefined' && window.location.origin
       ? window.location.origin
       : 'https://classcaddy.netlify.app';
 
@@ -3616,7 +3614,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <Link className="w-4 h-4 text-emerald-500 shrink-0" />
                     <span className="font-mono text-[11px] truncate select-all">
-                      {`https://classcaddy.netlify.app/archives.html/${[
+                      {`${typeof window !== 'undefined' && window.location.origin ? window.location.origin : 'https://classcaddy.netlify.app'}/archives.html/${[
                         ...folderPath.map((id) => {
                           const f = findCardDeep(rootCards, id);
                           return f ? getCardSlug(f) : id;
@@ -3630,7 +3628,8 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                   <button
                     type="button"
                     onClick={() => {
-                      const urlToCopy = `https://classcaddy.netlify.app/archives.html/${[
+                      const activeHost = typeof window !== 'undefined' && window.location.origin ? window.location.origin : 'https://classcaddy.netlify.app';
+                      const urlToCopy = `${activeHost}/archives.html/${[
                         ...folderPath.map((id) => {
                           const f = findCardDeep(rootCards, id);
                           return f ? getCardSlug(f) : id;

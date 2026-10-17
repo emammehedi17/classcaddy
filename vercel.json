@@ -1,5 +1,57 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "framework": "vite"
+  "framework": "vite",
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/archives.html/:path*",
+      "destination": "/archives.html"
+    },
+    {
+      "source": "/Archives.html/:path*",
+      "destination": "/archives.html"
+    },
+    {
+      "source": "/archives/:path*",
+      "destination": "/archives.html"
+    },
+    {
+      "source": "/Archives/:path*",
+      "destination": "/archives.html"
+    },
+    {
+      "source": "/Archives.html",
+      "destination": "/archives.html"
+    },
+    {
+      "source": "/Archives",
+      "destination": "/archives.html"
+    },
+    {
+      "source": "/archives",
+      "destination": "/archives.html"
+    },
+    {
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact.html"
+    },
+    {
+      "source": "/study_plan",
+      "destination": "/study_plan.html"
+    },
+    {
+      "source": "/study-plan",
+      "destination": "/study_plan.html"
+    },
+    {
+      "source": "/academic",
+      "destination": "/academic.html"
+    }
+  ]
 }
