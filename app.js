@@ -2488,18 +2488,19 @@ function updateMonthUI(monthId, monthData, weeksData) {
             if (!dayData) return;
 
             let timerObj;
-            let totalToShow;
             if (modal.dataset.timerScope === 'row') {
                 timerObj = dayData.rows?.[parseInt(modal.dataset.rowIndex)]?.timer || getDefaultTimerObj();
-                totalToShow = getTimerLiveValues(timerObj).total;
             } else {
                 timerObj = dayData.dayTimer || getDefaultTimerObj();
-                // Day's overall total = sum of all row totals + day main timer total (matches header display)
-                totalToShow = getTimerLiveValues(timerObj).total;
-                (dayData.rows || []).forEach(row => {
-                    totalToShow += getTimerLiveValues(row.timer).total;
-                });
             }
+
+            // In full screen mode, total time always shows the Day total study time (sum of all subject rows + day main timer)
+            let totalToShow = getTimerLiveValues(dayData.dayTimer || getDefaultTimerObj()).total;
+            (dayData.rows || []).forEach(row => {
+                if (row && row.timer) {
+                    totalToShow += getTimerLiveValues(row.timer).total;
+                }
+            });
 
             const { session } = getTimerLiveValues(timerObj);
             document.getElementById('fullscreen-timer-session').textContent = formatTimerHMS(session);
@@ -2551,15 +2552,20 @@ function updateMonthUI(monthId, monthData, weeksData) {
             const dayData = getDaySectionTimerObjects(monthId, weekId, dayIndex);
             if (!dayData) return;
 
-            let timerObj, totalToShow;
+            let timerObj;
             if (fsModal.dataset.timerScope === 'row') {
                 timerObj = dayData.rows?.[parseInt(fsModal.dataset.rowIndex)]?.timer || getDefaultTimerObj();
-                totalToShow = getTimerLiveValues(timerObj).total;
             } else {
                 timerObj = dayData.dayTimer || getDefaultTimerObj();
-                totalToShow = getTimerLiveValues(timerObj).total;
-                (dayData.rows || []).forEach(row => { totalToShow += getTimerLiveValues(row.timer).total; });
             }
+
+            // Always show Day total study time
+            let totalToShow = getTimerLiveValues(dayData.dayTimer || getDefaultTimerObj()).total;
+            (dayData.rows || []).forEach(row => {
+                if (row && row.timer) {
+                    totalToShow += getTimerLiveValues(row.timer).total;
+                }
+            });
 
             const { session } = getTimerLiveValues(timerObj);
             if (sessionEl) sessionEl.textContent = formatTimerHMS(session);
