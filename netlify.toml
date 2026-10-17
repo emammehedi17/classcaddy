@@ -3,6 +3,26 @@
   publish = "dist"
 
 [[redirects]]
+  from = "/archives.html/*"
+  to = "/archives.html"
+  status = 200
+
+[[redirects]]
+  from = "/Archives.html/*"
+  to = "/archives.html"
+  status = 200
+
+[[redirects]]
+  from = "/archives/*"
+  to = "/archives.html"
+  status = 200
+
+[[redirects]]
+  from = "/Archives/*"
+  to = "/archives.html"
+  status = 200
+
+[[redirects]]
   from = "/Archives.html"
   to = "/archives.html"
   status = 200

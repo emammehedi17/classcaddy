@@ -10,6 +10,7 @@ import {
   Trash2,
   Edit3,
   Copy,
+  Share2,
   Scissors,
   Clipboard,
   Plus,
@@ -69,6 +70,7 @@ interface Windows11ExplorerProps {
   onSaveCurrentCards: (updated: ArchiveCardButton[]) => void;
   onOpenUpload: () => void;
   onCloseExplorer: () => void;
+  onCopyShareUrl?: (card: ArchiveCardButton) => void;
 }
 
 export const Windows11Explorer: React.FC<Windows11ExplorerProps> = ({
@@ -86,6 +88,7 @@ export const Windows11Explorer: React.FC<Windows11ExplorerProps> = ({
   onSaveCurrentCards,
   onOpenUpload,
   onCloseExplorer,
+  onCopyShareUrl,
 }) => {
   // View mode and sorting state
   const [layout, setLayout] = useState<ExplorerLayout>(() => {
@@ -644,6 +647,15 @@ export const Windows11Explorer: React.FC<Windows11ExplorerProps> = ({
                         >
                           <Info className="w-4 h-4" />
                         </button>
+                        {onCopyShareUrl && (
+                          <button
+                            onClick={() => onCopyShareUrl(selCard)}
+                            className={`p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 text-emerald-600 dark:text-emerald-400`}
+                            title="Copy Shareable Link"
+                          >
+                            <Share2 className="w-4 h-4" />
+                          </button>
+                        )}
                         <button
                           onClick={() => handleRequestDelete(selCard.id)}
                           className={`p-1.5 rounded-md hover:bg-red-100 dark:hover:bg-red-950/50 text-red-500`}

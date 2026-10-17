@@ -28,6 +28,7 @@ export interface ArchiveCardButton {
   colorTheme?: 'emerald' | 'blue' | 'indigo' | 'purple' | 'amber' | 'rose';
   badgeText?: string;
   createdAt?: number;
+  urlSlug?: string; // Custom file name or slug used in the shareable URL
 }
 
 export interface PoemLine {

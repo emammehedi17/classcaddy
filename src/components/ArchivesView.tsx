@@ -43,6 +43,9 @@ import {
   RefreshCw,
   LayoutGrid,
   Monitor,
+  Share2,
+  Link,
+  Copy,
 } from 'lucide-react';
 import { Windows11Explorer } from './Windows11Explorer';
 
@@ -1427,6 +1430,88 @@ const updateCardsAtPath = (
   });
 };
 
+// Helper: Convert title, filename, or slug to a clean URL-friendly slug
+export const sanitizeSlug = (text: string): string => {
+  if (!text) return '';
+  const cleaned = text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s.-]/g, '')
+    .replace(/[\s-]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  return cleaned;
+};
+
+// Helper: Get canonical or custom slug for any card
+export const getCardSlug = (card: ArchiveCardButton): string => {
+  if (card.urlSlug && card.urlSlug.trim()) {
+    const custom = sanitizeSlug(card.urlSlug.trim());
+    if (custom) return custom;
+  }
+  if (card.fileName && card.fileName.trim()) {
+    const file = sanitizeSlug(card.fileName.trim());
+    if (file) return file;
+  }
+  const title = sanitizeSlug(card.title);
+  if (title) return title;
+  return sanitizeSlug(card.id) || card.id;
+};
+
+// Helper: Get the full shareable URL for a card given its lineage
+export const getCardShareableUrl = (
+  card: ArchiveCardButton,
+  currentPath: string[],
+  root: ArchiveCardButton[]
+): string => {
+  const origin =
+    typeof window !== 'undefined' && window.location.hostname.includes('netlify.app')
+      ? 'https://classcaddy.netlify.app'
+      : typeof window !== 'undefined' && window.location.origin
+      ? window.location.origin
+      : 'https://classcaddy.netlify.app';
+
+  const segments: string[] = [];
+  let currentList = root;
+
+  for (const folderId of currentPath) {
+    const folder = currentList.find((c) => c.id === folderId);
+    if (folder) {
+      segments.push(getCardSlug(folder));
+      currentList = folder.children || [];
+    }
+  }
+
+  // If card is an item inside the current folder
+  if (!currentPath.includes(card.id)) {
+    segments.push(getCardSlug(card));
+  }
+
+  return `${origin}/archives.html/${segments.join('/')}`;
+};
+
+// Helper: Get folder shareable path for history and URL synchronization
+export const getFolderPathUrl = (
+  currentPath: string[],
+  root: ArchiveCardButton[]
+): string => {
+  if (currentPath.length === 0) {
+    return '/archives.html';
+  }
+
+  const segments: string[] = [];
+  let currentList = root;
+
+  for (const folderId of currentPath) {
+    const folder = currentList.find((c) => c.id === folderId);
+    if (folder) {
+      segments.push(getCardSlug(folder));
+      currentList = folder.children || [];
+    }
+  }
+
+  return `/archives.html/${segments.join('/')}`;
+};
+
 export const ArchivesView: React.FC<ArchivesViewProps> = ({
   theme = 'light',
   isExplorerMode: propExplorerMode,
@@ -1608,23 +1693,36 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
       if (e.state && Array.isArray(e.state.folderPath)) {
         setFolderPath(e.state.folderPath);
       } else {
-        setFolderPath([]);
+        // Resolve from current pathname if popstate state is empty
+        const match = window.location.pathname.match(/\/archives(?:\.html)?\/(.+)$/i);
+        if (match && match[1]) {
+          const rawSegments = match[1].split('/').filter(Boolean).map((s) => decodeURIComponent(s).trim());
+          let currentList = rootCardsRef.current;
+          const resolved: string[] = [];
+          for (const seg of rawSegments) {
+            const segSlug = sanitizeSlug(seg);
+            const found = currentList.find((c) => getCardSlug(c) === segSlug || c.id === seg);
+            if (found && found.targetType === 'folder') {
+              resolved.push(found.id);
+              currentList = found.children || [];
+            }
+          }
+          setFolderPath(resolved);
+        } else {
+          setFolderPath([]);
+        }
       }
     };
-
-    // Ensure initial history state has folderPath
-    if (!window.history.state || !('folderPath' in window.history.state)) {
-      window.history.replaceState({ folderPath: [] }, '');
-    }
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Helper to navigate to a subfolder while recording history
+  // Helper to navigate to a subfolder while recording history and updating URL path
   const navigateToFolder = (newPath: string[]) => {
     setFolderPath(newPath);
-    window.history.pushState({ folderPath: newPath }, '');
+    const newUrl = getFolderPathUrl(newPath, rootCardsRef.current);
+    window.history.pushState({ folderPath: newPath }, '', newUrl);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -1672,6 +1770,8 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
   const [isAddMode, setIsAddMode] = useState(false);
   const [formTitle, setFormTitle] = useState('');
   const [formSubtitle, setFormSubtitle] = useState('');
+  const [formUrlSlug, setFormUrlSlug] = useState('');
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false);
   const [formTargetType, setFormTargetType] = useState<'url' | 'html' | 'file' | 'folder'>('url');
   const [formLink, setFormLink] = useState('');
   const [formHtmlContent, setFormHtmlContent] = useState('');
@@ -1683,6 +1783,140 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
   const [formTheme, setFormTheme] = useState<ArchiveCardButton['colorTheme']>('emerald');
   const [formBadge, setFormBadge] = useState('');
   const [fileReadError, setFileReadError] = useState('');
+
+  // Share & Deep Link State
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedPreview, setCopiedPreview] = useState(false);
+  const [shareToast, setShareToast] = useState<{ message: string; url: string } | null>(null);
+  const [directLinkCard, setDirectLinkCard] = useState<ArchiveCardButton | null>(null);
+  const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null);
+  const hasResolvedInitialDeepLinkRef = useRef<boolean>(false);
+
+  // Deep Link Resolver on initial load
+  useEffect(() => {
+    if (hasResolvedInitialDeepLinkRef.current) return;
+    if (!rootCards || rootCards.length === 0) return;
+
+    const pathname = window.location.pathname;
+    const hash = window.location.hash;
+
+    let pathString = '';
+    const match = pathname.match(/\/archives(?:\.html)?\/(.+)$/i);
+    if (match && match[1]) {
+      pathString = match[1];
+    } else {
+      const hashMatch = hash.match(/archives(?:\.html)?\/(.+)$/i);
+      if (hashMatch && hashMatch[1]) {
+        pathString = hashMatch[1];
+      }
+    }
+
+    if (!pathString) return;
+
+    hasResolvedInitialDeepLinkRef.current = true;
+    const rawSegments = pathString.split('/').filter(Boolean).map((s) => decodeURIComponent(s).trim());
+    if (rawSegments.length === 0) return;
+
+    let currentList = rootCards;
+    const resolvedPath: string[] = [];
+    let matchedItem: ArchiveCardButton | null = null;
+
+    for (let i = 0; i < rawSegments.length; i++) {
+      const segSlug = sanitizeSlug(rawSegments[i]);
+      const isLast = i === rawSegments.length - 1;
+
+      const found = currentList.find((c) => {
+        const slug = getCardSlug(c);
+        const titleSlug = sanitizeSlug(c.title);
+        const fileSlug = c.fileName ? sanitizeSlug(c.fileName) : '';
+        const idSlug = sanitizeSlug(c.id);
+        return (
+          slug === segSlug ||
+          titleSlug === segSlug ||
+          fileSlug === segSlug ||
+          idSlug === segSlug ||
+          c.id === rawSegments[i]
+        );
+      });
+
+      if (found) {
+        if (found.targetType === 'folder') {
+          resolvedPath.push(found.id);
+          if (isLast) {
+            matchedItem = found;
+          } else {
+            currentList = found.children || [];
+          }
+        } else {
+          matchedItem = found;
+        }
+      }
+    }
+
+    if (resolvedPath.length > 0) {
+      setFolderPath(resolvedPath);
+      window.history.replaceState({ folderPath: resolvedPath }, '', window.location.href);
+    }
+
+    if (matchedItem) {
+      setHighlightedCardId(matchedItem.id);
+      if (matchedItem.targetType !== 'folder') {
+        setDirectLinkCard(matchedItem);
+
+        // If it's HTML, open cleanly in embedded modal viewer
+        const isHtml =
+          matchedItem.targetType === 'html' ||
+          matchedItem.fileType?.includes('html') ||
+          matchedItem.fileName?.endsWith('.html') ||
+          matchedItem.fileName?.endsWith('.htm') ||
+          Boolean(matchedItem.htmlContent);
+
+        if (isHtml) {
+          setViewingHtmlCard(matchedItem);
+        }
+      }
+
+      // Smooth scroll to target card
+      setTimeout(() => {
+        const el = document.getElementById(`archive-card-${matchedItem?.id}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 400);
+    }
+  }, [rootCards]);
+
+  const handleCopyCardUrl = async (card: ArchiveCardButton, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const url = getCardShareableUrl(card, folderPath, rootCards);
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      setCopiedId(card.id);
+      setShareToast({
+        message: `Shareable link copied for "${card.title}"!`,
+        url,
+      });
+      setTimeout(() => {
+        setCopiedId((prev) => (prev === card.id ? null : prev));
+      }, 2500);
+      setTimeout(() => {
+        setShareToast(null);
+      }, 4500);
+    } catch (err) {
+      console.error('Failed to copy URL:', err);
+    }
+  };
 
   // Save current view list to nested tree, local storage, and real-time Firestore cloud database
   const saveCurrentCards = async (newCurrentList: ArchiveCardButton[]) => {
@@ -1869,6 +2103,10 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
       setFormTitle(nameWithoutExt.toUpperCase());
     }
 
+    if (!isSlugManuallyEdited || !formUrlSlug) {
+      setFormUrlSlug(file.name);
+    }
+
     const isTextHtml = file.type.includes('html') || file.name.endsWith('.html') || file.name.endsWith('.htm');
 
     if (isTextHtml) {
@@ -1903,6 +2141,8 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
     setIsAddMode(false);
     setFormTitle(card.title);
     setFormSubtitle(card.subtitle);
+    setFormUrlSlug(card.urlSlug || getCardSlug(card));
+    setIsSlugManuallyEdited(true);
     const resolvedType =
       card.targetType ||
       (card.children && card.children.length >= 0 ? 'folder' : card.fileData || card.htmlContent ? 'file' : 'url');
@@ -1925,6 +2165,8 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
     setIsAddMode(true);
     setFormTitle('');
     setFormSubtitle('');
+    setFormUrlSlug('');
+    setIsSlugManuallyEdited(false);
     setFormTargetType('url');
     setFormLink('https://');
     setFormHtmlContent('');
@@ -1963,11 +2205,16 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
       finalLink = '';
     }
 
+    const finalSlug = formUrlSlug.trim()
+      ? sanitizeSlug(formUrlSlug.trim())
+      : sanitizeSlug(formFileName || formTitle || 'item');
+
     if (isAddMode) {
       const newCard: ArchiveCardButton = {
         id: `card-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
         title: formTitle.trim(),
         subtitle: formSubtitle.trim(),
+        urlSlug: finalSlug,
         targetType,
         link: finalLink,
         htmlContent: finalHtml,
@@ -1990,6 +2237,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
             ...c,
             title: formTitle.trim(),
             subtitle: formSubtitle.trim(),
+            urlSlug: finalSlug,
             targetType,
             link: finalLink,
             htmlContent: finalHtml,
@@ -2181,10 +2429,83 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
               }, 150);
             }}
             onCloseExplorer={handleToggleExplorerMode}
+            onCopyShareUrl={handleCopyCardUrl}
           />
         </div>
       ) : (
         <>
+          {/* Direct Share Link Banner */}
+          {directLinkCard && (
+            <div
+              className={`mb-6 p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 shadow-lg ${
+                isDark
+                  ? 'bg-gradient-to-r from-emerald-950/80 via-gray-900 to-teal-950/80 border-emerald-500/50 text-white'
+                  : 'bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-100 border-emerald-300 text-slate-900'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-emerald-600 text-white shadow shrink-0">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-500 dark:text-emerald-400 border border-emerald-500/30">
+                      Opened from Shared URL
+                    </span>
+                    <span className="text-xs text-gray-400 font-mono">
+                      {getCardSlug(directLinkCard)}
+                    </span>
+                  </div>
+                  <h4 className="text-base font-bold mt-0.5">
+                    {directLinkCard.title}
+                  </h4>
+                  <p className={`text-xs ${isDark ? 'text-gray-300' : 'text-slate-600'}`}>
+                    {directLinkCard.subtitle || 'Directly accessed file from shared link.'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => handleCardClick(directLinkCard)}
+                  className="px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition flex items-center gap-2"
+                >
+                  <Eye className="w-4 h-4" />
+                  <span>Open File</span>
+                </button>
+                <button
+                  onClick={(e) => handleCopyCardUrl(directLinkCard, e)}
+                  className={`px-3 py-2 text-xs font-semibold rounded-xl border transition flex items-center gap-1.5 ${
+                    copiedId === directLinkCard.id
+                      ? 'bg-emerald-600 text-white border-emerald-500'
+                      : isDark
+                      ? 'bg-gray-800 hover:bg-gray-700 text-gray-200 border-gray-700'
+                      : 'bg-white hover:bg-slate-100 text-slate-800 border-slate-300'
+                  }`}
+                  title="Copy link"
+                >
+                  {copiedId === directLinkCard.id ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-white" />
+                      <span>Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="w-3.5 h-3.5 text-emerald-500" />
+                      <span className="hidden sm:inline">Share Link</span>
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => setDirectLinkCard(null)}
+                  className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-gray-700/40 transition"
+                  title="Dismiss banner"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Breadcrumb Trail & Sub-folder Navigation Header */}
           {folderPath.length > 0 && (
             <div className="mb-6 flex flex-wrap items-center gap-2 text-xs sm:text-sm font-medium animate-in fade-in duration-200">
@@ -2619,6 +2940,24 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                             </button>
                           )}
                           <button
+                            type="button"
+                            onClick={(e) => handleCopyCardUrl(c, e)}
+                            className={`p-1.5 rounded transition ${
+                              copiedId === c.id
+                                ? 'bg-emerald-600 text-white'
+                                : isDark
+                                ? 'hover:bg-gray-700 text-gray-300 hover:text-white'
+                                : 'hover:bg-slate-100 text-slate-700'
+                            }`}
+                            title={`Copy shareable link for ${c.title}`}
+                          >
+                            {copiedId === c.id ? (
+                              <Check className="w-3.5 h-3.5 text-white" />
+                            ) : (
+                              <Share2 className="w-3.5 h-3.5 text-emerald-500" />
+                            )}
+                          </button>
+                          <button
                             onClick={() => handleOpenEdit(c)}
                             className={`p-1.5 rounded transition ${
                               isDark
@@ -2717,13 +3056,17 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
               }
             };
 
+            const isHighlighted = highlightedCardId === card.id;
+
             return (
               <div
                 key={card.id}
                 id={`archive-card-${card.id}`}
                 className={`group relative rounded-2xl border p-6 sm:p-7 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-gradient-to-br ${
                   styles.bg
-                } ${styles.border} ${styles.hoverBorder}`}
+                } ${styles.border} ${styles.hoverBorder} ${
+                  isHighlighted ? 'ring-4 ring-emerald-500 ring-offset-2 ring-offset-slate-900 shadow-xl' : ''
+                }`}
               >
                 {/* Developer Inline Edit Trigger on the card */}
                 {isDeveloperMode && (
@@ -2840,21 +3183,48 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                     )}
                   </div>
 
-                  <button
-                    onClick={() => handleCardClick(card)}
-                    className={`px-5 py-2 text-xs sm:text-sm font-semibold rounded-xl border shadow-sm transition-all duration-200 flex items-center gap-2 ${
-                      styles.buttonBg
-                    } ${styles.buttonHover}`}
-                  >
-                    <span>{isFolder ? `Open ${card.title} Folder` : `Open ${card.title}`}</span>
-                    {isFolder ? (
-                      <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    ) : isHtml ? (
-                      <Eye className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                    ) : (
-                      <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                    )}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => handleCopyCardUrl(card, e)}
+                      className={`px-3 py-2 text-xs font-semibold rounded-xl border shadow-sm transition-all flex items-center gap-1.5 ${
+                        copiedId === card.id
+                          ? 'bg-emerald-600 text-white border-emerald-500 shadow-md'
+                          : isDark
+                          ? 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border-gray-700'
+                          : 'bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border-slate-300'
+                      }`}
+                      title={`Copy shareable URL for ${card.title}`}
+                    >
+                      {copiedId === card.id ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-white" />
+                          <span>Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Share2 className="w-3.5 h-3.5 text-emerald-500" />
+                          <span className="hidden sm:inline">Share</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      onClick={() => handleCardClick(card)}
+                      className={`px-4 sm:px-5 py-2 text-xs sm:text-sm font-semibold rounded-xl border shadow-sm transition-all duration-200 flex items-center gap-2 ${
+                        styles.buttonBg
+                      } ${styles.buttonHover}`}
+                    >
+                      <span>{isFolder ? `Open ${card.title} Folder` : `Open ${card.title}`}</span>
+                      {isFolder ? (
+                        <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      ) : isHtml ? (
+                        <Eye className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                      ) : (
+                        <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -2886,6 +3256,16 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
               </div>
 
               <div className="flex items-center gap-2">
+                <button
+                  onClick={(e) => handleCopyCardUrl(viewingHtmlCard, e)}
+                  className="px-3 py-1.5 text-xs font-semibold bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center gap-1.5 transition"
+                  title="Copy shareable link"
+                >
+                  <Share2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="hidden sm:inline">
+                    {copiedId === viewingHtmlCard.id ? 'Link Copied!' : 'Copy Share Link'}
+                  </span>
+                </button>
                 <button
                   onClick={() => {
                     const blob = new Blob([viewingHtmlCard.htmlContent || ''], {
@@ -3158,7 +3538,12 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                     type="text"
                     required
                     value={formTitle}
-                    onChange={(e) => setFormTitle(e.target.value)}
+                    onChange={(e) => {
+                      setFormTitle(e.target.value);
+                      if (!isSlugManuallyEdited) {
+                        setFormUrlSlug(e.target.value);
+                      }
+                    }}
                     placeholder={
                       formTargetType === 'folder'
                         ? 'e.g. 45th BCS, HSC 2026, Semester 1'
@@ -3187,6 +3572,87 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                     }`}
                   />
                 </div>
+              </div>
+
+              {/* URL Slug & Shareable Deep Link Field */}
+              <div className={`p-3.5 rounded-xl border ${
+                isDark ? 'bg-gray-800/60 border-gray-700' : 'bg-slate-50 border-slate-300'
+              }`}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                    {formTargetType === 'folder'
+                      ? 'Folder Name for URL (Share Link) *'
+                      : 'File / Button Name for URL (Share Link) *'}
+                  </label>
+                  <span className="text-[10px] text-gray-400">
+                    Custom URL name for sharing
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  value={formUrlSlug}
+                  onChange={(e) => {
+                    setIsSlugManuallyEdited(true);
+                    setFormUrlSlug(e.target.value);
+                  }}
+                  placeholder={
+                    formTargetType === 'folder'
+                      ? 'e.g. 45th_bcs or poems'
+                      : 'e.g. lecture_notes.pdf or arabic_poetry'
+                  }
+                  className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none font-mono ${
+                    isDark
+                      ? 'bg-gray-900 border-gray-700 text-emerald-300 focus:border-emerald-500'
+                      : 'bg-white border-slate-300 text-emerald-800 focus:border-emerald-600'
+                  }`}
+                />
+                
+                {/* Live Shareable URL Preview */}
+                <div className={`mt-2.5 p-2.5 rounded-lg border flex items-center justify-between gap-2 ${
+                  isDark
+                    ? 'bg-gray-950/80 border-emerald-500/30 text-emerald-300'
+                    : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                }`}>
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <Link className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <span className="font-mono text-[11px] truncate select-all">
+                      {`https://classcaddy.netlify.app/archives.html/${[
+                        ...folderPath.map((id) => {
+                          const f = findCardDeep(rootCards, id);
+                          return f ? getCardSlug(f) : id;
+                        }),
+                        formUrlSlug.trim()
+                          ? sanitizeSlug(formUrlSlug.trim())
+                          : sanitizeSlug(formFileName || formTitle || 'file_name'),
+                      ].join('/')}`}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const urlToCopy = `https://classcaddy.netlify.app/archives.html/${[
+                        ...folderPath.map((id) => {
+                          const f = findCardDeep(rootCards, id);
+                          return f ? getCardSlug(f) : id;
+                        }),
+                        formUrlSlug.trim()
+                          ? sanitizeSlug(formUrlSlug.trim())
+                          : sanitizeSlug(formFileName || formTitle || 'file_name'),
+                      ].join('/')}`;
+                      navigator.clipboard.writeText(urlToCopy);
+                      setCopiedPreview(true);
+                      setTimeout(() => setCopiedPreview(false), 2000);
+                    }}
+                    className="shrink-0 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1 transition shadow-sm"
+                    title="Copy preview link"
+                  >
+                    {copiedPreview ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedPreview ? 'Copied!' : 'Copy'}</span>
+                  </button>
+                </div>
+                <p className="text-[10px] text-gray-400 mt-1.5 leading-normal">
+                  Write the file name that will be used in the URL. You can copy this link and share it with others to open this {formTargetType === 'folder' ? 'folder' : 'file'} directly.
+                </p>
               </div>
 
               {/* Subtitle / Description (becomes sub folder description) */}
@@ -3485,6 +3951,35 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Share Link Copied Toast Notification */}
+      {shareToast && (
+        <div className="fixed bottom-6 right-6 z-50 max-w-md p-4 rounded-2xl bg-gray-900/95 text-white border border-emerald-500/50 shadow-2xl backdrop-blur-md animate-in slide-in-from-bottom-5 fade-in duration-200">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 shrink-0">
+              <Check className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                {shareToast.message}
+              </h4>
+              <p className="text-xs text-gray-300 mt-1 truncate font-mono bg-gray-800/80 px-2 py-1 rounded border border-gray-700 select-all">
+                {shareToast.url}
+              </p>
+              <p className="text-[11px] text-emerald-400 mt-1">
+                Anyone clicking this URL will open this file directly.
+              </p>
+            </div>
+            <button
+              onClick={() => setShareToast(null)}
+              className="p-1 rounded-lg text-gray-400 hover:text-white transition"
+              title="Close notification"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}

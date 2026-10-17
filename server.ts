@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
+import fs from 'fs';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { createServer as createViteServer } from 'vite';
@@ -154,21 +155,46 @@ async function startServer() {
 
   // Vite development middleware or static production serving
   if (process.env.NODE_ENV !== 'production') {
-    app.use((req, res, next) => {
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: 'spa',
+    });
+
+    app.use(async (req, res, next) => {
+      const parsedPath = req.url.split('?')[0];
+      const lower = parsedPath.toLowerCase();
+
+      // Deep linked archives path: /archives.html/... or /archives/...
+      if (
+        lower.startsWith('/archives.html/') ||
+        lower.startsWith('/archives/')
+      ) {
+        try {
+          const htmlPath = path.resolve(process.cwd(), 'archives.html');
+          let template = await fs.promises.readFile(htmlPath, 'utf-8');
+          template = await vite.transformIndexHtml(req.url, template);
+          res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
+          return;
+        } catch (e) {
+          next(e);
+          return;
+        }
+      }
+
       // Very basic extensionless to .html rewrite for development
       if (!req.url.includes('.') && req.url !== '/' && !req.url.startsWith('/api')) {
         req.url += '.html';
       }
       next();
     });
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
+
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath, { extensions: ["html"] }));
+    app.get(['/archives.html/*', '/Archives.html/*', '/archives/*', '/Archives/*'], (_req: Request, res: Response) => {
+      res.sendFile(path.join(distPath, 'archives.html'));
+    });
     app.get('*', (_req: Request, res: Response) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
