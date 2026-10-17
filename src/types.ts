@@ -29,6 +29,8 @@ export interface ArchiveCardButton {
   badgeText?: string;
   createdAt?: number;
   urlSlug?: string; // Custom file name or slug used in the shareable URL
+  hasFileData?: boolean;
+  fileSize?: number;
 }
 
 export interface PoemLine {
