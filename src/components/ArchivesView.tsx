@@ -46,6 +46,8 @@ import {
   Share2,
   Link,
   Copy,
+  Download,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Windows11Explorer } from './Windows11Explorer';
 
@@ -1587,8 +1589,9 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
 
 
 
-  // HTML Viewer Modal State
-  const [viewingHtmlCard, setViewingHtmlCard] = useState<ArchiveCardButton | null>(null);
+  // Independent Full-Window File State (Opens file directly as an independent window, not in a modal!)
+  const [independentWindowCard, setIndependentWindowCard] = useState<ArchiveCardButton | null>(null);
+  const [independentFolderPath, setIndependentFolderPath] = useState<string[]>([]);
 
   // File Explorer View Toggle State (Saved in localStorage for both User and Admin)
   const [internalExplorerMode, setInternalExplorerMode] = useState<boolean>(() => {
@@ -1689,24 +1692,57 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
       if (e.state && Array.isArray(e.state.folderPath)) {
+        if (e.state.cardId) {
+          const found = findCardDeep(rootCardsRef.current, e.state.cardId);
+          if (found && found.targetType !== 'folder') {
+            setIndependentWindowCard(found);
+            setIndependentFolderPath(e.state.folderPath);
+            return;
+          }
+        }
+        setIndependentWindowCard(null);
         setFolderPath(e.state.folderPath);
       } else {
         // Resolve from current pathname if popstate state is empty
         const match = window.location.pathname.match(/\/archives(?:\.html)?\/(.+)$/i);
         if (match && match[1]) {
-          const rawSegments = match[1].split('/').filter(Boolean).map((s) => decodeURIComponent(s).trim());
+          const rawSegments = match[1].split('?')[0].split('/').filter(Boolean).map((s) => decodeURIComponent(s).trim());
           let currentList = rootCardsRef.current;
           const resolved: string[] = [];
-          for (const seg of rawSegments) {
+          let targetCard: ArchiveCardButton | null = null;
+          for (let i = 0; i < rawSegments.length; i++) {
+            const seg = rawSegments[i];
+            const isLast = i === rawSegments.length - 1;
             const segSlug = sanitizeSlug(seg);
-            const found = currentList.find((c) => getCardSlug(c) === segSlug || c.id === seg);
-            if (found && found.targetType === 'folder') {
-              resolved.push(found.id);
-              currentList = found.children || [];
+            const found = currentList.find(
+              (c) =>
+                getCardSlug(c) === segSlug ||
+                sanitizeSlug(c.title) === segSlug ||
+                (c.fileName && sanitizeSlug(c.fileName) === segSlug) ||
+                c.id === seg
+            );
+            if (found) {
+              if (found.targetType === 'folder') {
+                resolved.push(found.id);
+                if (isLast) {
+                  targetCard = found;
+                } else {
+                  currentList = found.children || [];
+                }
+              } else {
+                targetCard = found;
+              }
             }
           }
+          if (targetCard && targetCard.targetType !== 'folder') {
+            setIndependentWindowCard(targetCard);
+            setIndependentFolderPath(resolved);
+            return;
+          }
+          setIndependentWindowCard(null);
           setFolderPath(resolved);
         } else {
+          setIndependentWindowCard(null);
           setFolderPath([]);
         }
       }
@@ -1851,36 +1887,29 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
       }
     }
 
-    if (resolvedPath.length > 0) {
-      setFolderPath(resolvedPath);
-      window.history.replaceState({ folderPath: resolvedPath }, '', window.location.href);
-    }
-
     if (matchedItem) {
       setHighlightedCardId(matchedItem.id);
       if (matchedItem.targetType !== 'folder') {
-        setDirectLinkCard(matchedItem);
-
-        // If it's HTML, open cleanly in embedded modal viewer
-        const isHtml =
-          matchedItem.targetType === 'html' ||
-          matchedItem.fileType?.includes('html') ||
-          matchedItem.fileName?.endsWith('.html') ||
-          matchedItem.fileName?.endsWith('.htm') ||
-          Boolean(matchedItem.htmlContent);
-
-        if (isHtml) {
-          setViewingHtmlCard(matchedItem);
+        // Open directly as an INDEPENDENT WINDOW (not in a modal inside the folder's page!)
+        setIndependentWindowCard(matchedItem);
+        setIndependentFolderPath(resolvedPath);
+      } else {
+        if (resolvedPath.length > 0) {
+          setFolderPath(resolvedPath);
+          window.history.replaceState({ folderPath: resolvedPath }, '', window.location.href);
         }
       }
 
-      // Smooth scroll to target card
+      // Smooth scroll to target card if in folder view
       setTimeout(() => {
         const el = document.getElementById(`archive-card-${matchedItem?.id}`);
         if (el) {
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }, 400);
+    } else if (resolvedPath.length > 0) {
+      setFolderPath(resolvedPath);
+      window.history.replaceState({ folderPath: resolvedPath }, '', window.location.href);
     }
   }, [rootCards]);
 
@@ -2310,6 +2339,106 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
     }
   };
 
+  // Open file in an independent new browser window / tab
+  const handleOpenInNewWindow = (card: ArchiveCardButton) => {
+    // 1. Direct HTML content
+    if (card.htmlContent || (card.targetType === 'html' && card.htmlContent)) {
+      const blob = new Blob([card.htmlContent], { type: 'text/html;charset=utf-8' });
+      const blobUrl = URL.createObjectURL(blob);
+      const newWin = window.open(blobUrl, '_blank', 'noopener,noreferrer');
+      if (!newWin) {
+        window.location.href = blobUrl;
+      }
+      return;
+    }
+
+    // 2. Uploaded file data (HTML, PDF, Image, etc.)
+    if (card.fileData) {
+      const isHtml =
+        card.fileType?.includes('html') ||
+        card.fileName?.endsWith('.html') ||
+        card.fileName?.endsWith('.htm');
+
+      if (isHtml) {
+        const blob = new Blob([card.fileData], { type: 'text/html;charset=utf-8' });
+        const blobUrl = URL.createObjectURL(blob);
+        const newWin = window.open(blobUrl, '_blank', 'noopener,noreferrer');
+        if (!newWin) {
+          window.location.href = blobUrl;
+        }
+        return;
+      }
+
+      const isPdf =
+        card.fileData.startsWith('data:application/pdf') ||
+        card.fileType?.includes('pdf') ||
+        card.fileName?.endsWith('.pdf');
+
+      if (isPdf) {
+        try {
+          const parts = card.fileData.split(',');
+          const byteString = atob(parts[1] || '');
+          const mimeMatch = parts[0].match(/:(.*?);/);
+          const mime = (mimeMatch && mimeMatch[1]) || 'application/pdf';
+          const ab = new ArrayBuffer(byteString.length);
+          const ia = new Uint8Array(ab);
+          for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+          }
+          const blob = new Blob([ab], { type: mime });
+          const blobUrl = URL.createObjectURL(blob);
+          const newWin = window.open(blobUrl, '_blank');
+          if (!newWin) {
+            window.location.href = blobUrl;
+          }
+          return;
+        } catch (e) {
+          window.open(card.fileData, '_blank');
+          return;
+        }
+      }
+
+      // Other binary file
+      const newWin = window.open(card.fileData, '_blank');
+      if (!newWin) {
+        handleDownloadFile(card);
+      }
+      return;
+    }
+
+    // 3. Web URL
+    if (card.link && card.link !== '#') {
+      window.open(card.link, '_blank', 'noopener,noreferrer');
+      return;
+    }
+  };
+
+  // Download file helper
+  const handleDownloadFile = (card: ArchiveCardButton) => {
+    const rawData = card.fileData || card.htmlContent;
+    if (!rawData) return;
+    const dl = document.createElement('a');
+    if (card.fileData) {
+      dl.href = card.fileData;
+    } else {
+      const blob = new Blob([card.htmlContent || ''], { type: 'text/html;charset=utf-8' });
+      dl.href = URL.createObjectURL(blob);
+    }
+    dl.download = card.fileName || `${sanitizeSlug(card.title)}.html`;
+    document.body.appendChild(dl);
+    dl.click();
+    document.body.removeChild(dl);
+  };
+
+  // Back to Archives from Independent Window
+  const handleBackToArchives = () => {
+    setIndependentWindowCard(null);
+    const targetPath = independentFolderPath.length > 0 ? independentFolderPath : folderPath;
+    setFolderPath(targetPath);
+    const folderUrl = getFolderPathUrl(targetPath, rootCardsRef.current);
+    window.history.pushState({ folderPath: targetPath }, '', folderUrl);
+  };
+
   // Click card handler: Supports Sub folders, URL, HTML Code, and Any Uploaded File (.pdf, .html, .docx, images, etc.)
   const handleCardClick = (card: ArchiveCardButton) => {
     if (card.targetType === 'folder') {
@@ -2317,81 +2446,17 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
       return;
     }
 
-    // Direct HTML code
-    if (card.targetType === 'html' && card.htmlContent) {
-      if (card.openInNewTab) {
-        const blob = new Blob([card.htmlContent], { type: 'text/html;charset=utf-8' });
-        const blobUrl = URL.createObjectURL(blob);
-        window.open(blobUrl, '_blank', 'noopener,noreferrer');
-      } else {
-        setViewingHtmlCard(card);
-      }
-      return;
-    }
-
-    // Uploaded file (HTML, PDF, Document, Image, etc.)
-    if (card.targetType === 'file' && (card.fileData || card.htmlContent)) {
-      const isHtml = card.fileType?.includes('html') || card.fileName?.endsWith('.html') || card.fileName?.endsWith('.htm') || Boolean(card.htmlContent);
-
-      if (isHtml) {
-        const htmlStr = card.htmlContent || card.fileData || '';
-        if (card.openInNewTab) {
-          const blob = new Blob([htmlStr], { type: 'text/html;charset=utf-8' });
-          const blobUrl = URL.createObjectURL(blob);
-          window.open(blobUrl, '_blank', 'noopener,noreferrer');
-        } else {
-          setViewingHtmlCard(card);
-        }
-        return;
-      }
-
-      // Non-HTML files (PDF, image, docs, etc.)
-      const rawData = card.fileData || '';
-      if (rawData) {
-        if (card.openInNewTab) {
-          // Open binary data URL or Blob in new tab
-          const newWin = window.open(rawData, '_blank', 'noopener,noreferrer');
-          if (!newWin) {
-            // Trigger automatic download if popup is blocked
-            const downloadLink = document.createElement('a');
-            downloadLink.href = rawData;
-            downloadLink.download = card.fileName || 'download';
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-          }
-        } else {
-          // Direct download or view
-          const downloadLink = document.createElement('a');
-          downloadLink.href = rawData;
-          downloadLink.download = card.fileName || 'download';
-          document.body.appendChild(downloadLink);
-          downloadLink.click();
-          document.body.removeChild(downloadLink);
-        }
-      }
-      return;
-    }
-
-    // Fallback if card has htmlContent from legacy data
-    if (card.htmlContent) {
-      if (card.openInNewTab) {
-        const blob = new Blob([card.htmlContent], { type: 'text/html;charset=utf-8' });
-        const blobUrl = URL.createObjectURL(blob);
-        window.open(blobUrl, '_blank', 'noopener,noreferrer');
-      } else {
-        setViewingHtmlCard(card);
-      }
-      return;
-    }
-
-    // Standard URL
-    if (!card.link || card.link === '#') return;
+    // If configured to open in new tab / independent window
     if (card.openInNewTab) {
-      window.open(card.link, '_blank', 'noopener,noreferrer');
-    } else {
-      window.location.href = card.link;
+      handleOpenInNewWindow(card);
+      return;
     }
+
+    // Open directly as an Independent Window (not inside a modal!)
+    setIndependentWindowCard(card);
+    setIndependentFolderPath(folderPath);
+    const cardUrl = getCardShareableUrl(card, folderPath, rootCardsRef.current);
+    window.history.pushState({ folderPath, cardId: card.id }, '', cardUrl);
   };
 
   return (
@@ -3232,71 +3297,217 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
         </>
       )}
 
-      {/* Embedded HTML Interactive Full-Screen Modal Viewer */}
-      {viewingHtmlCard && viewingHtmlCard.htmlContent && (
+      {/* Independent Full-Window Standalone File Viewer */}
+      {independentWindowCard && (
         <div
-          id="html-modal-viewer"
-          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-150"
+          id="independent-file-window"
+          className="fixed inset-0 w-screen h-screen z-[999999] bg-slate-950 flex flex-col overflow-hidden m-0 p-0 animate-in fade-in duration-150 select-text"
         >
-          <div className="w-full h-full max-w-6xl max-h-[92vh] flex flex-col rounded-2xl bg-gray-900 border border-gray-700 shadow-2xl overflow-hidden">
-            {/* Top Bar */}
-            <div className="flex items-center justify-between px-4 py-3 bg-gray-800 border-b border-gray-700 text-white">
-              <div className="flex items-center gap-2.5">
-                <FileCode className="w-5 h-5 text-emerald-400" />
-                <div>
-                  <h3 className="font-bold text-sm sm:text-base leading-tight">
-                    {viewingHtmlCard.title}
-                  </h3>
-                  <p className="text-[11px] text-gray-400">
-                    {viewingHtmlCard.fileName || 'Embedded HTML Document Viewer'}
-                  </p>
-                </div>
-              </div>
+          {/* Top Control Bar */}
+          <div className="flex items-center justify-between px-3 sm:px-5 py-2.5 bg-slate-900 text-white border-b border-slate-800 shadow-md select-none shrink-0 z-20">
+            <div className="flex items-center gap-3 min-w-0">
+              <button
+                onClick={handleBackToArchives}
+                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-gray-200 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition border border-slate-700 shadow-sm shrink-0"
+                title="Browse folder in Archives"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="hidden sm:inline">Browse Folder in Archives</span>
+                <span className="sm:hidden">Archives</span>
+              </button>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={(e) => handleCopyCardUrl(viewingHtmlCard, e)}
-                  className="px-3 py-1.5 text-xs font-semibold bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center gap-1.5 transition"
-                  title="Copy shareable link"
-                >
-                  <Share2 className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="hidden sm:inline">
-                    {copiedId === viewingHtmlCard.id ? 'Link Copied!' : 'Copy Share Link'}
+              <div className="h-4 w-px bg-slate-700 hidden sm:block" />
+
+              <div className="flex items-center gap-2 truncate min-w-0">
+                {independentWindowCard.targetType === 'folder' ? (
+                  <FolderOpen className="w-4 h-4 text-amber-400 shrink-0" />
+                ) : independentWindowCard.fileName?.endsWith('.pdf') || independentWindowCard.fileType?.includes('pdf') ? (
+                  <FileText className="w-4 h-4 text-rose-400 shrink-0" />
+                ) : independentWindowCard.htmlContent || independentWindowCard.targetType === 'html' || independentWindowCard.fileName?.endsWith('.html') ? (
+                  <FileCode className="w-4 h-4 text-emerald-400 shrink-0" />
+                ) : independentWindowCard.fileType?.startsWith('image/') || /\.(png|jpe?g|gif|webp|svg)$/i.test(independentWindowCard.fileName || '') ? (
+                  <ImageIcon className="w-4 h-4 text-purple-400 shrink-0" />
+                ) : (
+                  <FileText className="w-4 h-4 text-blue-400 shrink-0" />
+                )}
+                <span className="font-bold text-xs sm:text-sm text-white truncate">
+                  {independentWindowCard.title}
+                </span>
+                {independentWindowCard.fileName && (
+                  <span className="text-[11px] text-gray-400 font-mono hidden md:inline truncate">
+                    ({independentWindowCard.fileName})
                   </span>
-                </button>
-                <button
-                  onClick={() => {
-                    const blob = new Blob([viewingHtmlCard.htmlContent || ''], {
-                      type: 'text/html;charset=utf-8',
-                    });
-                    const url = URL.createObjectURL(blob);
-                    window.open(url, '_blank', 'noopener,noreferrer');
-                  }}
-                  className="px-3 py-1.5 text-xs font-semibold bg-gray-700 hover:bg-gray-600 text-white rounded-lg flex items-center gap-1.5 transition"
-                  title="Open in separate tab"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Open in New Tab</span>
-                </button>
-                <button
-                  onClick={() => setViewingHtmlCard(null)}
-                  className="p-1.5 rounded-lg bg-gray-700/60 hover:bg-red-600 text-gray-300 hover:text-white transition"
-                  title="Close viewer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                )}
+                {independentWindowCard.badgeText && (
+                  <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hidden sm:inline shrink-0">
+                    {independentWindowCard.badgeText}
+                  </span>
+                )}
               </div>
             </div>
 
-            {/* Iframe displaying the HTML content */}
-            <div className="flex-1 bg-white relative">
-              <iframe
-                title={viewingHtmlCard.title}
-                srcDoc={viewingHtmlCard.htmlContent}
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                className="w-full h-full border-0"
-              />
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={(e) => handleCopyCardUrl(independentWindowCard, e)}
+                className="px-3 py-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg flex items-center gap-1.5 transition shadow-sm"
+                title="Copy shareable link"
+              >
+                {copiedId === independentWindowCard.id ? (
+                  <Check className="w-3.5 h-3.5" />
+                ) : (
+                  <Share2 className="w-3.5 h-3.5" />
+                )}
+                <span className="hidden sm:inline">
+                  {copiedId === independentWindowCard.id ? 'Copied!' : 'Copy Share Link'}
+                </span>
+              </button>
+
+              <button
+                onClick={() => handleOpenInNewWindow(independentWindowCard)}
+                className="px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-gray-200 hover:text-white border border-slate-700 rounded-lg flex items-center gap-1.5 transition"
+                title="Open in an independent new browser window or tab"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="hidden sm:inline">Open in New Window</span>
+              </button>
+
+              {(independentWindowCard.fileData || independentWindowCard.htmlContent) && (
+                <button
+                  onClick={() => handleDownloadFile(independentWindowCard)}
+                  className="px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-gray-200 hover:text-white border border-slate-700 rounded-lg flex items-center gap-1.5 transition hidden md:flex"
+                  title="Download File"
+                >
+                  <Download className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Download</span>
+                </button>
+              )}
+
+              <button
+                onClick={handleBackToArchives}
+                className="p-1.5 rounded-lg bg-slate-800 hover:bg-red-600 text-gray-400 hover:text-white border border-slate-700 transition"
+                title="Close Window"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
+          </div>
+
+          {/* Full Screen Independent Document Body */}
+          <div className="flex-1 w-full h-full bg-slate-900 relative overflow-hidden flex flex-col">
+            {(() => {
+              const card = independentWindowCard;
+              const isHtml =
+                Boolean(card.htmlContent) ||
+                card.targetType === 'html' ||
+                card.fileType?.includes('html') ||
+                card.fileName?.endsWith('.html') ||
+                card.fileName?.endsWith('.htm');
+
+              if (isHtml) {
+                const content = card.htmlContent || card.fileData || '';
+                return (
+                  <iframe
+                    title={card.title}
+                    srcDoc={content}
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads allow-modals"
+                    className="w-full h-full border-0 m-0 p-0 block bg-white"
+                  />
+                );
+              }
+
+              const isPdf =
+                card.fileType?.includes('pdf') ||
+                card.fileName?.endsWith('.pdf') ||
+                card.fileData?.startsWith('data:application/pdf');
+
+              if (isPdf && card.fileData) {
+                return (
+                  <div className="w-full h-full flex flex-col bg-slate-900">
+                    <iframe
+                      title={card.title}
+                      src={card.fileData}
+                      className="w-full h-full border-0 block bg-slate-800"
+                    />
+                  </div>
+                );
+              }
+
+              const isImage =
+                card.fileType?.startsWith('image/') ||
+                /\.(png|jpe?g|gif|webp|svg)$/i.test(card.fileName || '') ||
+                card.fileData?.startsWith('data:image/');
+
+              if (isImage && card.fileData) {
+                return (
+                  <div className="w-full h-full flex items-center justify-center p-6 bg-slate-950 overflow-auto">
+                    <img
+                      src={card.fileData}
+                      alt={card.title}
+                      className="max-h-full max-w-full object-contain rounded-xl shadow-2xl border border-slate-800"
+                    />
+                  </div>
+                );
+              }
+
+              if (card.link && card.link !== '#') {
+                return (
+                  <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-slate-950 text-white">
+                    <div className="max-w-md w-full p-8 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl flex flex-col items-center">
+                      <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-4">
+                        <Globe className="w-8 h-8" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-2">{card.title}</h3>
+                      {card.subtitle && <p className="text-sm text-gray-400 mb-4">{card.subtitle}</p>}
+                      <p className="text-xs font-mono text-emerald-400 mb-6 break-all px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 w-full text-left">
+                        {card.link}
+                      </p>
+                      <button
+                        onClick={() => window.open(card.link, '_blank', 'noopener,noreferrer')}
+                        className="w-full py-3 px-4 rounded-xl font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center justify-center gap-2 shadow-lg"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        <span>Open Link in New Window</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-slate-950 text-white">
+                  <div className="max-w-md w-full p-8 rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl flex flex-col items-center">
+                    <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center mb-4">
+                      <FileText className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">{card.title}</h3>
+                    {card.fileName && (
+                      <span className="text-xs font-mono text-gray-400 mb-2">
+                        {card.fileName}
+                      </span>
+                    )}
+                    {card.subtitle && <p className="text-sm text-gray-400 mb-6">{card.subtitle}</p>}
+                    <div className="flex gap-3 w-full">
+                      {card.fileData && (
+                        <button
+                          onClick={() => handleDownloadFile(card)}
+                          className="flex-1 py-3 px-4 rounded-xl font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center justify-center gap-2 shadow-lg"
+                        >
+                          <Download className="w-4 h-4" />
+                          <span>Download</span>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleOpenInNewWindow(card)}
+                        className="flex-1 py-3 px-4 rounded-xl font-semibold bg-slate-800 hover:bg-slate-700 text-gray-200 border border-slate-700 transition flex items-center justify-center gap-2 shadow-sm"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        <span>New Window</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}
@@ -3871,22 +4082,27 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
 
               {/* Open In New Tab Checkbox (Only for URL/HTML/File) */}
               {formTargetType !== 'folder' && (
-                <div className="flex items-center gap-2 pt-1">
-                  <input
-                    type="checkbox"
-                    id="form-open-in-new-tab"
-                    checked={formOpenInNewTab}
-                    onChange={(e) => setFormOpenInNewTab(e.target.checked)}
-                    className="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4"
-                  />
-                  <label
-                    htmlFor="form-open-in-new-tab"
-                    className={`text-xs cursor-pointer select-none ${
-                      isDark ? 'text-gray-300' : 'text-slate-700'
-                    }`}
-                  >
-                    Open in a new browser tab / window
-                  </label>
+                <div>
+                  <div className="flex items-center gap-2 pt-1">
+                    <input
+                      type="checkbox"
+                      id="form-open-in-new-tab"
+                      checked={formOpenInNewTab}
+                      onChange={(e) => setFormOpenInNewTab(e.target.checked)}
+                      className="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4"
+                    />
+                    <label
+                      htmlFor="form-open-in-new-tab"
+                      className={`text-xs font-semibold cursor-pointer select-none ${
+                        isDark ? 'text-gray-200' : 'text-slate-800'
+                      }`}
+                    >
+                      Open as Independent Window / New Tab
+                    </label>
+                  </div>
+                  <p className={`text-[11px] pl-6 mt-0.5 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
+                    When enabled, opening this item opens it directly in an independent window or new browser tab instead of an in-page modal.
+                  </p>
                 </div>
               )}
 

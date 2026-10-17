@@ -1,7 +1,8 @@
 {
+  "version": 2,
+  "framework": null,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "framework": "vite",
   "cleanUrls": false,
   "trailingSlash": false,
   "rewrites": [
@@ -22,15 +23,19 @@
       "destination": "/archives.html"
     },
     {
+      "source": "/archives.html",
+      "destination": "/archives.html"
+    },
+    {
       "source": "/Archives.html",
       "destination": "/archives.html"
     },
     {
-      "source": "/Archives",
+      "source": "/archives",
       "destination": "/archives.html"
     },
     {
-      "source": "/archives",
+      "source": "/Archives",
       "destination": "/archives.html"
     },
     {
@@ -52,6 +57,21 @@
     {
       "source": "/academic",
       "destination": "/academic.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
     }
   ]
 }

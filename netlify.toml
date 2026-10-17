@@ -36,3 +36,8 @@
   from = "/archives"
   to = "/archives.html"
   status = 200
+
+[[redirects]]
+  from = "/archives.html"
+  to = "/archives.html"
+  status = 200
