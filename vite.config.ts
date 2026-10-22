@@ -53,6 +53,35 @@ function copyStaticAssetsPlugin(): Plugin {
           console.warn('Failed to create dist/Archives.html copy:', e);
         }
       }
+
+      // Ensure study-plan-styles.css is in dist
+      const srcStudyCss = path.resolve(__dirname, 'study-plan-styles.css');
+      const distStudyCss = path.resolve(__dirname, 'dist', 'study-plan-styles.css');
+      if (fs.existsSync(srcStudyCss) && !fs.existsSync(distStudyCss)) {
+        try {
+          fs.copyFileSync(srcStudyCss, distStudyCss);
+        } catch (e) {
+          console.warn('Failed to copy study-plan-styles.css to dist:', e);
+        }
+      }
+
+      // Final integrity check: Verify all dist/**/*.html files are actual HTML, not accidentally overwritten with CSS
+      const distHtmlFiles = globSync('dist/**/*.html');
+      for (const distHtmlPath of distHtmlFiles) {
+        try {
+          const content = fs.readFileSync(distHtmlPath, 'utf-8').trim();
+          if (!content.startsWith('<!') && !content.startsWith('<html')) {
+            console.warn(`WARNING: ${distHtmlPath} was not valid HTML! Restoring from source...`);
+            const relFromDist = path.relative(path.resolve(__dirname, 'dist'), distHtmlPath);
+            const srcHtmlPath = path.resolve(__dirname, relFromDist);
+            if (fs.existsSync(srcHtmlPath)) {
+              fs.copyFileSync(srcHtmlPath, distHtmlPath);
+            }
+          }
+        } catch (e) {
+          console.warn(`Could not verify HTML integrity for ${distHtmlPath}:`, e);
+        }
+      }
     },
   };
 }
@@ -88,7 +117,16 @@ export default defineConfig(() => {
             return `${chunkInfo.name}.js`;
           },
           assetFileNames: (assetInfo) => {
-            if (assetInfo.originalFileName) {
+            // Extracted or bundled CSS assets must never take an .html originalFileName or overwrite HTML files
+            if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+              return '[name][extname]';
+            }
+            if (
+              assetInfo.originalFileName &&
+              !assetInfo.originalFileName.endsWith('.html') &&
+              !assetInfo.originalFileName.endsWith('.htm') &&
+              path.extname(assetInfo.originalFileName) === path.extname(assetInfo.name || '')
+            ) {
               return assetInfo.originalFileName;
             }
             return '[name][extname]';

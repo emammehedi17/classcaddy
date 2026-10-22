@@ -41,3 +41,19 @@
   from = "/archives.html"
   to = "/archives.html"
   status = 200
+
+[[redirects]]
+  from = "/study_plan"
+  to = "/study_plan.html"
+  status = 200
+
+[[redirects]]
+  from = "/study-plan"
+  to = "/study_plan.html"
+  status = 200
+
+[[redirects]]
+  from = "/Study_plan"
+  to = "/study_plan.html"
+  status = 200
+
