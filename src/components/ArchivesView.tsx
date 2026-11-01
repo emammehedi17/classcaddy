@@ -1821,6 +1821,145 @@ export const deleteFileFromCloud = async (cardId: string): Promise<void> => {
   }
 };
 
+export const isHtmlCard = (card: ArchiveCardButton | null | undefined): boolean => {
+  if (!card || card.targetType === 'folder') return false;
+  if (card.targetType === 'html' || Boolean(card.htmlContent)) return true;
+  if (card.fileType && card.fileType.toLowerCase().includes('html')) return true;
+  if (card.fileName && /\.(html|htm)$/i.test(card.fileName.trim())) return true;
+  if (card.urlSlug && /\.(html|htm)$/i.test(card.urlSlug.trim())) return true;
+  if (card.title && /\.(html|htm)$/i.test(card.title.trim())) return true;
+  if (card.link && /\.(html|htm)(\?.*|#.*)?$/i.test(card.link.trim())) return true;
+  if (
+    card.fileData &&
+    (card.fileData.startsWith('data:text/html') || /^\s*<!doctype html|^\s*<html/i.test(card.fileData))
+  ) {
+    return true;
+  }
+  return false;
+};
+
+export const extractHtmlString = (data: string): string => {
+  if (!data) return '';
+  const trimmed = data.trim();
+  if (trimmed.startsWith('data:text/html')) {
+    const commaIdx = trimmed.indexOf(',');
+    if (commaIdx !== -1) {
+      const meta = trimmed.slice(0, commaIdx);
+      const body = trimmed.slice(commaIdx + 1);
+      if (meta.includes(';base64')) {
+        try {
+          const binary = atob(body);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+          }
+          return new TextDecoder('utf-8').decode(bytes);
+        } catch {
+          try {
+            return atob(body);
+          } catch {
+            return body;
+          }
+        }
+      } else {
+        try {
+          return decodeURIComponent(body);
+        } catch {
+          return body;
+        }
+      }
+    }
+  }
+  return data;
+};
+
+export const prepareStandaloneHtml = (rawData: string, fallbackTitle?: string): string => {
+  let html = extractHtmlString(rawData);
+  if (!html) return '';
+
+  // Normalize root-level relative asset paths so deep-linked URLs (/archives.html/folder/file.html) resolve assets from root
+  html = html.replace(
+    /\b(src|href)=(["'])(?:\.\/)?(images\/|audios\/|fonts\/|vocabs\/|style\.css|script\.js|study-plan-styles\.css|app\.js|questions\.js)/gi,
+    '$1=$2/$3'
+  );
+
+  // Inject DOMContentLoaded shim so scripts inside HTML files that listen for DOMContentLoaded always fire when written directly
+  const domReadyShim = `<script>
+(function(){
+  var domCbs = [];
+  var origDocAdd = document.addEventListener.bind(document);
+  var origWinAdd = window.addEventListener.bind(window);
+  document.addEventListener = function(type, listener, options) {
+    if (type === 'DOMContentLoaded' && typeof listener === 'function') {
+      domCbs.push(listener);
+      return;
+    }
+    return origDocAdd(type, listener, options);
+  };
+  window.addEventListener = function(type, listener, options) {
+    if (type === 'DOMContentLoaded' && typeof listener === 'function') {
+      domCbs.push(listener);
+      return;
+    }
+    return origWinAdd(type, listener, options);
+  };
+  window.__runDomReadyCbs = function() {
+    while (domCbs.length > 0) {
+      var fn = domCbs.shift();
+      try { fn(new Event('DOMContentLoaded')); } catch (e) { console.error(e); }
+    }
+  };
+  origWinAdd('load', function() {
+    if (window.__runDomReadyCbs) window.__runDomReadyCbs();
+  });
+})();
+</script>`;
+
+  if (/<head[^>]*>/i.test(html)) {
+    html = html.replace(/<head[^>]*>/i, (match) => `${match}${domReadyShim}`);
+  } else if (/<html[^>]*>/i.test(html)) {
+    html = html.replace(/<html[^>]*>/i, (match) => `${match}<head>${domReadyShim}</head>`);
+  } else {
+    html = `${domReadyShim}${html}`;
+  }
+
+  const triggerScript = `<script>if(window.__runDomReadyCbs){setTimeout(window.__runDomReadyCbs,0);}</script>`;
+  if (/<\/body>/i.test(html)) {
+    html = html.replace(/<\/body>/i, `${triggerScript}</body>`);
+  } else {
+    html = `${html}${triggerScript}`;
+  }
+
+  return html;
+};
+
+export const openHtmlDirectlyInWindow = (
+  targetWin: Window,
+  rawData: string,
+  fallbackTitle?: string,
+  shareUrl?: string
+) => {
+  const preparedHtml = prepareStandaloneHtml(rawData, fallbackTitle);
+  if (!preparedHtml) return;
+  try {
+    targetWin.document.open();
+    if (shareUrl) {
+      try {
+        targetWin.history.replaceState(null, '', shareUrl);
+      } catch {}
+    }
+    targetWin.document.write(preparedHtml);
+    targetWin.document.close();
+    if (fallbackTitle && !targetWin.document.title) {
+      targetWin.document.title = fallbackTitle;
+    }
+  } catch {
+    const blob = new Blob([preparedHtml], { type: 'text/html;charset=utf-8' });
+    const blobUrl = URL.createObjectURL(blob);
+    targetWin.location.replace(blobUrl);
+  }
+};
+
 export const ArchivesView: React.FC<ArchivesViewProps> = ({
   theme = 'light',
   isExplorerMode: propExplorerMode,
@@ -2004,6 +2143,17 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
         if (e.state.cardId) {
           const found = findCardDeep(rootCardsRef.current, e.state.cardId);
           if (found && found.targetType !== 'folder') {
+            if (isHtmlCard(found)) {
+              const raw = found.htmlContent || found.fileData;
+              if (raw) {
+                openHtmlDirectlyInWindow(window, raw, found.title, window.location.href);
+              } else {
+                loadFileFromCloud(found).then((data) => {
+                  if (data) openHtmlDirectlyInWindow(window, data, found.title, window.location.href);
+                });
+              }
+              return;
+            }
             setIndependentWindowCard(found);
             setIndependentFolderPath(e.state.folderPath);
             return;
@@ -2044,6 +2194,17 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
             }
           }
           if (targetCard && targetCard.targetType !== 'folder') {
+            if (isHtmlCard(targetCard)) {
+              const raw = targetCard.htmlContent || targetCard.fileData;
+              if (raw) {
+                openHtmlDirectlyInWindow(window, raw, targetCard.title, window.location.href);
+              } else {
+                loadFileFromCloud(targetCard).then((data) => {
+                  if (data) openHtmlDirectlyInWindow(window, data, targetCard!.title, window.location.href);
+                });
+              }
+              return;
+            }
             setIndependentWindowCard(targetCard);
             setIndependentFolderPath(resolved);
             return;
@@ -2137,6 +2298,17 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
   const [directLinkCard, setDirectLinkCard] = useState<ArchiveCardButton | null>(null);
   const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null);
   const hasResolvedInitialDeepLinkRef = useRef<boolean>(false);
+  const [isOpeningDirectHtml, setIsOpeningDirectHtml] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const p = window.location.pathname;
+    const h = window.location.hash;
+    const m = p.match(/\/archives(?:\.html)?\/(.+)$/i) || h.match(/archives(?:\.html)?\/(.+)$/i);
+    if (m && m[1]) {
+      const clean = decodeURIComponent(m[1].split('?')[0].split('#')[0]).trim();
+      return /\.(html|htm)$/i.test(clean);
+    }
+    return false;
+  });
 
   // Deep Link Resolver on initial load
   useEffect(() => {
@@ -2159,7 +2331,6 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
 
     if (!pathString) return;
 
-    hasResolvedInitialDeepLinkRef.current = true;
     const rawSegments = pathString.split('/').filter(Boolean).map((s) => decodeURIComponent(s).trim());
     if (rawSegments.length === 0) return;
 
@@ -2200,9 +2371,59 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
     }
 
     if (matchedItem) {
+      hasResolvedInitialDeepLinkRef.current = true;
       setHighlightedCardId(matchedItem.id);
       if (matchedItem.targetType !== 'folder') {
-        // Open directly as an INDEPENDENT WINDOW (not in a modal inside the folder's page!)
+        // If the shared link is of a .html or .htm file, open it directly without the modal!
+        if (isHtmlCard(matchedItem)) {
+          setIsOpeningDirectHtml(true);
+          if (resolvedPath.length > 0) {
+            setFolderPath(resolvedPath);
+          }
+
+          // Static URL HTML card (e.g. poem-aghmid.html)
+          if (
+            matchedItem.targetType === 'url' &&
+            matchedItem.link &&
+            !matchedItem.fileData &&
+            !matchedItem.htmlContent &&
+            !matchedItem.hasFileData
+          ) {
+            const targetHref =
+              matchedItem.link.startsWith('http') || matchedItem.link.startsWith('/')
+                ? matchedItem.link
+                : `/${matchedItem.link}`;
+            window.location.replace(targetHref);
+            return;
+          }
+
+          const existingData = matchedItem.htmlContent || matchedItem.fileData;
+          if (existingData) {
+            openHtmlDirectlyInWindow(window, existingData, matchedItem.title, window.location.href);
+          } else {
+            loadFileFromCloud(matchedItem)
+              .then((data) => {
+                if (data) {
+                  openHtmlDirectlyInWindow(window, data, matchedItem!.title, window.location.href);
+                } else if (matchedItem?.link && matchedItem.link !== '#') {
+                  const targetHref =
+                    matchedItem.link.startsWith('http') || matchedItem.link.startsWith('/')
+                      ? matchedItem.link
+                      : `/${matchedItem.link}`;
+                  window.location.replace(targetHref);
+                } else {
+                  setIsOpeningDirectHtml(false);
+                }
+              })
+              .catch(() => {
+                setIsOpeningDirectHtml(false);
+              });
+          }
+          return;
+        }
+
+        // Non-HTML files (PDF, image, etc.): open in the viewer window
+        setIsOpeningDirectHtml(false);
         setIndependentWindowCard(matchedItem);
         setIndependentFolderPath(resolvedPath);
 
@@ -2215,6 +2436,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
           });
         }
       } else {
+        setIsOpeningDirectHtml(false);
         if (resolvedPath.length > 0) {
           setFolderPath(resolvedPath);
           window.history.replaceState({ folderPath: resolvedPath }, '', window.location.href);
@@ -2228,11 +2450,15 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }, 400);
-    } else if (resolvedPath.length > 0) {
-      setFolderPath(resolvedPath);
-      window.history.replaceState({ folderPath: resolvedPath }, '', window.location.href);
+    } else if (syncStatus === 'synced') {
+      hasResolvedInitialDeepLinkRef.current = true;
+      setIsOpeningDirectHtml(false);
+      if (resolvedPath.length > 0) {
+        setFolderPath(resolvedPath);
+        window.history.replaceState({ folderPath: resolvedPath }, '', window.location.href);
+      }
     }
-  }, [rootCards]);
+  }, [rootCards, syncStatus]);
 
   // Automatically load file payload whenever an independent window file is opened
   useEffect(() => {
@@ -2708,29 +2934,59 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
 
   // Open file in an independent new browser window / tab
   const handleOpenInNewWindow = async (card: ArchiveCardButton) => {
+    const isHtml = isHtmlCard(card);
+
+    // 1. Direct HTML / .html / .htm file: open in a new window directly without modal
+    if (isHtml) {
+      // Static HTML URL card
+      if (
+        card.targetType === 'url' &&
+        card.link &&
+        card.link !== '#' &&
+        !card.fileData &&
+        !card.htmlContent &&
+        !card.hasFileData
+      ) {
+        const targetHref =
+          card.link.startsWith('http') || card.link.startsWith('/') ? card.link : `/${card.link}`;
+        const newWin = window.open(targetHref, '_blank');
+        if (!newWin) {
+          window.location.href = targetHref;
+        }
+        return;
+      }
+
+      const shareUrl = getCardShareableUrl(card, folderPathRef.current, rootCardsRef.current);
+      let data = card.htmlContent || card.fileData;
+
+      // Open window synchronously on user click so popup blocker never blocks async cloud fetch
+      const newWin = window.open('', '_blank');
+
+      if (!data && (card.hasFileData || card.targetType === 'file' || card.targetType === 'html')) {
+        if (newWin) {
+          try {
+            newWin.document.write(
+              `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Loading ${card.title}...</title><style>body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;background:#0f172a;color:#f8fafc;font-family:system-ui,sans-serif;}</style></head><body><div>Loading ${card.fileName || card.title}...</div></body></html>`
+            );
+          } catch {}
+        }
+        data = await loadFileFromCloud(card);
+      }
+
+      if (data) {
+        openHtmlDirectlyInWindow(newWin || window, data, card.title, shareUrl);
+        return;
+      } else if (newWin) {
+        newWin.close();
+      }
+    }
+
     let data = card.fileData || card.htmlContent;
     if (!data && (card.hasFileData || card.targetType === 'file' || card.targetType === 'html')) {
       data = await loadFileFromCloud(card);
     }
 
-    // 1. Direct HTML content
-    const isHtml =
-      card.fileType?.includes('html') ||
-      card.fileName?.endsWith('.html') ||
-      card.fileName?.endsWith('.htm') ||
-      card.targetType === 'html';
-
-    if (isHtml && data) {
-      const blob = new Blob([data], { type: 'text/html;charset=utf-8' });
-      const blobUrl = URL.createObjectURL(blob);
-      const newWin = window.open(blobUrl, '_blank', 'noopener,noreferrer');
-      if (!newWin) {
-        window.location.href = blobUrl;
-      }
-      return;
-    }
-
-    // 2. Uploaded file data (HTML, PDF, Image, etc.)
+    // 2. Uploaded file data (PDF, Image, etc.)
     if (data) {
       const isPdf =
         data.startsWith('data:application/pdf') ||
@@ -2771,7 +3027,10 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
 
     // 3. Web URL
     if (card.link && card.link !== '#') {
-      window.open(card.link, '_blank', 'noopener,noreferrer');
+      const newWin = window.open(card.link, '_blank');
+      if (!newWin) {
+        window.location.href = card.link;
+      }
       return;
     }
   };
@@ -2812,13 +3071,13 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
       return;
     }
 
-    // If configured to open in new tab / independent window
-    if (card.openInNewTab) {
+    // Always open .html / .htm files or items with openInNewTab directly in a new window (never the modal)
+    if (isHtmlCard(card) || card.openInNewTab) {
       handleOpenInNewWindow(card);
       return;
     }
 
-    // Open directly as an Independent Window (not inside a modal!)
+    // Open non-HTML files in the viewer window
     setIndependentWindowCard(card);
     setIndependentFolderPath(folderPath);
     const cardUrl = getCardShareableUrl(card, folderPath, rootCardsRef.current);
@@ -2833,6 +3092,15 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
       });
     }
   };
+
+  if (isOpeningDirectHtml) {
+    return (
+      <div className="fixed inset-0 w-screen h-screen z-[999999] bg-slate-950 flex flex-col items-center justify-center text-white p-6 text-center">
+        <Loader2 className="w-10 h-10 text-emerald-400 animate-spin mb-4" />
+        <h3 className="text-base sm:text-lg font-semibold">Opening HTML Document...</h3>
+      </div>
+    );
+  }
 
   return (
     <div
