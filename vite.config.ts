@@ -54,14 +54,38 @@ function copyStaticAssetsPlugin(): Plugin {
         }
       }
 
-      // Ensure study-plan-styles.css is in dist
-      const srcStudyCss = path.resolve(__dirname, 'study-plan-styles.css');
-      const distStudyCss = path.resolve(__dirname, 'dist', 'study-plan-styles.css');
-      if (fs.existsSync(srcStudyCss) && !fs.existsSync(distStudyCss)) {
+      // Ensure Grammar/ (capital G) exists alongside grammar/ (lowercase g) for case-insensitive static hosting (Netlify/Linux)
+      const distGrammar = path.resolve(__dirname, 'dist', 'grammar');
+      const distGrammarCap = path.resolve(__dirname, 'dist', 'Grammar');
+      if (fs.existsSync(distGrammar)) {
+        const copyDirRecursive = (src: string, dest: string) => {
+          if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+          const entries = fs.readdirSync(src, { withFileTypes: true });
+          for (const entry of entries) {
+            const srcPath = path.join(src, entry.name);
+            const destPath = path.join(dest, entry.name);
+            if (entry.isDirectory()) {
+              copyDirRecursive(srcPath, destPath);
+            } else {
+              fs.copyFileSync(srcPath, destPath);
+            }
+          }
+        };
+        copyDirRecursive(distGrammar, distGrammarCap);
+      }
+
+      // Ensure english_grammar_master_revision_note.html is available directly in dist/grammar and dist/Grammar
+      const srcGrammarNote = path.resolve(__dirname, 'grammar', 'public', 'english_grammar_master_revision_note.html');
+      if (fs.existsSync(srcGrammarNote)) {
+        const destGrammarNote = path.resolve(__dirname, 'dist', 'grammar', 'english_grammar_master_revision_note.html');
+        const destGrammarCapNote = path.resolve(__dirname, 'dist', 'Grammar', 'english_grammar_master_revision_note.html');
         try {
-          fs.copyFileSync(srcStudyCss, distStudyCss);
+          if (!fs.existsSync(path.dirname(destGrammarNote))) fs.mkdirSync(path.dirname(destGrammarNote), { recursive: true });
+          fs.copyFileSync(srcGrammarNote, destGrammarNote);
+          if (!fs.existsSync(path.dirname(destGrammarCapNote))) fs.mkdirSync(path.dirname(destGrammarCapNote), { recursive: true });
+          fs.copyFileSync(srcGrammarNote, destGrammarCapNote);
         } catch (e) {
-          console.warn('Failed to copy study-plan-styles.css to dist:', e);
+          console.warn('Failed to copy english_grammar_master_revision_note.html:', e);
         }
       }
 

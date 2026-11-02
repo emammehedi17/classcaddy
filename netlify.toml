@@ -57,3 +57,33 @@
   to = "/study_plan.html"
   status = 200
 
+[[redirects]]
+  from = "/grammar"
+  to = "/grammar/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/grammar/"
+  to = "/grammar/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/Grammar"
+  to = "/grammar/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/Grammar/"
+  to = "/grammar/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/Grammar/index.html"
+  to = "/grammar/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/Grammar/*"
+  to = "/grammar/:splat"
+  status = 200
+

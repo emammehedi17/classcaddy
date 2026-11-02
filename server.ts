@@ -181,8 +181,15 @@ async function startServer() {
         }
       }
 
+      // Grammar module rewrite: /grammar, /grammar/, /Grammar, /Grammar/
+      if (lower === '/grammar' || lower === '/grammar/' || lower === '/grammar/index' || lower === '/grammar/index.html') {
+        req.url = '/grammar/index.html';
+        next();
+        return;
+      }
+
       // Very basic extensionless to .html rewrite for development
-      if (!req.url.includes('.') && req.url !== '/' && !req.url.startsWith('/api')) {
+      if (!req.url.includes('.') && req.url !== '/' && !req.url.startsWith('/api') && !lower.startsWith('/grammar')) {
         req.url += '.html';
       }
       next();
@@ -192,6 +199,9 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath, { extensions: ["html"] }));
+    app.get(['/grammar', '/grammar/', '/Grammar', '/Grammar/'], (_req: Request, res: Response) => {
+      res.sendFile(path.join(distPath, 'grammar', 'index.html'));
+    });
     app.get(['/archives.html/*', '/Archives.html/*', '/archives/*', '/Archives/*'], (_req: Request, res: Response) => {
       res.sendFile(path.join(distPath, 'archives.html'));
     });

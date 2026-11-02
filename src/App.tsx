@@ -20,6 +20,10 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState<PageView>(() => {
     const path = window.location.pathname.toLowerCase();
     const hash = window.location.hash.toLowerCase();
+    if (path.includes('grammar') || hash.includes('grammar')) {
+      window.location.replace('/grammar/index.html');
+      return 'home';
+    }
     if (path.includes('study_plan') || hash.includes('study-plan') || hash.includes('study_plan')) return 'study-plan';
     if (path.includes('about') || hash.includes('about')) return 'about';
     if (path.includes('contact') || hash.includes('contact')) return 'contact';
