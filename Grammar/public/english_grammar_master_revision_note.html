@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ENGLISH GRAMMAR — MASTER REVISION NOTE (BCS, Bank & Admission)</title>
+  <meta name="description" content="Ultimate examination-oriented English Grammar Master Revision Note for BCS, Bank & University Admission. Prepared by Emam Mehedi.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-body: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-card-alt: #f1f5f9;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-light: #64748b;
+      --border-color: #e2e8f0;
+      --primary: #4338ca;
+      --primary-light: #e0e7ff;
+      --primary-dark: #312e81;
+      --accent-emerald: #059669;
+      --accent-rose: #e11d48;
+      --accent-amber: #d97706;
+      --font-family: 'Inter', 'Noto Sans Bengali', 'Hind Siliguri', 'Kalpurush', sans-serif;
+      --font-bengali: 'Noto Sans Bengali', 'Hind Siliguri', 'Kalpurush', sans-serif;
+      --base-font-size: 15px;
+    }
+
+    .dark {
+      --bg-body: #090d16;
+      --bg-card: #0f172a;
+      --bg-card-alt: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #cbd5e1;
+      --text-light: #94a3b8;
+      --border-color: #1e293b;
+      --primary: #6366f1;
+      --primary-light: #312e81;
+      --primary-dark: #1e1b4b;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --accent-amber: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      font-size: var(--base-font-size);
+      line-height: 1.6;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    /* Bengali Font Inheritance Protection for Brackets & Dynamic Text */
+    :lang(bn), .bengali-text, .bn-inline {
+      font-family: var(--font-bengali) !important;
+    }
+
+    /* Header in normal document flow - Strictly scrolls away */
+    .header-flow {
+      position: relative;
+      background: linear-gradient(180deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%);
+      color: #ffffff;
+      padding: 40px 20px 48px;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .header-content {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(165, 180, 252, 0.3);
+      color: #c7d2fe;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .main-title {
+      font-size: clamp(26px, 4vw, 44px);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 10px;
+      color: #ffffff;
+    }
+
+    .main-title span {
+      background: linear-gradient(90deg, #fbbf24, #2dd4bf, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sub-title {
+      font-size: clamp(14px, 2vw, 18px);
+      color: #cbd5e1;
+      margin-bottom: 24px;
+    }
+
+    .meta-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      padding: 16px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(71, 85, 105, 0.5);
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .meta-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #94a3b8;
+    }
+
+    .meta-value {
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    /* Sticky Study Toolbar */
+    .sticky-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      padding: 10px 20px;
+    }
+
+    .toolbar-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 240px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card-alt);
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+      font-size: 14px;
+    }
+
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card-alt);
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .btn:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    /* Main Container */
+    .content-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 24px 20px 80px;
+    }
+
+    /* Collapsible Table of Contents */
+    .toc-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .toc-header {
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-card-alt);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .toc-content {
+      display: none;
+      padding: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 10px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .toc-content.open {
+      display: grid;
+    }
+
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: var(--bg-body);
+      border: 1px solid var(--border-color);
+      text-decoration: none;
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 600;
+      transition: border-color 0.15s, transform 0.1s;
+    }
+
+    .toc-item:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateX(2px);
+    }
+
+    .toc-num {
+      width: 22px;
+      height: 22px;
+      background: var(--primary);
+      color: #ffffff;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      shrink: 0;
+    }
+
+    /* Topic Sections */
+    .section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      margin-bottom: 32px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      scroll-margin-top: 80px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .section-bengali {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+
+    .rule-card {
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      background: var(--bg-body);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .rule-header {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-card-alt);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .rule-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .formula-box {
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+
+    .example-correct {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .example-correct strong {
+      color: var(--accent-emerald);
+      display: block;
+      margin-bottom: 4px;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .example-incorrect {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .example-incorrect strong {
+      color: var(--accent-rose);
+      display: block;
+      margin-bottom: 4px;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .trap-box {
+      background: rgba(245, 158, 11, 0.1);
+      border-left: 4px solid var(--accent-amber);
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    .trap-box strong {
+      color: var(--accent-amber);
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .memory-box {
+      background: rgba(45, 212, 191, 0.1);
+      border: 1px solid rgba(45, 212, 191, 0.3);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #0f766e;
+    }
+
+    .dark .memory-box {
+      color: #2dd4bf;
+    }
+
+    /* Last Night Section */
+    .cram-box {
+      background: linear-gradient(180deg, rgba(217, 119, 6, 0.08) 0%, var(--bg-card) 100%);
+      border: 2px solid rgba(217, 119, 6, 0.4);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 40px;
+    }
+
+    .cram-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .cram-item {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: var(--bg-body);
+      border: 1px solid var(--border-color);
+    }
+
+    .cram-topic {
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--accent-amber);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .cram-formula {
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Back to Top */
+    .back-to-top {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 4px 12px rgba(67, 56, 202, 0.4);
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      z-index: 100;
+    }
+
+    /* Footer */
+    footer {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 48px 20px;
+      text-align: center;
+      font-size: 13px;
+      border-top: 1px solid #1e293b;
+    }
+
+    footer strong {
+      color: #ffffff;
+    }
+
+    @media print {
+      .no-print, .sticky-toolbar, .back-to-top {
+        display: none !important;
+      }
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      .section-card {
+        page-break-inside: avoid;
+        border: 1px solid #ccc;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 
+    STRICT REQUIREMENT: Header must remain in normal document flow.
+    It completely scrolls out of the viewport as user scrolls downward!
+  -->
+  <header class="header-flow">
+    <div class="header-content">
+      <div class="header-badge">
+        <span>⚡ EXAMINATION-ORIENTED REVISION NOTE</span>
+      </div>
+
+      <h1 class="main-title">
+        ENGLISH GRAMMAR <span>— MASTER REVISION NOTE</span>
+      </h1>
+
+      <p class="sub-title">
+        BCS • University Admission • Bank • Government & Other Competitive Exams
+      </p>
+
+      <div class="meta-bar">
+        <div class="meta-item">
+          <span class="meta-label">Prepared By</span>
+          <span class="meta-value">Emam Mehedi</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Revision Date</span>
+          <span class="meta-value">1 November, 2026</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Source Foundation</span>
+          <span class="meta-value">6 Consolidated Competitive References</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sticky Study Toolbar -->
+  <div class="sticky-toolbar no-print">
+    <div class="toolbar-container">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          id="searchInput" 
+          class="search-input" 
+          placeholder="Search rule, keyword or Bangla (e.g. Gerund, Preposition, বাচ্য)..."
+          oninput="handleSearch(this.value)"
+        >
+      </div>
+
+      <div class="btn-group">
+        <button class="btn" onclick="toggleTOC()">📋 Table of Contents</button>
+        <button class="btn" onclick="toggleAllCards()">↕ Expand/Collapse All</button>
+        <button class="btn" onclick="changeFontSize(-1)">A-</button>
+        <button class="btn" onclick="resetFontSize()">100%</button>
+        <button class="btn" onclick="changeFontSize(1)">A+</button>
+        <button class="btn" onclick="toggleTheme()">🌓 Theme</button>
+        <button class="btn" onclick="window.print()">🖨 Print / PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Container -->
+  <main class="content-container">
+
+    <!-- Collapsed Table of Contents (Click to open) -->
+    <div class="toc-card no-print">
+      <div class="toc-header" onclick="toggleTOC()">
+        <span>📚 Table of Contents / সূচিপত্র (Click to Expand / Collapse)</span>
+        <span id="tocToggleIcon">▼</span>
+      </div>
+      <div id="tocContent" class="toc-content">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </div>
+
+    <!-- ⚡ LAST-NIGHT REVISION -->
+    <div id="last-night" class="cram-box">
+      <h2 style="font-size: 24px; font-weight: 800; color: var(--accent-amber); display: flex; align-items: center; gap: 8px;">
+        ⚡ LAST-NIGHT REVISION (২৪টি দ্রুততম রিভিশন সূত্র)
+      </h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;" class="bengali-text">
+        পরীক্ষার আগের রাতে ঝড়ের গতিতে চোখ বুলিয়ে নেওয়ার জন্য সবচেয়ে গুরুত্বপূর্ণ সূত্রাবলি।
+      </p>
+
+      <div id="cramGrid" class="cram-grid">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Chapter Sections -->
+    <div id="sectionsContainer">
+      <!-- Dynamically Rendered by JavaScript Arrays -->
+    </div>
+
+  </main>
+
+  <!-- Back to Top Button -->
+  <button id="backToTop" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Back to top">
+    ↑
+  </button>
+
+  <!-- Footer -->
+  <footer>
+    <div style="max-width: 800px; margin: 0 auto; line-height: 1.8;">
+      <h3 style="color: #ffffff; font-size: 16px; margin-bottom: 8px;">ENGLISH GRAMMAR — MASTER REVISION NOTE</h3>
+      <p>BCS • University Admission • Bank • Government & Other Competitive Exams</p>
+      <p style="margin-top: 12px; color: #cbd5e1;">
+        Prepared by: <strong>Emam Mehedi</strong> | Revision Date: <strong>1 November, 2026</strong>
+      </p>
+      <p style="margin-top: 16px; font-size: 11px; color: #64748b;">
+        Final Authorized Edition: <strong>1 November, 2026</strong>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Core Data Architecture
+    const SECTIONS = [
+      {
+        id: "parts-of-speech",
+        number: 1,
+        title: "Parts of Speech & Sentence Positions",
+        bengaliTitle: "পদ প্রকরণ ও অবস্থানগত নিয়ম",
+        rules: [
+          {
+            title: "Determiner + Noun / Determiner + Adj + Noun",
+            bengali: "Article বা Determiner এর পর একটিমাত্র শব্দ থাকলে তা Noun, দুটি থাকলে ১ম টি Adjective ও ২য় টি Noun হয়।",
+            formula: "Article/Det + (Word 1 = Noun) | Article/Det + (Word 1 = Adj) + (Word 2 = Noun)",
+            explanation: "I walked for a while — এখানে while এর পূর্বে a থাকায় while হলো Noun। This is the go of the world — এখানে go হলো Noun।",
+            correct: "This is the go of the world. (go = Noun) | He is an only child. (only = Adjective)",
+            trap: "Go, While, Better শব্দগুলো সাধারণত Verb বা Conjunction হলেও Article এর পর বসলে 100% Noun।",
+            memory: "Article + 1 word = Noun; Article + 2 words = Adj + Noun"
+          },
+          {
+            title: "Preposition Without Object Becomes an Adverb",
+            bengali: "Preposition এর পর কোনো Noun/Pronoun না থাকলে তা Adverb হয়ে যায়।",
+            formula: "Prep + Noun = Preposition | Prep + (No Noun) = Adverb",
+            explanation: "He ran down the street — এখানে down এর পর the street থাকায় down হলো Preposition। কিন্তু The sun has gone down — এখানে down এর পর কোনো Noun নেই, তাই down হলো Adverb।",
+            correct: "Please come in. (in = Adverb) | He is in the room. (in = Preposition)",
+            trap: "Down, In, Up, Off শব্দগুলো বাক্যের শেষে বা কোনো Object ছাড়া বসলে সর্বদা Adverb।",
+            memory: "Prep + Object = Preposition; Prep alone = Adverb!"
+          },
+          {
+            title: "Noun + ly = Adjective vs Adjective + ly = Adverb",
+            bengali: "Noun এর সাথে ly যুক্ত হলে Adjective হয়; Adjective এর সাথে ly যুক্ত হলে Adverb হয়।",
+            formula: "Noun + ly = Adjective (friendly, lovely, motherly) | Adjective + ly = Adverb (quickly, wisely)",
+            explanation: "Friendly, motherly, scholarly, cowardly, lovely শব্দগুলো Adjective। এদের Adverb করতে হলে 'in a friendly manner / way' লিখতে হয়।",
+            correct: "He behaved in a friendly way. (Correct) | She is a lovely girl. (lovely = Adjective)",
+            incorrect: "He behaved friendly. (ভুল — friendly adverb নয়)",
+            trap: "পরীক্ষায় 'He acted cowardly' ভুল বাক্য হিসেবে আসে; সঠিক: 'He acted in a cowardly manner'।"
+          }
+        ]
+      },
+      {
+        id: "nouns",
+        number: 2,
+        title: "Noun: Classification & Uncountable Traps",
+        bengaliTitle: "বিশেষ্য: প্রকারভেদ ও আনকাউন্টেবল ফাঁদ",
+        rules: [
+          {
+            title: "Uncountable Nouns Never Take a/an or -s/-es",
+            bengali: "গণনা অযোগ্য Noun এর পূর্বে a/an বসে না এবং এদের Plural রূপ হয় না।",
+            formula: "No a/an + Uncountable Noun + Singular Verb",
+            explanation: "Advice, Furniture, Information, Luggage, Baggage, Scenery, Poetry, Traffic, Machinery, Bread, Homework, Money, Soap — এরা সর্বদা Singular।",
+            correct: "He gave me some advice. / a piece of advice. | The scenery of Cox's Bazar is charming.",
+            incorrect: "He gave me an advice. / He gave me many advices. | The sceneries are beautiful.",
+            trap: "পরীক্ষায় 'furnitures', 'informations', 'sceneries' লিখে ভুল অপশন সাজানো হয়।"
+          },
+          {
+            title: "Proper / Abstract Noun Becoming Common Noun",
+            bengali: "Proper বা Abstract Noun এর পূর্বে The বসলে বা তুলনা করলে তা Common Noun হয়।",
+            formula: "The + Proper / Abstract Noun + of = Common Noun",
+            explanation: "Kazi Nazrul Islam is the Shelley of Bangladesh (এখানে Shelley = Common Noun)। The honesty of the boy is praiseworthy (honesty = Common Noun)।",
+            correct: "Nelson Mandela is an Abraham Lincoln in his ideals. (Lincoln = Common Noun)",
+            trap: "ব্যক্তির নামের আগে 'The' দেখলেই বুঝে নেবেন তা Common Noun হয়ে গেছে।"
+          }
+        ]
+      },
+      {
+        id: "number",
+        number: 3,
+        title: "Number: Latin & Greek Irregular Plurals",
+        bengaliTitle: "বচন: ল্যাটিন ও গ্রীক বহুবচনের নিয়ম",
+        rules: [
+          {
+            title: "Latin/Greek Singular to Plural Rules",
+            bengali: "ল্যাটিন ও গ্রীক শব্দের রূপান্তর নিয়ম।",
+            formula: "-um -> -a | -is -> -es | -us -> -i | -on -> -a",
+            explanation: "Medium -> Media; Datum -> Data; Bacterium -> Bacteria; Crisis -> Crises; Analysis -> Analyses; Radius -> Radii; Alumnus -> Alumni; Criterion -> Criteria; Phenomenon -> Phenomena.",
+            correct: "What are the criteria for the scholarship? | The analyses were accurate.",
+            incorrect: "This is a criteria. (Must be: criterion)",
+            trap: "Crises, Analyses, Phenomena শব্দগুলো বহুবচন, এদের সাথে Plural Verb বসবে।"
+          },
+          {
+            title: "Invariable Forms (Singular & Plural Same)",
+            bengali: "কিছু Noun এর একবচন ও বহুবচন রূপ হুবহু একই থাকে।",
+            formula: "Sheep, Deer, Fish, Salmon, Aircraft, Offspring -> NO 'S' EVER",
+            explanation: "Five deer and ten sheep were grazing in the field. কোনো অবস্থাতেই deers বা sheeps লেখা যাবে না।",
+            correct: "We saw ten sheep on the hill. | Three aircraft were spotted.",
+            incorrect: "Ten sheeps and five deers."
+          }
+        ]
+      },
+      {
+        id: "pronoun",
+        number: 4,
+        title: "Pronoun: 231 vs 123 Rule & Relative Pronouns",
+        bengaliTitle: "সর্বনাম: ক্রম ও আপেক্ষিক সর্বনামের নিয়ম",
+        rules: [
+          {
+            title: "Order of Persons: 231 (Good) vs 123 (Fault/Crime)",
+            bengali: "স্বাভাবিক কথায় ২য় -> ৩য় -> ১ম পুরুষ; কিন্তু দোষ স্বীকারে ১ম -> ২য় -> ৩য় পুরুষ বসে।",
+            formula: "Normal: 2nd + 3rd + 1st Person (You, he and I) | Crime: 1st + 2nd + 3rd (I, you and he)",
+            explanation: "You, he and I are friends (স্বাভাবিক)। I, you and he are to blame / guilty (দোষ স্বীকারে)।",
+            correct: "You, he and I were present. | I, you and he committed the offense.",
+            incorrect: "I, you and he went to school together.",
+            trap: "তিনজন যুক্ত হলেও Verb কিন্তু Plural (are / were / have) হবে।"
+          },
+          {
+            title: "Objective Case After Preposition and 'Let'",
+            bengali: "Preposition ও Let এর পর সর্বদা Objective Pronoun বসে।",
+            formula: "Preposition / Let + me, him, her, them, us",
+            explanation: "Between you and me (NOT you and I). Let him and me do the work (NOT he and I).",
+            correct: "Between you and me, he is a cheat. | Let you and me go there.",
+            incorrect: "Between you and I. | Let he and I go."
+          },
+          {
+            title: "Pronoun Consistency with 'One'",
+            bengali: "Subject 'One' হলে তার পরবর্তী Pronoun সর্বদা 'one's' হবে, his/her নয়।",
+            formula: "One should do ONE'S duty (NOT his duty)",
+            explanation: "One must keep one's promise. তবে Everyone/Somebody থাকলে his or her বসে।",
+            correct: "One should be mindful of one's obligations.",
+            incorrect: "One should be mindful of his obligations."
+          }
+        ]
+      },
+      {
+        id: "verbs",
+        number: 5,
+        title: "Verb Classifications: Linking, Factitive & Causative",
+        bengaliTitle: "ক্রিয়া প্রকরণ: লিংকিং, ফ্যাকটিটিভ ও কজেটিভ ভার্ব",
+        rules: [
+          {
+            title: "Linking Verbs Take ADJECTIVES (AB FLRST)",
+            bengali: "Linking verb এর পর Adverb বসে না, Adjective বসে।",
+            formula: "Sub + Appear/Become/Feel/Look/Remain/Sound/Smell/Taste + ADJECTIVE",
+            explanation: "Honey tastes sweet (NOT sweetly). She looks beautiful (NOT beautifully). He feels cold.",
+            correct: "The rose smells sweet. | The food tasted delicious.",
+            incorrect: "The rose smells sweetly. | She looks beautifully."
+          },
+          {
+            title: "Causative Verbs (Have, Make, Let, Get)",
+            bengali: "অন্যকে দিয়ে কাজ করানোর বিশেষ কাঠামো।",
+            formula: "Make/Let + Person/Thing + V1 | Have + Person + V1, Thing + V3 | Get + Person + to+V1, Thing + V3",
+            explanation: "I had him wash my car vs I had my car washed. I got him to wash my car vs I got my car washed. He made me laugh.",
+            correct: "I had my hair cut yesterday. | She got him to sign the contract.",
+            incorrect: "I had my hair to cut. | He made me to laugh."
+          }
+        ]
+      },
+      {
+        id: "non-finite",
+        number: 6,
+        title: "Non-Finite Verbs: Gerund vs Participle",
+        bengaliTitle: "অসমাপিকা ক্রিয়া: জিরান্ড ও পার্টিসিপলের পার্থক্য",
+        rules: [
+          {
+            title: "The 3 Golden Formulas for Gerund vs Participle",
+            bengali: "জিরান্ড ও প্রেজেন্ট পার্টিসিপল নির্ণয়ের অব্যর্থ সূত্র।",
+            formula: "The + V-ing + of = Verbal Noun | Noun + for + V-ing = Gerund | Noun + is + V-ing = Participle",
+            explanation: "A sleeping pill = pill for sleeping (উদ্দেশ্য = Gerund). A sleeping child = child is sleeping (চলমান অবস্থা = Participle). The reading of history is fun (Verbal Noun).",
+            correct: "A rolling stone gathers no moss. (rolling = Participle) | Swimming is a good exercise. (swimming = Gerund)",
+            trap: "Preposition + V-ing = Gerund (He is fond of reading)."
+          },
+          {
+            title: "Phrases with 'To' that Require GERUND (V-ing)",
+            bengali: "সাধারণত to এর পর V1 বসে, কিন্তু এই ফ্রেজগুলোতে to এর পর V-ing বসে।",
+            formula: "Look forward to / With a view to / Be used to / Accustomed to / Addicted to + V-ing",
+            explanation: "I look forward to hearing from you. He came with a view to buying a dictionary.",
+            correct: "I am looking forward to meeting you. | He is used to working at night.",
+            incorrect: "I look forward to hear from you."
+          }
+        ]
+      },
+      {
+        id: "adjectives",
+        number: 7,
+        title: "Adjectives: OSASCOMP Order & Latin Comparatives",
+        bengaliTitle: "বিশেষণ: ক্রম ও ল্যাটিন তুলনামূলক শব্দ",
+        rules: [
+          {
+            title: "Multiple Adjective Order (OSASCOMP)",
+            bengali: "একাধিক Adjective এর ধারাবাহিক ক্রম।",
+            formula: "Opinion -> Size -> Age -> Shape -> Color -> Origin -> Material -> Purpose + NOUN",
+            explanation: "She bought a beautiful (O) small (S) round (Sh) black (C) Japanese (Or) wooden (M) table.",
+            correct: "An old round wooden table.",
+            trap: "পরীক্ষায় red round old বনাম old round red এর মধ্যে old (Age) round (Shape) red (Color) সঠিক।"
+          },
+          {
+            title: "Latin Comparatives Take 'TO', NEVER 'THAN'",
+            bengali: "Senior, junior, superior, inferior, prior, preferable এর পর সর্বদা TO বসে।",
+            formula: "Senior / Junior / Superior / Inferior / Prior / Preferable + TO",
+            explanation: "He is senior to me by two years. Death is preferable to dishonor.",
+            correct: "This product is superior to that one. | He is junior to me.",
+            incorrect: "He is senior than me. | Death is preferable than dishonor."
+          }
+        ]
+      },
+      {
+        id: "degree",
+        number: 8,
+        title: "Degree of Comparison: Special Structures",
+        bengaliTitle: "তুলনামূলক মাত্রা: বিশেষ নিয়মাবলী",
+        rules: [
+          {
+            title: "'Of the two' Takes THE + Comparative",
+            bengali: "দুইজনের মধ্যে একজনকে ভালো/মন্দ বোঝাতে Comparative এর পূর্বে The বসে।",
+            formula: "The + Comparative + of the two",
+            explanation: "Of the two girls, Rina is the prettier. He is the taller of the two brothers.",
+            correct: "He is the taller of the two. (Correct) | He is the tallest of the two. (ভুল — দুইজনে taller)",
+            trap: "৩ জন হলে Superlative (the tallest), কিন্তু ২ জন হলে The + Comparative (the taller)!"
+          },
+          {
+            title: "Double Comparative Formula",
+            bengali: "আনুপাতিক হ্রাস-বৃদ্ধি প্রকাশে উভয় ক্লজে The + Comparative বসে।",
+            formula: "The + Comparative ... , The + Comparative ...",
+            explanation: "The more you read, the more you learn. The higher you climb, the colder it gets.",
+            correct: "The sooner, the better. | The harder he worked, the happier he felt.",
+            incorrect: "More you read, more you learn."
+          }
+        ]
+      },
+      {
+        id: "articles",
+        number: 9,
+        title: "Articles: Sound Rules & Geographical Uses",
+        bengaliTitle: "পদাশ্রিত নির্দেশক: ধ্বনি ও ভৌগোলিক নাম",
+        rules: [
+          {
+            title: "Sound-Based Article Choice (A vs An)",
+            bengali: "Vowel এর উচ্চারণ 'ইউ' বা 'ওয়া' হলে A বসে; Silent 'H' ও স্বরধ্বনিতে An বসে।",
+            formula: "'Yu' / 'Wa' sound -> A | Vowel sound / Silent H -> An",
+            explanation: "A university, a European, a one-eyed man. An honest man, an hour, an heir, an MP, an LLB.",
+            correct: "He is an MA, but his brother is a BA. | I met a European.",
+            incorrect: "He is a MA. | He is an European."
+          },
+          {
+            title: "Mountain Ranges (The) vs Single Peak (No Article)",
+            bengali: "পর্বতমালা ও দ্বীপপুঞ্জে The বসে; একক পর্বতশৃঙ্গ বা একক দ্বীপে Article বসে না।",
+            formula: "The Himalayas / The Alps vs Mount Everest / Sandwip (No Article)",
+            explanation: "Mount Everest is the highest mountain in the Himalayas.",
+            correct: "Mount Everest is in the Himalayas. | Sandwip is an island.",
+            incorrect: "The Mount Everest is the highest peak."
+          }
+        ]
+      },
+      {
+        id: "prepositions",
+        number: 10,
+        title: "Prepositions: The 'DIE' Matrix & Appropriate Uses",
+        bengaliTitle: "পদান্বয়ী অব্যয়: Die এর বহুরূপ ও জরুরি প্রেপোজিশন",
+        rules: [
+          {
+            title: "The 'DIE' Preposition Matrix",
+            bengali: "মৃত্যুর কারণভেদে Die এর পর ভিন্ন প্রেপোজিশন বসে।",
+            formula: "Disease/Hunger = OF | Overwork/Wound = FROM | Poison/Suicide = BY | Country = FOR | Battle/Harness = IN",
+            explanation: "He died of malaria. The soldier died from his wound. He died by poison. He died for his country. The clerk died in harness.",
+            correct: "He died of cancer. | He died from overeating.",
+            trap: "Overeating বা Wound হলে 'from' হবে, 'of' নয়।"
+          },
+          {
+            title: "Zero Preposition After Certain Verbs",
+            bengali: "এই Verb গুলোর পর কোনো Preposition বসে না।",
+            formula: "Discuss / Describe / Order / Reach / Resemble / Enter + NO PREPOSITION",
+            explanation: "Let us discuss the matter (NOT discuss about). He ordered a coffee (NOT ordered for). She resembles her mother (NOT resembles to).",
+            correct: "He entered the room. | She ordered dinner.",
+            incorrect: "Let us discuss about it. | He entered into the room."
+          }
+        ]
+      },
+      {
+        id: "sva",
+        number: 11,
+        title: "Subject-Verb Agreement: Core Rules",
+        bengaliTitle: "কর্তা-ক্রিয়া অন্বয়: প্রধান নিয়মাবলী",
+        rules: [
+          {
+            title: "As well as / Along with / Together with",
+            bengali: "এই শব্দগুলো দিয়ে যুক্ত হলে Verb ১ম Subject অনুযায়ী বসে।",
+            formula: "Subject 1 + as well as / along with + Subject 2 + Verb (Agrees with Sub 1)",
+            explanation: "The chairman, along with his members, is coming. They, as well as he, are responsible.",
+            correct: "The manager, accompanied by his clerks, was present.",
+            incorrect: "The manager, along with his clerks, were present."
+          },
+          {
+            title: "'A Number of' vs 'The Number of'",
+            bengali: "A number of এর পর Plural Verb; The number of এর পর Singular Verb বসে।",
+            formula: "A number of + Plural Noun + PLURAL VERB | The number of + Plural Noun + SINGULAR VERB",
+            explanation: "A number of students are absent today. The number of students in the class is fifty.",
+            correct: "A number of boys were playing. | The number of applicants is increasing.",
+            trap: "A = Plural; The = Singular!"
+          },
+          {
+            title: "Fractions & Percentages",
+            bengali: "ভগ্নাংশ ও শতকরায় 'of' এর পরের Noun দেখে Verb বসে।",
+            formula: "Fraction of Singular = Singular Verb | Fraction of Plural = Plural Verb",
+            explanation: "Two-thirds of the work has been finished. Two-thirds of the boys are present.",
+            correct: "Two-thirds of the money was spent. | Three-fourths of the road is paved.",
+            incorrect: "Two-thirds of the work have been finished."
+          }
+        ]
+      },
+      {
+        id: "conditionals",
+        number: 12,
+        title: "Conditionals & Conditional Inversion",
+        bengaliTitle: "শর্তসূচক বাক্য ও শর্তীয় ইনভার্সন",
+        rules: [
+          {
+            title: "The 3 Core Conditionals",
+            bengali: "তিনটি প্রধান শর্তযুক্ত বাক্যের কাল মেলবন্ধন।",
+            formula: "1st: If+Present, will+V1 | 2nd: If+Past, would+V1 | 3rd: If+Had+V3, would have+V3",
+            explanation: "If you work hard, you will succeed. If I were you, I would do it. If he had called me, I would have helped him.",
+            correct: "Had I known this, I would have warned you.",
+            trap: "If-clause এ কখনো will বা would বসে না!"
+          },
+          {
+            title: "Conditional Inversion (Omitting 'If')",
+            bengali: "If তুলে দিয়ে Had/Were সামনে এনে ইনভার্সন।",
+            formula: "Had + Sub + V3 ... , Sub + would have + V3",
+            explanation: "Had I been a rich man, I would have helped the poor. (= If I had been a rich man...).",
+            correct: "Had he studied properly, he would have passed.",
+            incorrect: "Had he studied properly, he would pass."
+          }
+        ]
+      },
+      {
+        id: "subjunctive",
+        number: 13,
+        title: "Subjunctive Mood: Mandative Structures",
+        bengaliTitle: "সাবজাঙ্কটিভ মুড: বেস ফর্মের নিয়ম",
+        rules: [
+          {
+            title: "Mandative Verbs & Adjectives + BASE FORM",
+            bengali: "Insist, suggest, recommend, imperative that এর পর Verb এর Base Form বসে।",
+            formula: "Sub + suggest/insist/demand + THAT + Subj + BASE VERB (be, go, stop)",
+            explanation: "The doctor recommended that he stop smoking (NOT stops). I insisted that she be present (NOT is/was).",
+            correct: "It is essential that he join the team. | We propose that she be appointed.",
+            incorrect: "The doctor recommended that he stops smoking."
+          }
+        ]
+      },
+      {
+        id: "right-form",
+        number: 14,
+        title: "Right Form of Verbs: High-Yield Traps",
+        bengaliTitle: "ক্রিয়ার সঠিক রূপ: গুরুত্বপূর্ণ ব্যতিক্রম",
+        rules: [
+          {
+            title: "It is high time + Past Indefinite (V2)",
+            bengali: "It is high time এর পর Subject থাকলে Verb এর Past form (V2) বসে।",
+            formula: "It is high time + Subject + V2",
+            explanation: "It is high time we changed our habits. (কখনোই change বা should change নয়)।",
+            correct: "It is high time he started his studies. | It is time to leave.",
+            incorrect: "It is high time we change our habits."
+          },
+          {
+            title: "As if / As though / Wish -> Always WERE",
+            bengali: "অবাস্তব ইচ্ছা বা ভান বোঝাতে Be verb সর্বদা WERE হবে।",
+            formula: "Subject + wish / as if + WERE",
+            explanation: "He speaks as if he were a leader. I wish I were a bird.",
+            correct: "She acts as though she were a queen.",
+            incorrect: "He speaks as if he was a leader."
+          }
+        ]
+      },
+      {
+        id: "conjunctions",
+        number: 15,
+        title: "Correlative Conjunctions: Lest, Though, No Sooner",
+        bengaliTitle: "সংযোজক অব্যয়: লেস্ট, দো, নো সুনার",
+        rules: [
+          {
+            title: "'Lest' Clause Takes 'SHOULD', NEVER 'NOT'",
+            bengali: "Lest এর পর Subject + should + V1 বসে এবং কোনো negative শব্দ বসে না।",
+            formula: "Lest + Subject + SHOULD + V1",
+            explanation: "Walk fast lest you should miss the train.",
+            correct: "Run fast lest you should miss the opportunity.",
+            incorrect: "Walk fast lest you should not miss the train."
+          },
+          {
+            title: "No Sooner ... THAN / Hardly ... WHEN",
+            bengali: "No sooner এর সাথে THAN; Hardly ও Scarcely এর সাথে WHEN বসে।",
+            formula: "No sooner had + S + V3 ... THAN + Past Indefinite",
+            explanation: "No sooner had we reached the station than the train left.",
+            correct: "Hardly had he arrived when the rain began.",
+            incorrect: "No sooner had he left then it started."
+          }
+        ]
+      }
+    ];
+
+    const LAST_NIGHT = [
+      { topic: "Latin Plurals", formula: "Medium->Media, Datum->Data, Crisis->Crises, Radius->Radii, Criterion->Criteria" },
+      { topic: "Noun of Multitude", formula: "Jury united = was / its | Jury divided = were / their opinions" },
+      { topic: "Uncountable Nouns", formula: "Advice, Furniture, Information, Scenery, Bread, Traffic -> NEVER a/an or -s" },
+      { topic: "Pronoun Order", formula: "Good deeds = 231 (You, he and I) | Guilt/Fault = 123 (I, you and he)" },
+      { topic: "Preposition of Die", formula: "Disease = OF | Overeating = FROM | Poison = BY | Country = FOR | Battle = IN" },
+      { topic: "Linking Verbs", formula: "Appear, Become, Feel, Look, Smell, Taste + ADJECTIVE (Honey tastes sweet)" },
+      { topic: "Latin Comparatives", formula: "Senior, Junior, Superior, Inferior, Prior, Preferable + TO (NEVER THAN)" },
+      { topic: "Of the two", formula: "He is THE taller of the two (The + Comparative with 'of the two')" },
+      { topic: "Double Comparative", formula: "The more you read, the more you learn (The + Comp ... , The + Comp ...)" },
+      { topic: "Subjunctive", formula: "Suggest/Insist that + Subj + BASE VERB (He insists that she GO, not goes)" },
+      { topic: "It is high time", formula: "It is high time + Subject + V2 (It is high time we CHANGED our habits)" },
+      { topic: "Lest Clause", formula: "Lest + Subject + SHOULD + V1 (NO not/never ever with lest!)" },
+      { topic: "No Sooner Pair", formula: "No sooner had ... THAN | Hardly/Scarcely had ... WHEN" },
+      { topic: "As well as Agreement", formula: "Karim as well as his friends IS coming (Agrees with FIRST subject)" },
+      { topic: "A vs The Number of", formula: "A number of boys ARE | The number of boys IS" },
+      { topic: "Gerund vs Participle", formula: "For + V-ing = Gerund (sleeping pill) | Is + V-ing = Participle (sleeping child)" },
+      { topic: "Embedded Question", formula: "Do you know where he LIVES (Statement order: WH + Subject + Verb)" },
+      { topic: "Redundancy Traps", formula: "NO: return back, repeat again, proceed forward, enter into, reason because" }
+    ];
+
+    // Rendering Logic
+    function renderTOC() {
+      const container = document.getElementById('tocContent');
+      container.innerHTML = SECTIONS.map(s => `
+        <a href="#${s.id}" class="toc-item">
+          <span class="toc-num">${s.number}</span>
+          <div>
+            <div>${s.title}</div>
+            <div style="font-size: 11px; color: var(--text-light);">${s.bengaliTitle}</div>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    function renderLastNight() {
+      const container = document.getElementById('cramGrid');
+      container.innerHTML = LAST_NIGHT.map(item => `
+        <div class="cram-item">
+          <div class="cram-topic">⚡ ${item.topic}</div>
+          <div class="cram-formula">${item.formula}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderSections() {
+      const container = document.getElementById('sectionsContainer');
+      container.innerHTML = SECTIONS.map(sec => `
+        <section id="${sec.id}" class="section-card">
+          <div class="section-title">
+            <span style="background: var(--primary); color: white; width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px;">${sec.number}</span>
+            <span>${sec.title}</span>
+          </div>
+          <div class="section-bengali">${sec.bengaliTitle}</div>
+
+          <div class="rules-container">
+            ${sec.rules.map((r, rIdx) => `
+              <div class="rule-card" id="card-${sec.id}-${rIdx}">
+                <div class="rule-header" onclick="toggleCard('${sec.id}', ${rIdx})">
+                  <span>📌 ${r.title}</span>
+                  <span id="icon-${sec.id}-${rIdx}">▲</span>
+                </div>
+                <div class="rule-body" id="body-${sec.id}-${rIdx}">
+                  ${r.bengali ? `<p class="bengali-text" style="font-weight: 500; color: var(--text-muted);">${r.bengali}</p>` : ''}
+                  ${r.formula ? `<div class="formula-box">FORMULA: ${r.formula}</div>` : ''}
+                  <p class="bengali-text">${r.explanation}</p>
+                  
+                  <div class="examples-grid">
+                    ${r.correct ? `
+                      <div class="example-correct">
+                        <strong>✓ Correct (শুদ্ধ রূপ)</strong>
+                        <span>${r.correct}</span>
+                      </div>
+                    ` : ''}
+                    ${r.incorrect ? `
+                      <div class="example-incorrect">
+                        <strong>✗ Incorrect (ভুল রূপ)</strong>
+                        <span style="text-decoration: line-through;">${r.incorrect}</span>
+                      </div>
+                    ` : ''}
+                  </div>
+
+                  ${r.trap ? `
+                    <div class="trap-box">
+                      <strong>⚠️ EXAM TRAP / সতর্ক সংকেত</strong>
+                      <span class="bengali-text">${r.trap}</span>
+                    </div>
+                  ` : ''}
+
+                  ${r.memory ? `
+                    <div class="memory-box">
+                      ⚡ Quick Memory: ${r.memory}
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+      `).join('');
+    }
+
+    // Toggle TOC
+    function toggleTOC() {
+      const content = document.getElementById('tocContent');
+      const icon = document.getElementById('tocToggleIcon');
+      if (content.classList.contains('open')) {
+        content.classList.remove('open');
+        icon.textContent = '▼';
+      } else {
+        content.classList.add('open');
+        icon.textContent = '▲';
+      }
+    }
+
+    // Card collapse toggle
+    function toggleCard(secId, rIdx) {
+      const body = document.getElementById(`body-${secId}-${rIdx}`);
+      const icon = document.getElementById(`icon-${secId}-${rIdx}`);
+      if (body.style.display === 'none') {
+        body.style.display = 'flex';
+        icon.textContent = '▲';
+      } else {
+        body.style.display = 'none';
+        icon.textContent = '▼';
+      }
+    }
+
+    let allOpen = true;
+    function toggleAllCards() {
+      allOpen = !allOpen;
+      document.querySelectorAll('.rule-body').forEach(b => {
+        b.style.display = allOpen ? 'flex' : 'none';
+      });
+      document.querySelectorAll('.rule-header span:last-child').forEach(s => {
+        s.textContent = allOpen ? '▲' : '▼';
+      });
+    }
+
+    // Theme toggle
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+    }
+
+    // Font Sizing
+    let currentFontSize = 15;
+    function changeFontSize(delta) {
+      currentFontSize = Math.min(22, Math.max(12, currentFontSize + delta * 2));
+      document.documentElement.style.setProperty('--base-font-size', currentFontSize + 'px');
+    }
+
+    function resetFontSize() {
+      currentFontSize = 15;
+      document.documentElement.style.setProperty('--base-font-size', '15px');
+    }
+
+    // Search Engine
+    function handleSearch(query) {
+      const q = query.toLowerCase().trim();
+      document.querySelectorAll('.section-card').forEach(sec => {
+        const text = sec.innerText.toLowerCase();
+        if (!q || text.includes(q)) {
+          sec.style.display = 'block';
+        } else {
+          sec.style.display = 'none';
+        }
+      });
+    }
+
+    // Back to top scroll listener
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('backToTop');
+      if (window.scrollY > 400) {
+        btn.style.display = 'flex';
+      } else {
+        btn.style.display = 'none';
+      }
+    });
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTOC();
+      renderLastNight();
+      renderSections();
+    });
+  </script>
+</body>
+</html>

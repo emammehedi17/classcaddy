@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Inter', 'Noto Sans Bengali', 'Hind Siliguri', 'Kalpurush', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-bengali: 'Noto Sans Bengali', 'Hind Siliguri', 'Kalpurush', 'SolaimanLipi', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'Fira Code', monospace;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+  }
+
+  /* Universal Bengali text protection inside brackets, parenthesis, cards, tables, marks */
+  :lang(bn),
+  .bengali-text,
+  [data-lang="bn"] {
+    font-family: var(--font-bengali) !important;
+  }
+
+  /* Ensure Bengali characters inside brackets and punctuation inherit the proper Bengali font */
+  span, p, div, td, th, li, a, h1, h2, h3, h4, h5, h6, mark, code, pre {
+    font-feature-settings: "kern" 1;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Specific rule to prevent bracketed Bengali text from picking Arabic or unsupported fonts */
+  .bracket-bn,
+  .bn-inline {
+    font-family: var(--font-bengali) !important;
+    font-weight: 500;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background-color: white !important;
+    color: black !important;
+    font-size: 11pt !important;
+  }
+
+  .print-page-break {
+    page-break-before: always;
+  }
+
+  .topic-card {
+    break-inside: avoid;
+    border: 1px solid #ddd !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 85, 105, 0.7);
+}
+
+/* Highlight style */
+mark.search-highlight {
+  background-color: #fef08a;
+  color: #1e293b;
+  padding: 0.1em 0.25em;
+  border-radius: 0.25em;
+  font-family: inherit !important;
+}
+
+.dark mark.search-highlight {
+  background-color: #ca8a04;
+  color: #ffffff;
+}
