@@ -520,6 +520,81 @@ body {
 .geo-line b { color: var(--accent-text); }
 .geo-line small { color: var(--text-muted); }
 
+/* Fullscreen Card Mode */
+body.fs-open { overflow: hidden; }
+#fs-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2500;
+    background: var(--bg-main);
+    color: var(--text-primary);
+    flex-direction: column;
+    font-family: var(--font-family-bn);
+}
+#fs-overlay.open { display: flex; }
+.fs-stage {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 18px 14px 12px;
+}
+.fs-stage .event-card {
+    width: 100%;
+    max-width: 960px;
+    margin: auto;
+    box-shadow: var(--shadow-md);
+}
+.fs-stage .card-body { padding: 22px 26px; }
+.fs-stage .event-title { font-size: 1.55em; margin: 8px 0; }
+.fs-stage .event-desc { font-size: 1.18em; line-height: 1.9; }
+.fs-stage .geo-line { font-size: 1.05em; }
+.fs-stage .img-wrapper { max-height: 48vh; }
+.fs-stage .img-wrapper img { max-height: 48vh; object-fit: contain; }
+.fs-serial {
+    display: inline-block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: var(--accent-text);
+    background: var(--accent-soft);
+    border-radius: 8px;
+    padding: 3px 12px;
+}
+.fs-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: var(--bg-header);
+    border-top: 1px solid var(--border-color);
+}
+.fs-controls .btn { padding: 9px 16px; font-size: 14px; }
+.fs-controls input[type=number] {
+    width: 130px;
+    padding: 9px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 14px;
+    text-align: center;
+    outline: none;
+}
+.fs-controls select {
+    padding: 9px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 14px;
+}
+
 /* Image Engine Styling */
 .media-container {
     margin-top: 8px;
@@ -997,6 +1072,7 @@ u.hl-underline { text-decoration: underline wavy #ef4444 2px; text-underline-off
             <button class="btn active" id="view-grid-btn" onclick="setViewMode('grid')">⏹️ কার্ড গ্রিড</button>
             <button class="btn" id="view-reading-btn" onclick="setViewMode('reading')">📖 বুক রিডিং</button>
             <button class="btn" id="view-table-btn" onclick="setViewMode('table')">📊 টেবিল শিট</button>
+            <button class="btn" id="view-fs-btn" onclick="openFullscreenCards()" title="একটি একটি করে কার্ড, ফুল স্ক্রিনে">🃏 ফুলস্ক্রিন কার্ড</button>
         </div>
     </div>
 
@@ -1113,6 +1189,24 @@ u.hl-underline { text-decoration: underline wavy #ef4444 2px; text-underline-off
             <span id="quiz-score" style="font-weight:700; color:var(--accent);">স্কোর: ০ / ০</span>
             <button class="btn btn-primary" onclick="generateQuizQuestion()">পরবর্তী প্রশ্ন ➡️</button>
         </div>
+    </div>
+</div>
+
+<!-- Fullscreen Card Mode -->
+<div id="fs-overlay" aria-hidden="true">
+    <div class="fs-stage" id="fs-stage"></div>
+    <div class="fs-controls">
+        <button class="btn" id="fs-prev" onclick="fsStep(-1)">◀ আগের</button>
+        <input type="number" id="fs-jump" min="1" placeholder="কার্ড নং" title="কার্ড নম্বরে যান (Enter চাপুন)">
+        <button class="btn" onclick="fsGoInput()">যান</button>
+        <button class="btn" id="fs-next" onclick="fsStep(1)">পরের ▶</button>
+        <select id="fs-theme-select" onchange="fsTheme(this.value)" title="থিম পরিবর্তন">
+            <option value="light">☀️ Light</option>
+            <option value="sepia">📖 Sepia</option>
+            <option value="grey">🌫️ Grey</option>
+            <option value="dark">🌙 Dark</option>
+        </select>
+        <button class="btn" onclick="closeFullscreenCards()" title="বন্ধ করুন (Esc)">✖</button>
     </div>
 </div>
 
@@ -1460,6 +1554,120 @@ function geoLine(ev) {
     return `<div class="geo-line">🌍 <b>বর্তমান স্থান:</b> ${txt}${approx ? ' <small>(বিবরণ থেকে অনুমিত)</small>' : ''}</div>`;
 }
 
+/* ===== Fullscreen Card Mode ===== */
+let fsList = [];
+let fsIdx = 0;
+function fsCardHtml(ev) {
+    let media = '';
+    if (ev.primaryImg) {
+        const cap = escapeHtml(ev.imgCaption || ev.t);
+        media = `<div class="media-container"><div class="img-wrapper" onclick="openLightbox('${ev.primaryImg}', '${ev.fallbackImg}', '${cap}')">
+            <img src="${ev.primaryImg}" data-fallback="${ev.fallbackImg}" alt="${escapeHtml(ev.imgAlt)}" referrerpolicy="no-referrer" onerror="handleImgError(this)"></div>
+            ${(ev.imgCaption || ev.wikiSource) ? `<div class="media-caption"><div>${ev.imgCaption || ''}</div><div class="media-credit"><span>📷 ${ev.imgCredit || 'Wikimedia Commons'}</span>${ev.wikiSource ? `<a href="${ev.wikiSource}" target="_blank" rel="noopener noreferrer">উইকিপিডিয়া সোর্স ↗</a>` : ''}</div></div>` : ''}
+        </div>`;
+    } else {
+        media = `<div class="media-container aif-slot" data-serial="${ev.serial}" style="display:none;"></div>`;
+    }
+    return `<article class="event-card fs-card">
+        <div class="card-body">
+            <div class="fs-serial">#${toBengaliNum(ev.serial)} / ${toBengaliNum(allEvents.length)}</div>
+            <div class="meta-badges">
+                <span class="badge badge-year">⏳ ${ev.y || 'সময়কাল অজানা'}</span>
+                ${ev.pl ? `<span class="badge badge-place">📍 ${ev.pl}</span>` : ''}
+                ${ev.isPerson ? `<span class="badge badge-person">👤 ব্যক্তিত্ব</span>` : ''}
+                ${ev.subjects.map(s => `<span class="badge badge-subj">📘 ${SUBJECT_NAMES[s] || s}</span>`).join('')}
+            </div>
+            ${geoLine(ev)}
+            <h2 class="event-title">${ev.t}</h2>
+            <p class="event-desc">${ev.s || ''}</p>
+            ${media}
+        </div>
+    </article>`;
+}
+function fsRender() {
+    const ev = fsList[fsIdx];
+    if (!ev) return;
+    const stage = document.getElementById('fs-stage');
+    stage.innerHTML = fsCardHtml(ev);
+    stage.scrollTop = 0;
+    document.getElementById('fs-jump').value = ev.serial;
+    document.getElementById('fs-prev').disabled = fsIdx <= 0;
+    document.getElementById('fs-next').disabled = fsIdx >= fsList.length - 1;
+    aifScan();
+}
+function openFullscreenCards() {
+    if (!allEvents.length) return;
+    fsList = filteredEvents.length ? filteredEvents : allEvents;
+    fsIdx = Math.min(fsList.length - 1, Math.max(0, (currentPage - 1) * perPage));
+    document.getElementById('fs-theme-select').value = document.documentElement.getAttribute('data-theme') || 'light';
+    document.getElementById('fs-jump').max = allEvents.length;
+    document.getElementById('fs-overlay').classList.add('open');
+    document.getElementById('fs-overlay').setAttribute('aria-hidden', 'false');
+    document.body.classList.add('fs-open');
+    fsRender();
+    try {
+        const el = document.documentElement;
+        if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(() => {});
+    } catch (e) {}
+}
+function closeFullscreenCards() {
+    const ov = document.getElementById('fs-overlay');
+    if (!ov.classList.contains('open')) return;
+    ov.classList.remove('open');
+    ov.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('fs-open');
+    document.getElementById('fs-stage').innerHTML = '';
+    try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {}); } catch (e) {}
+    // main list-কে বর্তমান কার্ডের পেজে নিয়ে যাওয়া
+    const ev = fsList[fsIdx];
+    if (ev) {
+        const i = filteredEvents.findIndex(e => e.serial === ev.serial);
+        if (i !== -1) { currentPage = Math.floor(i / perPage) + 1; renderCurrentPage(); }
+    }
+}
+function fsStep(delta) {
+    const n = fsIdx + delta;
+    if (n < 0 || n >= fsList.length) return;
+    fsIdx = n;
+    fsRender();
+}
+function fsGoInput() {
+    const serial = parseInt(document.getElementById('fs-jump').value, 10);
+    if (!serial || serial < 1 || serial > allEvents.length) return;
+    let i = fsList.findIndex(e => e.serial === serial);
+    if (i === -1) {
+        fsList = allEvents;   // ফিল্টারের বাইরের নম্বর হলে সব ঘটনার তালিকায় যাওয়া
+        i = serial - 1;
+    }
+    fsIdx = i;
+    fsRender();
+}
+function fsTheme(v) {
+    document.getElementById('theme-select').value = v;
+    changeTheme(v);
+}
+document.getElementById('fs-jump').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); fsGoInput(); } });
+document.addEventListener('keydown', e => {
+    if (!document.getElementById('fs-overlay').classList.contains('open')) return;
+    if (document.getElementById('lightbox-modal').style.display === 'flex') return;
+    if (e.target && e.target.id === 'fs-jump') return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') { fsStep(1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { fsStep(-1); e.preventDefault(); }
+    else if (e.key === 'Escape') { closeFullscreenCards(); }
+});
+document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) closeFullscreenCards();
+});
+(function() {
+    let sx = 0, sy = 0;
+    const st = document.getElementById('fs-stage');
+    st.addEventListener('touchstart', e => { sx = e.changedTouches[0].clientX; sy = e.changedTouches[0].clientY; }, { passive: true });
+    st.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+        if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) fsStep(dx < 0 ? 1 : -1);
+    }, { passive: true });
+})();
+
 /* ===== Auto Image Finder: ছবিহীন ঘটনার জন্য উইকিপিডিয়া থেকে সবচেয়ে প্রাসঙ্গিক ছবি খোঁজা ===== */
 const AIF_KEY = 'itibritto_aif_cache_v2';
 let aifCache = {};
@@ -1573,8 +1781,9 @@ function aifEv(slot) {
     return allEvents[parseInt(slot.dataset.serial, 10) - 1];
 }
 function aifFill(ev) {
-    const slot = document.querySelector('#event-card-' + ev.serial + ' .aif-slot');
-    if (!slot) return;
+    document.querySelectorAll('.aif-slot[data-serial="' + ev.serial + '"]').forEach(slot => aifFillSlot(ev, slot));
+}
+function aifFillSlot(ev, slot) {
     const r = aifCache[ev.id];
     slot.innerHTML = '';
     if (!r || !r.u) { slot.style.display = 'none'; return; }
