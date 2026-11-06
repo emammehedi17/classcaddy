@@ -595,6 +595,23 @@ body.fs-open { overflow: hidden; }
     font-size: 14px;
 }
 
+/* Info Finder */
+.info-box {
+    margin-top: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+    background: var(--bg-main);
+}
+.info-box .info-title { font-weight: 700; color: var(--accent-text); margin-bottom: 6px; font-size: 0.95em; }
+.info-box .info-text p { margin: 0 0 8px; text-align: justify; line-height: 1.8; color: var(--text-primary); font-size: 0.96em; }
+.info-box .info-credit { font-size: 0.78em; color: var(--text-muted); margin-top: 4px; }
+.info-box .info-credit a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.info-more { font-size: 0.82em; margin-top: 8px; }
+.info-more a { color: var(--accent); text-decoration: none; font-weight: 600; }
+.fs-stage .info-box .info-text p { font-size: 1.08em; }
+
 /* Image Engine Styling */
 .media-container {
     margin-top: 8px;
@@ -1537,11 +1554,13 @@ function renderCurrentPage() {
                 ${geoLine(ev)}
                 <h2 class="event-title selectable-text" data-serial="${ev.serial}" data-title="${escapeHtml(ev.t)}">${ev.t}</h2>
                 <p class="event-desc selectable-text" data-serial="${ev.serial}" data-title="${escapeHtml(ev.t)}">${ev.s || ''}</p>
+                <div class="info-slot" data-serial="${ev.serial}"></div>
                 ${mediaHtml}
             </div>
         </article>`;
     }).join('');
     aifScan();
+    infoScan();
 }
 
 /* ===== Geo Line: প্রতিটি কার্ডে ঘটনার বর্তমান দেশ/স্থান ===== */
@@ -1580,6 +1599,7 @@ function fsCardHtml(ev) {
             ${geoLine(ev)}
             <h2 class="event-title">${ev.t}</h2>
             <p class="event-desc">${ev.s || ''}</p>
+            <div class="info-slot" data-serial="${ev.serial}"></div>
             ${media}
         </div>
     </article>`;
@@ -1594,6 +1614,7 @@ function fsRender() {
     document.getElementById('fs-prev').disabled = fsIdx <= 0;
     document.getElementById('fs-next').disabled = fsIdx >= fsList.length - 1;
     aifScan();
+    infoScan();
 }
 function openFullscreenCards() {
     if (!allEvents.length) return;
@@ -1667,6 +1688,183 @@ document.addEventListener('fullscreenchange', () => {
         if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) fsStep(dx < 0 ? 1 : -1);
     }, { passive: true });
 })();
+
+/* ===== Info Finder: প্রতিটি ঘটনার বিস্তারিত তথ্য (উইকিপিডিয়া থেকে) ===== */
+const INFO_MEM = {};
+function infoOpenDb() {
+    return new Promise(res => {
+        try {
+            const r = indexedDB.open('itibritto_info', 1);
+            r.onupgradeneeded = () => r.result.createObjectStore('kv');
+            r.onsuccess = () => res(r.result);
+            r.onerror = () => res(null);
+        } catch (e) { res(null); }
+    });
+}
+const infoDbP = infoOpenDb();
+async function infoGet(id) {
+    if (INFO_MEM[id] !== undefined) return INFO_MEM[id];
+    const db = await infoDbP;
+    if (!db) return undefined;
+    return new Promise(res => {
+        try {
+            const q = db.transaction('kv').objectStore('kv').get(id);
+            q.onsuccess = () => { if (q.result !== undefined) INFO_MEM[id] = q.result; res(q.result); };
+            q.onerror = () => res(undefined);
+        } catch (e) { res(undefined); }
+    });
+}
+async function infoSet(id, v) {
+    INFO_MEM[id] = v;
+    const db = await infoDbP;
+    if (!db) return;
+    try { db.transaction('kv', 'readwrite').objectStore('kv').put(v, id); } catch (e) {}
+}
+function infoTrim(text) {
+    text = String(text || '').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+    if (text.length <= 1400) return text;
+    const cut = text.slice(0, 1400);
+    const i = Math.max(cut.lastIndexOf('।'), cut.lastIndexOf('. '));
+    return i > 300 ? cut.slice(0, i + 1) : cut;
+}
+async function infoApi(lang, q) {
+    const url = 'https://' + lang + '.wikipedia.org/w/api.php?action=query&format=json&origin=*'
+        + '&generator=search&gsrnamespace=0&gsrlimit=5&gsrsearch=' + encodeURIComponent(q)
+        + '&prop=extracts|info|langlinks|pageprops&exintro=1&explaintext=1&exlimit=5'
+        + '&ppprop=disambiguation&inprop=url&lllang=en&lllimit=1';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const j = await res.json();
+    return Object.values((j.query && j.query.pages) || {}).sort((a, b) => a.index - b.index);
+}
+async function infoEn(title) {
+    const url = 'https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1'
+        + '&titles=' + encodeURIComponent(title)
+        + '&prop=extracts|info&exintro=1&explaintext=1&inprop=url';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const j = await res.json();
+    return Object.values((j.query && j.query.pages) || {})[0] || null;
+}
+async function infoFind(ev) {
+    const t = String(ev.t || '').replace(/[—–:|]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!t) return 0;
+    const tries = [], seen = new Set();
+    const add = (l, q, ref) => {
+        q = String(q).replace(/\s+/g, ' ').trim();
+        if (q.length < 2 || seen.has(l + '|' + q)) return;
+        seen.add(l + '|' + q); tries.push({ l, q, ref });
+    };
+    add('bn', t, ev.t);
+    String(ev.t).split(/[—–:|,،]/).forEach(seg => {
+        if (aifTokens(seg).some(x => !AIF_GENERIC.has(x))) add('bn', seg, ev.t);
+    });
+    add('bn', String(ev.t).replace(/\([^)]*\)/g, ' '), ev.t);
+    if (ev.pl && !t.includes(ev.pl)) add('bn', t + ' ' + ev.pl, ev.t);
+    const latin = ((ev.t || '').match(/[A-Za-z][A-Za-z'’.\- ]+/g) || []).join(' ').trim();
+    if (latin.replace(/[^A-Za-z]/g, '').length >= 4) add('en', latin, latin);
+    for (const tr of tries.slice(0, 5)) {
+        const pages = await infoApi(tr.l, tr.q);
+        let enChecks = 0;
+        for (const p of pages) {
+            if (p.pageprops && p.pageprops.disambiguation !== undefined) continue;
+            if (!aifRelevant(p.title, tr.ref)) continue;
+            if (p.extract && p.extract.trim().length >= 60) {
+                return { x: infoTrim(p.extract), t: p.title, p: p.fullurl || '', l: tr.l };
+            }
+            const ll = p.langlinks && p.langlinks[0] && (p.langlinks[0]['*'] || p.langlinks[0].title);
+            if (ll && enChecks < 2) {
+                enChecks++;
+                const ep = await infoEn(ll);
+                if (ep && ep.extract && ep.extract.trim().length >= 60) {
+                    return { x: infoTrim(ep.extract), t: p.title, p: ep.fullurl || p.fullurl || '', l: 'en' };
+                }
+            }
+        }
+    }
+    return 0;
+}
+const infoQueue = [], infoPending = new Set();
+let infoActive = 0, infoFails = 0, infoObserver = null;
+function infoEnqueue(ev) {
+    if (infoPending.has(ev.id)) return;
+    infoPending.add(ev.id);
+    infoQueue.push(ev);
+    infoPump();
+}
+function infoPump() {
+    while (infoActive < 2 && infoQueue.length && infoFails < 6) {
+        const ev = infoQueue.shift();
+        infoActive++;
+        infoFind(ev)
+            .then(r => { infoFails = 0; return infoSet(ev.id, r).then(() => infoFill(ev)); })
+            .catch(() => { infoFails++; })
+            .finally(() => { infoActive--; infoPending.delete(ev.id); setTimeout(infoPump, 200); });
+    }
+}
+function infoSearchLink(ev) {
+    const a = document.createElement('div');
+    a.className = 'info-more';
+    const l = document.createElement('a');
+    l.href = 'https://bn.wikipedia.org/w/index.php?search=' + encodeURIComponent(ev.t);
+    l.target = '_blank'; l.rel = 'noopener noreferrer';
+    l.textContent = '🔎 উইকিপিডিয়ায় আরও খুঁজুন ↗';
+    a.appendChild(l);
+    return a;
+}
+async function infoFill(ev) {
+    const slots = document.querySelectorAll('.info-slot[data-serial="' + ev.serial + '"]');
+    if (!slots.length) return;
+    const r = await infoGet(ev.id);
+    slots.forEach(slot => {
+        slot.innerHTML = '';
+        if (!r || !r.x) { slot.appendChild(infoSearchLink(ev)); return; }
+        const box = document.createElement('div');
+        box.className = 'info-box';
+        const ti = document.createElement('div');
+        ti.className = 'info-title';
+        ti.textContent = '📚 বিস্তারিত তথ্য — ' + r.t;
+        const tx = document.createElement('div');
+        tx.className = 'info-text';
+        r.x.split(/\n+/).filter(s => s.trim()).forEach(par => {
+            const p = document.createElement('p');
+            p.textContent = par.trim();
+            tx.appendChild(p);
+        });
+        const cr = document.createElement('div');
+        cr.className = 'info-credit';
+        cr.appendChild(document.createTextNode('সূত্র: ' + (r.l === 'en' ? 'English উইকিপিডিয়া (মূল ইংরেজি পাঠ)' : 'বাংলা উইকিপিডিয়া') + ' · CC BY-SA · '));
+        if (r.p) {
+            const a = document.createElement('a');
+            a.href = r.p; a.target = '_blank'; a.rel = 'noopener noreferrer';
+            a.textContent = 'পুরো নিবন্ধ ↗';
+            cr.appendChild(a);
+        }
+        box.appendChild(ti); box.appendChild(tx); box.appendChild(cr);
+        slot.appendChild(box);
+    });
+}
+function infoScan() {
+    infoFails = 0;
+    if (infoObserver) infoObserver.disconnect();
+    const slots = document.querySelectorAll('.info-slot');
+    if (!slots.length) return;
+    infoObserver = ('IntersectionObserver' in window)
+        ? new IntersectionObserver(entries => entries.forEach(en => {
+            if (!en.isIntersecting) return;
+            infoObserver.unobserve(en.target);
+            const ev = allEvents[parseInt(en.target.dataset.serial, 10) - 1];
+            if (!ev) return;
+            infoGet(ev.id).then(v => { if (v !== undefined) infoFill(ev); else infoEnqueue(ev); });
+        }), { rootMargin: '500px' })
+        : null;
+    slots.forEach(s => {
+        const ev = allEvents[parseInt(s.dataset.serial, 10) - 1];
+        if (!ev) return;
+        if (infoObserver) infoObserver.observe(s);
+        else infoGet(ev.id).then(v => { if (v !== undefined) infoFill(ev); else infoEnqueue(ev); });
+    });
+}
 
 /* ===== Auto Image Finder: ছবিহীন ঘটনার জন্য উইকিপিডিয়া থেকে সবচেয়ে প্রাসঙ্গিক ছবি খোঁজা ===== */
 const AIF_KEY = 'itibritto_aif_cache_v2';
