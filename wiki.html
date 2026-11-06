@@ -986,6 +986,67 @@ u.hl-underline { text-decoration: underline wavy #ef4444 2px; text-underline-off
     .workspace { flex-direction: column; }
     .study-sidebar { width: 100%; position: static; max-height: 500px; }
 }
+/* ===== New Compact Header (auto-hide on scroll) ===== */
+.top-navbar.hdr {
+    padding: 6px 16px 0;
+    transition: transform 0.3s ease, box-shadow 0.25s ease;
+    will-change: transform;
+}
+.top-navbar.hdr.nav-hidden { transform: translateY(-105%); box-shadow: none; }
+.hdr-row { max-width: 1600px; margin: 0 auto; display: flex; align-items: center; gap: 10px; }
+.hdr-main { padding: 2px 0 7px; }
+.hdr-brand { display: flex; align-items: center; gap: 9px; flex-shrink: 0; cursor: default; }
+.hdr-logo {
+    width: 36px; height: 36px; border-radius: 11px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: #fff; font-weight: 700; font-size: 19px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
+}
+.hdr-name { display: flex; flex-direction: column; line-height: 1.2; }
+.hdr-title { font-size: 17px; font-weight: 700; color: var(--text-primary); letter-spacing: 0.2px; }
+.hdr-title em { font-style: normal; color: var(--accent); }
+.hdr-count { font-size: 11.5px; font-weight: 600; color: var(--text-muted); }
+
+.hdr-search { flex: 1; min-width: 220px; max-width: 680px; margin: 0 auto; display: flex; align-items: center; gap: 8px; position: relative; }
+.hdr-search-ico { position: absolute; left: 13px; font-size: 14px; pointer-events: none; opacity: 0.75; }
+.hdr-search .search-input {
+    height: 38px; padding: 0 14px 0 36px; border-radius: 999px;
+    background: var(--bg-main); font-size: 13.5px;
+}
+.hdr-search .jump-input {
+    width: 88px; height: 38px; padding: 0 8px; border-radius: 999px;
+    background: var(--bg-main); text-align: center; font-size: 13px;
+}
+.hdr-tools { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.hdr-tools .btn, .hdr-tools .select-ctrl,
+.hdr-sub .btn, .hdr-sub .select-ctrl { height: 34px; border-radius: 999px; padding: 0 12px; }
+.hdr-seg {
+    display: inline-flex; align-items: center;
+    border: 1px solid var(--border-color); border-radius: 999px;
+    background: var(--bg-card); overflow: hidden;
+}
+.hdr-seg .btn { border: 0 !important; border-radius: 0 !important; height: 32px !important; padding: 0 12px !important; }
+.hdr-seg .btn + .btn { border-left: 1px solid var(--border-color) !important; }
+.hdr-sub { padding: 7px 0 8px; border-top: 1px solid var(--border-color); flex-wrap: wrap; justify-content: space-between; row-gap: 6px; }
+.hdr-filters { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.hdr-stats { display: flex; align-items: center; gap: 14px; font-size: 12.5px; font-weight: 600; color: var(--text-secondary); }
+.hdr-progress-line { height: 3px; margin: 0 -16px; background: var(--border-color); overflow: hidden; }
+.hdr-progress-line .progress-fill { height: 100%; }
+
+/* Sidebar follows header visibility */
+.study-sidebar {
+    top: calc(var(--hdr-off, 125px) + 14px);
+    max-height: calc(100vh - var(--hdr-off, 125px) - 28px);
+    transition: top 0.3s ease, max-height 0.3s ease, width 0.25s ease;
+}
+@media (max-width: 980px) {
+    .hdr-tools .lbl, .hdr-views .lbl { display: none; }
+    .hdr-search { order: 3; flex-basis: 100%; max-width: none; margin: 0; }
+    .hdr-main { flex-wrap: wrap; justify-content: space-between; }
+    .hdr-stats { width: 100%; justify-content: space-between; }
+}
+
 </style>
 </head>
 <body>
@@ -1009,46 +1070,44 @@ u.hl-underline { text-decoration: underline wavy #ef4444 2px; text-underline-off
 </button>
 
 <!-- Top Navigation Bar -->
-<header class="top-navbar" id="top-navbar">
-    <div class="nav-row-1">
-        <div class="brand-box">
-            <div class="brand-logo">ই</div>
-            <div class="brand-title">
-                <h1>ইতিবৃত্ত Pro <span class="badge badge-subj" id="total-Writeup-badge">৪,৯৯৫টি ঘটনা</span></h1>
-                <small>BCS ও প্রতিযোগিতামূলক পরীক্ষার পূর্ণাঙ্গ বিশ্ব ও বাংলাদেশ ইতিহাস স্টাডি স্যুট</small>
+<header class="top-navbar hdr" id="top-navbar">
+    <div class="hdr-row hdr-main">
+        <div class="hdr-brand" title="BCS ও প্রতিযোগিতামূলক পরীক্ষার পূর্ণাঙ্গ বিশ্ব ও বাংলাদেশ ইতিহাস স্টাডি স্যুট">
+            <div class="hdr-logo">ই</div>
+            <div class="hdr-name">
+                <span class="hdr-title">ইতিবৃত্ত <em>Pro</em></span>
+                <span class="hdr-count" id="total-Writeup-badge">৪,৯৯৫টি ঘটনা</span>
             </div>
         </div>
 
-        <div class="search-container">
-            <input type="text" id="search-input" class="search-input" placeholder="🔍 ঘটনা, সাল, স্থান বা ব্যক্তিত্ব খুঁজুন (যেমন: মুক্তিযুদ্ধ, পলাশী, সক্রেটিস, ১৫২৬)...">
-            <input type="number" id="jump-input" class="jump-input" min="1" max="4995" placeholder="ক্রমিক নং (১-৪৯৯৫)" title="যেকোনো ক্রমিক নম্বরে সরাসরি যান">
+        <div class="hdr-search">
+            <span class="hdr-search-ico">🔍</span>
+            <input type="text" id="search-input" class="search-input" placeholder="ঘটনা, সাল, স্থান বা ব্যক্তি খুঁজুন — যেমন: পলাশী, মুক্তিযুদ্ধ, ১৫২৬">
+            <input type="number" id="jump-input" class="jump-input" min="1" max="4995" placeholder="# নং" title="যেকোনো ক্রমিক নম্বরে সরাসরি যান (১–৪৯৯৫)">
         </div>
 
-        <div class="toolbar-controls">
+        <div class="hdr-tools">
             <select id="theme-select" class="select-ctrl" onchange="changeTheme(this.value)" title="রিডিং থিম পরিবর্তন করুন">
-                <option value="light">☀️ Light Mode</option>
-                <option value="sepia">📖 Reading (Sepia)</option>
-                <option value="grey">🌫️ Soft Grey</option>
-                <option value="dark">🌙 Dark Mode</option>
+                <option value="light">☀️ Light</option>
+                <option value="sepia">📖 Sepia</option>
+                <option value="grey">🌫️ Grey</option>
+                <option value="dark">🌙 Dark</option>
             </select>
-
-            <button class="btn" onclick="adjustFontSize(-1)" title="ফন্ট ছোট করুন">A-</button>
-            <button class="btn" onclick="adjustFontSize(1)" title="ফন্ট বড় করুন">A+</button>
-
-            <button class="btn" onclick="openFlashcardModal()">🎴 ফ্ল্যাশকার্ড</button>
-            <button class="btn" onclick="openQuizModal()">🎯 এমসিকিউ কুইজ</button>
-            <button class="btn active" onclick="toggleSidebar()" id="sidebar-toggle-btn">📒 নোটবুক</button>
-            <button class="btn" onclick="document.getElementById('upload-modal').style.display='flex'" title="নতুন JSON ফাইল আপলোড করুন">📂 ফাইল</button>
-            <button class="btn" onclick="toggleHeaderSection()" id="header-collapse-btn" title="উপরের হেডিং সেকশন কলাপস/এক্সপান্ড করুন">🔼</button>
+            <div class="hdr-seg">
+                <button class="btn" onclick="adjustFontSize(-1)" title="ফন্ট ছোট করুন">A−</button>
+                <button class="btn" onclick="adjustFontSize(1)" title="ফন্ট বড় করুন">A+</button>
+            </div>
+            <button class="btn" onclick="openFlashcardModal()" title="ফ্ল্যাশকার্ড">🎴<span class="lbl"> ফ্ল্যাশকার্ড</span></button>
+            <button class="btn" onclick="openQuizModal()" title="এমসিকিউ কুইজ">🎯<span class="lbl"> কুইজ</span></button>
+            <button class="btn active" onclick="toggleSidebar()" id="sidebar-toggle-btn" title="নোটবুক খুলুন/বন্ধ করুন">📒<span class="lbl"> নোটবুক</span></button>
+            <button class="btn" onclick="document.getElementById('upload-modal').style.display='flex'" title="ফাইল আপলোড / ব্যাকআপ">📂</button>
         </div>
     </div>
 
-    <div class="header-collapsible" id="header-collapsible">
-    <!-- Filter & View Row -->
-    <div class="filter-bar">
-        <div class="filter-group">
+    <div class="header-collapsible hdr-row hdr-sub" id="header-collapsible">
+        <div class="hdr-filters">
             <select id="era-filter" class="select-ctrl" onchange="applyFilters()">
-                <option value="all">⏳ সকল যুগ (All Eras)</option>
+                <option value="all">⏳ সকল যুগ</option>
                 <option value="anc">প্রাচীন যুগ (খ্রিপূ ৩৪০০ – ৪৯৯ খ্রি.)</option>
                 <option value="med">মধ্যযুগ (৫০০ – ১৪৯৯ খ্রি.)</option>
                 <option value="emod">আদি-আধুনিক যুগ (১৫০০ – ১৭৮৮ খ্রি.)</option>
@@ -1057,11 +1116,10 @@ u.hl-underline { text-decoration: underline wavy #ef4444 2px; text-underline-off
                 <option value="cold">স্নায়ুযুদ্ধ ও উপনিবেশমুক্তি (১৯৪৬ – ১৯৯১)</option>
                 <option value="now">সমকাল (১৯৯২ – ২০২৬)</option>
             </select>
-
             <select id="subject-filter" class="select-ctrl" onchange="applyFilters()">
-                <option value="all">📚 সকল বিষয় (All Subjects)</option>
-                <option value="ba">বাংলাদেশ বিষয়াবলি (৯৬০)</option>
-                <option value="ia">আন্তর্জাতিক বিষয়াবলি (৬২১)</option>
+                <option value="all">📚 সকল বিষয়</option>
+                <option value="ba">বাংলাদেশ বিষয়াবলি (৯৬০)</option>
+                <option value="ia">আন্তর্জাতিক বিষয়াবলি (৬২১)</option>
                 <option value="bn">বাংলা ভাষা ও সাহিত্য (৫২৭)</option>
                 <option value="en">ইংরেজি সাহিত্য (৪৮৪)</option>
                 <option value="ict">আইসিটি ও কম্পিউটার (২৯৭)</option>
@@ -1070,38 +1128,32 @@ u.hl-underline { text-decoration: underline wavy #ef4444 2px; text-underline-off
                 <option value="eth">নৈতিকতা ও সুশাসন (৪৭)</option>
                 <option value="math">গাণিতিক যুক্তি (৪০)</option>
             </select>
-
             <select id="type-filter" class="select-ctrl" onchange="applyFilters()">
-                <option value="all">🗂️ সব ধরন (৪,৯৯৫)</option>
+                <option value="all">🗂️ সব ধরন</option>
                 <option value="event">⚔️ ঐতিহাসিক ঘটনা (৪,২৬৬)</option>
                 <option value="person">👤 বিখ্যাত ব্যক্তিত্ব (৭২৯)</option>
                 <option value="image">🖼️ ছবিসহ ঘটনা (১,৯২৭)</option>
                 <option value="bookmarked">⭐ বুকমার্ক করা</option>
-                <option value="unread">📌 অপঠিত (Unread)</option>
-                <option value="read">✅ পঠিত (Completed)</option>
+                <option value="unread">📌 অপঠিত</option>
+                <option value="read">✅ পঠিত</option>
             </select>
-
-            <button class="btn" onclick="resetFilters()">🔄 রিসেট</button>
+            <button class="btn" onclick="resetFilters()" title="সব ফিল্টার রিসেট">🔄<span class="lbl"> রিসেট</span></button>
         </div>
 
-        <div class="filter-group">
-            <span style="font-size:12.5px; color:var(--text-muted);">ভিউ মোড:</span>
-            <button class="btn active" id="view-grid-btn" onclick="setViewMode('grid')">⏹️ কার্ড গ্রিড</button>
-            <button class="btn" id="view-reading-btn" onclick="setViewMode('reading')">📖 বুক রিডিং</button>
-            <button class="btn" id="view-table-btn" onclick="setViewMode('table')">📊 টেবিল শিট</button>
-            <button class="btn" id="view-fs-btn" onclick="openFullscreenCards()" title="একটি একটি করে কার্ড, ফুল স্ক্রিনে">🃏 ফুলস্ক্রিন কার্ড</button>
+        <div class="hdr-seg hdr-views">
+            <button class="btn active" id="view-grid-btn" onclick="setViewMode('grid')" title="কার্ড গ্রিড">⏹️<span class="lbl"> গ্রিড</span></button>
+            <button class="btn" id="view-reading-btn" onclick="setViewMode('reading')" title="বুক রিডিং">📖<span class="lbl"> রিডিং</span></button>
+            <button class="btn" id="view-table-btn" onclick="setViewMode('table')" title="টেবিল শিট">📊<span class="lbl"> টেবিল</span></button>
+            <button class="btn" id="view-fs-btn" onclick="openFullscreenCards()" title="একটি একটি করে কার্ড, ফুল স্ক্রিনে">🃏<span class="lbl"> ফুলস্ক্রিন</span></button>
+        </div>
+
+        <div class="hdr-stats">
+            <span id="progress-text">পড়া সম্পন্ন: ০ / ৪,৯৯৫ (০%)</span>
+            <span id="bookmark-count-text">⭐ বুকমার্ক: ০</span>
         </div>
     </div>
 
-    <!-- Study Progress Strip -->
-    <div class="progress-strip">
-        <span id="progress-text">পড়া সম্পন্ন: ০ / ৪,৯৯৫ (০%)</span>
-        <div class="progress-track">
-            <div class="progress-fill" id="progress-fill"></div>
-        </div>
-        <span id="bookmark-count-text">⭐ বুকমার্ক: ০</span>
-    </div>
-    </div>
+    <div class="hdr-progress-line"><div class="progress-fill" id="progress-fill"></div></div>
 </header>
 
 <!-- Main Workspace -->
@@ -2546,6 +2598,38 @@ function clearAllStorage() {
         location.reload();
     }
 }
+
+/* ===== Smart Header: নিচে স্ক্রল করলে পুরো হেডার লুকায়, উপরে স্ক্রল করলে ফিরে আসে ===== */
+(function() {
+    const nav = document.getElementById('top-navbar');
+    if (!nav) return;
+    let lastY = window.scrollY, ticking = false, hidden = false;
+    function setOffset() {
+        document.documentElement.style.setProperty('--hdr-off', (hidden ? 0 : nav.offsetHeight) + 'px');
+    }
+    function setHidden(h) {
+        if (h === hidden) return;
+        hidden = h;
+        nav.classList.toggle('nav-hidden', h);
+        setOffset();
+    }
+    function onScroll() {
+        const y = window.scrollY, d = y - lastY;
+        if (y < 80) setHidden(false);
+        else if (d > 6 && !nav.contains(document.activeElement)) setHidden(true);
+        else if (d < -6) setHidden(false);
+        lastY = y;
+        ticking = false;
+    }
+    window.addEventListener('scroll', () => {
+        if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
+    }, { passive: true });
+    window.addEventListener('resize', setOffset);
+    nav.addEventListener('focusin', () => setHidden(false));
+    document.addEventListener('mousemove', e => { if (hidden && e.clientY < 6) setHidden(false); });
+    setOffset();
+    setTimeout(setOffset, 400);
+})();
 
 // Initialize on Load
 (function() {
