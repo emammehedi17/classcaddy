@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Manager - হিসাব ব্যবস্থাপনা</title>
+  <!-- Load Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Load Google Fonts (Inter & Hind Siliguri for Bangla) -->
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', 'Hind Siliguri', sans-serif;
+    }
+    /* Custom scrollbar for smooth mobile and desktop experience */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Print-specific styles */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      main {
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+      }
+      .table-container {
+        box-shadow: none !important;
+        border: none !important;
+        overflow: visible !important;
+      }
+      table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 10pt !important;
+      }
+      th, td {
+        border: 1px solid #94a3b8 !important;
+        padding: 4px 6px !important;
+      }
+      input {
+        border: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        width: 100% !important;
+        color: #000 !important;
+      }
+      footer {
+        position: static !important;
+        box-shadow: none !important;
+        border-top: 2px solid #000 !important;
+        margin-top: 16px !important;
+        padding: 10px 0 !important;
+      }
+      tr.unpaid-row {
+        background-color: #fee2e2 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      thead th {
+        background-color: #f1f5f9 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col text-slate-800">
+
+  <!-- Top Sticky Header -->
+  <header class="bg-indigo-700 text-white p-3 sm:p-4 shadow-md sticky top-0 z-30 no-print">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
+      <div class="flex items-center gap-2.5">
+        <div class="bg-indigo-600 p-2 rounded-lg shadow-inner">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg sm:text-xl font-bold tracking-tight">Payment Tracker</h1>
+            <span id="save-badge" class="bg-emerald-500/20 border border-emerald-400/30 text-emerald-100 text-[10px] px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              Auto-Saved
+            </span>
+          </div>
+          <p class="text-xs text-indigo-200">সকল পরিবর্তন অটোমেটিক সেভ থাকে • লাল সারি = পেমেন্ট বাকি</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center flex-wrap gap-2 w-full sm:w-auto justify-end">
+        <!-- Search Filter -->
+        <div class="relative flex-grow sm:flex-grow-0 sm:w-56">
+          <input 
+            type="text" 
+            id="search-input" 
+            placeholder="নাম, রোল বা মোবাইল খুঁজুন..." 
+            class="w-full bg-indigo-800/80 text-white placeholder-indigo-300 text-xs sm:text-sm rounded-lg pl-8 pr-3 py-2 border border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-white/40"
+          >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-indigo-300 absolute left-2.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+
+        <!-- Add Row Button -->
+        <button 
+          onclick="addRow()" 
+          class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold shadow-sm transition-all flex items-center gap-1.5"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>নতুন সারি</span>
+        </button>
+
+        <!-- Print Button -->
+        <button 
+          onclick="window.print()" 
+          class="bg-white text-indigo-700 hover:bg-indigo-50 active:scale-95 px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold shadow-sm transition-all flex items-center gap-1.5"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          <span>Print</span>
+        </button>
+
+        <!-- Reset Default Data Button -->
+        <button 
+          onclick="openResetModal()" 
+          title="মূল ডাটায় ফিরে যান"
+          class="bg-indigo-800 hover:bg-rose-600 text-indigo-200 hover:text-white p-2 rounded-lg text-xs transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Print Only Header -->
+  <div class="hidden print:block text-center py-4 border-b border-gray-300 mb-3">
+    <h1 class="text-2xl font-bold">স্মারক ও মগ পেমেন্ট তালিকা</h1>
+    <p class="text-xs text-gray-600" id="print-date"></p>
+  </div>
+
+  <!-- Quick Filter Bar (Mobile Friendly) -->
+  <div class="bg-white border-b border-slate-200 px-3 py-2 no-print">
+    <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2 text-xs">
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+        <button onclick="setFilter('all')" id="filter-all" class="px-2.5 py-1 rounded-full font-semibold bg-indigo-600 text-white transition">সবগুলো (<span id="count-all">0</span>)</button>
+        <button onclick="setFilter('paid')" id="filter-paid" class="px-2.5 py-1 rounded-full font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition">পেমেন্ট সম্পন্ন (<span id="count-paid">0</span>)</button>
+        <button onclick="setFilter('unpaid')" id="filter-unpaid" class="px-2.5 py-1 rounded-full font-medium bg-rose-100 text-rose-700 hover:bg-rose-200 transition">পেমেন্ট বাকি (<span id="count-unpaid">0</span>)</button>
+      </div>
+      <div class="flex items-center gap-3 text-[11px] font-medium text-slate-600">
+        <span>বিকাশ: <strong id="summary-bkash" class="text-pink-600">৳0</strong></span>
+        <span>নগদ: <strong id="summary-nagad" class="text-orange-600">৳0</strong></span>
+        <span>রকেট: <strong id="summary-rocket" class="text-purple-600">৳0</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Table Area -->
+  <main class="flex-1 overflow-auto p-2 sm:p-4 pb-36">
+    <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto table-container">
+      <table class="w-full text-xs sm:text-sm text-left whitespace-nowrap">
+        <thead class="text-[11px] sm:text-xs text-slate-700 uppercase bg-slate-100 border-b border-slate-200 sticky top-0 z-10">
+          <tr>
+            <th class="px-2.5 py-3 font-bold text-center w-12">Serial</th>
+            <th class="px-3 py-3 font-bold min-w-[175px]">নাম</th>
+            <th class="px-2.5 py-3 font-bold min-w-[85px]">রোল</th>
+            <th class="px-3 py-3 font-bold min-w-[130px]">মোবাইল</th>
+            <th class="px-3 py-3 font-bold min-w-[120px]">কোনটি নিতে চান</th>
+            <th class="px-2.5 py-3 font-bold min-w-[105px]">পেমেন্ট মেথড</th>
+            <th class="px-2.5 py-3 font-bold min-w-[110px]">পেমেন্ট সিস্টেম</th>
+            <th class="px-3 py-3 font-bold min-w-[150px]">Transaction ID or Mobile Number</th>
+            <th class="px-3 py-3 font-bold min-w-[120px] text-right">টাকার পরিমাণ</th>
+            <th class="px-3 py-3 font-bold min-w-[120px] text-right">Offline Payment</th>
+            <th class="px-2 py-3 font-bold text-center w-10 no-print">মুছুন</th>
+          </tr>
+        </thead>
+        <tbody id="table-body" class="divide-y divide-slate-200">
+          <!-- Dynamic rows rendered by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Sticky Bottom Summary Bar -->
+  <footer class="bg-white/95 backdrop-blur border-t border-slate-200 p-3 sm:px-6 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] fixed bottom-0 left-0 w-full z-20">
+    <div class="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 items-center">
+      <div class="bg-slate-50 p-2 rounded-lg border border-slate-200/70 flex flex-col">
+        <span class="text-[10px] sm:text-xs text-slate-500 uppercase font-semibold">মোট এন্ট্রি (Entries)</span>
+        <div class="flex items-baseline gap-1.5">
+          <span id="total-entries" class="text-base sm:text-xl font-extrabold text-slate-800">0</span>
+          <span id="unpaid-badge" class="text-[11px] text-rose-600 font-semibold"></span>
+        </div>
+      </div>
+
+      <div class="bg-indigo-50/60 p-2 rounded-lg border border-indigo-100 flex flex-col">
+        <span class="text-[10px] sm:text-xs text-indigo-600 uppercase font-semibold">টাকার পরিমাণ (Online)</span>
+        <span id="total-online" class="text-base sm:text-xl font-extrabold text-indigo-700">৳0</span>
+      </div>
+
+      <div class="bg-emerald-50/60 p-2 rounded-lg border border-emerald-100 flex flex-col">
+        <span class="text-[10px] sm:text-xs text-emerald-600 uppercase font-semibold">Offline Payment</span>
+        <span id="total-offline" class="text-base sm:text-xl font-extrabold text-emerald-700">৳0</span>
+      </div>
+
+      <div class="bg-slate-900 text-white p-2 rounded-lg flex flex-col justify-between shadow-sm">
+        <span class="text-[10px] sm:text-xs text-amber-300 uppercase font-bold tracking-wider">সর্বমোট (Grand Total)</span>
+        <span id="total-grand" class="text-lg sm:text-2xl font-black text-white">৳0</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Custom Reset Confirmation Modal (No alert/confirm used) -->
+  <div id="reset-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-xl border border-slate-100">
+      <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <h3 class="text-base font-bold text-slate-900">মূল ডাটায় রিসেট করবেন?</h3>
+      <p class="text-xs text-slate-600 mt-1 leading-relaxed">এটি করলে আপনার করা সকল এডিট মুছে যাবে এবং পিডিএফ শিট এর ৮৪টি মূল ডাটা পুনরায় লোড হবে।</p>
+      <div class="flex justify-end gap-2 mt-5">
+        <button onclick="closeResetModal()" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">বাতিল</button>
+        <button onclick="confirmResetData()" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-rose-600 text-white hover:bg-rose-700">হ্যাঁ, রিসেট করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'payment_tracker_sheet_data_v1';
+
+    // Complete 84 entries from all 4 pages of the PDF
+    const defaultSheetData = [
+      // Page 1 (27 entries)
+      { id: 1, name: 'ইমাম মেহেদি', roll: '2878', mobile: '01743303877', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 2, name: 'Mohammad Azizur Rahr', roll: '2920', mobile: '01643098087', item: 'স্মারক', method: 'অনলাইন', system: 'বিকাশ', trnxId: 'DK988NJSBE', onlineAmount: '২৩৪', offlineAmount: '' },
+      { id: 3, name: 'MD.YASIR KHAN', roll: '2806', mobile: '01671839616', item: 'স্মারক, মগ', method: 'অনলাইন', system: 'বিকাশ', trnxId: 'DK908NKLU8', onlineAmount: '২৩৫', offlineAmount: '' },
+      { id: 4, name: 'Md Muzahidul Islam', roll: '2888', mobile: '01848189737', item: 'স্মারক', method: 'অনলাইন', system: 'বিকাশ', trnxId: 'DK94800DGO', onlineAmount: '২৫০', offlineAmount: '' },
+      { id: 5, name: 'Abdullah Md. Minhaz', roll: '2885', mobile: '01767768837', item: 'মগ', method: 'অনলাইন', system: 'বিকাশ', trnxId: 'DK918Q5EQH', onlineAmount: '২৩০', offlineAmount: '' },
+      { id: 6, name: 'ফারিতা জান্নাত', roll: '২৭৭৪', mobile: '01886565185', item: 'মগ', method: 'অনলাইন', system: 'বিকাশ', trnxId: '01886565185', onlineAmount: '২৩০', offlineAmount: '' },
+      { id: 7, name: 'মাহমুদা আক্তার', roll: '2936', mobile: '01996349041', item: 'মগ, স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '230' },
+      { id: 8, name: 'MD MASUD ALAM', roll: '2898', mobile: '01341816768', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 9, name: 'Samia Binte Belal', roll: '2857', mobile: '01737418633', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 10, name: 'Md.Shamim Hossain', roll: '2937', mobile: '01842507060', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '450' },
+      { id: 11, name: 'মো: মেহেদী হাসান', roll: '২৮৮৪', mobile: '01628655522', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 12, name: 'শাহিন', roll: '২৮৯৪', mobile: '01518955990', item: 'স্মারক, মর্গ', method: 'অনলাইন', system: 'বিকাশ', trnxId: '01609673087', onlineAmount: '২৩০', offlineAmount: '' },
+      { id: 13, name: 'MD Diluar Hossen', roll: '2899', mobile: '01928556729', item: 'মগ', method: 'অনলাইন', system: 'বিকাশ', trnxId: '01540731757', onlineAmount: '২৩০', offlineAmount: '' },
+      { id: 14, name: 'আব্দুল মুহিত ইকরাম / Ab', roll: '২৯০০', mobile: '01707638030', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '230' },
+      { id: 15, name: 'Abdullah Al-Mamun', roll: '2844', mobile: '01918879155', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '230' },
+      { id: 16, name: 'তাছকিনা তাবাচ্ছুম (রুবাই', roll: '২৯৩৫', mobile: '01856630486', item: 'স্মারক', method: 'অনলাইন', system: 'বিকাশ', trnxId: '01856630486', onlineAmount: '২৩০', offlineAmount: '' },
+      { id: 17, name: 'Masum Billah Munshi', roll: '২৭৭৫', mobile: '01919136678', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '230' },
+      { id: 18, name: 'MARGOBA', roll: '2867', mobile: '01789578559', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 19, name: 'Rezaur Rahman Fuad', roll: '2852', mobile: '01918928061', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 20, name: 'MD. Rasel Mahmud', roll: '২৭৮১', mobile: '01310353550', item: 'স্মারক, মগ', method: 'অনলাইন', system: 'বিকাশ', trnxId: '01310353550', onlineAmount: '৪৫০', offlineAmount: '' },
+      { id: 21, name: 'সায়মা আলী', roll: '২৮৬৬', mobile: '01956571418', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '230' },
+      { id: 22, name: 'Habib Ullah Maruf (হাবি', roll: '2789', mobile: '01613813612', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '230' },
+      { id: 23, name: 'মোহাম্মদ নাছরুল্লাহ', roll: '২৭৬২', mobile: '01968229904', item: 'স্মারক, মগ', method: 'অনলাইন', system: 'বিকাশ', trnxId: 'DK9892RZAA', onlineAmount: '৬০০', offlineAmount: '' },
+      { id: 24, name: 'Abdullah Anju', roll: '2986', mobile: '01303934478', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '230' },
+      { id: 25, name: 'রুমি আকন্দ', roll: '২৯০২', mobile: '01827794010', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 26, name: 'Mohammad Younus Sha', roll: '2922', mobile: '01792811507', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '230' },
+      { id: 27, name: 'Humyra Sadia', roll: '2780', mobile: '01350546979', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '230' },
+
+      // Page 2 (26 entries)
+      { id: 28, name: 'Masura Khatun', roll: '2876', mobile: '01584033748', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '230' },
+      { id: 29, name: 'MD KHALID SAIFULLAH', roll: '2864', mobile: '01706168086', item: 'স্মারক', method: 'অনলাইন', system: 'বিকাশ', trnxId: 'DK9394LQ4J', onlineAmount: '230', offlineAmount: '' },
+      { id: 30, name: 'MD. Rafiqul Hasan Shah', roll: '2925', mobile: '01895460393', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 31, name: 'ইফতি মোঃ আবুতালেব', roll: '2999', mobile: '01864670974', item: 'স্মারক', method: 'অনলাইন', system: 'রকেট', trnxId: '7142292400', onlineAmount: '235', offlineAmount: '' },
+      { id: 32, name: 'MAYSHA KHAN', roll: '2731', mobile: '01866227713', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '200' },
+      { id: 33, name: 'MD. TOUHID MOBUSSHI', roll: '2739', mobile: '01832637515', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 34, name: 'ATIQUL ISLAM', roll: '2815', mobile: '01826605078', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 35, name: 'Md. Khaled Shifullah', roll: '2818', mobile: '01611620310', item: 'স্মারক, মগ', method: 'অনলাইন', system: 'নগদ', trnxId: '76AAU2UX', onlineAmount: '450', offlineAmount: '' },
+      { id: 36, name: 'Arif Hasan', roll: '2872', mobile: '01943861641', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '1000' },
+      { id: 37, name: 'IRFAN', roll: '3004', mobile: '01869090245', item: 'স্মারক', method: 'অনলাইন', system: 'বিকাশ', trnxId: 'DK9395RAIT', onlineAmount: '230', offlineAmount: '' },
+      { id: 38, name: 'আমীর হামজা', roll: '২৯৯৫', mobile: '01746299662', item: 'স্মারক, মগ', method: 'অনলাইন', system: 'বিকাশ', trnxId: '', onlineAmount: '450', offlineAmount: '' },
+      { id: 39, name: 'মোঃআব্দুল কাদের', roll: '২৮৯৫', mobile: '01788264687', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 40, name: 'মো: মাহামুদুল হাসান', roll: '২৮১৯', mobile: '01893120881', item: 'স্মারক', method: 'অনলাইন', system: 'বিকাশ', trnxId: '01893120881', onlineAmount: '230', offlineAmount: '' },
+      { id: 41, name: 'মো. বেলায়েত হোসেন', roll: '২৮২৪', mobile: '01609002077', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 42, name: 'তুষার', roll: '২৮৯১', mobile: '01716075914', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 43, name: 'মুজাহিদ', roll: '২৭৪১', mobile: '01888433771', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 44, name: 'Ahsan Sabbir', roll: '96/2828', mobile: '01774130767', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 45, name: 'মুরাদ', roll: '2865', mobile: '01873597624', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 46, name: 'মুজাহিদুল ইসলাম', roll: '2805', mobile: '01937322777', item: 'স্মারক, মগ', method: 'অনলাইন', system: 'বিকাশ', trnxId: '01937322777', onlineAmount: '460', offlineAmount: '' },
+      { id: 47, name: 'ওয়াইস আল কারনী', roll: '2820', mobile: '01980722940', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 48, name: 'মোঃ রিয়াদুল ইসলাম', roll: '২৯০১', mobile: '01798057134', item: 'স্মারক', method: 'অনলাইন', system: 'বিকাশ', trnxId: '01867767103/', onlineAmount: '230', offlineAmount: '' },
+      { id: 49, name: 'আব্দুল্লাহ', roll: '২৯২৪', mobile: '01650250214', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '230' },
+      { id: 50, name: 'আব্দুর রহমান মাসুম', roll: '২৭১৯', mobile: '01733848002', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 51, name: 'মোফাজ্জল হোসেন আক', roll: '2893', mobile: '01648608106', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '230' },
+      { id: 52, name: 'TASFIA TASNIM', roll: '2772', mobile: '01977625980', item: 'স্মারক', method: 'অনলাইন', system: 'বিকাশ', trnxId: '01977625980', onlineAmount: '230', offlineAmount: '' },
+      { id: 53, name: 'আল জোবায়ের', roll: '2970', mobile: '01920204819', item: 'স্মারক', method: 'অনলাইন', system: 'বিকাশ', trnxId: 'DK969B8AT4', onlineAmount: '230', offlineAmount: '' },
+      { id: 54, name: 'আব্দুল আজিজ', roll: '2821', mobile: '01633309036', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+
+      // Page 3 (26 entries)
+      { id: 55, name: 'মিরাজ', roll: '2897', mobile: '01712442284', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 56, name: 'Md. Aminur Rahman', roll: '2853', mobile: '01317787988', item: 'মগ', method: 'অনলাইন', system: 'বিকাশ', trnxId: 'DK9691H5YI', onlineAmount: '230', offlineAmount: '' },
+      { id: 57, name: 'শওকত জাহান রিফাত', roll: '2832', mobile: '01859260525', item: 'স্মারক', method: 'অনলাইন', system: 'বিকাশ', trnxId: '01859260525', onlineAmount: '230', offlineAmount: '' },
+      { id: 58, name: 'MUHIBBULLAH NESARI', roll: '2810', mobile: '', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 59, name: 'ABDULLAH AL NUMAN', roll: '৩০০০', mobile: '01868678272', item: 'স্মারক', method: 'অনলাইন', system: 'নগদ', trnxId: '76AEXF5G', onlineAmount: '230', offlineAmount: '' },
+      { id: 60, name: 'Abdullah Al Mamun', roll: '2809', mobile: '01754481294', item: 'স্মারক, মগ', method: 'অনলাইন', system: 'রকেট', trnxId: 'DBBL Account*', onlineAmount: '460', offlineAmount: '' },
+      { id: 61, name: 'আনিসা তাবাসসুম', roll: '2869', mobile: '01570237466', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 62, name: 'Misbahul Mukarrabin', roll: '2720', mobile: '01761601712', item: 'মগ', method: 'অনলাইন', system: 'বিকাশ', trnxId: '01761601712', onlineAmount: '230', offlineAmount: '' },
+      { id: 63, name: 'আব্দুল মুকতাদির খাঁন', roll: '39', mobile: '01749826071', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 64, name: 'Nazmus Sakib', roll: '2822', mobile: '01567864013', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 65, name: 'MISKATUL JANNAT MIN', roll: '2773', mobile: '01868930129', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '230' },
+      { id: 66, name: 'মোঃ তাজকিরুল ইসলাম', roll: '২৮৫৪', mobile: '01790838180', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 67, name: 'মাসুমা', roll: '২৮৭৪', mobile: '01740264999', item: 'স্মারক', method: 'অনলাইন', system: 'নগদ', trnxId: '01740264999', onlineAmount: '230', offlineAmount: '' },
+      { id: 68, name: 'মোঃ শামীম হোসাইন', roll: '2783/2937', mobile: '01842507060', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 69, name: 'ইকবাল কবির', roll: '২৭৮৮', mobile: '01774481122', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 70, name: 'মিশকাতুল জান্নাত মীম', roll: '2773', mobile: '01868930129', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 71, name: 'মো: মোখলেছুর রহমান', roll: '২৮২৫', mobile: '01611448197', item: 'স্মারক, মগ', method: 'অনলাইন', system: 'বিকাশ', trnxId: '01611448197', onlineAmount: '450', offlineAmount: '' },
+      { id: 72, name: 'আরিফ হাসান', roll: '2872', mobile: '01943861641', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 73, name: 'আহসান সাব্বির', roll: '২৮২৮', mobile: '01774130767', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 74, name: 'আতিকুল ইসলাম', roll: '২৮১৫', mobile: '01826605078', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 75, name: 'হানান মাক্কিয়া', roll: '২৮১১', mobile: '01953956787', item: 'স্মারক, মগ', method: 'অনলাইন', system: 'বিকাশ', trnxId: '01953956787', onlineAmount: '450', offlineAmount: '' },
+      { id: 76, name: 'জুনায়েদ হোসাইন', roll: '২৭৮৪', mobile: '01518904140', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 77, name: 'আহম্মদ উল্লাহ নোমান', roll: '২৯২৩', mobile: '01766377443', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 78, name: 'মো. মোফাজ্জল হোসেন', roll: '২৮২৯', mobile: '01642491108', item: '', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 79, name: 'মো. মোফাজ্জল হোসেন', roll: '২৮২৯', mobile: '01642491108', item: 'মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 80, name: 'আবু মুহাম্মাদ ফয়সাল', roll: '২৮০৭', mobile: '01882156618', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 81, name: 'Mohammad Hasnain', roll: '2808', mobile: '01610794594', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+
+      // Page 4 (4 entries)
+      { id: 82, name: 'রুমি আকন্দ', roll: '২৯০২', mobile: '01827794010', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 83, name: 'আবু উবাইদা', roll: '2830', mobile: '01736996226', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 84, name: 'মোঃ খাইরুল রুম্মান ইমন', roll: '২৮৮২', mobile: '01643486138', item: 'স্মারক', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' },
+      { id: 85, name: 'Mahmudul Hasan Mahd', roll: '2887', mobile: '01682499853', item: 'স্মারক, মগ', method: 'অফলাইন', system: '', trnxId: '', onlineAmount: '', offlineAmount: '' }
+    ];
+
+    let sheetData = [];
+    let currentFilter = 'all';
+    let searchQuery = '';
+
+    // Convert Bangla digits to English digits and parse number
+    function parseAmount(val) {
+      if (!val) return 0;
+      const banglaDigits = { '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4', '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9' };
+      const normalized = val.toString().replace(/[০-৯]/g, d => banglaDigits[d]);
+      const cleaned = normalized.replace(/[^0-9.]/g, '');
+      const parsed = parseFloat(cleaned);
+      return isNaN(parsed) ? 0 : parsed;
+    }
+
+    // Escape HTML to avoid breaking input attributes
+    function escapeAttr(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    // Load from LocalStorage or fall back to default
+    function loadData() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            sheetData = parsed;
+            return;
+          }
+        }
+      } catch (e) {
+        console.error('Failed to read from localStorage:', e);
+      }
+      sheetData = JSON.parse(JSON.stringify(defaultSheetData));
+      saveData();
+    }
+
+    // Save to LocalStorage
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(sheetData));
+        flashSaveBadge();
+      } catch (e) {
+        console.error('Failed to save to localStorage:', e);
+      }
+    }
+
+    function flashSaveBadge() {
+      const badge = document.getElementById('save-badge');
+      if (!badge) return;
+      badge.classList.add('scale-105', 'bg-emerald-500/40');
+      setTimeout(() => {
+        badge.classList.remove('scale-105', 'bg-emerald-500/40');
+      }, 250);
+    }
+
+    // Check if a row has no payment
+    function isRowUnpaid(row) {
+      return parseAmount(row.onlineAmount) === 0 && parseAmount(row.offlineAmount) === 0;
+    }
+
+    // Render Table Rows
+    function renderTable() {
+      const tbody = document.getElementById('table-body');
+      const query = searchQuery.trim().toLowerCase();
+
+      const filtered = sheetData.filter(row => {
+        const unpaid = isRowUnpaid(row);
+        if (currentFilter === 'paid' && unpaid) return false;
+        if (currentFilter === 'unpaid' && !unpaid) return false;
+
+        if (!query) return true;
+        return (
+          (row.name && row.name.toLowerCase().includes(query)) ||
+          (row.roll && row.roll.toLowerCase().includes(query)) ||
+          (row.mobile && row.mobile.toLowerCase().includes(query)) ||
+          (row.trnxId && row.trnxId.toLowerCase().includes(query)) ||
+          (row.system && row.system.toLowerCase().includes(query))
+        );
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="11" class="text-center py-10 text-slate-400">
+              কোনো তথ্য পাওয়া যায়নি।
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((row, idx) => {
+        const unpaid = isRowUnpaid(row);
+        const rowBgClass = unpaid
+          ? 'unpaid-row bg-red-100/90 hover:bg-red-200/80 text-red-950'
+          : 'bg-white hover:bg-slate-50/90';
+
+        return `
+          <tr id="row-${row.id}" class="transition-colors ${rowBgClass}">
+            <td class="px-2 py-1.5 text-center font-bold text-slate-500 select-none">${idx + 1}</td>
+            <td class="p-1">
+              <input type="text" value="${escapeAttr(row.name)}" oninput="handleCellInput(${row.id}, 'name', this.value)" placeholder="নাম" class="w-full bg-transparent px-2 py-1.5 rounded border border-transparent focus:border-indigo-400 focus:bg-white focus:outline-none font-medium" />
+            </td>
+            <td class="p-1">
+              <input type="text" value="${escapeAttr(row.roll)}" oninput="handleCellInput(${row.id}, 'roll', this.value)" placeholder="রোল" class="w-full bg-transparent px-2 py-1.5 rounded border border-transparent focus:border-indigo-400 focus:bg-white focus:outline-none" />
+            </td>
+            <td class="p-1">
+              <input type="text" value="${escapeAttr(row.mobile)}" oninput="handleCellInput(${row.id}, 'mobile', this.value)" placeholder="মোবাইল" class="w-full bg-transparent px-2 py-1.5 rounded border border-transparent focus:border-indigo-400 focus:bg-white focus:outline-none font-mono text-xs" />
+            </td>
+            <td class="p-1">
+              <input type="text" value="${escapeAttr(row.item)}" oninput="handleCellInput(${row.id}, 'item', this.value)" placeholder="স্মারক / মগ" class="w-full bg-transparent px-2 py-1.5 rounded border border-transparent focus:border-indigo-400 focus:bg-white focus:outline-none" />
+            </td>
+            <td class="p-1">
+              <input type="text" value="${escapeAttr(row.method)}" oninput="handleCellInput(${row.id}, 'method', this.value)" placeholder="অনলাইন/অফলাইন" class="w-full bg-transparent px-2 py-1.5 rounded border border-transparent focus:border-indigo-400 focus:bg-white focus:outline-none" />
+            </td>
+            <td class="p-1">
+              <input type="text" value="${escapeAttr(row.system)}" oninput="handleCellInput(${row.id}, 'system', this.value)" placeholder="বিকাশ/নগদ/রকেট" class="w-full bg-transparent px-2 py-1.5 rounded border border-transparent focus:border-indigo-400 focus:bg-white focus:outline-none" />
+            </td>
+            <td class="p-1">
+              <input type="text" value="${escapeAttr(row.trnxId)}" oninput="handleCellInput(${row.id}, 'trnxId', this.value)" placeholder="Trnx ID / Mobile" class="w-full bg-transparent px-2 py-1.5 rounded border border-transparent focus:border-indigo-400 focus:bg-white focus:outline-none font-mono text-xs" />
+            </td>
+            <td class="p-1">
+              <input type="text" inputmode="decimal" value="${escapeAttr(row.onlineAmount)}" oninput="handleCellInput(${row.id}, 'onlineAmount', this.value)" placeholder="0" class="w-full bg-transparent px-2 py-1.5 rounded border border-transparent focus:border-indigo-500 focus:bg-white focus:outline-none text-right font-bold text-indigo-700" />
+            </td>
+            <td class="p-1">
+              <input type="text" inputmode="decimal" value="${escapeAttr(row.offlineAmount)}" oninput="handleCellInput(${row.id}, 'offlineAmount', this.value)" placeholder="0" class="w-full bg-transparent px-2 py-1.5 rounded border border-transparent focus:border-emerald-500 focus:bg-white focus:outline-none text-right font-bold text-emerald-700" />
+            </td>
+            <td class="p-1 text-center no-print">
+              <button onclick="deleteRow(${row.id})" title="সারি মুছুন" class="text-slate-400 hover:text-rose-600 hover:bg-rose-100 p-1.5 rounded-lg transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Handle instant edits without losing input focus
+    function handleCellInput(id, field, value) {
+      const row = sheetData.find(r => r.id === id);
+      if (!row) return;
+      row[field] = value;
+
+      // Update row red highlight dynamically on payment edit
+      const tr = document.getElementById(`row-${id}`);
+      if (tr) {
+        const unpaid = isRowUnpaid(row);
+        if (unpaid) {
+          tr.className = 'transition-colors unpaid-row bg-red-100/90 hover:bg-red-200/80 text-red-950';
+        } else {
+          tr.className = 'transition-colors bg-white hover:bg-slate-50/90';
+        }
+      }
+
+      saveData();
+      calculateTotals();
+    }
+
+    // Instant Totals Calculation
+    function calculateTotals() {
+      let onlineTotal = 0;
+      let offlineTotal = 0;
+      let paidCount = 0;
+      let unpaidCount = 0;
+
+      let bkashTotal = 0;
+      let nagadTotal = 0;
+      let rocketTotal = 0;
+
+      sheetData.forEach(row => {
+        const onAmt = parseAmount(row.onlineAmount);
+        const offAmt = parseAmount(row.offlineAmount);
+        onlineTotal += onAmt;
+        offlineTotal += offAmt;
+
+        if (onAmt === 0 && offAmt === 0) {
+          unpaidCount++;
+        } else {
+          paidCount++;
+        }
+
+        const sys = (row.system || '').toLowerCase();
+        const rowSum = onAmt + offAmt;
+        if (sys.includes('বিকাশ') || sys.includes('bkash')) {
+          bkashTotal += rowSum;
+        } else if (sys.includes('নগদ') || sys.includes('nagad')) {
+          nagadTotal += rowSum;
+        } else if (sys.includes('রকেট') || sys.includes('rocket')) {
+          rocketTotal += rowSum;
+        }
+      });
+
+      const grandTotal = onlineTotal + offlineTotal;
+
+      document.getElementById('total-entries').textContent = sheetData.length;
+      document.getElementById('unpaid-badge').textContent = `(${unpaidCount} বাকি)`;
+      document.getElementById('total-online').textContent = '৳' + onlineTotal.toLocaleString('en-IN');
+      document.getElementById('total-offline').textContent = '৳' + offlineTotal.toLocaleString('en-IN');
+      document.getElementById('total-grand').textContent = '৳' + grandTotal.toLocaleString('en-IN');
+
+      // Filter counts
+      document.getElementById('count-all').textContent = sheetData.length;
+      document.getElementById('count-paid').textContent = paidCount;
+      document.getElementById('count-unpaid').textContent = unpaidCount;
+
+      // Sub-summaries
+      document.getElementById('summary-bkash').textContent = '৳' + bkashTotal.toLocaleString('en-IN');
+      document.getElementById('summary-nagad').textContent = '৳' + nagadTotal.toLocaleString('en-IN');
+      document.getElementById('summary-rocket').textContent = '৳' + rocketTotal.toLocaleString('en-IN');
+    }
+
+    // Add a new row at the bottom and scroll to it
+    function addRow() {
+      const nextId = sheetData.length > 0 ? Math.max(...sheetData.map(r => r.id)) + 1 : 1;
+      const newRow = {
+        id: nextId,
+        name: '',
+        roll: '',
+        mobile: '',
+        item: '',
+        method: 'অফলাইন',
+        system: '',
+        trnxId: '',
+        onlineAmount: '',
+        offlineAmount: ''
+      };
+      sheetData.push(newRow);
+      saveData();
+      renderTable();
+      calculateTotals();
+
+      setTimeout(() => {
+        const tr = document.getElementById(`row-${nextId}`);
+        if (tr) {
+          tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          const firstInput = tr.querySelector('input');
+          if (firstInput) firstInput.focus();
+        }
+      }, 60);
+    }
+
+    // Delete a row
+    function deleteRow(id) {
+      sheetData = sheetData.filter(r => r.id !== id);
+      saveData();
+      renderTable();
+      calculateTotals();
+    }
+
+    // Filter switching
+    function setFilter(filterType) {
+      currentFilter = filterType;
+      const buttons = {
+        all: document.getElementById('filter-all'),
+        paid: document.getElementById('filter-paid'),
+        unpaid: document.getElementById('filter-unpaid')
+      };
+
+      Object.keys(buttons).forEach(key => {
+        if (key === filterType) {
+          buttons[key].className = 'px-2.5 py-1 rounded-full font-semibold bg-indigo-600 text-white transition';
+        } else if (key === 'unpaid') {
+          buttons[key].className = 'px-2.5 py-1 rounded-full font-medium bg-rose-100 text-rose-700 hover:bg-rose-200 transition';
+        } else {
+          buttons[key].className = 'px-2.5 py-1 rounded-full font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+        }
+      });
+
+      renderTable();
+    }
+
+    // Modal handlers for resetting data
+    function openResetModal() {
+      const modal = document.getElementById('reset-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeResetModal() {
+      const modal = document.getElementById('reset-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function confirmResetData() {
+      sheetData = JSON.parse(JSON.stringify(defaultSheetData));
+      saveData();
+      renderTable();
+      calculateTotals();
+      closeResetModal();
+    }
+
+    // Initialize on load
+    window.onload = function () {
+      loadData();
+      renderTable();
+      calculateTotals();
+
+      // Set print timestamp
+      document.getElementById('print-date').textContent = 'প্রিন্টের তারিখ: ' + new Date().toLocaleString('bn-BD');
+
+      // Attach search listener
+      document.getElementById('search-input').addEventListener('input', function (e) {
+        searchQuery = e.target.value;
+        renderTable();
+      });
+    };
+  </script>
+</body>
+</html>
