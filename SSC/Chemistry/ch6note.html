@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>রসায়ন অধ্যায় ৬: মোলের ধারণা ও রাসায়নিক গণনা - কমপ্লিট নোট</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Hind Siliguri & Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- KaTeX for High Quality Unbreakable Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Hind Siliguri', 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.7;
+        }
+        .eng-term {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+        }
+        /* Keep KaTeX equations clean and prevent breaking */
+        .katex-display {
+            margin: 0.75em 0 !important;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.25rem 0;
+        }
+        .katex {
+            font-size: 1.08em !important;
+        }
+        .gradient-header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #4f46e5 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+        }
+        @media print {
+            body { background-color: #ffffff; }
+            .no-print { display: none; }
+            .card-shadow { box-shadow: none; border: 1px solid #e2e8f0; }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-indigo-600 selection:text-white">
+
+    <!-- ==================== HEADER / BANNER ==================== -->
+    <header class="gradient-header text-white pt-10 pb-14 px-4 sm:px-8 relative overflow-hidden border-b-4 border-amber-400">
+        <!-- Decorative Background SVG -->
+        <svg class="absolute right-0 top-0 opacity-10 w-96 h-96 transform translate-x-16 -translate-y-12 pointer-events-none" viewBox="0 0 200 200" fill="none">
+            <circle cx="100" cy="100" r="80" stroke="white" stroke-width="4" stroke-dasharray="10 10"/>
+            <circle cx="100" cy="100" r="45" stroke="white" stroke-width="3"/>
+            <circle cx="100" cy="20" r="10" fill="white"/>
+            <circle cx="169" cy="140" r="10" fill="white"/>
+            <circle cx="31" cy="140" r="10" fill="white"/>
+        </svg>
+
+        <div class="max-w-7xl mx-auto relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div class="space-y-4 text-center lg:text-left max-w-3xl">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/30 border border-indigo-300/30 text-indigo-100 text-sm font-medium">
+                    <i class="fa-solid fa-flask-vial text-amber-300"></i>
+                    <span>SSC Chemistry • Chapter 06 • Master Mathematical & Concept Note</span>
+                </div>
+                <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+                    Concept of Mole and Chemical Counting
+                    <span class="block text-amber-300 text-2xl sm:text-3xl mt-2 font-bold">(মোলের ধারণা ও রাসায়নিক গণনা)</span>
+                </h1>
+                <p class="text-indigo-100 text-base sm:text-lg leading-relaxed">
+                    রসায়নের সকল প্রকার গাণিতিক সমস্যা (<span class="eng-term">All Types of Mathematical Problems</span>), সূত্রের ব্যবচ্ছেদ, প্রয়োজনীয় সংজ্ঞা, শর্টকাট ট্রিকস এবং ধাপে ধাপে সমাধানের পূর্ণাঙ্গ ও গোছানো হ্যান্ডনোট।
+                </p>
+                <div class="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-4">
+                    <div class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-amber-400 text-slate-900 flex items-center justify-center font-bold text-lg">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-xs text-indigo-200 uppercase tracking-wider">Prepared By</p>
+                            <p class="font-bold text-white text-base eng-term">Emam Mehedi</p>
+                        </div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-400 text-slate-900 flex items-center justify-center font-bold text-lg">
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-xs text-indigo-200 uppercase tracking-wider">Coverage</p>
+                            <p class="font-bold text-white text-sm">৮টি গাণিতিক টাইপ ও ২৪+ উদাহরণ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Author & QR Card -->
+            <div class="bg-white text-slate-800 p-4 rounded-2xl shadow-2xl border-2 border-amber-300 flex flex-col items-center w-52 shrink-0">
+                <div class="w-36 h-36 bg-slate-50 p-2 rounded-xl border border-slate-200 flex items-center justify-center overflow-hidden">
+                    <img src="https://classcaddy.netlify.app/qr.fb.png" 
+                         alt="QR Code - Emam Mehedi" 
+                         class="w-full h-full object-contain"
+                         onerror="this.onerror=null; this.src='https://placehold.co/150x150/4f46e5/ffffff?text=QR+Code';">
+                </div>
+                <div class="mt-3 text-center">
+                    <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700">Scan to Connect</span>
+                    <p class="text-xs text-slate-500 mt-1 font-medium">Prepared by <strong class="text-slate-800">Emam Mehedi</strong></p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================== MAIN CONTENT CONTAINER ==================== -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+
+        <!-- 1. CHAPTER OVERVIEW & ATOMIC MASS CHEAT SHEET -->
+        <section id="basics-container" class="space-y-8"></section>
+
+        <!-- 2. VISUAL SVG INFOGRAPHIC: THE MOLE HUB & DILUTE VS CONCENTRATED -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Master Mole Map SVG -->
+            <div class="lg:col-span-7 bg-white rounded-2xl p-6 card-shadow border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2.5 mb-2">
+                        <span class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm"><i class="fa-solid fa-diagram-project"></i></span>
+                        <h2 class="text-xl font-bold text-slate-800">মোলের কেন্দ্রীয় সম্পর্ক চিত্র (<span class="eng-term">The Master Mole Map</span>)</h2>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-4">যেকোনো গাণিতিক সমস্যায় ভর (<span class="eng-term">Mass</span>), অণু সংখ্যা (<span class="eng-term">Number of Molecules</span>), গ্যাসের আয়তন (<span class="eng-term">Volume</span>) এবং মোলারিটি (<span class="eng-term">Molarity</span>) থেকে মোল (<span class="eng-term">Mole, $n$</span>) বের করার ভিজ্যুয়াল ডায়াগ্রাম:</p>
+                </div>
+                
+                <div class="w-full overflow-x-auto bg-slate-50 rounded-xl p-3 border border-slate-200/80">
+                    <svg viewBox="0 0 680 320" class="w-full h-auto min-w-[520px]">
+                        <defs>
+                            <linearGradient id="centerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#4f46e5"/>
+                                <stop offset="100%" stop-color="#7c3aed"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Connecting Lines -->
+                        <line x1="175" y1="75" x2="285" y2="135" stroke="#6366f1" stroke-width="3" stroke-dasharray="5,5"/>
+                        <line x1="505" y1="75" x2="395" y2="135" stroke="#10b981" stroke-width="3" stroke-dasharray="5,5"/>
+                        <line x1="175" y1="245" x2="285" y2="185" stroke="#f59e0b" stroke-width="3" stroke-dasharray="5,5"/>
+                        <line x1="505" y1="245" x2="395" y2="185" stroke="#ec4899" stroke-width="3" stroke-dasharray="5,5"/>
+
+                        <!-- Top Left: Mass (W) -->
+                        <rect x="20" y="25" width="170" height="90" rx="14" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+                        <text x="105" y="52" text-anchor="middle" fill="#312e81" font-weight="bold" font-size="14">ভর (Mass, W)</text>
+                        <text x="105" y="74" text-anchor="middle" fill="#4338ca" font-size="13" font-weight="bold">n = W / M</text>
+                        <text x="105" y="96" text-anchor="middle" fill="#64748b" font-size="11">M = Molecular Mass</text>
+
+                        <!-- Top Right: Number of Particles (N) -->
+                        <rect x="490" y="25" width="170" height="90" rx="14" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+                        <text x="575" y="52" text-anchor="middle" fill="#065f46" font-weight="bold" font-size="14">কণা সংখ্যা (Particles, N)</text>
+                        <text x="575" y="74" text-anchor="middle" fill="#047857" font-size="13" font-weight="bold">n = N / N_A</text>
+                        <text x="575" y="96" text-anchor="middle" fill="#64748b" font-size="11">N_A = 6.023 × 10²³</text>
+
+                        <!-- Bottom Left: Gas Volume at STP -->
+                        <rect x="20" y="205" width="170" height="90" rx="14" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"/>
+                        <text x="105" y="232" text-anchor="middle" fill="#92400e" font-weight="bold" font-size="14">STP-তে আয়তন (V_STP)</text>
+                        <text x="105" y="254" text-anchor="middle" fill="#b45309" font-size="13" font-weight="bold">n = V(L) / 22.4</text>
+                        <text x="105" y="276" text-anchor="middle" fill="#64748b" font-size="11">0°C ও 1 atm চাপে</text>
+
+                        <!-- Bottom Right: Solution Molarity -->
+                        <rect x="490" y="205" width="170" height="90" rx="14" fill="#fdf2f8" stroke="#ec4899" stroke-width="2"/>
+                        <text x="575" y="232" text-anchor="middle" fill="#9d174d" font-weight="bold" font-size="14">দ্রবণের ঘনমাত্রা (S)</text>
+                        <text x="575" y="254" text-anchor="middle" fill="#be185d" font-size="13" font-weight="bold">n = S × V(L)</text>
+                        <text x="575" y="276" text-anchor="middle" fill="#64748b" font-size="11">W = S·M·V(mL) / 1000</text>
+
+                        <!-- Center Hub: MOLE -->
+                        <circle cx="340" cy="160" r="64" fill="url(#centerGrad)" stroke="#fbbf24" stroke-width="4"/>
+                        <text x="340" y="150" text-anchor="middle" fill="#ffffff" font-weight="bold" font-size="18">MOLE (n)</text>
+                        <text x="340" y="172" text-anchor="middle" fill="#fde68a" font-weight="bold" font-size="13">মোল সংখ্যা</text>
+                        <text x="340" y="190" text-anchor="middle" fill="#e0e7ff" font-size="10">রাসায়নিক গণনার কেন্দ্র</text>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Visual SVG: Solution Preparation & Limiting Reactant Concept -->
+            <div class="lg:col-span-5 bg-white rounded-2xl p-6 card-shadow border border-slate-200 flex flex-col justify-between space-y-4">
+                <div>
+                    <div class="flex items-center gap-2.5 mb-2">
+                        <span class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-sm"><i class="fa-solid fa-vials"></i></span>
+                        <h2 class="text-xl font-bold text-slate-800">ল্যাবরেটরি ভিজ্যুয়াল গাইড</h2>
+                    </div>
+                    <p class="text-sm text-slate-600">লঘু ও গাঢ় দ্রবণ এবং মোলার দ্রবণ প্রস্তুতির (<span class="eng-term">Solution Preparation</span>) মূলচিত্র:</p>
+                </div>
+
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200/80 flex items-center justify-around">
+                    <svg viewBox="0 0 360 190" class="w-full h-auto max-w-[350px]">
+                        <!-- Beaker 1: Dilute Solution -->
+                        <g transform="translate(25, 20)">
+                            <path d="M15,10 L15,120 Q15,135 30,135 L70,135 Q85,135 85,120 L85,10" fill="none" stroke="#475569" stroke-width="3"/>
+                            <path d="M17,55 L83,55 L83,120 Q83,133 70,133 L30,133 Q17,133 17,120 Z" fill="#bae6fd" opacity="0.65"/>
+                            <!-- Few Solute Particles -->
+                            <circle cx="35" cy="85" r="3.5" fill="#0284c7"/>
+                            <circle cx="65" cy="95" r="3.5" fill="#0284c7"/>
+                            <circle cx="48" cy="115" r="3.5" fill="#0284c7"/>
+                            <text x="50" y="153" text-anchor="middle" font-size="12" font-weight="bold" fill="#0f172a">Dilute Solution</text>
+                            <text x="50" y="168" text-anchor="middle" font-size="11" fill="#475569">(লঘু দ্রবণ - কম দ্রব)</text>
+                        </g>
+
+                        <!-- Beaker 2: Concentrated Solution -->
+                        <g transform="translate(135, 20)">
+                            <path d="M15,10 L15,120 Q15,135 30,135 L70,135 Q85,135 85,120 L85,10" fill="none" stroke="#475569" stroke-width="3"/>
+                            <path d="M17,55 L83,55 L83,120 Q83,133 70,133 L30,133 Q17,133 17,120 Z" fill="#38bdf8" opacity="0.85"/>
+                            <!-- Many Solute Particles -->
+                            <circle cx="30" cy="70" r="3.5" fill="#0369a1"/>
+                            <circle cx="50" cy="75" r="3.5" fill="#0369a1"/>
+                            <circle cx="70" cy="72" r="3.5" fill="#0369a1"/>
+                            <circle cx="38" cy="95" r="3.5" fill="#0369a1"/>
+                            <circle cx="62" cy="92" r="3.5" fill="#0369a1"/>
+                            <circle cx="28" cy="115" r="3.5" fill="#0369a1"/>
+                            <circle cx="52" cy="112" r="3.5" fill="#0369a1"/>
+                            <circle cx="72" cy="118" r="3.5" fill="#0369a1"/>
+                            <text x="50" y="153" text-anchor="middle" font-size="12" font-weight="bold" fill="#0f172a">Concentrated</text>
+                            <text x="50" y="168" text-anchor="middle" font-size="11" fill="#475569">(গাঢ় দ্রবণ - বেশি দ্রব)</text>
+                        </g>
+
+                        <!-- Volumetric Flask -->
+                        <g transform="translate(245, 10)">
+                            <path d="M40,10 L60,10 M45,10 L45,65 L15,125 Q8,140 25,145 L75,145 Q92,140 85,125 L55,65 L55,10" fill="none" stroke="#475569" stroke-width="3"/>
+                            <path d="M23,110 L77,110 L85,125 Q90,138 75,143 L25,143 Q10,138 15,125 Z" fill="#a7f3d0" opacity="0.85"/>
+                            <!-- Calibration Mark -->
+                            <line x1="40" y1="45" x2="60" y2="45" stroke="#ef4444" stroke-width="2.5"/>
+                            <text x="50" y="163" text-anchor="middle" font-size="12" font-weight="bold" fill="#065f46">Volumetric Flask</text>
+                            <text x="50" y="178" text-anchor="middle" font-size="11" fill="#475569">(আয়তনমিতিক ফ্লাস্ক)</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-xs sm:text-sm text-amber-900">
+                    <p class="font-bold flex items-center gap-1.5 mb-1"><i class="fa-solid fa-lightbulb text-amber-600"></i> মনে রাখার বিশেষ টিপস:</p>
+                    <p>নির্দিষ্ট আয়তনের ফ্লাস্কে <span class="eng-term">$W = \frac{S \cdot M \cdot V}{1000}$</span> সূত্র দিয়ে হিসাবকৃত গ্রাম ভর (<span class="eng-term">$W$</span>) মেপে নিয়ে দাগ পর্যন্ত পাতিত পানি (<span class="eng-term">Distilled Water</span>) যোগ করলেই নির্দিষ্ট মোলারিটির প্রমাণ দ্রবণ তৈরি হয়ে যায়।</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. ALL MATHEMATICAL PROBLEM TYPES (RENDERED VIA JS ARRAY) -->
+        <section class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b-2 border-indigo-200 pb-4">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-100 px-3 py-1 rounded-full">Step-by-Step Mathematical Guide</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">সকল গাণিতিক সমস্যার টাইপসমূহ (<span class="eng-term">All Types of Math Problems</span>)</h2>
+                </div>
+                <div class="text-sm text-slate-600 font-medium">
+                    প্রতিটি টাইপে রয়েছে: <span class="text-indigo-700 font-bold">সংজ্ঞা • সূত্র ও চলক পরিচিতি • সমাধানকৃত উদাহরণ</span>
+                </div>
+            </div>
+
+            <!-- Dynamic Container for All Math Types -->
+            <div id="math-types-container" class="space-y-10 pt-2"></div>
+        </section>
+
+        <!-- 4. IMPORTANT CHEMICAL REACTIONS & RADICALS REFERENCE -->
+        <section id="reactions-reference-container" class="space-y-8"></section>
+
+        <!-- 5. MASTER FORMULA SUMMARY TABLE -->
+        <section id="summary-table-container"></section>
+
+    </main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="bg-slate-900 text-slate-300 py-10 px-4 sm:px-8 border-t-4 border-indigo-500 mt-16">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="space-y-2 text-center sm:text-left">
+                <div class="flex items-center justify-center sm:justify-start gap-2.5">
+                    <span class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold"><i class="fa-solid fa-atom"></i></span>
+                    <span class="text-xl font-bold text-white">রসায়ন ৬ষ্ঠ অধ্যায়: মোলের ধারণা ও রাসায়নিক গণনা</span>
+                </div>
+                <p class="text-sm text-slate-400">নবম-দশম শ্রেণি ও এসএসসি পরীক্ষার্থীদের জন্য পূর্ণাঙ্গ গাণিতিক ও থিওরি হ্যান্ডনোট।</p>
+                <p class="text-sm font-semibold text-amber-400">Prepared by: <span class="eng-term">Emam Mehedi</span></p>
+            </div>
+
+            <div class="flex items-center gap-4 bg-slate-800/90 p-3 rounded-xl border border-slate-700">
+                <img src="https://classcaddy.netlify.app/qr.fb.png" 
+                     alt="QR Code" 
+                     class="w-16 h-16 rounded-lg bg-white p-1 object-contain"
+                     onerror="this.onerror=null; this.src='https://placehold.co/80x80/4f46e5/ffffff?text=QR';">
+                <div class="text-xs space-y-1">
+                    <p class="text-white font-bold uppercase tracking-wider">Follow & Connect</p>
+                    <p class="text-slate-400">যেকোনো আপডেট ও নোট পেতে</p>
+                    <p class="text-indigo-400 font-medium">QR কোডটি স্ক্যান করো</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== JAVASCRIPT DATA ARRAYS & RENDERING ==================== -->
+    <script>
+        // 1. Fundamental Concepts & Atomic Mass Shortcut Array
+        const fundamentalConcepts = [
+            {
+                termEng: "Atom",
+                termBn: "পরমাণু",
+                icon: "fa-atom",
+                color: "indigo",
+                desc: "মৌলিক পদার্থের ক্ষুদ্রতম কণা যার স্বাধীন অস্তিত্ব নেই কিন্তু রাসায়নিক বিক্রিয়ায় সরাসরি অংশগ্রহণ করতে পারে, তাকে Atom (পরমাণু) বলে। যেমন: $\\text{H, O, C, Na, Cl}$।"
+            },
+            {
+                termEng: "Molecule",
+                termBn: "অণু",
+                icon: "fa-circle-nodes",
+                color: "emerald",
+                desc: "মৌলিক বা যৌগিক পদার্থের ক্ষুদ্রতম কণা যা মুক্ত অবস্থায় বিরাজ করতে পারে, তাকে Molecule (অণু) বলে। দুই বা ততোধিক Atom (পরমাণু) পরস্পরের সাথে রাসায়নিক বন্ধনে যুক্ত হয়ে Molecule (অণু) গঠন করে। যেমন: $\\text{O}_2, \\text{H}_2\\text{O}, \\text{H}_2\\text{SO}_4$।"
+            },
+            {
+                termEng: "Mole (mol)",
+                termBn: "মোল",
+                icon: "fa-scale-balanced",
+                color: "amber",
+                desc: "রাসায়নিক পদার্থ পরিমাপের আন্তর্জাতিক একক হলো Mole (মোল)। কোনো পদার্থের যে পরিমাণের মধ্যে Avogadro's Number (অ্যাভোগেড্রো সংখ্যা = $6.023 \\times 10^{23}$) সংখ্যক পরমাণু, অণু বা আয়ন থাকে, তাকে ঐ পদার্থের $1\\text{ Mole}$ (১ মোল) বলে।"
+            },
+            {
+                termEng: "Molecular Mass",
+                termBn: "আণবিক ভর",
+                icon: "fa-weight-hanging",
+                color: "rose",
+                desc: "কোনো একটি Molecule (অণু)-তে বিদ্যমান সকল পরমাণুর Atomic Mass (পারমাণবিক ভর) যোগ করলে ঐ অণুর Molecular Mass (আণবিক ভর) পাওয়া যায়। আণবিক ভরকে গ্রাম (g) এককে প্রকাশ করলে তাকে Gram Molecular Mass (গ্রাম আণবিক ভর) বা $1\\text{ mol}$ বলে।"
+            }
+        ];
+
+        // Atomic Mass & Molecular Mass Table Data Array
+        const massCheatSheet = {
+            evenShortcut: [
+                { el: "He (হিলিয়াম)", z: 2, mass: "4" },
+                { el: "C (কার্বন)", z: 6, mass: "12" },
+                { el: "N (নাইট্রোজেন)*", z: 7, mass: "14" },
+                { el: "O (অক্সিজেন)", z: 8, mass: "16" },
+                { el: "Ne (নিয়ন)", z: 10, mass: "20" },
+                { el: "Mg (ম্যাগনেসিয়াম)", z: 12, mass: "24" },
+                { el: "Si (সিলিকন)", z: 14, mass: "28" },
+                { el: "S (সালফার)", z: 16, mass: "32" },
+                { el: "Ca (ক্যালসিয়াম)", z: 20, mass: "40" }
+            ],
+            oddShortcut: [
+                { el: "Li (লিথিয়াম)", z: 3, mass: "7" },
+                { el: "B (বোরন)", z: 5, mass: "11" },
+                { el: "F (ফ্লোরিন)", z: 9, mass: "19" },
+                { el: "Na (সোডিয়াম)", z: 11, mass: "23" },
+                { el: "Al (অ্যালুমিনিয়াম)", z: 13, mass: "27" },
+                { el: "P (ফসফরাস)", z: 15, mass: "31" },
+                { el: "K (পটাশিয়াম)", z: 19, mass: "39" }
+            ],
+            exceptions: [
+                { el: "H (হাইড্রোজেন)", z: 1, mass: "1" },
+                { el: "Be (বেরিলিয়াম)", z: 4, mass: "9" },
+                { el: "Cl (ক্লোরিন)", z: 17, mass: "35.5" },
+                { el: "Ar (আর্গন)", z: 18, mass: "40" },
+                { el: "Fe (আয়রন)", z: 26, mass: "55.85 (বা 56)" },
+                { el: "Cu (কপার)", z: 29, mass: "63.5" },
+                { el: "Zn (জিংক)", z: 30, mass: "65" }
+            ],
+            commonCompounds: [
+                { formula: "\\text{H}_2\\text{O} \\text{ (পানি)}", atomCount: "2 + 1 = 3\\text{ টি}", calc: "1\\times 2 + 16 = 18", oneMole: "18\\text{ g}" },
+                { formula: "\\text{CO}_2 \\text{ (কার্বন ডাই-অক্সাইড)}", atomCount: "1 + 2 = 3\\text{ টি}", calc: "12 + 16\\times 2 = 44", oneMole: "44\\text{ g}" },
+                { formula: "\\text{NaOH} \\text{ (কস্টিক সোডা)}", atomCount: "1 + 1 + 1 = 3\\text{ টি}", calc: "23 + 16 + 1 = 40", oneMole: "40\\text{ g}" },
+                { formula: "\\text{HCl} \\text{ (হাইড্রোক্লোরিক এসিড)}", atomCount: "1 + 1 = 2\\text{ টি}", calc: "1 + 35.5 = 36.5", oneMole: "36.5\\text{ g}" },
+                { formula: "\\text{NaCl} \\text{ (খাবার লবণ)}", atomCount: "1 + 1 = 2\\text{ টি}", calc: "23 + 35.5 = 58.5", oneMole: "58.5\\text{ g}" },
+                { formula: "\\text{H}_2\\text{SO}_4 \\text{ (সালফিউরিক এসিড)}", atomCount: "2 + 1 + 4 = 7\\text{ টি}", calc: "1\\times 2 + 32 + 16\\times 4 = 98", oneMole: "98\\text{ g}" },
+                { formula: "\\text{CaCO}_3 \\text{ (চুনাপাথর)}", atomCount: "1 + 1 + 3 = 5\\text{ টি}", calc: "40 + 12 + 16\\times 3 = 100", oneMole: "100\\text{ g}" },
+                { formula: "\\text{Na}_2\\text{CO}_3 \\text{ (সোডা অ্যাশ)}", atomCount: "2 + 1 + 3 = 6\\text{ টি}", calc: "23\\times 2 + 12 + 16\\times 3 = 106", oneMole: "106\\text{ g}" },
+                { formula: "\\text{CuSO}_4\\cdot 5\\text{H}_2\\text{O} \\text{ (তুঁতে / Blue Vitriol)}", atomCount: "1+1+4+5(3) = 21\\text{ টি}", calc: "63.5 + 32 + 16\\times 4 + 5(18) = 249.5", oneMole: "249.5\\text{ g}" }
+            ]
+        };
+
+        // 2. All Mathematical Problem Types Array
+        const mathProblemTypes = [
+            {
+                id: "type-1",
+                badge: "Type 01",
+                title: "Mole, Mass এবং Number of Particles নির্ণয়",
+                subtitle: "মোল সংখ্যা, পদার্থের ভর এবং অণু-পরমাণুর সংখ্যা সংক্রান্ত গাণিতিক সমস্যা",
+                themeColor: "indigo",
+                icon: "fa-cubes",
+                definitions: [
+                    {
+                        term: "Mole (মোল)",
+                        text: "কোনো রাসায়নিক পদার্থের পারমাণবিক ভর (<span class='eng-term'>Atomic Mass</span>) অথবা আণবিক ভর (<span class='eng-term'>Molecular Mass</span>)-কে গ্রাম (<span class='eng-term'>gram</span>) এককে প্রকাশ করলে যে পরিমাণ পাওয়া যায়, তাকে ঐ পদার্থের $1\\text{ Mole}$ (১ মোল) বলা হয়।"
+                    },
+                    {
+                        term: "Avogadro's Number (অ্যাভোগেড্রো সংখ্যা, $N_A$)",
+                        text: "কোনো পদার্থের $1\\text{ Mole}$ পরিমাণের মধ্যে ঠিক $6.023 \\times 10^{23}$ টি অণু (<span class='eng-term'>Molecule</span>), পরমাণু (<span class='eng-term'>Atom</span>) বা আয়ন (<span class='eng-term'>Ion</span>) থাকে। ইতালীয় বিজ্ঞানী অ্যামেদিও অ্যাভোগেড্রোর নামানুসারে এই ধ্রুব সংখ্যাকে <span class='eng-term'>Avogadro's Number ($N_A$)</span> বলে।"
+                    }
+                ],
+                formulaLatex: "$$n = \\frac{W}{M} = \\frac{N}{N_A} \\quad \\text{এবং} \\quad 1\\text{ টি অণুর ভর} = \\frac{M}{6.023 \\times 10^{23}}\\text{ g}$$",
+                variables: [
+                    { sym: "$n$", meaning: "Number of Moles (মোল সংখ্যা) [একক: $\\text{mol}$]" },
+                    { sym: "$W$", meaning: "Given Mass in grams (প্রদত্ত পদার্থের ভর, গ্রাম এককে) [একক: $\\text{g}$]" },
+                    { sym: "$M$", meaning: "Atomic Mass / Molecular Mass (পারমাণবিক ভর বা আণবিক ভর) [একক: $\\text{g/mol}$]" },
+                    { sym: "$N$", meaning: "Number of Molecules or Atoms (প্রদত্ত অণু বা পরমাণুর সংখ্যা)" },
+                    { sym: "$N_A$", meaning: "Avogadro's Number (অ্যাভোগেড্রো সংখ্যা) $= 6.023 \\times 10^{23}$" }
+                ],
+                specialNote: "কোনো যৌগের মোট অণু সংখ্যা $N$ বের করার পর যদি নির্দিষ্ট কোনো মৌলের <strong>পরমাণু সংখ্যা (Number of Atoms)</strong> জানতে চায়, তবে: $\\text{পরমাণু সংখ্যা} = (\\text{১টি অণুতে ঐ পরমাণুর সংখ্যা}) \\times N$ হবে।",
+                examples: [
+                    {
+                        q: "উদাহরণ ১.১: $20\\text{ g } \\text{NaOH}$ এবং $49\\text{ g } \\text{H}_2\\text{SO}_4$ এর Mole (মোল সংখ্যা) কত?",
+                        given: "$\\text{NaOH}$ এর ভর, $W_1 = 20\\text{ g}$; আণবিক ভর, $M_1 = 23 + 16 + 1 = 40\\text{ g/mol}$<br>$\\text{H}_2\\text{SO}_4$ এর ভর, $W_2 = 49\\text{ g}$; আণবিক ভর, $M_2 = 1\\times 2 + 32 + 16\\times 4 = 98\\text{ g/mol}$",
+                        steps: "আমরা জানি, মোল সংখ্যা $n = \\frac{W}{M}$<br><br><strong>১ম অংশ ($\\text{NaOH}$ এর ক্ষেত্রে):</strong><br>$$n_1 = \\frac{20}{40} = 0.5\\text{ mol}$$<br><strong>২য় অংশ ($\\text{H}_2\\text{SO}_4$ এর ক্ষেত্রে):</strong><br>$$n_2 = \\frac{49}{98} = 0.5\\text{ mol}$$",
+                        ans: "উভয় ক্ষেত্রেই মোল সংখ্যা $0.5\\text{ mol}$।"
+                    },
+                    {
+                        q: "উদাহরণ ১.২: $88\\text{ g } \\text{CO}_2$ গ্যাসে মোল সংখ্যা এবং অণু সংখ্যা (Number of Molecules) কত?",
+                        given: "প্রদত্ত ভর, $W = 88\\text{ g}$<br>$\\text{CO}_2$ এর আণবিক ভর, $M = 12 + 16\\times 2 = 44\\text{ g/mol}$<br>অ্যাভোগেড্রো সংখ্যা, $N_A = 6.023 \\times 10^{23}$",
+                        steps: "১ম ধাপ (মোল সংখ্যা নির্ণয়):<br>$$n = \\frac{W}{M} = \\frac{88}{44} = 2\\text{ mol}$$<br>২য় ধাপ (অণু সংখ্যা নির্ণয়):<br>$$\\frac{W}{M} = \\frac{N}{N_A} \\implies 2 = \\frac{N}{6.023 \\times 10^{23}}$$<br>$$\\therefore N = 2 \\times 6.023 \\times 10^{23} = 1.2046 \\times 10^{24}\\text{ টি অণু}$$",
+                        ans: "মোল সংখ্যা $2\\text{ mol}$ এবং অণু সংখ্যা $1.2046 \\times 10^{24}$ টি।"
+                    },
+                    {
+                        q: "উদাহরণ ১.৩: $1\\text{ g } \\text{H}_2\\text{SO}_4$-এ কতগুলো $\\text{H}_2\\text{SO}_4$ অণু আছে এবং এতে কয়টি করে $\\text{H}, \\text{S}$ ও $\\text{O}$ পরমাণু (Atoms) বিদ্যমান?",
+                        given: "ভর, $W = 1\\text{ g}$<br>$\\text{H}_2\\text{SO}_4$ এর আণবিক ভর, $M = 1\\times 2 + 32 + 16\\times 4 = 98\\text{ g/mol}$<br>অ্যাভোগেড্রো সংখ্যা, $N_A = 6.023 \\times 10^{23}$",
+                        steps: "আমরা জানি, $\\frac{W}{M} = \\frac{N}{N_A}$<br>$$\\implies N = \\frac{W \\times N_A}{M} = \\frac{1 \\times 6.023 \\times 10^{23}}{98} = 6.146 \\times 10^{21}\\text{ টি } \\text{H}_2\\text{SO}_4\\text{ অণু}$$<br>যেহেতু ১টি $\\text{H}_2\\text{SO}_4$ অণুতে $2$টি $\\text{H}$, $1$টি $\\text{S}$ এবং $4$টি $\\text{O}$ পরমাণু আছে:<br>• $\\text{H}$ পরমাণুর সংখ্যা $= 2 \\times N = 2 \\times 6.146 \\times 10^{21} = 1.2292 \\times 10^{22}$ টি<br>• $\\text{S}$ পরমাণুর সংখ্যা $= 1 \\times N = 1 \\times 6.146 \\times 10^{21} = 6.146 \\times 10^{21}$ টি<br>• $\\text{O}$ পরমাণুর সংখ্যা $= 4 \\times N = 4 \\times 6.146 \\times 10^{21} = 2.4584 \\times 10^{22}$ টি",
+                        ans: "অণু $6.146\\times 10^{21}$ টি; $\\text{H} = 1.2292\\times 10^{22}$ টি, $\\text{S} = 6.146\\times 10^{21}$ টি, $\\text{O} = 2.4584\\times 10^{22}$ টি।"
+                    },
+                    {
+                        q: "উদাহরণ ১.৪: পানির ($\\text{H}_2\\text{O}$) ১টি অণুর ভর কত গ্রাম?",
+                        given: "$1\\text{ mol } \\text{H}_2\\text{O}$ এর ভর, $M = 18\\text{ g}$<br>$1\\text{ mol } \\text{H}_2\\text{O}$-তে অণুর সংখ্যা, $N_A = 6.023 \\times 10^{23}$ টি",
+                        steps: "$6.023 \\times 10^{23}$ টি $\\text{H}_2\\text{O}$ অণুর ভর $= 18\\text{ g}$<br>$$\\therefore 1\\text{ টি } \\text{H}_2\\text{O}\\text{ অণুর ভর} = \\frac{18}{6.023 \\times 10^{23}}\\text{ g} = 2.99 \\times 10^{-23}\\text{ g}$$",
+                        ans: "$2.99 \\times 10^{-23}\\text{ g}$"
+                    }
+                ]
+            },
+
+            {
+                id: "type-2",
+                badge: "Type 02",
+                title: "Molar Volume of Gas (গ্যাসের মোলার আয়তন ও STP গণনা)",
+                subtitle: "প্রমাণ তাপমাত্রা ও চাপে (STP) গ্যাসের আয়তন, ভর এবং অণু-পরমাণু সংখ্যার সমন্বিত হিসাব",
+                themeColor: "emerald",
+                icon: "fa-wind",
+                definitions: [
+                    {
+                        term: "Molar Volume of Gas (গ্যাসের মোলার আয়তন)",
+                        text: "এক মোল ($1\\text{ mol}$) পরিমাণ যেকোনো গ্যাসীয় পদার্থ যে আয়তন দখল করে, তাকে ঐ গ্যাসের <span class='eng-term'>Molar Volume</span> (মোলার আয়তন) বলে।"
+                    },
+                    {
+                        term: "Standard Temperature and Pressure - STP (প্রমাণ তাপমাত্রা ও চাপ)",
+                        text: "$0^\\circ\\text{C}$ তাপমাত্রা ($273\\text{ K}$) এবং $1\\text{ atm}$ ($1$ বায়ুমণ্ডলীয়) চাপকে একত্রে <span class='eng-term'>Standard Temperature and Pressure (STP)</span> বা প্রমাণ অবস্থা (<span class='eng-term'>Standard Condition</span>) বলে। প্রমাণ অবস্থায় বা STP-তে $1\\text{ mol}$ যেকোনো গ্যাসের আয়তন সর্বদা <strong>$22.4\\text{ Liter (L)}$</strong>।"
+                    }
+                ],
+                formulaLatex: "$$n = \\frac{W}{M} = \\frac{N}{N_A} = \\frac{V_{\\text{STP}}(\\text{L})}{22.4}$$",
+                variables: [
+                    { sym: "$V_{\\text{STP}}(\\text{L})$", meaning: "Volume of gas at STP in Liters (প্রমাণ অবস্থায় লিটার এককে গ্যাসের আয়তন)" },
+                    { sym: "$22.4\\text{ L}$", meaning: "Molar Volume at STP (প্রমাণ অবস্থায় ১ মোল গ্যাসের ধ্রুব আয়তন)" },
+                    { sym: "$n, W, M, N$", meaning: "যথাক্রমে মোল সংখ্যা, ভর (g), আণবিক ভর এবং অণুর সংখ্যা" }
+                ],
+                specialNote: "যদি প্রশ্নে গ্যাসের আয়তন মিলিলিটার (<span class='eng-term'>mL</span> বা $\\text{cm}^3$) এককে দেওয়া থাকে, তবে সেটিকে $1000$ দিয়ে ভাগ করে লিটার (<span class='eng-term'>L</span>) এককে নিয়ে সূত্র বসাতে হবে, অথবা $22.4\\text{ L}$-এর বদলে $22400\\text{ mL}$ ব্যবহার করতে হবে।",
+                examples: [
+                    {
+                        q: "উদাহরণ ২.১: প্রমাণ অবস্থায় (STP-তে) $5\\text{ L } \\text{CH}_4$ (মিথেন) গ্যাসে কয়টি $\\text{H}$ পরমাণু আছে?",
+                        given: "STP-তে গ্যাসের আয়তন, $V_{\\text{STP}} = 5\\text{ L}$<br>অ্যাভোগেড্রো সংখ্যা, $N_A = 6.023 \\times 10^{23}$<br>১টি $\\text{CH}_4$ অণুতে $\\text{H}$ পরমাণু $= 4$ টি",
+                        steps: "আমরা জানি,<br>$$\\frac{N}{N_A} = \\frac{V_{\\text{STP}}(\\text{L})}{22.4}$$<br>$$\\implies N = \\frac{5}{22.4} \\times 6.023 \\times 10^{23} = 1.344 \\times 10^{23}\\text{ টি } \\text{CH}_4\\text{ অণু}$$<br>অতএব, মোট $\\text{H}$ পরমাণুর সংখ্যা:<br>$$= 4 \\times N = 4 \\times 1.344 \\times 10^{23} = 5.3776 \\times 10^{23}\\text{ টি}$$",
+                        ans: "$5.38 \\times 10^{23}$ টি $\\text{H}$ পরমাণু আছে।"
+                    },
+                    {
+                        q: "উদাহরণ ২.২: প্রমাণ অবস্থায় $10\\text{ g } \\text{H}_2$ গ্যাসের আয়তন কত লিটার?",
+                        given: "ভর, $W = 10\\text{ g}$<br>$\\text{H}_2$ গ্যাসের আণবিক ভর, $M = 1\\times 2 = 2\\text{ g/mol}$<br>STP-তে আয়তন, $V_{\\text{STP}} = ?$",
+                        steps: "আমরা জানি,<br>$$\\frac{W}{M} = \\frac{V_{\\text{STP}}}{22.4}$$<br>$$\\implies \\frac{10}{2} = \\frac{V_{\\text{STP}}}{22.4} \\implies 5 = \\frac{V_{\\text{STP}}}{22.4}$$<br>$$\\therefore V_{\\text{STP}} = 5 \\times 22.4 = 112\\text{ L}$$",
+                        ans: "প্রমাণ অবস্থায় আয়তন $112\\text{ Liter}$।"
+                    },
+                    {
+                        q: "উদাহরণ ২.৩: প্রমাণ তাপমাত্রা ও চাপে $1\\text{ L } \\text{CO}_2$ গ্যাসে কতটি অণু থাকে?",
+                        given: "আয়তন, $V_{\\text{STP}} = 1\\text{ L}$<br>$N_A = 6.023 \\times 10^{23}$, অণু সংখ্যা $N = ?$",
+                        steps: "সূত্রানুসারে,<br>$$\\frac{N}{N_A} = \\frac{V_{\\text{STP}}}{22.4}$$<br>$$\\implies N = \\frac{1 \\times 6.023 \\times 10^{23}}{22.4} = 2.69 \\times 10^{22}\\text{ টি}$$",
+                        ans: "$2.69 \\times 10^{22}$ টি অণু।"
+                    }
+                ]
+            },
+
+            {
+                id: "type-3",
+                badge: "Type 03",
+                title: "Molar Solution ও Molarity (মোলার দ্রবণ ও মোলারিটি সংক্রান্ত গণনা)",
+                subtitle: "দ্রবণের ঘনমাত্রা নির্ণয় এবং নির্দিষ্ট মোলারিটির দ্রবণ প্রস্তুতকরণের গাণিতিক সমস্যা",
+                themeColor: "amber",
+                icon: "fa-flask",
+                definitions: [
+                    {
+                        term: "Solution, Solute & Solvent (দ্রবণ, দ্রব ও দ্রাবক)",
+                        text: "দ্রব (<span class='eng-term'>Solute</span>) ও দ্রাবক (<span class='eng-term'>Solvent</span>) এর সমসত্ত্ব মিশ্রণকে দ্রবণ (<span class='eng-term'>Solution</span>) বলে। দ্রবণে যে উপাদানটি কম পরিমাণে থেকে দ্রবীভূত হয় তাকে <strong>Solute (দ্রব)</strong> এবং যে উপাদানটি বেশি পরিমাণে থেকে দ্রবীভূত করে তাকে <strong>Solvent (দ্রাবক)</strong> বলে। পানি দ্রাবক হলে তাকে <span class='eng-term'>Aqueous Solution (জলীয় দ্রবণ)</span> বলে।<br>$$\\text{Solution (দ্রবণ)} = \\text{Solute (দ্রব)} + \\text{Solvent (দ্রাবক)}$$"
+                    },
+                    {
+                        term: "Molarity (মোলারিটি, $S$)",
+                        text: "স্থির বা নির্দিষ্ট তাপমাত্রায় প্রতি $1\\text{ Liter}$ ($1000\\text{ mL}$) দ্রবণে যত মোল (<span class='eng-term'>mole</span>) দ্রব দ্রবীভূত থাকে, তাকে ঐ দ্রবণের <span class='eng-term'>Molarity</span> (মোলারিটি বা ঘনমাত্রা) বলে। এর একক <span class='eng-term'>$\\text{mol/L}$</span> বা <span class='eng-term'>$\\text{M}$</span>। (যেহেতু তাপমাত্রা বাড়ালে দ্রবণের আয়তন বাড়ে, তাই মোলারিটি তাপমাত্রার ওপর নির্ভরশীল)।"
+                    },
+                    {
+                        term: "প্রমাণ দ্রবণের ৪টি বিশেষ প্রকারভেদ (Standard Concentration Types)",
+                        text: "• <strong>Molar Solution (মোলার দ্রবণ):</strong> $1\\text{ L}$ দ্রবণে $1\\text{ mol}$ দ্রব থাকলে ($S = 1\\text{ M}$)<br>• <strong>Semimolar Solution (সেমিমোলার দ্রবণ):</strong> $1\\text{ L}$ দ্রবণে $0.5\\text{ mol}$ দ্রব থাকলে ($S = 0.5\\text{ M}$)<br>• <strong>Decimolar Solution (ডেসিমোলার দ্রবণ):</strong> $1\\text{ L}$ দ্রবণে $0.1\\text{ mol}$ দ্রব থাকলে ($S = 0.1\\text{ M}$)<br>• <strong>Centimolar Solution (সেন্টিমোলার দ্রবণ):</strong> $1\\text{ L}$ দ্রবণে $0.01\\text{ mol}$ দ্রব থাকলে ($S = 0.01\\text{ M}$)"
+                    }
+                ],
+                formulaLatex: "$$S = \\frac{n}{V(\\text{L})} \\implies W = S \\times M \\times V(\\text{L}) \\quad \\text{অথবা,} \\quad W = \\frac{S \\times M \\times V(\\text{mL})}{1000}$$",
+                variables: [
+                    { sym: "$W$", meaning: "Mass of Solute in grams (দ্রবীভূত দ্রবের ভর, গ্রাম এককে) [একক: $\\text{g}$]" },
+                    { sym: "$S$", meaning: "Molarity / Concentration (দ্রবণের মোলারিটি বা ঘনমাত্রা) [একক: $\\text{mol/L}$ বা $\\text{M}$]" },
+                    { sym: "$M$", meaning: "Molecular Mass of Solute (দ্রবের আণবিক ভর) [একক: $\\text{g/mol}$]" },
+                    { sym: "$V(\\text{L})$", meaning: "Volume in Liters (লিটার এককে দ্রবণের আয়তন)" },
+                    { sym: "$V(\\text{mL})$", meaning: "Volume in Milliliters (মিলিলিটার এককে দ্রবণের আয়তন, $1\\text{ L} = 1000\\text{ mL}$)" }
+                ],
+                specialNote: "অনেক সময় প্রশ্নে সরাসরি $S$ এর মান না দিয়ে <em>'সেমিমোলার'</em> ($S=0.5\\text{ M}$) বা <em>'ডেসিমোলার'</em> ($S=0.1\\text{ M}$) শব্দটি উল্লেখ থাকে। সেক্ষেত্রে শব্দ দেখেই $S$ এর মান বসাতে হবে।",
+                examples: [
+                    {
+                        q: "উদাহরণ ৩.১: $200\\text{ mL}$ সেমিমোলার (Semimolar) $\\text{Na}_2\\text{CO}_3$ দ্রবণ প্রস্তুত করতে কত গ্রাম $\\text{Na}_2\\text{CO}_3$ লাগবে?",
+                        given: "দ্রবণের আয়তন, $V = 200\\text{ mL}$<br>সেমিমোলার দ্রবণ হওয়ায় ঘনমাত্রা, $S = 0.5\\text{ M}$<br>$\\text{Na}_2\\text{CO}_3$ এর আণবিক ভর, $M = 23\\times 2 + 12 + 16\\times 3 = 106\\text{ g/mol}$<br>প্রয়োজনীয় ভর, $W = ?$",
+                        steps: "আমরা জানি,<br>$$W = \\frac{S \\times M \\times V(\\text{mL})}{1000}$$<br>$$\\implies W = \\frac{0.5 \\times 106 \\times 200}{1000} = 10.6\\text{ g}$$",
+                        ans: "$10.6\\text{ g } \\text{Na}_2\\text{CO}_3$ প্রয়োজন হবে।"
+                    },
+                    {
+                        q: "উদাহরণ ৩.২: কত লিটার দ্রবণে $40\\text{ g } \\text{NaOH}$ উপস্থিত থাকলে তার মোলারিটি $0.1\\text{ M}$ (Decimolar) হবে?",
+                        given: "ভর, $W = 40\\text{ g}$<br>$\\text{NaOH}$ এর আণবিক ভর, $M = 23 + 16 + 1 = 40\\text{ g/mol}$<br>মোলারিটি, $S = 0.1\\text{ M}$<br>লিটার এককে আয়তন, $V(\\text{L}) = ?$",
+                        steps: "লিটার এককের সূত্রানুসারে,<br>$$W = S \\times M \\times V(\\text{L})$$<br>$$\\implies V(\\text{L}) = \\frac{W}{S \\times M} = \\frac{40}{0.1 \\times 40} = \\frac{1}{0.1} = 10\\text{ L}$$",
+                        ans: "$10\\text{ Liter}$ দ্রবণে।"
+                    },
+                    {
+                        q: "উদাহরণ ৩.৩: $25\\text{ g } \\text{Na}_2\\text{CO}_3$ যদি $100\\text{ mL}$ দ্রবণে দ্রবীভূত থাকে এবং অপর একটি $200\\text{ mL}$ দ্রবণে $120\\text{ g } \\text{NaOH}$ দ্রবীভূত থাকে, তবে উভয় দ্রবণের মোলারিটি (Molarity) কত?",
+                        given: "১ম ক্ষেত্রে: $W_1 = 25\\text{ g}, M_1 = 106, V_1 = 100\\text{ mL}$<br>২য় ক্ষেত্রে: $W_2 = 120\\text{ g}, M_2 = 40, V_2 = 200\\text{ mL} = 0.2\\text{ L}$",
+                        steps: "<strong>১ম দ্রবণের মোলারিটি ($S_1$):</strong><br>$$S_1 = \\frac{W_1 \\times 1000}{M_1 \\times V_1(\\text{mL})} = \\frac{25 \\times 1000}{106 \\times 100} = \\frac{250}{106} = 2.36\\text{ M}$$<br><strong>২য় দ্রবণের মোলারিটি ($S_2$):</strong><br>$$S_2 = \\frac{n}{V(\\text{L})} = \\frac{120 / 40}{200 / 1000} = \\frac{3}{0.2} = 15\\text{ mol/L বা } 15\\text{ M}$$",
+                        ans: "১ম দ্রবণের মোলারিটি $2.36\\text{ M}$ এবং ২য় দ্রবণের মোলারিটি $15\\text{ M}$।"
+                    },
+                    {
+                        q: "উদাহরণ ৩.৪: $2\\text{ Liter}$ দ্রবণে $100\\text{ g } \\text{CaCO}_3$ যোগ করা হলে এটি কত মোলার দ্রবণ?",
+                        given: "ভর, $W = 100\\text{ g}$; আণবিক ভর, $M = 40+12+48 = 100\\text{ g/mol}$<br>আয়তন, $V(\\text{L}) = 2\\text{ L}$",
+                        steps: "$$S = \\frac{W}{M \\times V(\\text{L})} = \\frac{100}{100 \\times 2} = \\frac{1}{2} = 0.5\\text{ M}$$",
+                        ans: "$0.5\\text{ M}$ (অর্থাৎ এটি একটি সেমিমোলার দ্রবণ)।"
+                    }
+                ]
+            },
+
+            {
+                id: "type-4",
+                badge: "Type 04",
+                title: "Percentage Composition (যৌগে মৌলের শতকরা সংযুতি নির্ণয়)",
+                subtitle: "কোনো যৌগের ১০০ গ্রামের মধ্যে কোন মৌল বা কেলাস পানি কত গ্রাম আছে তা নির্ণয়",
+                themeColor: "rose",
+                icon: "fa-chart-pie",
+                definitions: [
+                    {
+                        term: "Percentage Composition (শতকরা সংযুতি)",
+                        text: "কোনো যৌগের $100\\text{ g}$ ভরের মধ্যে কোনো নির্দিষ্ট মৌল যত গ্রাম পরিমাণে বিদ্যমান থাকে, তাকে ঐ যৌগে ঐ মৌলের <span class='eng-term'>Percentage Composition</span> (শতকরা সংযুতি) বলে। যেকোনো যৌগের সকল মৌলের শতকরা সংযুতির যোগফল সর্বদা $100\\%$ হয়।"
+                    },
+                    {
+                        term: "Water of Crystallization / Lattice Water (কেলাস পানি)",
+                        text: "আর্দ্র বা সোদক কেলাসের (<span class='eng-term'>Hydrated Crystal</span>) প্রতি অণুর সাথে নির্দিষ্ট সংখ্যক পানির অণু রাসায়নিকভাবে যুক্ত থাকে, যাকে <span class='eng-term'>Lattice Water</span> বা কেলাস পানি বলে। যেমন: ব্লু-ভিট্রিয়ল বা তুঁতে ($\\text{CuSO}_4\\cdot 5\\text{H}_2\\text{O}$)-তে $5$ অণু কেলাস পানি থাকে।"
+                    }
+                ],
+                formulaLatex: "$$\\text{মৌলের শতকরা সংযুতি (\\%)} = \\frac{\\text{মৌলের পারমাণবিক ভর } (A) \\times \\text{পরমাণুর সংখ্যা } (x)}{\\text{যৌগের আণবিক ভর } (M)} \\times 100\\%$$",
+                variables: [
+                    { sym: "$A$", meaning: "Atomic Mass of the Element (যৌগে বিদ্যমান মৌলটির পারমাণবিক ভর)" },
+                    { sym: "$x$ (বা $n$)", meaning: "Number of Atoms in Formula (যৌগের ১টি অণুতে ঐ মৌলের পরমাণুর সংখ্যা)" },
+                    { sym: "$M$", meaning: "Molecular Mass of Compound (সম্পূর্ণ যৌগটির আণবিক ভর)" }
+                ],
+                specialNote: "কেলাস পানির (<span class='eng-term'>Lattice Water</span>) শতকরা সংযুতি বের করার সময় লবে (উপরে) মোট কেলাস পানির ভর (যেমন $5\\text{H}_2\\text{O} = 5 \\times 18 = 90$) বসিয়ে যৌগের মোট আণবিক ভর দিয়ে ভাগ করে $100\\%$ দিয়ে গুণ করতে হয়।",
+                examples: [
+                    {
+                        q: "উদাহরণ ৪.১: পানি ($\\text{H}_2\\text{O}$) এবং সালফিউরিক এসিড ($\\text{H}_2\\text{SO}_4$)-এ বিদ্যমান প্রতিটি মৌলের শতকরা সংযুতি (Percentage Composition) নির্ণয় করো।",
+                        given: "$\\text{H}_2\\text{O}$ এর আণবিক ভর $= 1\\times 2 + 16 = 18$<br>$\\text{H}_2\\text{SO}_4$ এর আণবিক ভর $= 1\\times 2 + 32 + 16\\times 4 = 98$",
+                        steps: "<strong>$\\text{H}_2\\text{O}$ এর ক্ষেত্রে:</strong><br>$$\\text{H এর শতকরা সংযুতি} = \\frac{1 \\times 2 \\times 100}{18}\\% = 11.11\\%$$<br>$$\\text{O এর শতকরা সংযুতি} = \\frac{16 \\times 1 \\times 100}{18}\\% = 88.89\\%$$<br><strong>$\\text{H}_2\\text{SO}_4$ এর ক্ষেত্রে:</strong><br>$$\\text{H এর সংযুতি} = \\frac{1 \\times 2 \\times 100}{98}\\% = 2.04\\%$$<br>$$\\text{S এর সংযুতি} = \\frac{32 \\times 1 \\times 100}{98}\\% = 32.65\\%$$<br>$$\\text{O এর সংযুতি} = \\frac{16 \\times 4 \\times 100}{98}\\% = 65.31\\%$$",
+                        ans: "$\\text{H}_2\\text{O}$-তে $\\text{H}=11.11\\%, \\text{O}=88.89\\%$; এবং $\\text{H}_2\\text{SO}_4$-এ $\\text{H}=2.04\\%, \\text{S}=32.65\\%, \\text{O}=65.31\\%$।"
+                    },
+                    {
+                        q: "উদাহরণ ৪.২: ব্লু-ভিট্রিয়ল বা তুঁতে ($\\text{CuSO}_4\\cdot 5\\text{H}_2\\text{O}$) যৌগে কপার ($\\text{Cu}$) এবং কেলাস পানির (Crystal Water) শতকরা সংযুতি কত?",
+                        given: "$\\text{CuSO}_4\\cdot 5\\text{H}_2\\text{O}$ এর আণবিক ভর, $M = 63.5 + 32 + 16\\times 4 + 5(18) = 249.5$<br>এখানে $\\text{Cu}$ এর ভর $= 63.5$ এবং $5$ অণু কেলাস পানির ($5\\text{H}_2\\text{O}$) ভর $= 5 \\times 18 = 90$",
+                        steps: "<strong>কপার ($\\text{Cu}$) এর শতকরা সংযুতি:</strong><br>$$\\text{\\% of Cu} = \\frac{63.5 \\times 1 \\times 100}{249.5}\\% = 25.45\\%$$<br><strong>কেলাস পানির ($5\\text{H}_2\\text{O}$) শতকরা সংযুতি:</strong><br>$$\\text{\\% of } 5\\text{H}_2\\text{O} = \\frac{90 \\times 100}{249.5}\\% = 36.07\\%$$",
+                        ans: "$\\text{Cu} = 25.45\\%$ এবং কেলাস পানি $= 36.07\\%$।"
+                    },
+                    {
+                        q: "উদাহরণ ৪.৩: $\\text{Al}_2(\\text{SO}_4)_3$ যৌগে $\\text{Al}, \\text{S}$ এবং $\\text{O}$ এর শতকরা সংযুতি নির্ণয় করো।",
+                        given: "$\\text{Al}_2(\\text{SO}_4)_3$ এ পরমাণুর সংখ্যা: $\\text{Al} = 2$টি, $\\text{S} = 1\\times 3 = 3$টি, $\\text{O} = 4\\times 3 = 12$টি।<br>আণবিক ভর, $M = 27\\times 2 + (32 + 16\\times 4)\\times 3 = 54 + 96\\times 3 = 342$",
+                        steps: "$$\\text{Al এর শতকরা সংযুতি} = \\frac{27 \\times 2 \\times 100}{342}\\% = 15.79\\%$$<br>$$\\text{S এর শতকরা সংযুতি} = \\frac{32 \\times 3 \\times 100}{342}\\% = 28.07\\%$$<br>$$\\text{O এর শতকরা সংযুতি} = \\frac{16 \\times 12 \\times 100}{342}\\% = 56.14\\%$$",
+                        ans: "$\\text{Al} = 15.79\\%, \\text{S} = 28.07\\%, \\text{O} = 56.14\\%$।"
+                    }
+                ]
+            },
+
+            {
+                id: "type-5",
+                badge: "Type 05",
+                title: "Empirical Formula (শতকরা সংযুতি হতে স্থূল সংকেত নির্ণয়)",
+                subtitle: "যৌগে বিদ্যমান মৌলসমূহের শতকরা পরিমাণ বা ভর থেকে পরমাণুর ক্ষুদ্রতম অনুপাত নির্ণয়",
+                themeColor: "purple",
+                icon: "fa-puzzle-piece",
+                definitions: [
+                    {
+                        term: "Empirical Formula (স্থূল সংকেত)",
+                        text: "যে সংকেত দ্বারা কোনো যৌগের অণুতে বিদ্যমান বিভিন্ন মৌলের পরমাণুগুলোর ক্ষুদ্রতম সরল অনুপাত (<span class='eng-term'>Simplest Whole Number Ratio</span>) প্রকাশ করা হয়, তাকে <span class='eng-term'>Empirical Formula</span> (স্থূল সংকেত) বলে। যেমন: গ্লুকোজের আণবিক সংকেত $\\text{C}_6\\text{H}_{12}\\text{O}_6$ হলেও এর পরমাণুগুলোর অনুপাত $6:12:6 = 1:2:1$, তাই এর স্থূল সংকেত $\\text{CH}_2\\text{O}$।"
+                    }
+                ],
+                formulaLatex: "$$\\text{Step 1: } R = \\frac{\\text{মৌলের শতকরা সংযুতি (\\%)}}{\\text{নিজ নিজ পারমাণবিক ভর}} \\quad \\longrightarrow \\quad \\text{Step 2: } \\text{অনুপাত} = \\frac{\\text{প্রাপ্ত ভাগফল } (R)}{\\text{ক্ষুদ্রতম ভাগফল } (R_{\\min})}$$",
+                variables: [
+                    { sym: "ধাপ ১", meaning: "প্রতিটি মৌলের শতকরা সংযুতিকে তার নিজ নিজ পারমাণবিক ভর দিয়ে ভাগ করতে হবে।" },
+                    { sym: "ধাপ ২", meaning: "প্রাপ্ত ভাগফলগুলোর মধ্যে যেটি সবচেয়ে ছোট (ক্ষুদ্রতম), সেই সংখ্যা দিয়ে সবগুলো ভাগফলকে পুনরায় ভাগ করতে হবে।" },
+                    { sym: "ধাপ ৩", meaning: "ভাগফল পূর্ণসংখ্যা না হলে (যেমন $1.5$ বা $2.5$ আসলে) উপযুক্ত ক্ষুদ্রতম পূর্ণসংখ্যা ($2$) দিয়ে সবাইকে গুণ করে পূর্ণসংখ্যায় রূপান্তর করতে হবে এবং মৌলের প্রতীকের ডানপাশে নিচে বসাতে হবে।" }
+                ],
+                specialNote: "একাধিক যৌগের একই <span class='eng-term'>Empirical Formula</span> (স্থূল সংকেত) হতে পারে! যেমন: অ্যাসিটিলিন ($\\text{C}_2\\text{H}_2$) এবং বেনজিন ($\\text{C}_6\\text{H}_6$) উভয়েরই স্থূল সংকেত $\\text{CH}$। আবার পানি ($\\text{H}_2\\text{O}$) ও অ্যামোনিয়া ($\\text{NH}_3$)-র স্থূল সংকেত এবং আণবিক সংকেত একই।",
+                examples: [
+                    {
+                        q: "উদাহরণ ৫.১: কোনো যৌগে $\\text{H} = 2.04\\%, \\text{S} = 32.65\\%$ এবং $\\text{O} = 65.30\\%$ হলে যৌগটির স্থূল সংকেত (Empirical Formula) নির্ণয় করো।",
+                        given: "$\\text{H} = 2.04\\%$ (পারমাণবিক ভর $= 1$)<br>$\\text{S} = 32.65\\%$ (পারমাণবিক ভর $= 32$)<br>$\\text{O} = 65.30\\%$ (পারমাণবিক ভর $= 16$)",
+                        steps: "<strong>১ম ধাপ (শতকরা সংযুতিকে নিজ নিজ পারমাণবিক ভর দ্বারা ভাগ):</strong><br>$$\\text{H} = \\frac{2.04}{1} = 2.04, \\quad \\text{S} = \\frac{32.65}{32} = 1.02, \\quad \\text{O} = \\frac{65.30}{16} = 4.08$$<br><strong>২য় ধাপ (ক্ষুদ্রতম ভাগফল $1.02$ দ্বারা সবগুলোকে ভাগ):</strong><br>$$\\text{H} = \\frac{2.04}{1.02} = 2, \\quad \\text{S} = \\frac{1.02}{1.02} = 1, \\quad \\text{O} = \\frac{4.08}{1.02} = 4$$<br>সুতরাং পরমাণুগুলোর অনুপাত $\\text{H}:\\text{S}:\\text{O} = 2:1:4$।",
+                        ans: "যৌগটির স্থূল সংকেত $\\text{H}_2\\text{S}_1\\text{O}_4$ বা $\\text{H}_2\\text{SO}_4$।"
+                    },
+                    {
+                        q: "উদাহরণ ৫.২: কোনো যৌগে $\\text{C} = 60\\%, \\text{H} = 13.33\\%$ এবং $\\text{O} = 26.67\\%$ হলে এর স্থূল সংকেত নির্ণয় করো।",
+                        given: "$\\text{C} = 60\\%$ (ভর $12$), $\\text{H} = 13.33\\%$ (ভর $1$), $\\text{O} = 26.67\\%$ (ভর $16$)",
+                        steps: "<strong>১ম ধাপ (পারমাণবিক ভর দ্বারা ভাগ):</strong><br>$$\\text{C} = \\frac{60}{12} = 5, \\quad \\text{H} = \\frac{13.33}{1} = 13.33, \\quad \\text{O} = \\frac{26.67}{16} = 1.67$$<br><strong>২য় ধাপ (ক্ষুদ্রতম ভাগফল $1.67$ দ্বারা ভাগ):</strong><br>$$\\text{C} = \\frac{5}{1.67} = 2.99 \\approx 3, \\quad \\text{H} = \\frac{13.33}{1.67} = 7.98 \\approx 8, \\quad \\text{O} = \\frac{1.67}{1.67} = 1$$",
+                        ans: "নির্ণেয় স্থূল সংকেত $\\text{C}_3\\text{H}_8\\text{O}$।"
+                    },
+                    {
+                        q: "উদাহরণ ৫.৩: কোনো যৌগে $\\text{C} = 60\\%, \\text{H} = 8\\%$ এবং $\\text{O} = 32\\%$ হলে এর স্থূল সংকেত নির্ণয় করো (ভগ্নাংশ অনুপাতের নিয়ম)।",
+                        given: "$\\text{C} = 60\\%, \\text{H} = 8\\%, \\text{O} = 32\\%$",
+                        steps: "<strong>১ম ধাপ:</strong><br>$$\\text{C} = \\frac{60}{12} = 5, \\quad \\text{H} = \\frac{8}{1} = 8, \\quad \\text{O} = \\frac{32}{16} = 2$$<br><strong>২য় ধাপ (ক্ষুদ্রতম ভাগফল $2$ দ্বারা ভাগ):</strong><br>$$\\text{C} = \\frac{5}{2} = 2.5, \\quad \\text{H} = \\frac{8}{2} = 4, \\quad \\text{O} = \\frac{2}{2} = 1$$<br>যেহেতু $\\text{C} = 2.5$ একটি ভগ্নাংশ (নোটের খসড়ায় $\\text{C}_{2.5}\\text{H}_4\\text{O}_1$ লেখা হলেও পরমাণুর সংখ্যা ভগ্নাংশ হতে পারে না), তাই সবগুলোকে $2$ দ্বারা গুণ করে পূর্ণসংখ্যায় রূপান্তর করি:<br>$$\\text{C} = 2.5 \\times 2 = 5, \\quad \\text{H} = 4 \\times 2 = 8, \\quad \\text{O} = 1 \\times 2 = 2$$",
+                        ans: "স্থূল সংকেত $\\text{C}_5\\text{H}_8\\text{O}_2$ (খসড়া অনুপাত $\\text{C}_{2.5}\\text{H}_4\\text{O}_1$)।"
+                    }
+                ]
+            },
+
+            {
+                id: "type-6",
+                badge: "Type 06",
+                title: "Molecular Formula (স্থূল সংকেত হতে আণবিক সংকেত নির্ণয়)",
+                subtitle: "যৌগের স্থূল সংকেত এবং আণবিক ভর ব্যবহার করে প্রকৃত আণবিক সংকেত নির্ণয়",
+                themeColor: "cyan",
+                icon: "fa-dna",
+                definitions: [
+                    {
+                        term: "Molecular Formula (আণবিক সংকেত)",
+                        text: "কোনো যৌগের একটি অণুতে বিদ্যমান বিভিন্ন মৌলের পরমাণুসমূহের প্রকৃত সংখ্যাকে (<span class='eng-term'>Actual Number of Atoms</span>) প্রতীকের মাধ্যমে সংক্ষিপ্ত রূপে প্রকাশ করাকে যৌগটির <span class='eng-term'>Molecular Formula</span> (আণবিক সংকেত) বলে। আণবিক সংকেত সর্বদা স্থূল সংকেতের সরল গুণিতক ($n$ গুণ) হয়।"
+                    }
+                ],
+                formulaLatex: "$$\\text{Molecular Formula} = (\\text{Empirical Formula})_n \\quad \\text{যেখানে, } n = \\frac{\\text{যৌগের আণবিক ভর (Molecular Mass)}}{\\text{স্থূল সংকেতের ভর (Empirical Formula Mass)}}$$",
+                variables: [
+                    { sym: "$n$", meaning: "Common Multiplier (সরল গুণিতক সংখ্যা: $1, 2, 3, 6$ ইত্যাদি)" },
+                    { sym: "স্থূল সংকেতের ভর", meaning: "স্থূল সংকেতে বিদ্যমান পরমাণুগুলোর পারমাণবিক ভরের যোগফল" }
+                ],
+                specialNote: "যদি উদ্দীপকে কোনো যৌগের সবগুলো মৌলের শতকরা সংযুতির যোগফল $100\\%$ এর কম দেওয়া থাকে (যেমন শুধু $\\text{C}$ ও $\\text{H}$ দেওয়া আছে), তবে বুঝতে হবে বাকি অংশটুকু অক্সিজেন ($\\text{O}$) বা অপর উল্লিখিত মৌল: $\\text{বাকি মৌল} = 100\\% - (\\text{প্রদত্ত মৌলগুলোর যোগফল})$।",
+                examples: [
+                    {
+                        q: "উদাহরণ ৬.১: একটি যৌগে $\\text{C} = 92.31\\%$ এবং $\\text{H} = 7.69\\%$। যৌগটির আণবিক ভর $78$ হলে এর আণবিক সংকেত (Molecular Formula) নির্ণয় করো।",
+                        given: "$\\text{C} = 92.31\\%, \\text{H} = 7.69\\%$<br>আণবিক ভর, $M = 78$",
+                        steps: "<strong>১ম অংশ (স্থূল সংকেত নির্ণয়):</strong><br>$$\\text{C} = \\frac{92.31}{12} = 7.69, \\quad \\text{H} = \\frac{7.69}{1} = 7.69$$<br>ক্ষুদ্রতম মান $7.69$ দিয়ে ভাগ করে পাই: $\\text{C} = 1, \\text{H} = 1$। সুতরাং স্থূল সংকেত $= \\text{CH}$।<br><br><strong>২য় অংশ (আণবিক সংকেত নির্ণয়):</strong><br>ধরি, যৌগটির আণবিক সংকেত $= (\\text{CH})_n$<br>স্থূল সংকেত $\\text{CH}$ এর ভর $= 12 + 1 = 13$<br>$$\\therefore n = \\frac{\\text{আণবিক ভর}}{\\text{স্থূল সংকেতের ভর}} = \\frac{78}{13} = 6$$<br>অতএব, আণবিক সংকেত $= (\\text{CH})_6 = \\text{C}_6\\text{H}_6$ (বেনজিন)।",
+                        ans: "$\\text{C}_6\\text{H}_6$ (Benzene)"
+                    },
+                    {
+                        q: "উদাহরণ ৬.২: একটি যৌগের স্থূল সংকেত $\\text{C}_3\\text{H}_8\\text{O}$ এবং এর আণবিক ভর $60$ হলে আণবিক সংকেত কত?",
+                        given: "স্থূল সংকেত $= \\text{C}_3\\text{H}_8\\text{O}$<br>স্থূল সংকেতের ভর $= 12\\times 3 + 1\\times 8 + 16\\times 1 = 36 + 8 + 16 = 60$<br>যৌগের আণবিক ভর $= 60$",
+                        steps: "আমরা জানি,<br>$$n = \\frac{\\text{আণবিক ভর}}{\\text{স্থূল সংকেতের ভর}} = \\frac{60}{60} = 1$$<br>সুতরাং আণবিক সংকেত $= (\\text{C}_3\\text{H}_8\\text{O})_1 = \\text{C}_3\\text{H}_8\\text{O}$ (বা প্রোপানল, $\\text{C}_3\\text{H}_7\\text{OH}$)।",
+                        ans: "$\\text{C}_3\\text{H}_8\\text{O}$"
+                    },
+                    {
+                        q: "উদাহরণ ৬.৩: গ্লুকোজ যৌগে $\\text{C} = 40\\%$ এবং $\\text{H} = 6.67\\%$ এবং বাকি অংশ অক্সিজেন ($\\text{O}$)। এর আণবিক ভর $180$ হলে আণবিক সংকেত নির্ণয় করো।",
+                        given: "$\\text{C} = 40\\%, \\text{H} = 6.67\\%$<br>অক্সিজেনের শতকরা সংযুতি, $\\text{O} = 100\\% - (40 + 6.67)\\% = 53.33\\%$<br>আণবিক ভর $= 180$",
+                        steps: "পারমাণবিক ভর দ্বারা ভাগ করে পাই:<br>$$\\text{C} = \\frac{40}{12} = 3.33, \\quad \\text{H} = \\frac{6.67}{1} = 6.67, \\quad \\text{O} = \\frac{53.33}{16} = 3.33$$<br>ক্ষুদ্রতম ভাগফল $3.33$ দ্বারা ভাগ করে পাই: $\\text{C} = 1, \\text{H} = 2, \\text{O} = 1$।<br>সুতরাং স্থূল সংকেত $= \\text{CH}_2\\text{O}$ এবং এর ভর $= 12 + 1\\times 2 + 16 = 30$।<br>$$\\therefore n = \\frac{180}{30} = 6$$<br>অতএব, আণবিক সংকেত $= (\\text{CH}_2\\text{O})_6 = \\text{C}_6\\text{H}_{12}\\text{O}_6$।",
+                        ans: "$\\text{C}_6\\text{H}_{12}\\text{O}_6$ (গ্লুকোজ)"
+                    }
+                ]
+            },
+
+            {
+                id: "type-7",
+                badge: "Type 07",
+                title: "Stoichiometry (স্টয়কিওমিতি ও রাসায়নিক সমীকরণভিত্তিক গণনা)",
+                subtitle: "সমতাকৃত রাসায়নিক সমীকরণ থেকে বিক্রিয়ক ও উৎপাদের ভর, মোল এবং আয়তনের হিসাব",
+                themeColor: "blue",
+                icon: "fa-scale-unbalanced-flip",
+                definitions: [
+                    {
+                        term: "Chemical Reaction, Reactant & Product (রাসায়নিক বিক্রিয়া, বিক্রিয়ক ও উৎপাদ)",
+                        text: "যে পরিবর্তনের ফলে কোনো পদার্থ নিজের ধর্ম ও বৈশিষ্ট্য হারিয়ে নতুন ধর্মবিশিষ্ট পদার্থে পরিণত হয় তাকে <span class='eng-term'>Chemical Reaction</span> বলে। যেসব পদার্থ নিয়ে বিক্রিয়া শুরু হয় তাদের <strong>Reactants (বিক্রিয়ক)</strong> এবং বিক্রিয়ার ফলে উৎপন্ন নতুন পদার্থকে <strong>Products (উৎপাদ)</strong> বলে।"
+                    },
+                    {
+                        term: "Stoichiometry (স্টয়কিওমিতি)",
+                        text: "রসায়নের যে শাখায় সমতাকৃত রাসায়নিক সমীকরণ (<span class='eng-term'>Balanced Chemical Equation</span>) থেকে বিক্রিয়কের পরিমাণ হতে উৎপাদের পরিমাণ এবং উৎপাদের পরিমাণ হতে বিক্রিয়কের পরিমাণ হিসাব-নিকাশ করা হয়, তাকে <span class='eng-term'>Stoichiometry</span> (স্টয়কিওমিতি) বলে। রাসায়নিক বিক্রিয়া সর্বদা <strong>Law of Conservation of Mass (ভরের সংরক্ষণ সূত্র)</strong> মেনে চলে।"
+                    }
+                ],
+                formulaLatex: "$$a\\text{A} + b\\text{B} \\longrightarrow c\\text{C} + d\\text{D} \\quad \\implies \\quad \\frac{n_{\\text{A}}}{a} = \\frac{n_{\\text{B}}}{b} = \\frac{n_{\\text{C}}}{c} = \\frac{n_{\\text{D}}}{d}$$",
+                variables: [
+                    { sym: "ধাপ ১", meaning: "প্রথমে প্রশ্নে প্রদত্ত বিক্রিয়াটির সঠিক সংকেত লিখে <strong>সমতাকরণ (Balancing)</strong> করতে হবে।" },
+                    { sym: "ধাপ ২", meaning: "সমতাকৃত সমীকরণের নিচে সংশ্লিষ্ট বিক্রিয়ক ও উৎপাদের স্টয়কিওমিতিক মোল সংখ্যা বা গ্রাম ভর ($n \\times M$) লিখতে হবে।" },
+                    { sym: "ধাপ ৩", meaning: "ঐকিক নিয়মে (Unitary Method) বা মোল অনুপাতে প্রদত্ত রাশি থেকে অজানা রাশির মান বের করতে হবে।" }
+                ],
+                specialNote: "রাসায়নিক সমীকরণে ভৌত অবস্থা প্রকাশের প্রতীকসমূহ: কঠিন (<span class='eng-term'>Solid</span>) $= (s)$, তরল (<span class='eng-term'>Liquid</span>) $= (l)$, গ্যাসীয় (<span class='eng-term'>Gas</span>) $= (g)$, জলীয় দ্রবণ (<span class='eng-term'>Aqueous Solution</span>) $= (aq)$ এবং তাপ প্রয়োগ বোঝাতে তীর চিহ্নের ওপর $\\Delta$ (ডেল্টা) ব্যবহৃত হয়।",
+                examples: [
+                    {
+                        q: "উদাহরণ ৭.১: $20\\text{ g } \\text{Mg}$ (ম্যাগনেসিয়াম) ধাতু পর্যাপ্ত অক্সিজেনের সাথে বিক্রিয়া করে কত গ্রাম $\\text{MgO}$ উৎপন্ন করবে? এবং $48\\text{ g } \\text{Mg}$ কত গ্রাম $\\text{O}_2$ এর সাথে বিক্রিয়া করে?",
+                        given: "ম্যাগনেসিয়ামের পারমাণবিক ভর $= 24$, অক্সিজেনের পারমাণবিক ভর $= 16$",
+                        steps: "সমতাকৃত রাসায়নিক সমীকরণ ও ভর সম্পর্ক:<br>$$\\begin{aligned} 2\\text{Mg}(s) \\quad &+ \\quad \\text{O}_2(g) \\quad \\longrightarrow \\quad 2\\text{MgO}(s) \\\\ 2\\times 24 = 48\\text{ g} \\quad & \\quad 1\\times 32 = 32\\text{ g} \\quad \\quad 2(24+16) = 80\\text{ g} \\end{aligned}$$<br><strong>১ম অংশ ($20\\text{ g } \\text{Mg}$ থেকে উৎপন্ন $\\text{MgO}$):</strong><br>$48\\text{ g } \\text{Mg}$ হতে $\\text{MgO}$ উৎপন্ন হয় $= 80\\text{ g}$<br>$\\therefore 1\\text{ g } \\text{Mg}$ হতে $\\text{MgO}$ উৎপন্ন হয় $= \\frac{80}{48}\\text{ g}$<br>$\\therefore 20\\text{ g } \\text{Mg}$ হতে $\\text{MgO}$ উৎপন্ন হয় $= \\frac{80 \\times 20}{48} = 33.33\\text{ g}$<br><br><strong>২য় অংশ ($48\\text{ g } \\text{Mg}$ এর জন্য প্রয়োজনীয় $\\text{O}_2$):</strong><br>সমীকরণ থেকেই স্পষ্ট দেখা যাচ্ছে, $48\\text{ g } \\text{Mg}$ ঠিক $32\\text{ g } \\text{O}_2$ এর সাথে বিক্রিয়া করে।",
+                        ans: "$33.33\\text{ g } \\text{MgO}$ উৎপন্ন হবে এবং $48\\text{ g } \\text{Mg}$ এর সাথে $32\\text{ g } \\text{O}_2$ বিক্রিয়া করবে।"
+                    },
+                    {
+                        q: "উদাহরণ ৭.২: $32\\text{ g } \\text{Na}$ (সোডিয়াম) এর সাথে সম্পূর্ণরূপে বিক্রিয়া করতে কত গ্রাম $\\text{O}_2$ প্রয়োজন হবে?",
+                        given: "$\\text{Na}$ এর পারমাণবিক ভর $= 23$, $\\text{O}$ এর পারমাণবিক ভর $= 16$",
+                        steps: "সমতাকৃত রাসায়নিক সমীকরণ:<br>$$\\begin{aligned} 4\\text{Na} \\quad &+ \\quad \\text{O}_2 \\quad \\longrightarrow \\quad 2\\text{Na}_2\\text{O} \\\\ 4\\times 23 = 92\\text{ g} \\quad & \\quad 16\\times 2 = 32\\text{ g} \\end{aligned}$$<br>সমীকরণ অনুযায়ী,<br>$92\\text{ g } \\text{Na}$ এর সাথে বিক্রিয়া করে $= 32\\text{ g } \\text{O}_2$<br>$\\therefore 1\\text{ g } \\text{Na}$ এর সাথে বিক্রিয়া করে $= \\frac{32}{92}\\text{ g } \\text{O}_2$<br>$\\therefore 32\\text{ g } \\text{Na}$ এর সাথে বিক্রিয়া করে $= \\frac{32 \\times 32}{92} = 11.13\\text{ g } \\text{O}_2$",
+                        ans: "$11.13\\text{ g } \\text{O}_2$ বিক্রিয়া করবে।"
+                    },
+                    {
+                        q: "উদাহরণ ৭.৩: প্রমাণ তাপমাত্রা ও চাপে (STP-তে) $4\\text{ Liter } \\text{N}_2$ গ্যাস থেকে কত লিটার $\\text{NH}_3$ গ্যাস পাওয়া যাবে?",
+                        given: "STP-তে $1\\text{ mol}$ গ্যাসের আয়তন $= 22.4\\text{ L}$",
+                        steps: "সমতাকৃত সমীকরণ ও STP আয়তন সম্পর্ক:<br>$$\\begin{aligned} \\text{N}_2(g) \\quad &+ \\quad 3\\text{H}_2(g) \\quad \\longrightarrow \\quad 2\\text{NH}_3(g) \\\\ 1\\text{ mol} = 22.4\\text{ L} \\quad & \\quad 3\\times 22.4 = 67.2\\text{ L} \\quad \\quad 2\\times 22.4 = 44.8\\text{ L} \\end{aligned}$$<br>প্রমাণ অবস্থায়,<br>$22.4\\text{ L } \\text{N}_2$ থেকে $\\text{NH}_3$ পাওয়া যায় $= 44.8\\text{ L}$<br>$\\therefore 4\\text{ L } \\text{N}_2$ থেকে $\\text{NH}_3$ পাওয়া যায় $= \\frac{44.8 \\times 4}{22.4} = 8\\text{ L}$",
+                        ans: "$8\\text{ Liter } \\text{NH}_3$ গ্যাস পাওয়া যাবে।"
+                    }
+                ]
+            },
+
+            {
+                id: "type-8",
+                badge: "Type 08",
+                title: "Limiting Reactant ও Percentage of Yield (লিমিটিং বিক্রিয়ক ও উৎপাদের শতকরা পরিমাণ)",
+                subtitle: "কোন বিক্রিয়কটি আগে শেষ হবে, কতটুকু অবশিষ্ট থাকবে এবং প্রকৃত উৎপাদের শতকরা হার নির্ণয়",
+                themeColor: "teal",
+                icon: "fa-hourglass-end",
+                definitions: [
+                    {
+                        term: "Limiting Reactant (লিমিটিং বিক্রিয়ক)",
+                        text: "রাসায়নিক বিক্রিয়ার সময় একাধিক বিক্রিয়কের মধ্যে যে বিক্রিয়কটি বিক্রিয়া করে সবার আগে শেষ হয়ে যায় (অর্থাৎ বিক্রিয়া শেষে পাত্রে আর অবশিষ্ট থাকে না), তাকে <span class='eng-term'>Limiting Reactant</span> (লিমিটিং বিক্রিয়ক) বলে। লিমিটিং বিক্রিয়কই নির্ধারণ করে কী পরিমাণ উৎপাদ তৈরি হবে। আর যে বিক্রিয়কটি বিক্রিয়া শেষে বেঁচে যায়, তাকে <strong>Excess Reactant (অতিরিক্ত বিক্রিয়ক)</strong> বলে।"
+                    },
+                    {
+                        term: "Analar Grade (অ্যানালার গ্রেড) ও Percentage of Yield (উৎপাদের শতকরা পরিমাণ)",
+                        text: "গবেষণাগারে ব্যবহৃত সবচেয়ে বিশুদ্ধ ($99\\%$ বা $95.5\\%+$ বিশুদ্ধ) রাসায়নিক পদার্থকে <span class='eng-term'>Analar</span> বা <span class='eng-term'>Analar Grade</span> পদার্থ বলে। সাধারণ বিক্রিয়ক $100\\%$ বিশুদ্ধ না হওয়ায় তাত্ত্বিক হিসাবের চেয়ে প্রকৃত উৎপাদ কম পাওয়া যায়।"
+                    }
+                ],
+                formulaLatex: "$$\\text{Percentage of Yield (উৎপাদের শতকরা পরিমাণ)} = \\frac{\\text{বিক্রিয়া থেকে প্রাপ্ত প্রকৃত উৎপাদ (Actual Yield)}}{\\text{সমীকরণ থেকে হিসাবকৃত তাত্ত্বিক উৎপাদ (Theoretical Yield)}} \\times 100\\%$$",
+                variables: [
+                    { sym: "Actual Yield", meaning: "প্রশ্নে পরীক্ষালব্ধ বা উদ্দীপকে যে পরিমাণ উৎপাদ পাওয়া গেছে বলে উল্লেখ থাকে" },
+                    { sym: "Theoretical Yield", meaning: "লিমিটিং বিক্রিয়কের ভর থেকে সমতাকৃত সমীকরণের সাহায্যে হিসাব করে যে ভর পাওয়া যায়" },
+                    { sym: "বিশুদ্ধতার হার (\\%)", meaning: "$\\frac{\\text{প্রকৃত উৎপাদ তৈরিতে প্রয়োজনীয় বিশুদ্ধ বিক্রিয়কের ভর}}{\\text{প্রদত্ত অবিশুদ্ধ বিক্রিয়কের মোট ভর}} \\times 100\\%$" }
+                ],
+                specialNote: "<strong>লিমিটিং বিক্রিয়ক বের করার ৪ ধাপ:</strong> (১) বিক্রিয়া লিখে সমতা করো $\\rightarrow$ (২) নিচে আণবিক ভর লেখো $\\rightarrow$ (৩) ১ম বিক্রিয়কের প্রদত্ত ভর দিয়ে ২য় বিক্রিয়কের কত গ্রাম লাগে তা হিসাব করো $\\rightarrow$ (৪) যা প্রয়োজন তার চেয়ে প্রশ্নে কম দেওয়া থাকলে সেটিই <span class='eng-term'>Limiting Reactant</span>!",
+                examples: [
+                    {
+                        q: "উদাহরণ ৮.১: $5\\text{ g}$ হাইড্রোজেন ($\\text{H}_2$) গ্যাসের মধ্যে $75\\text{ g}$ ক্লোরিন ($\\text{Cl}_2$) গ্যাস মিশ্রিত করা হলো। এখানে কোনটি লিমিটিং বিক্রিয়ক (Limiting Reactant)? বিক্রিয়া শেষে কোন বিক্রিয়কটি কত গ্রাম অবশিষ্ট থাকবে?",
+                        given: "প্রদত্ত $\\text{H}_2$ এর ভর $= 5\\text{ g}$ এবং প্রদত্ত $\\text{Cl}_2$ এর ভর $= 75\\text{ g}$<br>$\\text{H}_2$ এর আণবিক ভর $= 2\\text{ g}$, $\\text{Cl}_2$ এর আণবিক ভর $= 35.5\\times 2 = 71\\text{ g}$",
+                        steps: "সমতাকৃত রাসায়নিক সমীকরণ:<br>$$\\begin{aligned} \\text{H}_2(g) \\quad &+ \\quad \\text{Cl}_2(g) \\quad \\longrightarrow \\quad 2\\text{HCl}(g) \\\\ 2\\text{ g} \\quad & \\quad 71\\text{ g} \\quad \\quad \\quad 2\\times 36.5 = 73\\text{ g} \\end{aligned}$$<br><strong>১ম অংশ (লিমিটিং বিক্রিয়ক নির্ণয়):</strong><br>$2\\text{ g } \\text{H}_2$ এর সাথে বিক্রিয়া করে $= 71\\text{ g } \\text{Cl}_2$<br>$\\therefore 5\\text{ g } \\text{H}_2$ এর সাথে বিক্রিয়া করতে প্রয়োজন $= \\frac{71 \\times 5}{2} = 177.5\\text{ g } \\text{Cl}_2$<br>কিন্তু প্রশ্নে $\\text{Cl}_2$ দেওয়া আছে মাত্র $75\\text{ g}$ (যা প্রয়োজনীয় $177.5\\text{ g}$ অপেক্ষা কম)।<br>সুতরাং $\\text{Cl}_2$ আগে শেষ হয়ে যাবে, তাই <strong>$\\text{Cl}_2$ হলো লিমিটিং বিক্রিয়ক</strong>।<br><br><strong>২য় অংশ (অবশিষ্ট বিক্রিয়কের পরিমাণ নির্ণয়):</strong><br>$71\\text{ g } \\text{Cl}_2$ বিক্রিয়া করে $= 2\\text{ g } \\text{H}_2$ এর সাথে<br>$\\therefore 75\\text{ g } \\text{Cl}_2$ বিক্রিয়া করে $= \\frac{2 \\times 75}{71} = 2.11\\text{ g } \\text{H}_2$ এর সাথে।<br>অতএব, পাত্রে $\\text{H}_2$ অবশিষ্ট থাকবে $= (5 - 2.11)\\text{ g} = 2.89\\text{ g}$।",
+                        ans: "লিমিটিং বিক্রিয়ক $\\text{Cl}_2$ এবং বিক্রিয়া শেষে $2.89\\text{ g } \\text{H}_2$ অবশিষ্ট থাকবে।"
+                    },
+                    {
+                        q: "উদাহরণ ৮.২: $80\\text{ g}$ চুনাপাথর ($\\text{CaCO}_3$)-কে তাপ দিয়ে $39\\text{ g}$ চুন ($\\text{CaO}$) পাওয়া গেল। উৎপাদের শতকরা পরিমাণ (Percentage of Yield) এবং চুনাপাথরের বিশুদ্ধতার হার নির্ণয় করো।",
+                        given: "প্রদত্ত $\\text{CaCO}_3 = 80\\text{ g}$, প্রকৃত উৎপাদ ($\\text{CaO}$) $= 39\\text{ g}$<br>$\\text{CaCO}_3$ এর আণবিক ভর $= 40 + 12 + 16\\times 3 = 100\\text{ g}$<br>$\\text{CaO}$ এর আণবিক ভর $= 40 + 16 = 56\\text{ g}$",
+                        steps: "সমতাকৃত সমীকরণ:<br>$$\\begin{aligned} \\text{CaCO}_3(s) \\quad &\\xrightarrow{\\Delta} \\quad \\text{CaO}(s) \\quad + \\quad \\text{CO}_2(g) \\\\ 100\\text{ g} \\quad & \\quad \\quad 56\\text{ g} \\quad \\quad \\quad 44\\text{ g} \\end{aligned}$$<br><strong>উৎপাদের শতকরা পরিমাণ নির্ণয়:</strong><br>$100\\text{ g } \\text{CaCO}_3$ থেকে তাত্ত্বিকভাবে $\\text{CaO}$ পাওয়া যায় $= 56\\text{ g}$<br>$\\therefore 80\\text{ g } \\text{CaCO}_3$ থেকে তাত্ত্বিকভাবে $\\text{CaO}$ পাওয়ার কথা $= \\frac{56 \\times 80}{100} = 44.8\\text{ g}$<br>কিন্তু প্রকৃতপক্ষে পাওয়া গেছে $39\\text{ g } \\text{CaO}$।<br>$$\\therefore \\text{উৎপাদের শতকরা পরিমাণ} = \\frac{39}{44.8} \\times 100\\% = 87.05\\%$$<br><strong>বিকল্প (চুনাপাথরের বিশুদ্ধতা নির্ণয়):</strong><br>$56\\text{ g } \\text{CaO}$ উৎপন্ন করতে বিশুদ্ধ $\\text{CaCO}_3$ লাগে $= 100\\text{ g}$<br>$\\therefore 39\\text{ g } \\text{CaO}$ উৎপন্ন করতে বিশুদ্ধ $\\text{CaCO}_3$ লাগে $= \\frac{100 \\times 39}{56} = 69.64\\text{ g}$<br>$$\\therefore \\text{চুনাপাথরের বিশুদ্ধতা} = \\frac{69.64}{80} \\times 100\\% = 87.05\\%$$",
+                        ans: "উৎপাদের শতকরা পরিমাণ (এবং চুনাপাথরের বিশুদ্ধতা) $87.05\\%$।"
+                    },
+                    {
+                        q: "উদাহরণ ৮.৩: $16\\text{ g}$ হাইড্রোজেন ($\\text{H}_2$) গ্যাসের সাথে $32\\text{ g}$ অক্সিজেন ($\\text{O}_2$) মিশ্রিত করে বিক্রিয়া ঘটালে কত গ্রাম পানি ($\\text{H}_2\\text{O}$) উৎপন্ন হবে?",
+                        given: "প্রদত্ত $\\text{H}_2 = 16\\text{ g} = \\frac{16}{2} = 8\\text{ mol}$<br>প্রদত্ত $\\text{O}_2 = 32\\text{ g} = \\frac{32}{32} = 1\\text{ mol}$",
+                        steps: "সমতাকৃত সমীকরণ:<br>$$2\\text{H}_2 + \\text{O}_2 \\longrightarrow 2\\text{H}_2\\text{O}$$<br>সমীকরণ মতে, $1\\text{ mol } \\text{O}_2$ কেবল $2\\text{ mol } \\text{H}_2$ এর সাথে বিক্রিয়া করে $2\\text{ mol } \\text{H}_2\\text{O}$ তৈরি করে।<br>এখানে $\\text{H}_2$ আছে $8\\text{ mol}$ (অতিরিক্ত), কিন্তু $\\text{O}_2$ আছে মাত্র $1\\text{ mol}$। তাই $\\text{O}_2$ হলো লিমিটিং বিক্রিয়ক।<br>যেহেতু উৎপাদের পরিমাণ লিমিটিং বিক্রিয়ক ($\\text{O}_2$) দ্বারা নিয়ন্ত্রিত হয়:<br>$1\\text{ mol } \\text{O}_2$ থেকে উৎপন্ন পানি $= 2\\text{ mol } \\text{H}_2\\text{O} = 2 \\times 18\\text{ g} = 36\\text{ g}$।",
+                        ans: "$36\\text{ g}$ পানি ($\\text{H}_2\\text{O}$) উৎপন্ন হবে।"
+                    }
+                ]
+            }
+        ];
+
+        // 3. Radicals, Valency & Must-Know Chemical Names Array
+        const chemistryReferenceData = {
+            valencyGroups: [
+                { group: "Group 1 (যোজনী = 1)", elements: "H, Li, Na, K", charge: "+1" },
+                { group: "Group 2 (যোজনী = 2)", elements: "Be, Mg, Ca", charge: "+2" },
+                { group: "Group 13 (যোজনী = 3)", elements: "B, Al", charge: "+3" },
+                { group: "Group 15 (যোজনী = 3, 5)", elements: "N, P", charge: "-3" },
+                { group: "Group 17 (যোজনী = 1)", elements: "F, Cl, Br, I", charge: "-1" }
+            ],
+            radicals: [
+                { name: "Hydroxide (হাইড্রোক্সাইড)", formula: "\\text{OH}^-", valency: "1" },
+                { name: "Nitrate (নাইট্রেট)", formula: "\\text{NO}_3^-", valency: "1" },
+                { name: "Hydrogen Carbonate / Bicarbonate (বাইকার্বনেট)", formula: "\\text{HCO}_3^-", valency: "1" },
+                { name: "Ammonium (অ্যামোনিয়াম)", formula: "\\text{NH}_4^+", valency: "1" },
+                { name: "Carbonate (কার্বনেট)", formula: "\\text{CO}_3^{2-}", valency: "2" },
+                { name: "Sulfate (সালফেট)", formula: "\\text{SO}_4^{2-}", valency: "2" },
+                { name: "Phosphate (ফসফেট)", formula: "\\text{PO}_4^{3-}", valency: "3" }
+            ],
+            commercialNames: [
+                { common: "চুনাপাথর (Limestone)", chem: "Calcium Carbonate", formula: "\\text{CaCO}_3" },
+                { common: "চুন / কুইক লাইম (Quick Lime)", chem: "Calcium Oxide", formula: "\\text{CaO}" },
+                { common: "চুনের পানি (Lime Water)", chem: "Calcium Hydroxide", formula: "\\text{Ca(OH)}_2" },
+                { common: "কস্টিক সোডা (Caustic Soda)", chem: "Sodium Hydroxide", formula: "\\text{NaOH}" },
+                { common: "কস্টিক পটাশ (Caustic Potash)", chem: "Potassium Hydroxide", formula: "\\text{KOH}" },
+                { common: "খাবার সোডা (Baking Soda)", chem: "Sodium Bicarbonate", formula: "\\text{NaHCO}_3" },
+                { common: "সোডা অ্যাশ (Soda Ash)", chem: "Sodium Carbonate", formula: "\\text{Na}_2\\text{CO}_3" },
+                { common: "তুঁতে / ব্লু-ভিট্রিয়ল (Blue Vitriol)", chem: "Pentahydrate Copper(II) Sulfate", formula: "\\text{CuSO}_4\\cdot 5\\text{H}_2\\text{O}" }
+            ],
+            keyReactions: [
+                {
+                    type: "কার্বনেট লবণের সাথে এসিডের বিক্রিয়া (লবণ + পানি + কার্বন ডাই-অক্সাইড)",
+                    eqs: [
+                        "$$\\text{CaCO}_3(s) + 2\\text{HCl}(aq) \\longrightarrow \\text{CaCl}_2(aq) + \\text{H}_2\\text{O}(l) + \\text{CO}_2(g)$$",
+                        "$$\\text{MgCO}_3(s) + 2\\text{HCl}(aq) \\longrightarrow \\text{MgCl}_2(aq) + \\text{H}_2\\text{O}(l) + \\text{CO}_2(g)$$",
+                        "$$\\text{Na}_2\\text{CO}_3(s) + 2\\text{HCl}(aq) \\longrightarrow 2\\text{NaCl}(aq) + \\text{H}_2\\text{O}(l) + \\text{CO}_2(g)$$"
+                    ]
+                },
+                {
+                    type: "তাপীয় বিয়োজন ও দহন বিক্রিয়া (Thermal Decomposition & Combustion)",
+                    eqs: [
+                        "$$\\text{CaCO}_3(s) \\xrightarrow{\\Delta} \\text{CaO}(s) + \\text{CO}_2(g)$$",
+                        "$$2\\text{Mg(NO}_3)_2(s) \\xrightarrow{\\Delta} 2\\text{MgO}(s) + 4\\text{NO}_2(g) + \\text{O}_2(g)$$",
+                        "$$\\text{CuSO}_4\\cdot 5\\text{H}_2\\text{O}\\text{ (নীল)} \\xrightarrow{\\Delta} \\text{CuSO}_4\\text{ (সাদা)} + 5\\text{H}_2\\text{O}(g)$$"
+                    ]
+                },
+                {
+                    type: "গুরুত্বপূর্ণ সমতাকরণ উদাহরণ (Important Balancing Examples)",
+                    eqs: [
+                        "$$\\text{Al}_2\\text{O}_3(s) + 6\\text{HCl}(aq) \\longrightarrow 2\\text{AlCl}_3(s) + 3\\text{H}_2\\text{O}(l)$$",
+                        "$$3\\text{Ca(OH)}_2 + 2\\text{H}_3\\text{PO}_4 \\longrightarrow \\text{Ca}_3(\\text{PO}_4)_2 + 6\\text{H}_2\\text{O}$$",
+                        "$$2\\text{C}_6\\text{H}_{14} + 19\\text{O}_2 \\longrightarrow 12\\text{CO}_2 + 14\\text{H}_2\\text{O}$$"
+                    ]
+                }
+            ]
+        };
+
+        // 4. Master Formula Summary Table Array
+        const formulaSummaryList = [
+            { sl: "০১", topic: "মোল ও ভর সম্পর্ক (Mole & Mass)", formula: "$n = \\frac{W}{M}$", unit: "$\\text{mol}$" },
+            { sl: "০২", topic: "মোল ও কণা সংখ্যা (Mole & Particles)", formula: "$n = \\frac{N}{6.023 \\times 10^{23}}$", unit: "$\\text{mol}$" },
+            { sl: "০৩", topic: "প্রমাণ অবস্থায় গ্যাসের মোল (Mole at STP)", formula: "$n = \\frac{V_{\\text{STP}}(\\text{L})}{22.4}$", unit: "$\\text{mol}$" },
+            { sl: "০৪", topic: "১টি অণু বা পরমাণুর প্রকৃত ভর", formula: "$m = \\frac{M}{6.023 \\times 10^{23}}$", unit: "$\\text{g}$" },
+            { sl: "০৫", topic: "দ্রবণের মোলারিটি (Molarity)", formula: "$S = \\frac{n}{V(\\text{L})} = \\frac{W \\times 1000}{M \\times V(\\text{mL})}$", unit: "$\\text{mol/L (M)}$" },
+            { sl: "০৬", topic: "মোলার দ্রবণ প্রস্তুতিতে দ্রবের ভর", formula: "$W = \\frac{S \\times M \\times V(\\text{mL})}{1000}$", unit: "$\\text{g}$" },
+            { sl: "০৭", topic: "যৌগে মৌলের শতকরা সংযুতি", formula: "$\\% = \\frac{\\text{পারমাণবিক ভর} \\times \\text{পরমাণু সংখ্যা}}{\\text{যৌগের আণবিক ভর}} \\times 100\\%$", unit: "$\\%$" },
+            { sl: "০৮", topic: "স্থূল সংকেত হতে আণবিক সংকেত", formula: "$(\\text{স্থূল সংকেত})_n, \\text{ যেখানে } n = \\frac{\\text{আণবিক ভর}}{\\text{স্থূল সংকেত ভর}}$", unit: "সংকেত" },
+            { sl: "০৯", topic: "উৎপাদের শতকরা পরিমাণ (% Yield)", formula: "$\\%\\text{ Yield} = \\frac{\\text{প্রকৃত উৎপাদ}}{\\text{হিসাবকৃত উৎপাদ}} \\times 100\\%$", unit: "$\\%$" }
+        ];
+
+        // ==================== RENDER FUNCTIONS ====================
+
+        function renderBasicsSection() {
+            const container = document.getElementById('basics-container');
+            
+            // Concept Cards HTML
+            const conceptCardsHtml = fundamentalConcepts.map(item => `
+                <div class="bg-white rounded-2xl p-5 card-shadow border-t-4 border-${item.color}-500 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-${item.color}-100 text-${item.color}-700 eng-term">${item.termEng}</span>
+                            <div class="w-9 h-9 rounded-xl bg-${item.color}-50 text-${item.color}-600 flex items-center justify-center">
+                                <i class="fa-solid ${item.icon}"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">${item.termEng} <span class="text-slate-500 font-normal">(${item.termBn})</span></h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">${item.desc}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            // Atomic Mass Shortcut & Molecular Mass Table HTML
+            const evenRows = massCheatSheet.evenShortcut.map(e => `<span class="px-2.5 py-1 bg-indigo-50 text-indigo-900 rounded-lg text-xs font-medium border border-indigo-200"><strong>${e.el}</strong> (Z=${e.z}) → <strong>${e.mass}</strong></span>`).join('');
+            const oddRows = massCheatSheet.oddShortcut.map(e => `<span class="px-2.5 py-1 bg-emerald-50 text-emerald-900 rounded-lg text-xs font-medium border border-emerald-200"><strong>${e.el}</strong> (Z=${e.z}) → <strong>${e.mass}</strong></span>`).join('');
+            const exRows = massCheatSheet.exceptions.map(e => `<span class="px-2.5 py-1 bg-rose-50 text-rose-900 rounded-lg text-xs font-medium border border-rose-200"><strong>${e.el}</strong> (Z=${e.z}) → <strong>${e.mass}</strong></span>`).join('');
+
+            const compoundRows = massCheatSheet.commonCompounds.map((c, idx) => `
+                <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/80'} border-b border-slate-200">
+                    <td class="py-2.5 px-4 font-semibold text-slate-800">$${c.formula}$</td>
+                    <td class="py-2.5 px-4 text-center text-slate-600">$${c.atomCount}$</td>
+                    <td class="py-2.5 px-4 text-slate-700">$${c.calc}$</td>
+                    <td class="py-2.5 px-4 text-center"><span class="px-2.5 py-1 rounded-md bg-indigo-100 text-indigo-800 font-bold text-xs">$${c.oneMole}$</span></td>
+                </tr>
+            `).join('');
+
+            container.innerHTML = `
+                <!-- Section Title -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-md">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900">প্রাথমিক ধারণা ও পারমাণবিক ভরের শর্টকাট (<span class="eng-term">Core Concepts & Mass Tricks</span>)</h2>
+                        <p class="text-sm text-slate-600">গাণিতিক সমস্যা সমাধানের পূর্বে এই মৌলিক সংজ্ঞা এবং আণবিক ভরের তালিকাটি ভালোভাবে দেখে নাও</p>
+                    </div>
+                </div>
+
+                <!-- 4 Concept Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    ${conceptCardsHtml}
+                </div>
+
+                <!-- Atomic Mass Shortcut & Molecular Mass Table Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Left: Atomic Mass Trick -->
+                    <div class="lg:col-span-5 bg-white rounded-2xl p-6 card-shadow border border-slate-200 space-y-4">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center text-sm"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                            <h3 class="text-lg font-bold text-slate-800">Atomic Mass (পারমাণবিক ভর) মনে রাখার ট্রিকস</h3>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-600">১ থেকে ২০ পর্যন্ত মৌলগুলোর পারমাণবিক সংখ্যা ($Z$) থেকে খুব সহজেই পারমাণবিক ভর বের করা যায়:</p>
+
+                        <div class="space-y-3">
+                            <div class="p-3 rounded-xl bg-indigo-50/50 border border-indigo-100">
+                                <p class="text-xs font-bold text-indigo-800 uppercase mb-2"><i class="fa-solid fa-check-circle mr-1"></i> জোড় পারমাণবিক সংখ্যা হলে: ভর = $2 \\times Z$ (দ্বিগুণ)</p>
+                                <div class="flex flex-wrap gap-1.5">${evenRows}</div>
+                            </div>
+
+                            <div class="p-3 rounded-xl bg-emerald-50/50 border border-emerald-100">
+                                <p class="text-xs font-bold text-emerald-800 uppercase mb-2"><i class="fa-solid fa-plus-circle mr-1"></i> বিজোড় পারমাণবিক সংখ্যা হলে: ভর = $(2 \\times Z) + 1$ (দ্বিগুণ + ১)</p>
+                                <div class="flex flex-wrap gap-1.5">${oddRows}</div>
+                            </div>
+
+                            <div class="p-3 rounded-xl bg-rose-50/50 border border-rose-100">
+                                <p class="text-xs font-bold text-rose-800 uppercase mb-2"><i class="fa-solid fa-star mr-1"></i> ব্যতিক্রম ও বিশেষ প্রয়োজনীয় মৌলসমূহ (সরাসরি মুখস্থ রাখবে):</p>
+                                <div class="flex flex-wrap gap-1.5">${exRows}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Common Molecular Mass Table -->
+                    <div class="lg:col-span-7 bg-white rounded-2xl p-6 card-shadow border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2.5 mb-2">
+                                <span class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm"><i class="fa-solid fa-table-list"></i></span>
+                                <h3 class="text-lg font-bold text-slate-800">বহুল ব্যবহৃত যৌগের Molecular Mass (আণবিক ভর) ও $1\\text{ Mole}$</h3>
+                            </div>
+                            <p class="text-xs sm:text-sm text-slate-600 mb-4">অণুতে বিদ্যমান সকল পরমাণুর পারমাণবিক ভর যোগ করলেই আণবিক ভর ($M$) পাওয়া যায়:</p>
+                            
+                            <div class="overflow-x-auto rounded-xl border border-slate-200">
+                                <table class="w-full text-left text-xs sm:text-sm">
+                                    <thead class="bg-slate-800 text-white">
+                                        <tr>
+                                            <th class="py-3 px-4">যৌগের সংকেত ও নাম</th>
+                                            <th class="py-3 px-4 text-center">মোট পরমাণু</th>
+                                            <th class="py-3 px-4">আণবিক ভর ($M$) নির্ণয়</th>
+                                            <th class="py-3 px-4 text-center">$1\\text{ mol}$ সমান</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${compoundRows}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Color Palette Mapping for Dynamic Cards
+        const colorStyles = {
+            indigo: {
+                headerBg: "bg-gradient-to-r from-indigo-700 to-indigo-600",
+                badgeBg: "bg-indigo-100 text-indigo-800 border-indigo-300",
+                formulaBox: "bg-indigo-50/80 border-indigo-200",
+                exampleBorder: "border-indigo-200",
+                exampleHeader: "bg-indigo-50 text-indigo-900",
+                ansBadge: "bg-indigo-600 text-white"
+            },
+            emerald: {
+                headerBg: "bg-gradient-to-r from-emerald-700 to-teal-600",
+                badgeBg: "bg-emerald-100 text-emerald-800 border-emerald-300",
+                formulaBox: "bg-emerald-50/80 border-emerald-200",
+                exampleBorder: "border-emerald-200",
+                exampleHeader: "bg-emerald-50 text-emerald-900",
+                ansBadge: "bg-emerald-600 text-white"
+            },
+            amber: {
+                headerBg: "bg-gradient-to-r from-amber-600 to-orange-600",
+                badgeBg: "bg-amber-100 text-amber-900 border-amber-300",
+                formulaBox: "bg-amber-50/80 border-amber-200",
+                exampleBorder: "border-amber-200",
+                exampleHeader: "bg-amber-50 text-amber-900",
+                ansBadge: "bg-amber-600 text-white"
+            },
+            rose: {
+                headerBg: "bg-gradient-to-r from-rose-600 to-pink-600",
+                badgeBg: "bg-rose-100 text-rose-800 border-rose-300",
+                formulaBox: "bg-rose-50/80 border-rose-200",
+                exampleBorder: "border-rose-200",
+                exampleHeader: "bg-rose-50 text-rose-900",
+                ansBadge: "bg-rose-600 text-white"
+            },
+            purple: {
+                headerBg: "bg-gradient-to-r from-purple-700 to-fuchsia-600",
+                badgeBg: "bg-purple-100 text-purple-800 border-purple-300",
+                formulaBox: "bg-purple-50/80 border-purple-200",
+                exampleBorder: "border-purple-200",
+                exampleHeader: "bg-purple-50 text-purple-900",
+                ansBadge: "bg-purple-600 text-white"
+            },
+            cyan: {
+                headerBg: "bg-gradient-to-r from-cyan-700 to-sky-600",
+                badgeBg: "bg-cyan-100 text-cyan-800 border-cyan-300",
+                formulaBox: "bg-cyan-50/80 border-cyan-200",
+                exampleBorder: "border-cyan-200",
+                exampleHeader: "bg-cyan-50 text-cyan-900",
+                ansBadge: "bg-cyan-700 text-white"
+            },
+            blue: {
+                headerBg: "bg-gradient-to-r from-blue-700 to-indigo-700",
+                badgeBg: "bg-blue-100 text-blue-800 border-blue-300",
+                formulaBox: "bg-blue-50/80 border-blue-200",
+                exampleBorder: "border-blue-200",
+                exampleHeader: "bg-blue-50 text-blue-900",
+                ansBadge: "bg-blue-600 text-white"
+            },
+            teal: {
+                headerBg: "bg-gradient-to-r from-teal-700 to-emerald-700",
+                badgeBg: "bg-teal-100 text-teal-800 border-teal-300",
+                formulaBox: "bg-teal-50/80 border-teal-200",
+                exampleBorder: "border-teal-200",
+                exampleHeader: "bg-teal-50 text-teal-900",
+                ansBadge: "bg-teal-700 text-white"
+            }
+        };
+
+        function renderMathTypes() {
+            const container = document.getElementById('math-types-container');
+
+            container.innerHTML = mathProblemTypes.map(type => {
+                const st = colorStyles[type.themeColor] || colorStyles.indigo;
+
+                // Definitions List
+                const defsHtml = type.definitions.map(d => `
+                    <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                        <h4 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2 mb-1">
+                            <i class="fa-solid fa-bookmark text-indigo-600 text-xs"></i>
+                            <span>${d.term}:</span>
+                        </h4>
+                        <p class="text-sm text-slate-700 leading-relaxed">${d.text}</p>
+                    </div>
+                `).join('');
+
+                // Variables List
+                const varsHtml = type.variables.map(v => `
+                    <li class="flex items-start gap-2.5 text-sm text-slate-700">
+                        <span class="px-2 py-0.5 rounded bg-white border border-slate-300 font-bold text-slate-900 shrink-0 shadow-sm">${v.sym}</span>
+                        <span class="pt-0.5">${v.meaning}</span>
+                    </li>
+                `).join('');
+
+                // Examples List
+                const examplesHtml = type.examples.map(ex => `
+                    <div class="rounded-xl border-2 ${st.exampleBorder} bg-white overflow-hidden flex flex-col justify-between shadow-sm">
+                        <div>
+                            <div class="${st.exampleHeader} px-4 py-3 border-b ${st.exampleBorder} font-bold text-sm sm:text-base flex items-start gap-2.5">
+                                <i class="fa-solid fa-pen-to-square mt-1 shrink-0"></i>
+                                <span>${ex.q}</span>
+                            </div>
+                            <div class="p-4 space-y-3 text-sm">
+                                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200/80 text-slate-700">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-1">এখানে (Given Data):</span>
+                                    ${ex.given}
+                                </div>
+                                <div class="text-slate-800 leading-relaxed px-1 overflow-x-auto">
+                                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 block mb-1">সমাধান (Step-by-Step Solution):</span>
+                                    ${ex.steps}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex items-center gap-2">
+                            <span class="text-xs font-bold px-2.5 py-1 rounded ${st.ansBadge} shrink-0">উত্তর (Answer)</span>
+                            <span class="text-sm font-bold text-slate-800">${ex.ans}</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                return `
+                    <article id="${type.id}" class="bg-white rounded-2xl card-shadow border border-slate-200 overflow-hidden">
+                        <!-- Type Header -->
+                        <div class="${st.headerBg} text-white px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex items-start sm:items-center gap-4">
+                                <div class="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-2xl shrink-0 border border-white/25">
+                                    <i class="fa-solid ${type.icon}"></i>
+                                </div>
+                                <div>
+                                    <span class="inline-block text-xs font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-900 mb-1">${type.badge}</span>
+                                    <h3 class="text-xl sm:text-2xl font-extrabold">${type.title}</h3>
+                                    <p class="text-white/85 text-xs sm:text-sm">${type.subtitle}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Type Body -->
+                        <div class="p-5 sm:p-7 space-y-6">
+                            <!-- 1. Definitions -->
+                            <div class="space-y-3">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-info text-indigo-600"></i> প্রয়োজনীয় সংজ্ঞা ও মৌলিক ধারণা (Definitions & Concepts)
+                                </h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    ${defsHtml}
+                                </div>
+                            </div>
+
+                            <!-- 2. Formula & Variables Explanation -->
+                            <div class="rounded-2xl border-2 ${st.formulaBox} p-5 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-square-root-variable text-indigo-600"></i> গাণিতিক সূত্র ও চলক পরিচিতি (Formula & Variables Breakdown)
+                                    </span>
+                                </div>
+                                <div class="bg-white rounded-xl p-4 border border-slate-200/90 text-center shadow-sm overflow-x-auto">
+                                    ${type.formulaLatex}
+                                </div>
+                                <div>
+                                    <p class="text-xs font-bold text-slate-600 mb-2.5">এখানে কোন প্রতীকটি কী নির্দেশ করে (Where):</p>
+                                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                                        ${varsHtml}
+                                    </ul>
+                                </div>
+                                <div class="bg-white/90 rounded-xl p-3.5 border border-amber-300 text-xs sm:text-sm text-slate-700 flex items-start gap-2.5">
+                                    <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-1"></i>
+                                    <div>${type.specialNote}</div>
+                                </div>
+                            </div>
+
+                            <!-- 3. Solved Examples -->
+                            <div class="space-y-3">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-check-double text-emerald-600"></i> সমাধানকৃত গাণিতিক উদাহরণসমূহ (Solved Mathematical Examples)
+                                </h4>
+                                <div class="grid grid-cols-1 ${type.examples.length > 2 ? 'lg:grid-cols-2' : 'lg:grid-cols-2'} gap-5">
+                                    ${examplesHtml}
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        function renderReactionsReference() {
+            const container = document.getElementById('reactions-reference-container');
+
+            const valencyRows = chemistryReferenceData.valencyGroups.map(g => `
+                <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs sm:text-sm">
+                    <span class="font-bold text-slate-800">${g.group}</span>
+                    <span class="text-indigo-700 font-bold eng-term">${g.elements}</span>
+                    <span class="px-2 py-0.5 rounded bg-indigo-100 text-indigo-800 font-bold text-xs">আধান: ${g.charge}</span>
+                </div>
+            `).join('');
+
+            const radicalRows = chemistryReferenceData.radicals.map(r => `
+                <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs sm:text-sm">
+                    <span class="font-medium text-slate-800">${r.name}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-emerald-700">$${r.formula}$</span>
+                        <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold text-xs">যোজনী: ${r.valency}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            const commercialRows = chemistryReferenceData.commercialNames.map(c => `
+                <div class="p-3 rounded-xl bg-amber-50/60 border border-amber-200/80 flex items-center justify-between">
+                    <div>
+                        <p class="font-bold text-slate-800 text-sm">${c.common}</p>
+                        <p class="text-xs text-slate-500 eng-term">${c.chem}</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-lg bg-white border border-amber-300 font-bold text-amber-900 text-sm">$${c.formula}$</span>
+                </div>
+            `).join('');
+
+            const reactionBlocks = chemistryReferenceData.keyReactions.map(block => `
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2">
+                    <h4 class="font-bold text-indigo-900 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-fire-flame-curved text-amber-500"></i>
+                        <span>${block.type}</span>
+                    </h4>
+                    <div class="space-y-1 text-sm overflow-x-auto bg-white p-3 rounded-lg border border-slate-200/80">
+                        ${block.eqs.join('')}
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold shadow-md">
+                        <i class="fa-solid fa-vial-circle-check"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900">যোজনী, যৌগমূলক ও রাসায়নিক সমীকরণ রেফারেন্স (<span class="eng-term">Valency, Radicals & Equations</span>)</h2>
+                        <p class="text-sm text-slate-600">স্টয়কিওমিতির অংক করার সময় সঠিক সংকেত লেখা ও সমতাকরণের জন্য অপরিহার্য চার্ট</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Group Valency & Radicals -->
+                    <div class="lg:col-span-5 bg-white rounded-2xl p-6 card-shadow border border-slate-200 space-y-5">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800 mb-2.5 flex items-center gap-2">
+                                <i class="fa-solid fa-layer-group text-indigo-600"></i> গ্রুপভিত্তিক যোজনী (Valency) ও আধান
+                            </h3>
+                            <div class="space-y-2">${valencyRows}</div>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800 mb-2.5 flex items-center gap-2">
+                                <i class="fa-solid fa-atom text-emerald-600"></i> গুরুত্বপূর্ণ যৌগমূলক (Radicals) ও যোজনী
+                            </h3>
+                            <div class="space-y-2">${radicalRows}</div>
+                        </div>
+                    </div>
+
+                    <!-- Commercial Names & Must-Know Equations -->
+                    <div class="lg:col-span-7 bg-white rounded-2xl p-6 card-shadow border border-slate-200 space-y-5">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800 mb-2.5 flex items-center gap-2">
+                                <i class="fa-solid fa-tags text-amber-500"></i> প্রশ্নে ব্যবহৃত রাসায়নিক যৌগের বাণিজ্যিক ও সাধারণ নাম
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">${commercialRows}</div>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800 mb-2.5 flex items-center gap-2">
+                                <i class="fa-solid fa-code-compare text-indigo-600"></i> অধ্যায়ের সবচেয়ে গুরুত্বপূর্ণ সমতাকৃত বিক্রিয়াসমূহ
+                            </h3>
+                            <div class="space-y-3">${reactionBlocks}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSummaryTable() {
+            const container = document.getElementById('summary-table-container');
+
+            const rowsHtml = formulaSummaryList.map((item, idx) => `
+                <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-indigo-50/40'} border-b border-slate-200">
+                    <td class="py-3.5 px-4 font-bold text-indigo-700 text-center">${item.sl}</td>
+                    <td class="py-3.5 px-4 font-bold text-slate-800">${item.topic}</td>
+                    <td class="py-3.5 px-4 text-slate-900 font-medium">${item.formula}</td>
+                    <td class="py-3.5 px-4 text-center"><span class="px-2.5 py-1 rounded-full bg-slate-100 border border-slate-300 text-slate-700 text-xs font-bold">${item.unit}</span></td>
+                </tr>
+            `).join('');
+
+            container.innerHTML = `
+                <div class="bg-white rounded-2xl p-6 sm:p-8 card-shadow border-2 border-indigo-200 space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div class="flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-xl bg-amber-400 text-slate-900 flex items-center justify-center font-bold text-lg shadow-sm">
+                                <i class="fa-solid fa-bolt"></i>
+                            </span>
+                            <div>
+                                <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">একনজরে অধ্যায়ের সকল গাণিতিক সূত্র (<span class="eng-term">Quick Formula Cheat Sheet</span>)</h2>
+                                <p class="text-xs sm:text-sm text-slate-600">পরীক্ষার আগের রাতে দ্রুত রিভিশন দেওয়ার জন্য মাস্টার টেবিল</p>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-200 eng-term">Prepared by: Emam Mehedi</span>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-xl border border-slate-200">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-900 text-white">
+                                <tr>
+                                    <th class="py-3.5 px-4 text-center w-16">ক্রমিক</th>
+                                    <th class="py-3.5 px-4">গাণিতিক বিষয় (Mathematical Topic)</th>
+                                    <th class="py-3.5 px-4">প্রয়োজনীয় সূত্র (Equation / Formula)</th>
+                                    <th class="py-3.5 px-4 text-center w-32">একক (Unit)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize all sections and render KaTeX math cleanly on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderBasicsSection();
+            renderMathTypes();
+            renderReactionsReference();
+            renderSummaryTable();
+
+            // Render LaTeX Equations via KaTeX Auto-Render
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        });
+    </script>
+</body>
+</html>
