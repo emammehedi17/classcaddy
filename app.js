@@ -2,6 +2,22 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, signInWithCustomToken, signInAnonymously, getRedirectResult, signInWithRedirect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { initializeFirestore, setDoc, doc, getDoc, getDocFromServer, collection, query, getDocs, getDocsFromServer, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import 'katex/dist/katex.min.css';
+        import { McqImportWorkspace } from './mcq-engine/import-workspace.js';
+        import {
+            normalizeMcqItem,
+            toStorageMcqList,
+            isOptionCorrect,
+            isUserSelectionCorrect,
+            getCanonicalCorrectIndex,
+            htmlToPlainText
+        } from './mcq-engine/schema.js';
+        import {
+            renderRichHtmlString,
+            renderMcqFieldHtml,
+            formatMcqsForClipboardPlain
+        } from './mcq-engine/renderer.js';
+        import { parsePlainTextMcqs } from './mcq-engine/parsers/text-parser.js';
 		
         // --- Firebase Configuration ---
         setLogLevel('debug'); // Keep debug logging enabled for now
@@ -182,12 +198,7 @@
                 }
 
                 // 2. Set them as the new quiz questions
-                currentSerialQuestions = weakQuestions.map(q => ({
-                    ...q,
-                    userAnswer: null,
-                    isCorrect: null,
-                    options: getProcessedOptions(q.options)
-                }));
+                currentSerialQuestions = weakQuestions.map(q => cloneQuizQuestionWithProcessedOptions(q));
                 currentQuizQuestions = (quizSettings.shuffleQuestions !== false)
                     ? shuffleArray(currentSerialQuestions.map(q => ({ ...q })))
                     : currentSerialQuestions.map(q => ({ ...q }));
@@ -243,12 +254,7 @@
 
         // If questions are loaded, reorder them live so Start Quiz uses the selected mode
         if (currentSerialQuestions && currentSerialQuestions.length > 0 && !isWeaknessTest) {
-            const freshList = currentSerialQuestions.map(q => ({
-                ...q,
-                options: getProcessedOptions(q.options),
-                userAnswer: null,
-                isCorrect: null
-            }));
+            const freshList = currentSerialQuestions.map(q => cloneQuizQuestionWithProcessedOptions(q));
             currentQuizQuestions = enabled ? shuffleArray(freshList) : freshList;
         }
     }
@@ -340,6 +346,79 @@
         let studyTimeDailyChart = null;
         let studyTimeSubjectChart = null;
         let studyTimeStackedChart = null;
+
+        function getChartThemeColors() {
+            const isDark = document.body.classList.contains('dark-mode') || document.documentElement.classList.contains('dark');
+            return {
+                isDark,
+                tick: isDark ? '#cbd5e1' : '#4b5563',
+                grid: isDark ? 'rgba(148, 163, 184, 0.16)' : 'rgba(15, 23, 42, 0.08)',
+                legend: isDark ? '#e2e8f0' : '#374151',
+                pointBg: isDark ? '#0f172a' : '#ffffff'
+            };
+        }
+
+        function updateChartInstanceTheme(chart) {
+            if (!chart || !chart.options) return;
+            const theme = getChartThemeColors();
+            if (chart.options.scales) {
+                Object.values(chart.options.scales).forEach(scale => {
+                    if (!scale) return;
+                    scale.ticks = { ...(scale.ticks || {}), color: theme.tick };
+                    scale.grid = { ...(scale.grid || {}), color: theme.grid };
+                    if (scale.title) {
+                        scale.title = { ...scale.title, color: theme.tick };
+                    }
+                });
+            }
+            if (chart.options.plugins?.legend?.labels) {
+                chart.options.plugins.legend.labels.color = theme.legend;
+            }
+            chart.update('none');
+        }
+
+        function updateAllChartsTheme() {
+            [progressChart, studyTimeDailyChart, studyTimeSubjectChart, studyTimeStackedChart].forEach(updateChartInstanceTheme);
+        }
+
+        function getPrintRichHeadHtml() {
+            const katexCssUrls = [];
+            try {
+                document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+                    if (link.href && /katex/i.test(link.href)) {
+                        katexCssUrls.push(`<link rel="stylesheet" href="${link.href}">`);
+                    }
+                });
+            } catch {
+                // Ignore stylesheet inspection errors
+            }
+            if (katexCssUrls.length === 0) {
+                katexCssUrls.push('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">');
+            }
+            return `
+                ${katexCssUrls.join('\n')}
+                <style>
+                    .cc-rich-content { line-height: 1.55; overflow-wrap: anywhere; word-break: break-word; }
+                    .cc-rich-content.cc-rich-inline { display: inline; }
+                    .cc-rich-content p { margin: 0.25em 0; }
+                    .cc-rich-content p:first-child { margin-top: 0; }
+                    .cc-rich-content p:last-child { margin-bottom: 0; }
+                    .cc-rich-content img { max-width: 100%; height: auto; border-radius: 4px; margin: 4px 0; }
+                    .cc-code-block { position: relative; margin: 5px 0; border: 1px solid #cbd5e1; border-radius: 5px; background: #f8fafc; overflow: hidden; }
+                    .cc-code-lang { position: absolute; top: 3px; right: 6px; font-size: 9px; font-weight: 700; text-transform: uppercase; color: #475569; }
+                    .cc-code-block pre { margin: 0; padding: 8px 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 10px; white-space: pre-wrap; word-break: break-word; color: #0f172a; }
+                    .cc-inline-code, .cc-rich-content code:not(.hljs) { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; padding: 1px 4px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 3px; }
+                    .cc-table-scroll { width: 100%; overflow-x: auto; margin: 4px 0; }
+                    .cc-table-scroll table { width: 100%; border-collapse: collapse; font-size: 10px; }
+                    .cc-table-scroll th, .cc-table-scroll td { border: 1px solid #cbd5e1; padding: 4px 6px; text-align: left; }
+                    .hljs-comment, .hljs-quote { color: #64748b; font-style: italic; }
+                    .hljs-keyword, .hljs-selector-tag { color: #7c3aed; font-weight: 600; }
+                    .hljs-number, .hljs-literal, .hljs-variable { color: #0369a1; }
+                    .hljs-string, .hljs-doctag { color: #047857; }
+                    .hljs-title, .hljs-section { color: #b91c1c; font-weight: 600; }
+                </style>
+            `;
+        }
 		let currentQuizResultData = null; // <-- ADD THIS
 		let savedResultsCache = null; // <-- ADD THIS, for caching results
 		let isQuizResultSaved = false;
@@ -769,18 +848,14 @@
             dropBtn.innerHTML = '<i class="fas fa-history mr-1"></i> Previous Months <i class="fas fa-caret-down ml-1"></i>';
             dropBtn.style.cssText = 'white-space:nowrap;';
             const dropMenu = document.createElement('div');
-            dropMenu.style.cssText = 'position:absolute; top:100%; left:0; z-index:9999; background:#fff; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.12); min-width:160px; display:none; flex-direction:column; padding:4px 0;';
+            dropMenu.className = 'month-prev-dropdown-menu';
+            dropMenu.style.display = 'none';
             hiddenBtns.forEach(btn => {
                 const item = document.createElement('button');
+                item.type = 'button';
                 item.textContent = btn.textContent;
                 item.dataset.monthId = btn.dataset.monthId;
-                item.style.cssText = 'display:block; width:100%; text-align:left; border:none; padding:8px 16px; background:none; font-size:0.75rem; cursor:pointer; color:#374151;';
-                if (btn.classList.contains('active-month')) {
-                    item.style.background = '#d1fae5';
-                    item.style.fontWeight = '700';
-                }
-                item.addEventListener('mouseenter', () => { item.style.background = '#f3f4f6'; });
-                item.addEventListener('mouseleave', () => { item.style.background = btn.classList.contains('active-month') ? '#d1fae5' : 'none'; });
+                item.className = 'month-prev-dropdown-item' + (btn.classList.contains('active-month') ? ' is-active' : '');
                 item.addEventListener('click', () => {
                     dropMenu.style.display = 'none';
                     displayMonthPlan(btn.dataset.monthId);
@@ -3033,6 +3108,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 if (studyTimeSubjectChart) { studyTimeSubjectChart.destroy(); }
                 if (studyTimeStackedChart) { studyTimeStackedChart.destroy(); }
 
+                const chartTheme = getChartThemeColors();
                 const dailyCtx = document.getElementById('study-time-daily-canvas').getContext('2d');
                 studyTimeDailyChart = new Chart(dailyCtx, {
                     type: 'bar',
@@ -3050,7 +3126,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true } },
+                        scales: {
+                            x: { ticks: { color: chartTheme.tick }, grid: { color: chartTheme.grid } },
+                            y: { beginAtZero: true, ticks: { color: chartTheme.tick }, grid: { color: chartTheme.grid } }
+                        },
                         plugins: { legend: { display: false } }
                     }
                 });
@@ -3069,7 +3148,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: { legend: { position: 'bottom' } }
+                            plugins: { legend: { position: 'bottom', labels: { color: chartTheme.legend } } }
                         }
                     });
 
@@ -3093,10 +3172,10 @@ function updateMonthUI(monthId, monthData, weeksData) {
                             responsive: true,
                             maintainAspectRatio: false,
                             scales: {
-                                x: { stacked: true },
-                                y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Minutes' } }
+                                x: { stacked: true, ticks: { color: chartTheme.tick }, grid: { color: chartTheme.grid } },
+                                y: { stacked: true, beginAtZero: true, ticks: { color: chartTheme.tick }, grid: { color: chartTheme.grid }, title: { display: true, text: 'Minutes', color: chartTheme.tick } }
                             },
-                            plugins: { legend: { position: 'bottom' } }
+                            plugins: { legend: { position: 'bottom', labels: { color: chartTheme.legend } } }
                         }
                     });
                 } else {
@@ -4908,6 +4987,10 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
                 else if (document.msExitFullscreen) document.msExitFullscreen();
             }
+
+            if (modalId === 'add-mcq-modal' && typeof mcqWorkspaceInstance !== 'undefined' && mcqWorkspaceInstance) {
+                mcqWorkspaceInstance.abortExtraction();
+            }
             
             modal.style.display = "none"; 
 
@@ -5190,9 +5273,20 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         }
 
         
-		// --- HELPER: Conditional Option Shuffling (UPDATED) ---
-        function getProcessedOptions(originalOptions) {
-            // Words that prevent shuffling if present in ANY option
+		// --- HELPER: Conditional Option Shuffling with v2 Rich HTML Lockstep ---
+        function getProcessedOptionBundle(mcq, allowShuffle = true) {
+            const rawOptions = Array.isArray(mcq?.options) ? mcq.options.slice() : [];
+            const rawOptionsHtml = Array.isArray(mcq?.optionsHtml) ? mcq.optionsHtml.slice() : [];
+            const origCorrectIdx = getCanonicalCorrectIndex(mcq);
+
+            if (rawOptions.length <= 1) {
+                return {
+                    options: rawOptions,
+                    optionsHtml: rawOptionsHtml.length ? rawOptionsHtml : rawOptions.slice(),
+                    correctIndex: origCorrectIdx
+                };
+            }
+
             const restrictedPhrases = [
                 // English
                 "Both", "All of the above", "None of the above", "a & b", "b and c", "c and d", "none", "all", "All",
@@ -5201,19 +5295,53 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 // Bengali - None
                 "কোনোটিই নয়", "কোনোটিই না", "কোনোটি নয়", "কোনোটি না",
                 // Bengali - Combinations (e.g., "K and Kh")
-                "ক ও খ", "খ ও গ", "ক ও গ", "ক ও গ"
+                "ক ও খ", "খ ও গ", "ক ও গ"
             ];
-            
-            // Check if ANY option contains a restricted phrase
-            const shouldShuffle = !originalOptions.some(opt => 
-                restrictedPhrases.some(phrase => opt.toLowerCase().includes(phrase.toLowerCase()))
+
+            const shouldShuffle = allowShuffle && !rawOptions.some(opt => {
+                const plain = htmlToPlainText(opt).toLowerCase();
+                return restrictedPhrases.some(phrase => plain.includes(phrase.toLowerCase()));
+            });
+
+            const indices = rawOptions.map((_, i) => i);
+            const orderedIndices = shouldShuffle ? shuffleArray(indices) : indices;
+
+            const options = orderedIndices.map(i => rawOptions[i]);
+            const optionsHtml = orderedIndices.map(i =>
+                (rawOptionsHtml[i] !== undefined && rawOptionsHtml[i] !== null && rawOptionsHtml[i] !== '')
+                    ? rawOptionsHtml[i]
+                    : rawOptions[i]
             );
-            
-            // Create a copy of options
-            const newOptions = [...originalOptions];
-            
-            // Shuffle only if safe, otherwise keep original order
-            return shouldShuffle ? shuffleArray(newOptions) : newOptions;
+
+            let newCorrectIndex = -1;
+            if (origCorrectIdx !== -1) {
+                newCorrectIndex = orderedIndices.indexOf(origCorrectIdx);
+            } else if (mcq?.correctAnswer) {
+                newCorrectIndex = options.findIndex((o, idx) => isOptionCorrect({ ...mcq, options, optionsHtml }, idx, o));
+            }
+
+            return { options, optionsHtml, correctIndex: newCorrectIndex };
+        }
+
+        function cloneQuizQuestionWithProcessedOptions(mcq, allowShuffle = true) {
+            const base = normalizeMcqItem(mcq || {});
+            const bundle = getProcessedOptionBundle(base, allowShuffle);
+            return {
+                ...base,
+                options: bundle.options,
+                optionsText: bundle.options,
+                optionsHtml: bundle.optionsHtml,
+                correctIndex: bundle.correctIndex,
+                correctAnswer: bundle.correctIndex !== -1 ? bundle.options[bundle.correctIndex] : base.correctAnswer,
+                correctAnswerHtml: bundle.correctIndex !== -1 ? bundle.optionsHtml[bundle.correctIndex] : base.correctAnswerHtml,
+                userAnswer: null,
+                userAnswerIndex: null,
+                isCorrect: null
+            };
+        }
+
+        function getProcessedOptions(originalOptions) {
+            return getProcessedOptionBundle({ options: originalOptions }).options;
         }
 		
 		/**
@@ -5228,12 +5356,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 
             // --- Reset & Shuffle Questions AND Options for Start/Retry ---
             if (currentSerialQuestions && currentSerialQuestions.length > 0 && !isWeaknessTest) {
-                const freshList = currentSerialQuestions.map(q => ({
-                    ...q,
-                    options: getProcessedOptions(q.options),
-                    userAnswer: null,
-                    isCorrect: null
-                }));
+                const freshList = currentSerialQuestions.map(q => cloneQuizQuestionWithProcessedOptions(q));
                 currentQuizQuestions = (quizSettings.shuffleQuestions !== false)
                     ? shuffleArray(freshList)
                     : freshList;
@@ -5241,11 +5364,15 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 currentQuizQuestions.forEach(q => {
                     // 1. Reset Answer State
                     q.userAnswer = null;
+                    q.userAnswerIndex = null;
                     q.isCorrect = null;
                     
-                    // 2. RESHUFFLE OPTIONS
+                    // 2. RESHUFFLE OPTIONS IN LOCKSTEP WITH optionsHtml & correctIndex
                     if (q.options) {
-                        q.options = getProcessedOptions(q.options);
+                        const bundle = getProcessedOptionBundle(q);
+                        q.options = bundle.options;
+                        q.optionsHtml = bundle.optionsHtml;
+                        q.correctIndex = bundle.correctIndex;
                     }
                 });
 
@@ -5357,7 +5484,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             const timerEl = document.getElementById('quiz-timer');
             
             timerEl.textContent = formatTime(remaining); // Show initial time
-            timerEl.style.color = '#374151'; // Reset to default color (gray-700)
+            timerEl.style.color = ''; // Respect light/dark theme CSS color
 
             quizTimerInterval = setInterval(() => {
                 remaining--;
@@ -5402,7 +5529,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             }
             // ---------------------------
 
-            quizQuestionText.textContent = q.question;
+            quizQuestionText.innerHTML = renderMcqFieldHtml(q, 'question');
 
             // --- Button State Logic ---
             quizNextBtn.disabled = (q.userAnswer === null);
@@ -5421,32 +5548,39 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             // --- OPTIMIZED RENDERING ---
             const fragment = new DocumentFragment();
 
-            q.options.forEach(option => {
+            (q.options || []).forEach((option, optIdx) => {
                 const button = document.createElement('button');
-                button.textContent = option;
+                button.type = 'button';
+                button.innerHTML = renderMcqFieldHtml(q, 'option', optIdx);
                 button.className = "quiz-option-btn";
+                button.dataset.optIdx = String(optIdx);
                 
-                if (banglaRegex.test(option)) {
+                if (banglaRegex.test(htmlToPlainText(option))) {
                     button.classList.add('quiz-option-bangla');
                 }
 
                 if (q.userAnswer !== null) {
-                    // Question answered: Lock buttons & Show colors
-                    button.disabled = true;
-                    if (quizSettings.showAnswersInstantly) {
-                        if (option === q.correctAnswer) {
-                            button.classList.add('correct');
-                        } else if (option === q.userAnswer) {
-                            button.classList.add('incorrect');
-                        }
-                    } else {
-                        if (option === q.userAnswer) {
-                            button.classList.add('selected-neutral');
-                        }
-                    }
-                } else {
+                    // Question answered: Lock buttons & Show colors
+                    button.disabled = true;
+                    const isRightOpt = isOptionCorrect(q, optIdx, option);
+                    const isPickedOpt = (typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0)
+                        ? (optIdx === q.userAnswerIndex)
+                        : (option === q.userAnswer);
+
+                    if (quizSettings.showAnswersInstantly) {
+                        if (isRightOpt) {
+                            button.classList.add('correct');
+                        } else if (isPickedOpt) {
+                            button.classList.add('incorrect');
+                        }
+                    } else {
+                        if (isPickedOpt) {
+                            button.classList.add('selected-neutral');
+                        }
+                    }
+                } else {
                     // New question: Add click listener
-                    button.onclick = () => selectQuizAnswer(button, option);
+                    button.onclick = () => selectQuizAnswer(button, option, optIdx);
                 }
                 fragment.appendChild(button);
             });
@@ -5454,11 +5588,12 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizOptionsContainer.appendChild(fragment);
 
             // --- FIX: RE-RENDER NOTE IF ALREADY ANSWERED ---
-            if (q.userAnswer !== null && q.note && quizSettings.showAnswersInstantly) {
-                const noteDiv = document.createElement('div');
+            const noteSource = q.noteHtml || q.note || q.explanationHtml || q.explanation;
+            if (q.userAnswer !== null && noteSource && quizSettings.showAnswersInstantly) {
+                const noteDiv = document.createElement('div');
                 noteDiv.id = 'quiz-instant-note';
                 noteDiv.className = 'mt-4 p-3 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm explanation-text';
-                noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(q.note)}`;
+                noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${renderMcqFieldHtml(q, (q.noteHtml || q.note) ? 'note' : 'explanation')}`;
                 
                 // Insert after the options container
                 quizOptionsContainer.parentNode.insertBefore(noteDiv, quizOptionsContainer.nextSibling);
@@ -5469,15 +5604,20 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
        /**
          * Handles the user's answer selection. (UPDATED: Instant 100ms Advance)
          */
-        function selectQuizAnswer(selectedButton, selectedOption) {
+        function selectQuizAnswer(selectedButton, selectedOption, selectedIdx = null) {
             const q = currentQuizQuestions[currentQuizQuestionIndex];
             
             // Do nothing if already answered
             if (q.userAnswer !== null) return;
 
+            const optIdx = (typeof selectedIdx === 'number' && selectedIdx >= 0)
+                ? selectedIdx
+                : Number(selectedButton?.dataset?.optIdx ?? -1);
+
             // Store the answer
             q.userAnswer = selectedOption;
-            const isCorrect = (selectedOption === q.correctAnswer);
+            q.userAnswerIndex = optIdx >= 0 ? optIdx : null;
+            const isCorrect = isUserSelectionCorrect(q, selectedOption, q.userAnswerIndex);
             q.isCorrect = isCorrect;
             
             // Apply scoring & Update Counters
@@ -5498,23 +5638,29 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizScoreEl.textContent = `Score: ${currentQuizScore.toFixed(2)}`;
 
             // Apply visual feedback to buttons
-            Array.from(quizOptionsContainer.children).forEach(btn => {
-                btn.disabled = true;
-                if (quizSettings.showAnswersInstantly) {
-                    if (btn.textContent === q.correctAnswer) {
-                        btn.classList.add('correct');
-                    } else if (btn.textContent === selectedOption) {
-                        btn.classList.add('incorrect');
-                    }
-                } else {
-                    if (btn.textContent === selectedOption) {
-                        btn.classList.add('selected-neutral');
-                    }
-                }
-            });
+            Array.from(quizOptionsContainer.children).forEach(btn => {
+                btn.disabled = true;
+                const btnIdx = Number(btn.dataset.optIdx ?? -1);
+                const btnOpt = btnIdx >= 0 ? q.options?.[btnIdx] : btn.textContent;
+                const isRightBtn = isOptionCorrect(q, btnIdx, btnOpt);
+                const isPickedBtn = (optIdx >= 0) ? (btnIdx === optIdx) : (btn === selectedButton);
 
-            // --- SHOW NOTE IMMEDIATELY (CORRECT OR WRONG) ---
-            if (q.note && quizSettings.showAnswersInstantly) {
+                if (quizSettings.showAnswersInstantly) {
+                    if (isRightBtn) {
+                        btn.classList.add('correct');
+                    } else if (isPickedBtn) {
+                        btn.classList.add('incorrect');
+                    }
+                } else {
+                    if (isPickedBtn) {
+                        btn.classList.add('selected-neutral');
+                    }
+                }
+            });
+
+            // --- SHOW NOTE IMMEDIATELY (CORRECT OR WRONG) ---
+            const noteSource = q.noteHtml || q.note || q.explanationHtml || q.explanation;
+            if (noteSource && quizSettings.showAnswersInstantly) {
                 // Remove old note just in case
                 const oldNote = document.getElementById('quiz-instant-note');
                 if (oldNote) oldNote.remove();
@@ -5522,7 +5668,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 const noteDiv = document.createElement('div');
                 noteDiv.id = 'quiz-instant-note';
                 noteDiv.className = 'mt-4 p-3 bg-blue-50 text-blue-800 rounded border border-blue-200 text-sm animate-fade-in explanation-text';
-                noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(q.note)}`;
+                noteDiv.innerHTML = `<span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${renderMcqFieldHtml(q, (q.noteHtml || q.note) ? 'note' : 'explanation')}`;
                 
                 quizOptionsContainer.parentNode.insertBefore(noteDiv, quizOptionsContainer.nextSibling);
             }
@@ -5866,7 +6012,7 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             quizReviewContent.innerHTML = '';
             
             // MODIFIED: Include Wrong (false) AND Skipped (null)
-			const wrongAnswers = currentQuizQuestions.filter(q => q.isCorrect !== true);
+            const wrongAnswers = currentQuizQuestions.filter(q => q.isCorrect !== true);
             
             if (wrongAnswers.length === 0) {
                 quizReviewContent.innerHTML = '<p class="text-center text-gray-500 italic py-10">You got all questions correct!</p>';
@@ -5876,43 +6022,45 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
             let html = '';
             wrongAnswers.forEach(q => {
                 let feedbackHtml = '';
-                
-                if (q.correctAnswer) {
-                    // Standard Logic
-                    feedbackHtml = `
-                    <div class="review-options">
-                        ${q.options.map(option => {
-                            let className = 'review-option';
-                            if (option === q.correctAnswer) className += ' correct';
-                            else if (option === q.userAnswer) className += ' incorrect';
-                            return `<div class="${className}">${escapeHtml(option)}</div>`;
-                        }).join('')}
-                    </div>`;
+                const hasDefinedAnswer = getCanonicalCorrectIndex(q) !== -1 || Boolean(q.correctAnswer);
+
+                const optionsHtml = (q.options || []).map((option, optIdx) => {
+                    let className = 'review-option';
+                    const isRight = hasDefinedAnswer && isOptionCorrect(q, optIdx, option);
+                    const isPicked = (typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0)
+                        ? (optIdx === q.userAnswerIndex)
+                        : (q.userAnswer !== null && q.userAnswer !== undefined && option === q.userAnswer);
+
+                    if (isRight) className += ' correct';
+                    else if (isPicked) className += ' incorrect';
+                    return `<div class="${className}">${renderMcqFieldHtml(q, 'option', optIdx)}</div>`;
+                }).join('');
+
+                if (hasDefinedAnswer) {
+                    feedbackHtml = `<div class="review-options">${optionsHtml}</div>`;
                 } else {
-                    // Cancelled/No Answer Logic
+                    const expHtml = (q.explanationHtml || q.explanation)
+                        ? renderMcqFieldHtml(q, 'explanation')
+                        : 'No correct answer defined';
                     feedbackHtml = `
-                    <div class="review-options">
-                        ${q.options.map(option => {
-                            let className = 'review-option';
-                            if (option === q.userAnswer) className += ' incorrect'; // Mark user choice wrong
-                            return `<div class="${className}">${escapeHtml(option)}</div>`;
-                        }).join('')}
-                    </div>
-                    <div class="mt-2 text-sm text-amber-600 font-semibold p-2 bg-amber-50 rounded border border-amber-200">
-                        <i class="fas fa-info-circle mr-1"></i> Note: ${escapeHtml(q.explanation || 'No correct answer defined')}
+                    <div class="review-options">${optionsHtml}</div>
+                    <div class="mt-2 text-sm text-amber-600 font-semibold p-2 bg-amber-50 rounded border border-amber-200 explanation-text">
+                        <i class="fas fa-info-circle mr-1"></i> Note: ${expHtml}
                     </div>`;
                 }
 
                 // --- NEW: ADD NOTE TO REVIEW ---
                 let reviewNoteHtml = '';
-                if (q.note) {
-                    reviewNoteHtml = `<div class="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded"><i class="fas fa-info-circle mr-1"></i> ${escapeHtml(q.note)}</div>`;
+                if (q.noteHtml || q.note) {
+                    reviewNoteHtml = `<div class="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded explanation-text"><i class="fas fa-info-circle mr-1"></i> ${renderMcqFieldHtml(q, 'note')}</div>`;
+                } else if (hasDefinedAnswer && (q.explanationHtml || q.explanation)) {
+                    reviewNoteHtml = `<div class="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded explanation-text"><i class="fas fa-info-circle mr-1"></i> ${renderMcqFieldHtml(q, 'explanation')}</div>`;
                 }
                 // -------------------------------
 
                 html += `
                 <div class="review-item">
-                    <p class="review-question">${escapeHtml(q.question)}</p>
+                    <div class="review-question">${renderMcqFieldHtml(q, 'question')}</div>
                     ${feedbackHtml}
                     ${reviewNoteHtml}
                 </div>`;
@@ -6218,87 +6366,118 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
 		// --- START: NEW MCQ FEATURE LOGIC ---
 
         const addMcqModal = document.getElementById('add-mcq-modal');
-        const saveMcqBtn = document.getElementById('save-mcq-btn');
-        const mcqPasteTextarea = document.getElementById('mcq-paste-textarea');
         const viewMcqModal = document.getElementById('view-mcq-modal');
         const viewMcqContent = document.getElementById('view-mcq-content');
 
-       // 1. "Add/Edit MCQ" Button Handler (UPDATED: Shows Notes in Edit Mode)
-        async function openAddMcqModal(monthId, weekId, dayIndex, rowIndex) {
-            currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
-            mcqPasteTextarea.value = ''; 
-            
-            const deleteBtn = document.getElementById('delete-all-mcqs-btn');
-            deleteBtn.classList.add('hidden'); // Hide by default
+        let mcqWorkspaceInstance = null;
 
-            // Find the button in the DOM to check for data
+        function getRowMcqElements(target) {
+            if (!target) return { daySection: null, row: null, button: null };
+            const { monthId, weekId, dayIndex, rowIndex } = target;
             const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
             const row = daySection ? daySection.querySelector(`tr[data-row-index="${rowIndex}"]`) : null;
             const button = row ? row.querySelector('.add-row-mcq-btn') : null;
+            return { daySection, row, button };
+        }
 
-            let hasData = false;
+        function getMcqWorkspace() {
+            if (mcqWorkspaceInstance) return mcqWorkspaceInstance;
+            const mountEl = document.getElementById('mcq-import-workspace-mount');
+            if (!mountEl) return null;
+
+            mcqWorkspaceInstance = new McqImportWorkspace(mountEl, {
+                onConfirmSave: (finalItems) => {
+                    if (!currentMcqTarget) return;
+                    const storedItems = toStorageMcqList(finalItems);
+                    if (storedItems.length === 0) {
+                        showCustomAlert("No MCQs found! Please check the format and try again.", "error");
+                        return;
+                    }
+
+                    const { daySection, button } = getRowMcqElements(currentMcqTarget);
+                    closeModal('add-mcq-modal');
+
+                    if (button) {
+                        button.dataset.tempMcq = JSON.stringify(storedItems);
+                        button.innerHTML = `<i class="fas fa-pencil-alt mr-1"></i> Edit Qs (${storedItems.length})`;
+                        button.classList.add('bg-emerald-100', 'text-emerald-700');
+                        showCustomAlert(`${storedItems.length} MCQs attached to row! (Click 'Save Day' to confirm)`, "success");
+
+                        if (daySection && daySection.autosaveHandler) {
+                            daySection.dispatchEvent(new Event('input'));
+                        }
+                    } else {
+                        showCustomAlert("Error: Could not find row to update.", "error");
+                    }
+
+                    currentMcqTarget = null;
+                },
+                onDeleteAll: () => {
+                    if (!currentMcqTarget) return;
+                    const targetCopy = { ...currentMcqTarget };
+
+                    showConfirmationModal(
+                        "Delete All MCQs",
+                        "Are you sure you want to delete all MCQs for this row?",
+                        () => {
+                            const { daySection, button } = getRowMcqElements(targetCopy);
+                            closeModal('add-mcq-modal');
+
+                            if (button) {
+                                button.dataset.tempMcq = '[]';
+                                button.innerHTML = `<i class="fas fa-plus mr-1"></i> Add Qs`;
+                                button.classList.remove('bg-emerald-100', 'text-emerald-700');
+                                showCustomAlert("All MCQs removed. Click 'Save Day' to confirm.", "success");
+
+                                if (daySection && daySection.autosaveHandler) {
+                                    daySection.dispatchEvent(new Event('input'));
+                                }
+                            }
+                            currentMcqTarget = null;
+                        }
+                    );
+                },
+                onCancel: () => {
+                    closeModal('add-mcq-modal');
+                    currentMcqTarget = null;
+                },
+                onAlert: (message, type) => {
+                    showCustomAlert(message, type);
+                }
+            });
+
+            return mcqWorkspaceInstance;
+        }
+
+       // 1. "Add/Edit MCQ" Button Handler (Mounted Multi-Format Import Workspace)
+        async function openAddMcqModal(monthId, weekId, dayIndex, rowIndex) {
+            currentMcqTarget = { monthId, weekId, dayIndex, rowIndex };
+            const workspace = getMcqWorkspace();
+            const { button } = getRowMcqElements(currentMcqTarget);
+
+            let existingMcqs = [];
 
             // A. Check for LOCAL temporary data
             if (button && button.dataset.tempMcq) {
-                const localData = JSON.parse(button.dataset.tempMcq);
-                const rawText = localData.map((mcq, index) => {
-                    const options = mcq.options.map((opt, i) => `${['a', 'b', 'c', 'd'][i]}. ${opt}`).join('\n');
-                    
-                    let answerLine = "";
-                    if (mcq.correctAnswer) {
-                        const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
-                        const correctPrefix = correctIndex !== -1 ? ['a', 'b', 'c', 'd'][correctIndex] : '??';
-                        answerLine = `Correct answer: ${correctPrefix}. ${mcq.correctAnswer}`;
-                    } else {
-                        answerLine = `Correct answer: ${mcq.explanation || 'Cancelled'}`;
+                try {
+                    const localData = JSON.parse(button.dataset.tempMcq);
+                    if (Array.isArray(localData)) {
+                        existingMcqs = localData;
                     }
-
-                    // --- FIX: Append Note if exists ---
-                    if (mcq.note) {
-                        answerLine += `\nNote: ${mcq.note}`;
-                    }
-                    // ---------------------------------
-
-                    return `${index + 1}. ${mcq.question}\n${options}\n${answerLine}\n`;
-                }).join('\n');
-                
-                mcqPasteTextarea.value = rawText;
-                hasData = true;
+                } catch (e) {
+                    console.warn("Could not parse tempMcq JSON:", e);
+                }
             }
             // B. Check DATABASE if no local data
-            else {
+            else if (db && getUserPlansCollectionPath()) {
                 setSyncStatus("Loading...", "blue");
                 try {
                     const weekDocRef = doc(db, getUserPlansCollectionPath(), monthId, 'weeks', weekId);
                     const weekDocSnap = await getDoc(weekDocRef);
-                    
                     if (weekDocSnap.exists()) {
                         const mcqData = weekDocSnap.data().days?.[dayIndex]?.rows?.[rowIndex]?.mcqData;
-                        
-                        if (mcqData && mcqData.length > 0) {
-                            const rawText = mcqData.map((mcq, index) => {
-                                const options = mcq.options.map((opt, i) => `${['a', 'b', 'c', 'd'][i]}. ${opt}`).join('\n');
-                                
-                                let answerLine = "";
-                                if (mcq.correctAnswer) {
-                                    const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
-                                    const correctPrefix = correctIndex !== -1 ? ['a', 'b', 'c', 'd'][correctIndex] : '??';
-                                    answerLine = `Correct answer: ${correctPrefix}. ${mcq.correctAnswer}`;
-                                } else {
-                                    answerLine = `Correct answer: ${mcq.explanation || 'Cancelled'}`;
-                                }
-
-                                // --- FIX: Append Note if exists ---
-                                if (mcq.note) {
-                                    answerLine += `\nNote: ${mcq.note}`;
-                                }
-                                // ---------------------------------
-
-                                return `${index + 1}. ${mcq.question}\n${options}\n${answerLine}\n`;
-                            }).join('\n');
-                            
-                            mcqPasteTextarea.value = rawText;
-                            hasData = true;
+                        if (Array.isArray(mcqData) && mcqData.length > 0) {
+                            existingMcqs = mcqData;
                         }
                     }
                     setSyncStatus("Synced", "green");
@@ -6308,206 +6487,18 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
                 }
             }
 
-            if (hasData) {
-                deleteBtn.classList.remove('hidden');
+            if (workspace) {
+                workspace.loadExistingRowMcqs(existingMcqs, '');
             }
 
-            addMcqModal.style.display = 'block';
+            if (addMcqModal) {
+                addMcqModal.style.display = 'block';
+            }
         }
-		
-        // 2. Modal "Parse & Save" Handler (UPDATED: With Validation)
-        saveMcqBtn.addEventListener('click', () => { 
-            if (!currentMcqTarget) return;
 
-            const { monthId, weekId, dayIndex, rowIndex } = currentMcqTarget;
-            const rawText = mcqPasteTextarea.value;
-            const parsedData = parseMcqText(rawText);
-
-            // --- FIX: VALIDATION CHECK ---
-            if (parsedData.length === 0) {
-                showCustomAlert("No MCQs found! Please check the format and try again.", "error");
-                return; // Stop here, do NOT close the modal
-            }
-            // -----------------------------
-
-            closeModal('add-mcq-modal');
-            
-            // Find the button in the UI
-            const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
-            const row = daySection ? daySection.querySelector(`tr[data-row-index="${rowIndex}"]`) : null;
-            const button = row ? row.querySelector('.add-row-mcq-btn') : null;
-
-            if (button) {
-                if (parsedData.length > 0) {
-                    // 1. Save data to the DOM element temporarily
-                    button.dataset.tempMcq = JSON.stringify(parsedData);
-                    // 2. Update UI visually
-                    button.innerHTML = `<i class="fas fa-pencil-alt mr-1"></i> Edit Qs (${parsedData.length})`;
-                    button.classList.add('bg-emerald-100', 'text-emerald-700'); 
-                    showCustomAlert(`${parsedData.length} MCQs attached to row! (Click 'Save Day' to confirm)`, "success");
-                } else {
-                    // This block is now unreachable due to the check above, but kept for safety
-                    delete button.dataset.tempMcq;
-                    button.innerHTML = `<i class="fas fa-plus mr-1"></i> Add Qs`;
-                    button.classList.remove('bg-emerald-100', 'text-emerald-700');
-                }
-                
-                // Trigger the autosave logic for the day if it exists
-                if (daySection.autosaveHandler) {
-                    daySection.dispatchEvent(new Event('input'));
-                }
-            } else {
-                showCustomAlert("Error: Could not find row to update.", "error");
-            }
-
-            currentMcqTarget = null;
-        });
-		
-		
-	// 2a. "Delete All MCQs" Button Handler
-        document.getElementById('delete-all-mcqs-btn')?.addEventListener('click', () => {
-            if (!currentMcqTarget) return;
-            
-            if (!confirm("Are you sure you want to delete all MCQs for this row?")) {
-                return;
-            }
-
-            const { monthId, weekId, dayIndex, rowIndex } = currentMcqTarget;
-            
-            // Clear textarea
-            mcqPasteTextarea.value = '';
-            
-            closeModal('add-mcq-modal');
-
-            // Find the UI button
-            const daySection = document.querySelector(`[data-month-id="${monthId}"] [data-week-id="${weekId}"] [data-day-index="${dayIndex}"]`);
-            const row = daySection ? daySection.querySelector(`tr[data-row-index="${rowIndex}"]`) : null;
-            const button = row ? row.querySelector('.add-row-mcq-btn') : null;
-
-            if (button) {
-                // 1. Send empty array to indicate deletion
-                button.dataset.tempMcq = '[]'; 
-                
-                // 2. Reset UI
-                button.innerHTML = `<i class="fas fa-plus mr-1"></i> Add Qs`;
-                button.classList.remove('bg-emerald-100', 'text-emerald-700');
-                
-                showCustomAlert("All MCQs removed. Click 'Save Day' to confirm.", "success");
-
-                // 3. Trigger Autosave
-                if (daySection.autosaveHandler) {
-                    daySection.dispatchEvent(new Event('input'));
-                }
-            }
-
-            currentMcqTarget = null;
-        });
-		
-		
-		
-     // 3. ✨ The Magic Parser Function (UPDATED for Bangla Support)
+     // 3. ✨ Backwards-Compatible Parser Entrypoint (Delegates to Universal Engine)
     function parseMcqText(text) {
-        // 1. Clean text
-        let cleanText = text.replace(/\r\n/g, '\n');
-        
-        // 2. Split by question number (Supports English 1. and Bangla ১.)
-        // [0-9০-৯] means digits 0-9 OR Bangla digits ০-৯
-        const rawBlocks = cleanText.split(/\n(?=[0-9০-৯]+\.)/);
-        
-        const mcqData = [];
-
-        rawBlocks.forEach(block => {
-            if (!block || !block.trim()) return;
-
-            // Extract ID (Supports English and Bangla digits)
-            const idMatch = block.match(/^\s*([0-9০-৯]+)\./);
-            if (!idMatch) return;
-            
-            // Convert ID to integer (handling Bangla digits if present)
-            const idStr = idMatch[1].replace(/[০-৯]/g, d => "০১২৩৪৫৬৭৮৯".indexOf(d));
-            const id = parseInt(idStr);
-            
-            // Remove ID from content to get the body
-            let content = block.replace(/^\s*[0-9০-৯]+\.\s*/, '');
-            
-            // --- STEP 1: EXTRACT NOTE/EXPLANATION ---
-            // (Do this first to clear it from content)
-            let note = "";
-            const noteRegex = /\n\s*(?:Note|Explanation|নোট|ব্যাখ্যা)[:\s]*([\s\S]*)$/i;
-            const noteMatch = content.match(noteRegex);
-            
-            if (noteMatch) {
-                note = noteMatch[1].trim();
-                content = content.substring(0, noteMatch.index);
-            }
-            
-            // --- STEP 2: EXTRACT RAW ANSWER STRING ---
-            let rawAnswerString = "";
-            const ansRegex = /\n\s*(?:Correct answer|Correct|Answer|Ans|সঠিক উত্তর|সঠিক)[:\s]*([^\n]*)/i;
-            const ansMatch = content.match(ansRegex);
-            
-            if (ansMatch) {
-                rawAnswerString = ansMatch[1].trim();
-                content = content.substring(0, ansMatch.index); // Remove answer line from content
-            }
-
-            // --- STEP 3: EXTRACT OPTIONS & QUESTION ---
-            // Supports a,b,c,d AND ক,খ,গ,ঘ
-            const firstOptionIndex = content.search(/\n\s*(?:[\(]?(?:a|b|c|d|ক|খ|গ|ঘ)[\.\)])/i);
-            
-            let question = "";
-            const options = [];
-
-            if (firstOptionIndex !== -1) {
-                question = content.substring(0, firstOptionIndex).trim();
-                
-                const optionsPart = content.substring(firstOptionIndex);
-                const optionRegex = /\n\s*(?:[\(]?(?:a|b|c|d|ক|খ|গ|ঘ)[\.\)])\s*([^\n]+)/gi;
-                let optMatch;
-                while ((optMatch = optionRegex.exec(optionsPart)) !== null) {
-                    options.push(optMatch[1].trim());
-                }
-            } else {
-                question = content.trim();
-            }
-
-            // --- STEP 4: RESOLVE CORRECT ANSWER ---
-            let finalCorrectAnswer = "";
-
-            if (rawAnswerString) {
-                // Check if it is a single letter (a-d OR ক-ঘ)
-                const letterMatch = rawAnswerString.match(/^([a-dক-ঘ])[\.\)]?$/i);
-                
-                if (letterMatch) {
-                    // Map letter to index 0-3
-                    const letter = letterMatch[1].toLowerCase(); // Note: Bangla chars don't change case like English
-                    const map = { 
-                        'a': 0, 'b': 1, 'c': 2, 'd': 3, 
-                        'ক': 0, 'খ': 1, 'গ': 2, 'ঘ': 3 
-                    };
-                    const index = map[letter];
-
-                    // If that option exists, grab the text
-                    if (options[index]) {
-                        finalCorrectAnswer = options[index];
-                    }
-                } else {
-                    // It's full text, strip prefix if present (e.g. "ক. উত্তর")
-                    finalCorrectAnswer = rawAnswerString.replace(/^[a-dক-ঘ][\)\.]\s+/i, '');
-                }
-            }
-
-            mcqData.push({
-                id: id,
-                question: question,
-                options: options.slice(0, 4),
-                correctAnswer: finalCorrectAnswer,
-                note: note,
-                explanation: note 
-            });
-        });
-
-        return mcqData;
+        return parsePlainTextMcqs(text || '').items;
     }
 
 	// --- NEW HELPER: Shared Render Logic for View MCQ Modal ---
@@ -6536,48 +6527,61 @@ function renderViewMcqUI(mcqData, mainTitleText, subTitleText, subjectName) {
 
     let html = '';
     mcqData.forEach((mcq, index) => {
-        const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+        const correctIndex = getCanonicalCorrectIndex(mcq);
         const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+        const hasCorrect = correctIndex !== -1 || Boolean(mcq.correctAnswer || mcq.correctAnswerHtml);
         
         let answerHtml = '';
-        if (mcq.correctAnswer) {
+        if (hasCorrect) {
+             const correctBodyHtml = (correctIndex !== -1)
+                 ? renderMcqFieldHtml(mcq, 'option', correctIndex)
+                 : renderMcqFieldHtml(mcq, 'correctAnswer');
              answerHtml = `
                 <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm answer-card-bg">
                     <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg"><i class="fas fa-check text-xs"></i></div>
-                    <div class="font-semibold text-emerald-900 text-sm answer-text">Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span></div>
+                    <div class="font-semibold text-emerald-900 text-sm answer-text">Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${correctBodyHtml}</span></div>
                 </div>`;
         } else {
+             const fallbackExp = (mcq.explanationHtml || mcq.explanation)
+                 ? renderMcqFieldHtml(mcq, 'explanation')
+                 : "No Answer Defined";
              answerHtml = `
                 <div class="inline-flex items-center w-full sm:w-auto bg-amber-100 border border-amber-300 rounded-lg px-4 py-2 shadow-sm">
                     <div class="flex-shrink-0 bg-amber-200 rounded-full p-1 mr-3 text-amber-700"><i class="fas fa-exclamation text-xs"></i></div>
-                    <div class="font-semibold text-amber-900 text-sm answer-text">Note: <span class="text-amber-800">${escapeHtml(mcq.explanation || "No Answer Defined")}</span></div>
+                    <div class="font-semibold text-amber-900 text-sm answer-text">Note: <span class="text-amber-800">${fallbackExp}</span></div>
                 </div>`;
         }
 
         let noteHtml = '';
-        if (mcq.note) {
+        if (mcq.noteHtml || mcq.note || (hasCorrect && (mcq.explanationHtml || mcq.explanation))) {
+            const fieldName = (mcq.noteHtml || mcq.note) ? 'note' : 'explanation';
             noteHtml = `
                 <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800 explanation-text">
-                    <span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(mcq.note)}
+                    <span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${renderMcqFieldHtml(mcq, fieldName)}
                 </div>`;
         }
 
         // Highlight User's Wrong Answer if available (Specific to Review Mode)
         let userWrongLabel = '';
-        if (mcq.userAnswer && mcq.userAnswer !== mcq.correctAnswer) {
-             const wrongIndex = mcq.options.indexOf(mcq.userAnswer);
+        if (mcq.userAnswer && !isUserSelectionCorrect(mcq, mcq.userAnswer, mcq.userAnswerIndex)) {
+             const wrongIndex = (typeof mcq.userAnswerIndex === 'number' && mcq.userAnswerIndex >= 0)
+                 ? mcq.userAnswerIndex
+                 : (mcq.options || []).indexOf(mcq.userAnswer);
              const wrongOptLabel = (wrongIndex !== -1) ? getOptionLabel(wrongIndex, mcq.question) : '';
-             userWrongLabel = `<div class="text-xs text-red-600 font-bold mb-1"><i class="fas fa-times-circle mr-1"></i> You selected: ${wrongOptLabel}. ${escapeHtml(mcq.userAnswer)}</div>`;
+             const wrongBodyHtml = (wrongIndex !== -1)
+                 ? renderMcqFieldHtml(mcq, 'option', wrongIndex)
+                 : renderRichHtmlString(mcq.userAnswer, { inlineOnly: true });
+             userWrongLabel = `<div class="text-xs text-red-600 font-bold mb-1"><i class="fas fa-times-circle mr-1"></i> You selected: ${wrongOptLabel ? wrongOptLabel + '. ' : ''}${wrongBodyHtml}</div>`;
         }
 
         html += `
             <div class="study-card">
                 <div class="study-question text-gray-900 font-medium">
-                    <span class="text-indigo-600 font-bold mr-1">${index + 1}.</span>${escapeHtml(mcq.question)}
+                    <span class="text-indigo-600 font-bold mr-1">${index + 1}.</span>${renderMcqFieldHtml(mcq, 'question')}
                 </div>
                 <div class="study-options">
-                    ${mcq.options.map((opt, i) => `
-                        <div class="study-opt text-gray-900"><span class="font-bold text-black mr-2">${getOptionLabel(i, mcq.question)}.</span>${escapeHtml(opt)}</div>
+                    ${(mcq.options || []).map((opt, i) => `
+                        <div class="study-opt text-gray-900"><span class="font-bold text-black mr-2 cc-opt-label">${getOptionLabel(i, mcq.question)}.</span>${renderMcqFieldHtml(mcq, 'option', i)}</div>
                     `).join('')}
                 </div>
                 <div class="mt-4 pt-2 border-t border-dashed border-gray-200">
@@ -6940,15 +6944,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
 
                 currentMcqData = mcqData;
                 currentVocabData = null;
-                const rawList = currentMcqData.map(mcq => ({
-					question: mcq.question,
-					options: getProcessedOptions(mcq.options),
-					correctAnswer: mcq.correctAnswer,
-					explanation: mcq.explanation || null,
-					note: mcq.note || null,
-					userAnswer: null,
-					isCorrect: null
-				}));
+                const rawList = currentMcqData.map(mcq => cloneQuizQuestionWithProcessedOptions(mcq));
                 currentSerialQuestions = rawList;
 				currentQuizQuestions = (quizSettings.shuffleQuestions !== false)
                     ? shuffleArray(rawList.map(q => ({ ...q })))
@@ -7191,15 +7187,7 @@ async function openViewMcqModal(monthId, weekId, dayIndex, rowIndex) {
                 
                 currentMcqData = aggregatedMcqs; 
                 currentVocabData = null;
-                const rawList = currentMcqData.map(mcq => ({ 
-					question: mcq.question,
-					options: getProcessedOptions(mcq.options),
-					correctAnswer: mcq.correctAnswer,
-					explanation: mcq.explanation || null,
-					note: mcq.note || null,
-					userAnswer: null,
-					isCorrect: null
-				}));
+                const rawList = currentMcqData.map(mcq => cloneQuizQuestionWithProcessedOptions(mcq));
                 currentSerialQuestions = rawList;
 				currentQuizQuestions = (quizSettings.shuffleQuestions !== false)
                     ? shuffleArray(rawList.map(q => ({ ...q })))
@@ -7789,16 +7777,12 @@ document.getElementById('saved-quiz-restart-btn').addEventListener('click', () =
     currentMcqData = null; // সোর্স ক্লিয়ার করুন
 
     // --- START: FIX ---
-    // প্রশ্নগুলোকে " পরিষ্কার" করতে হবে (পুরনো উত্তর মুছে ফেলতে হবে)
-    const cleanQuestions = currentViewingSavedResult.questions.map(q => {
-        // ...q (স্প্রেড অপারেটর) দিয়ে পুরনো প্রশ্নটি কপি করুন
-        // তারপর userAnswer এবং isCorrect রিসেট করুন
-        return {
-            ...q, // প্রশ্ন, অপশন, সঠিক উত্তর কপি করুন
-            userAnswer: null, // পুরনো উত্তর রিসেট করুন
-            isCorrect: null   // পুরনো স্ট্যাটাস রিসেট করুন
-        };
-    });
+    const cleanQuestions = currentViewingSavedResult.questions.map(q => ({
+        ...normalizeMcqItem(q),
+        userAnswer: null, // পুরনো উত্তর রিসেট করুন
+        userAnswerIndex: null,
+        isCorrect: null   // পুরনো স্ট্যাটাস রিসেট করুন
+    }));
     
     currentQuizQuestions = cleanQuestions; // পরিষ্কার প্রশ্নগুলো গ্লোবাল ভেরিয়েবলে সেট করুন
     // --- END: FIX ---
@@ -7894,6 +7878,7 @@ function renderProgressChart(labels, data, title) {
     }
     
     const ctx = document.getElementById('progress-chart-canvas').getContext('2d');
+    const chartTheme = getChartThemeColors();
     
     // Create a gradient fill
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
@@ -7910,11 +7895,11 @@ function renderProgressChart(labels, data, title) {
                 fill: true,
                 backgroundColor: gradient, // Gradient fill
                 borderColor: '#10b981', // emerald-500
-                pointBackgroundColor: '#ffffff',
+                pointBackgroundColor: chartTheme.pointBg,
                 pointBorderColor: '#10b981',
                 pointHoverRadius: 7,
                 pointHoverBackgroundColor: '#10b981',
-                pointHoverBorderColor: '#ffffff',
+                pointHoverBorderColor: chartTheme.pointBg,
                 borderWidth: 3,
                 tension: 0.1 // Smooth curves
             }]
@@ -7926,14 +7911,22 @@ function renderProgressChart(labels, data, title) {
                 y: {
                     beginAtZero: true,
                     max: 100,
+                    grid: {
+                        color: chartTheme.grid
+                    },
                     ticks: {
+                        color: chartTheme.tick,
                         callback: function(value) {
                             return value + '%'; // Add % to Y-axis
                         }
                     }
                 },
                 x: {
+                    grid: {
+                        color: chartTheme.grid
+                    },
                     ticks: {
+                        color: chartTheme.tick,
                         maxRotation: 45,
                         minRotation: 45
                     }
@@ -9147,8 +9140,9 @@ function getOptionLabel(index, text) {
     const banglaRegex = /[\u0980-\u09FF]/;
     const labelsBangla = ['ক', 'খ', 'গ', 'ঘ'];
     const labelsEnglish = ['a', 'b', 'c', 'd'];
+    const plain = htmlToPlainText(text || '');
     
-    if (banglaRegex.test(text)) {
+    if (banglaRegex.test(plain)) {
         return labelsBangla[index] || (index + 1);
     }
     return labelsEnglish[index] || (index + 1);
@@ -9224,7 +9218,7 @@ async function buildMasterMcqPrintHtml() {
                             // Loop through Questions for this Subject
                             mcqs.forEach((mcq, idx) => {
                                 // Find correct answer label
-                                const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+                                const correctIndex = getCanonicalCorrectIndex(mcq);
                                 const ansLabel = (correctIndex !== -1) 
                                     ? getOptionLabel(correctIndex, mcq.question) 
                                     : '?';
@@ -9232,12 +9226,12 @@ async function buildMasterMcqPrintHtml() {
                                 html += `
                                     <div class="print-mcq-item">
                                         <div class="print-q-text">
-                                            <span class="q-num">${idx + 1}.</span> ${escapeHtml(mcq.question)}
+                                            <span class="q-num">${idx + 1}.</span> ${renderMcqFieldHtml(mcq, 'question')}
                                         </div>
                                         <div class="print-options-grid">
-                                            ${mcq.options.map((opt, i) => {
+                                            ${(mcq.options || []).map((opt, i) => {
                                                 const label = getOptionLabel(i, mcq.question);
-                                                return `<div><span class="opt-label">${label}.</span> ${escapeHtml(opt)}</div>`;
+                                                return `<div><span class="opt-label">${label}.</span> ${renderMcqFieldHtml(mcq, 'option', i)}</div>`;
                                             }).join('')}
                                         </div>
                                         <div class="print-ans-key">
@@ -9521,37 +9515,45 @@ function renderStudyView(mcqs) {
 
     let html = '';
     mcqs.forEach((mcq, idx) => {
-        const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+        const correctIndex = getCanonicalCorrectIndex(mcq);
         const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+        const hasCorrect = correctIndex !== -1 || Boolean(mcq.correctAnswer || mcq.correctAnswerHtml);
         
         // --- 1. Answer Box (Green/Yellow) ---
         let answerHtml = '';
-        if (mcq.correctAnswer) {
+        if (hasCorrect) {
+             const correctBodyHtml = (correctIndex !== -1)
+                 ? renderMcqFieldHtml(mcq, 'option', correctIndex)
+                 : renderMcqFieldHtml(mcq, 'correctAnswer');
              answerHtml = `
                 <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm answer-card-bg">
                     <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg">
                         <i class="fas fa-check text-xs"></i>
                     </div>
                     <div class="font-semibold text-emerald-900 text-sm answer-text">
-                        Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${escapeHtml(mcq.correctAnswer)}</span>
+                        Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${correctBodyHtml}</span>
                     </div>
                 </div>`;
         } else {
+             const fallbackExp = (mcq.explanationHtml || mcq.explanation)
+                 ? renderMcqFieldHtml(mcq, 'explanation')
+                 : "No Answer Defined";
              // Added 'answer-text' class here so it resizes too
              answerHtml = `
                 <div class="inline-flex items-center w-full sm:w-auto bg-amber-100 border border-amber-300 rounded-lg px-4 py-2 shadow-sm">
                     <div class="flex-shrink-0 bg-amber-200 rounded-full p-1 mr-3 text-amber-700"><i class="fas fa-exclamation text-xs"></i></div>
-                    <div class="font-semibold text-amber-900 text-sm answer-text">Note: <span class="text-amber-800">${escapeHtml(mcq.explanation || "No Answer Defined")}</span></div>
+                    <div class="font-semibold text-amber-900 text-sm answer-text">Note: <span class="text-amber-800">${fallbackExp}</span></div>
                 </div>`;
         }
 
         // --- 2. Note/Explanation Box (Blue) ---
         let noteHtml = '';
-        if (mcq.note) {
+        if (mcq.noteHtml || mcq.note || (hasCorrect && (mcq.explanationHtml || mcq.explanation))) {
+            const fieldName = (mcq.noteHtml || mcq.note) ? 'note' : 'explanation';
             // Added 'explanation-text' class here
             noteHtml = `
                 <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800 explanation-text">
-                    <span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${escapeHtml(mcq.note)}
+                    <span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${renderMcqFieldHtml(mcq, fieldName)}
                 </div>
             `;
         }
@@ -9559,14 +9561,14 @@ function renderStudyView(mcqs) {
         html += `
             <div class="study-card">
                 <div class="study-question text-gray-900 font-medium">
-                    <span class="text-indigo-600 font-bold mr-1">${idx + 1}.</span>${escapeHtml(mcq.question)}
+                    <span class="text-indigo-600 font-bold mr-1">${idx + 1}.</span>${renderMcqFieldHtml(mcq, 'question')}
                 </div>
                 
                 <div class="study-options">
-                    ${mcq.options.map((opt, i) => `
+                    ${(mcq.options || []).map((opt, i) => `
                         <div class="study-opt text-gray-900">
-                            <span class="font-bold text-black mr-2">${getOptionLabel(i, mcq.question)}.</span>
-                            ${escapeHtml(opt)}
+                            <span class="font-bold text-black mr-2 cc-opt-label">${getOptionLabel(i, mcq.question)}.</span>
+                            ${renderMcqFieldHtml(mcq, 'option', i)}
                         </div>
                     `).join('')}
                 </div>
@@ -9638,15 +9640,7 @@ document.getElementById('test-study-mcq-btn').addEventListener('click', () => {
     // 5. Prepare Questions
     currentMcqData = mcqData;
     currentVocabData = null;
-    const rawList = currentMcqData.map(mcq => ({ 
-		question: mcq.question,
-		options: getProcessedOptions(mcq.options),
-		correctAnswer: mcq.correctAnswer,
-		explanation: mcq.explanation || null,
-		note: mcq.note || null,
-		userAnswer: null,
-		isCorrect: null
-	}));
+    const rawList = currentMcqData.map(mcq => cloneQuizQuestionWithProcessedOptions(mcq));
     currentSerialQuestions = rawList;
 	currentQuizQuestions = (quizSettings.shuffleQuestions !== false)
         ? shuffleArray(rawList.map(q => ({ ...q })))
@@ -9682,8 +9676,13 @@ printStudyBtn.addEventListener('click', () => {
     // We create a temporary virtual structure to feed the print function
     
     const printWindow = window.open('', '', 'height=900,width=1200');
+    if (!printWindow) {
+        showCustomAlert("Please allow popups to print!", "error");
+        return;
+    }
     
     const styles = `
+        ${getPrintRichHeadHtml()}
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
             @page { size: A4; margin: 1cm; }
@@ -9695,13 +9694,14 @@ printStudyBtn.addEventListener('click', () => {
             .q-num { color: #059669; margin-right: 4px; }
             .print-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 10px; color: #4b5563; }
             .print-ans-key { text-align: right; margin-top: 6px; font-size: 10px; color: #059669; border-top: 1px dashed #f3f4f6; padding-top: 2px; }
+            .print-note { margin-top: 4px; font-size: 10px; color: #1e3a8a; background: #eff6ff; padding: 4px 6px; border-radius: 4px; }
         </style>
     `;
 
     printWindow.document.write('<html><head><title>Study Print</title>' + styles + '</head><body>');
     printWindow.document.write(`
         <div class="print-header">
-            <h1 style="margin:0; font-size:20px;">${currentStudyViewData.title}</h1>
+            <h1 style="margin:0; font-size:20px;">${escapeHtml(currentStudyViewData.title)}</h1>
             <p style="margin:5px 0; font-size:10px; color:#666;">Total Questions: ${currentStudyViewData.mcqs.length}</p>
         </div>
         <div class="mcq-print-wrapper">
@@ -9709,18 +9709,22 @@ printStudyBtn.addEventListener('click', () => {
 
     // Render Items
     currentStudyViewData.mcqs.forEach((mcq, idx) => {
-        const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+        const correctIndex = getCanonicalCorrectIndex(mcq);
         const ansLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+        const noteHtml = (mcq.noteHtml || mcq.note || mcq.explanationHtml || mcq.explanation)
+            ? `<div class="print-note"><b>Explanation:</b> ${renderMcqFieldHtml(mcq, (mcq.noteHtml || mcq.note) ? 'note' : 'explanation')}</div>`
+            : '';
         
         printWindow.document.write(`
             <div class="print-mcq-item">
                 <div class="print-q-text">
-                    <span class="q-num">${idx + 1}.</span> ${escapeHtml(mcq.question)}
+                    <span class="q-num">${idx + 1}.</span> ${renderMcqFieldHtml(mcq, 'question')}
                 </div>
                 <div class="print-options-grid">
-                    ${mcq.options.map((opt, i) => `<div><b>${getOptionLabel(i, mcq.question)}.</b> ${escapeHtml(opt)}</div>`).join('')}
+                    ${(mcq.options || []).map((opt, i) => `<div><b>${getOptionLabel(i, mcq.question)}.</b> ${renderMcqFieldHtml(mcq, 'option', i)}</div>`).join('')}
                 </div>
                 <div class="print-ans-key">Correct: <b>${ansLabel}</b></div>
+                ${noteHtml}
             </div>
         `);
     });
@@ -9841,15 +9845,7 @@ if (viewMcqTestBtn) {
 
             currentMcqData = mcqData;
             currentVocabData = null;
-            const rawList = currentMcqData.map(mcq => ({ 
-                question: mcq.question, 
-                options: getProcessedOptions(mcq.options), 
-                correctAnswer: mcq.correctAnswer, 
-                explanation: mcq.explanation || null, 
-                note: mcq.note || null, 
-                userAnswer: null, 
-                isCorrect: null 
-            }));
+            const rawList = currentMcqData.map(mcq => cloneQuizQuestionWithProcessedOptions(mcq));
             currentSerialQuestions = rawList;
             currentQuizQuestions = (quizSettings.shuffleQuestions !== false)
                 ? shuffleArray(rawList.map(q => ({ ...q })))
@@ -9907,7 +9903,12 @@ if (viewMcqPrintBtn) {
         if (!currentViewMcqData || !currentViewMcqData.mcqs.length) return;
         
         const printWindow = window.open('', '', 'height=900,width=1200');
+        if (!printWindow) {
+            showCustomAlert("Please allow popups to print!", "error");
+            return;
+        }
         const styles = `
+            ${getPrintRichHeadHtml()}
             <style>
                 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
                 @page { size: A4; margin: 1cm; }
@@ -9919,28 +9920,33 @@ if (viewMcqPrintBtn) {
                 .q-num { color: #059669; margin-right: 4px; }
                 .print-options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 10px; color: #4b5563; }
                 .print-ans-key { text-align: right; margin-top: 6px; font-size: 10px; color: #059669; border-top: 1px dashed #f3f4f6; padding-top: 2px; }
+                .print-note { margin-top: 4px; font-size: 10px; color: #1e3a8a; background: #eff6ff; padding: 4px 6px; border-radius: 4px; }
             </style>`;
 
         printWindow.document.write('<html><head><title>Print View</title>' + styles + '</head><body>');
         printWindow.document.write(`
             <div class="print-header">
-                <h1 style="margin:0; font-size:20px;">${currentViewMcqData.title}</h1>
+                <h1 style="margin:0; font-size:20px;">${escapeHtml(currentViewMcqData.title)}</h1>
                 <p style="margin:5px 0; font-size:10px; color:#666;">Total Questions: ${currentViewMcqData.mcqs.length}</p>
             </div>
             <div class="mcq-print-wrapper">
         `);
 
         currentViewMcqData.mcqs.forEach((mcq, idx) => {
-            const correctIndex = mcq.options.indexOf(mcq.correctAnswer);
+            const correctIndex = getCanonicalCorrectIndex(mcq);
             const ansLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+            const noteHtml = (mcq.noteHtml || mcq.note || mcq.explanationHtml || mcq.explanation)
+                ? `<div class="print-note"><b>Explanation:</b> ${renderMcqFieldHtml(mcq, (mcq.noteHtml || mcq.note) ? 'note' : 'explanation')}</div>`
+                : '';
             
             printWindow.document.write(`
                 <div class="print-mcq-item">
-                    <div class="print-q-text"><span class="q-num">${idx + 1}.</span> ${escapeHtml(mcq.question)}</div>
+                    <div class="print-q-text"><span class="q-num">${idx + 1}.</span> ${renderMcqFieldHtml(mcq, 'question')}</div>
                     <div class="print-options-grid">
-                        ${mcq.options.map((opt, i) => `<div><b>${getOptionLabel(i, mcq.question)}.</b> ${escapeHtml(opt)}</div>`).join('')}
+                        ${(mcq.options || []).map((opt, i) => `<div><b>${getOptionLabel(i, mcq.question)}.</b> ${renderMcqFieldHtml(mcq, 'option', i)}</div>`).join('')}
                     </div>
                     <div class="print-ans-key">Correct: <b>${ansLabel}</b></div>
+                    ${noteHtml}
                 </div>
             `);
         });
@@ -10029,6 +10035,7 @@ function applySettingsToDom() {
         document.documentElement.classList.remove('dark');
         localStorage.setItem('class_caddy_theme', 'light');
     }
+    updateAllChartsTheme();
 
     // Font Size (Apply to Study & View modals)
     ['mcq-study-content', 'view-mcq-content'].forEach(id => {
@@ -10764,47 +10771,7 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 
 // Helper to format MCQs for clipboard (FINAL FIX)
 function formatMcqsForClipboard(mcqs) {
-    const labels = ['a', 'b', 'c', 'd'];
-
-    return mcqs.map((mcq, index) => {
-        // 1. Format Options
-        const optionsText = mcq.options.map((opt, i) => {
-            return `${labels[i]}. ${opt}`;
-        }).join('\n');
-
-        // 2. Format Correct Answer
-        let answerLine = "";
-        let cleanAnswer = mcq.correctAnswer ? String(mcq.correctAnswer).trim() : "";
-        
-        // Check if answer is a single letter (a, b, c, d) with optional dot/paren
-        const letterMatch = cleanAnswer.match(/^([a-d])[\.\)]?$/i);
-
-        if (letterMatch) {
-            // Case 1: Answer is just "a" -> "Correct answer: a"
-            answerLine = `Correct answer: ${letterMatch[1].toLowerCase()}`;
-        } 
-        else if (cleanAnswer) {
-            // Case 2: Answer is text "Apple" -> Try to find index
-            const idx = mcq.options.indexOf(cleanAnswer);
-            if (idx !== -1) {
-                answerLine = `Correct answer: ${labels[idx]}. ${cleanAnswer}`;
-            } else {
-                // Fallback: Just print the text
-                answerLine = `Correct answer: ${cleanAnswer}`;
-            }
-        } else {
-            // Case 3: No answer
-            answerLine = `Correct answer: ${mcq.explanation || 'Cancelled'}`;
-        }
-
-        // 3. Format Note
-        const noteText = mcq.note || mcq.explanation;
-        if (noteText && !answerLine.includes(noteText)) {
-            answerLine += `\nNote: ${noteText}`;
-        }
-
-        return `${index + 1}. ${mcq.question}\n${optionsText}\n${answerLine}`;
-    }).join('\n\n');
+    return formatMcqsForClipboardPlain(mcqs);
 }
 
 // Handler for Copy Buttons
@@ -10892,22 +10859,20 @@ async function saveWrongQuestionsToReview(resultData) {
     const wrongQuestions = resultData.questions.filter(q => q.isCorrect !== true);
 
     for (const q of wrongQuestions) {
-        // Create a unique ID based on the question text to prevent duplicates
-        // We use a simple base64 encode of the question text as the ID
-        // FIX: Replace '/' with '_' and '+' with '-' to make it safe for Firebase paths
-        const docId = btoa(unescape(encodeURIComponent(q.question)))
+        const normalized = normalizeMcqItem(q);
+        const plainStem = htmlToPlainText(normalized.question || q.question || '') || String(q.question || '');
+        // Create a unique ID based on the plain question text to prevent duplicates
+        // Replace '/' with '_' and '+' with '-' to make it safe for Firebase paths
+        const docId = btoa(unescape(encodeURIComponent(plainStem)))
             .replace(/\//g, '_')
             .replace(/\+/g, '-')
             .substring(0, 150); 
             
         const docRef = doc(reviewCollectionRef, docId);
 
+        const [storageCopy] = toStorageMcqList([normalized]);
         const reviewData = {
-            question: q.question,
-            options: q.options,
-            correctAnswer: q.correctAnswer,
-            explanation: q.explanation || null,
-            note: q.note || null,
+            ...storageCopy,
             subject: resultData.subjectName || 'General',
             title: resultData.topicDetail || 'Quiz',
             savedAt: Timestamp.now(),
@@ -11159,7 +11124,8 @@ function printAnswerScript(savedData = null) {
     let printContent = `
     <html>
     <head>
-        <title>${titleText}</title>
+        <title>${escapeHtml(titleText)}</title>
+        ${getPrintRichHeadHtml()}
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kalpurush&display=swap');
             body { font-family: 'Inter', 'Kalpurush', sans-serif; padding: 40px; color: #1f2937; line-height: 1.4; font-size: 12px; }
@@ -11217,7 +11183,7 @@ function printAnswerScript(savedData = null) {
             .opt.correct { background-color: #d1fae5; border-color: #10b981; color: #064e3b; font-weight: 600; }
             .opt.correct .opt-label { border-color: #059669; color: #064e3b; background: white; }
             .opt.wrong-choice { background-color: #fee2e2; border-color: #ef4444; color: #991b1b; }
-            .opt.wrong-choice .opt-content span:last-child { text-decoration: line-through; } 
+            .opt.wrong-choice .opt-content > span:last-child { text-decoration: line-through; } 
             .opt.wrong-choice .opt-label { border-color: #b91c1c; color: #b91c1c; background: white; }
             .opt.user-correct { border: 1px solid #059669; background-color: #d1fae5; }
             
@@ -11239,9 +11205,9 @@ function printAnswerScript(savedData = null) {
     <body>
         <div class="header">
             <div class="header-info">
-                <h1>${titleText}</h1>
-                <p>Date: ${dateStr}</p>
-                <p style="margin-bottom: 2px;">Candidate ID: ${currentUser ? (currentUser.email || currentUser.uid.substring(0,8)) : 'Guest'}</p>
+                <h1>${escapeHtml(titleText)}</h1>
+                <p>Date: ${escapeHtml(dateStr)}</p>
+                <p style="margin-bottom: 2px;">Candidate ID: ${escapeHtml(currentUser ? (currentUser.email || currentUser.uid.substring(0,8)) : 'Guest')}</p>
                 <img src="https://classcaddy.netlify.app/images/qr2.png" alt="Scan to Visit" style="display: block; width: 50px; height: 50px; margin: 0; border: 1px solid #e5e7eb; padding: 2px; border-radius: 4px;">
             </div>
             
@@ -11281,15 +11247,17 @@ function printAnswerScript(savedData = null) {
 
     // 4. Loop Questions
     questions.forEach((q, index) => {
-        printContent += `<div class="q-item"><div class="q-text">Q${index + 1}. ${q.question}</div>`;
+        printContent += `<div class="q-item"><div class="q-text">Q${index + 1}. ${renderMcqFieldHtml(q, 'question')}</div>`;
         
-        q.options.forEach((opt, i) => {
+        (q.options || []).forEach((opt, i) => {
             let className = 'opt';
             let badge = '';
             const label = String.fromCharCode(97 + i); 
 
-            const isCorrectAnswer = (opt === q.correctAnswer);
-            const isUserSelected = (opt === q.userAnswer);
+            const isCorrectAnswer = isOptionCorrect(q, i, opt);
+            const isUserSelected = (typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0)
+                ? (i === q.userAnswerIndex)
+                : (q.userAnswer !== null && q.userAnswer !== undefined && opt === q.userAnswer);
 
             if (isCorrectAnswer) className += ' correct';
             
@@ -11305,13 +11273,14 @@ function printAnswerScript(savedData = null) {
 
             printContent += `
             <div class="${className}">
-                <div class="opt-content"><span class="opt-label">${label}</span><span>${opt}</span></div>
+                <div class="opt-content"><span class="opt-label">${label}</span><span>${renderMcqFieldHtml(q, 'option', i)}</span></div>
                 ${badge}
             </div>`;
         });
 
-        if (q.note || q.explanation) {
-            printContent += `<div class="note"><strong>Note:</strong> ${q.note || q.explanation}</div>`;
+        if (q.noteHtml || q.note || q.explanationHtml || q.explanation) {
+            const fieldName = (q.noteHtml || q.note) ? 'note' : 'explanation';
+            printContent += `<div class="note"><strong>Note:</strong> ${renderMcqFieldHtml(q, fieldName)}</div>`;
         }
         printContent += `</div>`;
     });
@@ -11524,13 +11493,27 @@ window.__StudyPlanQuizBridge = {
                 weekId: currentMcqTarget?.weekId || null,
                 dayIndex: currentMcqTarget?.dayIndex ?? null,
                 rowIndex: currentMcqTarget?.rowIndex ?? null,
-                questions: mcqSource.map(q => ({
-                    question: q.question,
-                    options: Array.isArray(q.options) ? q.options.slice() : [],
-                    correctAnswer: q.correctAnswer || '',
-                    explanation: q.explanation || null,
-                    note: q.note || null
-                }))
+                questions: mcqSource.map(q => {
+                    const n = normalizeMcqItem(q);
+                    return {
+                        version: n.version,
+                        uid: n.uid,
+                        question: n.question,
+                        questionHtml: n.questionHtml,
+                        options: n.options.slice(),
+                        optionsHtml: n.optionsHtml.slice(),
+                        correctAnswer: n.correctAnswer,
+                        correctAnswerHtml: n.correctAnswerHtml,
+                        correctIndex: n.correctIndex,
+                        explanation: n.explanation || null,
+                        explanationHtml: n.explanationHtml || null,
+                        note: n.note || null,
+                        noteHtml: n.noteHtml || null,
+                        hasMath: n.hasMath,
+                        hasCode: n.hasCode,
+                        hasMedia: n.hasMedia
+                    };
+                })
             };
         }
 

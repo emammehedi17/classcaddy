@@ -2,6 +2,13 @@
 // Class Caddy — New Examination Module: Question Bank Aggregator & Filter Engine
 // ============================================================================
 
+import {
+    normalizeMcqItem,
+    getCanonicalCorrectIndex,
+    htmlToPlainText,
+    isOptionCorrect
+} from '../mcq-engine/schema.js';
+
 const BANGLA_REGEX = /[\u0980-\u09FF]/;
 const PREVIOUS_PAPER_KEYWORDS = [
     'bcs', 'previous', 'past paper', 'question bank', 'model test', 'preliminary',
@@ -9,11 +16,12 @@ const PREVIOUS_PAPER_KEYWORDS = [
 ];
 
 export function isBanglaText(text) {
-    return BANGLA_REGEX.test(String(text || ''));
+    return BANGLA_REGEX.test(htmlToPlainText(String(text || '')));
 }
 
 export function getLocalizedOptionLabel(index, questionText = '', options = []) {
-    const sample = String(questionText || '') + ' ' + (Array.isArray(options) ? options.join(' ') : '');
+    const plainOpts = Array.isArray(options) ? options.map(o => htmlToPlainText(o)).join(' ') : '';
+    const sample = `${htmlToPlainText(String(questionText || ''))} ${plainOpts}`;
     if (isBanglaText(sample)) {
         return ['ক', 'খ', 'গ', 'ঘ', 'ঙ'][index] || String(index + 1);
     }
@@ -21,7 +29,9 @@ export function getLocalizedOptionLabel(index, questionText = '', options = []) 
 }
 
 export function computeQuestionUid(qText, correctAnswer) {
-    const raw = `${String(qText || '').trim().toLowerCase()}||${String(correctAnswer || '').trim().toLowerCase()}`;
+    const cleanQ = htmlToPlainText(String(qText || '')).trim().toLowerCase();
+    const cleanA = htmlToPlainText(String(correctAnswer || '')).trim().toLowerCase();
+    const raw = `${cleanQ}||${cleanA}`;
     let hash = 2166136261;
     for (let i = 0; i < raw.length; i++) {
         hash ^= raw.charCodeAt(i);
@@ -39,9 +49,18 @@ export function shuffleArrayCopy(arr) {
     return copy;
 }
 
-export function processOptionsOrder(originalOptions, shouldAllowShuffle = true) {
-    const opts = Array.isArray(originalOptions) ? originalOptions.slice() : [];
-    if (!shouldAllowShuffle || opts.length <= 1) return opts;
+export function processOptionBundle(q, shouldAllowShuffle = true) {
+    const rawOptions = Array.isArray(q?.options) ? q.options.slice() : [];
+    const rawOptionsHtml = Array.isArray(q?.optionsHtml) ? q.optionsHtml.slice() : [];
+    const origCorrectIdx = getCanonicalCorrectIndex(q);
+
+    if (!shouldAllowShuffle || rawOptions.length <= 1) {
+        return {
+            options: rawOptions,
+            optionsHtml: rawOptionsHtml.length ? rawOptionsHtml : rawOptions.slice(),
+            correctIndex: origCorrectIdx
+        };
+    }
 
     const restrictedPhrases = [
         'both', 'all of the above', 'none of the above', 'a & b', 'b and c', 'c and d', 'none', 'all',
@@ -50,12 +69,33 @@ export function processOptionsOrder(originalOptions, shouldAllowShuffle = true) 
         'ক ও খ', 'খ ও গ', 'ক ও গ'
     ];
 
-    const hasRestricted = opts.some(opt => {
-        const lower = String(opt || '').toLowerCase();
+    const hasRestricted = rawOptions.some(opt => {
+        const lower = htmlToPlainText(String(opt || '')).toLowerCase();
         return restrictedPhrases.some(phrase => lower.includes(phrase.toLowerCase()));
     });
 
-    return hasRestricted ? opts : shuffleArrayCopy(opts);
+    const indices = rawOptions.map((_, i) => i);
+    const ordered = hasRestricted ? indices : shuffleArrayCopy(indices);
+
+    const options = ordered.map(i => rawOptions[i]);
+    const optionsHtml = ordered.map(i =>
+        (rawOptionsHtml[i] !== undefined && rawOptionsHtml[i] !== null && rawOptionsHtml[i] !== '')
+            ? rawOptionsHtml[i]
+            : rawOptions[i]
+    );
+
+    let newCorrectIndex = -1;
+    if (origCorrectIdx !== -1) {
+        newCorrectIndex = ordered.indexOf(origCorrectIdx);
+    } else if (q?.correctAnswer) {
+        newCorrectIndex = options.findIndex((o, idx) => isOptionCorrect({ ...q, options, optionsHtml }, idx, o));
+    }
+
+    return { options, optionsHtml, correctIndex: newCorrectIndex };
+}
+
+export function processOptionsOrder(originalOptions, shouldAllowShuffle = true) {
+    return processOptionBundle({ options: originalOptions }, shouldAllowShuffle).options;
 }
 
 export function formatMonthTitle(monthId, monthName) {
@@ -195,21 +235,34 @@ export async function buildStudyPlanRepository(bridge) {
 
                         const topicQuestions = [];
                         rowData.mcqData.forEach((mcq, qIdx) => {
-                            if (!mcq || !mcq.question) return;
-                            const uid = computeQuestionUid(mcq.question, mcq.correctAnswer);
+                            if (!mcq || (!mcq.question && !mcq.questionHtml)) return;
+                            const norm = normalizeMcqItem(mcq, qIdx);
+                            const uid = computeQuestionUid(norm.question, norm.correctAnswer);
                             const dedupKey = `${topicKey}::${uid}::${qIdx}`;
                             if (seenMcqInTopic.has(dedupKey)) return;
                             seenMcqInTopic.add(dedupKey);
 
                             const normalizedQ = {
+                                version: norm.version,
                                 uid,
                                 kind: 'mcq',
                                 serialIndex: serialOrderCounter++,
-                                question: String(mcq.question),
-                                options: Array.isArray(mcq.options) ? mcq.options.slice() : [],
-                                correctAnswer: mcq.correctAnswer || '',
-                                explanation: mcq.explanation || null,
-                                note: mcq.note || null,
+                                question: norm.question,
+                                questionHtml: norm.questionHtml,
+                                options: norm.options.slice(),
+                                optionsHtml: norm.optionsHtml.slice(),
+                                correctAnswer: norm.correctAnswer,
+                                correctAnswerHtml: norm.correctAnswerHtml,
+                                correctIndex: norm.correctIndex,
+                                explanation: norm.explanation || null,
+                                explanationHtml: norm.explanationHtml || null,
+                                note: norm.note || null,
+                                noteHtml: norm.noteHtml || null,
+                                hasMath: norm.hasMath,
+                                hasCode: norm.hasCode,
+                                hasMedia: norm.hasMedia,
+                                tags: norm.tags,
+                                sourceFormat: norm.sourceFormat,
                                 subjectKey: subjectEntry.key,
                                 subject: subjectEntry.name,
                                 topicKey,
@@ -331,16 +384,29 @@ export async function buildStudyPlanRepository(bridge) {
     if (launchContext && Array.isArray(launchContext.questions) && launchContext.questions.length > 0) {
         const inheritedSubjectName = launchContext.subjectName || 'Selected Quiz';
         const inheritedQuestions = launchContext.questions.map((q, idx) => {
-            const uid = computeQuestionUid(q.question, q.correctAnswer);
+            const norm = normalizeMcqItem(q, idx);
+            const uid = computeQuestionUid(norm.question, norm.correctAnswer);
             return {
+                version: norm.version,
                 uid,
                 kind: launchContext.quizKind || 'mcq',
                 serialIndex: idx,
-                question: String(q.question || ''),
-                options: Array.isArray(q.options) ? q.options.slice() : [],
-                correctAnswer: q.correctAnswer || '',
-                explanation: q.explanation || null,
-                note: q.note || null,
+                question: norm.question,
+                questionHtml: norm.questionHtml,
+                options: norm.options.slice(),
+                optionsHtml: norm.optionsHtml.slice(),
+                correctAnswer: norm.correctAnswer,
+                correctAnswerHtml: norm.correctAnswerHtml,
+                correctIndex: norm.correctIndex,
+                explanation: norm.explanation || null,
+                explanationHtml: norm.explanationHtml || null,
+                note: norm.note || null,
+                noteHtml: norm.noteHtml || null,
+                hasMath: norm.hasMath,
+                hasCode: norm.hasCode,
+                hasMedia: norm.hasMedia,
+                tags: norm.tags,
+                sourceFormat: norm.sourceFormat,
                 subjectKey: inheritedSubjectName.toLowerCase(),
                 subject: inheritedSubjectName,
                 topicKey: 'inherited::current',
@@ -375,19 +441,30 @@ export async function buildStudyPlanRepository(bridge) {
     const planUidSet = new Set(allQuestions.map(q => q.uid));
     const orphanedWrongQuestions = [];
     reviewQuestions.forEach((rq, idx) => {
-        if (!rq || !rq.question) return;
-        const uid = computeQuestionUid(rq.question, rq.correctAnswer);
+        if (!rq || (!rq.question && !rq.questionHtml)) return;
+        const norm = normalizeMcqItem(rq, idx);
+        const uid = computeQuestionUid(norm.question, norm.correctAnswer);
         if (planUidSet.has(uid)) return;
         planUidSet.add(uid);
         orphanedWrongQuestions.push({
+            version: norm.version,
             uid,
             kind: 'mcq',
             serialIndex: 100000 + idx,
-            question: rq.question,
-            options: Array.isArray(rq.options) ? rq.options.slice() : [],
-            correctAnswer: rq.correctAnswer || '',
-            explanation: rq.explanation || null,
-            note: rq.note || null,
+            question: norm.question,
+            questionHtml: norm.questionHtml,
+            options: norm.options.slice(),
+            optionsHtml: norm.optionsHtml.slice(),
+            correctAnswer: norm.correctAnswer,
+            correctAnswerHtml: norm.correctAnswerHtml,
+            correctIndex: norm.correctIndex,
+            explanation: norm.explanation || null,
+            explanationHtml: norm.explanationHtml || null,
+            note: norm.note || null,
+            noteHtml: norm.noteHtml || null,
+            hasMath: norm.hasMath,
+            hasCode: norm.hasCode,
+            hasMedia: norm.hasMedia,
             subjectKey: String(rq.subject || 'Review Mistakes').toLowerCase(),
             subject: rq.subject || 'Review Mistakes',
             topicKey: 'review::saved',
@@ -563,15 +640,23 @@ export function selectQuestionsForExam(repo, configState, bookmarkSet) {
 
     const requestedCount = Math.max(1, parseInt(configState.settings.questionCount, 10) || 25);
     const actualCount = Math.min(requestedCount, ordered.length);
-    const chosen = ordered.slice(0, actualCount).map((q, index) => ({
-        ...q,
-        examIndex: index,
-        options: processOptionsOrder(q.options, configState.settings.shuffleOptions !== false),
-        userAnswer: null,
-        isCorrect: null,
-        markedForReview: false,
-        answeredAtMs: null
-    }));
+    const chosen = ordered.slice(0, actualCount).map((q, index) => {
+        const bundle = processOptionBundle(q, configState.settings.shuffleOptions !== false);
+        return {
+            ...q,
+            examIndex: index,
+            options: bundle.options,
+            optionsHtml: bundle.optionsHtml,
+            correctIndex: bundle.correctIndex,
+            correctAnswer: bundle.correctIndex !== -1 ? bundle.options[bundle.correctIndex] : q.correctAnswer,
+            correctAnswerHtml: bundle.correctIndex !== -1 ? bundle.optionsHtml[bundle.correctIndex] : q.correctAnswerHtml,
+            userAnswer: null,
+            userAnswerIndex: null,
+            isCorrect: null,
+            markedForReview: false,
+            answeredAtMs: null
+        };
+    });
 
     return {
         totalEligible,

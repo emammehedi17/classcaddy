@@ -22,12 +22,61 @@ import {
 
 import {
     getLocalizedOptionLabel,
+    processOptionBundle,
     processOptionsOrder,
     shuffleArrayCopy,
     buildStudyPlanRepository,
     resolveInitialScopeFromContext,
     selectQuestionsForExam
 } from './exam-bank.js';
+
+import {
+    isOptionCorrect,
+    isUserSelectionCorrect,
+    htmlToPlainText,
+    getCanonicalCorrectIndex
+} from '../mcq-engine/schema.js';
+
+import { renderMcqFieldHtml } from '../mcq-engine/renderer.js';
+
+function getExamPrintRichHeadHtml() {
+    const katexCssUrls = [];
+    try {
+        document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+            if (link.href && /katex/i.test(link.href)) {
+                katexCssUrls.push(`<link rel="stylesheet" href="${link.href}">`);
+            }
+        });
+    } catch {
+        // Ignore stylesheet inspection issues
+    }
+    if (katexCssUrls.length === 0) {
+        katexCssUrls.push('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css">');
+    }
+    return `
+        ${katexCssUrls.join('\n')}
+        <style>
+            .cc-rich-content { line-height: 1.5; overflow-wrap: anywhere; word-break: break-word; }
+            .cc-rich-content.cc-rich-inline { display: inline; }
+            .cc-rich-content p { margin: 0.25em 0; }
+            .cc-rich-content p:first-child { margin-top: 0; }
+            .cc-rich-content p:last-child { margin-bottom: 0; }
+            .cc-rich-content img { max-width: 100%; height: auto; border-radius: 4px; margin: 4px 0; }
+            .cc-code-block { position: relative; margin: 4px 0; border: 1px solid #cbd5e1; border-radius: 4px; background: #f8fafc; overflow: hidden; }
+            .cc-code-lang { position: absolute; top: 2px; right: 5px; font-size: 8px; font-weight: 700; text-transform: uppercase; color: #475569; }
+            .cc-code-block pre { margin: 0; padding: 6px 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 9.5px; white-space: pre-wrap; word-break: break-word; color: #0f172a; }
+            .cc-inline-code, .cc-rich-content code:not(.hljs) { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; padding: 1px 4px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 3px; }
+            .cc-table-scroll { width: 100%; overflow-x: auto; margin: 4px 0; }
+            .cc-table-scroll table { width: 100%; border-collapse: collapse; font-size: 9.5px; }
+            .cc-table-scroll th, .cc-table-scroll td { border: 1px solid #cbd5e1; padding: 3px 5px; text-align: left; }
+            .hljs-comment, .hljs-quote { color: #64748b; font-style: italic; }
+            .hljs-keyword, .hljs-selector-tag { color: #7c3aed; font-weight: 600; }
+            .hljs-number, .hljs-literal, .hljs-variable { color: #0369a1; }
+            .hljs-string, .hljs-doctag { color: #047857; }
+            .hljs-title, .hljs-section { color: #b91c1c; font-weight: 600; }
+        </style>
+    `;
+}
 
 const EXAM_PRESETS = [
     {
@@ -245,7 +294,7 @@ class NewExamSystemController {
                 const idx = ({ '1': 0, 'a': 0, '2': 1, 'b': 1, '3': 2, 'c': 2, '4': 3, 'd': 3 })[key];
                 if (q.options[idx] !== undefined) {
                     e.preventDefault();
-                    this.handleAnswerSelect(this.run.currentIndex, q.options[idx]);
+                    this.handleAnswerSelect(this.run.currentIndex, q.options[idx], idx);
                 }
             } else if (key === 'arrowright') {
                 e.preventDefault();
@@ -459,6 +508,7 @@ class NewExamSystemController {
                 ...q,
                 examIndex: idx,
                 userAnswer: null,
+                userAnswerIndex: null,
                 isCorrect: null,
                 markedForReview: false
             })),
@@ -652,23 +702,30 @@ class NewExamSystemController {
         return cfg.mode === 'practice' || cfg.mode === 'timed-practice' || cfg.mode === 'untimed-practice';
     }
 
-    handleAnswerSelect(qIndex, optionText) {
+    handleAnswerSelect(qIndex, optionText, optIdx = null) {
         if (!this.run) return;
         const q = this.run.questions[qIndex];
         if (!q) return;
 
+        const pickedIdx = (typeof optIdx === 'number' && !Number.isNaN(optIdx) && optIdx >= 0) ? optIdx : null;
         const isInstant = this.isPracticeInstantMode();
         if (this.run.config.lockAnswer && q.userAnswer !== null) return;
         if (isInstant && q.userAnswer !== null) return;
 
+        const isSamePick = (pickedIdx !== null && typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0)
+            ? (pickedIdx === q.userAnswerIndex)
+            : (q.userAnswer === optionText);
+
         // Clicking same selected option in unlocked Exam Mode clears it
-        if (!isInstant && !this.run.config.lockAnswer && q.userAnswer === optionText) {
+        if (!isInstant && !this.run.config.lockAnswer && isSamePick) {
             q.userAnswer = null;
+            q.userAnswerIndex = null;
             q.isCorrect = null;
             playExamSound(this.run.config.soundEffects, 'select');
         } else {
             q.userAnswer = optionText;
-            q.isCorrect = q.correctAnswer ? (optionText === q.correctAnswer) : false;
+            q.userAnswerIndex = pickedIdx;
+            q.isCorrect = isUserSelectionCorrect(q, optionText, pickedIdx);
 
             if (isInstant) {
                 playExamSound(this.run.config.soundEffects, q.isCorrect ? 'correct' : 'wrong');
@@ -696,6 +753,7 @@ class NewExamSystemController {
         const q = this.run.questions[qIndex];
         if (!q || this.run.config.lockAnswer || this.isPracticeInstantMode()) return;
         q.userAnswer = null;
+        q.userAnswerIndex = null;
         q.isCorrect = null;
         this.persistActiveDraft();
         this.render();
@@ -779,8 +837,8 @@ class NewExamSystemController {
         const topicStatsMap = new Map();
 
         const analyzedQuestions = this.run.questions.map((q) => {
-            const answered = q.userAnswer !== null && q.userAnswer !== undefined && q.userAnswer !== '';
-            const isCorrect = answered ? (q.correctAnswer ? q.userAnswer === q.correctAnswer : false) : null;
+            const answered = (q.userAnswer !== null && q.userAnswer !== undefined && q.userAnswer !== '') || (typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0);
+            const isCorrect = answered ? isUserSelectionCorrect(q, q.userAnswer, q.userAnswerIndex) : null;
             if (q.markedForReview) markedCount++;
 
             let delta = unans;
@@ -924,14 +982,22 @@ class NewExamSystemController {
             cfg.timingType = 'unlimited';
         }
 
-        const prepared = (cfg.questionOrder === 'serial' ? pool : shuffleArrayCopy(pool)).map((q, idx) => ({
-            ...q,
-            examIndex: idx,
-            options: processOptionsOrder(q.options, cfg.shuffleOptions !== false),
-            userAnswer: null,
-            isCorrect: null,
-            markedForReview: false
-        }));
+        const prepared = (cfg.questionOrder === 'serial' ? pool : shuffleArrayCopy(pool)).map((q, idx) => {
+            const bundle = processOptionBundle(q, cfg.shuffleOptions !== false);
+            return {
+                ...q,
+                examIndex: idx,
+                options: bundle.options,
+                optionsHtml: bundle.optionsHtml,
+                correctIndex: bundle.correctIndex,
+                correctAnswer: bundle.correctIndex !== -1 ? bundle.options[bundle.correctIndex] : q.correctAnswer,
+                correctAnswerHtml: bundle.correctIndex !== -1 ? bundle.optionsHtml[bundle.correctIndex] : q.correctAnswerHtml,
+                userAnswer: null,
+                userAnswerIndex: null,
+                isCorrect: null,
+                markedForReview: false
+            };
+        });
 
         this.startExamination(prepared, {
             title: onlyIncorrect ? `Mistakes Practice — ${sourceResult.title}` : sourceResult.title,
@@ -951,25 +1017,30 @@ class NewExamSystemController {
         const rowsHtml = resultObj.questions.map((q, idx) => {
             const statusText = q.isCorrect === true ? 'Correct' : (q.userAnswer ? 'Wrong' : 'Skipped');
             const statusColor = q.isCorrect === true ? '#16a34a' : (q.userAnswer ? '#dc2626' : '#64748b');
+            const hasExp = Boolean(q.explanationHtml || q.explanation || q.noteHtml || q.note);
+            const expField = (q.explanationHtml || q.explanation) ? 'explanation' : 'note';
             return `
                 <div class="q-item">
                     <div class="q-top">
-                        <span><b>Q${idx + 1}.</b> ${esc(q.question)}</span>
-                        <span style="color:${statusColor}; font-weight:700; font-size:10px;">[${statusText} | ${q.markDelta >= 0 ? '+' : ''}${q.markDelta}]</span>
+                        <span><b>Q${idx + 1}.</b> ${renderMcqFieldHtml(q, 'question')}</span>
+                        <span style="color:${statusColor}; font-weight:700; font-size:10px; white-space:nowrap;">[${statusText} | ${q.markDelta >= 0 ? '+' : ''}${q.markDelta}]</span>
                     </div>
                     <div class="q-opts">
                         ${(q.options || []).map((opt, i) => {
                             const lbl = getLocalizedOptionLabel(i, q.question, q.options);
-                            const isRight = opt === q.correctAnswer;
-                            const isMine = opt === q.userAnswer;
-                            return `<div class="${isRight ? 'opt-ok' : (isMine ? 'opt-bad' : '')}"><b>${lbl}.</b> ${esc(opt)} ${isRight ? '✓' : (isMine ? '✗ (You)' : '')}</div>`;
+                            const isRight = isOptionCorrect(q, i, opt);
+                            const isMine = (typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0)
+                                ? (i === q.userAnswerIndex)
+                                : (q.userAnswer !== null && opt === q.userAnswer);
+                            return `<div class="${isRight ? 'opt-ok' : (isMine ? 'opt-bad' : '')}"><b>${lbl}.</b> ${renderMcqFieldHtml(q, 'option', i)} ${isRight ? '✓' : (isMine ? '✗ (You)' : '')}</div>`;
                         }).join('')}
                     </div>
-                    ${(q.explanation || q.note) ? `<div class="q-exp"><b>Explanation:</b> ${esc(q.explanation || q.note)}</div>` : ''}
+                    ${hasExp ? `<div class="q-exp"><b>Explanation:</b> ${renderMcqFieldHtml(q, expField)}</div>` : ''}
                 </div>`;
         }).join('');
 
         win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(resultObj.title)} — Answer Script</title>
+        ${getExamPrintRichHeadHtml()}
         <style>
             @page { size: A4; margin: 1.1cm; }
             body { font-family: 'Inter', 'Kalpurush', sans-serif; color: #0f172a; font-size: 11px; line-height: 1.45; }
@@ -1630,8 +1701,10 @@ class NewExamSystemController {
 
         const optionsHtml = (q.options || []).map((opt, oIdx) => {
             const label = getLocalizedOptionLabel(oIdx, q.question, q.options);
-            const isPicked = q.userAnswer === opt;
-            const isRight = q.correctAnswer && opt === q.correctAnswer;
+            const isPicked = (typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0)
+                ? (oIdx === q.userAnswerIndex)
+                : (q.userAnswer !== null && q.userAnswer === opt);
+            const isRight = isOptionCorrect(q, oIdx, opt);
 
             let cls = 'ex-opt-btn';
             if (isInstant && q.userAnswer !== null) {
@@ -1642,9 +1715,9 @@ class NewExamSystemController {
             }
 
             return `
-                <button type="button" class="${cls}" data-pick-q="${qIdx}" data-pick-opt="${esc(opt)}" ${isLocked ? 'disabled' : ''}>
+                <button type="button" class="${cls}" data-pick-q="${qIdx}" data-pick-opt="${esc(opt)}" data-pick-idx="${oIdx}" ${isLocked ? 'disabled' : ''}>
                     <span class="ex-opt-bubble">${esc(label)}</span>
-                    <span style="flex:1; word-break:break-word;">${esc(opt)}</span>
+                    <span style="flex:1; min-width:0; word-break:break-word;">${renderMcqFieldHtml(q, 'option', oIdx)}</span>
                     ${oIdx < 4 ? `<span class="ex-kbd-hint">${oIdx + 1}</span>` : ''}
                 </button>
             `;
@@ -1653,14 +1726,19 @@ class NewExamSystemController {
         let feedbackHtml = '';
         if (isInstant && q.userAnswer !== null) {
             const ok = q.isCorrect === true;
-            const expText = q.explanation || q.note;
+            const correctIdx = getCanonicalCorrectIndex(q);
+            const correctDisplayHtml = correctIdx !== -1
+                ? renderMcqFieldHtml(q, 'option', correctIdx)
+                : ((q.correctAnswerHtml || q.correctAnswer) ? renderMcqFieldHtml(q, 'correctAnswer') : 'N/A');
+            const hasExp = Boolean(q.explanationHtml || q.explanation || q.noteHtml || q.note);
+            const expField = (q.explanationHtml || q.explanation) ? 'explanation' : 'note';
             feedbackHtml = `
                 <div class="ex-feedback ${ok ? '' : 'bad'}">
-                    <div style="font-weight:700; margin-bottom:${expText ? '4px' : '0'};">
+                    <div style="font-weight:700; margin-bottom:${hasExp ? '4px' : '0'};">
                         <i class="fas ${ok ? 'fa-check-circle' : 'fa-times-circle'}" style="margin-right:6px;"></i>
-                        ${ok ? 'Correct Answer!' : `Incorrect · Correct Answer: ${esc(q.correctAnswer || 'N/A')}`}
+                        ${ok ? 'Correct Answer!' : `Incorrect · Correct Answer: ${correctDisplayHtml}`}
                     </div>
-                    ${expText ? `<div style="font-size:0.88rem;"><b>Explanation:</b> ${esc(expText)}</div>` : ''}
+                    ${hasExp ? `<div style="font-size:0.88rem;"><b>Explanation:</b> ${renderMcqFieldHtml(q, expField)}</div>` : ''}
                 </div>
             `;
         }
@@ -1704,7 +1782,7 @@ class NewExamSystemController {
                         ` : ''}
                     </div>
                 </div>
-                <div class="ex-q-text">${esc(q.question)}</div>
+                <div class="ex-q-text">${renderMcqFieldHtml(q, 'question')}</div>
                 <div class="ex-options">${optionsHtml}</div>
                 ${feedbackHtml}
                 ${navHtml}
@@ -1781,31 +1859,35 @@ class NewExamSystemController {
         const r = this.run;
         const bookletHtml = r.questions.map((q, idx) => {
             const isLocked = (r.config.lockAnswer && q.userAnswer !== null) || (isInstant && q.userAnswer !== null);
+            const hasExp = Boolean(q.explanationHtml || q.explanation || q.noteHtml || q.note);
+            const expField = (q.explanationHtml || q.explanation) ? 'explanation' : 'note';
             return `
                 <div class="ex-bk-q ${idx === r.currentIndex ? 'cur' : ''}" data-scroll-q="${idx}" data-focus-q="${idx}">
                     <b class="ex-num" style="color:var(--ex-muted);">${idx + 1}.</b>
-                    <div>
-                        <div style="font-weight:600; font-size:0.98rem; line-height:1.5;">${esc(q.question)}</div>
+                    <div style="min-width:0;">
+                        <div style="font-weight:600; font-size:0.98rem; line-height:1.5;">${renderMcqFieldHtml(q, 'question')}</div>
                         <div class="ex-bk-opts">
                             ${(q.options || []).map((opt, oIdx) => {
                                 const lbl = getLocalizedOptionLabel(oIdx, q.question, q.options);
-                                const isPicked = q.userAnswer === opt;
-                                const isRight = q.correctAnswer && opt === q.correctAnswer;
+                                const isPicked = (typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0)
+                                    ? (oIdx === q.userAnswerIndex)
+                                    : (q.userAnswer !== null && q.userAnswer === opt);
+                                const isRight = isOptionCorrect(q, oIdx, opt);
                                 let cls = 'ex-bk-opt';
                                 if (isInstant && q.userAnswer !== null) {
                                     if (isRight) cls += ' right';
                                     else if (isPicked) cls += ' wrong';
                                 } else if (isPicked) cls += ' picked';
                                 return `
-                                    <div class="${cls}" ${isLocked ? '' : `data-pick-q="${idx}" data-pick-opt="${esc(opt)}"`}>
+                                    <div class="${cls}" ${isLocked ? '' : `data-pick-q="${idx}" data-pick-opt="${esc(opt)}" data-pick-idx="${oIdx}"`}>
                                         <span>(${esc(lbl)})</span>
-                                        <span>${esc(opt)}</span>
+                                        <span style="min-width:0;">${renderMcqFieldHtml(q, 'option', oIdx)}</span>
                                     </div>
                                 `;
                             }).join('')}
                         </div>
-                        ${(isInstant && q.userAnswer !== null && (q.explanation || q.note)) ? `
-                            <div style="margin-top:6px; font-size:0.82rem; color:var(--ex-good);"><b>Explanation:</b> ${esc(q.explanation || q.note)}</div>
+                        ${(isInstant && q.userAnswer !== null && hasExp) ? `
+                            <div style="margin-top:6px; font-size:0.82rem; color:var(--ex-good);"><b>Explanation:</b> ${renderMcqFieldHtml(q, expField)}</div>
                         ` : ''}
                     </div>
                 </div>
@@ -1829,8 +1911,10 @@ class NewExamSystemController {
                             <button type="button" class="ex-omr-rno ex-num" data-go-q="${globalIdx}">${globalIdx + 1}</button>
                             ${(q.options || []).map((opt, oIdx) => {
                                 const lbl = getLocalizedOptionLabel(oIdx, q.question, q.options);
-                                const isPicked = q.userAnswer === opt;
-                                const isRight = q.correctAnswer && opt === q.correctAnswer;
+                                const isPicked = (typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0)
+                                    ? (oIdx === q.userAnswerIndex)
+                                    : (q.userAnswer !== null && q.userAnswer === opt);
+                                const isRight = isOptionCorrect(q, oIdx, opt);
                                 let cls = 'ex-ob';
                                 if (isInstant && q.userAnswer !== null) {
                                     if (isRight) cls += ' ok';
@@ -1838,7 +1922,7 @@ class NewExamSystemController {
                                 } else if (isPicked) {
                                     cls += ' on';
                                 }
-                                return `<button type="button" class="${cls}" data-pick-q="${globalIdx}" data-pick-opt="${esc(opt)}" ${isLocked ? 'disabled' : ''}>${esc(lbl)}</button>`;
+                                return `<button type="button" class="${cls}" data-pick-q="${globalIdx}" data-pick-opt="${esc(opt)}" data-pick-idx="${oIdx}" ${isLocked ? 'disabled' : ''}>${esc(lbl)}</button>`;
                             }).join('')}
                         </div>
                     `;
@@ -1886,7 +1970,7 @@ class NewExamSystemController {
             if (this.resultFilter === 'skip' && q.userAnswer !== null) return false;
             if (this.resultFilter === 'marked' && !q.markedForReview) return false;
             if (this.resultSubjectFilter !== 'all' && (q.subject || 'General') !== this.resultSubjectFilter) return false;
-            if (qSearchLower && !q.question.toLowerCase().includes(qSearchLower)) return false;
+            if (qSearchLower && !htmlToPlainText(q.questionHtml || q.question || '').toLowerCase().includes(qSearchLower)) return false;
             return true;
         });
 
@@ -2056,25 +2140,27 @@ class NewExamSystemController {
                                             </span>
                                         </div>
                                     </div>
-                                    <div style="font-weight:600; font-size:1.03rem; line-height:1.5;">${esc(q.question)}</div>
+                                    <div style="font-weight:600; font-size:1.03rem; line-height:1.5;">${renderMcqFieldHtml(q, 'question')}</div>
                                     <div class="ex-rv-opts">
                                         ${(q.options || []).map((opt, oIdx) => {
                                             const lbl = getLocalizedOptionLabel(oIdx, q.question, q.options);
-                                            const isRight = opt === q.correctAnswer;
-                                            const isMine = opt === q.userAnswer;
+                                            const isRight = isOptionCorrect(q, oIdx, opt);
+                                            const isMine = (typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0)
+                                                ? (oIdx === q.userAnswerIndex)
+                                                : (q.userAnswer !== null && opt === q.userAnswer);
                                             const oCls = isRight ? 'right' : (isMine ? 'wrong' : '');
                                             return `
                                                 <div class="ex-rv-opt ${oCls}">
                                                     <b>${esc(lbl)}.</b>
-                                                    <span style="flex:1;">${esc(opt)}</span>
+                                                    <span style="flex:1; min-width:0;">${renderMcqFieldHtml(q, 'option', oIdx)}</span>
                                                     ${isRight ? '<i class="fas fa-check"></i>' : (isMine ? '<i class="fas fa-times"></i>' : '')}
                                                 </div>
                                             `;
                                         }).join('')}
                                     </div>
-                                    ${(q.explanation || q.note) ? `
+                                    ${(q.explanationHtml || q.explanation || q.noteHtml || q.note) ? `
                                         <div style="font-size:0.86rem; background:var(--ex-sunk); padding:9px 12px; border-radius:4px; border-left:3px solid var(--ex-accent);">
-                                            <b>Explanation:</b> ${esc(q.explanation || q.note)}
+                                            <b>Explanation:</b> ${renderMcqFieldHtml(q, (q.explanationHtml || q.explanation) ? 'explanation' : 'note')}
                                         </div>
                                     ` : ''}
                                 </div>
@@ -2435,8 +2521,10 @@ class NewExamSystemController {
             el.addEventListener('click', () => {
                 const idx = parseInt(el.dataset.pickQ, 10);
                 const opt = el.dataset.pickOpt;
+                const optIdxRaw = el.dataset.pickIdx;
+                const optIdx = optIdxRaw !== undefined ? parseInt(optIdxRaw, 10) : null;
                 this.run.currentIndex = idx;
-                this.handleAnswerSelect(idx, opt);
+                this.handleAnswerSelect(idx, opt, Number.isNaN(optIdx) ? null : optIdx);
             });
         });
         this.root.querySelectorAll('[data-go-q]').forEach(btn => {
