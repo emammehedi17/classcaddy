@@ -11480,3 +11480,141 @@ document.addEventListener('keydown', (e) => {
             break;
     }
 });
+
+// --- BRIDGE FOR NEW BCS MATE-INSPIRED EXAMINATION MODULE ---
+// Exposes live context, Study Plan question repository access, and persistence helpers
+// cleanly without modifying or interfering with the Classic Test Module.
+window.__StudyPlanQuizBridge = {
+    getUserId: () => userId,
+    isGuestMode: () => Boolean(isGuestMode),
+    getDb: () => db,
+    preProcessVocab: (vocabData) => preProcessVocab(vocabData || []),
+    generateQuizData: (questionList, optionPool) => generateQuizData(questionList || [], optionPool || { allWords: [], allBanglaMeanings: [], allSynonyms: [], allAntonyms: [] }),
+    getLaunchContext: () => {
+        const subjectName = window.currentQuizSubjectInfo?.subjectName || 'Study Plan';
+        const topicDetail = window.currentQuizSubjectInfo?.topicDetail || '';
+
+        if (Array.isArray(currentVocabData) && currentVocabData.length > 0 && currentOptionPool) {
+            const generated = generateQuizData(currentVocabData, currentOptionPool);
+            return {
+                quizKind: 'vocab',
+                subjectName,
+                topicDetail,
+                title: topicDetail ? `${subjectName}: ${topicDetail}` : subjectName,
+                monthId: window.currentQuizSourceInfo?.monthId || null,
+                weekId: window.currentQuizSourceInfo?.weekId || null,
+                dayIndex: window.currentQuizSourceInfo?.dayIndex ?? null,
+                rowIndex: window.currentQuizSourceInfo?.rowIndex ?? null,
+                questions: generated
+            };
+        }
+
+        const mcqSource = (Array.isArray(currentSerialQuestions) && currentSerialQuestions.length > 0)
+            ? currentSerialQuestions
+            : (Array.isArray(currentMcqData) && currentMcqData.length > 0 ? currentMcqData : []);
+
+        if (mcqSource.length > 0) {
+            return {
+                quizKind: 'mcq',
+                quizType: currentMcqTarget?.quizType || null,
+                subjectName,
+                topicDetail,
+                title: topicDetail ? `${subjectName} — ${topicDetail}` : subjectName,
+                monthId: currentMcqTarget?.monthId || null,
+                weekId: currentMcqTarget?.weekId || null,
+                dayIndex: currentMcqTarget?.dayIndex ?? null,
+                rowIndex: currentMcqTarget?.rowIndex ?? null,
+                questions: mcqSource.map(q => ({
+                    question: q.question,
+                    options: Array.isArray(q.options) ? q.options.slice() : [],
+                    correctAnswer: q.correctAnswer || '',
+                    explanation: q.explanation || null,
+                    note: q.note || null
+                }))
+            };
+        }
+
+        return null;
+    },
+    fetchAllStudyPlanData: async () => {
+        if (!userId || !db) return [];
+        const plansPath = getUserPlansCollectionPath();
+        const monthsQuery = query(collection(db, plansPath), orderBy(documentId(), 'asc'));
+        const monthsSnap = await getDocs(monthsQuery);
+        const weekOrder = ['week1', 'week2', 'week3', 'week4'];
+
+        const monthPromises = monthsSnap.docs.map(async (monthDoc) => {
+            const monthId = monthDoc.id;
+            const monthData = monthDoc.data() || {};
+            const weeksSnap = await getDocs(collection(db, monthDoc.ref.path, 'weeks'));
+            const weeks = weeksSnap.docs
+                .map(wDoc => ({
+                    weekId: wDoc.id,
+                    days: Array.isArray(wDoc.data()?.days) ? wDoc.data().days : []
+                }))
+                .sort((a, b) => weekOrder.indexOf(a.weekId) - weekOrder.indexOf(b.weekId));
+
+            return {
+                monthId,
+                monthName: monthData.monthName || monthId,
+                weeks
+            };
+        });
+
+        return Promise.all(monthPromises);
+    },
+    fetchClassicQuizResults: async () => {
+        if (!userId || !db || isGuestMode) return [];
+        const snap = await getDocs(collection(db, getUserResultsCollectionPath()));
+        return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    },
+    fetchNewExamResults: async () => {
+        if (!userId || !db || isGuestMode) return [];
+        const snap = await getDocs(collection(db, `artifacts/${appId}/users/${userId}/examResults`));
+        return snap.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .sort((a, b) => (b.timestampMs || 0) - (a.timestampMs || 0));
+    },
+    saveNewExamResult: async (payload) => {
+        if (!userId || !db || isGuestMode) return null;
+        const docId = payload.attemptId || ('ex_' + Date.now());
+        await setDoc(doc(db, `artifacts/${appId}/users/${userId}/examResults`, docId), {
+            ...payload,
+            savedAt: Timestamp.now()
+        });
+        return docId;
+    },
+    deleteNewExamResult: async (docId) => {
+        if (!userId || !db || isGuestMode || !docId) return;
+        await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/examResults`, docId));
+    },
+    fetchReviewQuestions: async () => {
+        if (!userId || !db || isGuestMode) return [];
+        const snap = await getDocs(collection(db, `artifacts/${appId}/users/${userId}/reviewQuestions`));
+        return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    },
+    syncWrongQuestionsToReview: async (resultRecord) => {
+        if (!userId || !db || isGuestMode || !resultRecord) return;
+        await saveWrongQuestionsToReview({
+            wrongCount: resultRecord.wrongCount,
+            notAnsweredCount: resultRecord.unansweredCount,
+            subjectName: resultRecord.subjectSummary || 'Examination',
+            topicDetail: resultRecord.title || 'New Exam UI',
+            questions: resultRecord.questions || []
+        });
+    },
+    fetchExamBookmarks: async () => {
+        if (!userId || !db || isGuestMode) return [];
+        const snap = await getDoc(doc(db, `artifacts/${appId}/users/${userId}/settings`, 'examBookmarks'));
+        if (!snap.exists()) return [];
+        const ids = snap.data()?.ids;
+        return Array.isArray(ids) ? ids : [];
+    },
+    saveExamBookmarks: async (idsArray) => {
+        if (!userId || !db || isGuestMode) return;
+        await setDoc(doc(db, `artifacts/${appId}/users/${userId}/settings`, 'examBookmarks'), {
+            ids: Array.isArray(idsArray) ? idsArray : [],
+            updatedAt: Timestamp.now()
+        });
+    }
+};

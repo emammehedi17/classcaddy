@@ -113,7 +113,7 @@ function copyStaticAssetsPlugin(): Plugin {
 export default defineConfig(() => {
   // Automatically find all HTML files across all directories
   const htmlFiles = globSync('**/*.html', {
-    ignore: ['node_modules/**', 'dist/**', '.git/**', '.next/**'],
+    ignore: ['node_modules/**', 'dist/**', '.git/**', '.next/**', 'public/assets/aistudio/**'],
   }).reduce((acc, file) => {
     // Generate a unique, normalized entry name matching relative path without .html
     const relativePath = path.relative(__dirname, path.resolve(__dirname, file));
