@@ -243,7 +243,32 @@ async function runTests() {
   const currencyRendered = renderRichHtmlString('The ticket costs $50 or between $10 and $20.');
   assert.ok(!currencyRendered.includes('class="katex"'), 'Currency amounts must not be rendered as KaTeX');
 
-  console.log('✓ All 12 CAAB & HTML/JS Extraction regression test groups passed (200/200 CAAB questions verified)!');
+  // 13. Verify Old View (raw stored) and New Exam (reloaded/normalized) produce identical HTML with no double-escaping
+  stored.forEach((rawItem, idx) => {
+    const normItem = reloaded[idx];
+    assert.equal(renderMcqFieldHtml(normItem, 'question'), renderMcqFieldHtml(rawItem, 'question'), `Q#${idx + 1} question must match`);
+    assert.equal(renderMcqFieldHtml(normItem, 'explanation'), renderMcqFieldHtml(rawItem, 'explanation'), `Q#${idx + 1} explanation must match`);
+    assert.equal(renderMcqFieldHtml(normItem, 'note'), renderMcqFieldHtml(rawItem, 'note'), `Q#${idx + 1} note must match`);
+    (rawItem.options || []).forEach((_, oIdx) => {
+      assert.equal(renderMcqFieldHtml(normItem, 'option', oIdx), renderMcqFieldHtml(rawItem, 'option', oIdx), `Q#${idx + 1} option[${oIdx}] must match`);
+    });
+  });
+
+  // Also guard legacy pre-escaped tagless *Html objects (e.g. from earlier drafts/history)
+  const legacyDoubleRisk = {
+    question: `'ননীর পুতুল' বাগধারাটির অর্থ কি?`,
+    questionHtml: `&#039;ননীর পুতুল&#039; বাগধারাটির অর্থ কি?`,
+    options: [`All's well`, `"Quote"`],
+    optionsHtml: [`All&#039;s well`, `&quot;Quote&quot;`],
+    explanation: `অর্থ 'তা'`,
+    explanationHtml: `অর্থ &#039;তা&#039;`,
+  };
+  assert.ok(!renderMcqFieldHtml(legacyDoubleRisk, 'question').includes('&amp;#039;'));
+  assert.ok(!renderMcqFieldHtml(legacyDoubleRisk, 'option', 0).includes('&amp;#039;'));
+  assert.ok(!renderMcqFieldHtml(legacyDoubleRisk, 'option', 1).includes('&amp;quot;'));
+  assert.ok(!renderMcqFieldHtml(legacyDoubleRisk, 'explanation').includes('&amp;#039;'));
+
+  console.log('✓ All 13 CAAB & HTML/JS Extraction & Rendering regression test groups passed (200/200 CAAB questions verified)!');
 }
 
 runTests().catch((err) => {

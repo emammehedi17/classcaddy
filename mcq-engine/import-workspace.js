@@ -15,7 +15,7 @@ import {
   FIRESTORE_ROW_WARN_BYTES,
   FIRESTORE_DOC_HARD_LIMIT_BYTES,
 } from './schema.js';
-import { renderRichHtmlString, sanitizeRichHtml } from './renderer.js';
+import { renderRichHtmlString, renderMcqFieldHtml, sanitizeRichHtml } from './renderer.js';
 import { extractMcqsFromInput } from './extractor.js';
 
 function formatBytes(bytes) {
@@ -941,9 +941,11 @@ Correct answer: b`;
     const confLabel = item.confidence === 'high' ? 'High Confidence' : item.confidence === 'medium' ? 'Medium' : 'Needs Review';
     const confClass = `cc-conf-${item.confidence || 'manual'}`;
 
-    const qRendered = renderRichHtmlString(item.questionHtml || item.question);
+    const qRendered = renderMcqFieldHtml(item, 'question');
     const expSource = item.explanationHtml || item.explanation || item.noteHtml || item.note;
-    const expRendered = expSource ? renderRichHtmlString(expSource) : '';
+    const expRendered = expSource
+      ? renderMcqFieldHtml(item, (item.explanationHtml || item.explanation) ? 'explanation' : 'note')
+      : '';
 
     return `
       <div class="cc-mcq-card ${isNeedsReview ? 'needs-review' : ''} ${isDup ? 'is-duplicate' : ''}" data-card-idx="${idx}">
@@ -981,12 +983,12 @@ Correct answer: b`;
         <div class="text-sm font-medium">${qRendered}</div>
 
         <div class="cc-preview-options">
-          ${(item.optionsHtml || item.options || [])
-            .map((optHtml, oIdx) => {
+          ${(item.options || item.optionsHtml || [])
+            .map((_, oIdx) => {
               const isCorr = item.correctIndex === oIdx;
               const prefix = getOptionPrefixLabel(oIdx, item.question);
               return `<div class="cc-preview-opt ${isCorr ? 'correct' : ''}">
-                <span class="font-bold mr-1">${prefix}.</span>${renderRichHtmlString(optHtml, { inlineOnly: true })}
+                <span class="font-bold mr-1">${prefix}.</span>${renderMcqFieldHtml(item, 'option', oIdx)}
               </div>`;
             })
             .join('')}
@@ -1012,7 +1014,7 @@ Correct answer: b`;
   renderEditableCard(item, idx) {
     const qHtml = sanitizeRichHtml(item.questionHtml || escapeHtmlBasic(item.question || ''));
     const expHtml = sanitizeRichHtml(item.explanationHtml || item.noteHtml || escapeHtmlBasic(item.explanation || item.note || ''));
-    const optionsArr = item.optionsHtml?.length ? item.optionsHtml : item.options || [];
+    const optionsArr = (item.options || []).map((opt, oIdx) => (item.optionsHtml?.[oIdx] || escapeHtmlBasic(opt || '')));
 
     return `
       <div class="cc-mcq-card" style="border: 2px solid var(--cc-accent, #4f46e5);" data-card-idx="${idx}">

@@ -99,7 +99,7 @@ export function htmlToPlainText(input) {
 
 export function hasRichMarkup(str) {
   if (!str || typeof str !== 'string') return false;
-  return /<(b|strong|i|em|u|s|del|ins|mark|sup|sub|span|p|div|br|ul|ol|li|table|tr|td|th|pre|code|blockquote|img|math|a|h[1-6])\b[^>]*>/i.test(str);
+  return /<(b|strong|i|em|u|s|del|ins|mark|sup|sub|span|p|div|br|ul|ol|li|table|caption|colgroup|col|thead|tbody|tfoot|tr|td|th|pre|code|kbd|samp|small|hr|dl|dt|dd|figure|figcaption|details|summary|blockquote|img|math|semantics|mrow|mi|mn|mo|ms|mtext|mspace|msup|msub|msubsup|mfrac|msqrt|mroot|mstyle|a|h[1-6])\b[^>]*>/i.test(str);
 }
 
 export function hasLatexSyntax(str) {
@@ -289,16 +289,17 @@ export function normalizeMcqItem(raw, fallbackIdx = 0) {
   const item = raw && typeof raw === 'object' ? raw : {};
 
   // Question
-  const rawQuestionHtml = typeof item.questionHtml === 'string' && item.questionHtml.trim()
-    ? item.questionHtml.trim()
+  const candidateQHtml = typeof item.questionHtml === 'string' ? item.questionHtml.trim() : '';
+  const rawQuestionHtml = (candidateQHtml && hasRichMarkup(candidateQHtml))
+    ? candidateQHtml
     : (typeof item.question === 'string' && hasRichMarkup(item.question) ? item.question.trim() : '');
   const rawQuestionText = typeof item.questionText === 'string' && item.questionText.trim()
     ? item.questionText.trim()
-    : (typeof item.question === 'string'
+    : (typeof item.question === 'string' && item.question.trim()
         ? (hasRichMarkup(item.question) ? htmlToPlainText(item.question) : item.question.trim())
         : '');
-  const questionPlain = rawQuestionText || htmlToPlainText(rawQuestionHtml);
-  const questionHtml = rawQuestionHtml || (questionPlain ? escapeHtmlBasic(questionPlain).replace(/\n/g, '<br>') : '');
+  const questionPlain = rawQuestionText || htmlToPlainText(candidateQHtml || rawQuestionHtml);
+  const questionHtml = rawQuestionHtml || (/\r?\n/.test(questionPlain) ? escapeHtmlBasic(questionPlain).replace(/\r?\n/g, '<br>') : '');
 
   // Options
   const sourceOptions = Array.isArray(item.options) ? item.options : [];
@@ -310,19 +311,22 @@ export function normalizeMcqItem(raw, fallbackIdx = 0) {
   const optionsHtml = [];
   for (let i = 0; i < maxLen; i++) {
     const rawOpt = sourceOptions[i];
-    const rawOptHtml = typeof sourceOptionsHtml[i] === 'string' ? sourceOptionsHtml[i].trim() : '';
+    const candidateOptHtml = typeof sourceOptionsHtml[i] === 'string' ? sourceOptionsHtml[i].trim() : '';
+    const rawOptHtml = (candidateOptHtml && hasRichMarkup(candidateOptHtml)) ? candidateOptHtml : '';
     const rawOptText = typeof sourceOptionsText[i] === 'string' ? sourceOptionsText[i].trim() : '';
 
     let plain = rawOptText;
     if (!plain && rawOpt !== undefined && rawOpt !== null) {
       plain = hasRichMarkup(String(rawOpt)) ? htmlToPlainText(String(rawOpt)) : String(rawOpt).trim();
     }
-    if (!plain && rawOptHtml) {
-      plain = htmlToPlainText(rawOptHtml);
+    if (!plain && candidateOptHtml) {
+      plain = htmlToPlainText(candidateOptHtml);
     }
 
     const html = rawOptHtml ||
-      (typeof rawOpt === 'string' && hasRichMarkup(rawOpt) ? rawOpt.trim() : escapeHtmlBasic(plain).replace(/\n/g, '<br>'));
+      (typeof rawOpt === 'string' && hasRichMarkup(rawOpt)
+        ? rawOpt.trim()
+        : (/\r?\n/.test(plain) ? escapeHtmlBasic(plain).replace(/\r?\n/g, '<br>') : ''));
 
     if (plain || html) {
       optionsPlain.push(plain || htmlToPlainText(html));
@@ -331,22 +335,29 @@ export function normalizeMcqItem(raw, fallbackIdx = 0) {
   }
 
   // Note & Explanation
-  const rawExp = item.explanationHtml || item.explanation || item.noteHtml || item.note || '';
-  const rawNote = item.noteHtml || item.note || item.explanationHtml || item.explanation || '';
+  const candidateExpHtml = typeof item.explanationHtml === 'string' ? item.explanationHtml.trim() : '';
+  const candidateNoteHtml = typeof item.noteHtml === 'string' ? item.noteHtml.trim() : '';
+  const richExpHtml = (candidateExpHtml && hasRichMarkup(candidateExpHtml)) ? candidateExpHtml : '';
+  const richNoteHtml = (candidateNoteHtml && hasRichMarkup(candidateNoteHtml)) ? candidateNoteHtml : '';
 
-  const explanationHtml = typeof item.explanationHtml === 'string' && item.explanationHtml.trim()
-    ? item.explanationHtml.trim()
-    : (hasRichMarkup(rawExp) ? String(rawExp).trim() : (rawExp ? escapeHtmlBasic(String(rawExp).trim()).replace(/\n/g, '<br>') : ''));
+  const rawExp = richExpHtml || item.explanation || richNoteHtml || item.note || candidateExpHtml || candidateNoteHtml || '';
+  const rawNote = richNoteHtml || item.note || richExpHtml || item.explanation || candidateNoteHtml || candidateExpHtml || '';
+
   const explanationPlain = typeof item.explanationText === 'string' && item.explanationText.trim()
     ? item.explanationText.trim()
     : (rawExp ? htmlToPlainText(rawExp) : '');
+  const explanationHtml = richExpHtml ||
+    (hasRichMarkup(rawExp)
+      ? String(rawExp).trim()
+      : (/\r?\n/.test(explanationPlain) ? escapeHtmlBasic(explanationPlain).replace(/\r?\n/g, '<br>') : ''));
 
-  const noteHtml = typeof item.noteHtml === 'string' && item.noteHtml.trim()
-    ? item.noteHtml.trim()
-    : (hasRichMarkup(rawNote) ? String(rawNote).trim() : (rawNote ? escapeHtmlBasic(String(rawNote).trim()).replace(/\n/g, '<br>') : ''));
   const notePlain = typeof item.noteText === 'string' && item.noteText.trim()
     ? item.noteText.trim()
     : (rawNote ? htmlToPlainText(rawNote) : '');
+  const noteHtml = richNoteHtml ||
+    (hasRichMarkup(rawNote)
+      ? String(rawNote).trim()
+      : (/\r?\n/.test(notePlain) ? escapeHtmlBasic(notePlain).replace(/\r?\n/g, '<br>') : ''));
 
   // Correct index & answer resolution
   const probe = {
@@ -357,12 +368,15 @@ export function normalizeMcqItem(raw, fallbackIdx = 0) {
     correctAnswerHtml: item.correctAnswerHtml,
   };
   const correctIndex = getCanonicalCorrectIndex(probe);
+  const candidateCorrectHtml = typeof item.correctAnswerHtml === 'string' ? item.correctAnswerHtml.trim() : '';
   const correctAnswer = correctIndex !== -1
     ? optionsPlain[correctIndex]
-    : (item.correctAnswer ? htmlToPlainText(String(item.correctAnswer)) : '');
+    : (item.correctAnswer ? htmlToPlainText(String(item.correctAnswer)) : (candidateCorrectHtml ? htmlToPlainText(candidateCorrectHtml) : ''));
   const correctAnswerHtml = correctIndex !== -1
     ? optionsHtml[correctIndex]
-    : (item.correctAnswerHtml || (correctAnswer ? escapeHtmlBasic(correctAnswer).replace(/\n/g, '<br>') : ''));
+    : (hasRichMarkup(candidateCorrectHtml)
+        ? candidateCorrectHtml
+        : (typeof item.correctAnswer === 'string' && hasRichMarkup(item.correctAnswer) ? item.correctAnswer.trim() : ''));
 
   const warnings = Array.isArray(item.warnings) ? [...item.warnings] : [];
   const missingQuestion = !questionPlain && !hasMediaMarkup(questionHtml);

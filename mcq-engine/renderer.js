@@ -17,7 +17,7 @@
 import DOMPurify from 'dompurify';
 import katex from 'katex';
 import hljs from 'highlight.js/lib/common';
-import { escapeHtmlBasic, decodeHtmlEntities, htmlToPlainText, getOptionPrefixLabel } from './schema.js';
+import { escapeHtmlBasic, decodeHtmlEntities, htmlToPlainText, hasRichMarkup, getOptionPrefixLabel } from './schema.js';
 
 const ALLOWED_TAGS = [
   'p', 'br', 'div', 'span', 'b', 'strong', 'i', 'em', 'u', 's', 'del', 'ins',
@@ -507,7 +507,7 @@ export function renderRichHtmlString(value, options = {}) {
 
   const looksLikeHtml =
     !forcePlainText &&
-    /<(b|strong|i|em|u|s|del|ins|mark|sup|sub|span|p|div|br|ul|ol|li|table|tr|td|th|pre|code|blockquote|img|math|a|h[1-6]|script|iframe|svg)\b/i.test(str);
+    (hasRichMarkup(str) || /<(script|iframe|svg)\b/i.test(str));
 
   let hydrated;
   if (!looksLikeHtml) {
@@ -535,29 +535,45 @@ export function renderRichHtmlString(value, options = {}) {
  * Renders a specific field of a normalized or legacy MCQ object through the
  * universal rich renderer.
  */
+function pickPreferredMcqValue(htmlVal, plainVal) {
+  if (typeof htmlVal === 'string' && htmlVal.trim() && hasRichMarkup(htmlVal)) {
+    return htmlVal;
+  }
+  if (plainVal !== undefined && plainVal !== null && String(plainVal).trim() !== '') {
+    return String(plainVal);
+  }
+  if (typeof htmlVal === 'string' && htmlVal.trim()) {
+    return decodeHtmlEntities(htmlVal);
+  }
+  return '';
+}
+
 export function renderMcqFieldHtml(mcq, field = 'question', optIndex = 0, opts = {}) {
   if (!mcq) return '';
   if (field === 'question') {
-    const val = mcq.questionHtml || mcq.question || mcq.questionText || '';
+    const val = pickPreferredMcqValue(mcq.questionHtml, mcq.question || mcq.questionText || '');
     return renderRichHtmlString(val, opts);
   }
   if (field === 'option') {
-    const val =
-      (Array.isArray(mcq.optionsHtml) && mcq.optionsHtml[optIndex]) ||
-      (Array.isArray(mcq.options) && mcq.options[optIndex]) ||
-      '';
+    const optHtml = Array.isArray(mcq.optionsHtml) ? mcq.optionsHtml[optIndex] : '';
+    const optPlain = Array.isArray(mcq.options) ? mcq.options[optIndex] : '';
+    const val = pickPreferredMcqValue(optHtml, optPlain);
     return renderRichHtmlString(val, { inlineOnly: true, ...opts });
   }
   if (field === 'correctAnswer') {
-    const val = mcq.correctAnswerHtml || mcq.correctAnswer || '';
+    const val = pickPreferredMcqValue(mcq.correctAnswerHtml, mcq.correctAnswer);
     return renderRichHtmlString(val, { inlineOnly: true, ...opts });
   }
   if (field === 'explanation') {
-    const val = mcq.explanationHtml || mcq.explanation || mcq.noteHtml || mcq.note || '';
+    const val = (mcq.explanationHtml && hasRichMarkup(mcq.explanationHtml))
+      ? mcq.explanationHtml
+      : (mcq.explanation || pickPreferredMcqValue(mcq.noteHtml, mcq.note) || (mcq.explanationHtml ? decodeHtmlEntities(mcq.explanationHtml) : ''));
     return renderRichHtmlString(val, opts);
   }
   if (field === 'note') {
-    const val = mcq.noteHtml || mcq.note || mcq.explanationHtml || mcq.explanation || '';
+    const val = (mcq.noteHtml && hasRichMarkup(mcq.noteHtml))
+      ? mcq.noteHtml
+      : (mcq.note || pickPreferredMcqValue(mcq.explanationHtml, mcq.explanation) || (mcq.noteHtml ? decodeHtmlEntities(mcq.noteHtml) : ''));
     return renderRichHtmlString(val, opts);
   }
   return '';
