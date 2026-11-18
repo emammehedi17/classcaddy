@@ -815,11 +815,39 @@ class NewExamSystemController {
                     this.goToQuestion(qIndex + 1);
                 }
             }, isInstant ? 380 : 120);
-        } else if ((this.run.config.layout === 'omr' || this.run.config.layout === 'scroll') && !isInstant) {
+        } else if (this.run.config.layout === 'omr' || this.run.config.layout === 'scroll') {
             this.patchRunQuestionInPlace(qIndex);
         } else {
             this.render();
         }
+    }
+
+    renderQuestionFeedbackHtml(q) {
+        if (!q || q.userAnswer === null) return '';
+        const ok = q.isCorrect === true;
+        const correctIdx = getCanonicalCorrectIndex(q);
+        const correctDisplayHtml = correctIdx !== -1
+            ? renderMcqFieldHtml(q, 'option', correctIdx)
+            : ((q.correctAnswerHtml || q.correctAnswer) ? renderMcqFieldHtml(q, 'correctAnswer') : 'N/A');
+        const hasExp = Boolean(q.explanationHtml || q.explanation || q.noteHtml || q.note);
+        const expField = (q.explanationHtml || q.explanation) ? 'explanation' : 'note';
+        return `
+            <div class="ex-feedback ${ok ? '' : 'bad'}">
+                <div style="font-weight:700; margin-bottom:${hasExp ? '4px' : '0'};">
+                    <i class="fas ${ok ? 'fa-check-circle' : 'fa-times-circle'}" style="margin-right:6px;"></i>
+                    ${ok ? 'Correct Answer!' : `Incorrect · Correct Answer: ${correctDisplayHtml}`}
+                </div>
+                ${hasExp ? `<div style="font-size:0.88rem;"><b>Explanation:</b> ${renderMcqFieldHtml(q, expField)}</div>` : ''}
+            </div>
+        `;
+    }
+
+    renderBookletFeedbackHtml(q) {
+        if (!q || q.userAnswer === null) return '';
+        const hasExp = Boolean(q.explanationHtml || q.explanation || q.noteHtml || q.note);
+        if (!hasExp) return '';
+        const expField = (q.explanationHtml || q.explanation) ? 'explanation' : 'note';
+        return `<div style="margin-top:6px; font-size:0.82rem; color:var(--ex-good);"><b>Explanation:</b> ${renderMcqFieldHtml(q, expField)}</div>`;
     }
 
     patchRunQuestionInPlace(qIndex) {
@@ -827,12 +855,23 @@ class NewExamSystemController {
         const r = this.run;
         const q = r.questions[qIndex];
         if (!q) return;
+
+        const isInstant = this.isPracticeInstantMode(r.config);
+        const isLocked = Boolean((r.config.lockAnswer && q.userAnswer !== null) || (isInstant && q.userAnswer !== null));
+
+        // Capture card position before patching so any layout change never jumps the viewport
+        const scrollAnchorEl = this.root.querySelector(`[data-scroll-q="${qIndex}"]`);
+        const beforeTop = scrollAnchorEl ? scrollAnchorEl.getBoundingClientRect().top : null;
+        const bookletEl = this.root.querySelector('.ex-booklet');
+        const bookletScrollTop = bookletEl ? bookletEl.scrollTop : 0;
+
         const total = r.questions.length;
         const answeredCount = r.questions.filter(item => item.userAnswer !== null).length;
         const unansweredCount = total - answeredCount;
         const markedCount = r.questions.filter(item => item.markedForReview).length;
+        const correctCount = isInstant ? r.questions.filter(item => item.isCorrect === true).length : 0;
+        const wrongCount = isInstant ? r.questions.filter(item => item.userAnswer !== null && item.isCorrect === false).length : 0;
         const progressPct = total > 0 ? Math.round((answeredCount / total) * 100) : 0;
-        const isLocked = Boolean(r.config.lockAnswer && q.userAnswer !== null);
 
         // 1. Update top bar counters
         const ansBadge = this.root.querySelector('#ex-answered-badge');
@@ -840,7 +879,7 @@ class NewExamSystemController {
         const progFill = this.root.querySelector('#ex-progress-fill');
         if (progFill) progFill.style.width = `${progressPct}%`;
 
-        // 2. Update option buttons & OMR bubbles for this question
+        // 2. Update option buttons, booklet options & OMR bubbles for this question
         this.root.querySelectorAll(`[data-pick-q="${qIndex}"]`).forEach((btn) => {
             const oIdxRaw = btn.dataset.pickIdx;
             const oIdx = oIdxRaw !== undefined ? parseInt(oIdxRaw, 10) : -1;
@@ -848,25 +887,64 @@ class NewExamSystemController {
             const isPicked = (typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0)
                 ? (oIdx === q.userAnswerIndex)
                 : (q.userAnswer !== null && q.userAnswer === optVal);
+            const isRight = (oIdx >= 0) ? isOptionCorrect(q, oIdx, q.options?.[oIdx] ?? optVal) : false;
 
             if (btn.classList.contains('ex-ob')) {
-                btn.classList.toggle('on', isPicked);
+                if (isInstant && q.userAnswer !== null) {
+                    btn.classList.remove('on');
+                    btn.classList.toggle('ok', isRight);
+                    btn.classList.toggle('no', !isRight && isPicked);
+                } else {
+                    btn.classList.remove('ok', 'no');
+                    btn.classList.toggle('on', isPicked);
+                }
+                btn.disabled = isLocked;
+            } else if (btn.classList.contains('ex-opt-btn')) {
+                if (isInstant && q.userAnswer !== null) {
+                    btn.classList.remove('picked');
+                    btn.classList.toggle('right', isRight);
+                    btn.classList.toggle('wrong', !isRight && isPicked);
+                } else {
+                    btn.classList.remove('right', 'wrong');
+                    btn.classList.toggle('picked', isPicked);
+                }
                 btn.disabled = isLocked;
             } else {
-                btn.classList.toggle('picked', isPicked);
+                if (isInstant && q.userAnswer !== null) {
+                    btn.classList.remove('picked');
+                    btn.classList.toggle('right', isRight);
+                    btn.classList.toggle('wrong', !isRight && isPicked);
+                } else {
+                    btn.classList.remove('right', 'wrong');
+                    btn.classList.toggle('picked', isPicked);
+                }
                 if (btn.tagName === 'BUTTON') btn.disabled = isLocked;
             }
         });
 
-        // 3. Update active highlight (.cur) for OMR / Scroll rows
+        // 3. Reveal instant practice feedback & explanation inline without re-rendering page
+        const fbSlot = this.root.querySelector(`[data-feedback-slot="${qIndex}"]`);
+        if (fbSlot) {
+            fbSlot.innerHTML = isInstant ? this.renderQuestionFeedbackHtml(q) : '';
+        }
+        const bkFbSlot = this.root.querySelector(`[data-bk-feedback-slot="${qIndex}"]`);
+        if (bkFbSlot) {
+            bkFbSlot.innerHTML = isInstant ? this.renderBookletFeedbackHtml(q) : '';
+        }
+
+        // 4. Update active highlight (.cur) for OMR / Scroll rows
         this.root.querySelectorAll('[data-scroll-q].cur, .ex-omr-row.cur').forEach(el => el.classList.remove('cur'));
         this.root.querySelectorAll(`[data-scroll-q="${qIndex}"], .ex-omr-row[data-omr-q="${qIndex}"]`).forEach(el => el.classList.add('cur'));
 
-        // 4. Update palette sidebar button & legend counts without rebuilding cards
+        // 5. Update palette sidebar button & legend counts without rebuilding cards
         const palCard = this.root.querySelector('.ex-palette-card');
         if (palCard) {
             const palCount = palCard.querySelector('#ex-pal-answered-count');
             if (palCount) palCount.textContent = `${answeredCount}/${total}`;
+            const legOk = palCard.querySelector('#ex-leg-ok');
+            if (legOk) legOk.innerHTML = `<i class="ex-pal-dot ok"></i> Correct (${correctCount})`;
+            const legNo = palCard.querySelector('#ex-leg-no');
+            if (legNo) legNo.innerHTML = `<i class="ex-pal-dot no"></i> Wrong (${wrongCount})`;
             const legAns = palCard.querySelector('#ex-leg-ans');
             if (legAns) legAns.innerHTML = `<i class="ex-pal-dot ans"></i> Answered (${answeredCount})`;
             const legUnans = palCard.querySelector('#ex-leg-unans');
@@ -878,8 +956,27 @@ class NewExamSystemController {
             const palBtn = palCard.querySelector(`.ex-pal-btn[data-go-q="${qIndex}"]`);
             if (palBtn) {
                 palBtn.classList.add('cur');
-                palBtn.classList.toggle('ans', q.userAnswer !== null);
                 palBtn.classList.toggle('fl', Boolean(q.markedForReview));
+                if (isInstant) {
+                    palBtn.classList.remove('ans');
+                    palBtn.classList.toggle('ok', q.userAnswer !== null && q.isCorrect === true);
+                    palBtn.classList.toggle('no', q.userAnswer !== null && q.isCorrect === false);
+                } else {
+                    palBtn.classList.remove('ok', 'no');
+                    palBtn.classList.toggle('ans', q.userAnswer !== null);
+                }
+            }
+        }
+
+        // 6. Keep the clicked question pinned to its exact vertical position on screen
+        if (bookletEl) {
+            bookletEl.scrollTop = bookletScrollTop;
+        }
+        if (scrollAnchorEl && beforeTop !== null) {
+            const afterTop = scrollAnchorEl.getBoundingClientRect().top;
+            const delta = afterTop - beforeTop;
+            if (Math.abs(delta) > 1) {
+                this.root.scrollTop += delta;
             }
         }
     }
@@ -1243,6 +1340,12 @@ class NewExamSystemController {
     render() {
         if (!this.root) return;
 
+        const sameView = this._lastRenderedView === this.view;
+        const prevRootScrollTop = sameView ? this.root.scrollTop : 0;
+        const prevBookletScrollTop = sameView ? (this.root.querySelector('.ex-booklet')?.scrollTop || 0) : 0;
+        const prevOmrScrollTop = sameView ? (this.root.querySelector('.ex-omr-pane')?.scrollTop || 0) : 0;
+        const prevPalScrollTop = sameView ? (this.root.querySelector('.ex-palette-card')?.scrollTop || 0) : 0;
+
         const isRun = this.view === 'run' && this.run;
         const headerHtml = isRun ? '' : this.renderTopNavHtml();
 
@@ -1261,6 +1364,19 @@ class NewExamSystemController {
 
         this.root.innerHTML = `${headerHtml}${bodyHtml}`;
         this.bindViewEvents();
+        this._lastRenderedView = this.view;
+
+        if (sameView) {
+            this.root.scrollTop = prevRootScrollTop;
+            const booklet = this.root.querySelector('.ex-booklet');
+            if (booklet) booklet.scrollTop = prevBookletScrollTop;
+            const omrPane = this.root.querySelector('.ex-omr-pane');
+            if (omrPane) omrPane.scrollTop = prevOmrScrollTop;
+            const palCard = this.root.querySelector('.ex-palette-card');
+            if (palCard) palCard.scrollTop = prevPalScrollTop;
+        } else {
+            this.root.scrollTop = 0;
+        }
     }
 
     renderTopNavHtml() {
@@ -1949,25 +2065,7 @@ class NewExamSystemController {
             `;
         }).join('');
 
-        let feedbackHtml = '';
-        if (isInstant && q.userAnswer !== null) {
-            const ok = q.isCorrect === true;
-            const correctIdx = getCanonicalCorrectIndex(q);
-            const correctDisplayHtml = correctIdx !== -1
-                ? renderMcqFieldHtml(q, 'option', correctIdx)
-                : ((q.correctAnswerHtml || q.correctAnswer) ? renderMcqFieldHtml(q, 'correctAnswer') : 'N/A');
-            const hasExp = Boolean(q.explanationHtml || q.explanation || q.noteHtml || q.note);
-            const expField = (q.explanationHtml || q.explanation) ? 'explanation' : 'note';
-            feedbackHtml = `
-                <div class="ex-feedback ${ok ? '' : 'bad'}">
-                    <div style="font-weight:700; margin-bottom:${hasExp ? '4px' : '0'};">
-                        <i class="fas ${ok ? 'fa-check-circle' : 'fa-times-circle'}" style="margin-right:6px;"></i>
-                        ${ok ? 'Correct Answer!' : `Incorrect · Correct Answer: ${correctDisplayHtml}`}
-                    </div>
-                    ${hasExp ? `<div style="font-size:0.88rem;"><b>Explanation:</b> ${renderMcqFieldHtml(q, expField)}</div>` : ''}
-                </div>
-            `;
-        }
+        const feedbackHtml = isInstant ? this.renderQuestionFeedbackHtml(q) : '';
 
         const navHtml = showNavButtons ? `
             <div class="ex-q-nav">
@@ -2010,7 +2108,7 @@ class NewExamSystemController {
                 </div>
                 <div class="ex-q-text">${renderMcqFieldHtml(q, 'question')}</div>
                 <div class="ex-options">${optionsHtml}</div>
-                ${feedbackHtml}
+                <div data-feedback-slot="${qIdx}">${feedbackHtml}</div>
                 ${navHtml}
             </article>
         `;
@@ -2027,8 +2125,8 @@ class NewExamSystemController {
                 </div>
                 <div class="ex-pal-legend">
                     ${isInstant ? `
-                        <span><i class="ex-pal-dot ok"></i> Correct (${r.questions.filter(q => q.isCorrect === true).length})</span>
-                        <span><i class="ex-pal-dot no"></i> Wrong (${r.questions.filter(q => q.userAnswer !== null && q.isCorrect === false).length})</span>
+                        <span id="ex-leg-ok"><i class="ex-pal-dot ok"></i> Correct (${r.questions.filter(q => q.isCorrect === true).length})</span>
+                        <span id="ex-leg-no"><i class="ex-pal-dot no"></i> Wrong (${r.questions.filter(q => q.userAnswer !== null && q.isCorrect === false).length})</span>
                     ` : `
                         <span id="ex-leg-ans"><i class="ex-pal-dot ans"></i> Answered (${answeredCount})</span>
                     `}
@@ -2085,8 +2183,6 @@ class NewExamSystemController {
         const r = this.run;
         const bookletHtml = r.questions.map((q, idx) => {
             const isLocked = (r.config.lockAnswer && q.userAnswer !== null) || (isInstant && q.userAnswer !== null);
-            const hasExp = Boolean(q.explanationHtml || q.explanation || q.noteHtml || q.note);
-            const expField = (q.explanationHtml || q.explanation) ? 'explanation' : 'note';
             return `
                 <div class="ex-bk-q ${idx === r.currentIndex ? 'cur' : ''}" data-scroll-q="${idx}" data-focus-q="${idx}">
                     <b class="ex-num" style="color:var(--ex-muted);">${idx + 1}.</b>
@@ -2112,9 +2208,7 @@ class NewExamSystemController {
                                 `;
                             }).join('')}
                         </div>
-                        ${(isInstant && q.userAnswer !== null && hasExp) ? `
-                            <div style="margin-top:6px; font-size:0.82rem; color:var(--ex-good);"><b>Explanation:</b> ${renderMcqFieldHtml(q, expField)}</div>
-                        ` : ''}
+                        <div data-bk-feedback-slot="${idx}">${isInstant ? this.renderBookletFeedbackHtml(q) : ''}</div>
                     </div>
                 </div>
             `;
