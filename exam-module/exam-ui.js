@@ -40,6 +40,7 @@ import {
 import { renderMcqFieldHtml } from '../mcq-engine/renderer.js';
 
 function getExamPrintRichHeadHtml() {
+    const origin = (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : '';
     const katexCssUrls = [];
     try {
         document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
@@ -56,7 +57,24 @@ function getExamPrintRichHeadHtml() {
     return `
         ${katexCssUrls.join('\n')}
         <style>
-            .cc-rich-content { line-height: 1.5; overflow-wrap: anywhere; word-break: break-word; }
+            @font-face {
+                font-family: 'Inter';
+                font-weight: 100 900;
+                font-style: normal;
+                font-display: swap;
+                src: url('${origin}/fonts/font_1.woff2') format('woff2');
+                unicode-range: U+0000-024F, U+1E00-1EFF, U+2000-206F, U+FB00-FB06;
+            }
+            @font-face {
+                font-family: 'Kalpurush';
+                font-weight: 100 900;
+                font-style: normal;
+                font-display: swap;
+                src: url('${origin}/fonts/font_2.woff2') format('woff2');
+                unicode-range: U+0980-09FF, U+0964-0965, U+200C-200D, U+25CC;
+            }
+            .katex .mtext, .katex .mord.text { font-family: 'Kalpurush', KaTeX_Main, 'Times New Roman', serif !important; }
+            .cc-rich-content { font-family: 'Inter', 'Kalpurush', sans-serif; line-height: 1.5; overflow-wrap: anywhere; word-break: break-word; }
             .cc-rich-content.cc-rich-inline { display: inline; }
             .cc-rich-content p { margin: 0.25em 0; }
             .cc-rich-content p:first-child { margin-top: 0; }
@@ -64,8 +82,8 @@ function getExamPrintRichHeadHtml() {
             .cc-rich-content img { max-width: 100%; height: auto; border-radius: 4px; margin: 4px 0; }
             .cc-code-block { position: relative; margin: 4px 0; border: 1px solid #cbd5e1; border-radius: 4px; background: #f8fafc; overflow: hidden; }
             .cc-code-lang { position: absolute; top: 2px; right: 5px; font-size: 8px; font-weight: 700; text-transform: uppercase; color: #475569; }
-            .cc-code-block pre { margin: 0; padding: 6px 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 9.5px; white-space: pre-wrap; word-break: break-word; color: #0f172a; }
-            .cc-inline-code, .cc-rich-content code:not(.hljs) { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; padding: 1px 4px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 3px; }
+            .cc-code-block pre { margin: 0; padding: 6px 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Kalpurush', monospace; font-size: 9.5px; white-space: pre-wrap; word-break: break-word; color: #0f172a; }
+            .cc-inline-code, .cc-rich-content code:not(.hljs) { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Kalpurush', monospace; font-size: 0.9em; padding: 1px 4px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 3px; }
             .cc-table-scroll { width: 100%; overflow-x: auto; margin: 4px 0; }
             .cc-table-scroll table { width: 100%; border-collapse: collapse; font-size: 9.5px; }
             .cc-table-scroll th, .cc-table-scroll td { border: 1px solid #cbd5e1; padding: 3px 5px; text-align: left; }
@@ -743,8 +761,72 @@ class NewExamSystemController {
                     this.goToQuestion(qIndex + 1);
                 }
             }, isInstant ? 380 : 120);
+        } else if ((this.run.config.layout === 'omr' || this.run.config.layout === 'scroll') && !isInstant) {
+            this.patchRunQuestionInPlace(qIndex);
         } else {
             this.render();
+        }
+    }
+
+    patchRunQuestionInPlace(qIndex) {
+        if (!this.run || !this.root) return;
+        const r = this.run;
+        const q = r.questions[qIndex];
+        if (!q) return;
+        const total = r.questions.length;
+        const answeredCount = r.questions.filter(item => item.userAnswer !== null).length;
+        const unansweredCount = total - answeredCount;
+        const markedCount = r.questions.filter(item => item.markedForReview).length;
+        const progressPct = total > 0 ? Math.round((answeredCount / total) * 100) : 0;
+        const isLocked = Boolean(r.config.lockAnswer && q.userAnswer !== null);
+
+        // 1. Update top bar counters
+        const ansBadge = this.root.querySelector('#ex-answered-badge');
+        if (ansBadge) ansBadge.textContent = `Answered ${answeredCount}/${total}`;
+        const progFill = this.root.querySelector('#ex-progress-fill');
+        if (progFill) progFill.style.width = `${progressPct}%`;
+
+        // 2. Update option buttons & OMR bubbles for this question
+        this.root.querySelectorAll(`[data-pick-q="${qIndex}"]`).forEach((btn) => {
+            const oIdxRaw = btn.dataset.pickIdx;
+            const oIdx = oIdxRaw !== undefined ? parseInt(oIdxRaw, 10) : -1;
+            const optVal = btn.dataset.pickOpt;
+            const isPicked = (typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0)
+                ? (oIdx === q.userAnswerIndex)
+                : (q.userAnswer !== null && q.userAnswer === optVal);
+
+            if (btn.classList.contains('ex-ob')) {
+                btn.classList.toggle('on', isPicked);
+                btn.disabled = isLocked;
+            } else {
+                btn.classList.toggle('picked', isPicked);
+                if (btn.tagName === 'BUTTON') btn.disabled = isLocked;
+            }
+        });
+
+        // 3. Update active highlight (.cur) for OMR / Scroll rows
+        this.root.querySelectorAll('[data-scroll-q].cur, .ex-omr-row.cur').forEach(el => el.classList.remove('cur'));
+        this.root.querySelectorAll(`[data-scroll-q="${qIndex}"], .ex-omr-row[data-omr-q="${qIndex}"]`).forEach(el => el.classList.add('cur'));
+
+        // 4. Update palette sidebar button & legend counts without rebuilding cards
+        const palCard = this.root.querySelector('.ex-palette-card');
+        if (palCard) {
+            const palCount = palCard.querySelector('#ex-pal-answered-count');
+            if (palCount) palCount.textContent = `${answeredCount}/${total}`;
+            const legAns = palCard.querySelector('#ex-leg-ans');
+            if (legAns) legAns.innerHTML = `<i class="ex-pal-dot ans"></i> Answered (${answeredCount})`;
+            const legUnans = palCard.querySelector('#ex-leg-unans');
+            if (legUnans) legUnans.innerHTML = `<i class="ex-pal-dot"></i> Unanswered (${unansweredCount})`;
+            const legMarked = palCard.querySelector('#ex-leg-marked');
+            if (legMarked) legMarked.innerHTML = `<i class="ex-pal-dot fl"></i> Marked (${markedCount})`;
+
+            palCard.querySelectorAll('.ex-pal-btn.cur').forEach(b => b.classList.remove('cur'));
+            const palBtn = palCard.querySelector(`.ex-pal-btn[data-go-q="${qIndex}"]`);
+            if (palBtn) {
+                palBtn.classList.add('cur');
+                palBtn.classList.toggle('ans', q.userAnswer !== null);
+                palBtn.classList.toggle('fl', Boolean(q.markedForReview));
+            }
         }
     }
 
@@ -756,7 +838,11 @@ class NewExamSystemController {
         q.userAnswerIndex = null;
         q.isCorrect = null;
         this.persistActiveDraft();
-        this.render();
+        if (this.run.config.layout === 'omr' || this.run.config.layout === 'scroll') {
+            this.patchRunQuestionInPlace(qIndex);
+        } else {
+            this.render();
+        }
     }
 
     toggleMarkForReview(qIndex) {
@@ -765,14 +851,37 @@ class NewExamSystemController {
         if (!q) return;
         q.markedForReview = !q.markedForReview;
         this.persistActiveDraft();
-        this.render();
+        if (this.run.config.layout === 'scroll' && this.root) {
+            const markBtn = this.root.querySelector(`[data-mark-q="${qIndex}"]`);
+            if (markBtn) {
+                markBtn.style.cssText = q.markedForReview ? 'border-color:var(--ex-amber); color:var(--ex-amber); background:var(--ex-amber-soft);' : '';
+                markBtn.innerHTML = `<i class="fas fa-flag"></i> ${q.markedForReview ? 'Marked' : 'Mark'}`;
+            }
+            const palBtn = this.root.querySelector(`.ex-pal-btn[data-go-q="${qIndex}"]`);
+            if (palBtn) palBtn.classList.toggle('fl', Boolean(q.markedForReview));
+            const legMarked = this.root.querySelector('#ex-leg-marked');
+            if (legMarked) {
+                const markedCount = this.run.questions.filter(item => item.markedForReview).length;
+                legMarked.innerHTML = `<i class="ex-pal-dot fl"></i> Marked (${markedCount})`;
+            }
+        } else {
+            this.render();
+        }
     }
 
     async toggleBookmark(questionUid) {
         const isNowBookmarked = !this.bookmarks.has(questionUid);
         this.bookmarks = await toggleBookmarkPersist(this.getBridge(), questionUid, isNowBookmarked);
         this.showToast(isNowBookmarked ? 'Question bookmarked.' : 'Bookmark removed.');
-        this.render();
+        if (this.view === 'run' && this.run && this.run.config.layout === 'scroll' && this.root) {
+            const safeAttr = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(questionUid) : questionUid;
+            this.root.querySelectorAll(`[data-bookmark-uid="${safeAttr}"]`).forEach((btn) => {
+                btn.style.cssText = isNowBookmarked ? 'border-color:var(--ex-indigo); color:var(--ex-indigo); background:var(--ex-indigo-soft);' : '';
+                btn.innerHTML = `<i class="${isNowBookmarked ? 'fas' : 'far'} fa-bookmark"></i>`;
+            });
+        } else {
+            this.render();
+        }
     }
 
     goToQuestion(targetIdx) {
@@ -782,14 +891,18 @@ class NewExamSystemController {
 
         this.run.currentIndex = targetIdx;
         this.persistActiveDraft();
-        this.render();
 
-        if (this.run.config.layout === 'omr' || this.run.config.layout === 'scroll') {
+        if ((this.run.config.layout === 'omr' || this.run.config.layout === 'scroll') && this.root) {
+            this.root.querySelectorAll('[data-scroll-q].cur, .ex-omr-row.cur, .ex-pal-btn.cur').forEach(el => el.classList.remove('cur'));
+            this.root.querySelectorAll(`[data-scroll-q="${targetIdx}"], .ex-omr-row[data-omr-q="${targetIdx}"], .ex-pal-btn[data-go-q="${targetIdx}"]`).forEach(el => el.classList.add('cur'));
             requestAnimationFrame(() => {
                 const el = this.root?.querySelector(`[data-scroll-q="${targetIdx}"]`);
                 el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             });
+            return;
         }
+
+        this.render();
     }
 
     updateRunHeaderCounters() {
@@ -1606,7 +1719,7 @@ class NewExamSystemController {
                         <div style="min-width:0; flex:1 1 220px;">
                             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                                 <b style="font-size:1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:340px;">${esc(r.title)}</b>
-                                <span class="ex-tag ex-num">Answered ${answeredCount}/${total}</span>
+                                <span id="ex-answered-badge" class="ex-tag ex-num">Answered ${answeredCount}/${total}</span>
                                 <span id="ex-tab-switch-badge" class="ex-tag" style="color:var(--ex-red); border-color:var(--ex-red); display:${r.tabSwitches > 0 ? 'inline-flex' : 'none'};">${r.tabSwitches} tab switch${r.tabSwitches === 1 ? '' : 'es'}</span>
                             </div>
                         </div>
@@ -1637,7 +1750,7 @@ class NewExamSystemController {
                         </div>
                     </div>
                     <div class="ex-progress-track">
-                        <div class="ex-progress-fill" style="width:${progressPct}%;"></div>
+                        <div id="ex-progress-fill" class="ex-progress-fill" style="width:${progressPct}%;"></div>
                     </div>
                 </div>
             </div>
@@ -1797,17 +1910,17 @@ class NewExamSystemController {
             <aside class="ex-palette-card">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <b style="font-size:0.9rem;">Question Palette</b>
-                    <span class="ex-num" style="font-size:0.78rem; color:var(--ex-muted);">${answeredCount}/${r.questions.length}</span>
+                    <span id="ex-pal-answered-count" class="ex-num" style="font-size:0.78rem; color:var(--ex-muted);">${answeredCount}/${r.questions.length}</span>
                 </div>
                 <div class="ex-pal-legend">
                     ${isInstant ? `
                         <span><i class="ex-pal-dot ok"></i> Correct (${r.questions.filter(q => q.isCorrect === true).length})</span>
                         <span><i class="ex-pal-dot no"></i> Wrong (${r.questions.filter(q => q.userAnswer !== null && q.isCorrect === false).length})</span>
                     ` : `
-                        <span><i class="ex-pal-dot ans"></i> Answered (${answeredCount})</span>
+                        <span id="ex-leg-ans"><i class="ex-pal-dot ans"></i> Answered (${answeredCount})</span>
                     `}
-                    <span><i class="ex-pal-dot"></i> Unanswered (${unansweredCount})</span>
-                    <span><i class="ex-pal-dot fl"></i> Marked (${markedCount})</span>
+                    <span id="ex-leg-unans"><i class="ex-pal-dot"></i> Unanswered (${unansweredCount})</span>
+                    <span id="ex-leg-marked"><i class="ex-pal-dot fl"></i> Marked (${markedCount})</span>
                 </div>
                 <div class="ex-pal-grid">
                     ${r.questions.map((q, idx) => {
@@ -1907,7 +2020,7 @@ class NewExamSystemController {
                     const globalIdx = cIdx * chunkSize + localIdx;
                     const isLocked = (r.config.lockAnswer && q.userAnswer !== null) || (isInstant && q.userAnswer !== null);
                     return `
-                        <div class="ex-omr-row ${globalIdx === r.currentIndex ? 'cur' : ''}">
+                        <div class="ex-omr-row ${globalIdx === r.currentIndex ? 'cur' : ''}" data-omr-q="${globalIdx}">
                             <button type="button" class="ex-omr-rno ex-num" data-go-q="${globalIdx}">${globalIdx + 1}</button>
                             ${(q.options || []).map((opt, oIdx) => {
                                 const lbl = getLocalizedOptionLabel(oIdx, q.question, q.options);

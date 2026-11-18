@@ -381,6 +381,31 @@
             [progressChart, studyTimeDailyChart, studyTimeSubjectChart, studyTimeStackedChart].forEach(updateChartInstanceTheme);
         }
 
+        function getSelfHostedPrintFontsCss() {
+            const origin = (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : '';
+            return `
+                @font-face {
+                    font-family: 'Inter';
+                    font-weight: 100 900;
+                    font-style: normal;
+                    font-display: swap;
+                    src: url('${origin}/fonts/font_1.woff2') format('woff2');
+                    unicode-range: U+0000-024F, U+1E00-1EFF, U+2000-206F, U+FB00-FB06;
+                }
+                @font-face {
+                    font-family: 'Kalpurush';
+                    font-weight: 100 900;
+                    font-style: normal;
+                    font-display: swap;
+                    src: url('${origin}/fonts/font_2.woff2') format('woff2');
+                    unicode-range: U+0980-09FF, U+0964-0965, U+200C-200D, U+25CC;
+                }
+                .katex .mtext, .katex .mord.text {
+                    font-family: 'Kalpurush', KaTeX_Main, 'Times New Roman', serif !important;
+                }
+            `;
+        }
+
         function getPrintRichHeadHtml() {
             const katexCssUrls = [];
             try {
@@ -398,6 +423,8 @@
             return `
                 ${katexCssUrls.join('\n')}
                 <style>
+                    ${getSelfHostedPrintFontsCss()}
+                    body, .cc-rich-content { font-family: 'Inter', 'Kalpurush', sans-serif; }
                     .cc-rich-content { line-height: 1.55; overflow-wrap: anywhere; word-break: break-word; }
                     .cc-rich-content.cc-rich-inline { display: inline; }
                     .cc-rich-content p { margin: 0.25em 0; }
@@ -406,8 +433,8 @@
                     .cc-rich-content img { max-width: 100%; height: auto; border-radius: 4px; margin: 4px 0; }
                     .cc-code-block { position: relative; margin: 5px 0; border: 1px solid #cbd5e1; border-radius: 5px; background: #f8fafc; overflow: hidden; }
                     .cc-code-lang { position: absolute; top: 3px; right: 6px; font-size: 9px; font-weight: 700; text-transform: uppercase; color: #475569; }
-                    .cc-code-block pre { margin: 0; padding: 8px 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 10px; white-space: pre-wrap; word-break: break-word; color: #0f172a; }
-                    .cc-inline-code, .cc-rich-content code:not(.hljs) { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; padding: 1px 4px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 3px; }
+                    .cc-code-block pre { margin: 0; padding: 8px 10px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Kalpurush', monospace; font-size: 10px; white-space: pre-wrap; word-break: break-word; color: #0f172a; }
+                    .cc-inline-code, .cc-rich-content code:not(.hljs) { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Kalpurush', monospace; font-size: 0.9em; padding: 1px 4px; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 3px; }
                     .cc-table-scroll { width: 100%; overflow-x: auto; margin: 4px 0; }
                     .cc-table-scroll table { width: 100%; border-collapse: collapse; font-size: 10px; }
                     .cc-table-scroll th, .cc-table-scroll td { border: 1px solid #cbd5e1; padding: 4px 6px; text-align: left; }
@@ -469,70 +496,89 @@
         // --- END: ADD THIS LISTENER ---
         
 
-        // --- Header Navigation & Scroll Logic (from script.js) ---
+        // --- Header Navigation & Scroll Logic (batched reads/writes + rAF throttled) ---
+        let lastAppliedStickyHeaderHeight = -1;
         function updateStickyOffsets(effectiveHeaderHeight) {
-            // Update sticky progress bars
+            lastAppliedStickyHeaderHeight = effectiveHeaderHeight;
             const headerTopPx = `${effectiveHeaderHeight}px`;
+            const pendingWrites = [];
+
+            // Phase 1: Batch ALL DOM reads first (zero interleaved style writes)
             document.querySelectorAll('.sticky-progress-wrapper').forEach(bar => {
-                bar.style.top = headerTopPx;
+                pendingWrites.push([bar, headerTopPx]);
             });
 
-            // Update sticky day progress headers & timer rows, stacking below the weekly bar
             document.querySelectorAll('.week-section').forEach(weekSection => {
                 const weeklyBar = weekSection.querySelector('.sticky-progress-wrapper');
                 const weeklyBarHeight = weeklyBar ? weeklyBar.offsetHeight : 0;
                 const dayHeaderTop = effectiveHeaderHeight + weeklyBarHeight;
+                const dayHeaderTopPx = `${dayHeaderTop}px`;
 
                 weekSection.querySelectorAll('.day-section-header.sticky-day-row').forEach(dayHeader => {
-                    dayHeader.style.top = `${dayHeaderTop}px`;
-
+                    pendingWrites.push([dayHeader, dayHeaderTopPx]);
                     const daySection = dayHeader.closest('.day-section');
                     const timerRow = daySection ? daySection.querySelector('.day-timer-row.sticky-day-row') : null;
                     if (timerRow) {
-                        timerRow.style.top = `${dayHeaderTop + dayHeader.offsetHeight}px`;
+                        pendingWrites.push([timerRow, `${dayHeaderTop + dayHeader.offsetHeight}px`]);
                     }
                 });
             });
+
+            // Phase 2: Batch ALL DOM writes together (only when value actually changed)
+            for (let i = 0; i < pendingWrites.length; i++) {
+                const [el, topVal] = pendingWrites[i];
+                if (el.style.top !== topVal) {
+                    el.style.top = topVal;
+                }
+            }
         }
         window.updateStickyOffsets = updateStickyOffsets;
 
         if (pageHeader) {
             let lastScrollY = window.scrollY;
-            // const headerHeight = pageHeader.offsetHeight; // <-- REMOVED FROM HERE
+            let cachedHeaderHeight = pageHeader.offsetHeight || 65;
+            let stickyScrollRaf = null;
 
             const recalcSticky = () => {
-                const headerHeight = pageHeader.offsetHeight || 65;
+                cachedHeaderHeight = pageHeader.offsetHeight || 65;
                 const isHeaderHidden = pageHeader.classList.contains('header-hidden');
-                const effectiveHeaderHeight = isHeaderHidden ? 0 : headerHeight;
+                const effectiveHeaderHeight = isHeaderHidden ? 0 : cachedHeaderHeight;
                 updateStickyOffsets(effectiveHeaderHeight);
             };
             window.recalcSticky = recalcSticky;
-            window.addEventListener('resize', recalcSticky);
+            window.addEventListener('resize', () => {
+                cachedHeaderHeight = pageHeader.offsetHeight || 65;
+                recalcSticky();
+            }, { passive: true });
             // Initial calculation after render
             setTimeout(recalcSticky, 0);
 
             window.addEventListener('scroll', () => {
-                const headerHeight = pageHeader.offsetHeight || 65; // <-- ADDED HERE, INSIDE
-                
-                const currentScrollY = window.scrollY;
-                let isHeaderHidden = pageHeader.classList.contains('header-hidden'); // Get current state
+                if (stickyScrollRaf) return;
+                stickyScrollRaf = requestAnimationFrame(() => {
+                    stickyScrollRaf = null;
+                    const currentScrollY = window.scrollY;
+                    let isHeaderHidden = pageHeader.classList.contains('header-hidden');
 
-                if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                    // Scrolling DOWN: Hide header
-                    pageHeader.classList.add('header-hidden');
-                    isHeaderHidden = true;
-                } else if (currentScrollY < lastScrollY || currentScrollY <= 0) {
-                    // Scrolling UP (or at the top): Show header
-                    pageHeader.classList.remove('header-hidden');
-                    isHeaderHidden = false;
-                }
-                
-                lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+                    if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                        if (!isHeaderHidden) {
+                            pageHeader.classList.add('header-hidden');
+                            isHeaderHidden = true;
+                        }
+                    } else if (currentScrollY < lastScrollY || currentScrollY <= 0) {
+                        if (isHeaderHidden) {
+                            pageHeader.classList.remove('header-hidden');
+                            isHeaderHidden = false;
+                        }
+                    }
 
-                const effectiveHeaderHeight = isHeaderHidden ? 0 : headerHeight;
-                updateStickyOffsets(effectiveHeaderHeight);
-
-            });
+                    lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+                    const effectiveHeaderHeight = isHeaderHidden ? 0 : cachedHeaderHeight;
+                    if (effectiveHeaderHeight !== lastAppliedStickyHeaderHeight) {
+                        updateStickyOffsets(effectiveHeaderHeight);
+                    }
+                });
+            }, { passive: true });
         }
 
         if (academicDropdown && academicMenu && academicButton) {
@@ -2655,7 +2701,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 <style>
                     *{box-sizing:border-box;margin:0;padding:0;}
                     html,body{width:100%;height:auto;overflow:hidden;}
-                    body{background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;font-family:Inter,sans-serif;}
+                    ${getSelfHostedPrintFontsCss()}
+                    body{background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;font-family:'Inter','Kalpurush',sans-serif;}
                     .body{padding:10px 10px 8px;text-align:center;}
                     #mini-timer-subject{font-size:.65rem;color:#9ca3af;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
                     #mini-timer-session{font-family:monospace;font-size:2.2rem;font-weight:800;letter-spacing:.04em;line-height:1.1;}
@@ -3208,7 +3255,8 @@ function updateMonthUI(monthId, monthData, weeksData) {
                 <head>
                     <title>Study Time Report</title>
                     <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; color: #000; }
+                        ${getSelfHostedPrintFontsCss()}
+                        body { font-family: 'Inter', 'Kalpurush', sans-serif; padding: 20px; color: #000; }
                         h2 { text-align: center; color: #059669; }
                         h4 { text-align: center; color: #374151; margin-top: 20px; }
                         img { max-width: 100%; margin: 10px 0; }
@@ -6501,6 +6549,150 @@ async function updateWeeklyProgressUI(monthId, weekId, weekData = null) {
         return parsePlainTextMcqs(text || '').items;
     }
 
+	// --- SHARED PROGRESSIVE STUDY CARD RENDERER ---
+function buildStudyCardHtml(mcq, index, includeUserWrong = false) {
+    const correctIndex = getCanonicalCorrectIndex(mcq);
+    const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
+    const hasCorrect = correctIndex !== -1 || Boolean(mcq.correctAnswer || mcq.correctAnswerHtml);
+
+    let answerHtml = '';
+    if (hasCorrect) {
+        const correctBodyHtml = (correctIndex !== -1)
+            ? renderMcqFieldHtml(mcq, 'option', correctIndex)
+            : renderMcqFieldHtml(mcq, 'correctAnswer');
+        answerHtml = `
+            <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm answer-card-bg">
+                <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg"><i class="fas fa-check text-xs"></i></div>
+                <div class="font-semibold text-emerald-900 text-sm answer-text">Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${correctBodyHtml}</span></div>
+            </div>`;
+    } else {
+        const fallbackExp = (mcq.explanationHtml || mcq.explanation)
+            ? renderMcqFieldHtml(mcq, 'explanation')
+            : "No Answer Defined";
+        answerHtml = `
+            <div class="inline-flex items-center w-full sm:w-auto bg-amber-100 border border-amber-300 rounded-lg px-4 py-2 shadow-sm">
+                <div class="flex-shrink-0 bg-amber-200 rounded-full p-1 mr-3 text-amber-700"><i class="fas fa-exclamation text-xs"></i></div>
+                <div class="font-semibold text-amber-900 text-sm answer-text">Note: <span class="text-amber-800">${fallbackExp}</span></div>
+            </div>`;
+    }
+
+    let noteHtml = '';
+    if (mcq.noteHtml || mcq.note || (hasCorrect && (mcq.explanationHtml || mcq.explanation))) {
+        const fieldName = (mcq.noteHtml || mcq.note) ? 'note' : 'explanation';
+        noteHtml = `
+            <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800 explanation-text">
+                <span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${renderMcqFieldHtml(mcq, fieldName)}
+            </div>`;
+    }
+
+    let userWrongLabel = '';
+    if (includeUserWrong && mcq.userAnswer && !isUserSelectionCorrect(mcq, mcq.userAnswer, mcq.userAnswerIndex)) {
+        const wrongIndex = (typeof mcq.userAnswerIndex === 'number' && mcq.userAnswerIndex >= 0)
+            ? mcq.userAnswerIndex
+            : (mcq.options || []).indexOf(mcq.userAnswer);
+        const wrongOptLabel = (wrongIndex !== -1) ? getOptionLabel(wrongIndex, mcq.question) : '';
+        const wrongBodyHtml = (wrongIndex !== -1)
+            ? renderMcqFieldHtml(mcq, 'option', wrongIndex)
+            : renderRichHtmlString(mcq.userAnswer, { inlineOnly: true });
+        userWrongLabel = `<div class="text-xs text-red-600 font-bold mb-1"><i class="fas fa-times-circle mr-1"></i> You selected: ${wrongOptLabel ? wrongOptLabel + '. ' : ''}${wrongBodyHtml}</div>`;
+    }
+
+    return `
+        <div class="study-card">
+            <div class="study-question text-gray-900 font-medium">
+                <span class="text-indigo-600 font-bold mr-1">${index + 1}.</span>${renderMcqFieldHtml(mcq, 'question')}
+            </div>
+            <div class="study-options">
+                ${(mcq.options || []).map((opt, i) => `
+                    <div class="study-opt text-gray-900"><span class="font-bold text-black mr-2 cc-opt-label">${getOptionLabel(i, mcq.question)}.</span>${renderMcqFieldHtml(mcq, 'option', i)}</div>
+                `).join('')}
+            </div>
+            <div class="mt-4 pt-2 border-t border-dashed border-gray-200">
+                ${userWrongLabel}
+                ${answerHtml}
+                ${noteHtml}
+            </div>
+        </div>
+    `;
+}
+
+function renderMcqsProgressively(containerEl, mcqs, options = {}) {
+    if (!containerEl) return;
+    if (containerEl._ccBatchObserver) {
+        containerEl._ccBatchObserver.disconnect();
+        containerEl._ccBatchObserver = null;
+    }
+
+    const { includeUserWrong = false, initialBatch = 25, chunkBatch = 30 } = options;
+    const total = Array.isArray(mcqs) ? mcqs.length : 0;
+    if (total === 0) {
+        containerEl.innerHTML = '<div class="text-center py-10 text-gray-500">No questions found.</div>';
+        return;
+    }
+
+    let renderedCount = Math.min(initialBatch, total);
+    let initialHtml = '';
+    for (let i = 0; i < renderedCount; i++) {
+        initialHtml += buildStudyCardHtml(mcqs[i], i, includeUserWrong);
+    }
+
+    containerEl.innerHTML = initialHtml;
+
+    if (renderedCount >= total) {
+        return;
+    }
+
+    const footerEl = document.createElement('div');
+    footerEl.className = 'cc-batch-footer';
+    containerEl.appendChild(footerEl);
+
+    const appendRange = (countToAdd) => {
+        if (renderedCount >= total) return;
+        const end = Math.min(total, renderedCount + countToAdd);
+        let chunkHtml = '';
+        for (let i = renderedCount; i < end; i++) {
+            chunkHtml += buildStudyCardHtml(mcqs[i], i, includeUserWrong);
+        }
+        renderedCount = end;
+        footerEl.insertAdjacentHTML('beforebegin', chunkHtml);
+        updateFooter();
+    };
+
+    const updateFooter = () => {
+        const remaining = total - renderedCount;
+        if (remaining <= 0) {
+            if (containerEl._ccBatchObserver) {
+                containerEl._ccBatchObserver.disconnect();
+                containerEl._ccBatchObserver = null;
+            }
+            footerEl.remove();
+            return;
+        }
+        const nextCount = Math.min(chunkBatch, remaining);
+        footerEl.innerHTML = `
+            <span>Loaded <strong>${renderedCount}</strong> of <strong>${total}</strong> questions (${remaining} remaining)</span>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" class="action-button action-button-secondary text-xs cc-batch-next-btn">Load Next ${nextCount}</button>
+                <button type="button" class="action-button text-xs cc-batch-all-btn">Show All (${total})</button>
+            </div>
+        `;
+        footerEl.querySelector('.cc-batch-next-btn')?.addEventListener('click', () => appendRange(chunkBatch));
+        footerEl.querySelector('.cc-batch-all-btn')?.addEventListener('click', () => appendRange(total - renderedCount));
+    };
+
+    updateFooter();
+
+    if (typeof IntersectionObserver === 'function') {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries.some((e) => e.isIntersecting)) {
+                appendRange(chunkBatch);
+            }
+        }, { root: containerEl, rootMargin: '320px 0px' });
+        observer.observe(footerEl);
+        containerEl._ccBatchObserver = observer;
+    }
+}
+
 	// --- NEW HELPER: Shared Render Logic for View MCQ Modal ---
 function renderViewMcqUI(mcqData, mainTitleText, subTitleText, subjectName) {
     const viewMcqContent = document.getElementById('view-mcq-content');
@@ -6519,85 +6711,17 @@ function renderViewMcqUI(mcqData, mainTitleText, subTitleText, subjectName) {
     if (modalTitle) modalTitle.textContent = mainTitleText;
     if (subtitle) subtitle.textContent = subTitleText;
 
-    // 3. Render Content
+    // 3. Render Content progressively for instant modal open & smooth scroll
     if (!mcqData || mcqData.length < 1) {
         viewMcqContent.innerHTML = '<div class="text-center py-10 text-gray-500">No questions found.</div>';
         return;
     }
 
-    let html = '';
-    mcqData.forEach((mcq, index) => {
-        const correctIndex = getCanonicalCorrectIndex(mcq);
-        const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
-        const hasCorrect = correctIndex !== -1 || Boolean(mcq.correctAnswer || mcq.correctAnswerHtml);
-        
-        let answerHtml = '';
-        if (hasCorrect) {
-             const correctBodyHtml = (correctIndex !== -1)
-                 ? renderMcqFieldHtml(mcq, 'option', correctIndex)
-                 : renderMcqFieldHtml(mcq, 'correctAnswer');
-             answerHtml = `
-                <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm answer-card-bg">
-                    <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg"><i class="fas fa-check text-xs"></i></div>
-                    <div class="font-semibold text-emerald-900 text-sm answer-text">Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${correctBodyHtml}</span></div>
-                </div>`;
-        } else {
-             const fallbackExp = (mcq.explanationHtml || mcq.explanation)
-                 ? renderMcqFieldHtml(mcq, 'explanation')
-                 : "No Answer Defined";
-             answerHtml = `
-                <div class="inline-flex items-center w-full sm:w-auto bg-amber-100 border border-amber-300 rounded-lg px-4 py-2 shadow-sm">
-                    <div class="flex-shrink-0 bg-amber-200 rounded-full p-1 mr-3 text-amber-700"><i class="fas fa-exclamation text-xs"></i></div>
-                    <div class="font-semibold text-amber-900 text-sm answer-text">Note: <span class="text-amber-800">${fallbackExp}</span></div>
-                </div>`;
-        }
+    renderMcqsProgressively(viewMcqContent, mcqData, { includeUserWrong: true });
 
-        let noteHtml = '';
-        if (mcq.noteHtml || mcq.note || (hasCorrect && (mcq.explanationHtml || mcq.explanation))) {
-            const fieldName = (mcq.noteHtml || mcq.note) ? 'note' : 'explanation';
-            noteHtml = `
-                <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800 explanation-text">
-                    <span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${renderMcqFieldHtml(mcq, fieldName)}
-                </div>`;
-        }
+    // Apply settings immediately (Font size CSS var, Dark mode)
+    if (typeof applySettingsToDom === 'function') applySettingsToDom();
 
-        // Highlight User's Wrong Answer if available (Specific to Review Mode)
-        let userWrongLabel = '';
-        if (mcq.userAnswer && !isUserSelectionCorrect(mcq, mcq.userAnswer, mcq.userAnswerIndex)) {
-             const wrongIndex = (typeof mcq.userAnswerIndex === 'number' && mcq.userAnswerIndex >= 0)
-                 ? mcq.userAnswerIndex
-                 : (mcq.options || []).indexOf(mcq.userAnswer);
-             const wrongOptLabel = (wrongIndex !== -1) ? getOptionLabel(wrongIndex, mcq.question) : '';
-             const wrongBodyHtml = (wrongIndex !== -1)
-                 ? renderMcqFieldHtml(mcq, 'option', wrongIndex)
-                 : renderRichHtmlString(mcq.userAnswer, { inlineOnly: true });
-             userWrongLabel = `<div class="text-xs text-red-600 font-bold mb-1"><i class="fas fa-times-circle mr-1"></i> You selected: ${wrongOptLabel ? wrongOptLabel + '. ' : ''}${wrongBodyHtml}</div>`;
-        }
-
-        html += `
-            <div class="study-card">
-                <div class="study-question text-gray-900 font-medium">
-                    <span class="text-indigo-600 font-bold mr-1">${index + 1}.</span>${renderMcqFieldHtml(mcq, 'question')}
-                </div>
-                <div class="study-options">
-                    ${(mcq.options || []).map((opt, i) => `
-                        <div class="study-opt text-gray-900"><span class="font-bold text-black mr-2 cc-opt-label">${getOptionLabel(i, mcq.question)}.</span>${renderMcqFieldHtml(mcq, 'option', i)}</div>
-                    `).join('')}
-                </div>
-                <div class="mt-4 pt-2 border-t border-dashed border-gray-200">
-                    ${userWrongLabel}
-                    ${answerHtml}
-                    ${noteHtml} 
-                </div>
-            </div>
-        `;
-    });
-
-    viewMcqContent.innerHTML = html;
-    
-    // Apply settings immediately (Font size, Dark mode)
-    if(typeof applySettingsToDom === 'function') applySettingsToDom();
-    
     modal.style.display = 'block';
 }
 
@@ -8086,7 +8210,7 @@ window.toggleSummaryRow = function(btn) {
                 // 4. Define Styles (INCLUDES NEW SUMMARY CSS)
                 const styles = `
                     <style>
-                        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
+                        ${getSelfHostedPrintFontsCss()}
                         
                         @page {
                             size: A4 landscape;
@@ -9506,82 +9630,15 @@ window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
     }
 };
 
-// 3. Render the Cards (UPDATED: With Resizable Explanation)
+// 3. Render the Cards (Progressive batching + CSS var font scaling)
 function renderStudyView(mcqs) {
-    if (mcqs.length === 0) {
+    if (!mcqs || mcqs.length === 0) {
         mcqStudyContent.innerHTML = '<div class="text-center py-10 text-gray-500">No MCQs found here.</div>';
         return;
     }
 
-    let html = '';
-    mcqs.forEach((mcq, idx) => {
-        const correctIndex = getCanonicalCorrectIndex(mcq);
-        const correctLabel = (correctIndex !== -1) ? getOptionLabel(correctIndex, mcq.question) : '?';
-        const hasCorrect = correctIndex !== -1 || Boolean(mcq.correctAnswer || mcq.correctAnswerHtml);
-        
-        // --- 1. Answer Box (Green/Yellow) ---
-        let answerHtml = '';
-        if (hasCorrect) {
-             const correctBodyHtml = (correctIndex !== -1)
-                 ? renderMcqFieldHtml(mcq, 'option', correctIndex)
-                 : renderMcqFieldHtml(mcq, 'correctAnswer');
-             answerHtml = `
-                <div class="inline-flex items-center w-full sm:w-auto bg-emerald-100 border border-emerald-300 rounded-lg px-4 py-2 shadow-sm answer-card-bg">
-                    <div class="flex-shrink-0 bg-emerald-200 rounded-full p-1 mr-3 text-emerald-700 answer-icon-bg">
-                        <i class="fas fa-check text-xs"></i>
-                    </div>
-                    <div class="font-semibold text-emerald-900 text-sm answer-text">
-                        Correct: <span class="text-emerald-800 answer-label">${correctLabel}. ${correctBodyHtml}</span>
-                    </div>
-                </div>`;
-        } else {
-             const fallbackExp = (mcq.explanationHtml || mcq.explanation)
-                 ? renderMcqFieldHtml(mcq, 'explanation')
-                 : "No Answer Defined";
-             // Added 'answer-text' class here so it resizes too
-             answerHtml = `
-                <div class="inline-flex items-center w-full sm:w-auto bg-amber-100 border border-amber-300 rounded-lg px-4 py-2 shadow-sm">
-                    <div class="flex-shrink-0 bg-amber-200 rounded-full p-1 mr-3 text-amber-700"><i class="fas fa-exclamation text-xs"></i></div>
-                    <div class="font-semibold text-amber-900 text-sm answer-text">Note: <span class="text-amber-800">${fallbackExp}</span></div>
-                </div>`;
-        }
+    renderMcqsProgressively(mcqStudyContent, mcqs, { includeUserWrong: false });
 
-        // --- 2. Note/Explanation Box (Blue) ---
-        let noteHtml = '';
-        if (mcq.noteHtml || mcq.note || (hasCorrect && (mcq.explanationHtml || mcq.explanation))) {
-            const fieldName = (mcq.noteHtml || mcq.note) ? 'note' : 'explanation';
-            // Added 'explanation-text' class here
-            noteHtml = `
-                <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800 explanation-text">
-                    <span class="font-bold"><i class="fas fa-info-circle mr-1"></i> Explanation:</span> ${renderMcqFieldHtml(mcq, fieldName)}
-                </div>
-            `;
-        }
-
-        html += `
-            <div class="study-card">
-                <div class="study-question text-gray-900 font-medium">
-                    <span class="text-indigo-600 font-bold mr-1">${idx + 1}.</span>${renderMcqFieldHtml(mcq, 'question')}
-                </div>
-                
-                <div class="study-options">
-                    ${(mcq.options || []).map((opt, i) => `
-                        <div class="study-opt text-gray-900">
-                            <span class="font-bold text-black mr-2 cc-opt-label">${getOptionLabel(i, mcq.question)}.</span>
-                            ${renderMcqFieldHtml(mcq, 'option', i)}
-                        </div>
-                    `).join('')}
-                </div>
-
-                <div class="mt-4 pt-2 border-t border-dashed border-gray-200">
-                    ${answerHtml}
-                    ${noteHtml}
-                </div>
-            </div>
-        `;
-    });
-    mcqStudyContent.innerHTML = html;
-    
     // Apply current settings immediately
     applySettingsToDom();
 }
@@ -9684,7 +9741,6 @@ printStudyBtn.addEventListener('click', () => {
     const styles = `
         ${getPrintRichHeadHtml()}
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
             @page { size: A4; margin: 1cm; }
             body { font-family: 'Inter', 'Kalpurush', sans-serif; color: #1f2937; font-size: 11px; line-height: 1.3; }
             .mcq-print-wrapper { column-count: 2; column-gap: 2rem; column-rule: 1px solid #eee; }
@@ -9910,7 +9966,6 @@ if (viewMcqPrintBtn) {
         const styles = `
             ${getPrintRichHeadHtml()}
             <style>
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Kalpurush:wght@400;700&display=swap');
                 @page { size: A4; margin: 1cm; }
                 body { font-family: 'Inter', 'Kalpurush', sans-serif; color: #1f2937; font-size: 11px; line-height: 1.3; }
                 .mcq-print-wrapper { column-count: 2; column-gap: 2rem; column-rule: 1px solid #eee; }
@@ -10037,24 +10092,12 @@ function applySettingsToDom() {
     }
     updateAllChartsTheme();
 
-    // Font Size (Apply to Study & View modals)
+    // Font Size (Set CSS variable on containers instead of mutating hundreds of cards)
     ['mcq-study-content', 'view-mcq-content'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
-            // Base container font
+            el.style.setProperty('--cc-reader-font-size', `${globalSettings.fontSize}px`);
             el.style.fontSize = `${globalSettings.fontSize}px`;
-            
-            // Question
-            el.querySelectorAll('.study-question').forEach(q => q.style.fontSize = `${globalSettings.fontSize}px`);
-            
-            // Options
-            el.querySelectorAll('.study-opt').forEach(o => o.style.fontSize = `${globalSettings.fontSize * 0.95}px`);
-            
-            // Answers (Correct/Note)
-            el.querySelectorAll('.answer-text').forEach(a => a.style.fontSize = `${globalSettings.fontSize * 0.9}px`);
-            
-            // --- NEW: Explanation Text ---
-            el.querySelectorAll('.explanation-text').forEach(e => e.style.fontSize = `${globalSettings.fontSize * 0.9}px`);
         }
     });
 
@@ -10820,20 +10863,27 @@ const scrollBtn = document.getElementById('scroll-toggle-btn');
 if (scrollBtn) {
     const scrollIcon = scrollBtn.querySelector('i');
 
-    // 1. Monitor Scroll to change Icon
+    // 1. Monitor Scroll to change Icon (rAF throttled + passive + state-diffed)
+    let scrollBtnRaf = null;
+    let lastIsNearTop = null;
     window.addEventListener('scroll', () => {
-        // If we are near the top (less than 300px down)
-        if (window.scrollY < 300) {
-            scrollIcon.classList.remove('fa-arrow-up');
-            scrollIcon.classList.add('fa-arrow-down');
-            scrollBtn.title = "Scroll to Bottom";
-        } else {
-            // We are scrolled down, show Up arrow
-            scrollIcon.classList.remove('fa-arrow-down');
-            scrollIcon.classList.add('fa-arrow-up');
-            scrollBtn.title = "Scroll to Top";
-        }
-    });
+        if (scrollBtnRaf) return;
+        scrollBtnRaf = requestAnimationFrame(() => {
+            scrollBtnRaf = null;
+            const isNearTop = window.scrollY < 300;
+            if (isNearTop === lastIsNearTop) return;
+            lastIsNearTop = isNearTop;
+            if (isNearTop) {
+                scrollIcon.classList.remove('fa-arrow-up');
+                scrollIcon.classList.add('fa-arrow-down');
+                scrollBtn.title = "Scroll to Bottom";
+            } else {
+                scrollIcon.classList.remove('fa-arrow-down');
+                scrollIcon.classList.add('fa-arrow-up');
+                scrollBtn.title = "Scroll to Top";
+            }
+        });
+    }, { passive: true });
 
     // 2. Click Action
     scrollBtn.addEventListener('click', () => {
@@ -11127,7 +11177,6 @@ function printAnswerScript(savedData = null) {
         <title>${escapeHtml(titleText)}</title>
         ${getPrintRichHeadHtml()}
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Kalpurush&display=swap');
             body { font-family: 'Inter', 'Kalpurush', sans-serif; padding: 40px; color: #1f2937; line-height: 1.4; font-size: 12px; }
             
             /* Header Layout */

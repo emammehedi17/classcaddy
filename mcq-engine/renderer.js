@@ -341,10 +341,19 @@ function preprocessPlainTextInput(rawText, inlineOnly = false) {
  * <math>, <kbd>, <samp>, .katex, or .cc-math-fallback) and enhances <pre><code>
  * blocks + tables in sanitized HTML fragments.
  */
+let sharedDomParser = null;
+function getSharedDomParser() {
+  if (!sharedDomParser && typeof globalThis.DOMParser === 'function') {
+    sharedDomParser = new globalThis.DOMParser();
+  }
+  return sharedDomParser;
+}
+
 function hydrateLatexInHtmlFragment(safeHtml) {
   if (!safeHtml) return '';
 
-  if (typeof globalThis.DOMParser !== 'function') {
+  const parser = getSharedDomParser();
+  if (!parser) {
     // Node.js fallback: protect <pre> and <code> blocks before hydrating LaTeX
     const protectedBlocks = [];
     const masked = String(safeHtml).replace(/<(pre|code|math)\b[\s\S]*?<\/\1\s*>/gi, (m) => {
@@ -357,7 +366,6 @@ function hydrateLatexInHtmlFragment(safeHtml) {
   }
 
   try {
-    const parser = new globalThis.DOMParser();
     const doc = parser.parseFromString(`<div class="cc-root">${safeHtml}</div>`, 'text/html');
     const root = doc.body.firstElementChild;
     if (!root) return safeHtml;
@@ -483,11 +491,20 @@ function renderLatexInRawText(text) {
  * Accepts either rich HTML or plain text (optionally containing LaTeX / fenced code).
  * Guarantees sanitized, KaTeX + highlight.js hydrated HTML output wrapped safely.
  */
+const MAX_RENDER_CACHE = 2000;
+const renderHtmlCache = new Map();
+
 export function renderRichHtmlString(value, options = {}) {
   const { inlineOnly = false, forcePlainText = false } = options;
   if (value === null || value === undefined || value === '') return '';
 
   const str = String(value);
+  const cacheKey = `${inlineOnly ? '1' : '0'}|${forcePlainText ? '1' : '0'}|${str}`;
+  const cached = renderHtmlCache.get(cacheKey);
+  if (cached !== undefined) {
+    return cached;
+  }
+
   const looksLikeHtml =
     !forcePlainText &&
     /<(b|strong|i|em|u|s|del|ins|mark|sup|sub|span|p|div|br|ul|ol|li|table|tr|td|th|pre|code|blockquote|img|math|a|h[1-6]|script|iframe|svg)\b/i.test(str);
@@ -502,10 +519,16 @@ export function renderRichHtmlString(value, options = {}) {
     hydrated = hydrateLatexInHtmlFragment(clean);
   }
 
-  if (inlineOnly) {
-    return `<span class="cc-rich-content cc-rich-inline">${hydrated}</span>`;
+  const finalHtml = inlineOnly
+    ? `<span class="cc-rich-content cc-rich-inline">${hydrated}</span>`
+    : `<div class="cc-rich-content">${hydrated}</div>`;
+
+  if (renderHtmlCache.size >= MAX_RENDER_CACHE) {
+    const oldestKey = renderHtmlCache.keys().next().value;
+    if (oldestKey !== undefined) renderHtmlCache.delete(oldestKey);
   }
-  return `<div class="cc-rich-content">${hydrated}</div>`;
+  renderHtmlCache.set(cacheKey, finalHtml);
+  return finalHtml;
 }
 
 /**

@@ -48,6 +48,9 @@ export class McqImportWorkspace {
     this.isExtracting = false;
     this.abortController = null;
     this.lastFocusedEditor = null;
+    this.pageSize = 25;
+    this.renderLimit = 25;
+    this._footerRaf = null;
 
     this.renderShell();
     this.bindShellEvents();
@@ -64,6 +67,7 @@ export class McqImportWorkspace {
     this.selectedIndices = new Set(this.items.map((_, i) => i));
     this.editingIndex = -1;
     this.filterMode = 'all';
+    this.renderLimit = this.pageSize;
     this.saveMode = 'replace';
     this.fileQueue = [];
     this.fileReports = [];
@@ -370,6 +374,7 @@ Correct answer: b`;
     this.mountEl.querySelectorAll('[data-cc-filter]').forEach((btn) => {
       btn.addEventListener('click', () => {
         this.filterMode = btn.dataset.ccFilter;
+        this.renderLimit = this.pageSize;
         this.renderReviewSection();
       });
     });
@@ -380,8 +385,11 @@ Correct answer: b`;
       const clamped = Math.max(0, Math.min(this.items.length - 1, targetIdx));
       if (this.filterMode !== 'all' && this.filterMode !== 'samples') {
         this.filterMode = 'all';
-        this.renderReviewSection();
       }
+      if (this.filterMode === 'all' && clamped >= this.renderLimit) {
+        this.renderLimit = Math.min(this.items.length, clamped + 15);
+      }
+      this.renderReviewSection();
       const listEl = this.mountEl.querySelector('#cc-review-list');
       const cardEl = listEl?.querySelector(`[data-card-idx="${clamped}"]`);
       if (cardEl) {
@@ -400,14 +408,14 @@ Correct answer: b`;
       jumpToIndex(this.items.length - 1)
     );
 
-    // Bulk selection buttons
+    // Bulk selection buttons (update DOM in place without rebuilding all cards)
     this.mountEl.querySelector('#cc-select-all-btn')?.addEventListener('click', () => {
       this.items.forEach((_, idx) => this.selectedIndices.add(idx));
-      this.renderReviewSection();
+      this.syncCheckboxesAndCounts();
     });
     this.mountEl.querySelector('#cc-deselect-all-btn')?.addEventListener('click', () => {
       this.selectedIndices.clear();
-      this.renderReviewSection();
+      this.syncCheckboxesAndCounts();
     });
     this.mountEl.querySelector('#cc-skip-dups-btn')?.addEventListener('click', () => {
       this.items.forEach((it, idx) => {
@@ -418,6 +426,103 @@ Correct answer: b`;
       });
       this.renderReviewSection();
     });
+
+    // Delegated listeners for review card actions & batch pagination
+    const listEl = this.mountEl.querySelector('#cc-review-list');
+    if (listEl) {
+      listEl.addEventListener('change', (e) => {
+        const cb = e.target.closest('[data-cc-toggle]');
+        if (cb) {
+          const idx = parseInt(cb.dataset.ccToggle, 10);
+          if (cb.checked) this.selectedIndices.add(idx);
+          else this.selectedIndices.delete(idx);
+          this.syncSelectedStatOnly();
+          this.updateFooterCounts(true);
+          return;
+        }
+        const dupSel = e.target.closest('[data-cc-dup-res]');
+        if (dupSel) {
+          const idx = parseInt(dupSel.dataset.ccDupRes, 10);
+          const item = this.items[idx];
+          if (!item) return;
+          item.duplicateResolution = dupSel.value;
+          if (dupSel.value === 'skip') this.selectedIndices.delete(idx);
+          else this.selectedIndices.add(idx);
+          this.renderReviewSection();
+        }
+      });
+
+      listEl.addEventListener('click', (e) => {
+        const loadMoreBtn = e.target.closest('#cc-load-more-review-btn');
+        if (loadMoreBtn) {
+          this.renderLimit += 30;
+          this.renderReviewSection(true);
+          return;
+        }
+        const showAllBtn = e.target.closest('#cc-show-all-review-btn');
+        if (showAllBtn) {
+          this.renderLimit = this.items.length;
+          this.renderReviewSection(true);
+          return;
+        }
+
+        const upBtn = e.target.closest('[data-cc-move-up]');
+        if (upBtn) {
+          const idx = parseInt(upBtn.dataset.ccMoveUp, 10);
+          if (idx <= 0) return;
+          const [moved] = this.items.splice(idx, 1);
+          this.items.splice(idx - 1, 0, moved);
+          this.rebuildSelectionSwap(idx, idx - 1);
+          this.renderReviewSection(true);
+          return;
+        }
+
+        const downBtn = e.target.closest('[data-cc-move-down]');
+        if (downBtn) {
+          const idx = parseInt(downBtn.dataset.ccMoveDown, 10);
+          if (idx >= this.items.length - 1) return;
+          const [moved] = this.items.splice(idx, 1);
+          this.items.splice(idx + 1, 0, moved);
+          this.rebuildSelectionSwap(idx, idx + 1);
+          this.renderReviewSection(true);
+          return;
+        }
+
+        const dupBtn = e.target.closest('[data-cc-dup-item]');
+        if (dupBtn) {
+          const idx = parseInt(dupBtn.dataset.ccDupItem, 10);
+          const copy = normalizeMcqItem({ ...this.items[idx], uid: undefined }, this.items.length);
+          copy.duplicateStatus = 'none';
+          this.items.splice(idx + 1, 0, copy);
+          this.selectedIndices = new Set(this.items.map((_, i) => i));
+          this.renderLimit = Math.max(this.renderLimit, idx + 2);
+          this.renderReviewSection(true);
+          return;
+        }
+
+        const delBtn = e.target.closest('[data-cc-del]');
+        if (delBtn) {
+          const idx = parseInt(delBtn.dataset.ccDel, 10);
+          this.items.splice(idx, 1);
+          const nextSel = new Set();
+          this.selectedIndices.forEach((s) => {
+            if (s < idx) nextSel.add(s);
+            else if (s > idx) nextSel.add(s - 1);
+          });
+          this.selectedIndices = nextSel;
+          if (this.editingIndex === idx) this.editingIndex = -1;
+          else if (this.editingIndex > idx) this.editingIndex--;
+          this.renderReviewSection(true);
+          return;
+        }
+
+        const editBtn = e.target.closest('[data-cc-edit]');
+        if (editBtn) {
+          this.editingIndex = parseInt(editBtn.dataset.ccEdit, 10);
+          this.renderReviewSection(true);
+        }
+      });
+    }
 
     // Footer buttons
     this.mountEl.querySelector('#cc-workspace-cancel-btn')?.addEventListener('click', () => {
@@ -430,6 +535,25 @@ Correct answer: b`;
     this.mountEl.querySelector('#save-mcq-btn')?.addEventListener('click', () => {
       this.handleConfirmSave();
     });
+  }
+
+  syncSelectedStatOnly() {
+    const statsSel = this.mountEl.querySelector('#cc-review-stats');
+    if (statsSel && statsSel.children[1]) {
+      statsSel.children[1].textContent = `Selected: ${this.selectedIndices.size}`;
+    }
+  }
+
+  syncCheckboxesAndCounts() {
+    const listEl = this.mountEl.querySelector('#cc-review-list');
+    if (listEl) {
+      listEl.querySelectorAll('[data-cc-toggle]').forEach((cb) => {
+        const idx = parseInt(cb.dataset.ccToggle, 10);
+        cb.checked = this.selectedIndices.has(idx);
+      });
+    }
+    this.syncSelectedStatOnly();
+    this.updateFooterCounts(true);
   }
 
   setActiveTab(tab) {
@@ -648,6 +772,7 @@ Correct answer: b`;
         });
         this.editingIndex = -1;
         this.filterMode = 'all';
+        this.renderLimit = this.pageSize;
         this.saveMode = this.existingMcqs.length > 0 ? 'append' : 'replace';
         const modeSel = this.mountEl.querySelector('#cc-save-mode-select');
         if (modeSel) modeSel.value = this.saveMode;
@@ -689,25 +814,40 @@ Correct answer: b`;
     return toStorageMcqList(baseList);
   }
 
-  updateFooterCounts() {
+  updateFooterCounts(deferSizeCalc = false) {
     const finalItems = this.computeFinalOutputList();
     const confirmSpan = this.mountEl.querySelector('#cc-confirm-count');
     if (confirmSpan) confirmSpan.textContent = String(finalItems.length);
 
-    const bytes = estimateStorageBytes(finalItems);
-    const badge = this.mountEl.querySelector('#cc-payload-size-badge');
-    if (badge) {
-      let colorStyle = '';
-      if (bytes > FIRESTORE_DOC_HARD_LIMIT_BYTES) {
-        colorStyle = 'color: #ef4444; font-weight: 700;';
-      } else if (bytes > FIRESTORE_ROW_WARN_BYTES) {
-        colorStyle = 'color: #d97706; font-weight: 700;';
+    const applySizeBadge = () => {
+      const bytes = estimateStorageBytes(finalItems);
+      const badge = this.mountEl.querySelector('#cc-payload-size-badge');
+      if (badge) {
+        let colorStyle = '';
+        if (bytes > FIRESTORE_DOC_HARD_LIMIT_BYTES) {
+          colorStyle = 'color: #ef4444; font-weight: 700;';
+        } else if (bytes > FIRESTORE_ROW_WARN_BYTES) {
+          colorStyle = 'color: #d97706; font-weight: 700;';
+        }
+        badge.innerHTML = `<span style="${colorStyle}">Payload: ${formatBytes(bytes)}</span>`;
       }
-      badge.innerHTML = `<span style="${colorStyle}">Payload: ${formatBytes(bytes)}</span>`;
+    };
+
+    if (this._footerRaf) {
+      cancelAnimationFrame(this._footerRaf);
+      this._footerRaf = null;
+    }
+    if (deferSizeCalc && finalItems.length > 40) {
+      this._footerRaf = requestAnimationFrame(() => {
+        this._footerRaf = null;
+        applySizeBadge();
+      });
+    } else {
+      applySizeBadge();
     }
   }
 
-  renderReviewSection() {
+  renderReviewSection(preserveScroll = false) {
     this.renderValidationSummary();
 
     const statsEl = this.mountEl.querySelector('#cc-review-stats');
@@ -741,6 +881,8 @@ Correct answer: b`;
 
     if (!listEl) return;
 
+    const prevScrollTop = preserveScroll ? listEl.scrollTop : 0;
+
     const firstIdx = 0;
     const midIdx = Math.floor((total - 1) / 2);
     const lastIdx = Math.max(0, total - 1);
@@ -761,12 +903,35 @@ Correct answer: b`;
       return;
     }
 
-    listEl.innerHTML = visibleEntries
-      .map(({ item, idx }) => (idx === this.editingIndex ? this.renderEditableCard(item, idx) : this.renderPreviewCard(item, idx)))
-      .join('');
+    const limit = this.filterMode === 'samples' ? visibleEntries.length : this.renderLimit;
+    const slicedEntries = visibleEntries.slice(0, limit);
+    const remaining = Math.max(0, visibleEntries.length - slicedEntries.length);
+
+    let batchFooterHtml = '';
+    if (remaining > 0) {
+      const nextStep = Math.min(30, remaining);
+      batchFooterHtml = `
+        <div class="cc-batch-footer" style="margin: 4px 0 8px;">
+          <span>Showing <strong>${slicedEntries.length}</strong> of <strong>${visibleEntries.length}</strong> questions (${remaining} more)</span>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" class="cc-mini-btn" id="cc-load-more-review-btn">Load Next ${nextStep}</button>
+            <button type="button" class="cc-mini-btn" id="cc-show-all-review-btn">Show All (${visibleEntries.length})</button>
+          </div>
+        </div>
+      `;
+    }
+
+    listEl.innerHTML =
+      slicedEntries
+        .map(({ item, idx }) => (idx === this.editingIndex ? this.renderEditableCard(item, idx) : this.renderPreviewCard(item, idx)))
+        .join('') + batchFooterHtml;
+
+    if (preserveScroll) {
+      listEl.scrollTop = prevScrollTop;
+    }
 
     this.bindReviewCardEvents(listEl);
-    this.updateFooterCounts();
+    this.updateFooterCounts(true);
   }
 
   renderPreviewCard(item, idx) {
@@ -923,90 +1088,8 @@ Correct answer: b`;
   }
 
   bindReviewCardEvents(listEl) {
-    listEl.querySelectorAll('[data-cc-toggle]').forEach((cb) => {
-      cb.addEventListener('change', () => {
-        const idx = parseInt(cb.dataset.ccToggle, 10);
-        if (cb.checked) this.selectedIndices.add(idx);
-        else this.selectedIndices.delete(idx);
-        this.updateFooterCounts();
-        const statsSel = this.mountEl.querySelector('#cc-review-stats');
-        if (statsSel) {
-          // lightweight refresh without losing scroll
-          const secondTag = statsSel.children[1];
-          if (secondTag) secondTag.textContent = `Selected: ${this.selectedIndices.size}`;
-        }
-      });
-    });
-
-    listEl.querySelectorAll('[data-cc-dup-res]').forEach((sel) => {
-      sel.addEventListener('change', () => {
-        const idx = parseInt(sel.dataset.ccDupRes, 10);
-        const item = this.items[idx];
-        if (!item) return;
-        item.duplicateResolution = sel.value;
-        if (sel.value === 'skip') this.selectedIndices.delete(idx);
-        else this.selectedIndices.add(idx);
-        this.renderReviewSection();
-      });
-    });
-
-    listEl.querySelectorAll('[data-cc-move-up]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.ccMoveUp, 10);
-        if (idx <= 0) return;
-        const [moved] = this.items.splice(idx, 1);
-        this.items.splice(idx - 1, 0, moved);
-        this.rebuildSelectionSwap(idx, idx - 1);
-        this.renderReviewSection();
-      });
-    });
-
-    listEl.querySelectorAll('[data-cc-move-down]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.ccMoveDown, 10);
-        if (idx >= this.items.length - 1) return;
-        const [moved] = this.items.splice(idx, 1);
-        this.items.splice(idx + 1, 0, moved);
-        this.rebuildSelectionSwap(idx, idx + 1);
-        this.renderReviewSection();
-      });
-    });
-
-    listEl.querySelectorAll('[data-cc-dup-item]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.ccDupItem, 10);
-        const copy = normalizeMcqItem({ ...this.items[idx], uid: undefined }, this.items.length);
-        copy.duplicateStatus = 'none';
-        this.items.splice(idx + 1, 0, copy);
-        this.selectedIndices = new Set(this.items.map((_, i) => i));
-        this.renderReviewSection();
-      });
-    });
-
-    listEl.querySelectorAll('[data-cc-del]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.ccDel, 10);
-        this.items.splice(idx, 1);
-        const nextSel = new Set();
-        this.selectedIndices.forEach((s) => {
-          if (s < idx) nextSel.add(s);
-          else if (s > idx) nextSel.add(s - 1);
-        });
-        this.selectedIndices = nextSel;
-        if (this.editingIndex === idx) this.editingIndex = -1;
-        else if (this.editingIndex > idx) this.editingIndex--;
-        this.renderReviewSection();
-      });
-    });
-
-    listEl.querySelectorAll('[data-cc-edit]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        this.editingIndex = parseInt(btn.dataset.ccEdit, 10);
-        this.renderReviewSection();
-      });
-    });
-
-    // If an item is currently open in edit mode
+    // Card checkbox, duplicate, move, delete, edit actions are delegated on listEl in bindShellEvents().
+    // Only bind the inline rich editor when a card is open in edit mode.
     if (this.editingIndex !== -1) {
       const card = listEl.querySelector(`[data-card-idx="${this.editingIndex}"]`);
       if (card) this.bindActiveEditorEvents(card, this.editingIndex);

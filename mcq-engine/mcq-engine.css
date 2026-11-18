@@ -5,6 +5,7 @@
 
 /* --- 1. Universal Rich-Content Container (.cc-rich-content) --- */
 .cc-rich-content {
+  font-family: 'Inter', 'Kalpurush', 'Noto Naskh Arabic', sans-serif;
   line-height: 1.65;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -145,11 +146,16 @@
   font-size: 1.04em;
 }
 
+.cc-rich-content .katex .mtext,
+.cc-rich-content .katex .mord.text {
+  font-family: 'Kalpurush', KaTeX_Main, 'Times New Roman', serif;
+}
+
 .cc-math-fallback {
   display: inline-block;
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Kalpurush', monospace;
   font-size: 0.88em;
   background: var(--cc-surface-muted, #f1f5f9);
   border: 1px solid var(--cc-border, #cbd5e1);
@@ -159,7 +165,7 @@
 /* Inline Code */
 .cc-inline-code,
 .cc-rich-content code:not(.hljs) {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Kalpurush', monospace;
   font-size: 0.87em;
   padding: 0.12rem 0.38rem;
   border-radius: 5px;
@@ -200,7 +206,7 @@
   padding: 0.85rem 1rem;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Kalpurush', monospace;
   font-size: 0.84rem;
   line-height: 1.5;
   color: var(--cc-code-text, #1e293b);
@@ -336,7 +342,7 @@ html.dark .hljs-built_in { color: #5eead4; }
   border: 1px solid var(--cc-border, #cbd5e1);
   background: var(--cc-input-bg, #ffffff);
   color: var(--cc-text-primary, #0f172a);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Kalpurush', monospace;
   font-size: 0.84rem;
   line-height: 1.5;
   resize: vertical;
@@ -564,6 +570,9 @@ html.dark .cc-stat-tag.dup {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 190px;
+  contain: layout style;
 }
 
 .cc-mcq-card.needs-review {
@@ -718,7 +727,7 @@ html.dark .cc-conf-low { color: #fca5a5; }
   border: 1px solid var(--cc-border, #cbd5e1);
   background: var(--cc-input-bg, #ffffff);
   color: var(--cc-text-primary, #0f172a);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Kalpurush', monospace;
   font-size: 0.82rem;
 }
 

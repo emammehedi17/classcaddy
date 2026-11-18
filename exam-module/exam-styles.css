@@ -1523,6 +1523,9 @@ html.dark #new-exam-ui-root {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 190px;
+    contain: layout style;
 }
 
 .ex-rv-card.right { border-left-color: var(--ex-good); }
@@ -1565,8 +1568,7 @@ html.dark #new-exam-ui-root {
     position: fixed;
     inset: 0;
     z-index: 300;
-    background: rgba(15, 23, 42, 0.72);
-    backdrop-filter: blur(6px);
+    background: rgba(15, 23, 42, 0.78);
     display: grid;
     place-items: center;
     padding: 16px;
@@ -1612,7 +1614,15 @@ html.dark #new-exam-ui-root {
     max-width: 100%;
 }
 
+#new-exam-ui-root .ex-qcard,
+#new-exam-ui-root .ex-bk-q {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 190px;
+    contain: layout style;
+}
+
 #new-exam-ui-root .cc-rich-content {
+    font-family: 'Inter', 'Kalpurush', 'Noto Naskh Arabic', sans-serif;
     min-width: 0;
     max-width: 100%;
     overflow-wrap: anywhere;
