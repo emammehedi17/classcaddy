@@ -428,6 +428,73 @@ html.dark #new-exam-ui-root {
     color: var(--ex-accent);
 }
 
+.ex-section-toggle {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    padding: 4px 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: pointer;
+    text-align: left;
+    color: inherit;
+    font: inherit;
+}
+
+.ex-section-toggle:hover .ex-legend {
+    color: var(--ex-ink);
+}
+
+.ex-section-toggle-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.ex-collapse-summary {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--ex-ink);
+    background: var(--ex-sunk);
+    border: 1px solid var(--ex-line);
+    border-radius: 4px;
+    padding: 2px 8px;
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ex-collapse-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: 1px solid var(--ex-line-ui);
+    background: var(--ex-surface);
+    color: var(--ex-muted);
+    display: inline-grid;
+    place-items: center;
+    font-size: 0.76rem;
+    transition: border-color 0.15s, color 0.15s, transform 0.18s;
+}
+
+.ex-section-toggle:hover .ex-collapse-icon {
+    border-color: var(--ex-accent);
+    color: var(--ex-accent);
+}
+
+.ex-subject-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 /* Preset Cards */
 .ex-presets {
     display: grid;

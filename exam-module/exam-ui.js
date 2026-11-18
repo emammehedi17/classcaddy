@@ -100,12 +100,14 @@ const EXAM_PRESETS = [
     {
         id: 'topic',
         title: 'Topic Test',
-        subtitle: 'Focused chapter drill · 25 Qs · 15m',
+        subtitle: 'Focused chapter drill · 25 Qs · 36s/Q',
         icon: 'fa-bullseye',
         apply(state, repo) {
             state.settings.questionCount = 25;
             state.settings.timingType = 'whole';
             state.settings.totalMinutes = 15;
+            state.settings.secondsPerQuestion = 36;
+            state.settings.customTimeOverride = false;
             state.settings.mode = 'exam';
             state.settings.positiveMark = 1;
             state.settings.negativeMark = 0.5;
@@ -116,6 +118,7 @@ const EXAM_PRESETS = [
             const resolved = resolveInitialScopeFromContext(repo);
             state.scopeMode = resolved.scopeMode;
             state.selectedSubjectKey = resolved.selectedSubjectKey;
+            state.selectedSubjectKeys = resolved.selectedSubjectKeys || (resolved.selectedSubjectKey ? [resolved.selectedSubjectKey] : []);
             state.selectedTopicKeys = resolved.selectedTopicKeys;
         }
     },
@@ -138,6 +141,8 @@ const EXAM_PRESETS = [
             state.settings.questionCount = 100;
             state.settings.timingType = 'whole';
             state.settings.totalMinutes = 60;
+            state.settings.secondsPerQuestion = 36;
+            state.settings.customTimeOverride = false;
             state.settings.mode = 'exam';
             state.settings.positiveMark = 1;
             state.settings.negativeMark = 0.5;
@@ -147,6 +152,8 @@ const EXAM_PRESETS = [
             state.settings.bookmarkedOnly = false;
             if (repo.previousPaperTopics.length > 0) {
                 state.scopeMode = 'all';
+                state.selectedSubjectKeys = Array.from(new Set(repo.previousPaperTopics.map(t => t.subjectKey)));
+                state.selectedSubjectKey = state.selectedSubjectKeys[0] || '';
                 state.selectedTopicKeys = repo.previousPaperTopics.map(t => t.topicKey);
             }
         }
@@ -160,6 +167,8 @@ const EXAM_PRESETS = [
             state.settings.questionCount = 100;
             state.settings.timingType = 'whole';
             state.settings.totalMinutes = 60;
+            state.settings.secondsPerQuestion = 36;
+            state.settings.customTimeOverride = false;
             state.settings.mode = 'exam';
             state.settings.layout = 'screen';
             state.settings.positiveMark = 1;
@@ -169,6 +178,8 @@ const EXAM_PRESETS = [
             state.settings.wrongOnly = false;
             state.settings.bookmarkedOnly = false;
             state.scopeMode = 'all';
+            state.selectedSubjectKeys = repo.subjects.map(s => s.key);
+            state.selectedSubjectKey = state.selectedSubjectKeys[0] || '';
             state.selectedTopicKeys = repo.allTopics.map(t => t.topicKey);
         }
     },
@@ -181,6 +192,8 @@ const EXAM_PRESETS = [
             state.settings.questionCount = 200;
             state.settings.timingType = 'whole';
             state.settings.totalMinutes = 120;
+            state.settings.secondsPerQuestion = 36;
+            state.settings.customTimeOverride = false;
             state.settings.mode = 'exam';
             state.settings.positiveMark = 1;
             state.settings.negativeMark = 0.5;
@@ -189,6 +202,8 @@ const EXAM_PRESETS = [
             state.settings.wrongOnly = false;
             state.settings.bookmarkedOnly = false;
             state.scopeMode = 'all';
+            state.selectedSubjectKeys = repo.subjects.map(s => s.key);
+            state.selectedSubjectKey = state.selectedSubjectKeys[0] || '';
             state.selectedTopicKeys = repo.allTopics.map(t => t.topicKey);
         }
     },
@@ -200,12 +215,14 @@ const EXAM_PRESETS = [
         apply(state, repo) {
             state.settings.questionCount = 30;
             state.settings.timingType = 'unlimited';
-            state.settings.mode = 'practice';
+            state.settings.mode = 'untimed-practice';
             state.settings.wrongOnly = true;
             state.settings.bookmarkedOnly = false;
             state.settings.includeAttempted = true;
             state.settings.avoidRecent = false;
             state.scopeMode = 'all';
+            state.selectedSubjectKeys = repo.subjects.map(s => s.key);
+            state.selectedSubjectKey = state.selectedSubjectKeys[0] || '';
             state.selectedTopicKeys = repo.allTopics.map(t => t.topicKey);
         }
     }
@@ -270,9 +287,11 @@ class NewExamSystemController {
         this.config = {
             scopeMode: 'all', // 'inherited' | 'all' | 'subject'
             selectedSubjectKey: '',
+            selectedSubjectKeys: [],
             selectedTopicKeys: [],
             topicSearch: '',
             customTitle: '',
+            sectionBExpanded: false,
             settings: loadExamSettings()
         };
 
@@ -388,9 +407,11 @@ class NewExamSystemController {
             const resolved = resolveInitialScopeFromContext(repo);
             this.config.scopeMode = resolved.scopeMode;
             this.config.selectedSubjectKey = resolved.selectedSubjectKey;
+            this.config.selectedSubjectKeys = resolved.selectedSubjectKeys || (resolved.selectedSubjectKey ? [resolved.selectedSubjectKey] : []);
             this.config.selectedTopicKeys = resolved.selectedTopicKeys;
             this.config.customTitle = repo.inheritedCollection?.title || '';
             this.config.topicSearch = '';
+            this.config.sectionBExpanded = false;
         } catch (err) {
             console.error('[NewExamUI] Failed to initialize repository:', err);
             this.showToast('Could not load Study Plan questions. Check your connection.');
@@ -438,6 +459,13 @@ class NewExamSystemController {
         return selectQuestionsForExam(this.repo, this.config, this.bookmarks);
     }
 
+    isAuto36SecMode(cfg = this.config.settings) {
+        if (!cfg) return false;
+        return (cfg.mode === 'exam' || cfg.mode === 'practice')
+            && cfg.timingType === 'whole'
+            && !cfg.customTimeOverride;
+    }
+
     getTimingSummary(qCount) {
         const s = this.config.settings;
         if (s.mode === 'untimed-practice' || s.timingType === 'unlimited') {
@@ -452,10 +480,12 @@ class NewExamSystemController {
 
         let totalSeconds = 0;
         if (s.timingType === 'per-question') {
-            const perQ = Math.max(5, parseInt(s.secondsPerQuestion, 10) || 30);
+            const perQ = Math.max(5, parseInt(s.secondsPerQuestion, 10) || 36);
             totalSeconds = Math.max(1, qCount) * perQ;
+        } else if (this.isAuto36SecMode(s)) {
+            totalSeconds = qCount > 0 ? qCount * 36 : 0;
         } else {
-            const mins = Math.max(1, parseFloat(s.totalMinutes) || 15);
+            const mins = Math.max(0.1, parseFloat(s.totalMinutes) || 15);
             totalSeconds = Math.round(mins * 60);
         }
 
@@ -464,7 +494,7 @@ class NewExamSystemController {
             totalSeconds,
             unlimited: false,
             secPerQuestion: secPerQ,
-            displayDuration: formatDurationWords(totalSeconds),
+            displayDuration: qCount > 0 ? formatDurationWords(totalSeconds) : '0 sec',
             paceText: qCount > 0 ? `${secPerQ} sec / question` : '—'
         };
     }
@@ -477,15 +507,29 @@ class NewExamSystemController {
             return this.repo.inheritedCollection.title;
         }
         if (this.config.scopeMode === 'subject') {
-            const subj = this.repo?.subjects.find(s => s.key === this.config.selectedSubjectKey);
-            const selectedCount = (this.config.selectedTopicKeys || []).length;
-            if (subj) {
-                if (selectedCount === 1) {
-                    const topic = subj.topics.find(t => t.topicKey === this.config.selectedTopicKeys[0]);
+            const subjectKeys = Array.isArray(this.config.selectedSubjectKeys) && this.config.selectedSubjectKeys.length > 0
+                ? this.config.selectedSubjectKeys
+                : (this.config.selectedSubjectKey ? [this.config.selectedSubjectKey] : []);
+            const selectedSubjects = (this.repo?.subjects || []).filter(s => subjectKeys.includes(s.key));
+            const selectedTopicSet = new Set(this.config.selectedTopicKeys || []);
+            const topicCountInScope = selectedSubjects.reduce(
+                (acc, sub) => acc + sub.topics.filter(t => selectedTopicSet.has(t.topicKey)).length,
+                0
+            );
+            if (selectedSubjects.length === 1) {
+                const subj = selectedSubjects[0];
+                if (topicCountInScope === 1) {
+                    const topic = subj.topics.find(t => selectedTopicSet.has(t.topicKey));
                     if (topic) return `${subj.name}: ${topic.title}`;
                 }
-                return `${subj.name} (${selectedCount || subj.topics.length} topics)`;
+                return `${subj.name} (${topicCountInScope || subj.topics.length} topics)`;
             }
+            if (selectedSubjects.length > 1) {
+                const names = selectedSubjects.slice(0, 2).map(s => s.name).join(' + ');
+                const extra = selectedSubjects.length > 2 ? ` +${selectedSubjects.length - 2} more` : '';
+                return `${names}${extra} (${topicCountInScope} topics)`;
+            }
+            return 'Custom Subject Selection';
         }
         const preset = EXAM_PRESETS.find(p => p.id === this.config.settings.presetId);
         return preset ? `${preset.title} — Study Plan` : 'Study Plan Examination';
@@ -515,6 +559,10 @@ class NewExamSystemController {
         }
 
         const timing = this.getTimingSummaryForConfig(selection.questions.length, cfg);
+        if (this.isAuto36SecMode(cfg) && timing.totalSeconds > 0) {
+            cfg.totalMinutes = Number((timing.totalSeconds / 60).toFixed(2));
+        }
+
         const nowMs = Date.now();
         const attemptId = 'ex_' + nowMs.toString(36) + '_' + Math.random().toString(36).slice(2, 7);
 
@@ -559,12 +607,18 @@ class NewExamSystemController {
         }
         if (cfg.timingType === 'per-question') {
             return {
-                totalSeconds: Math.max(1, qCount) * (Math.max(5, parseInt(cfg.secondsPerQuestion, 10) || 30)),
+                totalSeconds: Math.max(1, qCount) * (Math.max(5, parseInt(cfg.secondsPerQuestion, 10) || 36)),
+                unlimited: false
+            };
+        }
+        if (this.isAuto36SecMode(cfg)) {
+            return {
+                totalSeconds: Math.max(1, qCount) * 36,
                 unlimited: false
             };
         }
         return {
-            totalSeconds: Math.round((Math.max(1, parseFloat(cfg.totalMinutes) || 15)) * 60),
+            totalSeconds: Math.round((Math.max(0.1, parseFloat(cfg.totalMinutes) || 15)) * 60),
             unlimited: false
         };
     }
@@ -1305,39 +1359,77 @@ class NewExamSystemController {
                </div>`
             : '';
 
-        // 3. Subject & Topic Selection HTML
-        const activeSubject = repo.subjects.find(sub => sub.key === this.config.selectedSubjectKey) || repo.subjects[0];
+        // 3. Subject & Topic Selection HTML (Multi-subject & Multi-topic + Collapsible)
+        const selectedSubjectKeys = Array.isArray(this.config.selectedSubjectKeys)
+            ? this.config.selectedSubjectKeys
+            : (this.config.selectedSubjectKey ? [this.config.selectedSubjectKey] : []);
+        const selectedSubjectSet = new Set(selectedSubjectKeys);
+        const selectedSubjects = repo.subjects.filter(sub => selectedSubjectSet.has(sub.key));
+
         const visibleTopics = this.config.scopeMode === 'subject'
-            ? (activeSubject?.topics || [])
+            ? selectedSubjects.flatMap(sub => sub.topics)
             : repo.allTopics;
         const searchLower = (this.config.topicSearch || '').trim().toLowerCase();
         const filteredTopics = searchLower
             ? visibleTopics.filter(t => t.title.toLowerCase().includes(searchLower) || t.subject.toLowerCase().includes(searchLower) || t.subtitle.toLowerCase().includes(searchLower))
             : visibleTopics;
         const selectedTopicSet = new Set(this.config.selectedTopicKeys || []);
+        const selectedInVisibleCount = visibleTopics.filter(t => selectedTopicSet.has(t.topicKey)).length;
+
+        let sectionBSummary = '';
+        if (this.config.scopeMode === 'inherited' && repo.inheritedCollection) {
+            sectionBSummary = `${repo.inheritedCollection.title} · ${repo.inheritedCollection.questions.length} Qs`;
+        } else if (this.config.scopeMode === 'subject') {
+            if (selectedSubjects.length === 0) {
+                sectionBSummary = 'No subjects selected';
+            } else if (selectedSubjects.length === 1) {
+                sectionBSummary = `${selectedSubjects[0].name} · ${selectedInVisibleCount}/${visibleTopics.length} topics`;
+            } else {
+                sectionBSummary = `${selectedSubjects.length} subjects · ${selectedInVisibleCount}/${visibleTopics.length} topics`;
+            }
+        } else {
+            sectionBSummary = `All Subjects · ${selectedInVisibleCount}/${visibleTopics.length} topics`;
+        }
 
         const subjectChipsHtml = this.config.scopeMode === 'subject' ? `
-            <div class="ex-chips" style="margin-top:4px;">
-                ${repo.subjects.map(sub => `
-                    <button type="button" class="ex-chip ${sub.key === activeSubject?.key ? 'on' : ''}" data-subject-key="${esc(sub.key)}">
-                        <span>${esc(sub.name)}</span>
-                        <span class="cnt ex-num">${sub.questionCount}</span>
-                    </button>
-                `).join('')}
+            <div class="ex-subject-toolbar">
+                <span style="font-size:0.78rem; font-weight:600; color:var(--ex-muted);">
+                    Subjects (${selectedSubjects.length}/${repo.subjects.length} selected · click to toggle multiple)
+                </span>
+                <div class="ex-row">
+                    <button type="button" class="ex-btn sm" data-action="subjects-select-all">Select All (${repo.subjects.length})</button>
+                    <button type="button" class="ex-btn sm" data-action="subjects-clear">Clear</button>
+                </div>
+            </div>
+            <div class="ex-chips" style="margin-top:2px;">
+                ${repo.subjects.map(sub => {
+                    const isOn = selectedSubjectSet.has(sub.key);
+                    return `
+                        <button type="button" class="ex-chip ${isOn ? 'on' : ''}" data-subject-key="${esc(sub.key)}" aria-pressed="${isOn ? 'true' : 'false'}">
+                            ${isOn ? '<i class="fas fa-check" style="font-size:0.7rem;"></i>' : ''}
+                            <span>${esc(sub.name)}</span>
+                            <span class="cnt ex-num">${sub.questionCount}</span>
+                        </button>
+                    `;
+                }).join('')}
             </div>
         ` : '';
+
+        const emptyTopicsMsg = (this.config.scopeMode === 'subject' && selectedSubjects.length === 0)
+            ? 'Select one or more subjects above to pick topics.'
+            : 'No topics with questions match this filter.';
 
         const topicPickerHtml = (this.config.scopeMode !== 'inherited') ? `
             <div class="ex-topic-picker">
                 <div class="ex-topic-toolbar">
                     <input type="text" id="ex-topic-search-input" class="ex-input" placeholder="Filter topics or chapters..." value="${esc(this.config.topicSearch)}" style="flex:1; min-width:180px;">
                     <div class="ex-row">
-                        <button type="button" class="ex-btn sm" data-action="topics-select-all">Select All (${visibleTopics.length})</button>
+                        <button type="button" class="ex-btn sm" data-action="topics-select-all">Select All (${filteredTopics.length})</button>
                         <button type="button" class="ex-btn sm" data-action="topics-clear">Clear</button>
                     </div>
                 </div>
                 <div class="ex-topic-list">
-                    ${filteredTopics.length === 0 ? `<div style="grid-column:1/-1; padding:12px; text-align:center; color:var(--ex-muted); font-size:0.84rem;">No topics with questions match this filter.</div>` : filteredTopics.map(t => {
+                    ${filteredTopics.length === 0 ? `<div style="grid-column:1/-1; padding:12px; text-align:center; color:var(--ex-muted); font-size:0.84rem;">${emptyTopicsMsg}</div>` : filteredTopics.map(t => {
                         const checked = selectedTopicSet.has(t.topicKey);
                         return `
                             <label class="ex-topic-item ${checked ? 'checked' : ''}">
@@ -1420,19 +1512,29 @@ class NewExamSystemController {
                                 ${previousPaperNotice}
                             </fieldset>
 
-                            <!-- Section B: What to Examine -->
+                            <!-- Section B: What to Examine (Collapsed by default) -->
                             <fieldset class="ex-fieldset">
-                                <legend class="ex-legend"><i class="fas fa-book-open"></i> B. What to Examine — Subjects &amp; Topics</legend>
-                                <div class="ex-row">
-                                    <span class="ex-label-col">Scope</span>
-                                    <div class="ex-seg">
-                                        ${repo.inheritedCollection ? `<button type="button" class="${this.config.scopeMode === 'inherited' ? 'on' : ''}" data-scope="inherited">Current Selection (${repo.inheritedCollection.questions.length})</button>` : ''}
-                                        <button type="button" class="${this.config.scopeMode === 'all' ? 'on' : ''}" data-scope="all">All Subjects (${repo.allQuestions.length})</button>
-                                        <button type="button" class="${this.config.scopeMode === 'subject' ? 'on' : ''}" data-scope="subject">By Subject</button>
+                                <button type="button" class="ex-section-toggle" data-action="toggle-section-b" aria-expanded="${this.config.sectionBExpanded ? 'true' : 'false'}">
+                                    <span class="ex-legend" style="margin-bottom:0;"><i class="fas fa-book-open"></i> B. What to Examine — Subjects &amp; Topics</span>
+                                    <span class="ex-section-toggle-right">
+                                        <span class="ex-collapse-summary">${esc(sectionBSummary)}</span>
+                                        <span class="ex-collapse-icon" aria-hidden="true">
+                                            <i class="fas ${this.config.sectionBExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}"></i>
+                                        </span>
+                                    </span>
+                                </button>
+                                ${this.config.sectionBExpanded ? `
+                                    <div class="ex-row">
+                                        <span class="ex-label-col">Scope</span>
+                                        <div class="ex-seg">
+                                            ${repo.inheritedCollection ? `<button type="button" class="${this.config.scopeMode === 'inherited' ? 'on' : ''}" data-scope="inherited">Current Selection (${repo.inheritedCollection.questions.length})</button>` : ''}
+                                            <button type="button" class="${this.config.scopeMode === 'all' ? 'on' : ''}" data-scope="all">All Subjects (${repo.allQuestions.length})</button>
+                                            <button type="button" class="${this.config.scopeMode === 'subject' ? 'on' : ''}" data-scope="subject">By Subject</button>
+                                        </div>
                                     </div>
-                                </div>
-                                ${subjectChipsHtml}
-                                ${topicPickerHtml}
+                                    ${subjectChipsHtml}
+                                    ${topicPickerHtml}
+                                ` : ''}
                             </fieldset>
 
                             <!-- Section C: Question Count -->
@@ -1522,43 +1624,54 @@ class NewExamSystemController {
                             </fieldset>
 
                             <!-- Section F: Time Configuration -->
-                            <fieldset class="ex-fieldset">
-                                <legend class="ex-legend"><i class="fas fa-clock"></i> F. Time Configuration</legend>
-                                <div class="ex-row">
-                                    <span class="ex-label-col">Timing Rule</span>
-                                    <div class="ex-seg">
-                                        <button type="button" class="${s.timingType === 'whole' && s.mode !== 'untimed-practice' ? 'on' : ''}" data-timing="whole" ${s.mode === 'untimed-practice' ? 'disabled' : ''}>Whole Exam (min)</button>
-                                        <button type="button" class="${s.timingType === 'per-question' && s.mode !== 'untimed-practice' ? 'on' : ''}" data-timing="per-question" ${s.mode === 'untimed-practice' ? 'disabled' : ''}>Time Per Question (sec)</button>
-                                        <button type="button" class="${s.timingType === 'unlimited' || s.mode === 'untimed-practice' ? 'on' : ''}" data-timing="unlimited">Unlimited Time</button>
-                                    </div>
-                                </div>
-                                ${s.timingType === 'whole' && s.mode !== 'untimed-practice' ? `
-                                    <div class="ex-row">
-                                        <span class="ex-label-col">Minutes</span>
-                                        <div class="ex-chips" style="flex:1;">
-                                            ${[5, 10, 15, 25, 30, 60, 90, 120].map(m => `
-                                                <button type="button" class="ex-chip ${Number(s.totalMinutes) === m ? 'on' : ''}" data-minutes="${m}">${m}m</button>
-                                            `).join('')}
-                                            <input type="number" id="ex-custom-minutes" class="ex-input ex-num" min="1" max="360" value="${s.totalMinutes}" style="width:80px;" aria-label="Custom Minutes">
+                            ${(() => {
+                                const isAuto36 = this.isAuto36SecMode(s);
+                                const displayedMinutes = (isAuto36 && preview.actualCount > 0)
+                                    ? Number(((preview.actualCount * 36) / 60).toFixed(2))
+                                    : Number(s.totalMinutes || 15);
+                                return `
+                                    <fieldset class="ex-fieldset">
+                                        <legend class="ex-legend"><i class="fas fa-clock"></i> F. Time Configuration</legend>
+                                        <div class="ex-row">
+                                            <span class="ex-label-col">Timing Rule</span>
+                                            <div class="ex-seg">
+                                                <button type="button" class="${s.timingType === 'whole' && s.mode !== 'untimed-practice' ? 'on' : ''}" data-timing="whole" ${s.mode === 'untimed-practice' ? 'disabled' : ''}>Whole Exam (min)</button>
+                                                <button type="button" class="${s.timingType === 'per-question' && s.mode !== 'untimed-practice' ? 'on' : ''}" data-timing="per-question" ${s.mode === 'untimed-practice' ? 'disabled' : ''}>Time Per Question (sec)</button>
+                                                <button type="button" class="${s.timingType === 'unlimited' || s.mode === 'untimed-practice' ? 'on' : ''}" data-timing="unlimited">Unlimited Time</button>
+                                            </div>
                                         </div>
-                                    </div>
-                                ` : ''}
-                                ${s.timingType === 'per-question' && s.mode !== 'untimed-practice' ? `
-                                    <div class="ex-row">
-                                        <span class="ex-label-col">Sec / Question</span>
-                                        <div class="ex-chips" style="flex:1;">
-                                            ${[15, 30, 36, 45, 60, 90].map(sec => `
-                                                <button type="button" class="ex-chip ${Number(s.secondsPerQuestion) === sec ? 'on' : ''}" data-secperq="${sec}">${sec}s</button>
-                                            `).join('')}
-                                            <input type="number" id="ex-custom-secperq" class="ex-input ex-num" min="5" max="600" value="${s.secondsPerQuestion}" style="width:80px;" aria-label="Custom Seconds Per Question">
+                                        ${s.timingType === 'whole' && s.mode !== 'untimed-practice' ? `
+                                            <div class="ex-row">
+                                                <span class="ex-label-col">Minutes</span>
+                                                <div class="ex-chips" style="flex:1;">
+                                                    ${[5, 10, 15, 25, 30, 60, 90, 120].map(m => `
+                                                        <button type="button" class="ex-chip ${!isAuto36 && Math.abs(displayedMinutes - m) < 0.01 ? 'on' : ''}" data-minutes="${m}">${m}m</button>
+                                                    `).join('')}
+                                                    <input type="number" id="ex-custom-minutes" class="ex-input ex-num" min="0.5" max="360" step="any" value="${displayedMinutes}" style="width:86px;" aria-label="Custom Minutes">
+                                                </div>
+                                            </div>
+                                        ` : ''}
+                                        ${s.timingType === 'per-question' && s.mode !== 'untimed-practice' ? `
+                                            <div class="ex-row">
+                                                <span class="ex-label-col">Sec / Question</span>
+                                                <div class="ex-chips" style="flex:1;">
+                                                    ${[15, 30, 36, 45, 60, 90].map(sec => `
+                                                        <button type="button" class="ex-chip ${Number(s.secondsPerQuestion) === sec ? 'on' : ''}" data-secperq="${sec}">${sec}s</button>
+                                                    `).join('')}
+                                                    <input type="number" id="ex-custom-secperq" class="ex-input ex-num" min="5" max="600" value="${s.secondsPerQuestion}" style="width:80px;" aria-label="Custom Seconds Per Question">
+                                                </div>
+                                            </div>
+                                        ` : ''}
+                                        <div style="font-size:0.83rem; color:var(--ex-muted); background:var(--ex-sunk); padding:8px 12px; border-radius:4px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px;">
+                                            <span>
+                                                <i class="fas fa-tachometer-alt" style="color:var(--ex-accent); margin-right:6px;"></i>
+                                                <b>Pace:</b> ${preview.actualCount} questions / ${esc(timing.displayDuration)} = <b class="ex-num">${esc(timing.paceText)}</b>
+                                            </span>
+                                            ${isAuto36 ? `<span class="ex-tag" style="color:var(--ex-accent); border-color:color-mix(in srgb, var(--ex-accent) 40%, transparent);">Auto 36s × ${preview.actualCount} Qs</span>` : ''}
                                         </div>
-                                    </div>
-                                ` : ''}
-                                <div style="font-size:0.83rem; color:var(--ex-muted); background:var(--ex-sunk); padding:8px 12px; border-radius:4px;">
-                                    <i class="fas fa-tachometer-alt" style="color:var(--ex-accent); margin-right:6px;"></i>
-                                    <b>Pace:</b> ${preview.actualCount} questions / ${esc(timing.displayDuration)} = <b class="ex-num">${esc(timing.paceText)}</b>
-                                </div>
-                            </fieldset>
+                                    </fieldset>
+                                `;
+                            })()}
 
                             <!-- Section G: Marking System -->
                             <fieldset class="ex-fieldset">
@@ -2387,11 +2500,36 @@ class NewExamSystemController {
                     if (this.view === 'history') this.render();
                 } else if (act === 'resume-draft') this.resumeFromDraft();
                 else if (act === 'discard-draft') this.discardDraft();
-                else if (act === 'topics-select-all') {
-                    const list = this.config.scopeMode === 'subject'
-                        ? (this.repo.subjects.find(s => s.key === this.config.selectedSubjectKey)?.topics || [])
+                else if (act === 'toggle-section-b') {
+                    this.config.sectionBExpanded = !this.config.sectionBExpanded;
+                    this.render();
+                } else if (act === 'subjects-select-all') {
+                    this.config.scopeMode = 'subject';
+                    this.config.selectedSubjectKeys = this.repo.subjects.map(s => s.key);
+                    this.config.selectedSubjectKey = this.config.selectedSubjectKeys[0] || '';
+                    this.config.selectedTopicKeys = this.repo.allTopics.map(t => t.topicKey);
+                    this.render();
+                } else if (act === 'subjects-clear') {
+                    this.config.scopeMode = 'subject';
+                    this.config.selectedSubjectKeys = [];
+                    this.config.selectedSubjectKey = '';
+                    this.config.selectedTopicKeys = [];
+                    this.render();
+                } else if (act === 'topics-select-all') {
+                    const subjectKeys = Array.isArray(this.config.selectedSubjectKeys)
+                        ? this.config.selectedSubjectKeys
+                        : (this.config.selectedSubjectKey ? [this.config.selectedSubjectKey] : []);
+                    const subjectSet = new Set(subjectKeys);
+                    const baseList = this.config.scopeMode === 'subject'
+                        ? this.repo.subjects.filter(s => subjectSet.has(s.key)).flatMap(s => s.topics)
                         : this.repo.allTopics;
-                    this.config.selectedTopicKeys = list.map(t => t.topicKey);
+                    const searchLower = (this.config.topicSearch || '').trim().toLowerCase();
+                    const visibleList = searchLower
+                        ? baseList.filter(t => t.title.toLowerCase().includes(searchLower) || t.subject.toLowerCase().includes(searchLower) || t.subtitle.toLowerCase().includes(searchLower))
+                        : baseList;
+                    const merged = new Set(this.config.selectedTopicKeys || []);
+                    visibleList.forEach(t => merged.add(t.topicKey));
+                    this.config.selectedTopicKeys = Array.from(merged);
                     this.render();
                 } else if (act === 'topics-clear') {
                     this.config.selectedTopicKeys = [];
@@ -2455,24 +2593,45 @@ class NewExamSystemController {
             btn.addEventListener('click', () => {
                 this.config.scopeMode = btn.dataset.scope;
                 if (this.config.scopeMode === 'subject') {
-                    if (!this.config.selectedSubjectKey && this.repo.subjects[0]) {
-                        this.config.selectedSubjectKey = this.repo.subjects[0].key;
+                    const currentKeys = Array.isArray(this.config.selectedSubjectKeys) ? this.config.selectedSubjectKeys : [];
+                    const allSelected = currentKeys.length === this.repo.subjects.length && this.repo.subjects.length > 1;
+                    if (currentKeys.length === 0 || allSelected) {
+                        const firstKey = this.config.selectedSubjectKey || this.repo.subjects[0]?.key || '';
+                        this.config.selectedSubjectKeys = firstKey ? [firstKey] : [];
                     }
-                    const subj = this.repo.subjects.find(s => s.key === this.config.selectedSubjectKey);
-                    this.config.selectedTopicKeys = subj ? subj.topics.map(t => t.topicKey) : [];
+                    this.config.selectedSubjectKey = this.config.selectedSubjectKeys[0] || '';
+                    const subjSet = new Set(this.config.selectedSubjectKeys);
+                    this.config.selectedTopicKeys = this.repo.allTopics
+                        .filter(t => subjSet.has(t.subjectKey))
+                        .map(t => t.topicKey);
                 } else if (this.config.scopeMode === 'all') {
+                    this.config.selectedSubjectKeys = this.repo.subjects.map(s => s.key);
+                    this.config.selectedSubjectKey = this.config.selectedSubjectKeys[0] || '';
                     this.config.selectedTopicKeys = this.repo.allTopics.map(t => t.topicKey);
                 }
                 this.render();
             });
         });
 
-        // Subject picker
+        // Multi-subject toggle picker
         this.root.querySelectorAll('[data-subject-key]').forEach(btn => {
             btn.addEventListener('click', () => {
-                this.config.selectedSubjectKey = btn.dataset.subjectKey;
-                const subj = this.repo.subjects.find(s => s.key === this.config.selectedSubjectKey);
-                this.config.selectedTopicKeys = subj ? subj.topics.map(t => t.topicKey) : [];
+                const key = btn.dataset.subjectKey;
+                const subjSet = new Set(Array.isArray(this.config.selectedSubjectKeys) ? this.config.selectedSubjectKeys : []);
+                const topicSet = new Set(this.config.selectedTopicKeys || []);
+                const subj = this.repo.subjects.find(s => s.key === key);
+
+                if (subjSet.has(key)) {
+                    subjSet.delete(key);
+                    if (subj) subj.topics.forEach(t => topicSet.delete(t.topicKey));
+                } else {
+                    subjSet.add(key);
+                    if (subj) subj.topics.forEach(t => topicSet.add(t.topicKey));
+                }
+
+                this.config.selectedSubjectKeys = Array.from(subjSet);
+                this.config.selectedSubjectKey = this.config.selectedSubjectKeys[0] || '';
+                this.config.selectedTopicKeys = Array.from(topicSet);
                 this.render();
             });
         });
@@ -2532,10 +2691,19 @@ class NewExamSystemController {
 
         this.root.querySelectorAll('[data-mode]').forEach(btn => {
             btn.addEventListener('click', () => {
-                this.config.settings.mode = btn.dataset.mode;
-                if (btn.dataset.mode === 'untimed-practice') {
+                const nextMode = btn.dataset.mode;
+                this.config.settings.mode = nextMode;
+                if (nextMode === 'exam' || nextMode === 'practice') {
+                    this.config.settings.timingType = 'whole';
+                    this.config.settings.secondsPerQuestion = 36;
+                    this.config.settings.customTimeOverride = false;
+                    const preview = this.getCurrentSelectionPreview();
+                    if (preview.actualCount > 0) {
+                        this.config.settings.totalMinutes = Number(((preview.actualCount * 36) / 60).toFixed(2));
+                    }
+                } else if (nextMode === 'untimed-practice') {
                     this.config.settings.timingType = 'unlimited';
-                } else if (btn.dataset.mode === 'timed-practice' && this.config.settings.timingType === 'unlimited') {
+                } else if (nextMode === 'timed-practice' && this.config.settings.timingType === 'unlimited') {
                     this.config.settings.timingType = 'whole';
                 }
                 saveExamSettings(this.config.settings);
@@ -2557,6 +2725,11 @@ class NewExamSystemController {
                 if (btn.dataset.timing !== 'unlimited' && this.config.settings.mode === 'untimed-practice') {
                     this.config.settings.mode = 'timed-practice';
                 }
+                if (btn.dataset.timing === 'whole' && (this.config.settings.mode === 'exam' || this.config.settings.mode === 'practice')) {
+                    this.config.settings.customTimeOverride = false;
+                } else {
+                    this.config.settings.customTimeOverride = true;
+                }
                 saveExamSettings(this.config.settings);
                 this.render();
             });
@@ -2565,25 +2738,29 @@ class NewExamSystemController {
         this.root.querySelectorAll('[data-minutes]').forEach(btn => {
             btn.addEventListener('click', () => {
                 this.config.settings.totalMinutes = parseFloat(btn.dataset.minutes) || 15;
+                this.config.settings.customTimeOverride = true;
                 saveExamSettings(this.config.settings);
                 this.render();
             });
         });
         this.root.querySelector('#ex-custom-minutes')?.addEventListener('change', (e) => {
-            this.config.settings.totalMinutes = Math.max(1, parseFloat(e.target.value) || 15);
+            this.config.settings.totalMinutes = Math.max(0.5, parseFloat(e.target.value) || 15);
+            this.config.settings.customTimeOverride = true;
             saveExamSettings(this.config.settings);
             this.render();
         });
 
         this.root.querySelectorAll('[data-secperq]').forEach(btn => {
             btn.addEventListener('click', () => {
-                this.config.settings.secondsPerQuestion = parseInt(btn.dataset.secperq, 10) || 30;
+                this.config.settings.secondsPerQuestion = parseInt(btn.dataset.secperq, 10) || 36;
+                this.config.settings.customTimeOverride = true;
                 saveExamSettings(this.config.settings);
                 this.render();
             });
         });
         this.root.querySelector('#ex-custom-secperq')?.addEventListener('change', (e) => {
-            this.config.settings.secondsPerQuestion = Math.max(5, parseInt(e.target.value, 10) || 30);
+            this.config.settings.secondsPerQuestion = Math.max(5, parseInt(e.target.value, 10) || 36);
+            this.config.settings.customTimeOverride = true;
             saveExamSettings(this.config.settings);
             this.render();
         });

@@ -500,6 +500,7 @@ export function resolveInitialScopeFromContext(repo) {
         return {
             scopeMode: 'all', // 'inherited' | 'all' | 'subject'
             selectedSubjectKey: repo.subjects[0]?.key || '',
+            selectedSubjectKeys: repo.subjects.map(s => s.key),
             selectedTopicKeys: repo.allTopics.map(t => t.topicKey)
         };
     }
@@ -513,6 +514,7 @@ export function resolveInitialScopeFromContext(repo) {
             return {
                 scopeMode: 'subject',
                 selectedSubjectKey: exactTopic.subjectKey,
+                selectedSubjectKeys: [exactTopic.subjectKey],
                 selectedTopicKeys: [exactTopic.topicKey]
             };
         }
@@ -529,17 +531,11 @@ export function resolveInitialScopeFromContext(repo) {
         });
 
         if (matchingTopics.length > 0) {
-            const uniqueSubjects = new Set(matchingTopics.map(t => t.subjectKey));
-            if (uniqueSubjects.size === 1) {
-                return {
-                    scopeMode: 'subject',
-                    selectedSubjectKey: matchingTopics[0].subjectKey,
-                    selectedTopicKeys: matchingTopics.map(t => t.topicKey)
-                };
-            }
+            const uniqueSubjects = Array.from(new Set(matchingTopics.map(t => t.subjectKey)));
             return {
-                scopeMode: 'all',
-                selectedSubjectKey: '',
+                scopeMode: 'subject',
+                selectedSubjectKey: uniqueSubjects[0] || '',
+                selectedSubjectKeys: uniqueSubjects,
                 selectedTopicKeys: matchingTopics.map(t => t.topicKey)
             };
         }
@@ -549,6 +545,7 @@ export function resolveInitialScopeFromContext(repo) {
     return {
         scopeMode: 'inherited',
         selectedSubjectKey: ctx.subjectName?.toLowerCase() || '',
+        selectedSubjectKeys: ctx.subjectName ? [ctx.subjectName.toLowerCase()] : [],
         selectedTopicKeys: []
     };
 }
@@ -562,19 +559,27 @@ export function selectQuestionsForExam(repo, configState, bookmarkSet) {
     if (configState.scopeMode === 'inherited' && repo.inheritedCollection) {
         basePool = repo.inheritedCollection.questions.slice();
     } else if (configState.scopeMode === 'subject') {
+        const subjectKeys = Array.isArray(configState.selectedSubjectKeys)
+            ? configState.selectedSubjectKeys
+            : (configState.selectedSubjectKey ? [configState.selectedSubjectKey] : []);
+        const subjectSet = new Set(subjectKeys);
+        const hasExplicitTopics = Array.isArray(configState.selectedTopicKeys);
         const chosenKeys = new Set(configState.selectedTopicKeys || []);
-        const subj = repo.subjects.find(s => s.key === configState.selectedSubjectKey);
-        if (subj) {
-            subj.topics.forEach(t => {
-                if (chosenKeys.size === 0 || chosenKeys.has(t.topicKey)) {
-                    basePool.push(...t.questions);
-                }
+        if (subjectSet.size > 0) {
+            repo.subjects.forEach(subj => {
+                if (!subjectSet.has(subj.key)) return;
+                subj.topics.forEach(t => {
+                    if (!hasExplicitTopics || chosenKeys.has(t.topicKey)) {
+                        basePool.push(...t.questions);
+                    }
+                });
             });
         }
     } else {
-        // 'all' subjects mode (filter by selectedTopicKeys if non-empty, or allTopics)
+        // 'all' subjects mode (filter strictly by selectedTopicKeys if provided)
+        const hasExplicitTopics = Array.isArray(configState.selectedTopicKeys);
         const chosenKeys = new Set(configState.selectedTopicKeys || []);
-        if (chosenKeys.size > 0) {
+        if (hasExplicitTopics) {
             repo.allTopics.forEach(t => {
                 if (chosenKeys.has(t.topicKey)) {
                     basePool.push(...t.questions);

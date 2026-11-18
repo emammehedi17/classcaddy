@@ -17,6 +17,7 @@ export const DEFAULT_EXAM_SETTINGS = {
     timingType: 'whole', // 'whole' | 'per-question' | 'unlimited'
     totalMinutes: 15,
     secondsPerQuestion: 36,
+    customTimeOverride: false,
     positiveMark: 1,
     negativeMark: 0.5,
     unansweredMark: 0,
