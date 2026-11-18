@@ -35,10 +35,11 @@ export class McqImportWorkspace {
     this.activeTab = 'text'; // 'text' | 'files' | 'html' | 'source'
     this.existingMcqs = [];
     this.items = []; // Working batch of review items
+    this.summary = null; // Latest extraction validation summary
     this.selectedIndices = new Set();
     this.editingIndex = -1;
     this.sourceEditMode = false;
-    this.filterMode = 'all'; // 'all' | 'review' | 'duplicates'
+    this.filterMode = 'all'; // 'all' | 'samples' | 'review' | 'duplicates'
     this.saveMode = 'replace'; // 'replace' | 'append'
     this.fileQueue = [];
     this.fileReports = [];
@@ -59,6 +60,7 @@ export class McqImportWorkspace {
     this.abortExtraction();
     this.existingMcqs = normalizeMcqList(existingRawList || []);
     this.items = this.existingMcqs.map((q) => ({ ...q, duplicateStatus: 'none' }));
+    this.summary = null;
     this.selectedIndices = new Set(this.items.map((_, i) => i));
     this.editingIndex = -1;
     this.filterMode = 'all';
@@ -130,7 +132,7 @@ export class McqImportWorkspace {
           <div class="cc-dropzone" id="cc-import-dropzone" tabindex="0">
             <i class="fas fa-cloud-upload-alt text-2xl mb-1 text-indigo-500"></i>
             <div class="font-semibold text-sm">Drop multiple files here or click to browse</div>
-            <div class="text-xs opacity-75 mt-1">Supported: .txt, .html, .htm, .docx, .json, .js (Legacy binary .doc files are flagged with conversion guidance)</div>
+            <div class="text-xs opacity-75 mt-1">Supported: .txt, .html, .htm (including JS-driven HTML question banks), .docx, .json, .js</div>
             <input type="file" id="cc-import-file-input" class="hidden" multiple accept=".txt,.md,.html,.htm,.docx,.doc,.json,.js,.mjs" />
           </div>
           <div class="cc-file-queue" id="cc-import-file-queue"></div>
@@ -147,10 +149,10 @@ export class McqImportWorkspace {
           <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
             <label class="inline-flex items-center gap-2 font-medium cursor-pointer">
               <input type="checkbox" id="cc-preserve-css-toggle" checked class="w-4 h-4 rounded accent-indigo-600" />
-              <span>Preserve meaningful CSS styles (bold, colors, subscripts/superscripts, tables, code, math)</span>
+              <span>Preserve meaningful CSS styles & extract embedded JavaScript MCQ arrays / MathJax LaTeX</span>
             </label>
           </div>
-          <textarea id="cc-import-html-input" class="cc-import-textarea" placeholder="Paste full webpage HTML or rich formatted fragment here... Scripts, ads, navbars, and unsafe attributes are automatically stripped."></textarea>
+          <textarea id="cc-import-html-input" class="cc-import-textarea" placeholder="Paste full webpage HTML (including JavaScript-driven HTML question banks like const mcqData = [...]) or rich formatted fragment here..."></textarea>
           <div class="flex justify-end">
             <button type="button" class="action-button text-xs" id="cc-extract-html-btn">
               <i class="fas fa-code mr-1"></i> Extract Rich HTML
@@ -186,6 +188,9 @@ export class McqImportWorkspace {
         <!-- Diagnostics / Warnings -->
         <div id="cc-import-warnings" class="hidden"></div>
 
+        <!-- Import Validation Summary Banner -->
+        <div id="cc-validation-summary" class="cc-validation-summary hidden"></div>
+
         <!-- Interactive Review & Rich Editor Workspace -->
         <div id="cc-review-section" class="flex flex-col gap-2">
           <div class="cc-review-header">
@@ -202,12 +207,16 @@ export class McqImportWorkspace {
           </div>
 
           <div class="cc-review-controls">
-            <div class="flex flex-wrap gap-1.5">
+            <div class="flex flex-wrap gap-1.5 items-center">
               <button type="button" class="cc-mini-btn active-filter" data-cc-filter="all">All</button>
+              <button type="button" class="cc-mini-btn" data-cc-filter="samples" title="Preview 1st, Middle, and Last extracted questions">Sample Preview (1st / Mid / Last)</button>
               <button type="button" class="cc-mini-btn" data-cc-filter="review">Needs Review</button>
               <button type="button" class="cc-mini-btn" data-cc-filter="duplicates">Duplicates</button>
             </div>
-            <div class="flex flex-wrap gap-1.5">
+            <div class="flex flex-wrap gap-1.5 items-center">
+              <button type="button" class="cc-mini-btn" id="cc-jump-first-btn" title="Jump to first question">1st</button>
+              <button type="button" class="cc-mini-btn" id="cc-jump-mid-btn" title="Jump to middle question">Mid</button>
+              <button type="button" class="cc-mini-btn" id="cc-jump-last-btn" title="Jump to last question">Last</button>
               <button type="button" class="cc-mini-btn" id="cc-select-all-btn">Select All</button>
               <button type="button" class="cc-mini-btn" id="cc-deselect-all-btn">Deselect All</button>
               <button type="button" class="cc-mini-btn hidden" id="cc-skip-dups-btn">Skip All Duplicates</button>
@@ -365,6 +374,32 @@ Correct answer: b`;
       });
     });
 
+    // Quick Jump to First / Middle / Last Question
+    const jumpToIndex = (targetIdx) => {
+      if (this.items.length === 0) return;
+      const clamped = Math.max(0, Math.min(this.items.length - 1, targetIdx));
+      if (this.filterMode !== 'all' && this.filterMode !== 'samples') {
+        this.filterMode = 'all';
+        this.renderReviewSection();
+      }
+      const listEl = this.mountEl.querySelector('#cc-review-list');
+      const cardEl = listEl?.querySelector(`[data-card-idx="${clamped}"]`);
+      if (cardEl) {
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        cardEl.style.outline = '2px solid var(--cc-accent, #4f46e5)';
+        setTimeout(() => {
+          cardEl.style.outline = '';
+        }, 1200);
+      }
+    };
+    this.mountEl.querySelector('#cc-jump-first-btn')?.addEventListener('click', () => jumpToIndex(0));
+    this.mountEl.querySelector('#cc-jump-mid-btn')?.addEventListener('click', () =>
+      jumpToIndex(Math.floor((this.items.length - 1) / 2))
+    );
+    this.mountEl.querySelector('#cc-jump-last-btn')?.addEventListener('click', () =>
+      jumpToIndex(this.items.length - 1)
+    );
+
     // Bulk selection buttons
     this.mountEl.querySelector('#cc-select-all-btn')?.addEventListener('click', () => {
       this.items.forEach((_, idx) => this.selectedIndices.add(idx));
@@ -435,13 +470,17 @@ Correct answer: b`;
             : `<span class="cc-conf-badge cc-conf-medium">${rep.count} Found</span>`
           : `<span class="cc-conf-badge cc-conf-medium">Queued</span>`;
 
+        const sourceSub =
+          rep && rep.detectedSourceType
+            ? ` • ${escapeHtmlBasic(rep.detectedSourceType)}${rep.detectedVariableName ? ` (${escapeHtmlBasic(rep.detectedVariableName)})` : ''}`
+            : '';
         const warnSub = rep?.warnings?.length ? `<div class="text-xs text-amber-600 mt-0.5">${escapeHtmlBasic(rep.warnings[0])}</div>` : '';
 
         return `
           <div class="cc-file-item">
             <div class="cc-file-item-meta">
               <div class="cc-file-item-name">${escapeHtmlBasic(file.name)}</div>
-              <div class="cc-file-item-sub">${formatBytes(file.size)}</div>
+              <div class="cc-file-item-sub">${formatBytes(file.size)}${sourceSub}</div>
               ${warnSub}
             </div>
             <div class="flex items-center gap-2">
@@ -493,6 +532,85 @@ Correct answer: b`;
     `;
   }
 
+  renderValidationSummary() {
+    const sumEl = this.mountEl.querySelector('#cc-validation-summary');
+    if (!sumEl) return;
+    if (!this.summary || this.items.length === 0) {
+      sumEl.classList.add('hidden');
+      sumEl.innerHTML = '';
+      return;
+    }
+
+    const s = this.summary;
+    const discrepancy = s.detectedCount - s.validCount;
+    const discrepancyReasons = [];
+    if (s.missingOptionsCount > 0) discrepancyReasons.push(`${s.missingOptionsCount} missing options`);
+    if (s.invalidAnswerCount > 0) discrepancyReasons.push(`${s.invalidAnswerCount} invalid answer reference(s)`);
+    const otherUnresolved = Math.max(0, discrepancy - s.missingOptionsCount - s.invalidAnswerCount);
+    if (otherUnresolved > 0) discrepancyReasons.push(`${otherUnresolved} missing correct answer key(s)`);
+
+    sumEl.classList.remove('hidden');
+    sumEl.innerHTML = `
+      <div class="cc-val-header">
+        <span><i class="fas fa-clipboard-check text-indigo-500 mr-1.5"></i>Import Validation Summary</span>
+        <span class="text-xs font-normal opacity-80">${escapeHtmlBasic(s.fileName || 'Input Source')}</span>
+      </div>
+      <div class="cc-val-grid">
+        <div class="cc-val-item" title="${escapeHtmlBasic(s.fileName || '')}">
+          <span class="cc-val-label">Source File</span>
+          <span class="cc-val-value">${escapeHtmlBasic(s.fileName || 'Pasted Input')}</span>
+        </div>
+        <div class="cc-val-item" title="${escapeHtmlBasic(s.detectedSourceType || '')}">
+          <span class="cc-val-label">Source Type</span>
+          <span class="cc-val-value">${escapeHtmlBasic(s.detectedSourceType || 'Auto-detected')}</span>
+        </div>
+        <div class="cc-val-item" title="${escapeHtmlBasic(s.detectedVariableName || 'N/A')}">
+          <span class="cc-val-label">Data Variable</span>
+          <span class="cc-val-value font-mono">${escapeHtmlBasic(s.detectedVariableName || 'N/A')}</span>
+        </div>
+        <div class="cc-val-item">
+          <span class="cc-val-label">Objects Detected</span>
+          <span class="cc-val-value">${s.detectedCount}</span>
+        </div>
+        <div class="cc-val-item">
+          <span class="cc-val-label">Valid Questions</span>
+          <span class="cc-val-value text-emerald-600">${s.validCount}</span>
+        </div>
+        <div class="cc-val-item">
+          <span class="cc-val-label">Missing Options</span>
+          <span class="cc-val-value ${s.missingOptionsCount > 0 ? 'text-amber-600' : ''}">${s.missingOptionsCount}</span>
+        </div>
+        <div class="cc-val-item">
+          <span class="cc-val-label">Invalid Answer Refs</span>
+          <span class="cc-val-value ${s.invalidAnswerCount > 0 ? 'text-amber-600' : ''}">${s.invalidAnswerCount}</span>
+        </div>
+        <div class="cc-val-item">
+          <span class="cc-val-label">With Explanations</span>
+          <span class="cc-val-value">${s.withExplanationCount}</span>
+        </div>
+        <div class="cc-val-item">
+          <span class="cc-val-label">HTML Formatting</span>
+          <span class="cc-val-value">${s.withHtmlCount}</span>
+        </div>
+        <div class="cc-val-item">
+          <span class="cc-val-label">LaTeX Equations</span>
+          <span class="cc-val-value">${s.withLatexCount}</span>
+        </div>
+        <div class="cc-val-item">
+          <span class="cc-val-label">Duplicates</span>
+          <span class="cc-val-value ${s.duplicateCount > 0 ? 'text-indigo-600' : ''}">${s.duplicateCount}</span>
+        </div>
+      </div>
+      ${
+        discrepancy > 0
+          ? `<div class="text-xs text-amber-700 font-medium pt-1 border-t border-amber-200/60">
+              <i class="fas fa-info-circle mr-1"></i>Discrepancy Notice: ${s.detectedCount} question object(s) detected vs ${s.validCount} valid (${discrepancyReasons.join(', ')}). Incomplete records are flagged for review and not auto-selected.
+            </div>`
+          : ''
+      }
+    `;
+  }
+
   async runExtraction(params) {
     this.abortExtraction();
     this.isExtracting = true;
@@ -509,10 +627,12 @@ Correct answer: b`;
 
       this.warnings = result.warnings || [];
       this.fileReports = result.fileReports || [];
+      this.summary = result.summary || null;
       this.renderFileQueue();
       this.renderWarnings();
 
       if (result.items.length === 0) {
+        this.renderValidationSummary();
         this.onAlert(
           this.warnings[0] || 'No MCQs extracted. Review the format or create questions manually.',
           'error'
@@ -521,19 +641,20 @@ Correct answer: b`;
         this.items = result.items;
         this.selectedIndices = new Set();
         this.items.forEach((it, idx) => {
-          // Safe default: auto-select non-duplicates; let user inspect duplicates
-          if (it.duplicateStatus === 'none') {
+          // Safe default: auto-select complete non-duplicate questions; never silently auto-select incomplete records
+          if (it.duplicateStatus === 'none' && !it.isIncomplete) {
             this.selectedIndices.add(idx);
           }
         });
         this.editingIndex = -1;
+        this.filterMode = 'all';
         this.saveMode = this.existingMcqs.length > 0 ? 'append' : 'replace';
         const modeSel = this.mountEl.querySelector('#cc-save-mode-select');
         if (modeSel) modeSel.value = this.saveMode;
 
         this.renderReviewSection();
         this.onAlert(
-          `Extracted ${result.items.length} question(s): ${result.summary.highConfidence} ready, ${result.summary.needsReview} need review.`,
+          `Extracted ${result.items.length} question(s) (${result.summary.detectedSourceType}${result.summary.detectedVariableName && result.summary.detectedVariableName !== 'N/A' ? ': ' + result.summary.detectedVariableName : ''}): ${result.summary.validCount} valid.`,
           'success'
         );
       }
@@ -587,6 +708,8 @@ Correct answer: b`;
   }
 
   renderReviewSection() {
+    this.renderValidationSummary();
+
     const statsEl = this.mountEl.querySelector('#cc-review-stats');
     const listEl = this.mountEl.querySelector('#cc-review-list');
     const skipDupsBtn = this.mountEl.querySelector('#cc-skip-dups-btn');
@@ -618,9 +741,15 @@ Correct answer: b`;
 
     if (!listEl) return;
 
+    const firstIdx = 0;
+    const midIdx = Math.floor((total - 1) / 2);
+    const lastIdx = Math.max(0, total - 1);
+    const sampleSet = new Set([firstIdx, midIdx, lastIdx]);
+
     const visibleEntries = this.items
       .map((item, idx) => ({ item, idx }))
-      .filter(({ item }) => {
+      .filter(({ item, idx }) => {
+        if (this.filterMode === 'samples') return sampleSet.has(idx);
         if (this.filterMode === 'review') return item.confidence !== 'high' || (item.warnings && item.warnings.length > 0);
         if (this.filterMode === 'duplicates') return item.duplicateStatus && item.duplicateStatus !== 'none';
         return true;

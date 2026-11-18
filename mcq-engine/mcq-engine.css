@@ -40,10 +40,35 @@
   line-height: 0;
 }
 
+.cc-rich-content b,
+.cc-rich-content strong {
+  font-weight: 700;
+}
+
+.cc-rich-content i,
+.cc-rich-content em {
+  font-style: italic;
+}
+
+.cc-rich-content u,
+.cc-rich-content ins {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cc-rich-content s,
+.cc-rich-content del {
+  text-decoration: line-through;
+}
+
 .cc-rich-content ul,
 .cc-rich-content ol {
   margin: 0.45em 0 0.45em 1.25em;
   padding-left: 0.5em;
+}
+
+.cc-rich-content li {
+  margin: 0.2em 0;
 }
 
 .cc-rich-content ul {
@@ -464,6 +489,61 @@ html.dark .cc-stat-tag.dup {
   gap: 0.45rem;
   align-items: center;
   justify-content: space-between;
+}
+
+/* Import Validation Summary Card */
+.cc-validation-summary {
+  padding: 0.75rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--cc-border, #cbd5e1);
+  background: var(--cc-surface, #ffffff);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.cc-val-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--cc-text-primary, #0f172a);
+}
+
+.cc-val-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.4rem 0.65rem;
+  font-size: 0.77rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.cc-val-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  background: var(--cc-surface-muted, #f8fafc);
+  border: 1px solid var(--cc-border, #e2e8f0);
+}
+
+.cc-val-label {
+  color: var(--cc-text-secondary, #475569);
+  font-weight: 500;
+}
+
+.cc-val-value {
+  color: var(--cc-text-primary, #0f172a);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
 }
 
 .cc-review-list {

@@ -17,7 +17,7 @@
 import DOMPurify from 'dompurify';
 import katex from 'katex';
 import hljs from 'highlight.js/lib/common';
-import { escapeHtmlBasic, htmlToPlainText, getOptionPrefixLabel } from './schema.js';
+import { escapeHtmlBasic, decodeHtmlEntities, htmlToPlainText, getOptionPrefixLabel } from './schema.js';
 
 const ALLOWED_TAGS = [
   'p', 'br', 'div', 'span', 'b', 'strong', 'i', 'em', 'u', 's', 'del', 'ins',
@@ -33,6 +33,9 @@ const ALLOWED_TAGS = [
   'mprescripts', 'none', 'menclose',
 ];
 
+const ALLOWED_TAGS_SET = new Set(ALLOWED_TAGS);
+const SELF_CLOSING_TAGS_SET = new Set(['br', 'hr', 'img', 'col']);
+
 const ALLOWED_ATTR = [
   'class', 'title', 'alt', 'src', 'width', 'height', 'href', 'target', 'rel',
   'colspan', 'rowspan', 'scope', 'align', 'valign', 'start', 'type', 'style',
@@ -42,6 +45,8 @@ const ALLOWED_ATTR = [
   'encoding', 'columnalign', 'rowalign', 'linethickness', 'fence', 'separator',
   'stretchy', 'lspace', 'rspace', 'notation', 'accent', 'accentunder', 'bevelled',
 ];
+
+const ALLOWED_ATTR_SET = new Set(ALLOWED_ATTR);
 
 const SAFE_STYLE_PROPS = new Set([
   'color',
@@ -56,6 +61,75 @@ const SAFE_STYLE_PROPS = new Set([
   'width',
   'height',
 ]);
+
+function filterSafeInlineStyle(rawStyle) {
+  if (!rawStyle) return '';
+  const cleaned = [];
+  String(rawStyle)
+    .split(';')
+    .forEach((decl) => {
+      const idx = decl.indexOf(':');
+      if (idx === -1) return;
+      const prop = decl.slice(0, idx).trim().toLowerCase();
+      const val = decl.slice(idx + 1).trim();
+      if (!SAFE_STYLE_PROPS.has(prop)) return;
+      if (/expression|javascript:|vbscript:|url\s*\(|-moz-binding|@import/i.test(val)) return;
+      if (val) cleaned.push(`${prop}: ${val}`);
+    });
+  return cleaned.join('; ');
+}
+
+/**
+ * Strict allowlist fallback HTML sanitizer used when DOMPurify.sanitize is
+ * unavailable (e.g. headless Node.js environment without window/DOM).
+ */
+function sanitizeHtmlAllowlistFallback(dirtyHtml) {
+  let s = String(dirtyHtml || '');
+  // 1. Remove forbidden dangerous block tags and their entire contents
+  s = s.replace(/<(script|style|iframe|object|embed|svg|form| frameset|applet|noscript)\b[\s\S]*?<\/\1\s*>/gi, '');
+  s = s.replace(/<(script|style|iframe|object|embed|svg|form|input|textarea|select|button|meta|link|base)\b[^>]*\/?>/gi, '');
+  // 2. Remove HTML comments
+  s = s.replace(/<!--[\s\S]*?-->/g, '');
+  // 3. Process remaining tags against ALLOWED_TAGS_SET and ALLOWED_ATTR_SET
+  s = s.replace(/<\/?([a-zA-Z0-9-]+)([^>]*)>/g, (full, rawTag, rawAttrs) => {
+    const tag = String(rawTag || '').toLowerCase();
+    if (!ALLOWED_TAGS_SET.has(tag)) return '';
+    if (full.startsWith('</')) return `</${tag}>`;
+
+    const safeAttrs = [];
+    const attrRe = /([a-zA-Z0-9_-]+)\s*(?:=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
+    let m;
+    while ((m = attrRe.exec(rawAttrs || '')) !== null) {
+      const attrName = m[1].toLowerCase();
+      if (attrName.startsWith('on') || !ALLOWED_ATTR_SET.has(attrName)) continue;
+      const rawVal = m[2] ?? m[3] ?? m[4] ?? '';
+      if (attrName === 'style') {
+        const cleanStyle = filterSafeInlineStyle(rawVal);
+        if (cleanStyle) safeAttrs.push(`style="${escapeHtmlBasic(cleanStyle)}"`);
+      } else if (attrName === 'src') {
+        const src = rawVal.trim();
+        const isSafeUrl =
+          /^https?:\/\//i.test(src) ||
+          /^\//.test(src) ||
+          /^data:image\/(png|jpeg|jpg|gif|webp|avif);base64,[a-z0-9+/=\s]+$/i.test(src);
+        if (isSafeUrl) safeAttrs.push(`src="${escapeHtmlBasic(src)}"`);
+      } else if (attrName === 'href') {
+        const href = rawVal.trim();
+        const isSafeHref =
+          /^https?:\/\//i.test(href) ||
+          /^mailto:/i.test(href) ||
+          /^#/.test(href) ||
+          /^\//.test(href);
+        if (isSafeHref) safeAttrs.push(`href="${escapeHtmlBasic(href)}"`);
+      } else {
+        safeAttrs.push(`${attrName}="${escapeHtmlBasic(rawVal)}"`);
+      }
+    }
+    const attrStr = safeAttrs.length > 0 ? ' ' + safeAttrs.join(' ') : '';
+    return SELF_CLOSING_TAGS_SET.has(tag) ? `<${tag}${attrStr}>` : `<${tag}${attrStr}>`;
+  });
+  return s;
+}
 
 let cachedPurifier = null;
 
@@ -111,19 +185,9 @@ function getPurifier() {
 
       // 3. Strictly filter inline style properties
       if (node.hasAttribute('style')) {
-        const rawStyle = node.getAttribute('style') || '';
-        const cleaned = [];
-        rawStyle.split(';').forEach((decl) => {
-          const idx = decl.indexOf(':');
-          if (idx === -1) return;
-          const prop = decl.slice(0, idx).trim().toLowerCase();
-          const val = decl.slice(idx + 1).trim();
-          if (!SAFE_STYLE_PROPS.has(prop)) return;
-          if (/expression|javascript:|vbscript:|url\s*\(|-moz-binding|@import/i.test(val)) return;
-          if (val) cleaned.push(`${prop}: ${val}`);
-        });
-        if (cleaned.length > 0) {
-          node.setAttribute('style', cleaned.join('; '));
+        const cleanStyle = filterSafeInlineStyle(node.getAttribute('style') || '');
+        if (cleanStyle) {
+          node.setAttribute('style', cleanStyle);
         } else {
           node.removeAttribute('style');
         }
@@ -136,7 +200,7 @@ function getPurifier() {
 }
 
 /**
- * Sanitizes rich HTML using DOMPurify allowlist.
+ * Sanitizes rich HTML using DOMPurify allowlist (or strict allowlist fallback in Node).
  */
 export function sanitizeRichHtml(dirtyHtml) {
   if (dirtyHtml === null || dirtyHtml === undefined) return '';
@@ -151,22 +215,29 @@ export function sanitizeRichHtml(dirtyHtml) {
       FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
     });
   }
-  return escapeHtmlBasic(htmlToPlainText(str));
+  return sanitizeHtmlAllowlistFallback(str);
 }
 
+const KATEX_MACROS = {
+  '\\degree': '^\\circ',
+  '\\bold': '\\mathbf{#1}',
+};
+
 function renderLatexSegment(expr, displayMode) {
-  const cleaned = String(expr || '').trim();
-  if (!cleaned) return '';
+  const decoded = decodeHtmlEntities(String(expr || '')).trim();
+  if (!decoded) return '';
   try {
-    return katex.renderToString(cleaned, {
+    return katex.renderToString(decoded, {
       displayMode: Boolean(displayMode),
       throwOnError: true,
       strict: 'ignore',
+      trust: false,
+      macros: KATEX_MACROS,
       output: 'htmlAndMathml',
     });
   } catch {
-    return `<code class="cc-math-fallback" data-latex="${escapeHtmlBasic(cleaned)}" title="LaTeX expression">${escapeHtmlBasic(
-      displayMode ? `$$${cleaned}$$` : `$${cleaned}$`
+    return `<code class="cc-math-fallback" data-latex="${escapeHtmlBasic(decoded)}" title="LaTeX expression">${escapeHtmlBasic(
+      displayMode ? `$$${decoded}$$` : `$${decoded}$`
     )}</code>`;
   }
 }
@@ -188,6 +259,35 @@ function highlightCodeString(codeText, lang = '') {
   } catch {
     return { html: escapeHtmlBasic(cleanCode), language: cleanLang || 'code' };
   }
+}
+
+/**
+ * Protects LaTeX delimiters containing `<` or `>` inside rich HTML strings
+ * (outside `<pre>`, `<code>`, `<script>`, `<style>`) before HTML parsing so
+ * expressions like `$x < y$` or `$x > y$` are not corrupted by DOM parsing.
+ */
+function protectMathAnglesInHtml(htmlStr) {
+  if (!htmlStr || (!htmlStr.includes('$') && !htmlStr.includes('\\(') && !htmlStr.includes('\\['))) {
+    return htmlStr;
+  }
+  const codePlaceholders = [];
+  let working = String(htmlStr).replace(/<(pre|code|script|style)\b[\s\S]*?<\/\1\s*>/gi, (m) => {
+    const tok = `@@CC_CODE_GUARD_${codePlaceholders.length}@@`;
+    codePlaceholders.push(m);
+    return tok;
+  });
+
+  const mathRe = /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|(?<!\\)\$(?!\s)([^$\n]{1,400}?)(?<!\\|\s)\$(?!\d))/g;
+  working = working.replace(mathRe, (m) => {
+    if (!m.includes('<') && !m.includes('>')) return m;
+    // Do not treat across HTML tags as inline math if it looks like an actual HTML tag
+    if (/<\/?(b|strong|i|em|u|br|p|div|span|ul|ol|li|table|tr|td|th|sub|sup)\b/i.test(m)) {
+      return m;
+    }
+    return m.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  });
+
+  return working.replace(/@@CC_CODE_GUARD_(\d+)@@/g, (_, idx) => codePlaceholders[Number(idx)] || '');
 }
 
 /**
@@ -245,7 +345,15 @@ function hydrateLatexInHtmlFragment(safeHtml) {
   if (!safeHtml) return '';
 
   if (typeof globalThis.DOMParser !== 'function') {
-    return renderLatexInRawText(safeHtml);
+    // Node.js fallback: protect <pre> and <code> blocks before hydrating LaTeX
+    const protectedBlocks = [];
+    const masked = String(safeHtml).replace(/<(pre|code|math)\b[\s\S]*?<\/\1\s*>/gi, (m) => {
+      const tok = `@@CC_NODE_CODE_${protectedBlocks.length}@@`;
+      protectedBlocks.push(m);
+      return tok;
+    });
+    const rendered = renderLatexInRawText(masked);
+    return rendered.replace(/@@CC_NODE_CODE_(\d+)@@/g, (_, idx) => protectedBlocks[Number(idx)] || '');
   }
 
   try {
@@ -331,8 +439,8 @@ function hydrateLatexInHtmlFragment(safeHtml) {
 }
 
 /**
- * Matches $$...$$, \[...\], \(...\), and careful $...$ inside plain text
- * without touching currency values such as $50 or $12.50.
+ * Matches $$...$$, \[...\], \(...\), and $...$ inside text while avoiding
+ * standalone currency values ($50, $10 and $20, $10-$20, $50/$100).
  */
 function renderLatexInRawText(text) {
   if (!text) return '';
@@ -340,7 +448,7 @@ function renderLatexInRawText(text) {
 
   // Order matters: display delimiters before inline delimiters
   const mathPattern =
-    /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|(?<!\\)\$(?!\s*\d+(?:[.,]\d+)?(?:\s|$|[).,;:!?]))([^$\n]{1,300}?)(?<!\\|\s)\$)/g;
+    /(\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|(?<!\\)\$(?!\s)([^$\n]{1,400}?)(?<!\\|\s)\$(?!\d))/g;
 
   let lastIndex = 0;
   let out = '';
@@ -358,12 +466,7 @@ function renderLatexInRawText(text) {
       out += renderLatexSegment(full.slice(2, -2), false);
     } else if (full.startsWith('$') && full.endsWith('$')) {
       const inner = full.slice(1, -1);
-      // Avoid accidental currency range "$10 - $20"
-      if (/^\s*\d[\d,.\s]*$/.test(inner)) {
-        out += full;
-      } else {
-        out += renderLatexSegment(inner, false);
-      }
+      out += renderLatexSegment(inner, false);
     } else {
       out += full;
     }
@@ -393,8 +496,9 @@ export function renderRichHtmlString(value, options = {}) {
   if (!looksLikeHtml) {
     hydrated = preprocessPlainTextInput(str, inlineOnly);
   } else {
-    // CRITICAL SECURITY ORDER: Sanitize HTML first, THEN highlight code & render LaTeX
-    const clean = sanitizeRichHtml(str);
+    // CRITICAL SECURITY ORDER: Protect math `<`/`>`, sanitize HTML first, THEN highlight code & render LaTeX
+    const protectedStr = protectMathAnglesInHtml(str);
+    const clean = sanitizeRichHtml(protectedStr);
     hydrated = hydrateLatexInHtmlFragment(clean);
   }
 

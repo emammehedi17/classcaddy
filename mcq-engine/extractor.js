@@ -92,6 +92,30 @@ export async function extractMcqsFromInput({
   const collectedRaw = [];
   const warnings = [];
   const fileReports = [];
+  const sourceTypes = [];
+  const variableNames = [];
+  const fileNames = [];
+  let totalDetectedRaw = 0;
+
+  const recordMeta = (res, name = '') => {
+    if (name && !fileNames.includes(name)) fileNames.push(name);
+    if (res?.detectedSourceType && !sourceTypes.includes(res.detectedSourceType)) {
+      sourceTypes.push(res.detectedSourceType);
+    }
+    if (res?.detectedVariableName) {
+      res.detectedVariableName
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .forEach((v) => {
+          if (!variableNames.includes(v)) variableNames.push(v);
+        });
+    }
+    const rawCount = typeof res?.rawDetectedCount === 'number' && res.rawDetectedCount > 0
+      ? res.rawDetectedCount
+      : (res?.items || []).length;
+    totalDetectedRaw += rawCount;
+  };
 
   const report = (percent, status, processed = 0, total = 0) => {
     if (onProgress) onProgress({ percent, status, processed, total });
@@ -114,47 +138,66 @@ export async function extractMcqsFromInput({
           const buf = await file.arrayBuffer();
           const res = await parseDocxArrayBuffer(buf, name);
           collectedRaw.push(...(res.items || []));
+          recordMeta(
+            {
+              ...res,
+              detectedSourceType: res.detectedSourceType || 'Word Document (.docx)',
+              detectedVariableName: res.detectedVariableName || 'DOCX body',
+            },
+            name
+          );
           (res.warnings || []).forEach((w) => warnings.push(w));
           fileReports.push({
             name,
             size: file.size || 0,
             count: (res.items || []).length,
+            detectedSourceType: res.detectedSourceType || 'Word Document (.docx)',
+            detectedVariableName: res.detectedVariableName || '',
             status: res.unsupportedFormat ? 'error' : (res.items || []).length > 0 ? 'ok' : 'warning',
             warnings: res.warnings || [],
           });
         } else if (lower.endsWith('.html') || lower.endsWith('.htm')) {
           const content = await file.text();
-          const res = parseHtmlMcqs(content, { preserveCss });
+          const res = parseHtmlMcqs(content, { preserveCss, fileName: name });
           collectedRaw.push(...(res.items || []));
+          recordMeta(res, name);
           (res.warnings || []).forEach((w) => warnings.push(`${name}: ${w}`));
           fileReports.push({
             name,
             size: file.size || 0,
             count: (res.items || []).length,
+            detectedSourceType: res.detectedSourceType || 'HTML Document',
+            detectedVariableName: res.detectedVariableName || '',
             status: (res.items || []).length > 0 ? 'ok' : 'warning',
             warnings: res.warnings || [],
           });
         } else if (lower.endsWith('.json')) {
           const content = await file.text();
-          const res = parseJsonMcqs(content);
+          const res = parseJsonMcqs(content, { fileName: name });
           collectedRaw.push(...(res.items || []));
+          recordMeta(res, name);
           (res.warnings || []).forEach((w) => warnings.push(`${name}: ${w}`));
           fileReports.push({
             name,
             size: file.size || 0,
             count: (res.items || []).length,
+            detectedSourceType: res.detectedSourceType || 'JSON file',
+            detectedVariableName: res.detectedVariableName || '',
             status: res.syntaxError ? 'error' : (res.items || []).length > 0 ? 'ok' : 'warning',
             warnings: res.warnings || [],
           });
         } else if (lower.endsWith('.js') || lower.endsWith('.mjs')) {
           const content = await file.text();
-          const res = parseJsSourceMcqs(content);
+          const res = parseJsSourceMcqs(content, { fileName: name, detectedSourceType: 'JavaScript MCQ file' });
           collectedRaw.push(...(res.items || []));
+          recordMeta(res, name);
           (res.warnings || []).forEach((w) => warnings.push(`${name}: ${w}`));
           fileReports.push({
             name,
             size: file.size || 0,
             count: (res.items || []).length,
+            detectedSourceType: res.detectedSourceType || 'JavaScript MCQ file',
+            detectedVariableName: res.detectedVariableName || '',
             status: res.syntaxError ? 'error' : (res.items || []).length > 0 ? 'ok' : 'warning',
             warnings: res.warnings || [],
           });
@@ -162,11 +205,21 @@ export async function extractMcqsFromInput({
           const content = await file.text();
           const res = parsePlainTextMcqs(content);
           collectedRaw.push(...(res.items || []));
+          recordMeta(
+            {
+              ...res,
+              detectedSourceType: 'Plain Text / Markdown',
+              detectedVariableName: 'Text blocks',
+            },
+            name
+          );
           (res.warnings || []).forEach((w) => warnings.push(`${name}: ${w}`));
           fileReports.push({
             name,
             size: file.size || 0,
             count: (res.items || []).length,
+            detectedSourceType: 'Plain Text / Markdown',
+            detectedVariableName: '',
             status: (res.items || []).length > 0 ? 'ok' : 'warning',
             warnings: res.warnings || [],
           });
@@ -184,21 +237,48 @@ export async function extractMcqsFromInput({
       await yieldToMain();
     }
   } else if (mode === 'html') {
-    report(25, 'Parsing HTML DOM & CSS styles...');
+    report(25, 'Inspecting HTML scripts, DOM & CSS styles...');
     await yieldToMain();
-    const res = parseHtmlMcqs(html, { preserveCss });
+    const res = parseHtmlMcqs(html, { preserveCss, fileName: 'Pasted HTML' });
     collectedRaw.push(...(res.items || []));
+    recordMeta(res, 'Pasted HTML');
     warnings.push(...(res.warnings || []));
   } else if (mode === 'source') {
     report(25, 'Running static AST / JSON extraction (no code executed)...');
     await yieldToMain();
-    const res = parseJsSourceMcqs(sourceText);
+    const trimmedSrc = String(sourceText || '').trim();
+    const res =
+      /^<!DOCTYPE\s+html/i.test(trimmedSrc) || /<html\b|<script\b/i.test(trimmedSrc)
+        ? parseHtmlMcqs(sourceText, { preserveCss, fileName: 'Pasted HTML/Script' })
+        : parseJsSourceMcqs(sourceText, { fileName: 'Pasted JS/JSON' });
     collectedRaw.push(...(res.items || []));
+    recordMeta(res, 'Pasted JS/JSON');
     warnings.push(...(res.warnings || []));
   } else {
-    report(25, 'Parsing text blocks & answer keys...');
+    report(25, 'Parsing input content...');
     await yieldToMain();
-    const res = parsePlainTextMcqs(text);
+    const trimmedText = String(text || '').trim();
+    let res;
+    if (/^<!DOCTYPE\s+html/i.test(trimmedText) || /<html\b|<script\b/i.test(trimmedText)) {
+      res = parseHtmlMcqs(text, { preserveCss, fileName: 'Pasted HTML' });
+      recordMeta(res, 'Pasted HTML');
+    } else if (
+      /^(?:const|let|var|window\.|export\s+)/.test(trimmedText) ||
+      ((trimmedText.startsWith('[') || trimmedText.startsWith('{')) && /question|options|"q"\s*:|\bq\s*:/i.test(trimmedText))
+    ) {
+      res = parseJsSourceMcqs(text, { fileName: 'Pasted JS/JSON' });
+      recordMeta(res, 'Pasted JS/JSON');
+    } else {
+      res = parsePlainTextMcqs(text);
+      recordMeta(
+        {
+          ...res,
+          detectedSourceType: 'Plain Text MCQ blocks',
+          detectedVariableName: 'Text numbering',
+        },
+        'Pasted Text'
+      );
+    }
     collectedRaw.push(...(res.items || []));
     warnings.push(...(res.warnings || []));
   }
@@ -210,12 +290,39 @@ export async function extractMcqsFromInput({
 
   report(100, `Ready: ${items.length} question(s) extracted`, items.length, items.length);
 
+  const duplicatesExisting = items.filter((q) => q.duplicateStatus === 'existing').length;
+  const duplicatesBatch = items.filter((q) => q.duplicateStatus === 'batch').length;
+  const missingOptionsCount = items.filter((q) => q.missingOptions || (q.options || []).length < 2).length;
+  const invalidAnswerCount = items.filter((q) => q.invalidAnswerRef).length;
+  const validCount = items.filter(
+    (q) =>
+      !q.isIncomplete &&
+      !q.missingOptions &&
+      !q.invalidAnswerRef &&
+      (q.options || []).length >= 2 &&
+      (q.correctIndex !== -1 || Boolean(q.correctAnswer))
+  ).length;
+  const withExplanationCount = items.filter((q) => Boolean((q.explanation || q.note || '').trim())).length;
+  const withHtmlCount = items.filter((q) => Boolean(q.hasHtmlFormatting)).length;
+  const withLatexCount = items.filter((q) => Boolean(q.hasMath)).length;
+
   const summary = {
     total: items.length,
+    fileName: fileNames.join(', ') || (mode === 'files' ? 'Uploaded File' : 'Pasted Input'),
+    detectedSourceType: sourceTypes.join(', ') || 'Auto-detected MCQ input',
+    detectedVariableName: variableNames.join(', ') || 'N/A',
+    detectedCount: Math.max(totalDetectedRaw, items.length),
+    validCount,
+    missingOptionsCount,
+    invalidAnswerCount,
+    withExplanationCount,
+    withHtmlCount,
+    withLatexCount,
+    duplicateCount: duplicatesExisting + duplicatesBatch,
     highConfidence: items.filter((q) => q.confidence === 'high').length,
     needsReview: items.filter((q) => q.confidence !== 'high' || (q.warnings && q.warnings.length > 0)).length,
-    duplicatesExisting: items.filter((q) => q.duplicateStatus === 'existing').length,
-    duplicatesBatch: items.filter((q) => q.duplicateStatus === 'batch').length,
+    duplicatesExisting,
+    duplicatesBatch,
   };
 
   return { items, warnings: [...new Set(warnings)], fileReports, summary };

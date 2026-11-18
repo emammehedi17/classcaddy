@@ -108,7 +108,7 @@ export function hasLatexSyntax(str) {
     /\$\$[\s\S]+?\$\$/.test(str) ||
     /\\\[[\s\S]+?\\\]/.test(str) ||
     /\\\([\s\S]+?\\\)/.test(str) ||
-    /(^|[^\\$])\$(?!\s*\d[\d,.]*(?:\s|$))([^$\n]{1,300}?[^\\\s])\$(?!\d)/.test(str)
+    /(^|[^\\$])\$(?!\s)([^$\n]{1,400}?)(?<!\\|\s)\$(?!\d)/.test(str)
   );
 }
 
@@ -135,10 +135,18 @@ export function detectRichFlags(item) {
   ].filter(Boolean);
 
   const combined = fields.join('\n');
+  const hasHtmlFormatting =
+    Boolean(item?.hasHtmlFormatting) ||
+    hasRichMarkup(item?.questionHtml || item?.question || '') ||
+    (Array.isArray(item?.optionsHtml) && item.optionsHtml.some((o) => hasRichMarkup(o))) ||
+    (Array.isArray(item?.options) && item.options.some((o) => hasRichMarkup(o))) ||
+    hasRichMarkup(item?.explanationHtml || item?.explanation || item?.noteHtml || item?.note || '');
+
   return {
     hasMath: Boolean(item?.hasMath) || /<math\b/i.test(combined) || hasLatexSyntax(combined),
     hasCode: Boolean(item?.hasCode) || hasCodeSyntax(combined),
     hasMedia: Boolean(item?.hasMedia) || hasMediaMarkup(combined),
+    hasHtmlFormatting,
   };
 }
 
@@ -357,19 +365,33 @@ export function normalizeMcqItem(raw, fallbackIdx = 0) {
     : (item.correctAnswerHtml || (correctAnswer ? escapeHtmlBasic(correctAnswer).replace(/\n/g, '<br>') : ''));
 
   const warnings = Array.isArray(item.warnings) ? [...item.warnings] : [];
-  if (!questionPlain && !hasMediaMarkup(questionHtml)) {
+  const missingQuestion = !questionPlain && !hasMediaMarkup(questionHtml);
+  const missingOptions = Boolean(item.missingOptions) || optionsPlain.length < 2;
+  const invalidAnswerRef = Boolean(item.invalidAnswerRef);
+
+  if (missingQuestion) {
     if (!warnings.includes('Empty question stem')) warnings.push('Empty question stem');
   }
-  if (optionsPlain.length < 2) {
+  if (missingOptions) {
     if (!warnings.includes('Fewer than 2 options extracted')) warnings.push('Fewer than 2 options extracted');
   }
-  if (correctIndex === -1 && !correctAnswer) {
+  if (invalidAnswerRef) {
+    const refMsg = item.rawAnswerRef
+      ? `Invalid answer reference "${item.rawAnswerRef}" does not match any option`
+      : 'Invalid answer reference does not match any option';
+    if (!warnings.includes(refMsg)) warnings.push(refMsg);
+  } else if (correctIndex === -1 && !correctAnswer) {
     if (!warnings.includes('Correct answer not identified')) warnings.push('Correct answer not identified');
   }
 
+  const isIncomplete = Boolean(item.isIncomplete) || missingQuestion || missingOptions || invalidAnswerRef;
+
   let confidence = item.confidence;
   let confidenceScore = typeof item.confidenceScore === 'number' ? item.confidenceScore : null;
-  if (!confidence) {
+  if (isIncomplete) {
+    confidence = 'manual';
+    confidenceScore = 0.35;
+  } else if (!confidence) {
     if (warnings.length === 0 && optionsPlain.length >= 2 && (correctIndex !== -1 || correctAnswer)) {
       confidence = 'high';
       confidenceScore = 0.95;
@@ -406,6 +428,13 @@ export function normalizeMcqItem(raw, fallbackIdx = 0) {
     noteHtml,
     tags: Array.isArray(item.tags) ? item.tags.filter(Boolean).map(String) : [],
     sourceFormat: item.sourceFormat || 'legacy',
+    detectedSourceType: item.detectedSourceType || '',
+    detectedVariableName: item.detectedVariableName || '',
+    sourceFileName: item.sourceFileName || '',
+    rawAnswerRef: item.rawAnswerRef !== undefined ? String(item.rawAnswerRef) : '',
+    missingOptions,
+    invalidAnswerRef,
+    isIncomplete,
     confidence,
     confidenceScore,
     warnings,
@@ -419,6 +448,7 @@ export function normalizeMcqItem(raw, fallbackIdx = 0) {
       hasMath: item.hasMath,
       hasCode: item.hasCode,
       hasMedia: item.hasMedia,
+      hasHtmlFormatting: item.hasHtmlFormatting,
     }),
   };
 
