@@ -245,6 +245,8 @@ export async function buildStudyPlanRepository(bridge) {
                             const normalizedQ = {
                                 version: norm.version,
                                 uid,
+                                sourceMcqUid: mcq.uid || norm.uid || null,
+                                sourceMcqIndex: qIdx,
                                 kind: 'mcq',
                                 serialIndex: serialOrderCounter++,
                                 question: norm.question,
@@ -389,6 +391,8 @@ export async function buildStudyPlanRepository(bridge) {
             return {
                 version: norm.version,
                 uid,
+                sourceMcqUid: q.sourceMcqUid || q.uid || norm.uid || null,
+                sourceMcqIndex: (typeof q.sourceMcqIndex === 'number') ? q.sourceMcqIndex : idx,
                 kind: launchContext.quizKind || 'mcq',
                 serialIndex: idx,
                 question: norm.question,

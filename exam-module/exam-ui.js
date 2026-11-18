@@ -27,14 +27,20 @@ import {
     shuffleArrayCopy,
     buildStudyPlanRepository,
     resolveInitialScopeFromContext,
-    selectQuestionsForExam
+    selectQuestionsForExam,
+    computeQuestionUid
 } from './exam-bank.js';
 
 import {
     isOptionCorrect,
     isUserSelectionCorrect,
     htmlToPlainText,
-    getCanonicalCorrectIndex
+    getCanonicalCorrectIndex,
+    normalizeMcqItem,
+    escapeHtmlBasic,
+    hasRichMarkup,
+    normalizeCompareText,
+    computeFingerprint
 } from '../mcq-engine/schema.js';
 
 import { renderMcqFieldHtml } from '../mcq-engine/renderer.js';
@@ -273,6 +279,26 @@ function formatDateTime(tsMs) {
     }
 }
 
+function fieldValueForEdit(plainVal, htmlVal) {
+    const html = typeof htmlVal === 'string' ? htmlVal.trim() : '';
+    if (!html) return String(plainVal || '');
+    const withoutBrs = html.replace(/<br\s*\/?>/gi, '\n');
+    if (!hasRichMarkup(withoutBrs)) {
+        return htmlToPlainText(html) || String(plainVal || '');
+    }
+    return html;
+}
+
+function buildEditedFieldProps(rawInput) {
+    const trimmed = String(rawInput ?? '').trim();
+    const isRich = hasRichMarkup(trimmed);
+    const plain = isRich ? htmlToPlainText(trimmed) : trimmed;
+    const html = isRich
+        ? trimmed
+        : (/\r?\n/.test(trimmed) ? escapeHtmlBasic(trimmed).replace(/\r?\n/g, '<br>') : '');
+    return { plain, html };
+}
+
 class NewExamSystemController {
     constructor() {
         this.root = document.getElementById('new-exam-ui-root');
@@ -305,6 +331,8 @@ class NewExamSystemController {
         this.historySearch = '';
         this.historySubjectFilter = 'all';
         this.submitDialogOpen = false;
+        this.editingQuestionIndex = null;
+        this._pausedByEditModal = false;
         this.omrMobileTab = 'paper'; // 'paper' | 'sheet'
         this.toastTimer = null;
 
@@ -320,6 +348,13 @@ class NewExamSystemController {
         // Keyboard navigation & answer selection during exam runtime
         document.addEventListener('keydown', (e) => {
             if (!this.root || this.root.classList.contains('hidden')) return;
+            if (this.editingQuestionIndex !== null) {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    this.closeEditQuestionModal();
+                }
+                return;
+            }
             if (this.view !== 'run' || !this.run || this.run.paused || this.submitDialogOpen) return;
             if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target?.tagName)) return;
 
@@ -349,6 +384,9 @@ class NewExamSystemController {
             } else if (key === 'b') {
                 e.preventDefault();
                 this.toggleBookmark(q.uid);
+            } else if (key === 'e' && this.canEditActiveQuestion(q)) {
+                e.preventDefault();
+                this.openEditQuestionModal(this.run.currentIndex);
             }
         });
 
@@ -756,7 +794,7 @@ class NewExamSystemController {
         if (!silent) this.render();
     }
 
-    resumeExam() {
+    resumeExam(silent = false) {
         if (!this.run || !this.run.paused) return;
         const nowMs = Date.now();
         this.run.lastActiveStartMs = nowMs;
@@ -766,7 +804,7 @@ class NewExamSystemController {
         this.run.paused = false;
         this.persistActiveDraft();
         this.startTimerLoop();
-        this.render();
+        if (!silent) this.render();
     }
 
     isPracticeInstantMode(cfg = this.run?.config) {
@@ -1032,6 +1070,502 @@ class NewExamSystemController {
             });
         } else {
             this.render();
+        }
+    }
+
+    canEditActiveQuestion(q = null) {
+        if (!this.run || !this.run.config) return false;
+        if (this.run.config.mode === 'exam') return false;
+        if (!this.isPracticeInstantMode(this.run.config)) return false;
+        if (q && q.kind === 'vocab') return false;
+        return true;
+    }
+
+    openEditQuestionModal(qIndex) {
+        if (!this.run || !this.root) return;
+        const q = this.run.questions[qIndex];
+        if (!q || !this.canEditActiveQuestion(q)) {
+            this.showToast('Question editing is only available in Practice or Unlimited Practice mode.');
+            return;
+        }
+
+        this.root.querySelector('#ex-edit-modal-veil')?.remove();
+
+        if (!this.run.paused) {
+            this.pauseExam(true);
+            this._pausedByEditModal = true;
+        } else {
+            this._pausedByEditModal = false;
+        }
+        this.editingQuestionIndex = qIndex;
+
+        const qTextVal = fieldValueForEdit(q.question, q.questionHtml);
+        const expTextVal = fieldValueForEdit(q.explanation || q.note || '', q.explanationHtml || q.noteHtml || '');
+        const opts = Array.isArray(q.options) && q.options.length > 0 ? q.options : ['', ''];
+        const optsHtml = Array.isArray(q.optionsHtml) ? q.optionsHtml : [];
+        const currentCorrectIdx = getCanonicalCorrectIndex(q);
+        const selectedCorrectIdx = currentCorrectIdx >= 0 && currentCorrectIdx < opts.length ? currentCorrectIdx : 0;
+        const wasAnswered = (q.userAnswer !== null && q.userAnswer !== undefined && q.userAnswer !== '') || (typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0);
+
+        const buildOptionRowHtml = (optIdx, optVal, isCorrectOpt, origIdxVal) => {
+            const lbl = getLocalizedOptionLabel(optIdx, qTextVal, opts);
+            return `
+                <div class="ex-edit-opt-row ${isCorrectOpt ? 'is-correct' : ''}" data-orig-opt-idx="${origIdxVal}">
+                    <input type="radio" name="ex-edit-correct" class="ex-edit-opt-radio" value="${optIdx}" ${isCorrectOpt ? 'checked' : ''} title="Mark as correct answer">
+                    <span class="ex-edit-opt-badge">${esc(lbl)}</span>
+                    <textarea class="ex-input ex-edit-opt-ta" rows="2" placeholder="Alternative ${esc(lbl)}...">${esc(optVal)}</textarea>
+                    <button type="button" class="ex-btn sm" data-edit-remove-opt title="Remove alternative">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `;
+        };
+
+        const veil = document.createElement('div');
+        veil.id = 'ex-edit-modal-veil';
+        veil.className = 'ex-veil';
+        veil.innerHTML = `
+            <div class="ex-dlg ex-edit-dlg" role="dialog" aria-modal="true" aria-labelledby="ex-edit-modal-title">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+                    <div>
+                        <h3 id="ex-edit-modal-title" style="margin:0; font-size:1.12rem; font-weight:800;">
+                            <i class="fas fa-pen-to-square" style="color:var(--ex-accent); margin-right:6px;"></i>Edit Question #${qIndex + 1}
+                        </h3>
+                        <div style="font-size:0.78rem; color:var(--ex-muted); margin-top:2px;">
+                            ${esc(q.subject || 'General')}${q.topic ? ` · ${esc(q.topic)}` : ''}
+                        </div>
+                    </div>
+                    <button type="button" class="ex-btn sm" data-edit-cancel title="Close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="ex-edit-field">
+                    <label class="ex-edit-label" for="ex-edit-question">
+                        <span>Question Stem</span>
+                    </label>
+                    <textarea id="ex-edit-question" class="ex-input ex-edit-ta" rows="3" placeholder="Enter question text...">${esc(qTextVal)}</textarea>
+                </div>
+
+                <div class="ex-edit-field">
+                    <div class="ex-edit-label">
+                        <span>Alternatives (select the correct answer)</span>
+                        <button type="button" class="ex-btn sm" id="ex-edit-add-opt">
+                            <i class="fas fa-plus"></i> Add Option
+                        </button>
+                    </div>
+                    <div id="ex-edit-opts-list" class="ex-edit-opts">
+                        ${opts.map((opt, idx) => buildOptionRowHtml(
+                            idx,
+                            fieldValueForEdit(opt, optsHtml[idx] || ''),
+                            idx === selectedCorrectIdx,
+                            String(idx)
+                        )).join('')}
+                    </div>
+                </div>
+
+                <div class="ex-edit-field">
+                    <label class="ex-edit-label" for="ex-edit-explanation">
+                        <span>Explanation / Note</span>
+                    </label>
+                    <textarea id="ex-edit-explanation" class="ex-input ex-edit-ta" rows="3" placeholder="Optional explanation shown after answering...">${esc(expTextVal)}</textarea>
+                </div>
+
+                <div id="ex-edit-error" class="ex-callout warn" style="display:none; margin:0; font-size:0.82rem;"></div>
+
+                ${wasAnswered ? `
+                    <div style="font-size:0.79rem; color:var(--ex-muted); background:var(--ex-sunk); padding:8px 10px; border-radius:var(--ex-radius); border:1px solid var(--ex-line);">
+                        <i class="fas fa-calculator" style="color:var(--ex-accent); margin-right:5px;"></i>
+                        You have already answered this question — saving will automatically recalculate your result and palette status.
+                    </div>
+                ` : ''}
+
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:4px;">
+                    <button type="button" class="ex-btn" data-edit-cancel>Cancel</button>
+                    <button type="button" class="ex-btn primary" id="ex-edit-save-btn">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        `;
+
+        this.root.appendChild(veil);
+
+        const optsList = veil.querySelector('#ex-edit-opts-list');
+        const refreshOptionRowsUi = () => {
+            const rows = Array.from(optsList.querySelectorAll('.ex-edit-opt-row'));
+            const currentSampleQ = veil.querySelector('#ex-edit-question')?.value || qTextVal;
+            const currentSampleOpts = rows.map(r => r.querySelector('.ex-edit-opt-ta')?.value || '');
+            let anyChecked = false;
+            rows.forEach((row, idx) => {
+                const radio = row.querySelector('.ex-edit-opt-radio');
+                const badge = row.querySelector('.ex-edit-opt-badge');
+                if (radio) {
+                    radio.value = String(idx);
+                    if (radio.checked) anyChecked = true;
+                }
+                if (badge) {
+                    badge.textContent = getLocalizedOptionLabel(idx, currentSampleQ, currentSampleOpts);
+                }
+            });
+            if (!anyChecked && rows[0]) {
+                const firstRadio = rows[0].querySelector('.ex-edit-opt-radio');
+                if (firstRadio) firstRadio.checked = true;
+            }
+            rows.forEach((row) => {
+                const radio = row.querySelector('.ex-edit-opt-radio');
+                row.classList.toggle('is-correct', Boolean(radio?.checked));
+            });
+        };
+
+        const bindRowListeners = (row) => {
+            row.querySelector('.ex-edit-opt-radio')?.addEventListener('change', refreshOptionRowsUi);
+            row.querySelector('[data-edit-remove-opt]')?.addEventListener('click', () => {
+                const rows = optsList.querySelectorAll('.ex-edit-opt-row');
+                if (rows.length <= 2) {
+                    this.showToast('At least 2 alternatives are required.');
+                    return;
+                }
+                row.remove();
+                refreshOptionRowsUi();
+            });
+        };
+
+        optsList.querySelectorAll('.ex-edit-opt-row').forEach(bindRowListeners);
+
+        veil.querySelector('#ex-edit-add-opt')?.addEventListener('click', () => {
+            const rows = optsList.querySelectorAll('.ex-edit-opt-row');
+            if (rows.length >= 6) {
+                this.showToast('Maximum 6 alternatives supported.');
+                return;
+            }
+            const nextIdx = rows.length;
+            const tmp = document.createElement('div');
+            tmp.innerHTML = buildOptionRowHtml(nextIdx, '', false, '').trim();
+            const newRow = tmp.firstElementChild;
+            if (newRow) {
+                optsList.appendChild(newRow);
+                bindRowListeners(newRow);
+                refreshOptionRowsUi();
+                newRow.querySelector('.ex-edit-opt-ta')?.focus({ preventScroll: true });
+            }
+        });
+
+        veil.addEventListener('click', (e) => {
+            if (e.target === veil) this.closeEditQuestionModal();
+        });
+        veil.querySelectorAll('[data-edit-cancel]').forEach(btn => {
+            btn.addEventListener('click', () => this.closeEditQuestionModal());
+        });
+        veil.querySelector('#ex-edit-save-btn')?.addEventListener('click', () => {
+            this.saveEditedQuestion(qIndex);
+        });
+
+        requestAnimationFrame(() => {
+            veil.querySelector('#ex-edit-question')?.focus({ preventScroll: true });
+        });
+    }
+
+    closeEditQuestionModal() {
+        this.root?.querySelector('#ex-edit-modal-veil')?.remove();
+        this.editingQuestionIndex = null;
+        if (this._pausedByEditModal) {
+            this._pausedByEditModal = false;
+            this.resumeExam(true);
+        }
+    }
+
+    syncUpdatedQuestionToRepo(oldQ, updatedQ) {
+        if (!this.repo) return;
+        const matchesRepoItem = (item) => {
+            if (!item || item.kind === 'vocab') return false;
+            if (oldQ.sourceMcqUid && item.sourceMcqUid && item.sourceMcqUid === oldQ.sourceMcqUid) return true;
+            if (oldQ.uid && item.uid && item.uid === oldQ.uid) {
+                if (!oldQ.topicKey || !item.topicKey || item.topicKey === oldQ.topicKey) return true;
+            }
+            if (
+                oldQ.topicKey && item.topicKey === oldQ.topicKey &&
+                typeof oldQ.sourceMcqIndex === 'number' && item.sourceMcqIndex === oldQ.sourceMcqIndex
+            ) {
+                return true;
+            }
+            return false;
+        };
+
+        const applyFields = (target) => {
+            target.uid = updatedQ.uid;
+            target.question = updatedQ.question;
+            target.questionHtml = updatedQ.questionHtml;
+            target.options = updatedQ.options.slice();
+            target.optionsHtml = updatedQ.optionsHtml.slice();
+            target.correctAnswer = updatedQ.correctAnswer;
+            target.correctAnswerHtml = updatedQ.correctAnswerHtml;
+            target.correctIndex = updatedQ.correctIndex;
+            target.explanation = updatedQ.explanation;
+            target.explanationHtml = updatedQ.explanationHtml;
+            target.note = updatedQ.note;
+            target.noteHtml = updatedQ.noteHtml;
+            target.hasMath = updatedQ.hasMath;
+            target.hasCode = updatedQ.hasCode;
+            target.hasMedia = updatedQ.hasMedia;
+        };
+
+        const seen = new Set();
+        const touchList = (list) => {
+            if (!Array.isArray(list)) return;
+            list.forEach((item) => {
+                if (!item || seen.has(item)) return;
+                if (matchesRepoItem(item)) {
+                    seen.add(item);
+                    applyFields(item);
+                }
+            });
+        };
+
+        touchList(this.repo.allQuestions);
+        (this.repo.allTopics || []).forEach(t => touchList(t?.questions));
+        if (this.repo.inheritedCollection) {
+            touchList(this.repo.inheritedCollection.questions);
+        }
+    }
+
+    patchEditedQuestionInPlace(qIndex) {
+        if (!this.run || !this.root) return;
+        const r = this.run;
+        const q = r.questions[qIndex];
+        if (!q) return;
+        const isInstant = this.isPracticeInstantMode(r.config);
+        const cardEl = this.root.querySelector(`article.ex-qcard[data-scroll-q="${qIndex}"]`);
+        if (cardEl) {
+            const beforeTop = cardEl.getBoundingClientRect().top;
+            const tpl = document.createElement('template');
+            tpl.innerHTML = this.renderQuestionCardHtml(q, qIndex, isInstant, r.config.layout !== 'scroll').trim();
+            const newCard = tpl.content.firstElementChild;
+            if (newCard) {
+                if (r.currentIndex === qIndex) newCard.classList.add('cur');
+                cardEl.replaceWith(newCard);
+                this.bindQuestionContainerEvents(newCard);
+                const afterTop = newCard.getBoundingClientRect().top;
+                const delta = afterTop - beforeTop;
+                if (Math.abs(delta) > 1) {
+                    this.root.scrollTop += delta;
+                }
+            }
+        }
+        this.patchRunQuestionInPlace(qIndex);
+    }
+
+    async saveEditedQuestion(qIndex) {
+        if (!this.run || !this.root) return;
+        const q = this.run.questions[qIndex];
+        if (!q || !this.canEditActiveQuestion(q)) {
+            this.closeEditQuestionModal();
+            return;
+        }
+
+        const veil = this.root.querySelector('#ex-edit-modal-veil');
+        if (!veil) return;
+
+        const errEl = veil.querySelector('#ex-edit-error');
+        const showErr = (msg) => {
+            if (errEl) {
+                errEl.textContent = msg;
+                errEl.style.display = 'block';
+            }
+        };
+
+        const rawQ = veil.querySelector('#ex-edit-question')?.value ?? '';
+        const qProps = buildEditedFieldProps(rawQ);
+        if (!qProps.plain && !qProps.html) {
+            showErr('Question text cannot be empty.');
+            return;
+        }
+
+        const rows = Array.from(veil.querySelectorAll('.ex-edit-opt-row'));
+        const nextOptionsPlain = [];
+        const nextOptionsHtml = [];
+        const origIndexMap = [];
+        let selectedRowIndex = -1;
+
+        rows.forEach((row) => {
+            const ta = row.querySelector('.ex-edit-opt-ta');
+            const radio = row.querySelector('.ex-edit-opt-radio');
+            const optProps = buildEditedFieldProps(ta?.value ?? '');
+            if (!optProps.plain && !optProps.html) return;
+            const pushedIdx = nextOptionsPlain.length;
+            if (radio?.checked) selectedRowIndex = pushedIdx;
+            const origAttr = row.dataset.origOptIdx;
+            origIndexMap.push(origAttr !== '' && origAttr !== undefined ? parseInt(origAttr, 10) : -1);
+            nextOptionsPlain.push(optProps.plain);
+            nextOptionsHtml.push(optProps.html);
+        });
+
+        if (nextOptionsPlain.length < 2) {
+            showErr('Please provide at least 2 non-empty alternatives.');
+            return;
+        }
+        if (selectedRowIndex < 0 || selectedRowIndex >= nextOptionsPlain.length) {
+            showErr('Please select one of the non-empty alternatives as the correct answer.');
+            return;
+        }
+
+        const rawExp = veil.querySelector('#ex-edit-explanation')?.value ?? '';
+        const expProps = buildEditedFieldProps(rawExp);
+
+        const norm = normalizeMcqItem({
+            id: q.id,
+            uid: q.sourceMcqUid || q.uid,
+            question: qProps.plain,
+            questionText: qProps.plain,
+            questionHtml: qProps.html,
+            options: nextOptionsPlain,
+            optionsText: nextOptionsPlain,
+            optionsHtml: nextOptionsHtml,
+            correctIndex: selectedRowIndex,
+            correctAnswer: nextOptionsPlain[selectedRowIndex],
+            correctAnswerHtml: nextOptionsHtml[selectedRowIndex] || '',
+            explanation: expProps.plain,
+            explanationText: expProps.plain,
+            explanationHtml: expProps.html,
+            note: expProps.plain,
+            noteText: expProps.plain,
+            noteHtml: expProps.html,
+            tags: q.tags,
+            sourceFormat: q.sourceFormat
+        }, q.sourceMcqIndex ?? qIndex);
+
+        const newUid = computeQuestionUid(norm.question, norm.correctAnswer);
+        const bookmarkMigrated = Boolean(q.uid && newUid && q.uid !== newUid && this.bookmarks.has(q.uid));
+        if (bookmarkMigrated) {
+            this.bookmarks.delete(q.uid);
+            this.bookmarks.add(newUid);
+        }
+
+        const updatedQ = {
+            ...q,
+            version: norm.version,
+            uid: newUid,
+            question: norm.question,
+            questionHtml: norm.questionHtml,
+            options: norm.options.slice(),
+            optionsHtml: norm.optionsHtml.slice(),
+            correctAnswer: norm.correctAnswer,
+            correctAnswerHtml: norm.correctAnswerHtml,
+            correctIndex: norm.correctIndex,
+            explanation: norm.explanation || null,
+            explanationHtml: norm.explanationHtml || null,
+            note: norm.note || null,
+            noteHtml: norm.noteHtml || null,
+            hasMath: norm.hasMath,
+            hasCode: norm.hasCode,
+            hasMedia: norm.hasMedia
+        };
+
+        // Recalculate user answer & correctness if already answered
+        const wasAnswered = (q.userAnswer !== null && q.userAnswer !== undefined && q.userAnswer !== '') || (typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0);
+        if (wasAnswered) {
+            let nextUserIdx = -1;
+            if (typeof q.userAnswerIndex === 'number' && q.userAnswerIndex >= 0) {
+                nextUserIdx = origIndexMap.indexOf(q.userAnswerIndex);
+            }
+            if (nextUserIdx === -1 && q.userAnswer !== null && q.userAnswer !== undefined) {
+                const prevNorm = normalizeCompareText(q.userAnswer);
+                if (prevNorm) {
+                    nextUserIdx = updatedQ.options.findIndex(o => normalizeCompareText(o) === prevNorm);
+                }
+            }
+
+            if (nextUserIdx >= 0 && nextUserIdx < updatedQ.options.length) {
+                updatedQ.userAnswerIndex = nextUserIdx;
+                updatedQ.userAnswer = updatedQ.options[nextUserIdx];
+                updatedQ.isCorrect = isUserSelectionCorrect(updatedQ, updatedQ.userAnswer, updatedQ.userAnswerIndex);
+            } else {
+                updatedQ.userAnswerIndex = null;
+                updatedQ.userAnswer = null;
+                updatedQ.isCorrect = null;
+            }
+        } else {
+            updatedQ.userAnswerIndex = null;
+            updatedQ.userAnswer = null;
+            updatedQ.isCorrect = null;
+        }
+
+        this.run.questions[qIndex] = updatedQ;
+        this.syncUpdatedQuestionToRepo(q, updatedQ);
+        this.persistActiveDraft();
+
+        const layout = this.run.config.layout;
+        if (layout === 'scroll') {
+            this.closeEditQuestionModal();
+            this.patchEditedQuestionInPlace(qIndex);
+        } else {
+            const prevRootScroll = this.root.scrollTop;
+            const prevBookletScroll = this.root.querySelector('.ex-booklet')?.scrollTop || 0;
+            this.closeEditQuestionModal();
+            this.render();
+            this.root.scrollTop = prevRootScroll;
+            const bookletEl = this.root.querySelector('.ex-booklet');
+            if (bookletEl) bookletEl.scrollTop = prevBookletScroll;
+        }
+
+        // Persist migrated bookmark & updated MCQ back to Study Plan Firestore
+        const bridge = this.getBridge();
+        if (bookmarkMigrated) {
+            toggleBookmarkPersist(bridge, q.uid, false)
+                .then(() => toggleBookmarkPersist(bridge, newUid, true))
+                .then((nextSet) => { this.bookmarks = nextSet; })
+                .catch(() => {});
+        }
+        if (bridge && typeof bridge.updateStudyPlanMcq === 'function') {
+            try {
+                const saveRes = await bridge.updateStudyPlanMcq({
+                    monthId: q.monthId || null,
+                    weekId: q.weekId || null,
+                    dayIndex: q.dayIndex ?? null,
+                    rowIndex: q.rowIndex ?? null,
+                    sourceMcqIndex: q.sourceMcqIndex ?? null,
+                    sourceMcqUid: q.sourceMcqUid || null,
+                    originalQuestion: q.questionHtml || q.question || '',
+                    originalFingerprint: computeFingerprint(q),
+                    updatedMcq: {
+                        uid: q.sourceMcqUid || norm.uid,
+                        question: norm.question,
+                        questionText: norm.questionText,
+                        questionHtml: norm.questionHtml,
+                        options: norm.options,
+                        optionsText: norm.optionsText,
+                        optionsHtml: norm.optionsHtml,
+                        correctIndex: norm.correctIndex,
+                        correctAnswer: norm.correctAnswer,
+                        correctAnswerHtml: norm.correctAnswerHtml,
+                        explanation: norm.explanation,
+                        explanationText: norm.explanationText,
+                        explanationHtml: norm.explanationHtml,
+                        note: norm.note,
+                        noteText: norm.noteText,
+                        noteHtml: norm.noteHtml,
+                        tags: norm.tags
+                    }
+                });
+                if (saveRes?.savedRemote) {
+                    this.showToast(wasAnswered
+                        ? 'Question updated, result adjusted & saved to Study Plan.'
+                        : 'Question updated & saved to Study Plan.');
+                } else {
+                    this.showToast(wasAnswered
+                        ? 'Question updated & result adjusted for this session.'
+                        : 'Question updated for this session.');
+                }
+            } catch (err) {
+                console.warn('[NewExamUI] Study Plan persistence failed:', err);
+                this.showToast(wasAnswered
+                    ? 'Question updated & result adjusted locally.'
+                    : 'Question updated locally.');
+            }
+        } else {
+            this.showToast(wasAnswered
+                ? 'Question updated & result adjusted.'
+                : 'Question updated.');
         }
     }
 
@@ -2096,6 +2630,11 @@ class NewExamSystemController {
                         ${q.topic ? `<span class="ex-tag">${esc(q.topic)}</span>` : ''}
                     </div>
                     <div class="ex-row">
+                        ${this.canEditActiveQuestion(q) ? `
+                            <button type="button" class="ex-btn sm" data-edit-q="${qIdx}" title="Edit Question (E)">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                        ` : ''}
                         <button type="button" class="ex-btn sm" data-bookmark-uid="${esc(q.uid)}" title="Bookmark Question (B)" style="${isBookmarked ? 'border-color:var(--ex-indigo); color:var(--ex-indigo); background:var(--ex-indigo-soft);' : ''}">
                             <i class="${isBookmarked ? 'fas' : 'far'} fa-bookmark"></i>
                         </button>
@@ -2187,7 +2726,14 @@ class NewExamSystemController {
                 <div class="ex-bk-q ${idx === r.currentIndex ? 'cur' : ''}" data-scroll-q="${idx}" data-focus-q="${idx}">
                     <b class="ex-num" style="color:var(--ex-muted);">${idx + 1}.</b>
                     <div style="min-width:0;">
-                        <div style="font-weight:600; font-size:0.98rem; line-height:1.5;">${renderMcqFieldHtml(q, 'question')}</div>
+                        <div class="ex-bk-q-head">
+                            <div style="font-weight:600; font-size:0.98rem; line-height:1.5; min-width:0; flex:1;">${renderMcqFieldHtml(q, 'question')}</div>
+                            ${this.canEditActiveQuestion(q) ? `
+                                <button type="button" class="ex-btn sm ex-bk-edit-btn" data-edit-q="${idx}" title="Edit Question">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                            ` : ''}
+                        </div>
                         <div class="ex-bk-opts">
                             ${(q.options || []).map((opt, oIdx) => {
                                 const lbl = getLocalizedOptionLabel(oIdx, q.question, q.options);
@@ -2901,36 +3447,7 @@ class NewExamSystemController {
         });
 
         // Runtime controls
-        this.root.querySelectorAll('[data-pick-q]').forEach(el => {
-            el.addEventListener('click', () => {
-                const idx = parseInt(el.dataset.pickQ, 10);
-                const opt = el.dataset.pickOpt;
-                const optIdxRaw = el.dataset.pickIdx;
-                const optIdx = optIdxRaw !== undefined ? parseInt(optIdxRaw, 10) : null;
-                this.run.currentIndex = idx;
-                this.handleAnswerSelect(idx, opt, Number.isNaN(optIdx) ? null : optIdx);
-            });
-        });
-        this.root.querySelectorAll('[data-go-q]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.goToQuestion(parseInt(btn.dataset.goQ, 10));
-            });
-        });
-        this.root.querySelectorAll('[data-clear-q]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.clearAnswer(parseInt(btn.dataset.clearQ, 10));
-            });
-        });
-        this.root.querySelectorAll('[data-mark-q]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.toggleMarkForReview(parseInt(btn.dataset.markQ, 10));
-            });
-        });
-        this.root.querySelectorAll('[data-bookmark-uid]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.toggleBookmark(btn.dataset.bookmarkUid);
-            });
-        });
+        this.bindQuestionContainerEvents(this.root);
         this.root.querySelectorAll('[data-omr-tab]').forEach(btn => {
             btn.addEventListener('click', () => {
                 this.omrMobileTab = btn.dataset.omrTab;
@@ -3005,6 +3522,54 @@ class NewExamSystemController {
             this.historySubjectFilter = e.target.value;
             this.render();
         });
+    }
+
+    bindQuestionContainerEvents(container) {
+        if (!container) return;
+        container.querySelectorAll('[data-pick-q]').forEach(el => {
+            el.addEventListener('click', () => {
+                const idx = parseInt(el.dataset.pickQ, 10);
+                const opt = el.dataset.pickOpt;
+                const optIdxRaw = el.dataset.pickIdx;
+                const optIdx = optIdxRaw !== undefined ? parseInt(optIdxRaw, 10) : null;
+                this.run.currentIndex = idx;
+                this.handleAnswerSelect(idx, opt, Number.isNaN(optIdx) ? null : optIdx);
+            });
+        });
+        container.querySelectorAll('[data-go-q]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.goToQuestion(parseInt(btn.dataset.goQ, 10));
+            });
+        });
+        container.querySelectorAll('[data-clear-q]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.clearAnswer(parseInt(btn.dataset.clearQ, 10));
+            });
+        });
+        container.querySelectorAll('[data-mark-q]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.toggleMarkForReview(parseInt(btn.dataset.markQ, 10));
+            });
+        });
+        container.querySelectorAll('[data-bookmark-uid]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.toggleBookmark(btn.dataset.bookmarkUid);
+            });
+        });
+        container.querySelectorAll('[data-edit-q]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.dataset.editQ, 10);
+                if (!Number.isNaN(idx)) {
+                    this.openEditQuestionModal(idx);
+                }
+            });
+        });
+        if (container !== this.root) {
+            container.querySelectorAll('[data-action="request-submit"]').forEach(btn => {
+                btn.addEventListener('click', () => this.requestSubmit());
+            });
+        }
     }
 }
 

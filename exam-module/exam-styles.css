@@ -1653,6 +1653,115 @@ html.dark #new-exam-ui-root {
     gap: 14px;
 }
 
+.ex-edit-dlg {
+    width: min(680px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    gap: 12px;
+}
+
+.ex-edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.ex-edit-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--ex-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.ex-edit-ta {
+    width: 100%;
+    min-height: 68px;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.45;
+    padding: 8px 10px;
+}
+
+.ex-edit-opts {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ex-edit-opt-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px;
+    border-radius: var(--ex-radius);
+    border: 1px solid var(--ex-line);
+    background: var(--ex-sunk);
+}
+
+.ex-edit-opt-row.is-correct {
+    border-color: var(--ex-good);
+    background: var(--ex-good-soft);
+}
+
+.ex-edit-opt-radio {
+    margin-top: 8px;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--ex-good);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.ex-edit-opt-badge {
+    margin-top: 5px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--ex-line-ui);
+    background: var(--ex-surface);
+    color: var(--ex-ink);
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+
+.ex-edit-opt-row.is-correct .ex-edit-opt-badge {
+    border-color: var(--ex-good);
+    background: var(--ex-good);
+    color: #fff;
+}
+
+.ex-edit-opt-ta {
+    flex: 1;
+    min-width: 0;
+    min-height: 38px;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.4;
+    padding: 6px 9px;
+}
+
+.ex-bk-q-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.ex-bk-edit-btn {
+    min-height: 28px;
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+
 .ex-toast {
     position: fixed;
     left: 50%;

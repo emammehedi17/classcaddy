@@ -10,7 +10,9 @@
             isOptionCorrect,
             isUserSelectionCorrect,
             getCanonicalCorrectIndex,
-            htmlToPlainText
+            htmlToPlainText,
+            computeFingerprint,
+            normalizeCompareText
         } from './mcq-engine/schema.js';
         import {
             renderRichHtmlString,
@@ -11542,11 +11544,13 @@ window.__StudyPlanQuizBridge = {
                 weekId: currentMcqTarget?.weekId || null,
                 dayIndex: currentMcqTarget?.dayIndex ?? null,
                 rowIndex: currentMcqTarget?.rowIndex ?? null,
-                questions: mcqSource.map(q => {
-                    const n = normalizeMcqItem(q);
+                questions: mcqSource.map((q, idx) => {
+                    const n = normalizeMcqItem(q, idx);
                     return {
                         version: n.version,
-                        uid: n.uid,
+                        uid: q.uid || n.uid,
+                        sourceMcqUid: q.uid || n.uid || null,
+                        sourceMcqIndex: idx,
                         question: n.question,
                         questionHtml: n.questionHtml,
                         options: n.options.slice(),
@@ -11648,5 +11652,154 @@ window.__StudyPlanQuizBridge = {
             ids: Array.isArray(idsArray) ? idsArray : [],
             updatedAt: Timestamp.now()
         });
+    },
+    updateStudyPlanMcq: async (payload = {}) => {
+        if (!userId || !db || isGuestMode) {
+            return { savedRemote: false, reason: 'guest' };
+        }
+        const plansPath = getUserPlansCollectionPath();
+        if (!plansPath) {
+            return { savedRemote: false, reason: 'no-plans-path' };
+        }
+
+        const {
+            monthId,
+            weekId,
+            dayIndex,
+            rowIndex,
+            sourceMcqIndex,
+            sourceMcqUid,
+            originalQuestion,
+            originalFingerprint,
+            updatedMcq
+        } = payload;
+
+        if (!updatedMcq) {
+            return { savedRemote: false, reason: 'invalid-payload' };
+        }
+
+        const origQNorm = normalizeCompareText(originalQuestion || '');
+        const matchesCandidate = (rawItem, idx) => {
+            if (!rawItem || typeof rawItem !== 'object') return false;
+            if (sourceMcqUid && rawItem.uid && rawItem.uid === sourceMcqUid) return true;
+            const normItem = normalizeMcqItem(rawItem, idx);
+            if (originalFingerprint && normItem.fingerprint === originalFingerprint) return true;
+            if (origQNorm && normalizeCompareText(normItem.questionHtml || normItem.question || '') === origQNorm) return true;
+            return false;
+        };
+
+        const patchWeekDoc = async (targetMonthId, targetWeekId, hintDayIdx, hintRowIdx) => {
+            const weekDocRef = doc(db, plansPath, targetMonthId, 'weeks', targetWeekId);
+            const weekSnap = await getDoc(weekDocRef);
+            if (!weekSnap.exists()) return null;
+            const days = Array.isArray(weekSnap.data()?.days)
+                ? weekSnap.data().days.map(d => ({
+                    ...d,
+                    rows: Array.isArray(d.rows) ? d.rows.map(r => ({ ...r })) : []
+                }))
+                : [];
+
+            const dayCandidates = (hintDayIdx !== null && hintDayIdx !== undefined && days[Number(hintDayIdx)])
+                ? [Number(hintDayIdx)]
+                : days.map((_, i) => i);
+
+            for (const dIdx of dayCandidates) {
+                const dayObj = days[dIdx];
+                if (!dayObj || !Array.isArray(dayObj.rows)) continue;
+                const rowCandidates = (hintRowIdx !== null && hintRowIdx !== undefined && dayObj.rows[Number(hintRowIdx)])
+                    ? [Number(hintRowIdx)]
+                    : dayObj.rows.map((_, i) => i);
+
+                for (const rIdx of rowCandidates) {
+                    const rowObj = dayObj.rows[rIdx];
+                    if (!rowObj || !Array.isArray(rowObj.mcqData) || rowObj.mcqData.length === 0) continue;
+
+                    const list = rowObj.mcqData.slice();
+                    let foundIdx = -1;
+
+                    // 1. Direct index + match verification
+                    if (typeof sourceMcqIndex === 'number' && sourceMcqIndex >= 0 && sourceMcqIndex < list.length) {
+                        if (matchesCandidate(list[sourceMcqIndex], sourceMcqIndex)) {
+                            foundIdx = sourceMcqIndex;
+                        }
+                    }
+                    // 2. Search row items by uid / fingerprint / question text
+                    if (foundIdx === -1) {
+                        foundIdx = list.findIndex((item, idx) => matchesCandidate(item, idx));
+                    }
+
+                    if (foundIdx !== -1) {
+                        const existingRaw = list[foundIdx] || {};
+                        const mergedCandidate = {
+                            ...existingRaw,
+                            ...updatedMcq,
+                            fingerprint: '',
+                            hasMath: false,
+                            hasCode: false,
+                            hasMedia: false,
+                            hasHtmlFormatting: false,
+                            id: existingRaw.id !== undefined ? existingRaw.id : (foundIdx + 1),
+                            uid: existingRaw.uid || updatedMcq.uid || sourceMcqUid
+                        };
+                        const storageItem = toStorageMcqList([mergedCandidate])[0];
+                        if (existingRaw.id !== undefined) storageItem.id = existingRaw.id;
+                        list[foundIdx] = storageItem;
+                        dayObj.rows[rIdx] = { ...rowObj, mcqData: list };
+
+                        await updateDoc(weekDocRef, { days });
+
+                        // Sync Study Plan in-memory caches & row DOM if currently rendered
+                        if (targetMonthId === currentDisplayedMonthId && activeWeeksDataCache && activeWeeksDataCache[targetWeekId]) {
+                            activeWeeksDataCache[targetWeekId].days = days;
+                        }
+                        try {
+                            const rowBtn = document.querySelector(`[data-month-id="${targetMonthId}"] [data-week-id="${targetWeekId}"] [data-day-index="${dIdx}"] tr[data-row-index="${rIdx}"] .add-row-mcq-btn`);
+                            if (rowBtn && rowBtn.dataset.tempMcq) {
+                                rowBtn.dataset.tempMcq = JSON.stringify(list);
+                            }
+                            if (Array.isArray(currentMcqData)) {
+                                currentMcqData.forEach((item, idx) => {
+                                    if (matchesCandidate(item, idx)) currentMcqData[idx] = storageItem;
+                                });
+                            }
+                            if (Array.isArray(currentSerialQuestions)) {
+                                currentSerialQuestions.forEach((item, idx) => {
+                                    if (matchesCandidate(item, idx)) currentSerialQuestions[idx] = normalizeMcqItem(storageItem, idx);
+                                });
+                            }
+                        } catch (syncErr) {
+                            console.warn('[NewExamBridge] Optional local cache sync skipped:', syncErr);
+                        }
+
+                        return { savedRemote: true, storageItem, monthId: targetMonthId, weekId: targetWeekId, dayIndex: dIdx, rowIndex: rIdx, mcqIndex: foundIdx };
+                    }
+                }
+            }
+            return null;
+        };
+
+        try {
+            if (monthId && weekId) {
+                const directRes = await patchWeekDoc(monthId, weekId, dayIndex, rowIndex);
+                if (directRes) return directRes;
+            }
+
+            // Fallback search across user's months/weeks (e.g. inherited day/week/study view collections)
+            const monthsSnap = await getDocs(collection(db, plansPath));
+            for (const mDoc of monthsSnap.docs) {
+                if (monthId && mDoc.id !== monthId) continue;
+                const weeksSnap = await getDocs(collection(db, mDoc.ref.path, 'weeks'));
+                for (const wDoc of weeksSnap.docs) {
+                    if (weekId && wDoc.id !== weekId) continue;
+                    const res = await patchWeekDoc(mDoc.id, wDoc.id, dayIndex, rowIndex);
+                    if (res) return res;
+                }
+            }
+
+            return { savedRemote: false, reason: 'not-found' };
+        } catch (err) {
+            console.error('[NewExamBridge] Failed to update MCQ in Firestore:', err);
+            return { savedRemote: false, reason: 'error', error: err };
+        }
     }
 };
