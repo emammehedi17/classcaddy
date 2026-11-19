@@ -209,8 +209,46 @@ export default function App() {
         }));
         localStorage.setItem('class_caddy_user', JSON.stringify(profile));
       }
-    } catch (error) {
-      console.error('Google Sign-In Error:', error);
+    } catch (error: any) {
+      if (error && error.code === 'auth/unauthorized-domain') {
+        const domain = window.location.hostname;
+        let modal = document.getElementById('cc-unauth-domain-modal');
+        if (!modal) {
+          modal = document.createElement('div');
+          modal.id = 'cc-unauth-domain-modal';
+          modal.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(15,23,42,0.75);display:flex;align-items:center;justify-content:center;padding:16px;font-family:Inter,sans-serif;';
+          document.body.appendChild(modal);
+        }
+        modal.innerHTML = `
+          <div style="background:#ffffff;color:#1f2937;max-width:480px;width:100%;border-radius:12px;padding:20px 22px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.2);border:1px solid #e5e7eb;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <h3 style="margin:0;font-size:1.05rem;font-weight:700;color:#b91c1c;">Authorize Domain for Google Sign-In</h3>
+              <button id="cc-unauth-close-btn" style="background:none;border:none;font-size:1.25rem;cursor:pointer;color:#6b7280;">&times;</button>
+            </div>
+            <p style="font-size:0.85rem;color:#4b5563;line-height:1.5;margin:0 0 12px;">
+              This preview domain is not yet allowlisted in Firebase project <strong>study-plan-17</strong>. Add the domain below in <strong>Firebase Console &rarr; Authentication &rarr; Settings &rarr; Authorized domains</strong>:
+            </p>
+            <div style="display:flex;align-items:center;gap:8px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:8px 10px;margin-bottom:14px;">
+              <code style="font-size:0.78rem;color:#111827;word-break:break-all;flex:1;">${domain}</code>
+              <button id="cc-unauth-copy-btn" style="background:#10b981;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;">Copy Domain</button>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:8px;">
+              <a href="https://console.firebase.google.com/project/study-plan-17/authentication/settings" target="_blank" rel="noopener noreferrer" style="background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;padding:7px 12px;font-size:0.8rem;font-weight:600;">Open Firebase Console</a>
+              <button id="cc-unauth-ok-btn" style="background:#e5e7eb;color:#374151;border:none;border-radius:6px;padding:7px 14px;font-size:0.8rem;font-weight:600;cursor:pointer;">Close</button>
+            </div>
+          </div>
+        `;
+        modal.style.display = 'flex';
+        const closeModal = () => { if (modal) modal.style.display = 'none'; };
+        modal.querySelector('#cc-unauth-close-btn')?.addEventListener('click', closeModal);
+        modal.querySelector('#cc-unauth-ok-btn')?.addEventListener('click', closeModal);
+        modal.querySelector('#cc-unauth-copy-btn')?.addEventListener('click', (ev) => {
+          navigator.clipboard?.writeText(domain);
+          (ev.target as HTMLElement).textContent = 'Copied!';
+        });
+        return;
+      }
+      console.warn('Google Sign-In Notice:', error);
     }
   };
 
