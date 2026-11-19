@@ -743,8 +743,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const firebaseConfig = {
                 apiKey: "AIzaSyAj7MDnrnzKUO73BXG0jeM-uBGrAH3XiAY",
-                authDomain: "study-plan-17.firebaseapp.com",
-                projectId: "study-plan-17"
+                authDomain: "study-plan17.firebaseapp.com",
+                projectId: "study-plan17"
             };
 
             const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
@@ -822,14 +822,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button id="cc-unauth-close-btn" style="background:none;border:none;font-size:1.25rem;cursor:pointer;color:#6b7280;">&times;</button>
                         </div>
                         <p style="font-size:0.85rem;color:#4b5563;line-height:1.5;margin:0 0 12px;">
-                            This preview domain is not yet allowlisted in Firebase project <strong>study-plan-17</strong>. Add the domain below in <strong>Firebase Console &rarr; Authentication &rarr; Settings &rarr; Authorized domains</strong>:
+                            This preview domain is not yet allowlisted in Firebase project <strong>study-plan17</strong>. Add the domain below in <strong>Firebase Console &rarr; Authentication &rarr; Settings &rarr; Authorized domains</strong>:
                         </p>
                         <div style="display:flex;align-items:center;gap:8px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:8px 10px;margin-bottom:14px;">
                             <code style="font-size:0.78rem;color:#111827;word-break:break-all;flex:1;">${domain}</code>
                             <button id="cc-unauth-copy-btn" style="background:#10b981;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;">Copy Domain</button>
                         </div>
                         <div style="display:flex;justify-content:flex-end;gap:8px;">
-                            <a href="https://console.firebase.google.com/project/study-plan-17/authentication/settings" target="_blank" rel="noopener noreferrer" style="background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;padding:7px 12px;font-size:0.8rem;font-weight:600;">Open Firebase Console</a>
+                            <a href="https://console.firebase.google.com/project/study-plan17/authentication/settings" target="_blank" rel="noopener noreferrer" style="background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;padding:7px 12px;font-size:0.8rem;font-weight:600;">Open Firebase Console</a>
                             <button id="cc-unauth-ok-btn" style="background:#e5e7eb;color:#374151;border:none;border-radius:6px;padding:7px 14px;font-size:0.8rem;font-weight:600;cursor:pointer;">Close</button>
                         </div>
                     </div>

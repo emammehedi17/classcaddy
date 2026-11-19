@@ -27,9 +27,9 @@
         // PASTE YOUR ACTUAL FIREBASE CONFIG HERE:
         const firebaseConfig = {
           apiKey: "AIzaSyAj7MDnrnzKUO73BXG0jeM-uBGrAH3XiAY", // <-- YOUR ACTUAL KEY
-          authDomain: "study-plan-17.firebaseapp.com", // <-- YOURS
-          projectId: "study-plan-17", // <-- YOURS
-          storageBucket: "study-plan-17.appspot.com", // <-- YOURS
+          authDomain: "study-plan17.firebaseapp.com", // <-- YOURS
+          projectId: "study-plan17", // <-- YOURS
+          storageBucket: "study-plan17.appspot.com", // <-- YOURS
           messagingSenderId: "394648483332", // <-- YOURS
           appId: "1:394648483332:web:31c0d7a8b3f7065ce4e751", // <-- YOURS
           measurementId: "G-61TH4D55J3" // <-- YOURS (Optional)
@@ -787,14 +787,14 @@
                                 <button id="cc-unauth-close-btn" style="background:none;border:none;font-size:1.25rem;cursor:pointer;color:#6b7280;">&times;</button>
                             </div>
                             <p style="font-size:0.85rem;color:#4b5563;line-height:1.5;margin:0 0 12px;">
-                                This preview domain is not yet allowlisted in Firebase project <strong>study-plan-17</strong>. Add the domain below in <strong>Firebase Console &rarr; Authentication &rarr; Settings &rarr; Authorized domains</strong>:
+                                This preview domain is not yet allowlisted in Firebase project <strong>study-plan17</strong>. Add the domain below in <strong>Firebase Console &rarr; Authentication &rarr; Settings &rarr; Authorized domains</strong>:
                             </p>
                             <div style="display:flex;align-items:center;gap:8px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:8px 10px;margin-bottom:14px;">
                                 <code style="font-size:0.78rem;color:#111827;word-break:break-all;flex:1;">${domain}</code>
                                 <button id="cc-unauth-copy-btn" style="background:#10b981;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:0.75rem;font-weight:600;cursor:pointer;white-space:nowrap;">Copy Domain</button>
                             </div>
                             <div style="display:flex;justify-content:flex-end;gap:8px;">
-                                <a href="https://console.firebase.google.com/project/study-plan-17/authentication/settings" target="_blank" rel="noopener noreferrer" style="background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;padding:7px 12px;font-size:0.8rem;font-weight:600;">Open Firebase Console</a>
+                                <a href="https://console.firebase.google.com/project/study-plan17/authentication/settings" target="_blank" rel="noopener noreferrer" style="background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;padding:7px 12px;font-size:0.8rem;font-weight:600;">Open Firebase Console</a>
                                 <button id="cc-unauth-ok-btn" style="background:#e5e7eb;color:#374151;border:none;border-radius:6px;padding:7px 14px;font-size:0.8rem;font-weight:600;cursor:pointer;">Close</button>
                             </div>
                         </div>
@@ -873,7 +873,7 @@
                     if (modal) {
                         modal.style.display = 'flex';
                     } else {
-                        showCustomAlert(`Please add "${domain}" to Firebase Console → Authentication → Settings → Authorized domains in project study-plan-17.`, "error");
+                        showCustomAlert(`Please add "${domain}" to Firebase Console → Authentication → Settings → Authorized domains in project study-plan17.`, "error");
                     }
                     return;
                 }
@@ -8766,7 +8766,7 @@ refreshCloudListBtn.addEventListener('click', loadCloudBackups);
 // --- HELPER: Generate Backup Data Object (With Progress Tracking) ---
 async function generateBackupObject(onProgress = () => {}) {
     const userId = auth.currentUser.uid;
-    const appId = "study-plan-17";
+    const appId = "study-plan17";
     const plansCollectionPath = `artifacts/${appId}/users/${userId}/studyPlans`;
     
     const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
@@ -8875,7 +8875,7 @@ async function executeCloudBackup(isAuto = false) {
 
     try {
         const userId = auth.currentUser.uid;
-        const appId = "study-plan-17";
+        const appId = "study-plan17";
         const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
 
         // --- STEP 1: ENFORCE LIMIT (Quick check) ---
@@ -9040,7 +9040,7 @@ async function initSmartCloudBackup() {
         if (!auth.currentUser) return;
 
         const userId = auth.currentUser.uid;
-        const appId = "study-plan-17";
+        const appId = "study-plan17";
         const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
 
         try {
@@ -9117,7 +9117,7 @@ async function loadCloudBackups() {
     
     try {
         const userId = auth.currentUser.uid;
-        const appId = "study-plan-17";
+        const appId = "study-plan17";
         const cloudBackupsRef = collection(db, `artifacts/${appId}/users/${userId}/cloudBackups`);
         
         // Order by newest first (read from server -- see note on stale cache reads above)
@@ -9175,7 +9175,7 @@ window.restoreFromCloud = async function(docId) {
     
     try {
         const userId = auth.currentUser.uid;
-        const appId = "study-plan-17";
+        const appId = "study-plan17";
         const docRef = doc(db, `artifacts/${appId}/users/${userId}/cloudBackups`, docId);
         const docSnap = await getDocFromServer(docRef);
         
@@ -9274,7 +9274,7 @@ async function executeRestore(backupData) {
 
     try {
         const userId = auth.currentUser.uid;
-        const appId = "study-plan-17";
+        const appId = "study-plan17";
         const rootPath = `artifacts/${appId}/users/${userId}/studyPlans`;
 
         let totalMonths = 0;
@@ -9330,7 +9330,7 @@ async function buildMasterMcqPrintHtml() {
     
     try {
         const userId = auth.currentUser.uid;
-        const appId = "study-plan-17";
+        const appId = "study-plan17";
         const plansCollectionPath = `artifacts/${appId}/users/${userId}/studyPlans`;
         
         const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
@@ -9455,7 +9455,7 @@ async function displayMcqMenu() {
 
     try {
         const userId = auth.currentUser.uid;
-        const appId = "study-plan-17";
+        const appId = "study-plan17";
         const q = query(collection(db, `artifacts/${appId}/users/${userId}/studyPlans`), orderBy(documentId(), "asc"));
         const querySnapshot = await getDocs(q);
 
@@ -9616,7 +9616,7 @@ window.openMcqStudy = async function(scope, monthId, weekId, dayNum, subject) {
     // Fetch Logic
     try {
         const userId = auth.currentUser.uid;
-        const appId = "study-plan-17";
+        const appId = "study-plan17";
         const plansCollectionPath = `artifacts/${appId}/users/${userId}/studyPlans`;
         
         let q;

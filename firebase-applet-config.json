@@ -1,12 +1,12 @@
 {
-  "projectId": "study-plan-17",
-  "appId": "1:879338633365:web:041620aa471e48101a039c",
-  "apiKey": "AIzaSyB5lk2kMqSCCRVYC2qDy7R82wDaiVu4g9w",
-  "authDomain": "study-plan-17.firebaseapp.com",
+  "projectId": "study-plan17",
+  "appId": "1:394648483332:web:2d5b8e142e2660e3e4e751",
+  "apiKey": "AIzaSyDRVEGDg3Et_5NA0XxrtVmBT6MMwvp2ISE",
+  "authDomain": "study-plan17.firebaseapp.com",
   "firestoreDatabaseId": "ai-studio-classcaddy-10bfd916-f8ff-4cc3-b89f-b02ad67a275b",
-  "storageBucket": "study-plan-17.firebasestorage.app",
-  "messagingSenderId": "879338633365",
+  "storageBucket": "study-plan17.firebasestorage.app",
+  "messagingSenderId": "394648483332",
   "measurementId": "",
-  "oAuthClientId": "879338633365-g0k6p6pegqnbqrhfkfnn5tp2a6s1uj8a.apps.googleusercontent.com",
+  "oAuthClientId": "394648483332-d9pqk1r5lchchln64ah5e2it2vm5qqja.apps.googleusercontent.com",
   "recaptchaSiteKey": ""
 }
