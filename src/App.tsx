@@ -12,6 +12,7 @@ import { AboutView } from './components/AboutView';
 import { ContactView } from './components/ContactView';
 import { StudyPlanView } from './components/StudyPlanView';
 import { CourseDetailView } from './components/CourseDetailView';
+import { PrivacyPolicyView } from './components/PrivacyPolicyView';
 import { FloatingActionButtons } from './components/FloatingActionButtons';
 import { auth } from './lib/firebase';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
@@ -25,6 +26,7 @@ export default function App() {
       return 'home';
     }
     if (path.includes('study_plan') || hash.includes('study-plan') || hash.includes('study_plan')) return 'study-plan';
+    if (path.includes('privacy') || hash.includes('privacy')) return 'privacy';
     if (path.includes('about') || hash.includes('about')) return 'about';
     if (path.includes('contact') || hash.includes('contact')) return 'contact';
     if (path.includes('academic') || hash.includes('academic')) return 'academic';
@@ -308,6 +310,7 @@ export default function App() {
         )}
         {currentPage === 'about' && <AboutView />}
         {currentPage === 'contact' && <ContactView />}
+        {currentPage === 'privacy' && <PrivacyPolicyView />}
         {currentPage === 'study-plan' && <StudyPlanView />}
         {(currentPage === 'academic' || currentPage.startsWith('course-')) && (
           <CourseDetailView

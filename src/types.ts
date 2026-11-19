@@ -10,7 +10,8 @@ export type PageView =
   | 'course-408'
   | 'study-plan'
   | 'about'
-  | 'contact';
+  | 'contact'
+  | 'privacy';
 
 export interface ArchiveCardButton {
   id: string;

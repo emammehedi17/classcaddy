@@ -232,6 +232,21 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, theme = 'light' }) =
                   Academic Blog
                 </button>
               </li>
+              <li>
+                <a
+                  href="privacy.html"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavigate('privacy');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className={`transition text-left ${
+                    isDark ? 'hover:text-emerald-400' : 'hover:text-emerald-700'
+                  }`}
+                >
+                  Privacy Policy
+                </a>
+              </li>
             </ul>
           </div>
 
