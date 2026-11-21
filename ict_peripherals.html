@@ -13,6 +13,14 @@
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Tailwind CSS for Main Website Navbar & Auth Widget -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        };
+    </script>
+
     <style>
         /* CSS Variables for Deep Violet & Teal Theme */
         :root {
@@ -61,7 +69,7 @@
             display: none !important;
         }
 
-        /* --- Main Website Top Navbar Styles (Self-Contained without Tailwind Preflight) --- */
+        /* --- Main Website Top Navbar Styles (Self-Contained + Auth Widget Protection) --- */
         header.main-website-ui {
             position: fixed;
             top: 0;
@@ -87,6 +95,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            min-height: 44px;
         }
 
         header.main-website-ui .nav-brand {
@@ -108,6 +117,7 @@
             border: 2px solid #10b981;
             object-fit: cover;
             display: block;
+            flex-shrink: 0;
         }
 
         header.main-website-ui .nav-logo-du {
@@ -117,6 +127,7 @@
             border: 1px solid #e5e7eb;
             object-fit: cover;
             display: block;
+            flex-shrink: 0;
         }
 
         header.main-website-ui h1 {
@@ -167,6 +178,112 @@
             display: flex;
             align-items: center;
             gap: 14px;
+        }
+
+        /* Explicit rules for dynamically injected Firebase Auth Widget in #auth-container-desktop */
+        #auth-container-desktop,
+        #auth-container-desktop > div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #auth-container-desktop a[href*="study_plan"] {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 12px;
+            background: #f9fafb;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 9999px;
+            text-decoration: none !important;
+            transition: all 0.2s ease;
+            max-height: 42px;
+            box-sizing: border-box;
+        }
+
+        #auth-container-desktop a[href*="study_plan"]:hover {
+            background: #ecfdf5;
+            border-color: #10b981;
+        }
+
+        #auth-container-desktop a[href*="study_plan"] img {
+            width: 28px !important;
+            height: 28px !important;
+            min-width: 28px !important;
+            max-width: 28px !important;
+            border-radius: 50% !important;
+            object-fit: cover !important;
+            border: 1px solid #10b981;
+            margin: 0 !important;
+            display: block;
+            flex-shrink: 0;
+        }
+
+        #auth-container-desktop a[href*="study_plan"] div {
+            max-width: 125px;
+            overflow: hidden;
+            text-align: left;
+            line-height: 1.2;
+        }
+
+        #auth-container-desktop a[href*="study_plan"] p {
+            margin: 0 !important;
+            padding: 0 !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.25 !important;
+        }
+
+        #auth-container-desktop a[href*="study_plan"] p:first-child {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        #auth-container-desktop a[href*="study_plan"] p:last-child {
+            font-size: 0.65rem;
+            color: #6b7280;
+        }
+
+        #auth-container-desktop button[title="Logout"] {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #auth-container-desktop button[title="Logout"]:hover {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+        }
+
+        #auth-container-desktop .header-google-signin-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            border: 1px solid #d1d5db;
+            background: #ffffff;
+            color: #374151;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        #auth-container-desktop .header-google-signin-btn img {
+            width: 16px !important;
+            height: 16px !important;
         }
 
         header.main-website-ui .signup-button {
@@ -252,6 +369,13 @@
             box-sizing: border-box;
         }
 
+        #auth-container-mobile img {
+            width: 28px !important;
+            height: 28px !important;
+            border-radius: 50% !important;
+            object-fit: cover !important;
+        }
+
         /* Note Hero Header Styles */
         .note-header {
             background: linear-gradient(135deg, var(--primary-color) 0%, #4338ca 55%, #0f766e 100%);
@@ -296,6 +420,7 @@
 
         .note-header h1 {
             font-size: 2.6rem;
+            font-weight: 700;
             margin: 0 0 10px 0;
             line-height: 1.3;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
@@ -342,6 +467,7 @@
         .section-title {
             color: var(--text-heading);
             font-size: 1.9rem;
+            font-weight: 700;
             border-bottom: 3px solid var(--secondary-color);
             padding-bottom: 10px;
             margin-top: 45px;
@@ -349,6 +475,28 @@
             display: flex;
             align-items: center;
             gap: 12px;
+        }
+
+        .container > h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+        #written-q-list {
+            list-style-type: decimal;
+            padding-left: 24px;
+        }
+
+        #written-q-list li {
+            margin-bottom: 10px;
+        }
+
+        .alert-box ul,
+        .correction-box ul {
+            list-style-type: disc;
+            padding-left: 22px;
         }
 
         .card-grid {
@@ -437,6 +585,7 @@
             color: var(--primary-color);
             margin-top: 0;
             font-size: 1.4rem;
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -534,6 +683,11 @@
             color: var(--text-main);
             vertical-align: top;
             line-height: 1.6;
+        }
+
+        th {
+            font-weight: 700;
+            color: #ffffff;
         }
 
         tbody tr:hover {
@@ -814,6 +968,27 @@
         body.dark-mode header.main-website-ui .nav-links-desktop a.active-nav,
         html.dark header.main-website-ui .nav-links-desktop a.active-nav {
             color: #34d399;
+        }
+
+        body.dark-mode #auth-container-desktop a[href*="study_plan"],
+        html.dark #auth-container-desktop a[href*="study_plan"] {
+            background: #1e293b;
+            border-color: rgba(16, 185, 129, 0.45);
+        }
+
+        body.dark-mode #auth-container-desktop a[href*="study_plan"]:hover,
+        html.dark #auth-container-desktop a[href*="study_plan"]:hover {
+            background: #334155;
+        }
+
+        body.dark-mode #auth-container-desktop a[href*="study_plan"] p:first-child,
+        html.dark #auth-container-desktop a[href*="study_plan"] p:first-child {
+            color: #f1f5f9;
+        }
+
+        body.dark-mode #auth-container-desktop a[href*="study_plan"] p:last-child,
+        html.dark #auth-container-desktop a[href*="study_plan"] p:last-child {
+            color: #94a3b8;
         }
 
         body.dark-mode .info-card h3,
