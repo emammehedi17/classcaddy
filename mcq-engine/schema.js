@@ -61,6 +61,11 @@ export function htmlToPlainText(input) {
         const alt = img.getAttribute('alt') || 'Image';
         img.replaceWith(` [Image: ${alt}] `);
       });
+      root.querySelectorAll('svg').forEach((svg) => {
+        const titleEl = svg.querySelector('title');
+        const label = titleEl && titleEl.textContent ? titleEl.textContent.trim() : 'Diagram';
+        svg.replaceWith(` [${label}] `);
+      });
       root.querySelectorAll('p, div, li, tr, blockquote, pre, h1, h2, h3, h4, h5, h6').forEach((el) => {
         if (el.tagName === 'LI') {
           el.prepend('• ');
@@ -90,6 +95,7 @@ export function htmlToPlainText(input) {
       .replace(/<\/(p|div|li|tr|h[1-6]|pre|blockquote)>/gi, '\n')
       .replace(/<img[^>]*alt=["']([^"']*)["'][^>]*>/gi, ' [Image: $1] ')
       .replace(/<img[^>]*>/gi, ' [Image] ')
+      .replace(/<svg\b[\s\S]*?<\/svg\s*>/gi, ' [Diagram] ')
       .replace(/<[^>]+>/g, '')
   )
     .replace(/\u00a0/g, ' ')
@@ -99,7 +105,7 @@ export function htmlToPlainText(input) {
 
 export function hasRichMarkup(str) {
   if (!str || typeof str !== 'string') return false;
-  return /<(b|strong|i|em|u|s|del|ins|mark|sup|sub|span|p|div|br|ul|ol|li|table|caption|colgroup|col|thead|tbody|tfoot|tr|td|th|pre|code|kbd|samp|small|hr|dl|dt|dd|figure|figcaption|details|summary|blockquote|img|math|semantics|mrow|mi|mn|mo|ms|mtext|mspace|msup|msub|msubsup|mfrac|msqrt|mroot|mstyle|a|h[1-6])\b[^>]*>/i.test(str);
+  return /<(b|strong|i|em|u|s|del|ins|mark|sup|sub|span|p|div|br|ul|ol|li|table|caption|colgroup|col|thead|tbody|tfoot|tr|td|th|pre|code|kbd|samp|small|hr|dl|dt|dd|figure|figcaption|details|summary|blockquote|img|svg|g|path|circle|ellipse|line|polyline|polygon|rect|text|tspan|defs|marker|math|semantics|mrow|mi|mn|mo|ms|mtext|mspace|msup|msub|msubsup|mfrac|msqrt|mroot|mstyle|a|h[1-6])\b[^>]*>/i.test(str);
 }
 
 export function hasLatexSyntax(str) {
@@ -119,7 +125,7 @@ export function hasCodeSyntax(str) {
 
 export function hasMediaMarkup(str) {
   if (!str || typeof str !== 'string') return false;
-  return /<img\b/i.test(str);
+  return /<(img|svg)\b/i.test(str);
 }
 
 export function detectRichFlags(item) {
@@ -190,10 +196,11 @@ function makeUid(seed = '') {
  */
 export function getCanonicalCorrectIndex(rawItem) {
   if (!rawItem) return -1;
+  const hasExplicitOptsHtml = Array.isArray(rawItem.optionsHtml) && rawItem.optionsHtml.some(Boolean);
   const optionsPlain = Array.isArray(rawItem.options)
-    ? rawItem.options.map((o) => (hasRichMarkup(o) ? htmlToPlainText(o) : String(o ?? '').trim()))
+    ? rawItem.options.map((o) => (!hasExplicitOptsHtml && hasRichMarkup(o) ? htmlToPlainText(o) : String(o ?? '').trim()))
     : [];
-  const optionsHtml = Array.isArray(rawItem.optionsHtml)
+  const optionsHtml = hasExplicitOptsHtml
     ? rawItem.optionsHtml
     : optionsPlain;
 
@@ -296,7 +303,7 @@ export function normalizeMcqItem(raw, fallbackIdx = 0) {
   const rawQuestionText = typeof item.questionText === 'string' && item.questionText.trim()
     ? item.questionText.trim()
     : (typeof item.question === 'string' && item.question.trim()
-        ? (hasRichMarkup(item.question) ? htmlToPlainText(item.question) : item.question.trim())
+        ? (!candidateQHtml && hasRichMarkup(item.question) ? htmlToPlainText(item.question) : item.question.trim())
         : '');
   const questionPlain = rawQuestionText || htmlToPlainText(candidateQHtml || rawQuestionHtml);
   const questionHtml = rawQuestionHtml || (/\r?\n/.test(questionPlain) ? escapeHtmlBasic(questionPlain).replace(/\r?\n/g, '<br>') : '');
@@ -317,14 +324,14 @@ export function normalizeMcqItem(raw, fallbackIdx = 0) {
 
     let plain = rawOptText;
     if (!plain && rawOpt !== undefined && rawOpt !== null) {
-      plain = hasRichMarkup(String(rawOpt)) ? htmlToPlainText(String(rawOpt)) : String(rawOpt).trim();
+      plain = (!candidateOptHtml && hasRichMarkup(String(rawOpt))) ? htmlToPlainText(String(rawOpt)) : String(rawOpt).trim();
     }
     if (!plain && candidateOptHtml) {
       plain = htmlToPlainText(candidateOptHtml);
     }
 
     const html = rawOptHtml ||
-      (typeof rawOpt === 'string' && hasRichMarkup(rawOpt)
+      (typeof rawOpt === 'string' && !candidateOptHtml && hasRichMarkup(rawOpt)
         ? rawOpt.trim()
         : (/\r?\n/.test(plain) ? escapeHtmlBasic(plain).replace(/\r?\n/g, '<br>') : ''));
 
@@ -345,7 +352,9 @@ export function normalizeMcqItem(raw, fallbackIdx = 0) {
 
   const explanationPlain = typeof item.explanationText === 'string' && item.explanationText.trim()
     ? item.explanationText.trim()
-    : (rawExp ? htmlToPlainText(rawExp) : '');
+    : (typeof item.explanation === 'string' && item.explanation.trim() && richExpHtml
+        ? item.explanation.trim()
+        : (rawExp ? htmlToPlainText(rawExp) : ''));
   const explanationHtml = richExpHtml ||
     (hasRichMarkup(rawExp)
       ? String(rawExp).trim()
@@ -353,7 +362,9 @@ export function normalizeMcqItem(raw, fallbackIdx = 0) {
 
   const notePlain = typeof item.noteText === 'string' && item.noteText.trim()
     ? item.noteText.trim()
-    : (rawNote ? htmlToPlainText(rawNote) : '');
+    : (typeof item.note === 'string' && item.note.trim() && richNoteHtml
+        ? item.note.trim()
+        : (rawNote ? htmlToPlainText(rawNote) : ''));
   const noteHtml = richNoteHtml ||
     (hasRichMarkup(rawNote)
       ? String(rawNote).trim()
@@ -371,7 +382,7 @@ export function normalizeMcqItem(raw, fallbackIdx = 0) {
   const candidateCorrectHtml = typeof item.correctAnswerHtml === 'string' ? item.correctAnswerHtml.trim() : '';
   const correctAnswer = correctIndex !== -1
     ? optionsPlain[correctIndex]
-    : (item.correctAnswer ? htmlToPlainText(String(item.correctAnswer)) : (candidateCorrectHtml ? htmlToPlainText(candidateCorrectHtml) : ''));
+    : (item.correctAnswer ? (!candidateCorrectHtml && hasRichMarkup(String(item.correctAnswer)) ? htmlToPlainText(String(item.correctAnswer)) : String(item.correctAnswer)) : (candidateCorrectHtml ? htmlToPlainText(candidateCorrectHtml) : ''));
   const correctAnswerHtml = correctIndex !== -1
     ? optionsHtml[correctIndex]
     : (hasRichMarkup(candidateCorrectHtml)

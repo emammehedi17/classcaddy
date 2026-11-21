@@ -25,6 +25,11 @@ const ALLOWED_TAGS = [
   'ul', 'ol', 'li', 'dl', 'dt', 'dd', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
   'hr', 'a', 'img', 'table', 'caption', 'colgroup', 'col', 'thead', 'tbody',
   'tfoot', 'tr', 'th', 'td', 'figure', 'figcaption', 'details', 'summary',
+  // Safe static SVG diagram tags
+  'svg', 'g', 'path', 'circle', 'ellipse', 'line', 'polyline', 'polygon',
+  'rect', 'text', 'tspan', 'defs', 'marker', 'lineargradient', 'linearGradient',
+  'radialgradient', 'radialGradient', 'stop', 'clippath', 'clipPath',
+  'pattern', 'mask', 'title', 'desc',
   // MathML tags
   'math', 'semantics', 'annotation', 'annotation-xml', 'mrow', 'mi', 'mn',
   'mo', 'ms', 'mtext', 'mspace', 'msup', 'msub', 'msubsup', 'mfrac', 'msqrt',
@@ -33,20 +38,50 @@ const ALLOWED_TAGS = [
   'mprescripts', 'none', 'menclose',
 ];
 
-const ALLOWED_TAGS_SET = new Set(ALLOWED_TAGS);
+const ALLOWED_TAGS_SET = new Set(ALLOWED_TAGS.map((t) => t.toLowerCase()));
 const SELF_CLOSING_TAGS_SET = new Set(['br', 'hr', 'img', 'col']);
+const SVG_CAMEL_TAG_MAP = {
+  lineargradient: 'linearGradient',
+  radialgradient: 'radialGradient',
+  clippath: 'clipPath',
+};
 
 const ALLOWED_ATTR = [
   'class', 'title', 'alt', 'src', 'width', 'height', 'href', 'target', 'rel',
   'colspan', 'rowspan', 'scope', 'align', 'valign', 'start', 'type', 'style',
   'data-lang', 'data-latex',
+  // SVG diagram presentation & geometry attrs
+  'viewbox', 'viewBox', 'xmlns', 'fill', 'stroke', 'stroke-width', 'strokeWidth',
+  'stroke-dasharray', 'strokeDasharray', 'stroke-dashoffset', 'stroke-linecap', 'stroke-linejoin',
+  'stroke-miterlimit', 'stroke-opacity', 'fill-opacity', 'fill-rule', 'clip-rule', 'opacity',
+  'cx', 'cy', 'r', 'rx', 'ry', 'x', 'y', 'x1', 'y1', 'x2', 'y2', 'dx', 'dy',
+  'd', 'points', 'transform', 'text-anchor', 'dominant-baseline', 'alignment-baseline',
+  'font-size', 'font-family', 'font-weight', 'font-style', 'letter-spacing',
+  'marker-start', 'marker-mid', 'marker-end', 'id', 'orient',
+  'markerwidth', 'markerWidth', 'markerheight', 'markerHeight',
+  'refx', 'refX', 'refy', 'refY', 'markerunits', 'markerUnits',
+  'gradientunits', 'gradientUnits', 'gradienttransform', 'gradientTransform',
+  'spreadmethod', 'spreadMethod', 'offset', 'stop-color', 'stop-opacity',
+  'preserveaspectratio', 'preserveAspectRatio', 'clip-path', 'mask', 'vector-effect',
   // MathML attrs
-  'mathvariant', 'mathsize', 'mathcolor', 'mathbackground', 'display', 'xmlns',
+  'mathvariant', 'mathsize', 'mathcolor', 'mathbackground', 'display',
   'encoding', 'columnalign', 'rowalign', 'linethickness', 'fence', 'separator',
   'stretchy', 'lspace', 'rspace', 'notation', 'accent', 'accentunder', 'bevelled',
 ];
 
-const ALLOWED_ATTR_SET = new Set(ALLOWED_ATTR);
+const ALLOWED_ATTR_SET = new Set(ALLOWED_ATTR.map((a) => a.toLowerCase()));
+const SVG_CAMEL_ATTR_MAP = {
+  viewbox: 'viewBox',
+  markerwidth: 'markerWidth',
+  markerheight: 'markerHeight',
+  refx: 'refX',
+  refy: 'refY',
+  markerunits: 'markerUnits',
+  gradientunits: 'gradientUnits',
+  gradienttransform: 'gradientTransform',
+  spreadmethod: 'spreadMethod',
+  preserveaspectratio: 'preserveAspectRatio',
+};
 
 const SAFE_STYLE_PROPS = new Set([
   'color',
@@ -60,6 +95,10 @@ const SAFE_STYLE_PROPS = new Set([
   'max-width',
   'width',
   'height',
+  'margin',
+  'margin-top',
+  'margin-bottom',
+  'display',
 ]);
 
 function filterSafeInlineStyle(rawStyle) {
@@ -86,34 +125,39 @@ function filterSafeInlineStyle(rawStyle) {
 function sanitizeHtmlAllowlistFallback(dirtyHtml) {
   let s = String(dirtyHtml || '');
   // 1. Remove forbidden dangerous block tags and their entire contents
-  s = s.replace(/<(script|style|iframe|object|embed|svg|form| frameset|applet|noscript)\b[\s\S]*?<\/\1\s*>/gi, '');
-  s = s.replace(/<(script|style|iframe|object|embed|svg|form|input|textarea|select|button|meta|link|base)\b[^>]*\/?>/gi, '');
+  s = s.replace(/<(script|style|iframe|object|embed|foreignobject|form|frameset|applet|noscript|animate|animatetransform|animatemotion)\b[\s\S]*?<\/\1\s*>/gi, '');
+  s = s.replace(/<(script|style|iframe|object|embed|foreignobject|use|animate|animatetransform|animatemotion|set|form|input|textarea|select|button|meta|link|base)\b[^>]*\/?>/gi, '');
   // 2. Remove HTML comments
   s = s.replace(/<!--[\s\S]*?-->/g, '');
   // 3. Process remaining tags against ALLOWED_TAGS_SET and ALLOWED_ATTR_SET
   s = s.replace(/<\/?([a-zA-Z0-9-]+)([^>]*)>/g, (full, rawTag, rawAttrs) => {
     const tag = String(rawTag || '').toLowerCase();
     if (!ALLOWED_TAGS_SET.has(tag)) return '';
-    if (full.startsWith('</')) return `</${tag}>`;
+    const outTag = SVG_CAMEL_TAG_MAP[tag] || tag;
+    if (full.startsWith('</')) return `</${outTag}>`;
 
+    const isXmlSelfClosing = /\/\s*>$/.test(full);
     const safeAttrs = [];
-    const attrRe = /([a-zA-Z0-9_-]+)\s*(?:=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
+    const attrRe = /([a-zA-Z0-9_-]+)\s*(?:=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`/]+)))?/g;
     let m;
     while ((m = attrRe.exec(rawAttrs || '')) !== null) {
-      const attrName = m[1].toLowerCase();
-      if (attrName.startsWith('on') || !ALLOWED_ATTR_SET.has(attrName)) continue;
+      const attrNameLower = m[1].toLowerCase();
+      if (attrNameLower.startsWith('on') || !ALLOWED_ATTR_SET.has(attrNameLower)) continue;
+      if (attrNameLower === 'href' && tag !== 'a') continue;
+      const outAttrName = SVG_CAMEL_ATTR_MAP[attrNameLower] || attrNameLower;
       const rawVal = m[2] ?? m[3] ?? m[4] ?? '';
-      if (attrName === 'style') {
+      if (attrNameLower === 'style') {
         const cleanStyle = filterSafeInlineStyle(rawVal);
         if (cleanStyle) safeAttrs.push(`style="${escapeHtmlBasic(cleanStyle)}"`);
-      } else if (attrName === 'src') {
+      } else if (attrNameLower === 'src') {
+        if (tag !== 'img') continue;
         const src = rawVal.trim();
         const isSafeUrl =
           /^https?:\/\//i.test(src) ||
           /^\//.test(src) ||
           /^data:image\/(png|jpeg|jpg|gif|webp|avif);base64,[a-z0-9+/=\s]+$/i.test(src);
         if (isSafeUrl) safeAttrs.push(`src="${escapeHtmlBasic(src)}"`);
-      } else if (attrName === 'href') {
+      } else if (attrNameLower === 'href') {
         const href = rawVal.trim();
         const isSafeHref =
           /^https?:\/\//i.test(href) ||
@@ -122,11 +166,14 @@ function sanitizeHtmlAllowlistFallback(dirtyHtml) {
           /^\//.test(href);
         if (isSafeHref) safeAttrs.push(`href="${escapeHtmlBasic(href)}"`);
       } else {
-        safeAttrs.push(`${attrName}="${escapeHtmlBasic(rawVal)}"`);
+        safeAttrs.push(`${outAttrName}="${escapeHtmlBasic(rawVal)}"`);
       }
     }
     const attrStr = safeAttrs.length > 0 ? ' ' + safeAttrs.join(' ') : '';
-    return SELF_CLOSING_TAGS_SET.has(tag) ? `<${tag}${attrStr}>` : `<${tag}${attrStr}>`;
+    if (SELF_CLOSING_TAGS_SET.has(tag)) {
+      return `<${outTag}${attrStr}>`;
+    }
+    return isXmlSelfClosing ? `<${outTag}${attrStr} />` : `<${outTag}${attrStr}>`;
   });
   return s;
 }
@@ -150,9 +197,10 @@ function getPurifier() {
 
     instance.addHook('afterSanitizeAttributes', (node) => {
       if (!node || typeof node.getAttribute !== 'function') return;
+      const tagUpper = (node.tagName || '').toUpperCase();
 
       // 1. Validate <img src>
-      if (node.tagName === 'IMG') {
+      if (tagUpper === 'IMG') {
         const src = (node.getAttribute('src') || '').trim();
         const isSafeUrl =
           /^https?:\/\//i.test(src) ||
@@ -165,10 +213,12 @@ function getPurifier() {
           }
         }
         node.setAttribute('loading', 'lazy');
+      } else if (node.hasAttribute('src')) {
+        node.removeAttribute('src');
       }
 
-      // 2. Validate <a href>
-      if (node.tagName === 'A') {
+      // 2. Validate <a href> (never allow href on SVG elements)
+      if (tagUpper === 'A') {
         const href = (node.getAttribute('href') || '').trim();
         const isSafeHref =
           /^https?:\/\//i.test(href) ||
@@ -181,6 +231,8 @@ function getPurifier() {
           node.setAttribute('target', '_blank');
           node.setAttribute('rel', 'noopener noreferrer');
         }
+      } else if (node.hasAttribute('href')) {
+        node.removeAttribute('href');
       }
 
       // 3. Strictly filter inline style properties
@@ -211,8 +263,13 @@ export function sanitizeRichHtml(dirtyHtml) {
       ALLOWED_TAGS,
       ALLOWED_ATTR,
       ALLOW_DATA_ATTR: false,
-      FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'textarea', 'select', 'svg'],
-      FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
+      FORBID_TAGS: [
+        'script', 'style', 'iframe', 'object', 'embed', 'form', 'input',
+        'textarea', 'select', 'foreignobject', 'foreignObject', 'use',
+        'animate', 'animatetransform', 'animateTransform', 'animatemotion',
+        'animateMotion', 'set',
+      ],
+      FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'xlink:href'],
     });
   }
   return sanitizeHtmlAllowlistFallback(str);
@@ -354,9 +411,9 @@ function hydrateLatexInHtmlFragment(safeHtml) {
 
   const parser = getSharedDomParser();
   if (!parser) {
-    // Node.js fallback: protect <pre> and <code> blocks before hydrating LaTeX
+    // Node.js fallback: protect <pre>, <code>, <math>, and <svg> blocks before hydrating LaTeX
     const protectedBlocks = [];
-    const masked = String(safeHtml).replace(/<(pre|code|math)\b[\s\S]*?<\/\1\s*>/gi, (m) => {
+    const masked = String(safeHtml).replace(/<(pre|code|math|svg)\b[\s\S]*?<\/\1\s*>/gi, (m) => {
       const tok = `@@CC_NODE_CODE_${protectedBlocks.length}@@`;
       protectedBlocks.push(m);
       return tok;

@@ -9,7 +9,7 @@
  */
 
 import * as acorn from 'acorn';
-import { normalizeMcqItem, htmlToPlainText, hasRichMarkup } from '../schema.js';
+import { normalizeMcqItem, htmlToPlainText, hasRichMarkup, escapeHtmlBasic } from '../schema.js';
 import { sanitizeRichHtml } from '../renderer.js';
 
 const PREFERRED_COLLECTION_KEYS = new Set([
@@ -49,8 +49,61 @@ const PRIMARY_QUESTION_KEYS = [
   'statement',
 ];
 
+const STRICT_MAIN_QUESTION_KEYS = [
+  'questionHtml',
+  'question_html',
+  'question',
+  'q',
+  'questionText',
+  'question_text',
+  'title',
+  'prompt',
+  'text',
+  'query',
+  'problem',
+  'statement',
+];
+
+const STEM_CONTEXT_KEYS = [
+  '__inheritedStem',
+  's',
+  'stem',
+  'stemHtml',
+  'stem_html',
+  'stimulus',
+  'context',
+  'passage',
+  'uddpok',
+  'uddipok',
+];
+
+const ROMAN_ARRAY_KEYS = [
+  'r',
+  'romans',
+  'roman',
+  'statements',
+  'romanStatements',
+  'roman_statements',
+  'romanList',
+  'roman_list',
+];
+
+const SUB_QUESTION_KEYS = [
+  'sq',
+  'subQuestion',
+  'sub_question',
+  'subq',
+  'sub_q',
+  'tail',
+  'footerPrompt',
+  'footer_prompt',
+];
+
+const ROMAN_LABELS = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
+
 const ALL_QUESTION_KEYS_LOWER = new Set([
   ...PRIMARY_QUESTION_KEYS.map((k) => k.toLowerCase()),
+  's',
   'description',
 ]);
 
@@ -60,9 +113,17 @@ const OPTION_ARRAY_KEYS = [
   'answers',
   'alternatives',
   'opts',
+  'opt',
+  'o',
   'optionList',
   'option_list',
 ];
+
+const OPTION_ARRAY_KEYS_LOWER = new Set([
+  ...OPTION_ARRAY_KEYS.map((k) => k.toLowerCase()),
+  'optionshtml',
+  'options_html',
+]);
 
 const OPTION_KEY_GROUPS = [
   ['a', 'b', 'c', 'd', 'e', 'f'],
@@ -110,12 +171,17 @@ const EXPLANATION_KEYS = [
   'explanationHtml',
   'explanation_html',
   'explanation',
+  'explanationText',
+  'explanation_text',
+  'exp',
+  'explain',
   'noteHtml',
   'note_html',
   'note',
   'details',
   'solutionText',
   'solution_text',
+  'sol',
   'discussion',
   'rationale',
   'reference',
@@ -146,6 +212,23 @@ const KEY_NAME_TO_INDEX = {
   'ক': 0, 'খ': 1, 'গ': 2, 'ঘ': 3, 'ঙ': 4,
 };
 
+function normalizeDigitsToAscii(str) {
+  return String(str ?? '').replace(/[০-৯]/g, (d) => String('০১২৩৪৫৬৭৮৯'.indexOf(d)));
+}
+
+function hasOptionArrayProperty(obj) {
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return false;
+  return Object.keys(obj).some((rawKey) => {
+    const k = rawKey.toLowerCase();
+    if (!OPTION_ARRAY_KEYS_LOWER.has(k)) return false;
+    const val = obj[rawKey];
+    if (k === 'o' || k === 'opt') {
+      return Array.isArray(val) || (Boolean(val) && typeof val === 'object');
+    }
+    return true;
+  });
+}
+
 function hasQuestionKey(obj) {
   if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return false;
   const keys = Object.keys(obj).map((k) => k.toLowerCase());
@@ -154,10 +237,8 @@ function hasQuestionKey(obj) {
 
 function hasAnyMcqSignalKey(obj) {
   if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return false;
+  if (hasOptionArrayProperty(obj)) return true;
   const keys = Object.keys(obj).map((k) => k.toLowerCase());
-  if (keys.some((k) => ['options', 'optionshtml', 'options_html', 'choices', 'answers', 'alternatives', 'opts', 'optionlist', 'option_list'].includes(k))) {
-    return true;
-  }
   if (keys.some((k) => KEY_NAME_TO_INDEX[k] !== undefined)) return true;
   if (keys.some((k) => ANSWER_KEYS_PRIMARY.map((a) => a.toLowerCase()).includes(k))) return true;
   if (keys.some((k) => ANSWER_INDEX_KEYS.map((a) => a.toLowerCase()).includes(k))) return true;
@@ -171,7 +252,7 @@ export function looksLikeQuestionObject(obj, allowIncomplete = false) {
 
   const keys = Object.keys(obj).map((k) => k.toLowerCase());
   const hasOpts =
-    keys.some((k) => ['options', 'optionshtml', 'options_html', 'choices', 'answers', 'alternatives', 'opts', 'optionlist', 'option_list'].includes(k)) ||
+    hasOptionArrayProperty(obj) ||
     OPTION_KEY_GROUPS.some((grp) => {
       const present = grp.filter((gk) => keys.includes(gk.toLowerCase()));
       return present.length >= 2;
@@ -180,6 +261,92 @@ export function looksLikeQuestionObject(obj, allowIncomplete = false) {
   if (hasOpts) return true;
   if (allowIncomplete && hasAnyMcqSignalKey(obj)) return true;
   return false;
+}
+
+/**
+ * Propagates multi-question stems (e.g., "নিচের উদ্দীপকটি লক্ষ কর এবং ৮ ও ৯ নং প্রশ্নের উত্তর দাও:")
+ * to all referenced subsequent questions in the same array so each question remains self-contained
+ * in View Mode, Practice Mode, and shuffled Exam Mode.
+ */
+function propagateMultiQuestionStems(collectedEntries) {
+  if (!Array.isArray(collectedEntries) || collectedEntries.length < 2) return;
+
+  const getFieldCI = (raw, names) => {
+    if (!raw || typeof raw !== 'object') return undefined;
+    for (const n of names) {
+      if (raw[n] !== undefined && raw[n] !== null) return raw[n];
+      const matchKey = Object.keys(raw).find((k) => k.toLowerCase() === n.toLowerCase());
+      if (matchKey && raw[matchKey] !== undefined && raw[matchKey] !== null) return raw[matchKey];
+    }
+    return undefined;
+  };
+
+  const entryNumberMap = new Map();
+  collectedEntries.forEach((entry, idx) => {
+    const rawNum = getFieldCI(entry.raw, ['n', 'no', 'qno', 'sl', 'id', 'questionId', 'question_id', 'num', 'number']);
+    const normStr = normalizeDigitsToAscii(rawNum !== undefined ? rawNum : idx + 1).trim();
+    const numMatch = normStr.match(/\d+/);
+    const num = numMatch ? parseInt(numMatch[0], 10) : idx + 1;
+    if (Number.isInteger(num)) {
+      if (!entryNumberMap.has(num)) entryNumberMap.set(num, []);
+      entryNumberMap.get(num).push(entry);
+    }
+  });
+
+  collectedEntries.forEach((entry) => {
+    const raw = entry?.raw;
+    if (!raw || typeof raw !== 'object') return;
+    const hasMainQ = getFieldCI(raw, STRICT_MAIN_QUESTION_KEYS) !== undefined;
+    if (!hasMainQ) return;
+    const stemVal = getFieldCI(raw, ['s', 'stem', 'stemHtml', 'stem_html', 'stimulus', 'context', 'passage', 'uddpok', 'uddipok']);
+    if (stemVal === undefined || stemVal === null || String(stemVal).trim() === '') return;
+
+    const stemPlain = normalizeDigitsToAscii(htmlToPlainText(String(stemVal)));
+    // Match Bangla or English multi-question references e.g. "8 ও 9 নং প্রশ্নের", "13, 14 ও 15 নং", "20-21 নং", "questions 8 and 9"
+    const refRegexes = [
+      /(\d+(?:\s*(?:,|ও|এবং|থেকে|হতে|to|and|&|[-–—])\s*\d+)+)\s*(?:নং|নম্বর)?\s*(?:প্রশ্ন|প্রশ্নের)/i,
+      /(?:questions?|q\.?\s*nos?\.?)\s*(\d+(?:\s*(?:,|ও|এবং|থেকে|হতে|to|and|&|[-–—])\s*\d+)+)/i,
+    ];
+
+    let refExpr = '';
+    for (const re of refRegexes) {
+      const m = stemPlain.match(re);
+      if (m && m[1]) {
+        refExpr = m[1];
+        break;
+      }
+    }
+    if (!refExpr) return;
+
+    const targetNumbers = new Set();
+    // Handle range patterns like "8-10" or "8 থেকে 10" or "8 to 10"
+    const rangeRe = /(\d+)\s*(?:থেকে|হতে|to|[-–—])\s*(\d+)/gi;
+    let rm;
+    while ((rm = rangeRe.exec(refExpr)) !== null) {
+      const start = parseInt(rm[1], 10);
+      const end = parseInt(rm[2], 10);
+      if (Number.isInteger(start) && Number.isInteger(end) && end >= start && end - start <= 15) {
+        for (let k = start; k <= end; k++) targetNumbers.add(k);
+      }
+    }
+    // Also add all individual numbers mentioned
+    const allNums = refExpr.match(/\d+/g) || [];
+    allNums.forEach((nStr) => {
+      const n = parseInt(nStr, 10);
+      if (Number.isInteger(n)) targetNumbers.add(n);
+    });
+
+    targetNumbers.forEach((targetNum) => {
+      const matchingEntries = entryNumberMap.get(targetNum) || [];
+      matchingEntries.forEach((targetEntry) => {
+        if (targetEntry === entry || !targetEntry?.raw) return;
+        const existingStem = getFieldCI(targetEntry.raw, STEM_CONTEXT_KEYS);
+        if (existingStem === undefined || existingStem === null || String(existingStem).trim() === '') {
+          targetEntry.raw.__inheritedStem = String(stemVal);
+        }
+      });
+    });
+  });
 }
 
 /**
@@ -192,6 +359,7 @@ export function collectQuestionObjects(root, results = [], parentTags = [], sour
 
   if (Array.isArray(root)) {
     const hasCompleteMcq = root.some((el) => looksLikeQuestionObject(el, false));
+    const startIdx = results.length;
     root.forEach((entry) => {
       if (looksLikeQuestionObject(entry, hasCompleteMcq)) {
         results.push({ raw: entry, inheritedTags: parentTags, variableName: sourceVariableName });
@@ -199,6 +367,9 @@ export function collectQuestionObjects(root, results = [], parentTags = [], sour
         collectQuestionObjects(entry, results, parentTags, sourceVariableName);
       }
     });
+    if (results.length > startIdx + 1) {
+      propagateMultiQuestionStems(results.slice(startIdx));
+    }
     return results;
   }
 
@@ -238,9 +409,10 @@ export function mapRawObjectToMcq(raw, idx, inheritedTags = [], sourceFormat = '
     return undefined;
   };
 
-  // 1. Question extraction (with fallback to `description` only when no primary question key exists)
+  // 1. Question extraction (including optional stem `s`, Roman numeral statements `r`, and sub-question `sq`)
   const qHtmlExplicit = getAny('questionHtml', 'question_html');
-  let qVal = getAny(...PRIMARY_QUESTION_KEYS);
+  const strictMainQVal = getAny(...STRICT_MAIN_QUESTION_KEYS);
+  let qVal = strictMainQVal !== undefined ? strictMainQVal : getAny(...PRIMARY_QUESTION_KEYS);
   let usedDescriptionAsQuestion = false;
   if (qVal === undefined && qHtmlExplicit === undefined) {
     const descVal = getAny('description');
@@ -250,18 +422,116 @@ export function mapRawObjectToMcq(raw, idx, inheritedTags = [], sourceFormat = '
     }
   }
 
-  const rawQStr = qVal !== undefined ? String(qVal).trim() : '';
-  const rawQHtmlStr = qHtmlExplicit !== undefined
-    ? String(qHtmlExplicit).trim()
-    : hasRichMarkup(rawQStr)
-    ? sanitizeRichHtml(rawQStr)
-    : undefined;
-  const cleanQPlain = rawQHtmlStr ? htmlToPlainText(rawQHtmlStr) : rawQStr;
+  // Extract separate stem (`s`, `stem`, `stimulus`, `context`, `passage`, `__inheritedStem`) if distinct from main question
+  let stemRawStr = '';
+  if (strictMainQVal !== undefined || qHtmlExplicit !== undefined) {
+    const stemCandidate = getAny(...STEM_CONTEXT_KEYS);
+    if (stemCandidate !== undefined && stemCandidate !== null && String(stemCandidate).trim() !== '') {
+      const sTrimmed = String(stemCandidate).trim();
+      if (sTrimmed !== String(qVal ?? '').trim()) {
+        stemRawStr = sTrimmed;
+      }
+    }
+  } else if (qVal === undefined) {
+    const sOnly = getAny('s');
+    if (sOnly !== undefined && sOnly !== null) {
+      qVal = sOnly;
+    }
+  }
 
-  // 2. Options extraction (array, object map {a,b,c,d}, or top-level keys a/b/c/d, optionA..D, option_1..4, ক..ঘ)
+  // Extract optional Roman numeral statements (`r`, `romans`, `statements`)
+  const rawRomans = getAny(...ROMAN_ARRAY_KEYS);
+  let romanBlockHtml = '';
+  let romanBlockPlain = '';
+  if (Array.isArray(rawRomans) && rawRomans.length > 0) {
+    const romanHtmlItems = [];
+    const romanPlainItems = [];
+    rawRomans.forEach((rItem, rIdx) => {
+      const rStr = String(rItem ?? '').trim();
+      if (!rStr) return;
+      const rLabel = ROMAN_LABELS[rIdx] || String(rIdx + 1);
+      const rSafeHtml = hasRichMarkup(rStr) ? sanitizeRichHtml(rStr) : escapeHtmlBasic(rStr);
+      const rPlain = hasRichMarkup(rStr) ? htmlToPlainText(rStr) : rStr;
+      romanHtmlItems.push(
+        `<li class="cc-roman-item"><span class="cc-roman-num">${rLabel}.</span> <span class="cc-roman-text">${rSafeHtml}</span></li>`
+      );
+      romanPlainItems.push(`${rLabel}. ${rPlain}`);
+    });
+    if (romanHtmlItems.length > 0) {
+      romanBlockHtml = `<ul class="cc-roman-list">${romanHtmlItems.join('')}</ul>`;
+      romanBlockPlain = romanPlainItems.join('\n');
+    }
+  }
+
+  // Extract optional sub-question (`sq`, `subQuestion`, `tail`)
+  const rawSubQ = getAny(...SUB_QUESTION_KEYS);
+  let subQHtml = '';
+  let subQPlain = '';
+  if (rawSubQ !== undefined && rawSubQ !== null && String(rawSubQ).trim() !== '') {
+    const sqStr = String(rawSubQ).trim();
+    const sqSafeHtml = hasRichMarkup(sqStr) ? sanitizeRichHtml(sqStr) : escapeHtmlBasic(sqStr);
+    subQHtml = `<div class="cc-sub-q">${sqSafeHtml}</div>`;
+    subQPlain = hasRichMarkup(sqStr) ? htmlToPlainText(sqStr) : sqStr;
+  }
+
+  const rawQStr = qVal !== undefined ? String(qVal).trim() : '';
+  const hasCompoundParts = Boolean(stemRawStr || romanBlockHtml || subQHtml);
+
+  let rawQHtmlStr;
+  let cleanQPlain;
+
+  if (hasCompoundParts) {
+    const htmlParts = [];
+    const plainParts = [];
+
+    if (stemRawStr) {
+      const safeStemHtml = hasRichMarkup(stemRawStr) ? sanitizeRichHtml(stemRawStr) : escapeHtmlBasic(stemRawStr);
+      htmlParts.push(`<div class="cc-stem-block">${safeStemHtml}</div>`);
+      plainParts.push(hasRichMarkup(stemRawStr) ? htmlToPlainText(safeStemHtml) : stemRawStr);
+    }
+
+    const baseQHtml = qHtmlExplicit !== undefined
+      ? sanitizeRichHtml(String(qHtmlExplicit).trim())
+      : hasRichMarkup(rawQStr)
+      ? sanitizeRichHtml(rawQStr)
+      : escapeHtmlBasic(rawQStr);
+    const baseQPlain = qHtmlExplicit !== undefined
+      ? htmlToPlainText(baseQHtml)
+      : hasRichMarkup(rawQStr)
+      ? htmlToPlainText(baseQHtml)
+      : rawQStr;
+
+    if (baseQHtml) {
+      htmlParts.push(`<div class="cc-q-main">${baseQHtml}</div>`);
+    }
+    if (baseQPlain) {
+      plainParts.push(baseQPlain);
+    }
+    if (romanBlockHtml) {
+      htmlParts.push(romanBlockHtml);
+      plainParts.push(romanBlockPlain);
+    }
+    if (subQHtml) {
+      htmlParts.push(subQHtml);
+      plainParts.push(subQPlain);
+    }
+
+    rawQHtmlStr = htmlParts.join('');
+    cleanQPlain = plainParts.filter(Boolean).join('\n');
+  } else {
+    rawQHtmlStr = qHtmlExplicit !== undefined
+      ? sanitizeRichHtml(String(qHtmlExplicit).trim())
+      : hasRichMarkup(rawQStr)
+      ? sanitizeRichHtml(rawQStr)
+      : undefined;
+    cleanQPlain = rawQHtmlStr ? htmlToPlainText(rawQHtmlStr) : rawQStr;
+  }
+
+  // 2. Options extraction (array `options`/`o`/`opts`, object map {a,b,c,d}, or top-level keys a/b/c/d, optionA..D, option_1..4, ক..ঘ)
   let rawOptions = getAny(...OPTION_ARRAY_KEYS);
   let rawOptionsHtml = getAny('optionsHtml', 'options_html');
   let optionKeyOrder = [];
+  let usedIndividualOptionKeys = false;
 
   if (rawOptions && typeof rawOptions === 'object' && !Array.isArray(rawOptions)) {
     const keys = Object.keys(rawOptions);
@@ -286,8 +556,14 @@ export function mapRawObjectToMcq(raw, idx, inheritedTags = [], sourceFormat = '
       }
       if (bestOpts.length >= 4) break;
     }
-    rawOptions = bestOpts;
-    optionKeyOrder = bestKeys;
+    if (bestOpts.length >= 2) {
+      rawOptions = bestOpts;
+      optionKeyOrder = bestKeys;
+      usedIndividualOptionKeys = true;
+    } else {
+      rawOptions = bestOpts;
+      optionKeyOrder = bestKeys;
+    }
   }
 
   const extractedOptionStrings = Array.isArray(rawOptions)
@@ -313,7 +589,7 @@ export function mapRawObjectToMcq(raw, idx, inheritedTags = [], sourceFormat = '
   const cleanOptionsPlain = extractedOptionStrings.map((o) => (hasRichMarkup(o) ? htmlToPlainText(o) : o));
   const missingOptions = cleanOptionsPlain.length < 2;
 
-  // 3. Correct answer resolution (supports index, letter, key name, boolean option flags, or full text)
+  // 3. Correct answer resolution (supports index, letter, key name, boolean option flags, shorthand `a`, or full text)
   let correctIndex = -1;
   let correctAnswer = '';
   let invalidAnswerRef = false;
@@ -348,7 +624,11 @@ export function mapRawObjectToMcq(raw, idx, inheritedTags = [], sourceFormat = '
     }
   }
 
-  let rawAns = getAny(...ANSWER_KEYS_PRIMARY);
+  // When options come from an array (e.g. `o: [...]` or `options: [...]`) rather than `{a, b, c, d}`, allow shorthand `a` as answer key
+  const answerCandidateKeys = usedIndividualOptionKeys
+    ? ANSWER_KEYS_PRIMARY
+    : [...ANSWER_KEYS_PRIMARY, 'a'];
+  let rawAns = getAny(...answerCandidateKeys);
   const rawSolution = getAny('solution');
   let solutionUsedAsAnswer = false;
 
@@ -429,8 +709,12 @@ export function mapRawObjectToMcq(raw, idx, inheritedTags = [], sourceFormat = '
     }
   }
 
-  // 4. Explanation / Note resolution (preserving HTML tags & LaTeX)
-  let expVal = getAny(...EXPLANATION_KEYS);
+  // 4. Explanation / Note resolution (preserving HTML tags, SVG diagrams & LaTeX)
+  // Allow shorthand `e` for explanation whenever `e` was not used as Option E
+  const explanationCandidateKeys = optionKeyOrder.includes('e')
+    ? EXPLANATION_KEYS
+    : [...EXPLANATION_KEYS, 'e'];
+  let expVal = getAny(...explanationCandidateKeys);
   if (expVal === undefined && !usedDescriptionAsQuestion) {
     expVal = getAny('description');
   }
@@ -453,9 +737,17 @@ export function mapRawObjectToMcq(raw, idx, inheritedTags = [], sourceFormat = '
     .filter(Boolean)
     .map(String);
 
+  const rawIdCandidate = getAny('id', 'questionId', 'question_id', 'no', 'qno', 'sl', 'n', 'num', 'number');
+  let resolvedId = idx + 1;
+  if (rawIdCandidate !== undefined && rawIdCandidate !== null && String(rawIdCandidate).trim() !== '') {
+    const asciiDigits = normalizeDigitsToAscii(rawIdCandidate).trim();
+    const parsedNum = Number(asciiDigits);
+    resolvedId = Number.isInteger(parsedNum) && parsedNum > 0 ? parsedNum : rawIdCandidate;
+  }
+
   return normalizeMcqItem(
     {
-      id: getAny('id', 'questionId', 'question_id', 'no', 'qno', 'sl') ?? idx + 1,
+      id: resolvedId,
       question: cleanQPlain,
       questionHtml: rawQHtmlStr,
       options: cleanOptionsPlain,
@@ -566,7 +858,7 @@ export function parseJsonMcqs(rawJson, options = {}) {
 /**
  * Static AST evaluator: evaluates ONLY pure literals, static arrays, static objects,
  * binary '+' string concatenation, static identifier references declared in the same script,
- * and zero-expression template literals.
+ * and template literals with static interpolated variables.
  * NEVER executes functions or external code.
  */
 function evalStaticAstNode(node, meta = { dynamicCount: 0, dynamicPaths: [] }, path = '', scopeMap = new Map()) {
@@ -585,13 +877,27 @@ function evalStaticAstNode(node, meta = { dynamicCount: 0, dynamicPaths: [] }, p
       meta.dynamicPaths.push(path || node.name);
       return `[Dynamic JS Identifier: ${node.name}]`;
 
-    case 'TemplateLiteral':
+    case 'TemplateLiteral': {
       if (!node.expressions || node.expressions.length === 0) {
         return node.quasis.map((q) => q.value?.cooked ?? q.value?.raw ?? '').join('');
       }
-      meta.dynamicCount++;
-      meta.dynamicPaths.push(path || 'template-expression');
-      return `[Dynamic Template Value]`;
+      let out = '';
+      for (let i = 0; i < node.quasis.length; i++) {
+        out += node.quasis[i].value?.cooked ?? node.quasis[i].value?.raw ?? '';
+        if (i < node.expressions.length) {
+          const exprVal = evalStaticAstNode(
+            node.expressions[i],
+            meta,
+            path ? `${path}.\${${i}}` : `\${${i}}`,
+            scopeMap
+          );
+          if (exprVal !== undefined && exprVal !== null) {
+            out += String(exprVal);
+          }
+        }
+      }
+      return out;
+    }
 
     case 'UnaryExpression':
       if (node.operator === '-' || node.operator === '+') {
@@ -726,6 +1032,52 @@ function isDataContainerNode(node) {
   return false;
 }
 
+/**
+ * Pre-populates `scopeMap` with static scalar/template/string/number bindings
+ * declared in the script (e.g. `const svgStarToMesh = "<svg>...</svg>"`) so
+ * template literals inside MCQ objects can reference them statically.
+ */
+function populateStaticScopeBindings(ast, scopeMap) {
+  const visit = (node) => {
+    if (!node || typeof node !== 'object') return;
+    if (Array.isArray(node)) {
+      node.forEach(visit);
+      return;
+    }
+
+    if (node.type === 'VariableDeclarator' && node.id?.type === 'Identifier' && node.init && !isDataContainerNode(node.init)) {
+      const tmpMeta = { dynamicCount: 0, dynamicPaths: [] };
+      const val = evalStaticAstNode(node.init, tmpMeta, node.id.name, scopeMap);
+      if (tmpMeta.dynamicCount === 0 && (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean')) {
+        scopeMap.set(node.id.name, val);
+      }
+      return;
+    }
+
+    if (
+      node.type === 'AssignmentExpression' &&
+      node.left?.type === 'Identifier' &&
+      node.right &&
+      !isDataContainerNode(node.right)
+    ) {
+      const tmpMeta = { dynamicCount: 0, dynamicPaths: [] };
+      const val = evalStaticAstNode(node.right, tmpMeta, node.left.name, scopeMap);
+      if (tmpMeta.dynamicCount === 0 && (typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean')) {
+        scopeMap.set(node.left.name, val);
+      }
+      return;
+    }
+
+    for (const key of Object.keys(node)) {
+      if (key === 'loc' || key === 'range') continue;
+      const val = node[key];
+      if (val && typeof val === 'object') visit(val);
+    }
+  };
+
+  visit(ast);
+}
+
 function collectAstCandidateRoots(ast) {
   const candidates = [];
 
@@ -832,6 +1184,8 @@ export function parseJsSourceMcqs(rawJs, options = {}) {
   const warnings = [];
   const detectedVariableNames = [];
   const scopeMap = new Map();
+  populateStaticScopeBindings(ast, scopeMap);
+
   let totalDynamicCount = 0;
   let rawDetectedCount = 0;
 

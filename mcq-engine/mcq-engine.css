@@ -62,6 +62,10 @@
   text-decoration: line-through;
 }
 
+.cc-rich-content .overline {
+  text-decoration: overline;
+}
+
 .cc-rich-content ul,
 .cc-rich-content ol {
   margin: 0.45em 0 0.45em 1.25em;
@@ -80,6 +84,58 @@
   list-style: decimal;
 }
 
+/* Compound MCQ Elements: Stem (উদ্দীপক), Roman numeral statements (i, ii, iii), Sub-question */
+.cc-rich-content .cc-stem-block {
+  margin: 0 0 0.65rem 0;
+  padding: 0.65rem 0.85rem;
+  background: var(--cc-surface-muted, #f8fafc);
+  border: 1px solid var(--cc-border, #e2e8f0);
+  border-left: 3.5px solid var(--cc-accent, #059669);
+  border-radius: 6px;
+  font-size: 0.95em;
+}
+
+.cc-rich-content .cc-stem-block .stem-title {
+  font-weight: 700;
+  color: var(--cc-accent, #047857);
+  margin-bottom: 0.35rem;
+  font-size: 0.92em;
+}
+
+.cc-rich-content .cc-q-main {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.cc-rich-content ul.cc-roman-list,
+.cc-rich-content ul.roman-list {
+  list-style: none;
+  margin: 0.35rem 0 0.45rem 0.5rem;
+  padding-left: 0.25rem;
+}
+
+.cc-rich-content ul.cc-roman-list li,
+.cc-rich-content ul.roman-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  margin: 0.2rem 0;
+  font-weight: 500;
+}
+
+.cc-rich-content .cc-roman-num {
+  font-weight: 700;
+  min-width: 1.35rem;
+  color: var(--cc-text-secondary, #475569);
+  flex-shrink: 0;
+}
+
+.cc-rich-content .cc-sub-q,
+.cc-rich-content .sub-q {
+  font-weight: 600;
+  margin-top: 0.35rem;
+}
+
 .cc-rich-content blockquote {
   margin: 0.55em 0;
   padding: 0.45em 0.85em;
@@ -96,6 +152,23 @@
   margin: 0.5rem 0;
   border: 1px solid var(--cc-border, #e2e8f0);
   display: block;
+}
+
+.cc-rich-content svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0.45rem auto;
+  padding: 0.4rem 0.6rem;
+  background: #ffffff;
+  border: 1px solid var(--cc-border, #e2e8f0);
+  border-radius: 8px;
+}
+
+body.dark-mode .cc-rich-content svg,
+html.dark .cc-rich-content svg {
+  background: #f8fafc;
+  border-color: #475569;
 }
 
 .cc-rich-content a {
@@ -126,6 +199,11 @@
   padding: 0.45rem 0.65rem;
   border: 1px solid var(--cc-border, #e2e8f0);
   text-align: left;
+}
+
+.cc-table-scroll table.mini-table th,
+.cc-table-scroll table.mini-table td {
+  text-align: center;
 }
 
 .cc-table-scroll th {
