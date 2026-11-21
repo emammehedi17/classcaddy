@@ -195,18 +195,6 @@ export default function App() {
 
       </main>
 
-      {/* Floating Back to Top Button */}
-      {showBackToTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-6 right-6 z-40 p-3 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white shadow-xl hover:shadow-indigo-500/30 transition-all duration-200 cursor-pointer no-print focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          title="Back to Top"
-          aria-label="Back to Top"
-        >
-          <ArrowUp className="w-5 h-5" />
-        </button>
-      )}
-
       {/* Final Footer with Strict Date & Author Signature */}
       <footer className="mt-20 bg-slate-900 text-slate-400 border-t border-slate-800 py-12 px-4 sm:px-6 lg:px-8 text-center text-xs sm:text-sm">
         <div className="max-w-4xl mx-auto space-y-4">

@@ -331,7 +331,7 @@ function recoverMathSourceNodes(doc) {
 function isGreenHighlightOrCorrect(el) {
   if (!el) return false;
   const cls = (el.getAttribute('class') || '').toLowerCase();
-  if (/(?:^|\b)(?:correct|right-ans|right-answer|is-correct|ans-correct|answer-true)(?:\b|$)/.test(cls)) {
+  if (/(?:^|\b)(?:correct|right-ans|right-answer|is-correct|ans-correct|answer-true|ans)(?:\b|$)/.test(cls)) {
     return true;
   }
   if (el.getAttribute('data-correct') === 'true' || el.getAttribute('data-answer') === 'true') {
@@ -350,10 +350,22 @@ function cleanAndCheckCorrectOptionHtml(rawInnerHtml, elementRef = null) {
   let flaggedCorrect = isGreenHighlightOrCorrect(elementRef);
   let html = String(rawInnerHtml || '').trim();
 
+  // Strip leading wrapped span label e.g. `<span>(ক)</span>` or `<span class="lbl">A.</span>`
+  html = html.replace(
+    /^\s*<([a-zA-Z0-9]+)\b[^>]*>\s*(?:\(([a-hA-Hক-জ1-8১-৮])\)|\[([a-hA-Hক-জ1-8১-৮])\]|([a-hA-Hক-জ1-8১-৮])[\.\):])\s*<\/\1>\s*/i,
+    ''
+  );
+
   // Strip leading option label e.g. "a. ", "(B) ", "ক) "
   const prefixMatch = html.match(OPT_PREFIX_HTML_RE);
   if (prefixMatch) {
     html = (prefixMatch[4] || '').trim();
+  }
+
+  // Strip trailing wrapped checkmark span e.g. `<span>✔</span>`
+  if (/<([a-zA-Z0-9]+)\b[^>]*>\s*[✓✔☑]\s*<\/\1>\s*$/i.test(html)) {
+    flaggedCorrect = true;
+    html = html.replace(/<([a-zA-Z0-9]+)\b[^>]*>\s*[✓✔☑]\s*<\/\1>\s*$/i, '').trim();
   }
 
   // Strip trailing checkmark symbol from text end
@@ -369,7 +381,18 @@ function cleanAndCheckCorrectOptionHtml(rawInnerHtml, elementRef = null) {
 }
 
 function stripQuestionPrefixFromHtml(rawHtml) {
-  const m = String(rawHtml || '').trim().match(QUESTION_NUM_HTML_RE);
+  let cleaned = String(rawHtml || '').trim();
+  // Also handle `<span class="q-num">১.</span><span>Question...</span>`
+  const spanNumMatch = cleaned.match(
+    /^\s*<([a-zA-Z0-9]+)\b[^>]*>\s*(?:Q(?:uestion)?\s*\.?\s*|প্রশ্ন\s*\.?\s*)?(?:\(?([0-9০-৯]{1,4})\)?[\.\):])\s*<\/\1>\s*([\s\S]*)$/i
+  );
+  if (spanNumMatch) {
+    return {
+      num: parseInt(normalizeDigits(spanNumMatch[2]), 10),
+      html: sanitizeRichHtml(spanNumMatch[3].trim()),
+    };
+  }
+  const m = cleaned.match(QUESTION_NUM_HTML_RE);
   if (m) {
     return {
       num: parseInt(normalizeDigits(m[1]), 10),
@@ -380,7 +403,7 @@ function stripQuestionPrefixFromHtml(rawHtml) {
 }
 
 /**
- * Strategy 1: Semantic MCQ containers (.question-card, .mcq-item, .quiz-question, .question, etc.)
+ * Strategy 1: Semantic MCQ containers (.question-card, .mcq-item, .q-block, .quiz-question, .question, etc.)
  */
 function tryExtractFromSemanticCards(doc, preserveCss, fileName = '') {
   const selectors = [
@@ -388,6 +411,7 @@ function tryExtractFromSemanticCards(doc, preserveCss, fileName = '') {
     '.mcq-card',
     '.question-card',
     '.question-block',
+    '.q-block',
     '.quiz-question',
     '.exam-question',
     '.question-container',
@@ -408,22 +432,65 @@ function tryExtractFromSemanticCards(doc, preserveCss, fileName = '') {
   if (cards.length === 0) return null;
 
   const items = [];
+  let activeMultiStemHtml = '';
+  let activeMultiStemTargets = new Set();
+
   cards.forEach((card, idx) => {
+    // Check if an immediate preceding sibling is a `.stem` block
+    const prevEl = card.previousElementSibling;
+    let directStemHtml = '';
+    if (prevEl && prevEl.classList && prevEl.classList.contains('stem')) {
+      directStemHtml = sanitizeRichHtml(prevEl.innerHTML);
+      const stemPlain = normalizeDigits(prevEl.textContent || '');
+      const refM = stemPlain.match(/(\d+(?:\s*(?:,|ও|এবং|থেকে|হতে|to|and|&|[-–—])\s*\d+)+)\s*(?:নং|নম্বর)?\s*(?:প্রশ্ন|প্রশ্নের)/i);
+      if (refM && refM[1]) {
+        activeMultiStemHtml = directStemHtml;
+        activeMultiStemTargets = new Set((refM[1].match(/\d+/g) || []).map((n) => parseInt(n, 10)));
+      }
+    }
+
     const clone = card.cloneNode(true);
     if (!preserveCss) clone.querySelectorAll('[style]').forEach((n) => n.removeAttribute('style'));
 
     const qNode = clone.querySelector('.question-text, .stem, .q-text, .prompt, .question-title, h3, h4, p');
-    const optNodes = Array.from(clone.querySelectorAll('.option, .choice, .mcq-option, .opt, .options li, ul li, ol li'));
-    const expNode = clone.querySelector('.explanation, .rationale, .note, .solution, .exp-box');
-    const ansNode = clone.querySelector('.answer, .correct-answer, .ans');
+    const romanNode = clone.querySelector('.roman-list, .cc-roman-list');
+    const subQNode = clone.querySelector('.sub-q, .cc-sub-q');
+    const optNodes = Array.from(clone.querySelectorAll('.option, .choice, .mcq-option, .opt, .options li, .opts-grid > div'));
+    const fallbackOptNodes = optNodes.length > 0
+      ? optNodes
+      : Array.from(clone.querySelectorAll('ul:not(.roman-list):not(.cc-roman-list) li, ol:not(.roman-list):not(.cc-roman-list) li'));
+    const expNode = clone.querySelector('.explanation, .rationale, .note, .solution, .exp-box, .exp');
+    const ansNode = clone.querySelector('.answer, .correct-answer, .ans:not(.opt)');
 
-    if (!qNode && optNodes.length === 0) return;
+    if (!qNode && fallbackOptNodes.length === 0) return;
 
-    const { num, html: qHtml } = stripQuestionPrefixFromHtml(qNode ? qNode.innerHTML : '');
+    const { num, html: baseQHtml } = stripQuestionPrefixFromHtml(qNode ? qNode.innerHTML : '');
+    const resolvedId = num || idx + 1;
+
+    let stemToUse = directStemHtml;
+    if (!stemToUse && activeMultiStemHtml && activeMultiStemTargets.has(resolvedId)) {
+      stemToUse = activeMultiStemHtml;
+    }
+
+    const composedQParts = [];
+    if (stemToUse) {
+      composedQParts.push(`<div class="cc-stem-block">${stemToUse}</div>`);
+    }
+    if (baseQHtml) {
+      composedQParts.push(stemToUse || romanNode || subQNode ? `<div class="cc-q-main">${baseQHtml}</div>` : baseQHtml);
+    }
+    if (romanNode) {
+      composedQParts.push(`<ul class="cc-roman-list">${sanitizeRichHtml(romanNode.innerHTML)}</ul>`);
+    }
+    if (subQNode) {
+      composedQParts.push(`<div class="cc-sub-q">${sanitizeRichHtml(subQNode.innerHTML)}</div>`);
+    }
+    const qHtml = composedQParts.join('');
+
     const optionsHtml = [];
     let correctIndex = -1;
 
-    optNodes.forEach((optEl) => {
+    fallbackOptNodes.forEach((optEl) => {
       const { html, flaggedCorrect } = cleanAndCheckCorrectOptionHtml(optEl.innerHTML, optEl);
       if (html) {
         if (flaggedCorrect && correctIndex === -1) correctIndex = optionsHtml.length;
@@ -442,7 +509,7 @@ function tryExtractFromSemanticCards(doc, preserveCss, fileName = '') {
           correctAnswerHtml = optionsHtml[mapped];
         }
       } else if (ansText) {
-        const matchIdx = optNodes.findIndex((o) => (o.textContent || '').trim().toLowerCase() === ansText.toLowerCase());
+        const matchIdx = fallbackOptNodes.findIndex((o) => (o.textContent || '').trim().toLowerCase() === ansText.toLowerCase());
         if (matchIdx !== -1) {
           correctIndex = matchIdx;
           correctAnswerHtml = optionsHtml[matchIdx];
@@ -452,12 +519,14 @@ function tryExtractFromSemanticCards(doc, preserveCss, fileName = '') {
       }
     }
 
-    const expHtml = expNode ? sanitizeRichHtml(expNode.innerHTML.replace(/^(?:explanation|note|solution|ব্যাখ্যা)\s*[:\-]\s*/i, '')) : '';
+    const expHtml = expNode
+      ? sanitizeRichHtml(expNode.innerHTML.replace(/^(?:<[^>]+>\s*)*(?:explanation|note|solution|ব্যাখ্যা)\s*[:\-]\s*(?:<\/[^>]+>\s*)*/i, ''))
+      : '';
 
     items.push(
       normalizeMcqItem(
         {
-          id: num || idx + 1,
+          id: resolvedId,
           questionHtml: qHtml,
           optionsHtml,
           correctIndex,
@@ -638,7 +707,7 @@ function extractFromRichFlow(root, preserveCss, fileName = '') {
       }
       if (node.nodeType !== 1) return;
       const tag = node.tagName.toUpperCase();
-      if (['PRE', 'TABLE', 'BLOCKQUOTE', 'FIGURE', 'MATH', 'IMG'].includes(tag)) {
+      if (['PRE', 'TABLE', 'BLOCKQUOTE', 'FIGURE', 'MATH', 'IMG', 'SVG'].includes(tag)) {
         blockNodes.push({ html: node.outerHTML, text: node.textContent || '', el: node });
         return;
       }
@@ -652,13 +721,13 @@ function extractFromRichFlow(root, preserveCss, fileName = '') {
         }
       }
       if (['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI'].includes(tag)) {
-        if (node.querySelector('br') && !node.querySelector('pre, table, math')) {
+        if (node.querySelector('br') && !node.querySelector('pre, table, math, svg')) {
           const parts = node.innerHTML.split(/<br\s*\/?>/i);
           parts.forEach((partHtml) => {
             const tmp = node.ownerDocument.createElement('div');
             tmp.innerHTML = partHtml;
             const txt = (tmp.textContent || '').trim();
-            if (txt || tmp.querySelector('img, math')) {
+            if (txt || tmp.querySelector('img, math, svg')) {
               blockNodes.push({ html: partHtml.trim(), text: txt, el: node });
             }
           });
@@ -672,7 +741,7 @@ function extractFromRichFlow(root, preserveCss, fileName = '') {
       );
       if (hasBlockChildren) {
         collect(node);
-      } else if ((node.textContent || '').trim() || node.querySelector('img, math')) {
+      } else if ((node.textContent || '').trim() || node.querySelector('img, math, svg')) {
         blockNodes.push({ html: node.innerHTML.trim(), text: (node.textContent || '').trim(), el: node });
       }
     });
@@ -715,7 +784,7 @@ function extractFromRichFlow(root, preserveCss, fileName = '') {
 
   for (const blk of blockNodes) {
     const txt = (blk.text || '').trim();
-    const isCodeOrTable = blk.el && ['PRE', 'TABLE', 'IMG', 'MATH', 'FIGURE'].includes(blk.el.tagName.toUpperCase());
+    const isCodeOrTable = blk.el && ['PRE', 'TABLE', 'IMG', 'MATH', 'FIGURE', 'SVG'].includes(blk.el.tagName.toUpperCase());
 
     if (!isCodeOrTable && txt) {
       const qMatch = txt.match(/^(?:Q(?:uestion)?\s*\.?\s*|প্রশ্ন\s*\.?\s*)?(?:\(?([0-9০-৯]{1,4})\)?[\.\):])\s+([\s\S]+)$/i);

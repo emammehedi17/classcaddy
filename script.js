@@ -283,17 +283,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     /* ==========================================================================
-     * 6. Header Scroll Effect Logic
+     * 6. Header Scroll Effect Logic (Disabled: Universal Study Plan Header stays pinned)
      * ========================================================================== */
-    const header = document.querySelector('header');
-    if (header) {
-        let lastScrollY = window.scrollY;
-        window.addEventListener('scroll', () => {
-            const currentScrollY = window.scrollY;
-            header.classList.toggle('header-hidden', currentScrollY > lastScrollY && currentScrollY > 100);
-            lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
-        });
-    }
 
     /* ==========================================================================
      * 7. Mobile Navigation Logic
@@ -304,19 +295,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const mobileAcademicMenu = document.getElementById('mobile-academic-menu');
 
     if (mobileMenuButton && mobileMenu) {
-        mobileMenuButton.addEventListener('click', () => {
+        mobileMenuButton.onclick = () => {
             mobileMenu.classList.toggle('hidden');
-        });
+        };
     }
 
     if (mobileAcademicButton && mobileAcademicMenu) {
-        mobileAcademicButton.addEventListener('click', () => {
+        mobileAcademicButton.onclick = () => {
             mobileAcademicMenu.classList.toggle('hidden');
             const arrowIcon = mobileAcademicButton.querySelector('svg');
             if (arrowIcon) {
                 arrowIcon.classList.toggle('rotate-180');
             }
-        });
+        };
     }
 	
 	/* ==========================================================================
@@ -351,23 +342,15 @@ document.addEventListener('DOMContentLoaded', function () {
 	/* == 9. Karaoke Highlighting and Scrolling Function == */
 	/* ================================================= */
 
-	/**
-	 * Initializes the karaoke highlighting functionality on a page.
-	 * This function is designed to be called automatically if the required
-	 * elements and data (lineTimings) are present.
-	 * @param {Array} timings - The array of timestamp objects for the current page.
-	 */
 	function setupKaraoke(timings) {
 		const audio = document.getElementById('audio-source');
 		const lines = Array.from(document.querySelectorAll('tbody tr[id^="line-"]'));
 		let currentHighlight = null;
 
 		if (!audio || lines.length === 0) {
-			// Exit if essential elements aren't found
 			return;
 		}
 
-		// --- Click-to-seek functionality for each table row ---
 		lines.forEach(lineEl => {
 			const lineData = timings.find(t => t.id === lineEl.id);
 			if (lineData) {
@@ -380,7 +363,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		});
 
-		// --- Main listener to update highlight during playback ---
 		audio.addEventListener('timeupdate', function() {
 			const currentTime = audio.currentTime;
 			let activeLine = null;
@@ -393,15 +375,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (activeLine && activeLine !== currentHighlight) {
-				// Remove highlight from the previous line
 				if (currentHighlight) {
 					currentHighlight.classList.remove('highlight');
 				}
-				// Add highlight to the new active line
 				activeLine.classList.add('highlight');
 				currentHighlight = activeLine;
 
-				// Auto-scroll to the highlighted line
 				currentHighlight.scrollIntoView({
 					behavior: 'smooth',
 					block: 'center'
@@ -409,7 +388,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		});
 
-		// --- Cleanup when the audio finishes ---
 		audio.addEventListener('ended', function() {
 			if (currentHighlight) {
 				currentHighlight.classList.remove('highlight');
@@ -419,35 +397,18 @@ document.addEventListener('DOMContentLoaded', function () {
 	}
 
 /* ==========================================================================
- * 10. Auto-scroll to Academic Courses on Index Page
+ * 10. Auto-scroll to Academic Courses on Index Page (Removed per redesign)
  * ========================================================================== */
-// Check if the current page is the index page by looking for a unique element,
-// like the login form.
-const loginFormForScroll = document.getElementById('login-form');
-const academicCoursesSection = document.getElementById('academic-courses');
-
-// If we are on the index page and the academic section exists...
-if (loginFormForScroll && academicCoursesSection) {
-    // Scroll to the section after a short delay to ensure the page has loaded smoothly.
-    setTimeout(() => {
-        academicCoursesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 500); // 500ms delay
-}
 
 /* ==========================================================================
  * 11. Auto-scroll to Course Contents on Course Pages
  * ========================================================================== */
-// Check if an element with the ID 'course-contents' exists on the page.
 const courseContentsSection = document.getElementById('course-contents');
-
-// If the section exists, it implies we are on a course page.
 if (courseContentsSection) {
-    // Scroll to the section after a short delay.
     setTimeout(() => {
         courseContentsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 500); // 500ms delay
+    }, 500);
 }
-
 
 /* ==========================================================================
  * 12. Make all download links open in a new tab
@@ -455,79 +416,510 @@ if (courseContentsSection) {
 const downloadButtons = document.querySelectorAll('.download-btn');
 downloadButtons.forEach(button => {
     button.setAttribute('target', '_blank');
-    button.setAttribute('rel', 'noopener noreferrer'); // For security
+    button.setAttribute('rel', 'noopener noreferrer');
 });
 
-
-	// --- Auto-starter ---
-// This code is ALREADY inside a DOMContentLoaded listener,
-// so we just check for the variable and run the setup function directly.
 if (typeof lineTimings !== 'undefined') {
     setupKaraoke(lineTimings);
 }
 });
 
-
-// ===== START: ACTIVE NAVIGATION SCRIPT =====
-document.addEventListener('DOMContentLoaded', () => {
-    const path = window.location.pathname;
-    const pageName = path.split("/").pop();
-
-    // --- Define which pages belong to the 'Academic' section ---
-    const isAcademicPage = path.includes('academic.html') || 
-                           path.includes('course-') || 
-                           path.includes('poem-') || 
-                           path.includes('biography-');
-
-    // --- Select Navigation Elements ---
-    const academicButton = document.getElementById('academic-button');
-    const homeLink = document.querySelector('.hidden.md\\:flex a[href="index.html"]');
-    // Add other links here if you want them to be active on their pages
-    // const shopLink = document.querySelector('.hidden.md\\:flex a[href="shop.html"]');
-
-    // --- Logic to Apply Active Styles ---
-    if (isAcademicPage) {
-        // If it's an academic page, make the 'Academic' button green
-        academicButton.classList.add('bg-emerald-500');
-        academicButton.classList.remove('text-gray-400', 'hover:text-white');
-    } else if (pageName === 'index.html' || pageName === '') {
-        // If it's the homepage, make the 'Home' link green
-        homeLink.classList.add('bg-emerald-500', 'rounded-full');
-        homeLink.classList.remove('text-gray-400');
-    }
-    // You can add more 'else if' blocks here for 'Shop', 'About', etc.
-});
-// ===== END: ACTIVE NAVIGATION SCRIPT =====
-
 // ===== START: SMOOTH SCROLL SCRIPT =====
 document.addEventListener('DOMContentLoaded', () => {
-    // This targets any link that starts with "index.html#"
-    const scrollLinks = document.querySelectorAll('a[href^="index.html#"]');
+    const scrollLinks = document.querySelectorAll('a[href^="index.html#"], a[href^="/index.html#"]');
 
     scrollLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            // Check if we are already on the homepage
             const onHomePage = window.location.pathname.endsWith('/') || window.location.pathname.endsWith('index.html');
-            const hash = this.hash; // Gets the '#signup' part
+            const hash = this.hash;
 
-            if (onHomePage) {
-                e.preventDefault(); // Stop the default jump
+            if (onHomePage && hash) {
+                e.preventDefault();
                 const targetElement = document.querySelector(hash);
                 if (targetElement) {
-                    // Perform a smooth scroll to the target
                     targetElement.scrollIntoView({ behavior: 'smooth' });
                 }
             }
-            // If we are NOT on the homepage, the link will work normally,
-            // taking the user to index.html and then jumping to the section.
         });
     });
 });
 // ===== END: SMOOTH SCROLL SCRIPT =====
 
-// ===== START: GLOBAL DARK MODE, SCROLL TOGGLE & UNIVERSAL AUTH SYNC =====
+// ===== START: UNIVERSAL STUDY PLAN HEADER, FLOATING BUTTONS & AUTH ENGINE =====
 (function () {
-    // 1. Universal Theme Manager
+    const googleSvgData = "data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=";
+
+    function isInsideInternalReaderIframe() {
+        try {
+            if (window.self !== window.top && window.parent && window.parent.document) {
+                if (window.parent.document.getElementById('doc-iframe')) {
+                    return true;
+                }
+            }
+        } catch (e) {}
+        return false;
+    }
+
+    function isStudyPlanPage() {
+        const path = (window.location.pathname || '').toLowerCase();
+        return path.includes('study_plan') || path.includes('study-plan');
+    }
+
+    // 0. Inject Self-Contained Universal CSS (Matches study_plan.html & study-plan-styles.css 100%)
+    function ensureUniversalStylesAndIcons() {
+        // Ensure FontAwesome is loaded so fa-moon / fa-sun / fa-arrow-down / fa-arrow-up always render
+        const hasFontAwesome = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).some(
+            (l) => (l.href || '').includes('font-awesome') || (l.href || '').includes('fontawesome')
+        );
+        if (!hasFontAwesome && document.head) {
+            const faLink = document.createElement('link');
+            faLink.rel = 'stylesheet';
+            faLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css';
+            document.head.appendChild(faLink);
+        }
+
+        if (!document.getElementById('cc-universal-ui-styles') && document.head) {
+            const style = document.createElement('style');
+            style.id = 'cc-universal-ui-styles';
+            style.textContent = `
+                /* Universal Study Plan Header Protection & Fallback Layout (Works with or without Tailwind) */
+                header.main-website-ui {
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    z-index: 50 !important;
+                    background: rgba(255, 255, 255, 0.95) !important;
+                    border-bottom: 1px solid #e5e7eb !important;
+                    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    border-radius: 0 !important;
+                    text-align: left !important;
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+                    backdrop-filter: blur(8px);
+                    -webkit-backdrop-filter: blur(8px);
+                }
+                html.dark header.main-website-ui,
+                body.dark-mode header.main-website-ui {
+                    background: rgba(17, 24, 39, 0.95) !important;
+                    border-bottom-color: #1f2937 !important;
+                }
+                header.main-website-ui::before,
+                header.main-website-ui::after {
+                    display: none !important;
+                    content: none !important;
+                }
+                header.main-website-ui > .container {
+                    max-width: 1280px !important;
+                    margin-left: auto !important;
+                    margin-right: auto !important;
+                    padding: 0.75rem 1.5rem !important;
+                    box-sizing: border-box !important;
+                }
+                header.main-website-ui nav {
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: space-between !important;
+                    width: 100% !important;
+                }
+                header.main-website-ui .cc-brand-left {
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 1rem !important;
+                    min-width: 0 !important;
+                }
+                header.main-website-ui a {
+                    text-decoration: none !important;
+                }
+                header.main-website-ui h1 {
+                    font-size: 1.25rem !important;
+                    line-height: 1.75rem !important;
+                    font-weight: 700 !important;
+                    color: #1f2937 !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    background: none !important;
+                    -webkit-text-fill-color: unset !important;
+                    letter-spacing: normal !important;
+                }
+                html.dark header.main-website-ui h1,
+                body.dark-mode header.main-website-ui h1 {
+                    color: #f9fafb !important;
+                }
+                header.main-website-ui img.cc-avatar-founder {
+                    width: 40px !important;
+                    height: 40px !important;
+                    border-radius: 9999px !important;
+                    border: 2px solid #10b981 !important;
+                    object-fit: cover !important;
+                    display: block !important;
+                }
+                header.main-website-ui img[alt="DU Logo"] {
+                    width: 40px !important;
+                    height: 40px !important;
+                    border-radius: 9999px !important;
+                    border: 1px solid #e5e7eb !important;
+                    object-fit: cover !important;
+                    display: block !important;
+                }
+                html.dark header.main-website-ui img[alt="DU Logo"],
+                body.dark-mode header.main-website-ui img[alt="DU Logo"] {
+                    border-color: #374151 !important;
+                }
+                header.main-website-ui #header-desktop-nav-tabs {
+                    display: none;
+                    align-items: center !important;
+                    gap: 0.25rem !important;
+                    background-color: #f3f4f6 !important;
+                    border: 1px solid #e5e7eb !important;
+                    border-radius: 9999px !important;
+                    padding: 0.25rem !important;
+                    font-size: 0.875rem !important;
+                }
+                html.dark header.main-website-ui #header-desktop-nav-tabs,
+                body.dark-mode header.main-website-ui #header-desktop-nav-tabs {
+                    background-color: #1f2937 !important;
+                    border-color: #374151 !important;
+                }
+                header.main-website-ui #header-desktop-nav-tabs a {
+                    padding: 0.375rem 1.25rem !important;
+                    border-radius: 9999px !important;
+                    font-size: 0.875rem !important;
+                    line-height: 1.25rem !important;
+                    transition: all 0.15s ease !important;
+                    color: #4b5563;
+                    display: inline-block !important;
+                }
+                html.dark header.main-website-ui #header-desktop-nav-tabs a,
+                body.dark-mode header.main-website-ui #header-desktop-nav-tabs a {
+                    color: #d1d5db;
+                }
+                header.main-website-ui #header-desktop-nav-tabs a:hover {
+                    background-color: #e5e7eb;
+                    color: #111827;
+                }
+                html.dark header.main-website-ui #header-desktop-nav-tabs a:hover,
+                body.dark-mode header.main-website-ui #header-desktop-nav-tabs a:hover {
+                    background-color: #374151;
+                    color: #ffffff;
+                }
+                header.main-website-ui #header-desktop-nav-tabs a.cc-nav-active,
+                header.main-website-ui #header-desktop-nav-tabs a.bg-emerald-500 {
+                    background-color: #10b981 !important;
+                    color: #ffffff !important;
+                    font-weight: 500 !important;
+                    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+                }
+                header.main-website-ui .cc-right-desktop {
+                    display: none;
+                    align-items: center !important;
+                    gap: 1rem !important;
+                }
+                header.main-website-ui .cc-mobile-toggle-wrap {
+                    display: flex;
+                    align-items: center;
+                }
+                @media (min-width: 768px) {
+                    header.main-website-ui #header-desktop-nav-tabs {
+                        display: flex !important;
+                    }
+                    header.main-website-ui .cc-right-desktop {
+                        display: flex !important;
+                    }
+                    header.main-website-ui .cc-mobile-toggle-wrap,
+                    header.main-website-ui #mobile-menu {
+                        display: none !important;
+                    }
+                }
+                header.main-website-ui #auth-container-desktop p,
+                header.main-website-ui #auth-container-mobile p {
+                    margin: 0 !important;
+                    line-height: 1.3 !important;
+                }
+                header.main-website-ui #auth-container-desktop p.font-semibold,
+                header.main-website-ui #auth-container-mobile p.font-semibold {
+                    font-weight: 600 !important;
+                    font-size: 0.875rem !important;
+                    color: #374151 !important;
+                }
+                header.main-website-ui #auth-container-desktop p.text-xs,
+                header.main-website-ui #auth-container-mobile p.text-xs {
+                    font-size: 0.75rem !important;
+                    color: #6b7280 !important;
+                }
+                html.dark header.main-website-ui #auth-container-desktop p.font-semibold,
+                body.dark-mode header.main-website-ui #auth-container-desktop p.font-semibold,
+                html.dark header.main-website-ui #auth-container-mobile p.font-semibold,
+                body.dark-mode header.main-website-ui #auth-container-mobile p.font-semibold {
+                    color: #e5e7eb !important;
+                }
+                html.dark header.main-website-ui #auth-container-desktop p.text-xs,
+                body.dark-mode header.main-website-ui #auth-container-desktop p.text-xs,
+                html.dark header.main-website-ui #auth-container-mobile p.text-xs,
+                body.dark-mode header.main-website-ui #auth-container-mobile p.text-xs {
+                    color: #9ca3af !important;
+                }
+                header.main-website-ui #header-signin-btn,
+                header.main-website-ui #mobile-signin-btn {
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    gap: 0.75rem !important;
+                    padding: 0.5rem 1rem !important;
+                    background-color: #ffffff !important;
+                    color: #374151 !important;
+                    border: 1px solid #d1d5db !important;
+                    border-radius: 9999px !important;
+                    font-size: 0.875rem !important;
+                    font-weight: 500 !important;
+                    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+                    cursor: pointer !important;
+                    transition: background-color 0.15s ease !important;
+                }
+                header.main-website-ui #mobile-signin-btn {
+                    justify-content: center !important;
+                    width: 100% !important;
+                }
+                header.main-website-ui #header-signin-btn:hover,
+                header.main-website-ui #mobile-signin-btn:hover {
+                    background-color: #f9fafb !important;
+                }
+                html.dark header.main-website-ui #header-signin-btn,
+                body.dark-mode header.main-website-ui #header-signin-btn,
+                html.dark header.main-website-ui #mobile-signin-btn,
+                body.dark-mode header.main-website-ui #mobile-signin-btn {
+                    background-color: #1f2937 !important;
+                    color: #e5e7eb !important;
+                    border-color: #374151 !important;
+                }
+                header.main-website-ui #header-signin-btn img,
+                header.main-website-ui #mobile-signin-btn img {
+                    width: 20px !important;
+                    height: 20px !important;
+                    display: inline-block !important;
+                }
+                header.main-website-ui #mobile-menu.hidden {
+                    display: none !important;
+                }
+                header.main-website-ui #mobile-menu:not(.hidden) {
+                    display: block !important;
+                    background-color: #ffffff !important;
+                    border-top: 1px solid #e5e7eb !important;
+                    margin: 0.75rem -1.5rem 0 -1.5rem !important;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+                }
+                html.dark header.main-website-ui #mobile-menu:not(.hidden),
+                body.dark-mode header.main-website-ui #mobile-menu:not(.hidden) {
+                    background-color: #111827 !important;
+                    border-top-color: #1f2937 !important;
+                }
+                header.main-website-ui #mobile-menu a {
+                    display: block !important;
+                    padding: 0.75rem 1.5rem !important;
+                    font-size: 0.875rem !important;
+                    color: #374151 !important;
+                }
+                html.dark header.main-website-ui #mobile-menu a,
+                body.dark-mode header.main-website-ui #mobile-menu a {
+                    color: #d1d5db !important;
+                }
+                header.main-website-ui #mobile-menu a.cc-mobile-active {
+                    color: #059669 !important;
+                    background-color: #ecfdf5 !important;
+                    font-weight: 600 !important;
+                }
+                html.dark header.main-website-ui #mobile-menu a.cc-mobile-active,
+                body.dark-mode header.main-website-ui #mobile-menu a.cc-mobile-active {
+                    color: #34d399 !important;
+                    background-color: rgba(6, 78, 59, 0.4) !important;
+                }
+
+                /* Universal Study Plan Floating Action Buttons (#scroll-toggle-btn & #global-dark-mode-btn) */
+                #scroll-toggle-btn {
+                    position: fixed !important;
+                    bottom: 128px !important; /* 8rem / bottom-32 */
+                    right: 20px !important;   /* 1.25rem / right-5 */
+                    width: 48px !important;   /* w-12 */
+                    height: 48px !important;  /* h-12 */
+                    background-color: #374151 !important; /* bg-gray-700 */
+                    color: #ffffff !important;
+                    border-radius: 9999px !important;
+                    border: none !important;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
+                    z-index: 100 !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    cursor: pointer !important;
+                    opacity: 0.9 !important;
+                    transition: all 0.3s ease !important;
+                    padding: 0 !important;
+                }
+                #scroll-toggle-btn:hover {
+                    background-color: #111827 !important; /* hover:bg-gray-900 */
+                    transform: scale(1.1) !important;
+                    opacity: 1 !important;
+                }
+                #scroll-toggle-btn i {
+                    font-size: 1rem !important;
+                    color: #ffffff !important;
+                }
+
+                #global-dark-mode-btn {
+                    position: fixed !important;
+                    bottom: 75px !important;  /* Matches study-plan-styles.css line 3230 */
+                    right: 20px !important;   /* right-5 */
+                    width: 44px !important;   /* Matches study-plan-styles.css line 3228 */
+                    height: 44px !important;  /* Matches study-plan-styles.css line 3229 */
+                    background-color: #1f2937 !important; /* bg-gray-800 */
+                    color: #facc15 !important; /* text-yellow-400 */
+                    border: 2px solid #374151 !important; /* border-gray-700 */
+                    border-radius: 9999px !important;
+                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
+                    z-index: 999 !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    cursor: pointer !important;
+                    transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease !important;
+                    padding: 0 !important;
+                }
+                #global-dark-mode-btn:hover {
+                    transform: scale(1.1) !important;
+                }
+                #global-dark-mode-btn i {
+                    font-size: 1.1rem !important; /* Matches study-plan-styles.css line 3233 */
+                    line-height: 1 !important;
+                }
+                html.dark #global-dark-mode-btn,
+                body.dark-mode #global-dark-mode-btn {
+                    background-color: #fbbf24 !important; /* Yellow Sun — study-plan-styles.css line 2659 */
+                    color: #1f2937 !important;            /* Dark Icon — study-plan-styles.css line 2660 */
+                    border-color: #f59e0b !important;     /* study-plan-styles.css line 2661 */
+                }
+                html.dark #global-dark-mode-btn i,
+                body.dark-mode #global-dark-mode-btn i {
+                    color: #1f2937 !important;
+                }
+                html.dark #global-dark-mode-btn i::before,
+                body.dark-mode #global-dark-mode-btn i::before {
+                    content: "\\f185" !important; /* Switch Moon to Sun Icon — study-plan-styles.css line 2664 */
+                }
+
+                @media (max-width: 414px) {
+                    #scroll-toggle-btn {
+                        right: 10px !important;
+                        bottom: 130px !important;
+                        width: 40px !important;
+                        height: 40px !important;
+                    }
+                    #global-dark-mode-btn {
+                        right: 10px !important;
+                        bottom: 70px !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    function isMainReactApp() {
+        return !!document.querySelector('script[src*="/src/main.tsx"]');
+    }
+
+    // 1. Universal Global Header Replacement / Injection (Matches study_plan.html 100%)
+    function ensureUniversalHeader() {
+        // Skip if main React app manages the page (/src/main.tsx) or if inside Archives internal reader iframe or on study_plan.html itself
+        if (isMainReactApp() || isInsideInternalReaderIframe() || isStudyPlanPage()) {
+            return;
+        }
+
+        // Preserve homepage language switchers if present on index.html
+        const existingLangDesktop = document.getElementById('header-lang-switcher');
+        const existingLangMobile = document.getElementById('mobile-lang-switcher');
+        const langDesktopHTML = existingLangDesktop ? existingLangDesktop.outerHTML : '';
+        const langMobileHTML = existingLangMobile ? existingLangMobile.outerHTML : '';
+
+        const canonicalHeaderInner = `
+        <div class="container mx-auto px-4 sm:px-6 py-3">
+            <nav class="flex justify-between items-center">
+                <div class="cc-brand-left flex items-center gap-3 sm:gap-4 min-w-0">
+                    <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer" class="flex-shrink-0">
+                        <img src="/images/profile.jpg" alt="Profile" class="cc-avatar-founder h-10 w-10 rounded-full border-2 border-emerald-500 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/ffffff/059669?text=CC';">
+                    </a>
+                    <a href="/index.html">
+                        <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">Class Caddy</h1>
+                    </a>
+                </div>
+                <!-- Center: Desktop Navigation -->
+                <div id="header-desktop-nav-tabs" class="hidden md:flex items-center gap-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-1 text-sm">
+                    <a href="/index.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Home</a>
+                    <a href="/archives.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Archives</a>
+                    <a href="/study_plan.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Study Plan</a>
+                    <a href="/about.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">About</a>
+                    <a href="/contact.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Contact</a>
+                </div>
+                <!-- Right: Language Switcher (on Homepage), DU Logo / User Photo & Auth Container -->
+                <div class="cc-right-desktop hidden md:flex items-center gap-4">
+                    ${langDesktopHTML}
+                    <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
+                        <img src="/images/du_logo.png" alt="DU Logo" class="h-10 w-10 rounded-full border border-gray-200 dark:border-gray-700 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/eeeeee/111827?text=DU';">
+                    </a>
+                    <div id="auth-container-desktop" class="auth-container text-sm"></div>
+                </div>
+                <!-- Mobile Menu Toggle Button -->
+                <div class="cc-mobile-toggle-wrap md:hidden flex items-center">
+                    <button id="mobile-menu-button" type="button" aria-label="Toggle Menu" class="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-gray-700 dark:text-gray-200 focus:outline-none">
+                        <svg class="w-6 h-6" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </nav>
+            <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 -mx-6 mt-3 shadow-md">
+                <a href="/index.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Home</a>
+                <a href="/archives.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Archives</a>
+                <a href="/study_plan.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Study Plan</a>
+                <a href="/about.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">About</a>
+                <a href="/contact.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Contact</a>
+                ${langMobileHTML}
+                <div id="auth-container-mobile" class="auth-container px-6 py-4 border-t border-gray-200 dark:border-gray-800"></div>
+            </div>
+        </div>`;
+
+        // Find existing website header (either header.main-website-ui or top-level nav header)
+        let targetHeader = document.querySelector('header.main-website-ui');
+        if (!targetHeader) {
+            const firstHeader = document.querySelector('body > header');
+            if (firstHeader && (firstHeader.querySelector('nav') || firstHeader.textContent.includes('Class Caddy'))) {
+                targetHeader = firstHeader;
+            }
+        }
+
+        if (targetHeader) {
+            targetHeader.className = 'fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 border-b border-gray-200 dark:border-gray-800 main-website-ui shadow-sm';
+            targetHeader.innerHTML = canonicalHeaderInner;
+        } else if (document.body) {
+            const newHeader = document.createElement('header');
+            newHeader.className = 'fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 border-b border-gray-200 dark:border-gray-800 main-website-ui shadow-sm';
+            newHeader.innerHTML = canonicalHeaderInner;
+            document.body.insertBefore(newHeader, document.body.firstChild);
+            // Ensure body has top padding clearance if a header was freshly injected onto a standalone note page
+            const currentPaddingTop = parseInt(window.getComputedStyle(document.body).paddingTop || '0', 10);
+            if (currentPaddingTop < 64) {
+                document.body.style.paddingTop = '80px';
+            }
+        }
+
+        // Re-bind mobile menu toggle button
+        const mobileMenuBtn = document.getElementById('mobile-menu-button');
+        const mobileMenuEl = document.getElementById('mobile-menu');
+        if (mobileMenuBtn && mobileMenuEl) {
+            mobileMenuBtn.onclick = () => {
+                mobileMenuEl.classList.toggle('hidden');
+            };
+        }
+    }
+
+    // 2. Universal Theme Manager
     function getStoredTheme() {
         const directTheme = localStorage.getItem('class_caddy_theme');
         if (directTheme) return directTheme;
@@ -545,19 +937,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function applyGlobalTheme(isDark) {
         if (isDark) {
-            document.body.classList.add('dark-mode');
+            document.body?.classList.add('dark-mode');
             document.documentElement.classList.add('dark');
         } else {
-            document.body.classList.remove('dark-mode');
+            document.body?.classList.remove('dark-mode');
             document.documentElement.classList.remove('dark');
         }
-        
+
         const darkBtn = document.getElementById('global-dark-mode-btn');
         if (darkBtn) {
-            darkBtn.innerHTML = isDark 
-                ? '<i class="fas fa-sun text-2xl text-amber-400"></i>' 
-                : '<i class="fas fa-moon text-2xl text-yellow-400"></i>';
-            darkBtn.title = isDark ? "Switch to Light Mode" : "Switch to Dark Mode";
+            // Study Plan uses <i class="fas fa-moon text-2xl"></i> and CSS switches ::before to \f185 in dark-mode
+            darkBtn.innerHTML = '<i class="fas fa-moon text-2xl"></i>';
+            darkBtn.title = 'Toggle Dark Mode';
         }
     }
 
@@ -583,41 +974,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const initialThemeIsDark = getStoredTheme() === 'dark';
     if (initialThemeIsDark) {
         document.documentElement.classList.add('dark');
-        document.body.classList.add('dark-mode');
+        document.body?.classList.add('dark-mode');
     }
 
-    // 2. Ensure Floating Action Buttons exist on DOM
+    // 3. Ensure Study Plan's Exact Two Floating Action Buttons exist on DOM & remove legacy duplicates
     function ensureFloatingButtons() {
-        // If this page mounts React App with FloatingActionButtons, do not inject duplicate HTML buttons
-        if (document.getElementById('root')) {
+        if (isMainReactApp() || isInsideInternalReaderIframe()) {
             return;
         }
 
-        // Scroll Toggle Button
+        // Remove any page-specific legacy back-to-top buttons so only Study Plan's 2 universal buttons appear
+        document.querySelectorAll('.go-to-top-btn, #back-to-top, .back-to-top, #backToTop').forEach((el) => {
+            el.remove();
+        });
+        const oldGoToTop = document.getElementById('go-to-top-btn');
+        if (oldGoToTop && !oldGoToTop.closest('#action-buttons-container')) {
+            oldGoToTop.remove();
+        }
+
+        // 1) Scroll Toggle Button — Exact Study Plan markup & classes
         let scrollBtn = document.getElementById('scroll-toggle-btn');
         if (!scrollBtn) {
             scrollBtn = document.createElement('button');
             scrollBtn.id = 'scroll-toggle-btn';
-            scrollBtn.className = 'fixed bottom-24 right-5 z-[999] w-12 h-12 bg-gray-700 hover:bg-gray-900 text-white rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100 cursor-pointer border border-gray-600/30';
-            scrollBtn.title = 'Scroll to Bottom';
-            scrollBtn.setAttribute('aria-label', 'Scroll to Bottom');
-            scrollBtn.innerHTML = '<i class="fas fa-arrow-down"></i>';
             document.body.appendChild(scrollBtn);
         }
+        scrollBtn.className = 'fixed bottom-32 right-5 z-[100] w-12 h-12 bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-gray-900 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100';
+        scrollBtn.title = 'Scroll';
+        if (!scrollBtn.querySelector('i')) {
+            scrollBtn.innerHTML = '<i class="fas fa-arrow-down"></i>';
+        }
 
-        if (scrollBtn) {
+        if (!isStudyPlanPage()) {
             const updateScrollIcon = () => {
                 const icon = scrollBtn.querySelector('i');
                 if (!icon) return;
                 const scrollPos = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
-                if (scrollPos > 300) {
+                if (scrollPos >= 300) {
                     icon.className = 'fas fa-arrow-up';
-                    scrollBtn.title = "Scroll to Top";
-                    scrollBtn.setAttribute('aria-label', "Scroll to Top");
+                    scrollBtn.title = 'Scroll to Top';
                 } else {
                     icon.className = 'fas fa-arrow-down';
-                    scrollBtn.title = "Scroll to Bottom";
-                    scrollBtn.setAttribute('aria-label', "Scroll to Bottom");
+                    scrollBtn.title = 'Scroll to Bottom';
                 }
             };
 
@@ -628,37 +1026,30 @@ document.addEventListener('DOMContentLoaded', () => {
             scrollBtn.onclick = (e) => {
                 if (e) e.preventDefault();
                 const scrollPos = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
-                if (scrollPos > 300) {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else {
+                if (scrollPos < 300) {
                     const maxScroll = Math.max(
                         document.body.scrollHeight,
-                        document.documentElement.scrollHeight,
-                        document.body.offsetHeight,
-                        document.documentElement.offsetHeight,
-                        document.body.clientHeight,
-                        document.documentElement.clientHeight
+                        document.documentElement.scrollHeight
                     );
                     window.scrollTo({ top: maxScroll, behavior: 'smooth' });
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             };
         }
 
-        // Global Dark Mode Button
+        // 2) Global Dark Mode Button — Exact Study Plan markup & classes
         let darkBtn = document.getElementById('global-dark-mode-btn');
         if (!darkBtn) {
             darkBtn = document.createElement('button');
             darkBtn.id = 'global-dark-mode-btn';
-            darkBtn.className = 'fixed bottom-6 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-2xl border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 transition-transform cursor-pointer';
-            darkBtn.title = initialThemeIsDark ? 'Switch to Light Mode' : 'Switch to Dark Mode';
-            darkBtn.setAttribute('aria-label', 'Toggle Dark Mode');
-            darkBtn.innerHTML = initialThemeIsDark 
-                ? '<i class="fas fa-sun text-2xl text-amber-400"></i>' 
-                : '<i class="fas fa-moon text-2xl text-yellow-400"></i>';
             document.body.appendChild(darkBtn);
         }
+        darkBtn.className = 'fixed bottom-6 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-lg border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 transition-transform';
+        darkBtn.title = 'Toggle Dark Mode';
+        darkBtn.innerHTML = '<i class="fas fa-moon text-2xl"></i>';
 
-        if (darkBtn) {
+        if (!isStudyPlanPage()) {
             darkBtn.onclick = (e) => {
                 if (e) e.preventDefault();
                 window.toggleGlobalTheme();
@@ -666,81 +1057,75 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 3. Dynamic Navigation Active-Tab Highlighting
+    // 4. Dynamic Navigation Active-Tab Highlighting
     function syncNavigationState() {
         const path = (window.location.pathname || '').toLowerCase();
-        let activePage = 'home';
+        let activePage = 'archives';
         if (path.includes('study_plan') || path.includes('study-plan')) {
             activePage = 'study_plan';
-        } else if (path.includes('archives')) {
-            activePage = 'archives';
         } else if (path.includes('about')) {
             activePage = 'about';
         } else if (path.includes('contact')) {
             activePage = 'contact';
-        } else if (path.includes('academic') || path.includes('course-')) {
-            activePage = 'archives';
-        } else if (path.includes('index') || path === '/' || path.endsWith('/')) {
+        } else if (path.endsWith('/index.html') || path === '/' || path === '') {
             activePage = 'home';
+        } else {
+            // Archives & all notes/courses/grammar/poets inside Archives highlight Archives
+            activePage = 'archives';
         }
 
-        // Desktop center nav links
-        const desktopNavLinks = document.querySelectorAll('#header-desktop-nav-tabs a, header nav .hidden.md\\:flex a, header nav div.md\\:flex a');
+        const desktopNavLinks = document.querySelectorAll('#header-desktop-nav-tabs a, header.main-website-ui nav div.md\\:flex a');
         desktopNavLinks.forEach(link => {
             const href = (link.getAttribute('href') || '').toLowerCase();
-            if (link.closest('#auth-container-desktop') || link.closest('#auth-container-mobile') || link.classList.contains('signup-button') || href.includes('facebook') || href.includes('du.ac.bd') || link.querySelector('img')) {
+            if (link.closest('#auth-container-desktop') || link.closest('#auth-container-mobile') || link.closest('#header-lang-switcher') || href.includes('facebook') || href.includes('du.ac.bd') || link.querySelector('img')) {
                 return;
             }
-            const isMatch = 
-                (activePage === 'home' && (href === 'index.html' || href === '/' || href === '')) ||
-                (activePage === 'archives' && (href === 'archives.html' || href.includes('archives.html'))) ||
+            const isMatch =
+                (activePage === 'home' && (href.endsWith('index.html') || href === '/')) ||
+                (activePage === 'archives' && href.includes('archives.html')) ||
                 (activePage === 'study_plan' && href.includes('study_plan')) ||
                 (activePage === 'about' && href.includes('about')) ||
                 (activePage === 'contact' && href.includes('contact'));
 
-            link.classList.remove('bg-emerald-500', 'text-white', 'font-medium', 'shadow-sm', 'text-emerald-600', 'bg-emerald-50', 'text-gray-600', 'text-gray-700', 'text-gray-300');
-            
+            link.classList.remove('bg-emerald-500', 'text-white', 'font-medium', 'shadow-sm', 'cc-nav-active', 'text-gray-600', 'dark:text-gray-300');
+
             if (isMatch) {
-                link.classList.add('bg-emerald-500', 'text-white', 'font-medium', 'shadow-sm');
+                link.classList.add('bg-emerald-500', 'text-white', 'font-medium', 'shadow-sm', 'cc-nav-active');
             } else {
                 link.classList.add('text-gray-600', 'dark:text-gray-300');
             }
         });
 
-        // Mobile nav links
-        const mobileLinks = document.querySelectorAll('#mobile-menu a');
+        const mobileLinks = document.querySelectorAll('#mobile-menu > a');
         mobileLinks.forEach(link => {
             const href = (link.getAttribute('href') || '').toLowerCase();
-            if (link.closest('#auth-container-desktop') || link.closest('#auth-container-mobile') || link.classList.contains('signup-button')) {
-                return;
-            }
-            const isMatch = 
-                (activePage === 'home' && (href === 'index.html' || href === '/' || href === '')) ||
+            const isMatch =
+                (activePage === 'home' && (href.endsWith('index.html') || href === '/')) ||
                 (activePage === 'archives' && href.includes('archives')) ||
                 (activePage === 'study_plan' && href.includes('study_plan')) ||
                 (activePage === 'about' && href.includes('about')) ||
                 (activePage === 'contact' && href.includes('contact'));
 
-            link.classList.remove('text-emerald-600', 'bg-emerald-50', 'dark:bg-emerald-950/40', 'text-gray-700', 'text-gray-300', 'font-semibold');
+            link.classList.remove('text-emerald-600', 'bg-emerald-50', 'dark:bg-emerald-950/40', 'font-semibold', 'cc-mobile-active', 'text-gray-700', 'dark:text-gray-300');
             if (isMatch) {
-                link.classList.add('text-emerald-600', 'bg-emerald-50', 'dark:bg-emerald-950/40', 'font-semibold');
+                link.classList.add('text-emerald-600', 'bg-emerald-50', 'dark:bg-emerald-950/40', 'font-semibold', 'cc-mobile-active');
             } else {
                 link.classList.add('text-gray-700', 'dark:text-gray-300');
             }
         });
     }
 
-    // 4. Firebase Google Sign-In Initialization for Static Pages
+    // 5. Firebase Google Sign-In Initialization for Static Pages
     let firebaseAuthInstance = null;
     let googleAuthProvider = null;
     let isFirebaseLoaded = false;
 
     async function initFirebaseForStaticPages() {
-        if (isFirebaseLoaded || window._fb_auth_initialized) return;
+        if (isFirebaseLoaded || window._fb_auth_initialized || isStudyPlanPage()) return;
         try {
             const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
-            const { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
-            
+            const { getAuth, onAuthStateChanged, GoogleAuthProvider } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
+
             const firebaseConfig = {
                 apiKey: "AIzaSyAj7MDnrnzKUO73BXG0jeM-uBGrAH3XiAY",
                 authDomain: "study-plan17.firebaseapp.com",
@@ -860,10 +1245,10 @@ document.addEventListener('DOMContentLoaded', () => {
         syncAuthUI();
     };
 
-    // 5. Universal Auth UI Synchronization
-    const googleSvgData = "data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=";
-
+    // 6. Universal Auth UI Synchronization — Exact Study Plan Header Format (app.js lines 674-772)
     function syncAuthUI() {
+        if (isStudyPlanPage() || isMainReactApp()) return;
+
         let user = null;
         try {
             const raw1 = localStorage.getItem('cc_auth_user');
@@ -878,7 +1263,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (parsed && (parsed.isLoggedIn || parsed.email || parsed.name)) {
                         user = {
                             isLoggedIn: true,
-                            name: parsed.name || parsed.displayName || 'Learner',
+                            displayName: parsed.name || parsed.displayName || 'User',
                             email: parsed.email || '',
                             photoURL: parsed.photoURL || parsed.avatar || null
                         };
@@ -887,90 +1272,49 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (e) {}
         }
 
-        // Update Desktop and Mobile Auth Containers on all pages
+        const headerLogo = document.querySelector('header.main-website-ui img[alt="DU Logo"]');
+        const headerLink = headerLogo ? headerLogo.closest('a') : null;
         const authDesktop = document.getElementById('auth-container-desktop');
         const authMobile = document.getElementById('auth-container-mobile');
 
         if (user && user.isLoggedIn) {
             const displayName = user.displayName || user.name || user.email?.split('@')[0] || 'User';
-            const avatar = user.photoURL 
-                ? `<img src="${user.photoURL}" alt="${displayName}" class="w-7 h-7 rounded-full object-cover border border-emerald-500 inline-block mr-2" onerror="this.src='https://placehold.co/28x28/059669/ffffff?text=${displayName.charAt(0).toUpperCase()}';" />`
-                : `<span class="w-7 h-7 rounded-full bg-emerald-500 text-white font-bold inline-flex items-center justify-center mr-2 text-xs shadow-sm">${displayName.charAt(0).toUpperCase()}</span>`;
 
-            if (authDesktop) {
-                authDesktop.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <a href="study_plan.html" class="flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 hover:bg-emerald-50 dark:hover:bg-gray-700 border border-emerald-500/40 rounded-full transition shadow-sm group" title="Open Study Plan">
-                            ${avatar}
-                            <div class="text-left max-w-[120px]">
-                                <p class="text-xs font-semibold text-gray-800 dark:text-gray-200 group-hover:text-emerald-500 transition truncate">${displayName}</p>
-                                <p class="text-[10px] text-gray-400 truncate">${user.email || 'My Study Plan'}</p>
-                            </div>
-                        </a>
-                        <button onclick="window.triggerGoogleSignOutGlobal()" class="p-1.5 rounded-full hover:bg-red-500/10 text-gray-400 hover:text-red-500 transition cursor-pointer" title="Logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
-                    </div>
-                `;
+            // Exact Study Plan behavior: replace DU Logo with user's Google profile photo when logged in
+            if (user.photoURL && headerLogo) {
+                headerLogo.src = user.photoURL;
+                if (headerLink) headerLink.removeAttribute('href');
             }
 
-            if (authMobile) {
-                authMobile.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <a href="study_plan.html" class="flex items-center gap-2 text-sm font-medium text-emerald-500">
-                            ${avatar}
-                            <span>${displayName}</span>
-                        </a>
-                        <button onclick="window.triggerGoogleSignOutGlobal()" class="text-xs font-medium text-red-500 hover:underline px-2 py-1 cursor-pointer">
-                            Log out
-                        </button>
-                    </div>
-                `;
-            }
+            const loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700 dark:text-gray-200">${displayName}</p><p class="text-gray-500 dark:text-gray-400 text-xs">${user.email || ''}</p></div>`;
+
+            if (authDesktop) authDesktop.innerHTML = loggedInHTML;
+            if (authMobile) authMobile.innerHTML = loggedInHTML;
         } else {
-            if (authDesktop) {
-                authDesktop.innerHTML = `
-                    <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="header-google-signin-btn flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-700 rounded-full transition-all duration-200 text-sm font-medium shadow-sm hover:shadow cursor-pointer">
-                        <img src="${googleSvgData}" alt="Google" class="w-4 h-4 flex-shrink-0" />
-                        <span>Sign In</span>
-                    </button>
-                `;
+            // Exact Study Plan behavior: restore DU Logo when logged out
+            if (headerLogo) {
+                headerLogo.src = '/images/du_logo.png';
+                if (headerLink) headerLink.href = 'https://du.ac.bd/';
             }
 
-            if (authMobile) {
-                authMobile.innerHTML = `
-                    <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="flex items-center justify-center gap-2.5 w-full py-2.5 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-700 rounded-full transition text-sm font-medium shadow-sm cursor-pointer">
-                        <img src="${googleSvgData}" alt="Google" class="w-4 h-4 flex-shrink-0" />
-                        <span>Sign in with Google</span>
-                    </button>
-                `;
-            }
+            const loggedOutHTML = `
+                <button id="header-signin-btn" type="button" onclick="window.triggerGoogleSignInGlobal()" class="flex items-center gap-3 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-full transition-colors text-sm font-medium shadow-sm cursor-pointer">
+                    <img src="${googleSvgData}" alt="G" class="w-5 h-5">
+                    <span>Sign in</span>
+                </button>`;
+
+            const mobileLoggedOutHTML = loggedOutHTML
+                .replace('id="header-signin-btn"', 'id="mobile-signin-btn"')
+                .replace('flex items-center', 'flex items-center justify-center w-full');
+
+            if (authDesktop) authDesktop.innerHTML = loggedOutHTML;
+            if (authMobile) authMobile.innerHTML = mobileLoggedOutHTML;
         }
-
-        // Find any remaining standalone sign up links or buttons
-        const standaloneAuthElements = document.querySelectorAll(
-            'a.signup-button, button.signup-button, a[href="index.html#signup"], a[href="study_plan.html#signup"], a[href="#signup"]'
-        );
-
-        standaloneAuthElements.forEach((el) => {
-            if (el.closest('#auth-container-desktop') || el.closest('#auth-container-mobile')) return;
-            if (user && user.isLoggedIn) {
-                const displayName = user.displayName || user.name || user.email?.split('@')[0] || 'User';
-                el.href = 'study_plan.html';
-                el.innerHTML = `Study Plan (${displayName})`;
-            } else {
-                if (el.tagName === 'A') {
-                    el.onclick = (e) => {
-                        e.preventDefault();
-                        window.triggerGoogleSignInGlobal();
-                    };
-                }
-            }
-        });
     }
 
-    // Initialize all logic
     function initAll() {
+        ensureUniversalStylesAndIcons();
+        ensureUniversalHeader();
         applyGlobalTheme(getStoredTheme() === 'dark');
         ensureFloatingButtons();
         syncNavigationState();
@@ -984,7 +1328,6 @@ document.addEventListener('DOMContentLoaded', () => {
         initAll();
     }
 
-    // Listen for storage events across tabs/windows
     window.addEventListener('storage', (e) => {
         if (e.key === 'class_caddy_theme' || e.key === 'studyPlanSettings') {
             applyGlobalTheme(getStoredTheme() === 'dark');
@@ -994,4 +1337,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 })();
-// ===== END: GLOBAL DARK MODE, SCROLL TOGGLE & UNIVERSAL AUTH SYNC =====
+// ===== END: UNIVERSAL STUDY PLAN HEADER, FLOATING BUTTONS & AUTH ENGINE =====
+

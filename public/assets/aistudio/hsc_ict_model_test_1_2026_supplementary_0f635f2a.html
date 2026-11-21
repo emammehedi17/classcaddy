@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HSC ICT MCQ Note — Model Test 1 (2026)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- MathJax Configuration for Clean LaTeX Rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+      line-height: 1.55;
+      padding: 20px 12px 50px;
+    }
+    .page {
+      max-width: 880px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 28px 34px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    }
+    /* Header & QR Branding */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2.5px solid #0f172a;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+      gap: 16px;
+    }
+    .header-info h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .header-info h2 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 2px;
+    }
+    .meta-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .badge {
+      background: #f8fafc;
+      border: 1px solid #334155;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+    .qr-box {
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .qr-box img {
+      width: 78px;
+      height: 78px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 3px;
+      background: #fff;
+      display: block;
+      margin: 0 auto;
+    }
+    .qr-box span {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #475569;
+      display: block;
+      margin-top: 3px;
+    }
+
+    /* Stems & Questions */
+    .stem {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-left: 4px solid #0f172a;
+      padding: 10px 14px;
+      margin: 18px 0 10px;
+      border-radius: 4px;
+      font-size: 15.5px;
+    }
+    .stem-title { font-weight: 700; margin-bottom: 6px; }
+    .tables-row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 6px; }
+    table.mini-table { border-collapse: collapse; font-size: 14px; background: #fff; }
+    table.mini-table th, table.mini-table td { border: 1px solid #0f172a; padding: 3px 10px; text-align: center; }
+    table.mini-table th { background: #e2e8f0; }
+
+    pre.code-snip {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+      font-size: 13.5px;
+      margin-top: 5px;
+      overflow-x: auto;
+    }
+
+    .q-block {
+      padding: 12px 0;
+      border-bottom: 1px dashed #cbd5e1;
+      page-break-inside: avoid;
+    }
+    .q-block:last-child { border-bottom: none; }
+    .q-text { font-weight: 600; font-size: 16px; margin-bottom: 5px; }
+    .roman-list { list-style: none; margin: 3px 0 6px 20px; font-size: 15px; }
+    .roman-list li span { display: inline-block; width: 24px; font-style: italic; font-weight: 600; }
+    .sub-q { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+
+    .opts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px 14px;
+      margin-bottom: 7px;
+    }
+    .opt {
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .opt.ans {
+      background: #ecfdf5;
+      border: 1.5px solid #059669;
+      color: #065f46;
+      font-weight: 700;
+    }
+    .exp {
+      font-size: 14.5px;
+      background: #f8fafc;
+      border-left: 3px solid #64748b;
+      padding: 5px 10px;
+      color: #1e293b;
+    }
+    .overline { text-decoration: overline; }
+    .footer {
+      margin-top: 24px;
+      padding-top: 12px;
+      border-top: 1.5px solid #0f172a;
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    @media (max-width: 600px) {
+      .opts-grid { grid-template-columns: 1fr; }
+      .page { padding: 18px 16px; }
+      .header { flex-direction: column; text-align: center; }
+    }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .page { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+      .opt.ans { background: #ecfdf5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+  <header class="header">
+    <div class="header-info">
+      <h1>HSC ICT — Model Test 01 (MCQ Note)</h1>
+      <h2>HSC 2026 Supplementary Exam Preparation • Subject Code: 275</h2>
+      <div class="meta-badges">
+        <span class="badge">Full Marks: 25</span>
+        <span class="badge">All 6 Chapters Covered</span>
+        <span class="badge">Prepared by: Emam Mehedi</span>
+      </div>
+    </div>
+    <div class="qr-box">
+      <img src="https://classcaddy.netlify.app/qr.fb.png" alt="QR Code" onerror="this.src='https://placehold.co/80x80/f8fafc/0f172a?text=QR'">
+      <span>Scan for Updates</span>
+    </div>
+  </header>
+
+  <main id="mcq-list"></main>
+
+  <footer class="footer">
+    <span>Prepared by: Emam Mehedi</span>
+    <span>HSC ICT 2026 — Model Set 01</span>
+  </footer>
+</div>
+
+<script>
+  const keys = ['ক', 'খ', 'গ', 'ঘ'];
+
+  // SVG Diagrams
+  const svgStarToMesh = `
+    <svg width="290" height="95" viewBox="0 0 290 95" xmlns="http://www.w3.org/2000/svg">
+      <!-- Star Topology -->
+      <circle cx="65" cy="48" r="10" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.5"/>
+      <text x="65" y="51" font-size="9" text-anchor="middle" font-weight="bold">Hub</text>
+      <line x1="65" y1="38" x2="65" y2="14" stroke="#0f172a" stroke-width="1.3"/>
+      <line x1="74" y1="43" x2="102" y2="28" stroke="#0f172a" stroke-width="1.3"/>
+      <line x1="74" y1="53" x2="102" y2="68" stroke="#0f172a" stroke-width="1.3"/>
+      <line x1="56" y1="53" x2="28" y2="68" stroke="#0f172a" stroke-width="1.3"/>
+      <line x1="56" y1="43" x2="28" y2="28" stroke="#0f172a" stroke-width="1.3"/>
+      <circle cx="65" cy="14" r="4" fill="#0f172a"/><circle cx="102" cy="28" r="4" fill="#0f172a"/>
+      <circle cx="102" cy="68" r="4" fill="#0f172a"/><circle cx="28" cy="68" r="4" fill="#0f172a"/>
+      <circle cx="28" cy="28" r="4" fill="#0f172a"/>
+      <text x="65" y="90" font-size="12" text-anchor="middle" font-weight="bold">চিত্র-১</text>
+
+      <!-- Arrow -->
+      <line x1="125" y1="48" x2="160" y2="48" stroke="#0f172a" stroke-width="1.8"/>
+      <polygon points="160,44 168,48 160,52" fill="#0f172a"/>
+
+      <!-- Mesh Topology (5 nodes) -->
+      <g stroke="#0f172a" stroke-width="1.2">
+        <line x1="225" y1="14" x2="262" y2="32"/><line x1="225" y1="14" x2="250" y2="70"/>
+        <line x1="225" y1="14" x2="200" y2="70"/><line x1="225" y1="14" x2="188" y2="32"/>
+        <line x1="262" y1="32" x2="250" y2="70"/><line x1="262" y1="32" x2="200" y2="70"/>
+        <line x1="262" y1="32" x2="188" y2="32"/><line x1="250" y1="70" x2="200" y2="70"/>
+        <line x1="250" y1="70" x2="188" y2="32"/><line x1="200" y1="70" x2="188" y2="32"/>
+      </g>
+      <circle cx="225" cy="14" r="4" fill="#0f172a"/><circle cx="262" cy="32" r="4" fill="#0f172a"/>
+      <circle cx="250" cy="70" r="4" fill="#0f172a"/><circle cx="200" cy="70" r="4" fill="#0f172a"/>
+      <circle cx="188" cy="32" r="4" fill="#0f172a"/>
+      <text x="225" y="90" font-size="12" text-anchor="middle" font-weight="bold">চিত্র-২</text>
+    </svg>
+  `;
+
+  const svgLogicGate = `
+    <svg width="240" height="90" viewBox="0 0 240 90" xmlns="http://www.w3.org/2000/svg">
+      <text x="10" y="25" font-size="14" font-family="serif" font-weight="bold">A</text>
+      <text x="10" y="65" font-size="14" font-family="serif" font-weight="bold">B</text>
+      <line x1="25" y1="21" x2="65" y2="21" stroke="#000" stroke-width="1.5"/>
+      <line x1="25" y1="61" x2="65" y2="61" stroke="#000" stroke-width="1.5"/>
+      <!-- XOR Gate -->
+      <path d="M60,12 Q70,21 60,30" fill="none" stroke="#000" stroke-width="1.5"/>
+      <path d="M65,12 Q75,21 65,30 Q85,30 98,21 Q85,12 65,12 Z" fill="none" stroke="#000" stroke-width="1.5"/>
+      <!-- NOT on B -->
+      <polygon points="65,54 65,68 78,61" fill="none" stroke="#000" stroke-width="1.5"/>
+      <circle cx="81" cy="61" r="3" fill="none" stroke="#000" stroke-width="1.5"/>
+      <!-- Wires to NAND -->
+      <polyline points="98,21 120,21 120,34 140,34" fill="none" stroke="#000" stroke-width="1.5"/>
+      <polyline points="84,61 120,61 120,48 140,48" fill="none" stroke="#000" stroke-width="1.5"/>
+      <!-- Final NAND -->
+      <path d="M140,26 L160,26 A15,15 0 0,1 160,56 L140,56 Z" fill="none" stroke="#000" stroke-width="1.5"/>
+      <circle cx="179" cy="41" r="3.5" fill="none" stroke="#000" stroke-width="1.5"/>
+      <line x1="183" y1="41" x2="210" y2="41" stroke="#000" stroke-width="1.5"/>
+      <text x="215" y="45" font-size="14" font-family="serif" font-weight="bold">Y</text>
+    </svg>
+  `;
+
+  // Compact JS Array of 25 Board-Standard MCQs (Mahbubur Rahman Textbook Based)
+  const mcqs = [
+    // Chapter 1 (4 MCQs)
+    {
+      n: "১",
+      q: "বিশ্বগ্রাম (Global Village) ধারণার প্রবক্তা হারবার্ট মার্শাল ম্যাকলুহান তাঁর কোন গ্রন্থে ইলেকট্রনিক মিডিয়াকে ‘ইলেকট্রনিক নার্ভাস সিস্টেম’ হিসেবে অভিহিত করেছেন?",
+      o: ["The Mechanical Bride", "The Gutenberg Galaxy", "Understanding Media", "The Medium is the Massage"],
+      a: 2,
+      e: "১৯৬৪ সালে প্রকাশিত <u><i>Understanding Media: The Extensions of Man</i></u> বইয়ে ম্যাকলুহান বৈদ্যুতিক প্রযুক্তির মাধ্যমে বিশ্বকে একটি একক গ্রামে রূপান্তরের ধারণা দেন।"
+    },
+    {
+      n: "২",
+      q: "নিচের কোনটি <b>আচরণগত (Behavioral)</b> বায়োমেট্রিক্স পদ্ধতির অন্তর্ভুক্ত?",
+      o: ["আইরিস স্ক্যান (Iris Scan)", "হ্যান্ড জিওমেট্রি (Hand Geometry)", "টাইপিং কী-স্ট্রোক (Typing Keystroke)", "রেটিনা স্ক্যান (Retina Scan)"],
+      a: 2,
+      e: "কণ্ঠস্বর, সিগনেচার ও <b>টাইপিং কী-স্ট্রোক</b> হলো আচরণগত বায়োমেট্রিক্স; বাকি তিনটি দেহের গঠনগত বা শারীরবৃত্তীয় (Physiological) পদ্ধতি।"
+    },
+    {
+      n: "৩",
+      q: "রিকম্বিনেন্ট DNA প্রযুক্তিতে DNA অণুর সুনির্দিষ্ট অংশ কাটার জন্য নিচের কোনটি ব্যবহৃত হয়?",
+      o: ["লাইগেজ এনজাইম", "রেস্ট্রিকশন এনজাইম", "প্লাজমিড", "ইন্টারফেরন"],
+      a: 1,
+      e: "<b>রেস্ট্রিকশন এনজাইমকে</b> ‘আণবিক কাঁচি’ বলা হয়, যা DNA অণুর নির্দিষ্ট অংশ কাটতে ব্যবহৃত হয়। আর জোড়া লাগাতে <i>লাইগেজ এনজাইম</i> ব্যবহৃত হয়।"
+    },
+    {
+      n: "৪",
+      q: "ক্রায়োসার্জারি চিকিৎসা পদ্ধতিতে—",
+      r: ["অত্যন্ত নিম্ন তাপমাত্রায় রোগাক্রান্ত কোষ ধ্বংস করা হয়", "তরল নাইট্রোজেন ও আর্গন গ্যাস ব্যবহৃত হয়", "রোগীর শরীরে প্রচুর রক্তপাত ও কাটাছেঁড়া হয়"],
+      sq: "নিচের কোনটি সঠিক?",
+      o: ["<i>i</i> ও <i>ii</i>", "<i>i</i> ও <i>iii</i>", "<i>ii</i> ও <i>iii</i>", "<i>i, ii</i> ও <i>iii</i>"],
+      a: 0,
+      e: "ক্রায়োসার্জারিতে <b>$-41^\\circ\\text{C}$</b> বা তার চেয়ে কম তাপমাত্রায় তরল নাইট্রোজেন/আর্গন প্রয়োগ করে রক্তপাতহীনভাবে আক্রান্ত কোষ ধ্বংস করা হয়।"
+    },
+
+    // Chapter 2 (5 MCQs)
+    {
+      n: "৫",
+      q: "অ্যাসিনক্রোনাস ট্রান্সমিশনে একটি <b>৮-বিট</b> ক্যারেক্টার ডেটা প্রেরণের ক্ষেত্রে মোট কত বিট ডেটা ট্রান্সমিট হয়?",
+      o: ["৮ বা ৯ বিট", "১০ বা ১১ বিট", "১২ বা ১৩ বিট", "১৬ বিট"],
+      a: 1,
+      e: "৮-বিট ক্যারেক্টারের সামনে <b>১টি স্টার্ট বিট</b> এবং শেষে <b>১টি বা ২টি স্টপ বিট</b> যুক্ত হয়ে মোট $8 + 1 + 1 = 10$ অথবা $8 + 1 + 2 = 11$ বিট ট্রান্সমিট হয়।"
+    },
+
+    // Chapter 2 (5 MCQs)
+    {
+      n: "৫",
+      q: "অ্যাসিনক্রোনাস ট্রান্সমিশনে একটি <b>৮-বিট</b> ক্যারেক্টার ডেটা প্রেরণের ক্ষেত্রে মোট কত বিট ডেটা ট্রান্সমিট হয়?",
+      o: ["৮ বা ৯ বিট", "১০ বা ১১ বিট", "১২ বা ১৩ বিট", "১৬ বিট"],
+      a: 1,
+      e: "৮-বিট ক্যারেক্টারের সামনে <b>১টি স্টার্ট বিট</b> এবং শেষে <b>১টি বা ২টি স্টপ বিট</b> যুক্ত হয়ে মোট $8+1+1 = 10$ অথবা $8+1+2 = 11$ বিট ট্রান্সমিট হয়।"
+    },
+    {
+      n: "৬",
+      q: "নিচের কোন ক্যাবলটি <b>EMI (Electromagnetic Interference)</b> থেকে সম্পূর্ণ মুক্ত?",
+      o: ["UTP ক্যাবল", "STP ক্যাবল", "কো-এক্সিয়াল ক্যাবল", "ফাইবার অপটিক ক্যাবল"],
+      a: 3,
+      e: "<b>ফাইবার অপটিক ক্যাবলে</b> তড়িৎ সংকেতের পরিবর্তে আলোক সংকেত (পূর্ণ অভ্যন্তরীণ প্রতিফলন) প্রবাহিত হয় বলে এতে কোনো তড়িৎ-চুম্বকীয় প্রভাব (EMI) নেই।"
+    },
+    {
+      n: "৭",
+      q: "WiMAX প্রযুক্তির স্ট্যান্ডার্ড কোনটি?",
+      o: ["IEEE 802.11", "IEEE 802.15", "IEEE 802.16", "IEEE 802.3"],
+      a: 2,
+      e: "<b>IEEE 802.16</b> হলো WiMAX (WMAN) স্ট্যান্ডার্ড। উল্লেখ্য, <i>IEEE 802.11</i> হলো Wi-Fi এবং <i>IEEE 802.15</i> হলো Bluetooth স্ট্যান্ডার্ড।"
+    },
+    {
+      n: "৮",
+      s: `<div class="stem-title">নিচের উদ্দীপকটি লক্ষ কর এবং ৮ ও ৯ নং প্রশ্নের উত্তর দাও:</div>${svgStarToMesh}`,
+      q: "উদ্দীপকের <b>চিত্র-১</b> থেকে <b>চিত্র-২</b> এর নেটওয়ার্কে রূপান্তর করলে অতিরিক্ত কয়টি তারের প্রয়োজন হবে?",
+      o: ["৫টি", "১০টি", "১৫টি", "২০টি"],
+      a: 0,
+      e: "চিত্র-১ (স্টার টপোলজি)-এ ৫টি কম্পিউটারের জন্য তার লাগে <b>৫টি</b>। চিত্র-২ (মেশ টপোলজি)-এ তার লাগে $\\frac{n(n-1)}{2} = \\frac{5(5-1)}{2} = 10$টি। সুতরাং অতিরিক্ত তার লাগবে $10 - 5 = 5$<b>টি</b>।"
+    },
+    {
+      n: "৯",
+      q: "চিত্র-২ এর টপোলজিটির প্রধান সুবিধাসমূহ হলো—",
+      r: ["ডেটা কমিউনিকেশনে অনেক বেশি নিশ্চয়তা থাকে", "নেটওয়ার্ক ইনস্টলেশন ও কনফিগারেশন অত্যন্ত সহজ", "কোনো একটি লিংক নষ্ট হলেও বিকল্প পথে ডেটা পাঠানো যায়"],
+      sq: "নিচের কোনটি সঠিক?",
+      o: ["<i>i</i> ও <i>ii</i>", "<i>i</i> ও <i>iii</i>", "<i>ii</i> ও <i>iii</i>", "<i>i, ii</i> ও <i>iii</i>"],
+      a: 1,
+      e: "মেশ টপোলজিতে প্রতিটি নোডের সাথে সরাসরি সংযোগ থাকায় নির্ভরযোগ্যতা বেশি ও বিকল্প পথ থাকে, তবে এর ইনস্টলেশন ও কনফিগারেশন জটিল ও ব্যয়বহুল।"
+    },
+
+    // Chapter 3 (5 MCQs)
+    {
+      n: "১০",
+      q: "$(76)_8$ এর ঠিক পরের অক্টাল সংখ্যাটি কত?",
+      o: ["$(77)_8$", "$(80)_8$", "$(100)_8$", "$(70)_8$"],
+      a: 0,
+      e: "অক্টাল সংখ্যা পদ্ধতির ভিত্তি ৮ (অঙ্কসমূহ ০–৭)। তাই $(76)_8 + (1)_8 = (77)_8$ (এবং $(77)_8$ এর পরের সংখ্যাটি হবে $(100)_8$)।"
+    },
+    {
+      n: "১১",
+      q: "<b>ইউনিকোড (Unicode)</b> মোট কতটি অদ্বিতীয় চিহ্ন বা অক্ষরকে নির্দিষ্ট করতে পারে?",
+      o: ["$256$", "$1024$", "$32768$", "$65536$"],
+      a: 3,
+      e: "ইউনিকোড মূলত ১৬-বিটের কোড হওয়ায় এর মাধ্যমে সর্বোচ্চ $2^{16} = 65,536$টি ভিন্ন ভিন্ন অক্ষর ও প্রতীক প্রকাশ করা যায়।"
+    },
+    {
+      n: "১২",
+      q: "বুলিয়ান বীজগণিতে $A + \\bar{A}B$ এর সরলীকৃত মান কোনটি?",
+      o: ["$A$", "$B$", "$A + B$", "$AB$"],
+      a: 2,
+      e: "বুলিয়ান বিভাজন উপপাদ্য অনুযায়ী, $A + \\bar{A}B = (A + \\bar{A})(A + B) = 1 \\cdot (A + B) = A + B$।"
+    },
+    {
+      n: "১৩",
+      s: `<div class="stem-title">নিচের লজিক সার্কিটটি লক্ষ কর এবং ১৩ ও ১৪ নং প্রশ্নের উত্তর দাও:</div>${svgLogicGate}`,
+      q: "উদ্দীপকের লজিক সার্কিটে $A = 1$ এবং $B = 0$ হলে আউটপুট $Y$ এর মান কত হবে?",
+      o: ["$0$", "$1$", "$A$", "$B$"],
+      a: 0,
+      e: "$A=1, B=0$ হলে XOR গেইটের আউটপুট $1 \\oplus 0 = 1$ এবং NOT গেইটের আউটপুট $\\bar{0} = 1$। ফলে NAND গেইটের আউটপুট $Y = \\overline{1 \\cdot 1} = 0$।"
+    },
+    {
+      n: "১৪",
+      q: "একটি <b>ফুল অ্যাডার (Full Adder)</b> বাস্তবায়ন করতে নিচের কোনটি প্রয়োজন?",
+      r: ["২টি হাফ অ্যাডার ও ১টি OR গেইট", "২টি XOR, ২টি AND ও ১টি OR গেইট", "১টি হাফ অ্যাডার ও ১টি NAND গেইট"],
+      sq: "নিচের কোনটি সঠিক?",
+      o: ["<i>i</i> ও <i>ii</i>", "<i>i</i> ও <i>iii</i>", "<i>ii</i> ও <i>iii</i>", "<i>i, ii</i> ও <i>iii</i>"],
+      a: 0,
+      e: "১টি হাফ অ্যাডারে ১টি XOR ও ১টি AND গেইট থাকে। তাই ২টি হাফ অ্যাডার (২টি XOR + ২টি AND) এবং ১টি OR গেইট মিলে একটি ফুল অ্যাডার গঠিত হয়।"
+    },
+
+    // Chapter 4 (3 MCQs)
+    {
+      n: "১৫",
+      q: "ওয়েবপেইজে <code>H<sub>2</sub>SO<sub>4</sub></code> প্রদর্শনের জন্য সঠিক HTML ট্যাগ কোনটি?",
+      o: ["<code>H&lt;sup&gt;2&lt;/sup&gt;SO&lt;sup&gt;4&lt;/sup&gt;</code>", "<code>H&lt;sub&gt;2&lt;/sub&gt;SO&lt;sub&gt;4&lt;/sub&gt;</code>", "<code>H&lt;small&gt;2&lt;/small&gt;SO&lt;small&gt;4&lt;/small&gt;</code>", "<code>H&lt;down&gt;2&lt;/down&gt;SO&lt;down&gt;4&lt;/down&gt;</code>"],
+      a: 1,
+      e: "কোনো লেখাকে স্বাভাবিক লাইনের নিচে (Subscript) দেখানোর জন্য HTML-এ <code>&lt;sub&gt;...&lt;/sub&gt;</code> ট্যাগ ব্যবহৃত হয়।"
+    },
+    {
+      n: "১৬",
+      q: "নিচের কোনটি <b>এম্পটি (Empty)</b> বা ফাঁকা HTML ট্যাগ?",
+      r: ["<code>&lt;br&gt;</code>", "<code>&lt;hr&gt;</code>", "<code>&lt;img&gt;</code>"],
+      sq: "নিচের কোনটি সঠিক?",
+      o: ["<i>i</i> ও <i>ii</i>", "<i>i</i> ও <i>iii</i>", "<i>ii</i> ও <i>iii</i>", "<i>i, ii</i> ও <i>iii</i>"],
+      a: 3,
+      e: "যে সকল ট্যাগের ওপেনিং ট্যাগ থাকে কিন্তু ক্লোজিং ট্যাগ থাকে না তাদের এম্পটি ট্যাগ বলে। <code>&lt;br&gt;</code>, <code>&lt;hr&gt;</code> এবং <code>&lt;img&gt;</code> তিনটিই এম্পটি ট্যাগ।"
+    },
+    {
+      n: "১৭",
+      q: "একটি ওয়েবসাইটের মূল পাতার সাথে অন্যান্য পাতাগুলোর সংযোগ (Hyperlink) তৈরি করতে <code>&lt;a&gt;</code> ট্যাগের কোন অ্যাট্রিবিউটটি অপরিহার্য?",
+      o: ["<code>src</code>", "<code>link</code>", "<code>href</code>", "<code>rel</code>"],
+      a: 2,
+      e: "অ্যাঙ্কর ট্যাগ (<code>&lt;a&gt;</code>)-এ গন্তব্য পেইজের ঠিকানা বা URL নির্ধারণ করার জন্য <b><code>href</code> (Hypertext Reference)</b> অ্যাট্রিবিউট ব্যবহৃত হয়।"
+    },
+
+    // Chapter 5 (4 MCQs)
+    {
+      n: "১৮",
+      q: "সি (C) প্রোগ্রামিং ভাষায় <code>double</code> ডেটা টাইপের জন্য মেমোরিতে কত বাইট জায়গা সংরক্ষিত হয়?",
+      o: ["২ বাইট", "৪ বাইট", "৮ বাইট", "১৬ বাইট"],
+      a: 2,
+      e: "সি ভাষায় <code>char</code> = ১ বাইট, <code>int</code> = ২ বা ৪ বাইট, <code>float</code> = ৪ বাইট এবং <b><code>double</code> = ৮ বাইট</b> মেমোরি দখল করে।"
+    },
+    {
+      n: "১৯",
+      q: "নিচের কোন অনুবাদক প্রোগ্রামটি সম্পূর্ণ সোর্স প্রোগ্রামকে একসাথে মেশিন ভাষায় রূপান্তর করে?",
+      o: ["ইন্টারপ্রিটার (Interpreter)", "কম্পাইলার (Compiler)", "অ্যাসেম্বলার (Assembler)", "লিঙ্কার (Linker)"],
+      a: 1,
+      e: "<b>কম্পাইলার</b> সম্পূর্ণ প্রোগ্রামটি একসাথে পড়ে অনুবাদ করে এবং সবগুলো ভুল একসাথে প্রদর্শন করে; পক্ষান্তরে <i>ইন্টারপ্রিটার</i> লাইন বাই লাইন অনুবাদ করে।"
+    },
+    {
+      n: "২০",
+      s: `<div class="stem-title">নিচের সি-প্রোগ্রাম অংশটুকু পড় এবং ২০ ও ২১ নং প্রশ্নের উত্তর দাও:</div>
+          <pre class="code-snip">int i, s = 0;
+for (i = 2; i &lt;= 10; i = i + 2)
+{
+    s = s + i;
+}
+printf("%d", s);</pre>`,
+      q: "প্রোগ্রামটির আউটপুট কত হবে?",
+      o: ["২০", "২৫", "৩০", "৫৫"],
+      a: 2,
+      e: "লুপটি $2 + 4 + 6 + 8 + 10$ পর্যন্ত জোড় সংখ্যাগুলোর যোগফল নির্ণয় করছে, যার মান $2 + 4 + 6 + 8 + 10 = 30$।"
+    },
+    {
+      n: "২১",
+      q: "উদ্দীপকের লুপটি কতবার নির্বাহ (Execute) হবে?",
+      o: ["৪ বার", "৫ বার", "৬ বার", "১০ বার"],
+      a: 1,
+      e: "$i$ এর মান যথাক্রমে $2, 4, 6, 8, 10$ এর জন্য লুপের বডি মোট <b>৫ বার</b> নির্বাহ হবে ($i = 12$ হলে শর্ত মিথ্যা হয়ে লুপ থেমে যাবে)।"
+    },
+
+    // Chapter 6 (4 MCQs)
+    {
+      n: "২২",
+      q: "ডেটাবেজ টেবিলের প্রতিটি সারিকে (Row) কী বলা হয়?",
+      o: ["ফিল্ড (Field)", "অ্যাট্রিবিউট (Attribute)", "রেকর্ড বা টাপল (Record/Tuple)", "এনটিটি (Entity)"],
+      a: 2,
+      e: "ডেটাবেজ টেবিলের প্রতিটি সারিকে <b>রেকর্ড বা টাপল (Tuple)</b> এবং প্রতিটি কলামকে <i>ফিল্ড বা অ্যাট্রিবিউট</i> বলা হয়।"
+    },
+    {
+      n: "২৩",
+      q: "তথ্যের গোপনীয়তা রক্ষার জন্য মূল তথ্যকে (Plaintext) সংকেতায়িত তথ্যে (Ciphertext) রূপান্তর করার প্রক্রিয়াকে কী বলে?",
+      o: ["ডিক্রিপশন (Decryption)", "এনক্রিপশন (Encryption)", "ইনডেক্সিং (Indexing)", "সর্টিং (Sorting)"],
+      a: 1,
+      e: "অননুমোদিত ব্যক্তির হাত থেকে ডেটা রক্ষার জন্য প্লেইনটেক্সটকে সাইফারটেক্সটে রূপান্তর করার প্রক্রিয়াকে <b>এনক্রিপশন (Encryption)</b> বলে।"
+    },
+    {
+      n: "২৪",
+      s: `<div class="stem-title">নিচের টেবিলটি লক্ষ কর এবং ২৪ ও ২৫ নং প্রশ্নের উত্তর দাও:</div>
+          <div class="tables-row">
+            <table class="mini-table">
+              <caption>Table : Employee</caption>
+              <tr><th>Emp_ID</th><th>Name</th><th>Dept</th><th>Salary</th></tr>
+              <tr><td>E101</td><td>Kamal</td><td>IT</td><td>35000</td></tr>
+              <tr><td>E102</td><td>Nadia</td><td>HR</td><td>30000</td></tr>
+              <tr><td>E103</td><td>Sajid</td><td>IT</td><td>40000</td></tr>
+            </table>
+          </div>`,
+      q: "উদ্দীপকের টেবিলে <code>Salary</code> ফিল্ডের জন্য উপযুক্ত ডেটা টাইপ কোনটি?",
+      o: ["Text", "Currency / Number", "Memo", "AutoNumber"],
+      a: 1,
+      e: "বেতন বা আর্থিক সংখ্যাসূচক মান সংরক্ষণের জন্য ডেটাবেজে <b>Currency</b> অথবা <b>Number</b> ডেটা টাইপ ব্যবহৃত হয়।"
+    },
+    {
+      n: "২৫",
+      q: "<code>Employee</code> টেবিল থেকে <b>IT</b> বিভাগের কর্মীদের নাম ও বেতন দেখার সঠিক SQL কুয়েরি কোনটি?",
+      o: [
+        "<code>SELECT Name, Salary FROM Employee WHERE Dept = 'IT';</code>",
+        "<code>SELECT * FROM Employee WHERE Dept = IT;</code>",
+        "<code>SELECT Name, Salary WHERE Dept = 'IT' FROM Employee;</code>",
+        "<code>FIND Name, Salary FROM Employee WHERE Dept = 'IT';</code>"
+      ],
+      a: 0,
+      e: "নির্দিষ্ট কলাম নির্বাচনের জন্য <code>SELECT Name, Salary</code>, টেবিলের নামের জন্য <code>FROM Employee</code> এবং টেক্সট শর্তের জন্য কোটেশনসহ <code>WHERE Dept = 'IT';</code> ব্যবহৃত হয়।"
+    }
+  ];
+
+  // Render MCQs dynamically
+  const container = document.getElementById('mcq-list');
+  mcqs.forEach(item => {
+    if (item.s) {
+      const stemDiv = document.createElement('div');
+      stemDiv.className = 'stem';
+      stemDiv.innerHTML = item.s;
+      container.appendChild(stemDiv);
+    }
+
+    const qDiv = document.createElement('div');
+    qDiv.className = 'q-block';
+
+    const romansHTML = item.r
+      ? `<ul class="roman-list">${item.r.map((txt, idx) => `<li><span>${['i.', 'ii.', 'iii.'][idx]}</span> ${txt}</li>`).join('')}</ul>`
+      : '';
+
+    const subQHTML = item.sq ? `<div class="sub-q">${item.sq}</div>` : '';
+
+    const optsHTML = `<div class="opts-grid">${item.o.map((opt, idx) => `
+      <div class="opt ${idx === item.a ? 'ans' : ''}">
+        <span>(${keys[idx]})</span>
+        <span>${opt}</span>
+        ${idx === item.a ? '<span>✔</span>' : ''}
+      </div>
+    `).join('')}</div>`;
+
+    qDiv.innerHTML = `
+      <div class="q-text">${item.n}। ${item.q}</div>
+      ${romansHTML}
+      ${subQHTML}
+      ${optsHTML}
+      <div class="exp"><b>ব্যাখ্যা:</b> ${item.e}</div>
+    `;
+    container.appendChild(qDiv);
+  });
+
+  // Ensure MathJax typesets dynamically rendered content
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise();
+  }
+</script>
+
+</body>
+</html>
