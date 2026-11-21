@@ -4309,16 +4309,17 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
       {(editingCard || isAddMode) && (
         <div
           id="edit-card-modal"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150 overflow-y-auto"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150"
         >
           <div
-            className={`w-full max-w-xl rounded-2xl border p-6 shadow-2xl my-8 transition-all ${
+            className={`w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden rounded-2xl border shadow-2xl transition-all ${
               isDark
                 ? 'bg-gray-900 border-gray-700 text-white'
                 : 'bg-white border-slate-200 text-slate-900'
             }`}
           >
-            <div className="flex items-center justify-between pb-3.5 border-b border-gray-700/60 dark:border-gray-800">
+            {/* Fixed Modal Header */}
+            <div className="shrink-0 flex items-center justify-between px-6 py-4 border-b border-gray-700/60 dark:border-gray-800">
               <h3 className="text-lg font-bold flex items-center gap-2">
                 <Edit3 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 {isAddMode
@@ -4326,467 +4327,499 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
                   : `Edit "${editingCard?.title}" Card`}
               </h3>
               <button
+                type="button"
                 onClick={() => {
                   setEditingCard(null);
                   setIsAddMode(false);
                 }}
-                className="p-1 rounded-lg hover:bg-gray-700/40 text-gray-400 hover:text-white transition"
+                className="p-1.5 rounded-lg hover:bg-gray-700/40 text-gray-400 hover:text-white transition"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveCard} className="space-y-4 mt-4 text-xs">
-              {/* Button Type Choice: Sub folder vs File / HTML / Web Link */}
-              <div>
-                <label className="block font-semibold uppercase tracking-wider mb-1.5 text-emerald-600 dark:text-emerald-400">
-                  Select Button Type *
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFormTargetType('folder');
-                      if (formIcon === 'Briefcase' || formIcon === 'BookOpen') setFormIcon('Folder');
-                    }}
-                    className={`py-2 px-2 rounded-xl border flex flex-col items-center gap-1 transition ${
-                      formTargetType === 'folder'
-                        ? isDark
-                          ? 'bg-amber-600 text-white border-amber-500 shadow'
-                          : 'bg-amber-600 text-white border-amber-600 shadow'
-                        : isDark
-                        ? 'bg-gray-800 hover:bg-gray-750 text-gray-300 border-gray-700'
-                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-300'
-                    }`}
-                  >
-                    <FolderTree className="w-4 h-4" />
-                    <span className="font-semibold text-xs">Sub Folder</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setFormTargetType('file')}
-                    className={`py-2 px-2 rounded-xl border flex flex-col items-center gap-1 transition ${
-                      formTargetType === 'file'
-                        ? isDark
-                          ? 'bg-emerald-600 text-white border-emerald-500 shadow'
-                          : 'bg-emerald-600 text-white border-emerald-600 shadow'
-                        : isDark
-                        ? 'bg-gray-800 hover:bg-gray-750 text-gray-300 border-gray-700'
-                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-300'
-                    }`}
-                  >
-                    <Upload className="w-4 h-4" />
-                    <span className="font-semibold text-xs">Upload File</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setFormTargetType('html')}
-                    className={`py-2 px-2 rounded-xl border flex flex-col items-center gap-1 transition ${
-                      formTargetType === 'html'
-                        ? isDark
-                          ? 'bg-emerald-600 text-white border-emerald-500 shadow'
-                          : 'bg-emerald-600 text-white border-emerald-600 shadow'
-                        : isDark
-                        ? 'bg-gray-800 hover:bg-gray-750 text-gray-300 border-gray-700'
-                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-300'
-                    }`}
-                  >
-                    <Code2 className="w-4 h-4" />
-                    <span className="font-semibold text-xs">Paste HTML</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setFormTargetType('url')}
-                    className={`py-2 px-2 rounded-xl border flex flex-col items-center gap-1 transition ${
-                      formTargetType === 'url'
-                        ? isDark
-                          ? 'bg-emerald-600 text-white border-emerald-500 shadow'
-                          : 'bg-emerald-600 text-white border-emerald-600 shadow'
-                        : isDark
-                        ? 'bg-gray-800 hover:bg-gray-750 text-gray-300 border-gray-700'
-                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-300'
-                    }`}
-                  >
-                    <Globe className="w-4 h-4" />
-                    <span className="font-semibold text-xs">Web URL</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Title & Badge */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <form onSubmit={handleSaveCard} className="flex flex-col flex-1 min-h-0 text-xs">
+              {/* Scrollable Form Body */}
+              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+                {/* Button Type Choice: Sub folder vs File / HTML / Web Link */}
                 <div>
-                  <label className="block font-semibold uppercase tracking-wider mb-1">
-                    {formTargetType === 'folder' ? 'Sub Folder Name *' : 'Card Title / Name *'}
+                  <label className="block font-semibold uppercase tracking-wider mb-1.5 text-emerald-600 dark:text-emerald-400">
+                    Select Button Type *
                   </label>
-                  <input
-                    type="text"
-                    required
-                    value={formTitle}
-                    onChange={(e) => {
-                      setFormTitle(e.target.value);
-                      if (!isSlugManuallyEdited) {
-                        setFormUrlSlug(e.target.value);
-                      }
-                    }}
-                    placeholder={
-                      formTargetType === 'folder'
-                        ? 'e.g. 45th BCS, HSC 2026, Semester 1'
-                        : 'e.g. BCS, SSC, Syllabus, Notes'
-                    }
-                    className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none ${
-                      isDark
-                        ? 'bg-gray-800 border-gray-700 text-white focus:border-emerald-500'
-                        : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
-                    }`}
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold uppercase tracking-wider mb-1">
-                    Badge Pill (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={formBadge}
-                    onChange={(e) => setFormBadge(e.target.value)}
-                    placeholder="e.g. New Folder, Important, Cadre"
-                    className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none ${
-                      isDark
-                        ? 'bg-gray-800 border-gray-700 text-white focus:border-emerald-500'
-                        : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
-                    }`}
-                  />
-                </div>
-              </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormTargetType('folder');
+                        if (formIcon === 'Briefcase' || formIcon === 'BookOpen') setFormIcon('Folder');
+                      }}
+                      className={`py-2 px-3 rounded-xl border flex items-center justify-center gap-2 transition ${
+                        formTargetType === 'folder'
+                          ? isDark
+                            ? 'bg-amber-600 text-white border-amber-500 shadow'
+                            : 'bg-amber-600 text-white border-amber-600 shadow'
+                          : isDark
+                          ? 'bg-gray-800 hover:bg-gray-750 text-gray-300 border-gray-700'
+                          : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-300'
+                      }`}
+                    >
+                      <FolderTree className="w-4 h-4 shrink-0" />
+                      <span className="font-semibold text-xs">Sub Folder</span>
+                    </button>
 
-              {/* URL Slug & Shareable Deep Link Field */}
-              <div className={`p-3.5 rounded-xl border ${
-                isDark ? 'bg-gray-800/60 border-gray-700' : 'bg-slate-50 border-slate-300'
-              }`}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                    {formTargetType === 'folder'
-                      ? 'Folder Name for URL (Share Link) *'
-                      : 'File / Button Name for URL (Share Link) *'}
-                  </label>
-                  <span className="text-[10px] text-gray-400">
-                    Custom URL name for sharing
-                  </span>
-                </div>
-                <input
-                  type="text"
-                  value={formUrlSlug}
-                  onChange={(e) => {
-                    setIsSlugManuallyEdited(true);
-                    setFormUrlSlug(e.target.value);
-                  }}
-                  placeholder={
-                    formTargetType === 'folder'
-                      ? 'e.g. 45th_bcs or poems'
-                      : 'e.g. lecture_notes.pdf or arabic_poetry'
-                  }
-                  className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none font-mono ${
-                    isDark
-                      ? 'bg-gray-900 border-gray-700 text-emerald-300 focus:border-emerald-500'
-                      : 'bg-white border-slate-300 text-emerald-800 focus:border-emerald-600'
-                  }`}
-                />
-                
-                {/* Live Shareable URL Preview */}
-                <div className={`mt-2.5 p-2.5 rounded-lg border flex items-center justify-between gap-2 ${
-                  isDark
-                    ? 'bg-gray-950/80 border-emerald-500/30 text-emerald-300'
-                    : 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                }`}>
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <Link className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span className="font-mono text-[11px] truncate select-all">
-                      {`${typeof window !== 'undefined' && window.location.origin ? window.location.origin : 'https://classcaddy.netlify.app'}/archives.html/${[
-                        ...folderPath.map((id) => {
-                          const f = findCardDeep(rootCards, id);
-                          return f ? getCardSlug(f) : id;
-                        }),
-                        formUrlSlug.trim()
-                          ? sanitizeSlug(formUrlSlug.trim())
-                          : sanitizeSlug(formFileName || formTitle || 'file_name'),
-                      ].join('/')}`}
-                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setFormTargetType('file')}
+                      className={`py-2 px-3 rounded-xl border flex items-center justify-center gap-2 transition ${
+                        formTargetType === 'file'
+                          ? isDark
+                            ? 'bg-emerald-600 text-white border-emerald-500 shadow'
+                            : 'bg-emerald-600 text-white border-emerald-600 shadow'
+                          : isDark
+                          ? 'bg-gray-800 hover:bg-gray-750 text-gray-300 border-gray-700'
+                          : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-300'
+                      }`}
+                    >
+                      <Upload className="w-4 h-4 shrink-0" />
+                      <span className="font-semibold text-xs">Upload File</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setFormTargetType('html')}
+                      className={`py-2 px-3 rounded-xl border flex items-center justify-center gap-2 transition ${
+                        formTargetType === 'html'
+                          ? isDark
+                            ? 'bg-emerald-600 text-white border-emerald-500 shadow'
+                            : 'bg-emerald-600 text-white border-emerald-600 shadow'
+                          : isDark
+                          ? 'bg-gray-800 hover:bg-gray-750 text-gray-300 border-gray-700'
+                          : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-300'
+                      }`}
+                    >
+                      <Code2 className="w-4 h-4 shrink-0" />
+                      <span className="font-semibold text-xs">Paste HTML</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setFormTargetType('url')}
+                      className={`py-2 px-3 rounded-xl border flex items-center justify-center gap-2 transition ${
+                        formTargetType === 'url'
+                          ? isDark
+                            ? 'bg-emerald-600 text-white border-emerald-500 shadow'
+                            : 'bg-emerald-600 text-white border-emerald-600 shadow'
+                          : isDark
+                          ? 'bg-gray-800 hover:bg-gray-750 text-gray-300 border-gray-700'
+                          : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-300'
+                      }`}
+                    >
+                      <Globe className="w-4 h-4 shrink-0" />
+                      <span className="font-semibold text-xs">Web URL</span>
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const activeHost = typeof window !== 'undefined' && window.location.origin ? window.location.origin : 'https://classcaddy.netlify.app';
-                      const urlToCopy = `${activeHost}/archives.html/${[
-                        ...folderPath.map((id) => {
-                          const f = findCardDeep(rootCards, id);
-                          return f ? getCardSlug(f) : id;
-                        }),
-                        formUrlSlug.trim()
-                          ? sanitizeSlug(formUrlSlug.trim())
-                          : sanitizeSlug(formFileName || formTitle || 'file_name'),
-                      ].join('/')}`;
-                      navigator.clipboard.writeText(urlToCopy);
-                      setCopiedPreview(true);
-                      setTimeout(() => setCopiedPreview(false), 2000);
-                    }}
-                    className="shrink-0 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1 transition shadow-sm"
-                    title="Copy preview link"
-                  >
-                    {copiedPreview ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedPreview ? 'Copied!' : 'Copy'}</span>
-                  </button>
                 </div>
-                <p className="text-[10px] text-gray-400 mt-1.5 leading-normal">
-                  Write the file name that will be used in the URL. You can copy this link and share it with others to open this {formTargetType === 'folder' ? 'folder' : 'file'} directly.
-                </p>
-              </div>
 
-              {/* Subtitle / Description (becomes sub folder description) */}
-              <div>
-                <label className="block font-semibold uppercase tracking-wider mb-1">
-                  {formTargetType === 'folder'
-                    ? 'Sub Folder Description / Overview'
-                    : 'Description / Subtitle'}
-                </label>
-                <textarea
-                  rows={2}
-                  value={formSubtitle}
-                  onChange={(e) => setFormSubtitle(e.target.value)}
-                  placeholder={
-                    formTargetType === 'folder'
-                      ? 'e.g. Complete collection of preliminary tests, written question bank, and viva guide.'
-                      : 'e.g. Past Questions, Notes, and Examination Portal'
-                  }
-                  className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none resize-none ${
-                    isDark
-                      ? 'bg-gray-800 border-gray-700 text-white focus:border-emerald-500'
-                      : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
-                  }`}
-                />
-              </div>
+                {/* Wide 2-Column Layout for Core Metadata */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Left Column: Title, Badge, Icon & Theme */}
+                  <div className="space-y-3.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-semibold uppercase tracking-wider mb-1">
+                          {formTargetType === 'folder' ? 'Sub Folder Name *' : 'Card Title / Name *'}
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formTitle}
+                          onChange={(e) => {
+                            setFormTitle(e.target.value);
+                            if (!isSlugManuallyEdited) {
+                              setFormUrlSlug(e.target.value);
+                            }
+                          }}
+                          placeholder={
+                            formTargetType === 'folder'
+                              ? 'e.g. 45th BCS, HSC 2026'
+                              : 'e.g. BCS, SSC, Syllabus, Notes'
+                          }
+                          className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none ${
+                            isDark
+                              ? 'bg-gray-800 border-gray-700 text-white focus:border-emerald-500'
+                              : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-semibold uppercase tracking-wider mb-1">
+                          Badge Pill (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          value={formBadge}
+                          onChange={(e) => setFormBadge(e.target.value)}
+                          placeholder="e.g. New Folder, Important"
+                          className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none ${
+                            isDark
+                              ? 'bg-gray-800 border-gray-700 text-white focus:border-emerald-500'
+                              : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                          }`}
+                        />
+                      </div>
+                    </div>
 
-              {/* Specific Input for each type */}
-              {formTargetType === 'folder' && (
-                <div
-                  className={`p-3.5 rounded-xl border flex items-start gap-2.5 ${
-                    isDark
-                      ? 'bg-amber-950/30 border-amber-500/30 text-amber-200'
-                      : 'bg-amber-50 border-amber-200 text-amber-900'
-                  }`}
-                >
-                  <FolderTree className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                    {/* Subtitle / Description (becomes sub folder description) */}
+                    <div>
+                      <label className="block font-semibold uppercase tracking-wider mb-1">
+                        {formTargetType === 'folder'
+                          ? 'Sub Folder Description / Overview'
+                          : 'Description / Subtitle'}
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={formSubtitle}
+                        onChange={(e) => setFormSubtitle(e.target.value)}
+                        placeholder={
+                          formTargetType === 'folder'
+                            ? 'e.g. Complete collection of preliminary tests, written question bank, and viva guide.'
+                            : 'e.g. Past Questions, Notes, and Examination Portal'
+                        }
+                        className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none resize-none ${
+                          isDark
+                            ? 'bg-gray-800 border-gray-700 text-white focus:border-emerald-500'
+                            : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                        }`}
+                      />
+                    </div>
+
+                    {/* Icon & Theme Choice */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-semibold uppercase tracking-wider mb-1">
+                          Select Icon
+                        </label>
+                        <select
+                          value={formIcon}
+                          onChange={(e) =>
+                            setFormIcon(e.target.value as ArchiveCardButton['iconName'])
+                          }
+                          className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none ${
+                            isDark
+                              ? 'bg-gray-800 border-gray-700 text-white'
+                              : 'bg-slate-50 border-slate-300 text-slate-900'
+                          }`}
+                        >
+                          <option value="Folder">Folder (Sub-Folder)</option>
+                          <option value="FolderTree">Folder Tree (Directory)</option>
+                          <option value="Briefcase">Briefcase (Jobs / BCS)</option>
+                          <option value="GraduationCap">Graduation Cap (Academic)</option>
+                          <option value="BookOpen">Book Open (Study Notes)</option>
+                          <option value="Award">Award (Certificates)</option>
+                          <option value="FileText">File Text (Past Papers / HTML)</option>
+                          <option value="Sparkles">Sparkles (Special)</option>
+                          <option value="Layers">Layers (Multi-resource)</option>
+                          <option value="Compass">Compass (Guidance)</option>
+                          <option value="Globe">Globe (International / Web)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block font-semibold uppercase tracking-wider mb-1">
+                          Color Accent Theme
+                        </label>
+                        <select
+                          value={formTheme}
+                          onChange={(e) =>
+                            setFormTheme(e.target.value as ArchiveCardButton['colorTheme'])
+                          }
+                          className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none ${
+                            isDark
+                              ? 'bg-gray-800 border-gray-700 text-white'
+                              : 'bg-slate-50 border-slate-300 text-slate-900'
+                          }`}
+                        >
+                          <option value="emerald">Emerald Green (Official / Govt)</option>
+                          <option value="amber">Amber Gold (Sub-folders / Special)</option>
+                          <option value="blue">Royal Blue (Education Board)</option>
+                          <option value="indigo">Indigo (University)</option>
+                          <option value="purple">Purple (Advanced / Research)</option>
+                          <option value="rose">Rose Red (Important Notices)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: URL Slug & Shareable Deep Link Field + Open in New Tab */}
+                  <div className="space-y-3.5 flex flex-col justify-between">
+                    <div
+                      className={`p-3.5 rounded-xl border ${
+                        isDark ? 'bg-gray-800/60 border-gray-700' : 'bg-slate-50 border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                          {formTargetType === 'folder'
+                            ? 'Folder Name for URL (Share Link) *'
+                            : 'File / Button Name for URL (Share Link) *'}
+                        </label>
+                        <span className="text-[10px] text-gray-400">
+                          Custom URL name for sharing
+                        </span>
+                      </div>
+                      <input
+                        type="text"
+                        value={formUrlSlug}
+                        onChange={(e) => {
+                          setIsSlugManuallyEdited(true);
+                          setFormUrlSlug(e.target.value);
+                        }}
+                        placeholder={
+                          formTargetType === 'folder'
+                            ? 'e.g. 45th_bcs or poems'
+                            : 'e.g. lecture_notes.pdf or arabic_poetry'
+                        }
+                        className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none font-mono ${
+                          isDark
+                            ? 'bg-gray-900 border-gray-700 text-emerald-300 focus:border-emerald-500'
+                            : 'bg-white border-slate-300 text-emerald-800 focus:border-emerald-600'
+                        }`}
+                      />
+
+                      {/* Live Shareable URL Preview */}
+                      <div
+                        className={`mt-2.5 p-2 rounded-lg border flex items-center justify-between gap-2 ${
+                          isDark
+                            ? 'bg-gray-950/80 border-emerald-500/30 text-emerald-300'
+                            : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <Link className="w-4 h-4 text-emerald-500 shrink-0" />
+                          <span className="font-mono text-[11px] truncate select-all">
+                            {`${typeof window !== 'undefined' && window.location.origin ? window.location.origin : 'https://classcaddy.netlify.app'}/archives.html/${[
+                              ...folderPath.map((id) => {
+                                const f = findCardDeep(rootCards, id);
+                                return f ? getCardSlug(f) : id;
+                              }),
+                              formUrlSlug.trim()
+                                ? sanitizeSlug(formUrlSlug.trim())
+                                : sanitizeSlug(formFileName || formTitle || 'file_name'),
+                            ].join('/')}`}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const activeHost =
+                              typeof window !== 'undefined' && window.location.origin
+                                ? window.location.origin
+                                : 'https://classcaddy.netlify.app';
+                            const urlToCopy = `${activeHost}/archives.html/${[
+                              ...folderPath.map((id) => {
+                                const f = findCardDeep(rootCards, id);
+                                return f ? getCardSlug(f) : id;
+                              }),
+                              formUrlSlug.trim()
+                                ? sanitizeSlug(formUrlSlug.trim())
+                                : sanitizeSlug(formFileName || formTitle || 'file_name'),
+                            ].join('/')}`;
+                            navigator.clipboard.writeText(urlToCopy);
+                            setCopiedPreview(true);
+                            setTimeout(() => setCopiedPreview(false), 2000);
+                          }}
+                          className="shrink-0 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1 transition shadow-sm"
+                          title="Copy preview link"
+                        >
+                          {copiedPreview ? (
+                            <Check className="w-3.5 h-3.5" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                          <span>{copiedPreview ? 'Copied!' : 'Copy'}</span>
+                        </button>
+                      </div>
+                      <p className="text-[10px] text-gray-400 mt-1.5 leading-normal">
+                        Write the file name that will be used in the URL. You can copy this link and share it with others to open this {formTargetType === 'folder' ? 'folder' : 'file'} directly.
+                      </p>
+                    </div>
+
+                    {/* Open In New Tab Checkbox (Only for URL/HTML/File) */}
+                    {formTargetType !== 'folder' && (
+                      <div
+                        className={`p-3 rounded-xl border ${
+                          isDark ? 'bg-gray-800/40 border-gray-700/70' : 'bg-slate-50/80 border-slate-200'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="form-open-in-new-tab"
+                            checked={formOpenInNewTab}
+                            onChange={(e) => setFormOpenInNewTab(e.target.checked)}
+                            className="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4"
+                          />
+                          <label
+                            htmlFor="form-open-in-new-tab"
+                            className={`text-xs font-semibold cursor-pointer select-none ${
+                              isDark ? 'text-gray-200' : 'text-slate-800'
+                            }`}
+                          >
+                            Open as Independent Window / New Tab
+                          </label>
+                        </div>
+                        <p className={`text-[11px] pl-6 mt-0.5 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
+                          Opens directly in an independent window or new browser tab instead of an in-page modal.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Specific Input for each type */}
+                {formTargetType === 'folder' && (
+                  <div
+                    className={`p-3.5 rounded-xl border flex items-start gap-2.5 ${
+                      isDark
+                        ? 'bg-amber-950/30 border-amber-500/30 text-amber-200'
+                        : 'bg-amber-50 border-amber-200 text-amber-900'
+                    }`}
+                  >
+                    <FolderTree className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-xs">Full Sub Folder Page</p>
+                      <p className="text-[11px] opacity-90 mt-0.5 leading-relaxed">
+                        Clicking this button will open a dedicated page titled with this button's name and description. Inside that page, you can add more buttons, upload files, or create unlimited nested sub folders.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {formTargetType === 'url' && (
                   <div>
-                    <p className="font-semibold text-xs">Full Sub Folder Page</p>
-                    <p className="text-[11px] opacity-90 mt-0.5 leading-relaxed">
-                      Clicking this button will open a dedicated page titled with this button's name and description. Inside that page, you can add more buttons, upload files, or create unlimited nested sub folders.
-                    </p>
+                    <label className="block font-semibold uppercase tracking-wider mb-1">
+                      Destination URL / Web Link *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        required={formTargetType === 'url'}
+                        value={formLink}
+                        onChange={(e) => setFormLink(e.target.value)}
+                        placeholder="https://example.com or https://bpsc.gov.bd"
+                        className={`w-full rounded-xl pl-3 pr-8 py-2 text-sm border focus:outline-none font-mono ${
+                          isDark
+                            ? 'bg-gray-800 border-gray-700 text-white focus:border-emerald-500'
+                            : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
+                        }`}
+                      />
+                      <ExternalLink className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {formTargetType === 'url' && (
-                <div>
-                  <label className="block font-semibold uppercase tracking-wider mb-1">
-                    Destination URL / Web Link *
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      required={formTargetType === 'url'}
-                      value={formLink}
-                      onChange={(e) => setFormLink(e.target.value)}
-                      placeholder="https://example.com or https://bpsc.gov.bd"
-                      className={`w-full rounded-xl pl-3 pr-8 py-2 text-sm border focus:outline-none font-mono ${
+                {formTargetType === 'html' && (
+                  <div>
+                    <label className="block font-semibold uppercase tracking-wider mb-1 flex items-center justify-between">
+                      <span>Direct HTML Code *</span>
+                      <span className="text-[10px] lowercase font-normal opacity-75">
+                        Full &lt;html&gt; documents or custom widgets
+                      </span>
+                    </label>
+                    <textarea
+                      rows={4}
+                      required={formTargetType === 'html'}
+                      value={formHtmlContent}
+                      onChange={(e) => setFormHtmlContent(e.target.value)}
+                      placeholder="<!DOCTYPE html><html><head><style>body { font-family: sans-serif; padding: 20px; }</style></head><body><h1>Welcome</h1><p>Your custom content here...</p></body></html>"
+                      className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none font-mono leading-relaxed resize-y ${
                         isDark
-                          ? 'bg-gray-800 border-gray-700 text-white focus:border-emerald-500'
+                          ? 'bg-gray-800 border-gray-700 text-emerald-300 focus:border-emerald-500'
                           : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
                       }`}
                     />
-                    <ExternalLink className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
                   </div>
-                </div>
-              )}
+                )}
 
-              {formTargetType === 'html' && (
-                <div>
-                  <label className="block font-semibold uppercase tracking-wider mb-1 flex items-center justify-between">
-                    <span>Direct HTML Code *</span>
-                    <span className="text-[10px] lowercase font-normal opacity-75">
-                      Full &lt;html&gt; documents or custom widgets
-                    </span>
-                  </label>
-                  <textarea
-                    rows={5}
-                    required={formTargetType === 'html'}
-                    value={formHtmlContent}
-                    onChange={(e) => setFormHtmlContent(e.target.value)}
-                    placeholder="<!DOCTYPE html><html><head><style>body { font-family: sans-serif; padding: 20px; }</style></head><body><h1>Welcome</h1><p>Your custom content here...</p></body></html>"
-                    className={`w-full rounded-xl px-3 py-2 text-xs border focus:outline-none font-mono leading-relaxed resize-y ${
-                      isDark
-                        ? 'bg-gray-800 border-gray-700 text-emerald-300 focus:border-emerald-500'
-                        : 'bg-slate-50 border-slate-300 text-slate-900 focus:border-emerald-600'
-                    }`}
-                  />
-                </div>
-              )}
+                {formTargetType === 'file' && (
+                  <div className="space-y-2">
+                    <label className="block font-semibold uppercase tracking-wider mb-1">
+                      Select File from PC / Mobile (.pdf, .html, .docx, images, etc.) *
+                    </label>
 
-              {formTargetType === 'file' && (
-                <div className="space-y-2">
-                  <label className="block font-semibold uppercase tracking-wider mb-1">
-                    Select File from PC / Mobile (.pdf, .html, .docx, images, etc.) *
-                  </label>
-
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-
-                  <div
-                    onClick={() => fileInputRef.current?.click()}
-                    className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center gap-2 ${
-                      isDark
-                        ? 'border-gray-700 hover:border-emerald-500 bg-gray-800/50 hover:bg-gray-800'
-                        : 'border-slate-300 hover:border-emerald-600 bg-slate-50 hover:bg-slate-100'
-                    }`}
-                  >
-                    <Upload className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
-                    <div>
-                      <p className="font-semibold text-xs">
-                        {formFileName ? (
-                          <span className="text-emerald-600 dark:text-emerald-400">
-                            Selected File: {formFileName}
-                          </span>
-                        ) : (
-                          'Click to Browse & Upload Any File (.pdf, .html, .docx, images, etc.)'
-                        )}
-                      </p>
-                      <p className={`text-[10px] mt-0.5 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
-                        Supports PDF books, lecture slides, question papers, HTML documents, or images
-                      </p>
-                    </div>
-                  </div>
-
-                  {fileReadError && (
-                    <p className="text-xs text-red-500 font-medium">{fileReadError}</p>
-                  )}
-
-                  {(formFileData || formHtmlContent) && (
-                    <div className="mt-2">
-                      <div className="flex items-center justify-between text-[11px] mb-1 font-medium">
-                        <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                          <Check className="w-3.5 h-3.5" /> File Loaded: {formFileName || 'Uploaded Document'}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="hover:underline text-gray-400"
-                        >
-                          Change File
-                        </button>
-                      </div>
-                      <div
-                        className={`w-full rounded-xl px-3 py-2 text-[11px] border font-mono truncate ${
-                          isDark
-                            ? 'bg-gray-800/80 border-gray-700 text-gray-300'
-                            : 'bg-slate-100 border-slate-300 text-slate-700'
-                        }`}
-                      >
-                        {formFileType || 'application/octet-stream'} • Ready to open or download
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Icon & Theme Choice */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                <div>
-                  <label className="block font-semibold uppercase tracking-wider mb-1">
-                    Select Icon
-                  </label>
-                  <select
-                    value={formIcon}
-                    onChange={(e) =>
-                      setFormIcon(e.target.value as ArchiveCardButton['iconName'])
-                    }
-                    className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none ${
-                      isDark
-                        ? 'bg-gray-800 border-gray-700 text-white'
-                        : 'bg-slate-50 border-slate-300 text-slate-900'
-                    }`}
-                  >
-                    <option value="Folder">Folder (Sub-Folder)</option>
-                    <option value="FolderTree">Folder Tree (Directory)</option>
-                    <option value="Briefcase">Briefcase (Jobs / BCS)</option>
-                    <option value="GraduationCap">Graduation Cap (Academic)</option>
-                    <option value="BookOpen">Book Open (Study Notes)</option>
-                    <option value="Award">Award (Certificates)</option>
-                    <option value="FileText">File Text (Past Papers / HTML)</option>
-                    <option value="Sparkles">Sparkles (Special)</option>
-                    <option value="Layers">Layers (Multi-resource)</option>
-                    <option value="Compass">Compass (Guidance)</option>
-                    <option value="Globe">Globe (International / Web)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-semibold uppercase tracking-wider mb-1">
-                    Color Accent Theme
-                  </label>
-                  <select
-                    value={formTheme}
-                    onChange={(e) =>
-                      setFormTheme(e.target.value as ArchiveCardButton['colorTheme'])
-                    }
-                    className={`w-full rounded-xl px-3 py-2 text-sm border focus:outline-none ${
-                      isDark
-                        ? 'bg-gray-800 border-gray-700 text-white'
-                        : 'bg-slate-50 border-slate-300 text-slate-900'
-                    }`}
-                  >
-                    <option value="emerald">Emerald Green (Official / Govt)</option>
-                    <option value="amber">Amber Gold (Sub-folders / Special)</option>
-                    <option value="blue">Royal Blue (Education Board)</option>
-                    <option value="indigo">Indigo (University)</option>
-                    <option value="purple">Purple (Advanced / Research)</option>
-                    <option value="rose">Rose Red (Important Notices)</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Open In New Tab Checkbox (Only for URL/HTML/File) */}
-              {formTargetType !== 'folder' && (
-                <div>
-                  <div className="flex items-center gap-2 pt-1">
                     <input
-                      type="checkbox"
-                      id="form-open-in-new-tab"
-                      checked={formOpenInNewTab}
-                      onChange={(e) => setFormOpenInNewTab(e.target.checked)}
-                      className="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4"
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileChange}
+                      className="hidden"
                     />
-                    <label
-                      htmlFor="form-open-in-new-tab"
-                      className={`text-xs font-semibold cursor-pointer select-none ${
-                        isDark ? 'text-gray-200' : 'text-slate-800'
+
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`border-2 border-dashed rounded-xl p-3.5 text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5 ${
+                        isDark
+                          ? 'border-gray-700 hover:border-emerald-500 bg-gray-800/50 hover:bg-gray-800'
+                          : 'border-slate-300 hover:border-emerald-600 bg-slate-50 hover:bg-slate-100'
                       }`}
                     >
-                      Open as Independent Window / New Tab
-                    </label>
-                  </div>
-                  <p className={`text-[11px] pl-6 mt-0.5 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
-                    When enabled, opening this item opens it directly in an independent window or new browser tab instead of an in-page modal.
-                  </p>
-                </div>
-              )}
+                      <Upload className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                      <div>
+                        <p className="font-semibold text-xs">
+                          {formFileName ? (
+                            <span className="text-emerald-600 dark:text-emerald-400">
+                              Selected File: {formFileName}
+                            </span>
+                          ) : (
+                            'Click to Browse & Upload Any File (.pdf, .html, .docx, images, etc.)'
+                          )}
+                        </p>
+                        <p className={`text-[10px] mt-0.5 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
+                          Supports PDF books, lecture slides, question papers, HTML documents, or images
+                        </p>
+                      </div>
+                    </div>
 
-              {/* Actions */}
-              <div className="flex items-center justify-between gap-2 pt-3 border-t border-gray-700/50 dark:border-gray-800">
+                    {fileReadError && (
+                      <p className="text-xs text-red-500 font-medium">{fileReadError}</p>
+                    )}
+
+                    {(formFileData || formHtmlContent) && (
+                      <div className="mt-2">
+                        <div className="flex items-center justify-between text-[11px] mb-1 font-medium">
+                          <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                            <Check className="w-3.5 h-3.5" /> File Loaded: {formFileName || 'Uploaded Document'}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="hover:underline text-gray-400"
+                          >
+                            Change File
+                          </button>
+                        </div>
+                        <div
+                          className={`w-full rounded-xl px-3 py-2 text-[11px] border font-mono truncate ${
+                            isDark
+                              ? 'bg-gray-800/80 border-gray-700 text-gray-300'
+                              : 'bg-slate-100 border-slate-300 text-slate-700'
+                          }`}
+                        >
+                          {formFileType || 'application/octet-stream'} • Ready to open or download
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Fixed Modal Footer Actions */}
+              <div
+                className={`shrink-0 flex items-center justify-between gap-2 px-6 py-3.5 border-t ${
+                  isDark
+                    ? 'bg-gray-900/95 border-gray-800'
+                    : 'bg-slate-50/95 border-slate-200'
+                }`}
+              >
                 <div>
                   {!isAddMode && editingCard && (
                     <button
