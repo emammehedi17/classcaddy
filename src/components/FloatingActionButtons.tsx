@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowDown, ArrowUp, Moon, Sun } from 'lucide-react';
 import { ThemeMode } from '../types';
 
 interface FloatingActionButtonsProps {
@@ -32,35 +31,32 @@ export function FloatingActionButtons({ theme, toggleTheme }: FloatingActionButt
 
   return (
     <>
-      {/* Scroll to Bottom / Scroll to Top Toggle Button */}
+      {/* Scroll to Bottom / Scroll to Top Toggle Button — Matches study_plan.html */}
       <button
         id="scroll-toggle-btn"
         onClick={handleScrollToggle}
-        className="fixed bottom-32 right-5 z-[100] w-12 h-12 bg-gray-700 hover:bg-gray-900 text-white rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100 active:scale-95"
+        className="fixed bottom-32 right-5 max-[414px]:right-[10px] max-[414px]:bottom-[130px] max-[414px]:w-10 max-[414px]:h-10 z-[100] w-12 h-12 bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-gray-900 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100 cursor-pointer"
         title={isScrolledDown ? 'Scroll to Top' : 'Scroll to Bottom'}
         aria-label={isScrolledDown ? 'Scroll to Top' : 'Scroll to Bottom'}
       >
-        {isScrolledDown ? (
-          <ArrowUp className="w-5 h-5 transition-transform" />
-        ) : (
-          <ArrowDown className="w-5 h-5 transition-transform" />
-        )}
+        <i className={`fas ${isScrolledDown ? 'fa-arrow-up' : 'fa-arrow-down'}`} />
       </button>
 
-      {/* Global Dark Mode Toggle Button */}
+      {/* Global Dark Mode Toggle Button — Matches study_plan.html (44x44, bottom: 75px, golden yellow in dark mode) */}
       <button
         id="global-dark-mode-btn"
         onClick={toggleTheme}
-        className="fixed bottom-6 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-2xl border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 active:scale-95 transition-transform focus:outline-none"
-        title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-        aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        className={`fixed bottom-[75px] right-5 max-[414px]:right-[10px] max-[414px]:bottom-[70px] w-[44px] h-[44px] rounded-full shadow-lg border-2 z-[999] flex items-center justify-center hover:scale-110 transition-transform cursor-pointer ${
+          isDark
+            ? 'bg-[#fbbf24] text-[#1f2937] border-[#f59e0b]'
+            : 'bg-gray-800 text-yellow-400 border-gray-700'
+        }`}
+        title="Toggle Dark Mode"
+        aria-label="Toggle Dark Mode"
       >
-        {isDark ? (
-          <Sun className="w-7 h-7 text-amber-300 transition-transform rotate-0 hover:rotate-45" />
-        ) : (
-          <Moon className="w-7 h-7 text-yellow-400 transition-transform -rotate-12 hover:rotate-0" />
-        )}
+        <i className={`fas ${isDark ? 'fa-sun' : 'fa-moon'} text-[1.1rem]`} />
       </button>
     </>
   );
 }
+

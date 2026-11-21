@@ -2654,7 +2654,7 @@ body.dark-mode .tracker-label-small {
     border: 1px solid rgba(16, 185, 129, 0.3) !important;
 }
 
-/* 9. Global Toggle Button State */
+/* 9. Global Toggle Button State & Header Auth Contrast */
 body.dark-mode #global-dark-mode-btn {
     background-color: #fbbf24 !important; /* Yellow Sun */
     color: #1f2937 !important; /* Dark Text */
@@ -2662,6 +2662,23 @@ body.dark-mode #global-dark-mode-btn {
 }
 body.dark-mode #global-dark-mode-btn i::before {
     content: "\f185"; /* Switch Moon to Sun Icon */
+}
+body.dark-mode header.main-website-ui h1 {
+    color: #f9fafb !important;
+}
+body.dark-mode #auth-container-desktop p.font-semibold,
+body.dark-mode #auth-container-mobile p.font-semibold {
+    color: #e5e7eb !important;
+}
+body.dark-mode #auth-container-desktop p.text-xs,
+body.dark-mode #auth-container-mobile p.text-xs {
+    color: #9ca3af !important;
+}
+body.dark-mode #header-signin-btn,
+body.dark-mode #mobile-signin-btn {
+    background-color: #1f2937 !important;
+    color: #e5e7eb !important;
+    border-color: #374151 !important;
 }
 
 /* --- END: GLOBAL DARK MODE OVERRIDES --- */

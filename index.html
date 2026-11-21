@@ -92,75 +92,75 @@
 <body class="lang-bn bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200 selection:bg-emerald-500 selection:text-white">
 
 <!-- =================== HEADER START =================== -->
-<header class="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 main-website-ui shadow-sm transition-colors duration-200">
+<header class="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 border-b border-gray-200 dark:border-gray-800 main-website-ui shadow-sm">
     <div class="container mx-auto px-4 sm:px-6 py-3">
-        <nav class="flex justify-between items-center gap-4">
+        <nav class="flex justify-between items-center">
             <!-- Left Side: Profile & Title -->
-            <div class="flex items-center gap-3.5 shrink-0">
-                <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer" title="Emam Mehedi">
+            <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer" class="flex-shrink-0">
                     <img src="images/profile.jpg" alt="Profile" class="h-10 w-10 rounded-full border-2 border-emerald-500 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/ffffff/059669?text=CC';">
                 </a>
-                <a href="index.html" class="whitespace-nowrap">
-                    <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Class Caddy</h1>
+                <a href="index.html">
+                    <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">Class Caddy</h1>
                 </a>
             </div>
 
-            <!-- Center: Desktop Navigation -->
-            <div class="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full p-1 text-sm">
-                <a href="index.html" class="px-5 py-1.5 bg-emerald-500 text-white rounded-full transition-colors font-medium shadow-sm whitespace-nowrap">Home</a>
-                <a href="archives.html" class="px-5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors whitespace-nowrap">Archives</a>
-                <a href="study_plan.html" class="px-5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors whitespace-nowrap">Study Plan</a>
-                <a href="about.html" class="px-5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors whitespace-nowrap">About</a>
-                <a href="contact.html" class="px-5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors whitespace-nowrap">Contact</a>
+            <!-- Center: Desktop Navigation (hidden on mobile) -->
+            <div class="hidden md:flex items-center gap-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-1 text-sm">
+                <a href="index.html" class="px-5 py-1.5 bg-emerald-500 text-white rounded-full transition-colors font-medium shadow-sm">Home</a>
+                <a href="archives.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Archives</a>
+                <a href="study_plan.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Study Plan</a>
+                <a href="about.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">About</a>
+                <a href="contact.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Contact</a>
             </div>
 
             <!-- Right Side: Language Switcher, DU Logo & Google Auth -->
-            <div class="hidden md:flex items-center gap-3 shrink-0">
-                <!-- Language Toggle (Bangla / English) -->
-                <div class="inline-flex items-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full p-0.5 text-xs font-semibold" role="group" aria-label="Language Switcher">
+            <div class="hidden md:flex items-center gap-4">
+                <!-- Language Toggle (Bangla / English) in Header -->
+                <div id="header-lang-switcher" class="inline-flex items-center bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-0.5 text-xs font-semibold" role="group" aria-label="Language Switcher">
                     <button type="button" onclick="window.setHomepageLang('bn')" id="lang-btn-bn-header" class="px-3 py-1 rounded-full transition-all cursor-pointer bg-emerald-600 text-white shadow-sm whitespace-nowrap">
                         বাংলা
                     </button>
-                    <button type="button" onclick="window.setHomepageLang('en')" id="lang-btn-en-header" class="px-3 py-1 rounded-full transition-all cursor-pointer text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white whitespace-nowrap">
+                    <button type="button" onclick="window.setHomepageLang('en')" id="lang-btn-en-header" class="px-3 py-1 rounded-full transition-all cursor-pointer text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white whitespace-nowrap">
                         EN
                     </button>
                 </div>
 
-                <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer" class="shrink-0" title="University of Dhaka">
-                    <img src="images/du_logo.png" alt="DU Logo" class="h-9 w-9 rounded-full border border-slate-200 dark:border-slate-700 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/36x36/eeeeee/111827?text=DU';">
+                <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
+                    <img src="images/du_logo.png" alt="DU Logo" class="h-10 w-10 rounded-full border border-gray-200 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/eeeeee/111827?text=DU';">
                 </a>
 
                 <div id="auth-container-desktop" class="auth-container text-sm">
-                    <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="header-google-signin-btn flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-full transition-all duration-200 text-sm font-medium shadow-sm hover:shadow cursor-pointer whitespace-nowrap">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=" alt="Google" class="w-4 h-4 flex-shrink-0" />
-                        <span>Sign In</span>
+                    <button id="header-signin-btn" type="button" onclick="window.triggerGoogleSignInGlobal()" class="flex items-center gap-3 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-full transition-colors text-sm font-medium shadow-sm cursor-pointer">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=" alt="G" class="w-5 h-5" />
+                        <span>Sign in</span>
                     </button>
                 </div>
             </div>
 
             <!-- Mobile Right Controls: Lang Toggle + Hamburger -->
             <div class="md:hidden flex items-center gap-2">
-                <div class="inline-flex items-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full p-0.5 text-xs font-semibold">
+                <div id="mobile-lang-switcher" class="inline-flex items-center bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-0.5 text-xs font-semibold">
                     <button type="button" onclick="window.setHomepageLang('bn')" id="lang-btn-bn-mobile" class="px-2.5 py-1 rounded-full transition-all cursor-pointer bg-emerald-600 text-white">বাংলা</button>
-                    <button type="button" onclick="window.setHomepageLang('en')" id="lang-btn-en-mobile" class="px-2.5 py-1 rounded-full transition-all cursor-pointer text-slate-600 dark:text-slate-300">EN</button>
+                    <button type="button" onclick="window.setHomepageLang('en')" id="lang-btn-en-mobile" class="px-2.5 py-1 rounded-full transition-all cursor-pointer text-gray-600 dark:text-gray-300">EN</button>
                 </div>
-                <button id="mobile-menu-button" class="text-slate-700 dark:text-slate-200 focus:outline-none p-1.5" aria-label="Open Menu">
+                <button id="mobile-menu-button" type="button" aria-label="Toggle Menu" class="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-gray-700 dark:text-gray-200 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
             </div>
         </nav>
 
         <!-- Mobile Menu Panel -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 -mx-6 mt-3 shadow-md">
+        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 -mx-6 mt-3 shadow-md">
             <a href="index.html" class="block px-6 py-3 text-sm font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400 transition-colors">Home</a>
-            <a href="archives.html" class="block px-6 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Archives</a>
-            <a href="study_plan.html" class="block px-6 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Study Plan</a>
-            <a href="about.html" class="block px-6 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">About</a>
-            <a href="contact.html" class="block px-6 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Contact</a>
-            <div id="auth-container-mobile" class="auth-container px-6 py-4 border-t border-slate-200 dark:border-slate-800">
-                <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="flex items-center justify-center gap-2.5 w-full py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-full transition text-sm font-medium shadow-sm cursor-pointer">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=" alt="Google" class="w-4 h-4 flex-shrink-0" />
-                    <span>Sign in with Google</span>
+            <a href="archives.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Archives</a>
+            <a href="study_plan.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Study Plan</a>
+            <a href="about.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">About</a>
+            <a href="contact.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Contact</a>
+            <div id="auth-container-mobile" class="auth-container px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                <button id="mobile-signin-btn" type="button" onclick="window.triggerGoogleSignInGlobal()" class="flex items-center justify-center w-full gap-3 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-full transition-colors text-sm font-medium shadow-sm cursor-pointer">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=" alt="G" class="w-5 h-5" />
+                    <span>Sign in</span>
                 </button>
             </div>
         </div>
@@ -179,35 +179,17 @@
          1. HERO SECTION — Value Proposition & Interactive Ecosystem Preview
          ===================================================================== -->
     <section class="relative z-10 container mx-auto px-4 sm:px-6 pt-6 pb-16 md:pt-12 md:pb-24">
-        <!-- Top Bar inside Hero: Language Switcher & Direct Google Auth Banner -->
-        <div class="flex flex-wrap items-center justify-between gap-4 pb-8 mb-8 border-b border-slate-200/80 dark:border-slate-800/80">
-            <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-                <span class="font-semibold text-emerald-700 dark:text-emerald-400">
-                    <span class="lang-bn">স্মার্ট লার্নিং ও স্টাডি ম্যানেজমেন্ট প্ল্যাটফর্ম</span>
-                    <span class="lang-en">Smart Learning &amp; Study Management Platform</span>
-                </span>
-                <span aria-hidden="true">·</span>
-                <span>
-                    <span class="lang-bn">বিসিএস, চাকরির প্রস্তুতি ও একাডেমিক পড়াশোনা</span>
-                    <span class="lang-en">BCS, Job Prep &amp; Academic Excellence</span>
-                </span>
-            </div>
-
-            <!-- Prominent Hero Language Toggle -->
-            <div class="flex items-center gap-2.5">
-                <span class="text-xs text-slate-500 dark:text-slate-400">
-                    <span class="lang-bn">ভাষা পরিবর্তন করুন:</span>
-                    <span class="lang-en">Language:</span>
-                </span>
-                <div class="inline-flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-1 shadow-sm">
-                    <button type="button" onclick="window.setHomepageLang('bn')" id="lang-btn-bn-hero" class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer bg-emerald-600 text-white shadow-sm whitespace-nowrap">
-                        বাংলা (সহজ ভাষা)
-                    </button>
-                    <button type="button" onclick="window.setHomepageLang('en')" id="lang-btn-en-hero" class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white whitespace-nowrap">
-                        English Version
-                    </button>
-                </div>
-            </div>
+        <!-- Hero Kicker Line -->
+        <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-6">
+            <span class="font-semibold text-emerald-700 dark:text-emerald-400">
+                <span class="lang-bn">স্মার্ট লার্নিং ও স্টাডি ম্যানেজমেন্ট প্ল্যাটফর্ম</span>
+                <span class="lang-en">Smart Learning &amp; Study Management Platform</span>
+            </span>
+            <span aria-hidden="true">·</span>
+            <span>
+                <span class="lang-bn">বিসিএস, চাকরির প্রস্তুতি ও একাডেমিক পড়াশোনা</span>
+                <span class="lang-en">BCS, Job Prep &amp; Academic Excellence</span>
+            </span>
         </div>
 
         <!-- Hero 2-Column Split -->
@@ -225,10 +207,10 @@
 
                 <p class="mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
                     <span class="lang-bn">
-                        <strong>Class Caddy</strong>-তে আপনাকে স্বাগতম। প্রতিদিনের পড়াশোনার হিসাব রাখা, টাইমার ধরে টপিক শেষ করা, যেকোনো প্রশ্ন বা মডেল টেস্ট থেকে স্বয়ংক্রিয়ভাবে MCQ কুইজ তৈরি করা এবং গোছানো নোটস আর্কাইভ ব্যবহার করার জন্য এটি আপনার ব্যক্তিগত ডিজিটাল স্টাডি ডেস্ক। আলাদা করে অ্যাকাউন্ট খোলা বা পাসওয়ার্ড মনে রাখার কোনো ঝামেলা নেই—সরাসরি আপনার <strong>Google Account</strong> দিয়ে এক ক্লিকেই সব সুবিধা ব্যবহার করতে পারবেন।
+                        <strong>Class Caddy</strong>-তে আপনাকে স্বাগতম। প্রতিদিনের পড়াশোনার হিসাব রাখা, টাইমার ধরে টপিক শেষ করা, যেকোনো প্রশ্ন বা মডেল টেস্ট থেকে স্বয়ংক্রিয়ভাবে MCQ কুইজ তৈরি করা এবং গোছানো নোটস আর্কাইভ ব্যবহার করার জন্য এটি আপনার ব্যক্তিগত ডিজিটাল স্টাডি ডেস্ক। আলাদা করে অ্যাকাউন্ট খোলা বা পাসওয়ার্ড মনে রাখার কোনো ঝামেলা নেই—সরাসরি আপনার <strong>Google Account</strong> দিয়ে সাইন ইন করেই সব সুবিধা ব্যবহার করতে পারবেন।
                     </span>
                     <span class="lang-en">
-                        Welcome to <strong>Class Caddy</strong>—a complete digital workspace designed to organize your daily study schedule, track focused reading hours with dual timers, convert HTML/text questions into interactive MCQ exams, and browse structured revision notes. No manual registration or password forms needed—sign in directly with your <strong>Google Account</strong> in one click and sync across all your devices.
+                        Welcome to <strong>Class Caddy</strong>—a complete digital workspace designed to organize your daily study schedule, track focused reading hours with dual timers, convert HTML/text questions into interactive MCQ exams, and browse structured revision notes. No manual registration or password forms needed—sign in directly with your <strong>Google Account</strong> and sync across all your devices.
                     </span>
                 </p>
 
@@ -246,12 +228,12 @@
                         <span class="lang-en">Explore Archives</span>
                     </a>
 
-                    <!-- Dynamic Google One-Click Sign-In / Signed-In Greeting Button -->
+                    <!-- Dynamic Google Sign-In / Signed-In Greeting Button -->
                     <div id="hero-google-auth-slot">
                         <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="px-5 py-3.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-medium rounded-xl border border-slate-700 transition-all duration-150 flex items-center gap-2.5 cursor-pointer whitespace-nowrap shadow-sm">
                             <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=" alt="Google" class="w-4 h-4 shrink-0" />
-                            <span class="lang-bn">গুগল দিয়ে ১-ক্লিকে সাইন ইন</span>
-                            <span class="lang-en">One-Click Google Sign-In</span>
+                            <span class="lang-bn">গুগল দিয়ে সাইন ইন</span>
+                            <span class="lang-en">Sign in with Google</span>
                         </button>
                     </div>
                 </div>
@@ -1180,11 +1162,11 @@
                         <i class="fas fa-cloud-upload-alt"></i>
                     </div>
                     <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                        <span class="lang-bn">১-ক্লিকে গুগল ক্লাউড সিঙ্ক</span>
-                        <span class="lang-en">1-Click Google Cloud Sync</span>
+                        <span class="lang-bn">গুগল ক্লাউড সিঙ্ক</span>
+                        <span class="lang-en">Google Cloud Sync</span>
                     </h4>
                     <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                        <span class="lang-bn">আলাদা ইউজারনেম বা পাসওয়ার্ড দিয়ে রেজিস্ট্রেশন করার দরকার নেই। আপনার জিমেইল দিয়ে সাইন ইন করলেই মোবাইল, ট্যাব ও কম্পিউটার—সব জায়গায় আপনার রুটিন ও টাইমার অটো-সিঙ্ক হবে।</span>
+                        <span class="lang-bn">আলাদা ইউজারনেম বা পাসওয়ার্ড দিয়ে রেজিস্ট্রেশন করার দরকার নেই। আপনার গুগল অ্যাকাউন্ট দিয়ে সাইন ইন করলেই মোবাইল, ট্যাব ও কম্পিউটার—সব জায়গায় আপনার রুটিন ও টাইমার অটো-সিঙ্ক হবে।</span>
                         <span class="lang-en">No separate registration forms or passwords required. Sign in with Google to automatically synchronize your study routines, timers, and MCQ banks across phone and PC.</span>
                     </p>
                 </div>
@@ -1344,8 +1326,8 @@
                 <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                     <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-2">STEP 01</div>
                     <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                        <span class="lang-bn">গুগল দিয়ে ১-ক্লিকে সাইন ইন করুন</span>
-                        <span class="lang-en">Sign In with Google in 1 Click</span>
+                        <span class="lang-bn">গুগল দিয়ে সাইন ইন করুন</span>
+                        <span class="lang-en">Sign in with Google</span>
                     </h4>
                     <p class="text-sm text-slate-600 dark:text-slate-400">
                         <span class="lang-bn">উপরে ডান পাশের <strong>Sign In</strong> বাটনে ক্লিক করে আপনার গুগল অ্যাকাউন্ট যুক্ত করুন, যাতে আপনার সব ডেটা নিরাপদে ক্লাউডে সেভ থাকে।</span>
@@ -1522,13 +1504,11 @@
         // Update all toggle button active styles
         const bnBtns = [
             document.getElementById('lang-btn-bn-header'),
-            document.getElementById('lang-btn-bn-mobile'),
-            document.getElementById('lang-btn-bn-hero')
+            document.getElementById('lang-btn-bn-mobile')
         ];
         const enBtns = [
             document.getElementById('lang-btn-en-header'),
-            document.getElementById('lang-btn-en-mobile'),
-            document.getElementById('lang-btn-en-hero')
+            document.getElementById('lang-btn-en-mobile')
         ];
 
         const activeClasses = ['bg-emerald-600', 'text-white', 'shadow-sm'];
@@ -1684,11 +1664,11 @@
 <script type="module" src="script.js"></script>
 
 <!-- Floating Action Buttons (Scroll to Bottom/Top & Global Dark Mode) -->
-<button id="scroll-toggle-btn" class="fixed bottom-24 right-5 z-[100] w-12 h-12 bg-slate-700 hover:bg-slate-900 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105 focus:outline-none opacity-90 hover:opacity-100 cursor-pointer" title="Scroll to Bottom" aria-label="Scroll to Bottom">
+<button id="scroll-toggle-btn" class="fixed bottom-32 right-5 z-[100] w-12 h-12 bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-gray-900 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100" title="Scroll">
     <i class="fas fa-arrow-down"></i>
 </button>
 
-<button id="global-dark-mode-btn" class="fixed bottom-6 right-5 w-14 h-14 bg-slate-800 text-yellow-400 rounded-full shadow-lg border-2 border-slate-700 z-[999] flex items-center justify-center hover:scale-105 transition-transform cursor-pointer" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
+<button id="global-dark-mode-btn" class="fixed bottom-6 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-lg border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 transition-transform" title="Toggle Dark Mode">
     <i class="fas fa-moon text-2xl"></i>
 </button>
 

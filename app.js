@@ -693,10 +693,26 @@
                 let loggedInHTML = '';
                 if (isGuestMode) {
                     // Removed the 'Exit' button from here
-                    loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700">Guest Mode</p><p class="text-gray-500 text-xs">Viewing Mehedi's Plan</p></div>`;
+                    loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700 dark:text-gray-200">Guest Mode</p><p class="text-gray-500 dark:text-gray-400 text-xs">Viewing Mehedi's Plan</p></div>`;
                 } else {
                     // Removed the 'Log Out' button from here
-                    loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700">${user.displayName || 'User'}</p><p class="text-gray-500 text-xs">${user.email || (user.isAnonymous ? 'Anonymous' : '')}</p></div>`;
+                    loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700 dark:text-gray-200">${user.displayName || 'User'}</p><p class="text-gray-500 dark:text-gray-400 text-xs">${user.email || (user.isAnonymous ? 'Anonymous' : '')}</p></div>`;
+                    try {
+                        const profileName = user.displayName || user.email?.split('@')[0] || 'User';
+                        localStorage.setItem('cc_auth_user', JSON.stringify({
+                            uid: user.uid,
+                            displayName: profileName,
+                            email: user.email || '',
+                            photoURL: user.photoURL || null,
+                            isLoggedIn: true
+                        }));
+                        localStorage.setItem('class_caddy_user', JSON.stringify({
+                            name: profileName,
+                            email: user.email || '',
+                            photoURL: user.photoURL || null,
+                            isLoggedIn: true
+                        }));
+                    } catch (e) {}
                 }
                 
                 authContainerDesktop.innerHTML = loggedInHTML;
@@ -732,6 +748,10 @@
                 currentUser = null;
                 userId = null;
                 window._currentUserId = null;
+                try {
+                    localStorage.removeItem('cc_auth_user');
+                    localStorage.removeItem('class_caddy_user');
+                } catch (e) {}
                 // Clear streak/goal/history data so next account starts fresh
                 ['studyStreak_v1', 'studyDailyGoal_v1', 'studyDayHistory_v1'].forEach(base => {
                     Object.keys(localStorage).filter(k => k.startsWith(base)).forEach(k => localStorage.removeItem(k));
@@ -742,7 +762,7 @@
 
                 // --- START: RESET HEADER LOGO TO DU ---
                 if (headerLogo) {
-                    headerLogo.src = "images/du_logo.png"; // Revert to DU Logo
+                    headerLogo.src = "/images/du_logo.png"; // Revert to DU Logo
                     if (headerLink) headerLink.href = "https://du.ac.bd/"; // Restore DU Link
                 }
                 // --- END: RESET HEADER LOGO TO DU ---
