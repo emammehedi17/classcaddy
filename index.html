@@ -1,98 +1,164 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-	<!-- Google tag (gtag.js) -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-JWZXVQC68L"></script>
-	<script>
-	  window.dataLayer = window.dataLayer || [];
-	  function gtag(){dataLayer.push(arguments);}
-	  gtag('js', new Date());
-
-	  gtag('config', 'G-JWZXVQC68L');
-	</script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWZXVQC68L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-JWZXVQC68L');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Caddy - Home</title>
-    
+    <title>Class Caddy — স্মার্ট স্টাডি প্ল্যানার, MCQ ইঞ্জিন ও ডিজিটাল আর্কাইভস</title>
+    <meta name="description" content="Class Caddy হলো আপনার প্রতিদিনের পড়াশোনার রুটিন, লাইভ টাইমার, ডাইনামিক MCQ কুইজ, এক্সাম স্টুডিও এবং গোছানো নোটসের পূর্ণাঙ্গ ডিজিটাল প্ল্যাটফর্ম।">
+    <meta property="og:title" content="Class Caddy — Smart Study Planner, MCQ Engine & Digital Archives">
+    <meta property="og:description" content="প্রতিদিনের পড়াশোনা গুছিয়ে রাখা, লাইভ টাইমার ট্র্যাকিং, ডাইনামিক MCQ কুইজ এবং গোছানো আর্কাইভসের পূর্ণাঙ্গ ওয়েব অ্যাপ।">
+
     <!-- Tailwind CSS with class-based Dark Mode -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      tailwind.config = { darkMode: "class",
+      tailwind.config = {
         darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Poppins', 'Inter', 'Kalpurush', 'sans-serif'],
+              sans: ['Hind Siliguri', 'Plus Jakarta Sans', 'Poppins', 'sans-serif'],
+              display: ['Plus Jakarta Sans', 'Hind Siliguri', 'Poppins', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
             }
           }
         }
       }
     </script>
-    
-    <!-- Google Fonts (Poppins) -->
+
+    <!-- Google Fonts: Hind Siliguri (Bangla), Plus Jakarta Sans (Display/Body), JetBrains Mono (Timers/Metrics) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-	<link rel="stylesheet" href="style.css">
-	<link rel="icon" href="https://eco.du.ac.bd//assets/images/fab_icon.ico" type="image/x-icon">
-</head>
-<body class="bg-slate-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="https://eco.du.ac.bd//assets/images/fab_icon.ico" type="image/x-icon">
 
-<!-- For: index.html -->
-<!-- =================== HEADER & BREADCRUMBS START =================== -->
-<header class="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 main-website-ui shadow-sm transition-colors duration-200">
-    <div class="container mx-auto px-6 py-3">
-        <nav class="flex justify-between items-center">
+    <style>
+        /* Bilingual Toggle Visibility System */
+        body.lang-bn .lang-en {
+            display: none !important;
+        }
+        body.lang-en .lang-bn {
+            display: none !important;
+        }
+
+        /* Smooth typography and layout refinements */
+        body {
+            font-family: 'Hind Siliguri', 'Plus Jakarta Sans', 'Poppins', sans-serif;
+            line-height: 1.65;
+        }
+        body.lang-en {
+            font-family: 'Plus Jakarta Sans', 'Poppins', 'Hind Siliguri', sans-serif;
+        }
+
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        .text-balance {
+            text-wrap: balance;
+        }
+
+        /* Custom subtle scrollbars for feature nav */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Header Authenticated User Pill Protection */
+        #auth-container-desktop img {
+            width: 28px !important;
+            height: 28px !important;
+            border-radius: 9999px !important;
+            object-fit: cover !important;
+        }
+        #auth-container-desktop p {
+            margin: 0 !important;
+            line-height: 1.2 !important;
+        }
+    </style>
+</head>
+<body class="lang-bn bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200 selection:bg-emerald-500 selection:text-white">
+
+<!-- =================== HEADER START =================== -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 main-website-ui shadow-sm transition-colors duration-200">
+    <div class="container mx-auto px-4 sm:px-6 py-3">
+        <nav class="flex justify-between items-center gap-4">
             <!-- Left Side: Profile & Title -->
-            <div class="flex items-center gap-4">
-                <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
+            <div class="flex items-center gap-3.5 shrink-0">
+                <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer" title="Emam Mehedi">
                     <img src="images/profile.jpg" alt="Profile" class="h-10 w-10 rounded-full border-2 border-emerald-500 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/ffffff/059669?text=CC';">
                 </a>
-                <a href="index.html">
-                    <h1 class="text-xl font-bold text-gray-900 dark:text-white">Class Caddy</h1>
+                <a href="index.html" class="whitespace-nowrap">
+                    <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Class Caddy</h1>
                 </a>
             </div>
 
-            <!-- Center: Desktop Navigation (hidden on mobile) -->
-            <div class="hidden md:flex items-center gap-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-1 text-sm">
-                <a href="index.html" class="px-5 py-1.5 bg-emerald-500 text-white rounded-full transition-colors font-medium shadow-sm">Home</a>
-                <a href="archives.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Archives</a>
-                <a href="study_plan.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Study Plan</a>
-                <a href="about.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">About</a>
-                <a href="contact.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Contact</a>
+            <!-- Center: Desktop Navigation -->
+            <div class="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full p-1 text-sm">
+                <a href="index.html" class="px-5 py-1.5 bg-emerald-500 text-white rounded-full transition-colors font-medium shadow-sm whitespace-nowrap">Home</a>
+                <a href="archives.html" class="px-5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors whitespace-nowrap">Archives</a>
+                <a href="study_plan.html" class="px-5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors whitespace-nowrap">Study Plan</a>
+                <a href="about.html" class="px-5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors whitespace-nowrap">About</a>
+                <a href="contact.html" class="px-5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors whitespace-nowrap">Contact</a>
             </div>
 
-            <!-- Right Side: DU Logo & Sign Up (hidden on mobile) -->
-            <div class="hidden md:flex items-center gap-4">
-                <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
-                    <img src="images/du_logo.png" alt="DU Logo" class="h-10 w-10 rounded-full border border-gray-200 dark:border-gray-700 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/eeeeee/111827?text=DU';">
+            <!-- Right Side: Language Switcher, DU Logo & Google Auth -->
+            <div class="hidden md:flex items-center gap-3 shrink-0">
+                <!-- Language Toggle (Bangla / English) -->
+                <div class="inline-flex items-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full p-0.5 text-xs font-semibold" role="group" aria-label="Language Switcher">
+                    <button type="button" onclick="window.setHomepageLang('bn')" id="lang-btn-bn-header" class="px-3 py-1 rounded-full transition-all cursor-pointer bg-emerald-600 text-white shadow-sm whitespace-nowrap">
+                        বাংলা
+                    </button>
+                    <button type="button" onclick="window.setHomepageLang('en')" id="lang-btn-en-header" class="px-3 py-1 rounded-full transition-all cursor-pointer text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white whitespace-nowrap">
+                        EN
+                    </button>
+                </div>
+
+                <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer" class="shrink-0" title="University of Dhaka">
+                    <img src="images/du_logo.png" alt="DU Logo" class="h-9 w-9 rounded-full border border-slate-200 dark:border-slate-700 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/36x36/eeeeee/111827?text=DU';">
                 </a>
+
                 <div id="auth-container-desktop" class="auth-container text-sm">
-                    <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="header-google-signin-btn flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-full transition-all duration-200 text-sm font-medium shadow-sm hover:shadow cursor-pointer">
+                    <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="header-google-signin-btn flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-full transition-all duration-200 text-sm font-medium shadow-sm hover:shadow cursor-pointer whitespace-nowrap">
                         <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=" alt="Google" class="w-4 h-4 flex-shrink-0" />
                         <span>Sign In</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Mobile Hamburger Menu Button -->
-            <div class="md:hidden flex items-center">
-                <button id="mobile-menu-button" class="text-gray-700 dark:text-gray-200 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            <!-- Mobile Right Controls: Lang Toggle + Hamburger -->
+            <div class="md:hidden flex items-center gap-2">
+                <div class="inline-flex items-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full p-0.5 text-xs font-semibold">
+                    <button type="button" onclick="window.setHomepageLang('bn')" id="lang-btn-bn-mobile" class="px-2.5 py-1 rounded-full transition-all cursor-pointer bg-emerald-600 text-white">বাংলা</button>
+                    <button type="button" onclick="window.setHomepageLang('en')" id="lang-btn-en-mobile" class="px-2.5 py-1 rounded-full transition-all cursor-pointer text-slate-600 dark:text-slate-300">EN</button>
+                </div>
+                <button id="mobile-menu-button" class="text-slate-700 dark:text-slate-200 focus:outline-none p-1.5" aria-label="Open Menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
             </div>
         </nav>
 
         <!-- Mobile Menu Panel -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 -mx-6 mt-3 shadow-md">
+        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 -mx-6 mt-3 shadow-md">
             <a href="index.html" class="block px-6 py-3 text-sm font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400 transition-colors">Home</a>
-            <a href="archives.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Archives</a>
-            <a href="study_plan.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Study Plan</a>
-            <a href="about.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">About</a>
-            <a href="contact.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Contact</a>
-            <div id="auth-container-mobile" class="auth-container px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="flex items-center justify-center gap-2.5 w-full py-2.5 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-full transition text-sm font-medium shadow-sm cursor-pointer">
+            <a href="archives.html" class="block px-6 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Archives</a>
+            <a href="study_plan.html" class="block px-6 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Study Plan</a>
+            <a href="about.html" class="block px-6 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">About</a>
+            <a href="contact.html" class="block px-6 py-3 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">Contact</a>
+            <div id="auth-container-mobile" class="auth-container px-6 py-4 border-t border-slate-200 dark:border-slate-800">
+                <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="flex items-center justify-center gap-2.5 w-full py-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-full transition text-sm font-medium shadow-sm cursor-pointer">
                     <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=" alt="Google" class="w-4 h-4 flex-shrink-0" />
                     <span>Sign in with Google</span>
                 </button>
@@ -102,383 +168,1529 @@
 </header>
 <!-- =================== HEADER END =================== -->
 
-<!-- Main Content -->
-<div class="relative min-h-screen overflow-hidden pt-24">
-    <!-- Background Gradients -->
-    <div class="absolute top-0 left-0 w-96 h-96 bg-purple-500/10 dark:bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute bottom-0 right-0 w-96 h-96 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute top-1/4 right-1/4 w-72 h-72 bg-red-500/5 dark:bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
+<!-- =================== MAIN CONTENT START =================== -->
+<main class="relative pt-24 overflow-hidden">
 
-        <!-- Content Wrapper -->
-        <div class="relative z-10">
-            <!-- Hero Section -->
-            <main class="container mx-auto px-6 mt-12 md:mt-20">
-                <div class="flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-16">
-                    
-                    <!-- Welcome Text -->
-                    <div class="text-center md:text-left md:w-1/2">
-                        <h2 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-emerald-600 dark:text-emerald-400 leading-tight tracking-tight">
-                            Welcome to <br class="hidden sm:inline"> Class Caddy
-                        </h2>
-                        <p class="text-gray-600 dark:text-gray-300 max-w-xl mt-6 text-base sm:text-lg leading-relaxed">
-                            Welcome to The Class Caddy, your dedicated hub for shared academic notes, study plans, and learning resources.
-                            Access your syllabus, lecture summaries, previous questions, and personal productivity tools in one place.
-                        </p>
-                        <div class="mt-8 flex flex-wrap gap-4 justify-center md:justify-start">
-                            <a href="study_plan.html" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2">
-                                <i class="fas fa-calendar-check"></i>
-                                <span>Go to Study Plan</span>
-                            </a>
-                            <a href="archives.html" class="px-6 py-3 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold rounded-xl border border-gray-300 dark:border-gray-600 shadow-sm transition-all duration-200 flex items-center gap-2">
-                                <i class="fas fa-book-open text-emerald-600 dark:text-emerald-400"></i>
-                                <span>Explore Archives</span>
-                            </a>
+    <!-- Subtle Ambient Background Glows -->
+    <div class="absolute top-0 left-1/4 w-[28rem] h-[28rem] bg-emerald-500/10 dark:bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-96 right-10 w-[24rem] h-[24rem] bg-teal-500/10 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- =====================================================================
+         1. HERO SECTION — Value Proposition & Interactive Ecosystem Preview
+         ===================================================================== -->
+    <section class="relative z-10 container mx-auto px-4 sm:px-6 pt-6 pb-16 md:pt-12 md:pb-24">
+        <!-- Top Bar inside Hero: Language Switcher & Direct Google Auth Banner -->
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-8 mb-8 border-b border-slate-200/80 dark:border-slate-800/80">
+            <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                <span class="font-semibold text-emerald-700 dark:text-emerald-400">
+                    <span class="lang-bn">স্মার্ট লার্নিং ও স্টাডি ম্যানেজমেন্ট প্ল্যাটফর্ম</span>
+                    <span class="lang-en">Smart Learning &amp; Study Management Platform</span>
+                </span>
+                <span aria-hidden="true">·</span>
+                <span>
+                    <span class="lang-bn">বিসিএস, চাকরির প্রস্তুতি ও একাডেমিক পড়াশোনা</span>
+                    <span class="lang-en">BCS, Job Prep &amp; Academic Excellence</span>
+                </span>
+            </div>
+
+            <!-- Prominent Hero Language Toggle -->
+            <div class="flex items-center gap-2.5">
+                <span class="text-xs text-slate-500 dark:text-slate-400">
+                    <span class="lang-bn">ভাষা পরিবর্তন করুন:</span>
+                    <span class="lang-en">Language:</span>
+                </span>
+                <div class="inline-flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-1 shadow-sm">
+                    <button type="button" onclick="window.setHomepageLang('bn')" id="lang-btn-bn-hero" class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer bg-emerald-600 text-white shadow-sm whitespace-nowrap">
+                        বাংলা (সহজ ভাষা)
+                    </button>
+                    <button type="button" onclick="window.setHomepageLang('en')" id="lang-btn-en-hero" class="px-3.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white whitespace-nowrap">
+                        English Version
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero 2-Column Split -->
+        <div class="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+            <!-- Left Column: Copy & Action CTAs (7 cols) -->
+            <div class="lg:col-span-7 text-left">
+                <h2 class="text-3xl sm:text-5xl lg:text-[3.35rem] font-extrabold text-slate-900 dark:text-white leading-[1.18] tracking-tight text-balance">
+                    <span class="lang-bn">
+                        আপনার প্রতিদিনের পড়াশোনা, <span class="text-emerald-600 dark:text-emerald-400">রুটিন ও পরীক্ষার প্রস্তুতি</span>—সবকিছু এক জায়গায়
+                    </span>
+                    <span class="lang-en">
+                        Your Daily Study Routine, <span class="text-emerald-600 dark:text-emerald-400">Live Timers &amp; Exam Studio</span> in One Place
+                    </span>
+                </h2>
+
+                <p class="mt-6 text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                    <span class="lang-bn">
+                        <strong>Class Caddy</strong>-তে আপনাকে স্বাগতম। প্রতিদিনের পড়াশোনার হিসাব রাখা, টাইমার ধরে টপিক শেষ করা, যেকোনো প্রশ্ন বা মডেল টেস্ট থেকে স্বয়ংক্রিয়ভাবে MCQ কুইজ তৈরি করা এবং গোছানো নোটস আর্কাইভ ব্যবহার করার জন্য এটি আপনার ব্যক্তিগত ডিজিটাল স্টাডি ডেস্ক। আলাদা করে অ্যাকাউন্ট খোলা বা পাসওয়ার্ড মনে রাখার কোনো ঝামেলা নেই—সরাসরি আপনার <strong>Google Account</strong> দিয়ে এক ক্লিকেই সব সুবিধা ব্যবহার করতে পারবেন।
+                    </span>
+                    <span class="lang-en">
+                        Welcome to <strong>Class Caddy</strong>—a complete digital workspace designed to organize your daily study schedule, track focused reading hours with dual timers, convert HTML/text questions into interactive MCQ exams, and browse structured revision notes. No manual registration or password forms needed—sign in directly with your <strong>Google Account</strong> in one click and sync across all your devices.
+                    </span>
+                </p>
+
+                <!-- Primary Action Buttons -->
+                <div class="mt-8 flex flex-wrap items-center gap-3.5">
+                    <a href="study_plan.html" class="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-150 flex items-center gap-2.5 whitespace-nowrap">
+                        <i class="fas fa-calendar-check text-base"></i>
+                        <span class="lang-bn">স্টাডি প্ল্যানে যান</span>
+                        <span class="lang-en">Open Study Plan</span>
+                    </a>
+
+                    <a href="archives.html" class="px-6 py-3.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-semibold rounded-xl border border-slate-300 dark:border-slate-700 shadow-sm transition-all duration-150 flex items-center gap-2.5 whitespace-nowrap">
+                        <i class="fas fa-folder-open text-emerald-600 dark:text-emerald-400 text-base"></i>
+                        <span class="lang-bn">আর্কাইভস ও নোটস দেখুন</span>
+                        <span class="lang-en">Explore Archives</span>
+                    </a>
+
+                    <!-- Dynamic Google One-Click Sign-In / Signed-In Greeting Button -->
+                    <div id="hero-google-auth-slot">
+                        <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="px-5 py-3.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white font-medium rounded-xl border border-slate-700 transition-all duration-150 flex items-center gap-2.5 cursor-pointer whitespace-nowrap shadow-sm">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=" alt="Google" class="w-4 h-4 shrink-0" />
+                            <span class="lang-bn">গুগল দিয়ে ১-ক্লিকে সাইন ইন</span>
+                            <span class="lang-en">One-Click Google Sign-In</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Key Platform Pillars (Unboxed clean metadata row) -->
+                <div class="mt-10 pt-8 border-t border-slate-200 dark:border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-6">
+                    <div>
+                        <div class="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">100%</div>
+                        <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            <span class="lang-bn">ক্লাউড সিঙ্ক ও ফ্রি অ্যাক্সেস</span>
+                            <span class="lang-en">Cloud Sync &amp; Free Access</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">Dual</div>
+                        <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            <span class="lang-bn">টাস্ক ও ডে-টাইমার ট্র্যাকার</span>
+                            <span class="lang-en">Task &amp; Daily Study Timers</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-slate-900 dark:text-white tabular-nums">Auto</div>
+                        <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            <span class="lang-bn">ডাইনামিক MCQ ও SVG পার্সার</span>
+                            <span class="lang-en">Dynamic MCQ &amp; SVG Parser</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">5 Views</div>
+                        <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                            <span class="lang-bn">উইন্ডোজ ১১ ফাইল এক্সপ্লোরার</span>
+                            <span class="lang-en">Win11 Explorer &amp; Note Views</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Interactive Live Workspace Preview (5 cols) -->
+            <div class="lg:col-span-5">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-lg overflow-hidden">
+                    <!-- Top Preview Window Bar -->
+                    <div class="px-4 py-3 bg-slate-100/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-laptop-code text-emerald-600 dark:text-emerald-400 text-sm"></i>
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                <span class="lang-bn">লাইভ প্রিভিউ: স্টাডি প্ল্যানার ড্যাশবোর্ড</span>
+                                <span class="lang-en">Live Preview: Study Planner Dashboard</span>
+                            </span>
+                        </div>
+                        <span class="text-[11px] text-slate-500 dark:text-slate-400 font-mono tabular-nums" id="hero-demo-clock">22/11/2026</span>
+                    </div>
+
+                    <!-- Compact Day Header Mockup (Matching actual app's redesigned compact sticky header!) -->
+                    <div class="p-4 bg-emerald-50/70 dark:bg-emerald-950/30 border-b border-emerald-200/70 dark:border-emerald-900/50">
+                        <div class="flex items-center justify-between gap-2 flex-wrap">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-sm text-slate-900 dark:text-white">Day 1</span>
+                                <span class="text-xs text-slate-500 dark:text-slate-400 tabular-nums">22/11/2026</span>
+                            </div>
+
+                            <!-- Compact Day Timer Pill -->
+                            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-emerald-200 dark:border-slate-700 text-xs">
+                                <i class="fas fa-stopwatch text-emerald-600 dark:text-emerald-400 text-[11px]"></i>
+                                <span id="hero-demo-timer" class="font-mono font-bold text-slate-800 dark:text-slate-200 tabular-nums">01:24:18</span>
+                                <button type="button" onclick="window.toggleHeroDemoTimer()" id="hero-demo-timer-btn" class="ml-1 text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 cursor-pointer" title="Play/Pause Demo Timer">
+                                    <i class="fas fa-pause text-[10px]"></i>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span id="hero-demo-pct" class="text-xs font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">67%</span>
+                                <a href="study_plan.html" class="px-2.5 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-[11px] font-semibold text-slate-700 dark:text-slate-200 hover:border-emerald-500 transition">
+                                    <i class="fas fa-pen text-[9px] mr-1"></i>Edit
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="mt-2.5 w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div id="hero-demo-bar" class="h-full bg-emerald-500 transition-all duration-300 rounded-full" style="width: 67%;"></div>
                         </div>
                     </div>
 
-                    <!-- Login Form -->
-                    <div class="w-full max-w-sm login-form-container md:w-1/2">
-                        <!-- Glow Container -->
-                        <div id="login-glow" class="login-glow-container">
-                            <span class="glow"></span>
-                            <span class="glow"></span>
-                            <span class="glow"></span>
-                            <span class="glow"></span>
+                    <!-- Interactive Task Rows Preview -->
+                    <div class="p-4 space-y-2.5">
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-1">
+                            <span class="lang-bn">নিচের যেকোনো টাস্কের <strong>"Done"</strong> বাটনে ক্লিক করে প্রগ্রেস বার পরীক্ষা করে দেখুন:</span>
+                            <span class="lang-en">Click any task's <strong>"Done"</strong> button below to test the live progress bar:</span>
+                        </p>
+
+                        <!-- Demo Task 1 -->
+                        <div class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80">
+                            <div class="min-w-0">
+                                <div class="text-xs font-bold text-slate-900 dark:text-white truncate">Bangla &amp; English Grammar</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate">Master Revision Note + 25 MCQs</div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 font-mono text-[11px] text-emerald-700 dark:text-emerald-400 tabular-nums">00:35:10</span>
+                                <button type="button" onclick="window.toggleHeroTask(0)" id="hero-task-btn-0" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-600 text-white cursor-pointer transition">
+                                    <i class="fas fa-check mr-1"></i>Done
+                                </button>
+                            </div>
                         </div>
-                        
-                        <!-- Login Card -->
-                        <div class="login-glow-card relative z-10">
-                            <div class="text-center mb-6">
-                                <div class="mx-auto w-14 h-14 rounded-full flex items-center justify-center bg-emerald-50 dark:bg-gray-700/60 mb-3 border border-emerald-200 dark:border-gray-600 shadow-inner">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                </div>
-                                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Member Login</h2>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Sign in with Google or your credentials</p>
+
+                        <!-- Demo Task 2 -->
+                        <div class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80">
+                            <div class="min-w-0">
+                                <div class="text-xs font-bold text-slate-900 dark:text-white truncate">ICT Peripherals &amp; Logic Gates</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate">Input/Output Devices &amp; Model Test</div>
                             </div>
-                            
-                            <!-- Google Fast Sign-In -->
-                            <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="w-full mb-4 flex items-center justify-center gap-2.5 py-2.5 px-4 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:shadow transition font-medium text-sm cursor-pointer">
-                                <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=" alt="Google" class="w-4 h-4 flex-shrink-0" />
-                                <span>Continue with Google</span>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 font-mono text-[11px] text-emerald-700 dark:text-emerald-400 tabular-nums">00:28:40</span>
+                                <button type="button" onclick="window.toggleHeroTask(1)" id="hero-task-btn-1" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-600 text-white cursor-pointer transition">
+                                    <i class="fas fa-check mr-1"></i>Done
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Demo Task 3 -->
+                        <div class="flex items-center justify-between gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80">
+                            <div class="min-w-0">
+                                <div class="text-xs font-bold text-slate-900 dark:text-white truncate">English Literature Digest</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate">Romantic &amp; Victorian Period</div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono text-[11px] text-slate-600 dark:text-slate-400 tabular-nums">00:20:28</span>
+                                <button type="button" onclick="window.toggleHeroTask(2)" id="hero-task-btn-2" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 cursor-pointer transition">
+                                    <i class="far fa-circle mr-1"></i>Done
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Link Bar -->
+                    <div class="px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
+                        <span class="text-slate-500 dark:text-slate-400">
+                            <span class="lang-bn">গুগল লগইনে অটোমেটিক ক্লাউডে সেভ থাকে</span>
+                            <span class="lang-en">Auto-saved to cloud with Google Sign-In</span>
+                        </span>
+                        <a href="study_plan.html" class="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 whitespace-nowrap">
+                            <span class="lang-bn">মূল অ্যাপ খুলুন</span>
+                            <span class="lang-en">Launch Full App</span>
+                            <i class="fas fa-arrow-right text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         2. STICKY / QUICK FEATURE DIRECTORY BAR (সাজানো ফিচার তালিকা)
+         ===================================================================== -->
+    <section class="border-y border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm">
+        <div class="container mx-auto px-4 sm:px-6 py-3.5">
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar text-xs sm:text-sm font-medium">
+                <span class="text-slate-400 dark:text-slate-500 shrink-0 mr-1">
+                    <span class="lang-bn">ফিচারসমূহ:</span>
+                    <span class="lang-en">Features:</span>
+                </span>
+                <a href="#feature-study-planner" class="px-3.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition whitespace-nowrap shrink-0">
+                    <span class="lang-bn">০১. স্টাডি প্ল্যানার ও টাইমার</span>
+                    <span class="lang-en">01. Study Planner &amp; Timer</span>
+                </a>
+                <a href="#feature-mcq-engine" class="px-3.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition whitespace-nowrap shrink-0">
+                    <span class="lang-bn">০২. ডাইনামিক MCQ ইঞ্জিন</span>
+                    <span class="lang-en">02. Dynamic MCQ Engine</span>
+                </a>
+                <a href="#feature-exam-studio" class="px-3.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition whitespace-nowrap shrink-0">
+                    <span class="lang-bn">০৩. এক্সাম স্টুডিও</span>
+                    <span class="lang-en">03. Exam Studio</span>
+                </a>
+                <a href="#feature-archives-explorer" class="px-3.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition whitespace-nowrap shrink-0">
+                    <span class="lang-bn">০৪. আর্কাইভস ও Win11 এক্সপ্লোরার</span>
+                    <span class="lang-en">04. Archives &amp; Win11 Explorer</span>
+                </a>
+                <a href="#feature-master-notes" class="px-3.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition whitespace-nowrap shrink-0">
+                    <span class="lang-bn">০৫. গ্রামার ও ICT মাস্টার নোটস</span>
+                    <span class="lang-en">05. Grammar &amp; ICT Master Notes</span>
+                </a>
+                <a href="#feature-cloud-sync" class="px-3.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition whitespace-nowrap shrink-0">
+                    <span class="lang-bn">০৬. ক্লাউড সিঙ্ক ও ব্যাকআপ</span>
+                    <span class="lang-en">06. Cloud Sync &amp; Backup</span>
+                </a>
+                <a href="#feature-academic-hub" class="px-3.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition whitespace-nowrap shrink-0">
+                    <span class="lang-bn">০৭. একাডেমিক ও আরবি সাহিত্য মডিউল</span>
+                    <span class="lang-en">07. Academic &amp; Arabic Module</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         3. FEATURE 01: SMART STUDY PLANNER & LIVE DUAL TIMERS
+         ===================================================================== -->
+    <section id="feature-study-planner" class="py-20 md:py-28 border-b border-slate-200 dark:border-slate-800">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="grid lg:grid-cols-12 gap-12 items-center">
+                <!-- Feature Description (6 cols) -->
+                <div class="lg:col-span-6">
+                    <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 tracking-wide mb-2">
+                        <span class="lang-bn">০১. প্রতিদিনের রুটিন ও সময় ব্যবস্থাপনা</span>
+                        <span class="lang-en">01. Daily Study Routine &amp; Time Tracking</span>
+                    </div>
+                    <h3 class="text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight text-balance">
+                        <span class="lang-bn">স্মার্ট স্টাডি প্ল্যানার ও ডুয়াল লাইভ টাইমার</span>
+                        <span class="lang-en">Smart Study Planner &amp; Dual Live Timers</span>
+                    </h3>
+                    <p class="mt-4 text-slate-600 dark:text-slate-300 text-base leading-relaxed">
+                        <span class="lang-bn">
+                            অগোছালো পড়াশোনাকে বিদায় জানান। আমাদের স্টাডি প্ল্যানারে আপনি প্রতিটি দিনের (Day 1, Day 2...) জন্য আলাদা বিষয় ও টপিক সাজিয়ে রাখতে পারবেন। কোন বিষয়ে কতক্ষণ পড়ছেন তা মাপার জন্য প্রতিটি টাস্কের সাথেই রয়েছে নিজস্ব স্টপওয়াচ টাইমার।
+                        </span>
+                        <span class="lang-en">
+                            Replace scattered study habits with a structured day-by-day plan. Create daily schedules (Day 1, Day 2...), organize subjects and topics, and measure your exact focused study time with built-in stopwatch timers for every single row.
+                        </span>
+                    </p>
+
+                    <div class="mt-8 space-y-5">
+                        <div class="flex items-start gap-3.5">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                                <i class="fas fa-stopwatch text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 dark:text-white text-base">
+                                    <span class="lang-bn">টাস্ক টাইমার ও একীভূত ডে-টাইমার (Current ও Total Time)</span>
+                                    <span class="lang-en">Per-Task Stopwatch &amp; Unified Daily Timer</span>
+                                </h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                                    <span class="lang-bn">প্রতিটি বিষয়ের জন্য বর্তমান সেশন (Current) ও মোট পঠিত সময় (Total) আলাদাভাবে দেখা যায়। স্ক্রল করার সুবিধার্থে দিনের মোট টাইমার ও প্রগ্রেস বার একদম কমপ্যাক্ট হেডারে উপরে ভেসে থাকে।</span>
+                                    <span class="lang-en">Track both your current study session and cumulative time per topic. A compact sticky header keeps your daily total timer and progress bar visible while scrolling without taking up screen space.</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3.5">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                                <i class="fas fa-sliders-h text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 dark:text-white text-base">
+                                    <span class="lang-bn">নিজের মতো রুটিন এডিট ও ড্র্যাগ-অ্যান্ড-ড্রপ সাজানো</span>
+                                    <span class="lang-en">Full Customization &amp; Drag-and-Drop Reordering</span>
+                                </h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                                    <span class="lang-bn">'Edit' বাটনে ক্লিক করে যেকোনো দিনের তারিখ, বিষয় বা টপিকের নাম পরিবর্তন করতে পারবেন, নতুন টাস্ক বা নতুন দিন যোগ করতে পারবেন এবং টেনে (Drag &amp; Drop) ওপর-নিচ করে সাজাতে পারবেন।</span>
+                                    <span class="lang-en">Click 'Edit' on any day card to modify subjects, dates, or topics, insert new rows or days, and reorder tasks effortlessly via drag-and-drop handles.</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3.5">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                                <i class="fas fa-chart-line text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 dark:text-white text-base">
+                                    <span class="lang-bn">সামগ্রিক অগ্রগতি ও স্টাডি অ্যানালিটিক্স</span>
+                                    <span class="lang-en">Overall Progress Bar &amp; Study Analytics</span>
+                                </h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                                    <span class="lang-bn">প্রতিদিনের প্রগ্রেসের পাশাপাশি আপনার পুরো স্টাডি প্ল্যানের মোট কত শতাংশ পড়া শেষ হয়েছে এবং সর্বমোট কত ঘণ্টা পড়াশোনা করেছেন তা ড্যাশবোর্ডের শুরুতেই দেখতে পাবেন।</span>
+                                    <span class="lang-en">Monitor both daily completion percentages and overall syllabus progress alongside your lifetime study hours right at the top of the planner.</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <a href="study_plan.html" class="inline-flex items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-sm transition text-sm">
+                            <span class="lang-bn">স্টাডি প্ল্যানার ব্যবহার করুন</span>
+                            <span class="lang-en">Open Study Planner</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Feature Visual Showcase Card (6 cols) -->
+                <div class="lg:col-span-6">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-md">
+                        <!-- Simulated Compact Sticky Day Header -->
+                        <div class="p-3.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/60 mb-4">
+                            <div class="flex items-center justify-between gap-2 mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-bold text-slate-900 dark:text-white">Day 1</span>
+                                    <span class="text-xs text-slate-500 dark:text-slate-400 tabular-nums">19/11/2026</span>
+                                </div>
+                                <!-- Compact Day Timer sitting over Progress Bar -->
+                                <div class="flex items-center gap-2 px-2.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-emerald-300/70 dark:border-emerald-800 text-[11px]">
+                                    <i class="fas fa-stopwatch text-emerald-600 dark:text-emerald-400"></i>
+                                    <span class="text-slate-500 dark:text-slate-400">Current:</span>
+                                    <span class="font-mono font-bold text-slate-900 dark:text-white tabular-nums">00:42:15</span>
+                                    <span class="text-slate-300 dark:text-slate-600">|</span>
+                                    <span class="text-slate-500 dark:text-slate-400">Total:</span>
+                                    <span class="font-mono font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">03:15:40</span>
+                                </div>
+                                <span class="text-xs font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">80%</span>
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <div class="flex-1 h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="h-full bg-emerald-500 rounded-full" style="width: 80%;"></div>
+                                </div>
+                                <span class="px-2.5 py-0.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-[11px] font-semibold text-slate-700 dark:text-slate-200 shrink-0">
+                                    <i class="fas fa-pen text-[9px] mr-1"></i>Edit
+                                </span>
+                                <i class="fas fa-chevron-up text-xs text-slate-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- Task Table Header -->
+                        <div class="grid grid-cols-12 gap-2 px-3 py-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 border-b border-slate-100 dark:border-slate-800">
+                            <div class="col-span-3">SUBJECT</div>
+                            <div class="col-span-4">TOPIC / VOCAB</div>
+                            <div class="col-span-3 text-center">TIMER</div>
+                            <div class="col-span-2 text-right">STATUS</div>
+                        </div>
+
+                        <!-- Task Rows -->
+                        <div class="divide-y divide-slate-100 dark:divide-slate-800/80 text-xs">
+                            <div class="grid grid-cols-12 gap-2 items-center px-3 py-3">
+                                <div class="col-span-3 font-semibold text-slate-900 dark:text-white">Quran</div>
+                                <div class="col-span-4 text-slate-600 dark:text-slate-400 truncate">Reciting 1/300 Portion</div>
+                                <div class="col-span-3 text-center">
+                                    <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 font-mono text-[11px] tabular-nums">00:15:00</span>
+                                </div>
+                                <div class="col-span-2 text-right">
+                                    <span class="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-semibold">Done</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-12 gap-2 items-center px-3 py-3">
+                                <div class="col-span-3 font-semibold text-slate-900 dark:text-white">Bangla Grammar</div>
+                                <div class="col-span-4 text-slate-600 dark:text-slate-400 truncate">ধ্বনি ও বর্ণ প্রকরণ + MCQ</div>
+                                <div class="col-span-3 text-center">
+                                    <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 font-mono text-[11px] tabular-nums">00:55:20</span>
+                                </div>
+                                <div class="col-span-2 text-right">
+                                    <span class="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-semibold">Done</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-12 gap-2 items-center px-3 py-3">
+                                <div class="col-span-3 font-semibold text-slate-900 dark:text-white">English Lit.</div>
+                                <div class="col-span-4 text-slate-600 dark:text-slate-400 truncate">Digest &amp; Job Solution</div>
+                                <div class="col-span-3 text-center">
+                                    <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 font-mono text-[11px] tabular-nums">01:10:05</span>
+                                </div>
+                                <div class="col-span-2 text-right">
+                                    <span class="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-semibold">Done</span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-12 gap-2 items-center px-3 py-3">
+                                <div class="col-span-3 font-semibold text-slate-900 dark:text-white">ICT Chapter 3</div>
+                                <div class="col-span-4 text-slate-600 dark:text-slate-400 truncate">Number Systems &amp; Logic Gates</div>
+                                <div class="col-span-3 text-center">
+                                    <span class="px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 font-mono text-[11px] tabular-nums">00:55:15</span>
+                                </div>
+                                <div class="col-span-2 text-right">
+                                    <span class="px-2 py-0.5 rounded-full border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-[10px] font-medium">Reading</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         4. FEATURE 02: DYNAMIC MCQ ENGINE & SVG / TABLE PARSER
+         ===================================================================== -->
+    <section id="feature-mcq-engine" class="py-20 md:py-28 bg-white dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="grid lg:grid-cols-12 gap-12 items-center">
+                <!-- Interactive MCQ Engine Preview (6 cols - Left on desktop) -->
+                <div class="lg:col-span-6 order-2 lg:order-1">
+                    <div class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 sm:p-6 shadow-md">
+                        <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-200 dark:border-slate-800">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-1 rounded-md bg-emerald-600 text-white text-xs font-bold">MCQ #14</span>
+                                <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                                    <span class="lang-bn">ডাইনামিক SVG ও উদ্দীপক প্রিভিউ</span>
+                                    <span class="lang-en">Dynamic SVG &amp; Stimulus Preview</span>
+                                </span>
+                            </div>
+                            <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                                <span class="lang-bn">অপশনে ক্লিক করে উত্তর যাচাই করুন</span>
+                                <span class="lang-en">Click an option to test</span>
+                            </span>
+                        </div>
+
+                        <!-- Sample Question Stem with Embedded SVG Logic Gate -->
+                        <div class="text-sm font-semibold text-slate-900 dark:text-white mb-3">
+                            <span class="lang-bn">নিচের লজিক সার্কিটটির আউটপুট (Y) কোন গেইটের সমতুল্য?</span>
+                            <span class="lang-en">Which logic gate is equivalent to the output (Y) of the circuit below?</span>
+                        </div>
+
+                        <!-- SVG Diagram Box (Demonstrating SVG extraction capability) -->
+                        <div class="my-3 p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex justify-center">
+                            <svg viewBox="0 0 310 100" class="w-full max-w-[290px] h-auto text-slate-800 dark:text-slate-200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Inputs A and B -->
+                                <text x="12" y="34" fill="currentColor" font-size="13" font-weight="bold">A</text>
+                                <text x="12" y="74" fill="currentColor" font-size="13" font-weight="bold">B</text>
+                                <line x1="28" y1="30" x2="75" y2="30" stroke="currentColor" stroke-width="2"/>
+                                <line x1="28" y1="70" x2="75" y2="70" stroke="currentColor" stroke-width="2"/>
+                                <!-- AND Gate -->
+                                <path d="M75 15 H105 A35 35 0 0 1 105 85 H75 Z" stroke="#10b981" stroke-width="2.5" fill="rgba(16,185,129,0.08)"/>
+                                <!-- NOT Bubble1 -->
+                                <circle cx="145" cy="50" r="5" stroke="#10b981" stroke-width="2.2" fill="currentColor"/>
+                                <line x1="150" y1="50" x2="190" y2="50" stroke="currentColor" stroke-width="2"/>
+                                <!-- Inverter / NOT Gate -->
+                                <polygon points="190,32 190,68 224,50" stroke="#0ea5e9" stroke-width="2.2" fill="rgba(14,165,233,0.08)"/>
+                                <circle cx="229" cy="50" r="4.5" stroke="#0ea5e9" stroke-width="2" fill="currentColor"/>
+                                <line x1="234" y1="50" x2="270" y2="50" stroke="currentColor" stroke-width="2"/>
+                                <text x="276" y="55" fill="#10b981" font-size="13" font-weight="bold">Y = A·B</text>
+                            </svg>
+                        </div>
+
+                        <!-- Interactive Options Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-4" id="demo-mcq-options">
+                            <button type="button" onclick="window.selectDemoMcqOption(this, false)" class="demo-mcq-opt text-left px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-emerald-500 transition flex items-center gap-2.5 cursor-pointer text-xs font-medium text-slate-800 dark:text-slate-200">
+                                <span class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center font-bold text-[11px] shrink-0">ক</span>
+                                <span>OR Gate</span>
                             </button>
+                            <button type="button" onclick="window.selectDemoMcqOption(this, true)" class="demo-mcq-opt text-left px-3.5 py-2.5 rounded-xl border border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/40 transition flex items-center justify-between gap-2.5 cursor-pointer text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[11px] shrink-0">খ</span>
+                                    <span>AND Gate</span>
+                                </div>
+                                <i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400"></i>
+                            </button>
+                            <button type="button" onclick="window.selectDemoMcqOption(this, false)" class="demo-mcq-opt text-left px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-emerald-500 transition flex items-center gap-2.5 cursor-pointer text-xs font-medium text-slate-800 dark:text-slate-200">
+                                <span class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center font-bold text-[11px] shrink-0">গ</span>
+                                <span>NAND Gate</span>
+                            </button>
+                            <button type="button" onclick="window.selectDemoMcqOption(this, false)" class="demo-mcq-opt text-left px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-emerald-500 transition flex items-center gap-2.5 cursor-pointer text-xs font-medium text-slate-800 dark:text-slate-200">
+                                <span class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center font-bold text-[11px] shrink-0">ঘ</span>
+                                <span>XOR Gate</span>
+                            </button>
+                        </div>
 
-                            <div class="relative flex py-2 items-center mb-4">
-                                <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
-                                <span class="flex-shrink mx-3 text-xs text-gray-400 dark:text-gray-500 font-medium">or email login</span>
-                                <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+                        <!-- Explanation Box -->
+                        <div id="demo-mcq-explanation" class="mt-4 p-3.5 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/60 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                            <div class="font-bold text-emerald-700 dark:text-emerald-400 mb-1">
+                                <i class="fas fa-lightbulb mr-1"></i>
+                                <span class="lang-bn">ব্যাখ্যা (সঠিক উত্তর: খ — AND Gate):</span>
+                                <span class="lang-en">Explanation (Correct Answer: B — AND Gate):</span>
                             </div>
+                            <span class="lang-bn">প্রথম গেইটটি একটি NAND গেইট যার আউটপুট <code class="font-mono">(A·B)'</code>। এরপর এটি একটি NOT গেইটের মধ্য দিয়ে যাওয়ায় ডাবল কমপ্লিমেন্ট হয়ে আউটপুট <code class="font-mono">Y = ((A·B)')' = A·B</code> হয়, যা <strong>AND Gate</strong>-এর সমতুল্য।</span>
+                            <span class="lang-en">The first gate is a NAND gate producing <code class="font-mono">(A·B)'</code>. Passing through the subsequent NOT gate applies double negation <code class="font-mono">Y = ((A·B)')' = A·B</code>, which is an <strong>AND Gate</strong>.</span>
+                        </div>
+                    </div>
+                </div>
 
-                            <form id="login-form">
-                                <div class="mb-4">
-                                    <label for="login-email" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5 text-left">Email ID*</label>
-                                    <input type="email" id="login-email" placeholder="Enter your academic email" required class="w-full px-3.5 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
-                                    <p class="text-[11px] text-gray-500 dark:text-gray-400 mt-1 text-left">i.e. s-2020343876@arab.du.ac.bd</p>
-                                </div>
-                                
-                                <div class="mb-5">
-                                    <label for="login-password" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5 text-left">Password*</label>
-                                    <input type="password" id="login-password" placeholder="Enter your password" required class="w-full px-3.5 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
-                                </div>
-                                
-                                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition duration-200 text-sm shadow-md cursor-pointer">Login</button>
-                                <p id="login-error-msg" class="text-red-500 dark:text-red-400 text-center mt-3 text-xs"></p>
-                            </form>
-                            
-                            <p class="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
-                                Don't have an account? 
-                                <a href="#signup" class="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline">Create account</a>
+                <!-- Feature Description (6 cols - Right on desktop) -->
+                <div class="lg:col-span-6 order-1 lg:order-2">
+                    <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 tracking-wide mb-2">
+                        <span class="lang-bn">০২. স্মার্ট প্রশ্ন পার্সার ও ইন্টারেক্টিভ কুইজ</span>
+                        <span class="lang-en">02. Smart Question Parser &amp; Interactive Quiz</span>
+                    </div>
+                    <h3 class="text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight text-balance">
+                        <span class="lang-bn">ডাইনামিক MCQ ইঞ্জিন: HTML, ছক ও SVG ডায়াগ্রাম সাপোর্ট</span>
+                        <span class="lang-en">Dynamic MCQ Engine with Rich HTML, Table &amp; SVG Support</span>
+                    </h3>
+                    <p class="mt-4 text-slate-600 dark:text-slate-300 text-base leading-relaxed">
+                        <span class="lang-bn">
+                            স্টাডি প্ল্যানের প্রতিটি টপিকের সাথে আপনি নিজের পছন্দমতো MCQ প্রশ্ন যুক্ত করতে পারবেন। শুধু সাধারণ টেক্সট নয়—যেকোনো জটিল HTML মডেল টেস্ট শিট পেস্ট করলেই আমাদের ডাইনামিক ইঞ্জিন স্বয়ংক্রিয়ভাবে প্রশ্ন, অপশন, সঠিক উত্তর এবং ব্যাখ্যা আলাদা করে ফেলে।
+                        </span>
+                        <span class="lang-en">
+                            Attach custom MCQ sets directly to any topic in your Study Plan. Paste plain text or full HTML model test files—our multi-strategy parser automatically extracts questions, options, correct answers, and explanations while preserving complex visuals.
+                        </span>
+                    </p>
+
+                    <div class="mt-7 space-y-4">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mt-1"></i>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">
+                                <span class="lang-bn"><strong>SVG ডায়াগ্রাম, উদ্দীপকের ছক ও কোড অক্ষুণ্ণ রাখে:</strong> আইসিটি লজিক গেইট, গণিত ও পদার্থবিজ্ঞানের চিত্র, HTML টেবিল এবং প্রোগ্রামিং কোড স্নিপেট কোনো পরিবর্তন ছাড়াই হুবহু কুইজে প্রদর্শিত হয়।</span>
+                                <span class="lang-en"><strong>Preserves SVG Diagrams, Tables &amp; Code Blocks:</strong> ICT logic gates, physics/math figures, stimulus tables, and code blocks render cleanly inside question stems, options, and explanations.</span>
+                            </p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mt-1"></i>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">
+                                <span class="lang-bn"><strong>বহু-উপাদান বা রোমান সংখ্যার প্রশ্ন (i, ii, iii) সাপোর্ট:</strong> বোর্ড পরীক্ষা ও বিসিএস-এর বহুপদী সমাপ্তিসূচক প্রশ্ন (যেমন: i ও ii, ii ও iii) স্বয়ংক্রিয়ভাবে শনাক্ত করে।</span>
+                                <span class="lang-en"><strong>Multi-Statement &amp; Roman Numeral Questions (i, ii, iii):</strong> Accurately parses board-style stimulus statements and combination choices in both Bangla and English.</span>
+                            </p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mt-1"></i>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">
+                                <span class="lang-bn"><strong>ক্লাসিক কুইজ মোড (Classic Practice Mode):</strong> অনুশীলনের সময় প্রতিটি প্রশ্নের অপশনে ক্লিক করার সাথে সাথেই সঠিক উত্তর ও বিস্তারিত ব্যাখ্যা দেখে শেখার সুযোগ।</span>
+                                <span class="lang-en"><strong>Classic Practice Mode:</strong> Get instant answer validation and detailed collapsible explanations as you practice topic by topic.</span>
                             </p>
                         </div>
                     </div>
                 </div>
-            </main>
-
-            <!-- Courses Section -->
-            <section id="academic-courses" class="container mx-auto px-6 mt-20 md:mt-28 pb-24">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-gray-900 dark:text-emerald-400 mb-2">Academic Courses</h2>
-                    <p class="text-gray-500 dark:text-gray-400 font-medium">8th Semester Curriculum</p>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 max-w-5xl mx-auto">
-                    <!-- Course 405 -->
-                    <a href="course-405.html" class="group course-button-glow flex flex-col items-center justify-center p-5 bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl aspect-square hover:border-emerald-500 hover:shadow-md transition-all">
-                        <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
-                        <div class="relative z-10 p-3.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl mb-3 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/20 transition-colors">
-                            <i class="fas fa-feather-alt text-2xl text-emerald-600 dark:text-emerald-400"></i>
-                        </div>
-                        <div class="relative z-10 text-center">
-                            <div class="font-bold text-sm text-gray-800 dark:text-gray-200">Course-405</div>
-                            <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Modern Poetry II</div>
-                        </div>
-                    </a>
-                    
-                    <!-- Course 406 -->
-                    <a href="course-406.html" class="group course-button-glow flex flex-col items-center justify-center p-5 bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl aspect-square hover:border-emerald-500 hover:shadow-md transition-all">
-                        <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
-                        <div class="relative z-10 p-3.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl mb-3 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/20 transition-colors">
-                            <i class="fas fa-language text-2xl text-emerald-600 dark:text-emerald-400"></i>
-                        </div>
-                        <div class="relative z-10 text-center">
-                            <div class="font-bold text-sm text-gray-800 dark:text-gray-200">Course-406</div>
-                            <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Translation & Terms</div>
-                        </div>
-                    </a>
-                    
-                    <!-- Course 407 -->
-                    <a href="course-407.html" class="group course-button-glow flex flex-col items-center justify-center p-5 bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl aspect-square hover:border-emerald-500 hover:shadow-md transition-all">
-                        <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
-                        <div class="relative z-10 p-3.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl mb-3 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/20 transition-colors">
-                            <i class="fas fa-book-reader text-2xl text-emerald-600 dark:text-emerald-400"></i>
-                        </div>
-                        <div class="relative z-10 text-center">
-                            <div class="font-bold text-sm text-gray-800 dark:text-gray-200">Course-407</div>
-                            <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Literary Criticism</div>
-                        </div>
-                    </a>
-                    
-                    <!-- Course 408 -->
-                    <a href="course-408.html" class="group course-button-glow flex flex-col items-center justify-center p-5 bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl aspect-square hover:border-emerald-500 hover:shadow-md transition-all">
-                        <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
-                        <div class="relative z-10 p-3.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl mb-3 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/20 transition-colors">
-                            <i class="fas fa-project-diagram text-2xl text-emerald-600 dark:text-emerald-400"></i>
-                        </div>
-                        <div class="relative z-10 text-center">
-                            <div class="font-bold text-sm text-gray-800 dark:text-gray-200">Course-408 (B)</div>
-                            <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Social Research</div>
-                        </div>
-                    </a>
-					
-					<!-- Previous Questions 17-21 -->
-					<a href="https://drive.google.com/file/d/1I9fn2ROCa7a-jrNZ9U0KXK8jKznh378D/view?usp=sharing" target="_blank" class="group course-button-glow flex flex-col items-center justify-center p-5 bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl aspect-square hover:border-emerald-500 hover:shadow-md transition-all">
-                        <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
-                        <div class="relative z-10 p-3.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl mb-3 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/20 transition-colors">
-                            <i class="fas fa-file-pdf text-2xl text-emerald-600 dark:text-emerald-400"></i>
-                        </div>
-                        <div class="relative z-10 text-center">
-                            <div class="font-bold text-sm text-gray-800 dark:text-gray-200">Pre. Questions</div>
-                            <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">2017 - 2021</div>
-                        </div>
-                    </a>
-					
-					<!-- Previous Questions 21-23 -->
-					<a href="https://drive.google.com/file/d/1A6asIfVsu2LiVqg0lozhS075gF-GvT_-/view?usp=sharing" target="_blank" class="group course-button-glow flex flex-col items-center justify-center p-5 bg-white dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-2xl aspect-square hover:border-emerald-500 hover:shadow-md transition-all">
-                        <span class="glow"></span><span class="glow"></span><span class="glow"></span><span class="glow"></span>
-                        <div class="relative z-10 p-3.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl mb-3 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/20 transition-colors">
-                            <i class="fas fa-file-archive text-2xl text-emerald-600 dark:text-emerald-400"></i>
-                        </div>
-                        <div class="relative z-10 text-center">
-                            <div class="font-bold text-sm text-gray-800 dark:text-gray-200">Pre. Questions</div>
-                            <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-1">2021 - 2023</div>
-                        </div>
-                    </a>
-                </div>
-            </section>
+            </div>
         </div>
-    </div>
+    </section>
 
-     <!-- Signup Section -->
-    <div id="signup" class="relative z-10 py-20 bg-gray-100 dark:bg-gray-900/80 border-t border-gray-200 dark:border-gray-800 transition-colors duration-200">
-        <div class="container mx-auto px-6">
-            <div class="flex justify-center">
-                <div class="w-full max-w-sm login-form-container">
-                    <!-- Glow Effect Container -->
-                    <div id="signup-glow" class="login-glow-container">
-                        <span class="glow"></span>
-                        <span class="glow"></span>
-                        <span class="glow"></span>
-                        <span class="glow"></span>
+    <!-- =====================================================================
+         5. FEATURE 03: PROFESSIONAL EXAM STUDIO & RESULT ANALYTICS
+         ===================================================================== -->
+    <section id="feature-exam-studio" class="py-20 md:py-28 border-b border-slate-200 dark:border-slate-800">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="grid lg:grid-cols-12 gap-12 items-center">
+                <!-- Feature Description (6 cols) -->
+                <div class="lg:col-span-6">
+                    <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 tracking-wide mb-2">
+                        <span class="lang-bn">০৩. ঘড়ির কাঁটা ধরে মডেল টেস্ট ও মূল্যায়ন</span>
+                        <span class="lang-en">03. Timed Model Tests &amp; Performance Evaluation</span>
                     </div>
-                    
-                    <div class="login-glow-card relative z-10">
-                        <div class="text-center mb-6">
-                            <div class="mx-auto w-14 h-14 rounded-full flex items-center justify-center bg-emerald-50 dark:bg-gray-700/60 mb-3 border border-emerald-200 dark:border-gray-600">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                                </svg>
+                    <h3 class="text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight text-balance">
+                        <span class="lang-bn">প্রফেশনাল এক্সাম স্টুডিও ও নেগেটিভ মার্কিং বিশ্লেষণ</span>
+                        <span class="lang-en">Professional Exam Studio with Negative Marking &amp; Analytics</span>
+                    </h3>
+                    <p class="mt-4 text-slate-600 dark:text-slate-300 text-base leading-relaxed">
+                        <span class="lang-bn">
+                            শুধু নোট পড়লেই প্রস্তুতি পূর্ণ হয় না—প্রয়োজন সময় ধরে পরীক্ষা দেওয়ার অভ্যাস। আমাদের <strong>Exam Studio</strong>-তে আপনি নিজের সেভ করা যেকোনো MCQ সেটের ওপর আসল পরীক্ষার মতো কাউন্টডাউন টাইমার ও নেগেটিভ মার্কিং দিয়ে পরীক্ষা দিতে পারবেন।
+                        </span>
+                        <span class="lang-en">
+                            Turn any saved MCQ bank into a realistic examination hall experience. Configure time limits, question counts, and negative marking rules in <strong>Exam Studio</strong> to test your speed and accuracy under pressure.
+                        </span>
+                    </p>
+
+                    <div class="mt-7 grid sm:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                            <div class="text-emerald-600 dark:text-emerald-400 font-bold text-sm mb-1">
+                                <i class="fas fa-sliders-h mr-1.5"></i>
+                                <span class="lang-bn">কাস্টমাইজযোগ্য নিয়ম</span>
+                                <span class="lang-en">Custom Exam Rules</span>
                             </div>
-                            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Create Account</h2>
-                            <p class="text-gray-500 dark:text-gray-400 text-xs mt-1">Sign up with Google or submit your details</p>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">
+                                <span class="lang-bn">প্রশ্নের সংখ্যা, পরীক্ষার সময় (মিনিট), এবং প্রতিটি ভুল উত্তরের জন্য নেগেটিভ মার্ক (যেমন ০.২৫ বা ০.৫০) নিজের মতো নির্ধারণ করুন।</span>
+                                <span class="lang-en">Set question limits, countdown duration, and negative marking penalties (0.25, 0.50, etc.) before starting.</span>
+                            </p>
                         </div>
 
-                        <!-- Google Sign Up Button -->
-                        <button type="button" onclick="window.triggerGoogleSignInGlobal()" class="w-full mb-4 flex items-center justify-center gap-2.5 py-2.5 px-4 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm hover:shadow transition font-medium text-sm cursor-pointer">
-                            <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=" alt="Google" class="w-4 h-4 flex-shrink-0" />
-                            <span>Sign up with Google</span>
-                        </button>
-
-                        <div class="relative flex py-2 items-center mb-4">
-                            <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
-                            <span class="flex-shrink mx-3 text-xs text-gray-400 dark:text-gray-500 font-medium">or fill form</span>
-                            <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+                        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                            <div class="text-emerald-600 dark:text-emerald-400 font-bold text-sm mb-1">
+                                <i class="fas fa-random mr-1.5"></i>
+                                <span class="lang-bn">প্রশ্ন ও অপশন শাফল</span>
+                                <span class="lang-en">Question &amp; Option Shuffle</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">
+                                <span class="lang-bn">প্রতিবার পরীক্ষায় প্রশ্নের ক্রম ও অপশনগুলো এলোমেলো (Shuffle) করে দেওয়ার ব্যবস্থা যেন মুখস্থ না হয়ে প্রকৃত প্রস্তুতি যাচাই হয়।</span>
+                                <span class="lang-en">Randomize question order and answer choices on every attempt for genuine self-assessment.</span>
+                            </p>
                         </div>
-                        
-                        <form id="signup-form">
-                            <div class="mb-3.5">
-                                <label for="signup-name" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">Full Name*</label>
-                                <input type="text" id="signup-name" placeholder="Enter your full name" required class="w-full px-3.5 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
+
+                        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                            <div class="text-emerald-600 dark:text-emerald-400 font-bold text-sm mb-1">
+                                <i class="fas fa-th mr-1.5"></i>
+                                <span class="lang-bn">লাইভ প্রশ্ন নেভিগেটর</span>
+                                <span class="lang-en">Live Question Palette</span>
                             </div>
-                            
-                            <div class="mb-3.5">
-                                <label for="signup-email" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">Email*</label>
-                                <input type="email" id="signup-email" placeholder="Enter your email" required class="w-full px-3.5 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
+                            <p class="text-xs text-slate-600 dark:text-slate-400">
+                                <span class="lang-bn">কোন প্রশ্নগুলো উত্তর করেছেন এবং কোনগুলো বাকি আছে তা এক নজরে দেখে যেকোনো প্রশ্নে জাম্প করার সুবিধা।</span>
+                                <span class="lang-en">Jump between answered, unanswered, and flagged questions using an OMR-style navigation grid.</span>
+                            </p>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                            <div class="text-emerald-600 dark:text-emerald-400 font-bold text-sm mb-1">
+                                <i class="fas fa-chart-pie mr-1.5"></i>
+                                <span class="lang-bn">বিস্তারিত রেজাল্ট শিট</span>
+                                <span class="lang-en">Detailed Result Sheet</span>
                             </div>
-                            
-                            <div class="mb-3.5">
-                                <label for="signup-mobile" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">Mobile Number*</label>
-                                <input type="tel" id="signup-mobile" placeholder="Enter your mobile number" required class="w-full px-3.5 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition">
+                            <p class="text-xs text-slate-600 dark:text-slate-400">
+                                <span class="lang-bn">সাবমিট করার সাথে সাথেই প্রাপ্ত নম্বর, নির্ভুলতার হার (Accuracy %), ব্যয়িত সময় ও ভুল প্রশ্নের সমাধান দেখুন।</span>
+                                <span class="lang-en">Instant scorecard with net marks after negative deduction, accuracy percentage, time spent, and full review.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exam Studio Visual Mockup (6 cols) -->
+                <div class="lg:col-span-6">
+                    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md">
+                        <!-- Top Scorecard Header -->
+                        <div class="flex flex-wrap items-center justify-between gap-4 pb-5 mb-5 border-b border-slate-200 dark:border-slate-800">
+                            <div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400">
+                                    <span class="lang-bn">মডেল টেস্ট ফলাফল বিশ্লেষণ</span>
+                                    <span class="lang-en">Model Test Result Summary</span>
+                                </div>
+                                <div class="text-lg font-bold text-slate-900 dark:text-white mt-0.5">HSC &amp; BCS ICT Model Test — 01</div>
                             </div>
-                            
-                            <div class="mb-5 relative">
-                                <label for="signup-password" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 text-left">Password*</label>
-                                <input type="password" id="signup-password" placeholder="Set a strong password" required class="w-full px-3.5 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 pr-10 transition">
-                                <button type="button" id="toggle-password" class="absolute right-3 top-7 text-gray-400 hover:text-emerald-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </button>
+                            <div class="px-3.5 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-right">
+                                <div class="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">NET SCORE</div>
+                                <div class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">21.50 / 25</div>
                             </div>
-                            
-                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg transition duration-200 text-sm shadow-md cursor-pointer">Register</button>
-                            <p id="signup-error-msg" class="text-red-500 dark:text-red-400 text-center mt-3 text-xs"></p>
-                        </form>
-                        
-                        <p class="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
-                            Already have an account? 
-                            <a href="index.html" class="font-semibold text-emerald-600 dark:text-emerald-400 hover:underline login-redirect">Login instead</a>
+                        </div>
+
+                        <!-- 4 Metric Breakdown Cards -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/70 text-center">
+                                <div class="text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono tabular-nums">22</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400">
+                                    <span class="lang-bn">সঠিক উত্তর</span>
+                                    <span class="lang-en">Correct</span>
+                                </div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/70 text-center">
+                                <div class="text-lg font-bold text-rose-600 dark:text-rose-400 font-mono tabular-nums">2</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400">
+                                    <span class="lang-bn">ভুল (-০.৫০)</span>
+                                    <span class="lang-en">Wrong (-0.50)</span>
+                                </div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/70 text-center">
+                                <div class="text-lg font-bold text-amber-600 dark:text-amber-400 font-mono tabular-nums">1</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400">
+                                    <span class="lang-bn">স্কিপ করা</span>
+                                    <span class="lang-en">Skipped</span>
+                                </div>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/70 dark:border-slate-700/70 text-center">
+                                <div class="text-lg font-bold text-sky-600 dark:text-sky-400 font-mono tabular-nums">14m 20s</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400">
+                                    <span class="lang-bn">ব্যয়িত সময়</span>
+                                    <span class="lang-en">Time Taken</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- OMR Question Palette Mockup -->
+                        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800">
+                            <div class="flex items-center justify-between text-xs mb-3">
+                                <span class="font-semibold text-slate-700 dark:text-slate-300">
+                                    <span class="lang-bn">প্রশ্ন নেভিগেটর ও উত্তর রিভিউ</span>
+                                    <span class="lang-en">Question Navigator &amp; Review</span>
+                                </span>
+                                <span class="text-[11px] text-slate-500 font-mono tabular-nums">Accuracy: 91.6%</span>
+                            </div>
+                            <div class="grid grid-cols-10 gap-1.5 text-[11px] font-mono font-bold text-center">
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">1</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">2</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">3</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">4</span>
+                                <span class="py-1.5 rounded bg-rose-600 text-white">5</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">6</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">7</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">8</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">9</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">10</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">11</span>
+                                <span class="py-1.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">12</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">13</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">14</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">15</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">16</span>
+                                <span class="py-1.5 rounded bg-rose-600 text-white">17</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">18</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">19</span>
+                                <span class="py-1.5 rounded bg-emerald-600 text-white">20</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         6. FEATURE 04: DIGITAL ARCHIVES & WINDOWS 11 FILE EXPLORER MODE
+         ===================================================================== -->
+    <section id="feature-archives-explorer" class="py-20 md:py-28 bg-white dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="grid lg:grid-cols-12 gap-12 items-center">
+                <!-- Windows 11 Explorer Visual Mockup (6 cols) -->
+                <div class="lg:col-span-6 order-2 lg:order-1">
+                    <div class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-md">
+                        <!-- Explorer Window Titlebar -->
+                        <div class="px-4 py-2.5 bg-slate-200/70 dark:bg-slate-800 border-b border-slate-300/80 dark:border-slate-700 flex items-center justify-between">
+                            <div class="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-200">
+                                <i class="fas fa-folder text-amber-500"></i>
+                                <span>Class Caddy Explorer — Archives</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-[11px] text-slate-500">
+                                <span class="px-2 py-0.5 rounded bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium">Grid</span>
+                                <span class="px-2 py-0.5 rounded hover:bg-white/60">List</span>
+                                <span class="px-2 py-0.5 rounded bg-emerald-600 text-white font-semibold">Win11 Mode</span>
+                            </div>
+                        </div>
+
+                        <!-- Explorer Address / Breadcrumb Bar -->
+                        <div class="px-4 py-2 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 text-xs">
+                            <div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 truncate">
+                                <i class="fas fa-home text-emerald-600"></i>
+                                <span>&rsaquo;</span>
+                                <span>Archives</span>
+                                <span>&rsaquo;</span>
+                                <span class="font-semibold text-slate-900 dark:text-white">BCS &amp; Job Preparation</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400 shrink-0">6 Folders · 18 Notes</span>
+                        </div>
+
+                        <!-- Explorer Folder & File Grid -->
+                        <div class="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <a href="archives.html" class="p-3.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition group">
+                                <i class="fas fa-folder text-2xl text-amber-500 mb-2 group-hover:scale-105 transition-transform"></i>
+                                <div class="text-xs font-bold text-slate-900 dark:text-white truncate">BCS Preliminary</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Subject-wise Notes</div>
+                            </a>
+
+                            <a href="/grammar/index.html" class="p-3.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition group">
+                                <i class="fas fa-file-code text-2xl text-emerald-600 dark:text-emerald-400 mb-2 group-hover:scale-105 transition-transform"></i>
+                                <div class="text-xs font-bold text-slate-900 dark:text-white truncate">English Grammar</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Interactive Master Note</div>
+                            </a>
+
+                            <a href="ict_peripherals.html" class="p-3.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition group">
+                                <i class="fas fa-microchip text-2xl text-sky-600 dark:text-sky-400 mb-2 group-hover:scale-105 transition-transform"></i>
+                                <div class="text-xs font-bold text-slate-900 dark:text-white truncate">ICT Peripherals</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Visual Hardware Guide</div>
+                            </a>
+
+                            <a href="EnglishPoets.html" class="p-3.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition group">
+                                <i class="fas fa-feather-alt text-2xl text-purple-600 dark:text-purple-400 mb-2 group-hover:scale-105 transition-transform"></i>
+                                <div class="text-xs font-bold text-slate-900 dark:text-white truncate">English Poets</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Literature &amp; Biographies</div>
+                            </a>
+
+                            <a href="English.html" class="p-3.5 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition group">
+                                <i class="fas fa-book-open text-2xl text-teal-600 dark:text-teal-400 mb-2 group-hover:scale-105 transition-transform"></i>
+                                <div class="text-xs font-bold text-slate-900 dark:text-white truncate">English Module</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Vocab &amp; Practice</div>
+                            </a>
+
+                            <a href="archives.html" class="p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 hover:bg-emerald-100/70 transition flex flex-col justify-center items-center text-center">
+                                <i class="fas fa-arrow-right text-emerald-600 dark:text-emerald-400 text-lg mb-1"></i>
+                                <div class="text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                                    <span class="lang-bn">সব আর্কাইভ দেখুন</span>
+                                    <span class="lang-en">Open Full Archives</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Description (6 cols) -->
+                <div class="lg:col-span-6 order-1 lg:order-2">
+                    <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 tracking-wide mb-2">
+                        <span class="lang-bn">০৪. গোছানো নোটস লাইব্রেরি ও ফাইল ম্যানেজার</span>
+                        <span class="lang-en">04. Structured Notes Library &amp; File Manager</span>
+                    </div>
+                    <h3 class="text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight text-balance">
+                        <span class="lang-bn">ডিজিটাল আর্কাইভস ও উইন্ডোজ ১১ ফাইল এক্সপ্লোরার মোড</span>
+                        <span class="lang-en">Digital Archives with Windows 11 File Explorer Mode</span>
+                    </h3>
+                    <p class="mt-4 text-slate-600 dark:text-slate-300 text-base leading-relaxed">
+                        <span class="lang-bn">
+                            শত শত ফাইল ও নোটের ভিড়ে প্রয়োজনীয় টপিক খুঁজে পাওয়া এখন একদম সহজ। আমাদের <strong>Archives</strong> পেজে প্রতিটি বিষয় ফোল্ডার ও সাব-ফোল্ডারে সাজানো রয়েছে। আপনি চাইলে সাধারণ কার্ড ভিউ ছাড়াও এক ক্লিকে <strong>Windows 11 File Explorer</strong> মোডে পুরো স্ক্রিন জুড়ে কম্পিউটারের ফোল্ডারের মতো সব নোট ব্রাউজ করতে পারবেন।
+                        </span>
+                        <span class="lang-en">
+                            Never lose track of an important revision sheet again. Our <strong>Archives</strong> module organizes study materials into nested folders and interactive web notes—complete with a full-screen <strong>Windows 11 File Explorer</strong> mode for desktop-grade navigation.
+                        </span>
+                    </p>
+
+                    <div class="mt-7 space-y-4">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mt-1"></i>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">
+                                <span class="lang-bn"><strong>৫টি আকর্ষণীয় ভিউ মোড:</strong> আপনার পছন্দমতো Grid, Compact, List, Magazine অথবা ফুল-স্ক্রিন Windows 11 Explorer ভিউতে নোটস দেখার সুবিধা।</span>
+                                <span class="lang-en"><strong>5 Flexible Viewing Layouts:</strong> Switch seamlessly between Grid, Compact, List, Magazine, and Fullscreen Windows 11 Explorer views.</span>
+                            </p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mt-1"></i>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">
+                                <span class="lang-bn"><strong>তাৎক্ষণিক সার্চ ও ব্রেডক্রাম্ব নেভিগেশন:</strong> যেকোনো ফোল্ডারের ভেতরে ঢুকে সহজেই আগের ফোল্ডারে ফেরা এবং সার্চ বক্সে লিখে মুহূর্তেই নোট খুঁজে বের করার ব্যবস্থা।</span>
+                                <span class="lang-en"><strong>Instant Search &amp; Breadcrumb Pathing:</strong> Filter notes in real time and traverse multi-level subject folders with zero page reloads.</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <a href="archives.html" class="inline-flex items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-sm transition text-sm">
+                            <span class="lang-bn">আর্কাইভস এক্সপ্লোর করুন</span>
+                            <span class="lang-en">Browse Digital Archives</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         7. FEATURE 05: INTERACTIVE MASTER NOTES PORTALS (Grammar, ICT, English)
+         ===================================================================== -->
+    <section id="feature-master-notes" class="py-20 md:py-28 border-b border-slate-200 dark:border-slate-800">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="max-w-3xl mb-12">
+                <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 tracking-wide mb-2">
+                    <span class="lang-bn">০৫. ইন্টারেক্টিভ মাস্টার নোটস ও ভিজ্যুয়াল লার্নিং</span>
+                    <span class="lang-en">05. Interactive Master Revision Portals</span>
+                </div>
+                <h3 class="text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight text-balance">
+                    <span class="lang-bn">সাধারণ পিডিএফ নয়—ছবি, শর্টকাট টেকনিক ও প্রশ্নব্যাংকসহ স্মার্ট ওয়েব নোটস</span>
+                    <span class="lang-en">Beyond Static PDFs: Visual Web Notes with Shortcut Rules &amp; Past Questions</span>
+                </h3>
+                <p class="mt-4 text-slate-600 dark:text-slate-300 text-base leading-relaxed">
+                    <span class="lang-bn">
+                        বিসিএস, ব্যাংক ও বিশ্ববিদ্যালয় ভর্তি পরীক্ষার সবচেয়ে গুরুত্বপূর্ণ টপিকগুলোর ওপর আমরা তৈরি করেছি বিশেষ ইন্টারেক্টিভ মাস্টার নোটস—যেখানে প্রতিটি নিয়মের সাথে রয়েছে বাস্তব উদাহরণ, ভিজ্যুয়াল চিত্র এবং বিগত সালের প্রশ্ন।
+                    </span>
+                    <span class="lang-en">
+                        Explore purpose-built interactive revision portals crafted for BCS, bank, and university examinations—combining rule tables, high-resolution hardware galleries, and verified past questions.
+                    </span>
+                </p>
+            </div>
+
+            <!-- 3 Asymmetric Feature Spotlight Cards -->
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Card 1: English Grammar Master Revision Note -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-sm">
+                    <div>
+                        <div class="w-11 h-11 rounded-xl bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-5">
+                            <i class="fas fa-spell-check text-lg"></i>
+                        </div>
+                        <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                            <span>English Grammar</span> · <span>BCS &amp; Admission</span>
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-3">
+                            <span class="lang-bn">ইংলিশ গ্রামার মাস্টার রিভিশন নোট</span>
+                            <span class="lang-en">English Grammar Master Revision Note</span>
+                        </h4>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                            <span class="lang-bn">Parts of Speech, Noun, Pronoun, Verb, Tense, Clause, Voice ও Narration-এর সবচেয়ে গুরুত্বপূর্ণ নিয়ম, ব্যতিক্রম ও শর্টকাট কৌশল এক পাতায় সহজ বাংলায় সাজানো।</span>
+                            <span class="lang-en">Comprehensive coverage of Parts of Speech, Clauses, Voice, Narration, and high-yield exam exceptions organized with crystal-clear Bengali explanations.</span>
                         </p>
                     </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <a href="/grammar/index.html" class="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                            <span class="lang-bn">গ্রামার নোটটি পড়ুন</span>
+                            <span class="lang-en">Open Grammar Master Note</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 2: ICT Peripherals & Hardware Visual Note -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-sm">
+                    <div>
+                        <div class="w-11 h-11 rounded-xl bg-sky-100 dark:bg-sky-950/70 text-sky-600 dark:text-sky-400 flex items-center justify-center mb-5">
+                            <i class="fas fa-desktop text-lg"></i>
+                        </div>
+                        <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                            <span>ICT Master Note</span> · <span>Visual Hardware Gallery</span>
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-3">
+                            <span class="lang-bn">কম্পিউটার পেরিফেরালস: ইনপুট ও আউটপুট ডিভাইস</span>
+                            <span class="lang-en">ICT Computer Peripherals: Input &amp; Output Devices</span>
+                        </h4>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                            <span class="lang-bn">কী-বোর্ড, মাউস, ওএমআর (OMR), ওসিআর (OCR), এমআইসিআর (MICR), স্ক্যানার ও মনিটরের বাস্তব ছবি (লাইটবক্স জুমসহ) এবং বিগত বিসিএস ও নিয়োগ পরীক্ষার পূর্ণাঙ্গ প্রশ্নব্যাংক।</span>
+                            <span class="lang-en">Interactive visual guide covering keyboards, pointing devices, OMR, OCR, MICR, printers, and monitors with high-res zoomable photos and past BCS MCQs.</span>
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <a href="ict_peripherals.html" class="inline-flex items-center gap-2 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                            <span class="lang-bn">আইসিটি নোটটি পড়ুন</span>
+                            <span class="lang-en">Open ICT Peripherals Note</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Card 3: English Literature & Poets Portal -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 flex flex-col justify-between hover:border-emerald-500 transition shadow-sm">
+                    <div>
+                        <div class="w-11 h-11 rounded-xl bg-purple-100 dark:bg-purple-950/70 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-5">
+                            <i class="fas fa-feather-alt text-lg"></i>
+                        </div>
+                        <div class="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                            <span>English Literature</span> · <span>Poets &amp; Periods</span>
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-900 dark:text-white mb-3">
+                            <span class="lang-bn">ইংরেজি সাহিত্য ও বিখ্যাত কবিদের জীবনী</span>
+                            <span class="lang-en">English Literature &amp; Major Poets Portal</span>
+                        </h4>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                            <span class="lang-bn">ইংরেজি সাহিত্যের যুগবিভাগ, বিখ্যাত কবি ও সাহিত্যিকদের সাহিত্যকর্ম, গুরুত্বপূর্ণ উদ্ধৃতি (Quotations) এবং ভোকাবুলারি অনুশীলনের গোছানো সংগ্রহ।</span>
+                            <span class="lang-en">Structured summaries of major literary periods, poet biographies, famous quotations, and vocabulary modules tailored for competitive exams.</span>
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                        <a href="EnglishPoets.html" class="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+                            <span class="lang-bn">কবিদের তালিকা</span>
+                            <span class="lang-en">English Poets</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                        <span class="text-slate-300 dark:text-slate-700">|</span>
+                        <a href="English.html" class="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400">
+                            <span class="lang-bn">ইংলিশ মডিউল</span>
+                            <span class="lang-en">English Hub</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-	
+    </section>
+
+    <!-- =====================================================================
+         8. FEATURE 06: GOOGLE CLOUD SYNC, JSON BACKUP & EYE-CARE DARK MODE
+         ===================================================================== -->
+    <section id="feature-cloud-sync" class="py-20 md:py-24 bg-white dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="max-w-3xl mb-12">
+                <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 tracking-wide mb-2">
+                    <span class="lang-bn">০৬. ডেটা সুরক্ষা, ক্লাউড সিঙ্ক ও পার্সোনালাইজেশন</span>
+                    <span class="lang-en">06. Data Security, Cloud Sync &amp; Personalization</span>
+                </div>
+                <h3 class="text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white leading-tight text-balance">
+                    <span class="lang-bn">পাসওয়ার্ড ছাড়াই গুগল লগইন, অফলাইন ব্যাকআপ এবং চোখের আরামদায়ক ডার্ক মোড</span>
+                    <span class="lang-en">Passwordless Google Sync, Local JSON Backup &amp; Eye-Friendly Dark Mode</span>
+                </h3>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Sync -->
+                <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                        <span class="lang-bn">১-ক্লিকে গুগল ক্লাউড সিঙ্ক</span>
+                        <span class="lang-en">1-Click Google Cloud Sync</span>
+                    </h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                        <span class="lang-bn">আলাদা ইউজারনেম বা পাসওয়ার্ড দিয়ে রেজিস্ট্রেশন করার দরকার নেই। আপনার জিমেইল দিয়ে সাইন ইন করলেই মোবাইল, ট্যাব ও কম্পিউটার—সব জায়গায় আপনার রুটিন ও টাইমার অটো-সিঙ্ক হবে।</span>
+                        <span class="lang-en">No separate registration forms or passwords required. Sign in with Google to automatically synchronize your study routines, timers, and MCQ banks across phone and PC.</span>
+                    </p>
+                </div>
+
+                <!-- JSON Backup -->
+                <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4">
+                        <i class="fas fa-file-export"></i>
+                    </div>
+                    <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                        <span class="lang-bn">অফলাইন JSON ব্যাকআপ ও রিস্টোর</span>
+                        <span class="lang-en">Instant JSON Export &amp; Restore</span>
+                    </h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                        <span class="lang-bn">ক্লাউড সিঙ্কের পাশাপাশি আপনি যেকোনো সময় আপনার পুরো স্টাডি প্ল্যান ও প্রশ্নের ডেটাবেস একটি ফাইলে ডাউনলোড (Export) করে রাখতে পারবেন এবং বন্ধুদের সাথেও শেয়ার করতে পারবেন।</span>
+                        <span class="lang-en">Download a full snapshot of your study plan, timers, and imported quizzes as a portable JSON file at any time—or share study schedules with classmates.</span>
+                    </p>
+                </div>
+
+                <!-- Dark Mode -->
+                <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                    <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                        <span class="lang-bn">স্মার্ট ডার্ক ও লাইট থিম</span>
+                        <span class="lang-en">Adaptive Dark &amp; Light Themes</span>
+                    </h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                        <span class="lang-bn">রাতের বেলা দীর্ঘ সময় পড়াশোনা করার সময় চোখের ওপর চাপ কমাতে নিচের ডান পাশের চাঁদ আইকনে ক্লিক করে মুহূর্তেই পুরো ওয়েবসাইট ডার্ক মোডে পরিবর্তন করে নিতে পারেন।</span>
+                        <span class="lang-en">Studying late at night? Toggle the global theme button at the bottom-right corner to switch every page, note, and quiz into an eye-friendly dark slate theme.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         9. FEATURE 07 (NEAR BOTTOM): ACADEMIC CURRICULUM & ARABIC LITERATURE MODULE
+         ===================================================================== -->
+    <section id="feature-academic-hub" class="py-20 md:py-24 border-b border-slate-200 dark:border-slate-800">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-10 shadow-sm">
+                <div class="grid lg:grid-cols-12 gap-10 items-center">
+                    <!-- Left Explanation (5 cols) -->
+                    <div class="lg:col-span-5">
+                        <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 tracking-wide mb-2">
+                            <span class="lang-bn">০৭. বিশেষ একাডেমিক আর্কাইভ (ঢাকা বিশ্ববিদ্যালয়)</span>
+                            <span class="lang-en">07. Specialized University Curriculum Module</span>
+                        </div>
+                        <h3 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white leading-tight">
+                            <span class="lang-bn">একাডেমিক কোর্স, ত্রিভাষিক পরিভাষা ও অডিও কাব্য বিশ্লেষণ</span>
+                            <span class="lang-en">Academic Courses, Trilingual Terminology &amp; Audio Poetry</span>
+                        </h3>
+                        <p class="mt-3.5 text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                            <span class="lang-bn">
+                                ঢাকা বিশ্ববিদ্যালয়ের আরবি বিভাগের ৮ম সেমিস্টারের শিক্ষার্থীদের জন্য রয়েছে একটি বিশেষায়িত একাডেমিক মডিউল। এতে রয়েছে আধুনিক আরবি কবিতার শব্দে-শব্দে ( আরবি-বাংলা-ইংরেজি ) অনুবাদ, অডিও আবৃত্তির সাথে অটো-হাইলাইট (Karaoke Sync), কবিদের জীবনী এবং ২০১৭–২০২৩ সালের বিগত পরীক্ষার প্রশ্নব্যাংক।
+                            </span>
+                            <span class="lang-en">
+                                A dedicated academic resource hub built for the Department of Arabic, University of Dhaka (8th Semester). Includes word-by-word trilingual poetry analysis (Arabic-Bangla-English), synchronized audio recitation, poet biographies, and past question archives (2017–2023).
+                            </span>
+                        </p>
+                        <div class="mt-6 flex flex-wrap gap-3">
+                            <a href="academic.html" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition inline-flex items-center gap-2">
+                                <i class="fas fa-graduation-cap"></i>
+                                <span class="lang-bn">একাডেমিক পোর্টাল খুলুন</span>
+                                <span class="lang-en">Open Academic Portal</span>
+                            </a>
+                            <a href="poem-summaries.html" class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs sm:text-sm font-semibold rounded-xl transition inline-flex items-center gap-2">
+                                <i class="fas fa-headphones-alt text-emerald-600 dark:text-emerald-400"></i>
+                                <span class="lang-bn">কবিতা ও অডিও সামারি</span>
+                                <span class="lang-en">Poem Summaries &amp; Audio</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Right Compact Course & Question Bank Grid (7 cols) -->
+                    <div class="lg:col-span-7">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+                            <!-- Course 405 -->
+                            <a href="course-405.html" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition group">
+                                <div class="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-2.5">
+                                    <i class="fas fa-feather-alt"></i>
+                                </div>
+                                <div class="font-bold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">Course-405</div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Modern Poetry II</div>
+                            </a>
+
+                            <!-- Course 406 -->
+                            <a href="course-406.html" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition group">
+                                <div class="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-2.5">
+                                    <i class="fas fa-language"></i>
+                                </div>
+                                <div class="font-bold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">Course-406</div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Translation &amp; Terms</div>
+                            </a>
+
+                            <!-- Course 407 -->
+                            <a href="course-407.html" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition group">
+                                <div class="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-2.5">
+                                    <i class="fas fa-book-reader"></i>
+                                </div>
+                                <div class="font-bold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">Course-407</div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Literary Criticism</div>
+                            </a>
+
+                            <!-- Course 408 -->
+                            <a href="course-408.html" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition group">
+                                <div class="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-2.5">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <div class="font-bold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">Course-408 (B)</div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Social Research</div>
+                            </a>
+
+                            <!-- Past Questions 17-21 -->
+                            <a href="https://drive.google.com/file/d/1I9fn2ROCa7a-jrNZ9U0KXK8jKznh378D/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition group">
+                                <div class="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-2.5">
+                                    <i class="fas fa-file-pdf"></i>
+                                </div>
+                                <div class="font-bold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">Past Questions</div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">2017 – 2021 (PDF)</div>
+                            </a>
+
+                            <!-- Past Questions 21-23 -->
+                            <a href="https://drive.google.com/file/d/1A6asIfVsu2LiVqg0lozhS075gF-GvT_-/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 transition group">
+                                <div class="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-2.5">
+                                    <i class="fas fa-file-archive"></i>
+                                </div>
+                                <div class="font-bold text-sm text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">Past Questions</div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 tabular-nums">2021 – 2023 (PDF)</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================================
+         10. 3-STEP QUICK START GUIDE & CONVERSION BANNER
+         ===================================================================== -->
+    <section class="py-20 bg-white dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <h3 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+                    <span class="lang-bn">মাত্র ৩টি সহজ ধাপে আপনার পড়াশোনা গুছিয়ে নিন</span>
+                    <span class="lang-en">Start Organizing Your Study Routine in 3 Simple Steps</span>
+                </h3>
+                <p class="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-400">
+                    <span class="lang-bn">কোনো জটিল সেটআপ বা ফর্ম পূরণের প্রয়োজন নেই—মুহূর্তেই শুরু করুন।</span>
+                    <span class="lang-en">Zero complicated setup or registration forms—get started in seconds.</span>
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                    <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-2">STEP 01</div>
+                    <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                        <span class="lang-bn">গুগল দিয়ে ১-ক্লিকে সাইন ইন করুন</span>
+                        <span class="lang-en">Sign In with Google in 1 Click</span>
+                    </h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                        <span class="lang-bn">উপরে ডান পাশের <strong>Sign In</strong> বাটনে ক্লিক করে আপনার গুগল অ্যাকাউন্ট যুক্ত করুন, যাতে আপনার সব ডেটা নিরাপদে ক্লাউডে সেভ থাকে।</span>
+                        <span class="lang-en">Click the Google <strong>Sign In</strong> button to link your account so your progress and custom study plan stay safely backed up in the cloud.</span>
+                    </p>
+                </div>
+
+                <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                    <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-2">STEP 02</div>
+                    <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                        <span class="lang-bn">দিনের রুটিন ও MCQ প্রশ্ন সাজান</span>
+                        <span class="lang-en">Customize Your Routine &amp; MCQs</span>
+                    </h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                        <span class="lang-bn"><strong>Study Plan</strong> পেজে গিয়ে আপনার প্রতিদিনের পড়ার টপিকগুলো লিখুন এবং প্রয়োজনমতো HTML বা টেক্সট থেকে MCQ কুইজ ইমপোর্ট করুন।</span>
+                        <span class="lang-en">Head over to <strong>Study Plan</strong>, customize your daily topics, and import HTML or text question sheets into the MCQ Engine.</span>
+                    </p>
+                </div>
+
+                <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                    <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-2">STEP 03</div>
+                    <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                        <span class="lang-bn">টাইমার ধরে পড়ুন ও নিজেকে যাচাই করুন</span>
+                        <span class="lang-en">Track Time &amp; Test in Exam Studio</span>
+                    </h4>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                        <span class="lang-bn">পড়ার সময় লাইভ টাইমার চালু রাখুন, পড়া শেষে 'Done' দিন এবং <strong>Exam Studio</strong>-তে মডেল টেস্ট দিয়ে নিজের প্রস্তুতি যাচাই করুন।</span>
+                        <span class="lang-en">Run the live timer while studying, mark tasks as Done, and launch timed model tests in <strong>Exam Studio</strong> to measure your mastery.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+<!-- =================== MAIN CONTENT END =================== -->
+
 <!-- =================== FEEDBACK & FOOTER START =================== -->
-<!-- FEEDBACK SECTION -->
-<section class="feedback-section py-20 bg-slate-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 transition-colors duration-200">
-    <div class="container mx-auto px-6">
+<section class="feedback-section py-20 bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
+    <div class="container mx-auto px-4 sm:px-6">
         <div class="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
-                <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">Feedback & Suggestions</h2>
-                <p class="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">We value your input to make Class Caddy better. Please share your suggestions, report any issues, or let us know what features you want next!</p>
-                <div class="flex gap-6">
-                    <a href="https://facebook.com/emammehedi17" target="_blank" class="w-10 h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 shadow-sm transition"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://wa.me/+8801743303877" target="_blank" class="w-10 h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 shadow-sm transition"><i class="fab fa-whatsapp"></i></a>
-                    <a href="https://t.me/emammehedi17" target="_blank" class="w-10 h-10 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 shadow-sm transition"><i class="fab fa-telegram"></i></a>
+                <h2 class="text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+                    <span class="lang-bn">আপনার মতামত ও পরামর্শ দিন</span>
+                    <span class="lang-en">Feedback &amp; Suggestions</span>
+                </h2>
+                <p class="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
+                    <span class="lang-bn">Class Caddy-কে আপনার পড়াশোনার জন্য আরও কার্যকর করতে আপনার যেকোনো পরামর্শ, নতুন ফিচারের আবদার বা সমস্যার কথা আমাদের জানাতে পারেন।</span>
+                    <span class="lang-en">We value your input to make Class Caddy even better. Share your suggestions, report any issues, or let us know what features you would like to see next!</span>
+                </p>
+                <div class="flex gap-4">
+                    <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 shadow-sm transition" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://wa.me/+8801743303877" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 shadow-sm transition" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://t.me/emammehedi17" target="_blank" rel="noopener noreferrer" class="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 shadow-sm transition" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
                 </div>
             </div>
             <div>
-                <form name="feedback" netlify data-netlify-honeypot="bot-field" class="bg-white dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 sm:p-8 shadow-sm">
-					<p class="hidden">
-						<label>
-							Don’t fill this out if you’re human: <input name="bot-field" />
-						</label>
-					</p>
-
-					<div>
-						<label for="email" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
-						<input type="email" name="email" id="email" placeholder="Enter your email address" class="w-full bg-slate-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg py-2.5 px-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
-					</div>
-					<div class="mt-4">
-						<label for="suggestion" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Your Feedback / Suggestion</label>
-						<textarea name="suggestion" id="suggestion" rows="4" placeholder="Write your thoughts or issues here..." class="w-full bg-slate-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg py-2.5 px-4 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"></textarea>
-					</div>
-					<div class="mt-6">
-						<button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition text-sm shadow-md cursor-pointer">Send Feedback</button>
-					</div>
-				</form>
+                <form id="homepage-feedback-form" name="feedback" netlify data-netlify-honeypot="bot-field" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm">
+                    <p class="hidden">
+                        <label>Don’t fill this out if you’re human: <input name="bot-field" /></label>
+                    </p>
+                    <div>
+                        <label for="email" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                            <span class="lang-bn">আপনার ইমেইল অ্যাড্রেস</span>
+                            <span class="lang-en">Email Address</span>
+                        </label>
+                        <input type="email" name="email" id="email" required placeholder="you@example.com" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg py-2.5 px-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                    </div>
+                    <div class="mt-4">
+                        <label for="suggestion" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                            <span class="lang-bn">আপনার মতামত বা পরামর্শ</span>
+                            <span class="lang-en">Your Feedback / Suggestion</span>
+                        </label>
+                        <textarea name="suggestion" id="suggestion" rows="4" required placeholder="আপনার মতামত এখানে লিখুন / Write your thoughts here..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg py-2.5 px-4 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"></textarea>
+                    </div>
+                    <div class="mt-6">
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-lg transition text-sm shadow-sm cursor-pointer">
+                            <span class="lang-bn">মতামত পাঠান</span>
+                            <span class="lang-en">Send Feedback</span>
+                        </button>
+                    </div>
+                    <p id="feedback-status-msg" class="hidden mt-3 text-center text-xs font-semibold text-emerald-600 dark:text-emerald-400"></p>
+                </form>
             </div>
         </div>
     </div>
 </section>
 
 <!-- FOOTER SECTION -->
-<footer class="bg-slate-100 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 pt-16 pb-8 text-gray-700 dark:text-gray-400 transition-colors duration-200">
-    <div class="container mx-auto px-6">
+<footer class="bg-slate-100 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 pt-16 pb-8 text-slate-700 dark:text-slate-400 transition-colors duration-200">
+    <div class="container mx-auto px-4 sm:px-6">
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
             <!-- Column 1: Quick Links -->
             <div class="col-span-1">
-                <h3 class="font-bold text-gray-900 dark:text-white mb-4 text-sm uppercase tracking-wider">Quick Links</h3>
+                <h3 class="font-bold text-slate-900 dark:text-white mb-4 text-sm">Quick Links</h3>
                 <ul class="space-y-2.5 text-sm">
-                    <li><a href="about.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">About Us</a></li>
-                    <li><a href="archives.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">Archives & Notes</a></li>
                     <li><a href="study_plan.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">Study Plan</a></li>
-                    <li><a href="https://eco.du.ac.bd/" target="_blank" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">DU Student Portal</a></li>
-                    <li><a href="https://result.du.ac.bd/" target="_blank" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">DU Result Portal</a></li>
+                    <li><a href="archives.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">Archives &amp; Notes</a></li>
+                    <li><a href="about.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">About Us</a></li>
+                    <li><a href="privacy.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">Privacy Policy</a></li>
+                    <li><a href="https://eco.du.ac.bd/" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">DU Student Portal</a></li>
                 </ul>
             </div>
 
             <!-- Column 2: Contact Us -->
             <div class="col-span-1">
-                <h3 class="font-bold text-gray-900 dark:text-white mb-4 text-sm uppercase tracking-wider">Contact Us</h3>
+                <h3 class="font-bold text-slate-900 dark:text-white mb-4 text-sm">Contact Us</h3>
                 <ul class="space-y-2.5 text-sm">
-                    <li><a href="tel:+8801743303877" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition flex items-center gap-2"><i class="fa-solid fa-phone text-xs"></i> Customer Support</a></li>
-                    <li><a href="https://wa.me/+8801743303877" target="_blank" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-whatsapp text-xs"></i> WhatsApp</a></li>
-                    <li><a href="https://facebook.com/emammehedi17" target="_blank" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-facebook-f text-xs"></i> Facebook</a></li>
-                    <li><a href="https://t.me/emammehedi17" target="_blank" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-telegram text-xs"></i> Telegram</a></li>
+                    <li><a href="tel:+8801743303877" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition flex items-center gap-2"><i class="fa-solid fa-phone text-xs"></i> Support</a></li>
+                    <li><a href="https://wa.me/+8801743303877" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-whatsapp text-xs"></i> WhatsApp</a></li>
+                    <li><a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-facebook-f text-xs"></i> Facebook</a></li>
+                    <li><a href="https://t.me/emammehedi17" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition flex items-center gap-2"><i class="fab fa-telegram text-xs"></i> Telegram</a></li>
                 </ul>
             </div>
 
-            <!-- Column 3: Others -->
+            <!-- Column 3: Resources -->
             <div class="col-span-1">
-                <h3 class="font-bold text-gray-900 dark:text-white mb-4 text-sm uppercase tracking-wider">Resources</h3>
+                <h3 class="font-bold text-slate-900 dark:text-white mb-4 text-sm">Featured Portals</h3>
                 <ul class="space-y-2.5 text-sm">
-                    <li><a href="English.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">English Module</a></li>
-                    <li><a href="archives.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">Arabic Poems</a></li>
+                    <li><a href="/grammar/index.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">English Grammar Note</a></li>
                     <li><a href="ict_peripherals.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">ICT Peripherals</a></li>
+                    <li><a href="English.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">English Module</a></li>
+                    <li><a href="EnglishPoets.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">English Poets</a></li>
                     <li><a href="academic.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">Academic Courses</a></li>
                 </ul>
             </div>
 
-            <!-- Column 4 & 5: Download App -->
+            <!-- Column 4 & 5: Platform Summary -->
             <div class="col-span-2 lg:col-span-2">
-                 <h3 class="font-bold text-gray-900 dark:text-white mb-4 text-sm uppercase tracking-wider">Mobile App</h3>
-                 <div class="flex flex-col sm:flex-row lg:flex-col gap-3">
-                    <a href="#" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 flex items-center gap-3 hover:border-emerald-500 dark:hover:border-emerald-500 shadow-sm transition">
-                        <i class="fab fa-google-play fa-2x text-emerald-600 dark:text-emerald-400"></i>
-                        <div>
-                            <p class="text-[10px] text-gray-500 uppercase tracking-wider">GET IT ON</p>
-                            <p class="text-sm font-bold text-gray-800 dark:text-white">Google Play</p>
-                        </div>
+                <h3 class="font-bold text-slate-900 dark:text-white mb-3 text-sm">Class Caddy Ecosystem</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+                    <span class="lang-bn">প্রতিদিনের রুটিন ট্র্যাকিং, ডাইনামিক MCQ কুইজ, এক্সাম স্টুডিও এবং গোছানো আর্কাইভসের সমন্বয়ে তৈরি একটি আধুনিক ও ওপেন লার্নিং প্ল্যাটফর্ম।</span>
+                    <span class="lang-en">An integrated study planner, dynamic MCQ parser, timed exam studio, and digital notes archive built for focused learners.</span>
+                </p>
+                <div class="flex flex-wrap gap-2.5">
+                    <a href="study_plan.html" class="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 hover:border-emerald-500 transition">
+                        <i class="fas fa-calendar-check text-emerald-600 mr-1.5"></i>Study Planner
                     </a>
-                    <a href="#" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 flex items-center gap-3 hover:border-emerald-500 dark:hover:border-emerald-500 shadow-sm transition">
-                        <i class="fab fa-apple fa-2x text-emerald-600 dark:text-emerald-400"></i>
-                        <div>
-                            <p class="text-[10px] text-gray-500 uppercase tracking-wider">Download on the</p>
-                            <p class="text-sm font-bold text-gray-800 dark:text-white">App Store</p>
-                        </div>
+                    <a href="archives.html" class="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-800 dark:text-slate-200 hover:border-emerald-500 transition">
+                        <i class="fas fa-folder-open text-emerald-600 mr-1.5"></i>Archives Explorer
                     </a>
-                 </div>
+                </div>
             </div>
         </div>
 
         <!-- Copyright -->
-        <div class="mt-12 pt-6 border-t border-gray-200 dark:border-gray-800 text-center text-gray-500 text-xs">
-            <p>&copy; 2025 Class Caddy. All rights reserved.</p>
+        <div class="mt-12 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-slate-500 text-xs">
+            <p>&copy; 2026 Class Caddy. All rights reserved.</p>
+            <div class="flex items-center gap-4">
+                <a href="privacy.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">Privacy Policy</a>
+                <span>·</span>
+                <a href="about.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">About</a>
+                <span>·</span>
+                <a href="contact.html" class="hover:text-emerald-600 dark:hover:text-emerald-400 transition">Contact</a>
+            </div>
         </div>
     </div>
 </footer>
 <!-- =================== FEEDBACK & FOOTER END =================== -->
 
-    <!-- Go to Top Button -->
-    <button class="go-to-top-btn" aria-label="Go to top">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
-        </svg>
-    </button>
+<!-- Interactive Homepage Logic: Language Toggle, Demo Timer, Interactive Progress & Auth Greeting -->
+<script>
+(function() {
+    // 1. Bilingual Toggle (Bangla / English)
+    function applyLanguage(lang) {
+        const validLang = lang === 'en' ? 'en' : 'bn';
+        document.body.classList.remove('lang-bn', 'lang-en');
+        document.body.classList.add('lang-' + validLang);
+        document.documentElement.lang = validLang;
+        try {
+            localStorage.setItem('cc_home_lang', validLang);
+        } catch (e) {}
+
+        // Update all toggle button active styles
+        const bnBtns = [
+            document.getElementById('lang-btn-bn-header'),
+            document.getElementById('lang-btn-bn-mobile'),
+            document.getElementById('lang-btn-bn-hero')
+        ];
+        const enBtns = [
+            document.getElementById('lang-btn-en-header'),
+            document.getElementById('lang-btn-en-mobile'),
+            document.getElementById('lang-btn-en-hero')
+        ];
+
+        const activeClasses = ['bg-emerald-600', 'text-white', 'shadow-sm'];
+        const inactiveClasses = ['text-slate-600', 'dark:text-slate-300'];
+
+        bnBtns.forEach(btn => {
+            if (!btn) return;
+            if (validLang === 'bn') {
+                btn.classList.add(...activeClasses);
+                btn.classList.remove(...inactiveClasses);
+            } else {
+                btn.classList.remove(...activeClasses);
+                btn.classList.add(...inactiveClasses);
+            }
+        });
+
+        enBtns.forEach(btn => {
+            if (!btn) return;
+            if (validLang === 'en') {
+                btn.classList.add(...activeClasses);
+                btn.classList.remove(...inactiveClasses);
+            } else {
+                btn.classList.remove(...activeClasses);
+                btn.classList.add(...inactiveClasses);
+            }
+        });
+    }
+
+    window.setHomepageLang = function(lang) {
+        applyLanguage(lang);
+    };
+
+    // Initialize saved language (Default: Bangla 'bn')
+    let initialLang = 'bn';
+    try {
+        const stored = localStorage.getItem('cc_home_lang');
+        if (stored === 'en' || stored === 'bn') initialLang = stored;
+    } catch (e) {}
+    applyLanguage(initialLang);
+
+    // 2. Interactive Hero Study Planner Preview (Live Ticking Timer & Task Done Toggle)
+    const taskStates = [true, true, false];
+    let demoSeconds = 1 * 3600 + 24 * 60 + 18; // 01:24:18
+    let demoTimerRunning = true;
+
+    function formatHMS(totalSec) {
+        const hrs = Math.floor(totalSec / 3600);
+        const mins = Math.floor((totalSec % 3600) / 60);
+        const secs = totalSec % 60;
+        return [hrs, mins, secs].map(v => String(v).padStart(2, '0')).join(':');
+    }
+
+    setInterval(function() {
+        if (!demoTimerRunning) return;
+        demoSeconds++;
+        const el = document.getElementById('hero-demo-timer');
+        if (el) el.textContent = formatHMS(demoSeconds);
+    }, 1000);
+
+    window.toggleHeroDemoTimer = function() {
+        demoTimerRunning = !demoTimerRunning;
+        const btn = document.getElementById('hero-demo-timer-btn');
+        if (btn) {
+            btn.innerHTML = demoTimerRunning
+                ? '<i class="fas fa-pause text-[10px]"></i>'
+                : '<i class="fas fa-play text-[10px]"></i>';
+        }
+    };
+
+    window.toggleHeroTask = function(index) {
+        taskStates[index] = !taskStates[index];
+        const btn = document.getElementById('hero-task-btn-' + index);
+        if (btn) {
+            if (taskStates[index]) {
+                btn.className = 'px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-600 text-white cursor-pointer transition';
+                btn.innerHTML = '<i class="fas fa-check mr-1"></i>Done';
+            } else {
+                btn.className = 'px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 cursor-pointer transition';
+                btn.innerHTML = '<i class="far fa-circle mr-1"></i>Done';
+            }
+        }
+        const doneCount = taskStates.filter(Boolean).length;
+        const pct = Math.round((doneCount / taskStates.length) * 100);
+        const pctEl = document.getElementById('hero-demo-pct');
+        const barEl = document.getElementById('hero-demo-bar');
+        if (pctEl) pctEl.textContent = pct + '%';
+        if (barEl) barEl.style.width = pct + '%';
+    };
+
+    // 3. Interactive MCQ Option Demo in Feature 02
+    window.selectDemoMcqOption = function(clickedBtn, isCorrect) {
+        const container = document.getElementById('demo-mcq-options');
+        if (!container) return;
+        const buttons = container.querySelectorAll('.demo-mcq-opt');
+        buttons.forEach(btn => {
+            btn.className = 'demo-mcq-opt text-left px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 transition flex items-center gap-2.5 cursor-pointer text-xs font-medium text-slate-800 dark:text-slate-200';
+        });
+
+        if (isCorrect) {
+            clickedBtn.className = 'demo-mcq-opt text-left px-3.5 py-2.5 rounded-xl border border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/40 transition flex items-center justify-between gap-2.5 cursor-pointer text-xs font-semibold text-emerald-800 dark:text-emerald-300';
+        } else {
+            clickedBtn.className = 'demo-mcq-opt text-left px-3.5 py-2.5 rounded-xl border border-rose-500 bg-rose-50/70 dark:bg-rose-950/40 transition flex items-center justify-between gap-2.5 cursor-pointer text-xs font-semibold text-rose-800 dark:text-rose-300';
+        }
+    };
+
+    // 4. Sync Hero Google Auth Button when User is Logged In
+    function updateHeroAuthSlot() {
+        const slot = document.getElementById('hero-google-auth-slot');
+        if (!slot) return;
+        let user = null;
+        try {
+            const raw = localStorage.getItem('cc_auth_user') || localStorage.getItem('class_caddy_user');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (parsed && (parsed.isLoggedIn || parsed.uid || parsed.email)) {
+                    user = parsed;
+                }
+            }
+        } catch (e) {}
+
+        if (user) {
+            const name = user.displayName || user.name || (user.email ? user.email.split('@')[0] : 'Learner');
+            slot.innerHTML = `
+                <a href="study_plan.html" class="px-5 py-3.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-semibold rounded-xl border border-emerald-300 dark:border-emerald-800 transition-all duration-150 flex items-center gap-2.5 whitespace-nowrap">
+                    <i class="fas fa-user-check text-emerald-600 dark:text-emerald-400"></i>
+                    <span class="lang-bn">স্বাগতম, ${name} (ড্যাশবোর্ড)</span>
+                    <span class="lang-en">Welcome, ${name} (Dashboard)</span>
+                </a>
+            `;
+        }
+    }
+
+    updateHeroAuthSlot();
+    window.addEventListener('storage', updateHeroAuthSlot);
+    setTimeout(updateHeroAuthSlot, 1200);
+
+    // 5. Feedback Form Clean Confirmation Handler
+    const feedbackForm = document.getElementById('homepage-feedback-form');
+    if (feedbackForm) {
+        feedbackForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const statusMsg = document.getElementById('feedback-status-msg');
+            if (statusMsg) {
+                statusMsg.classList.remove('hidden');
+                statusMsg.innerHTML = '<span class="lang-bn">ধন্যবাদ! আপনার মূল্যবান মতামত সফলভাবে গ্রহণ করা হয়েছে।</span><span class="lang-en">Thank you! Your feedback has been received.</span>';
+            }
+            feedbackForm.reset();
+        });
+    }
+})();
+</script>
+
 <script type="module" src="script.js"></script>
 
-    <!-- Floating Action Buttons (Scroll to Bottom/Top & Global Dark Mode) -->
-    <button id="scroll-toggle-btn" class="fixed bottom-32 right-5 z-[100] w-12 h-12 bg-gray-700 hover:bg-gray-900 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100 cursor-pointer" title="Scroll to Bottom" aria-label="Scroll to Bottom">
-        <i class="fas fa-arrow-down"></i>
-    </button>
+<!-- Floating Action Buttons (Scroll to Bottom/Top & Global Dark Mode) -->
+<button id="scroll-toggle-btn" class="fixed bottom-24 right-5 z-[100] w-12 h-12 bg-slate-700 hover:bg-slate-900 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105 focus:outline-none opacity-90 hover:opacity-100 cursor-pointer" title="Scroll to Bottom" aria-label="Scroll to Bottom">
+    <i class="fas fa-arrow-down"></i>
+</button>
 
-    <button id="global-dark-mode-btn" class="fixed bottom-6 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-lg border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 transition-transform cursor-pointer" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
-        <i class="fas fa-moon text-2xl"></i>
-    </button>
+<button id="global-dark-mode-btn" class="fixed bottom-6 right-5 w-14 h-14 bg-slate-800 text-yellow-400 rounded-full shadow-lg border-2 border-slate-700 z-[999] flex items-center justify-center hover:scale-105 transition-transform cursor-pointer" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
+    <i class="fas fa-moon text-2xl"></i>
+</button>
 
 </body>
 </html>
