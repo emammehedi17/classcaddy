@@ -50,19 +50,219 @@
         .container {
             max-width: 1100px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 92px 20px 20px 20px;
         }
 
-        /* Header Styles */
+        body.in-iframe .container {
+            padding-top: 20px;
+        }
+
+        body.in-iframe header.main-website-ui {
+            display: none !important;
+        }
+
+        /* --- Main Website Top Navbar Styles (Self-Contained without Tailwind Preflight) --- */
+        header.main-website-ui {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            color: #1f2937;
+            font-family: 'Hind Siliguri', system-ui, -apple-system, sans-serif;
+        }
+
+        header.main-website-ui .nav-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 10px 24px;
+        }
+
+        header.main-website-ui nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header.main-website-ui .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        header.main-website-ui .nav-brand a {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        header.main-website-ui .nav-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #10b981;
+            object-fit: cover;
+            display: block;
+        }
+
+        header.main-website-ui .nav-logo-du {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid #e5e7eb;
+            object-fit: cover;
+            display: block;
+        }
+
+        header.main-website-ui h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0;
+            line-height: 1.2;
+            text-shadow: none;
+        }
+
+        header.main-website-ui .nav-links-desktop {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(243, 244, 246, 0.7);
+            border: 1px solid #e5e7eb;
+            border-radius: 9999px;
+            padding: 4px;
+            font-size: 0.875rem;
+        }
+
+        header.main-website-ui .nav-links-desktop a {
+            padding: 6px 18px;
+            color: #4b5563;
+            text-decoration: none;
+            border-radius: 9999px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        header.main-website-ui .nav-links-desktop a:hover {
+            color: #111827;
+            background: #e5e7eb;
+        }
+
+        header.main-website-ui .nav-links-desktop a.active-nav {
+            color: #059669;
+            font-weight: 600;
+        }
+
+        header.main-website-ui .nav-links-desktop a.active-nav:hover {
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        header.main-website-ui .nav-right-desktop {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        header.main-website-ui .signup-button {
+            display: inline-block;
+            padding: 7px 18px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background-color: #10b981;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 9999px;
+            transition: background-color 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+        }
+
+        header.main-website-ui .signup-button:hover {
+            background-color: #059669;
+        }
+
+        header.main-website-ui .nav-mobile-toggle {
+            display: none;
+            align-items: center;
+        }
+
+        header.main-website-ui #mobile-menu-button {
+            background: transparent;
+            border: none;
+            color: #374151;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        header.main-website-ui #mobile-menu-button svg {
+            width: 24px;
+            height: 24px;
+            display: block;
+        }
+
+        header.main-website-ui #mobile-menu {
+            display: none;
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            margin: 10px -24px -10px -24px;
+            padding: 6px 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+        }
+
+        header.main-website-ui #mobile-menu.open {
+            display: block;
+        }
+
+        header.main-website-ui #mobile-menu a.mobile-link {
+            display: block;
+            padding: 10px 24px;
+            font-size: 0.9rem;
+            color: #374151;
+            text-decoration: none;
+            transition: background-color 0.15s;
+        }
+
+        header.main-website-ui #mobile-menu a.mobile-link:hover {
+            background: #f3f4f6;
+        }
+
+        header.main-website-ui #mobile-menu a.mobile-link.active-nav {
+            color: #059669;
+            font-weight: 600;
+        }
+
+        header.main-website-ui #mobile-menu .mobile-auth {
+            padding: 12px 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        header.main-website-ui #mobile-menu .mobile-auth .signup-button {
+            display: block;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Note Hero Header Styles */
         .note-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #4338ca 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4338ca 55%, #0f766e 100%);
             color: white;
             padding: 45px 35px;
             border-radius: 16px;
             margin-bottom: 35px;
             position: relative;
-            box-shadow: 0 12px 30px rgba(49, 46, 129, 0.2);
+            box-shadow: 0 12px 30px rgba(49, 46, 129, 0.22);
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.14);
         }
 
         .note-header::before {
@@ -73,8 +273,9 @@
             top: -30px;
             right: -20px;
             font-size: 180px;
-            color: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.06);
             transform: rotate(-10deg);
+            pointer-events: none;
         }
 
         .chapter-tag {
@@ -84,17 +285,33 @@
             border-radius: 25px;
             font-size: 1rem;
             font-weight: 700;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.12);
+            position: relative;
+            z-index: 1;
         }
 
-        h1 {
-            font-size: 2.8rem;
+        .note-header h1 {
+            font-size: 2.6rem;
             margin: 0 0 10px 0;
             line-height: 1.3;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
             color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .note-header .header-subtitle {
+            font-size: 1.12rem;
+            color: #e0e7ff;
+            margin: 0;
+            max-width: 820px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
         }
 
         .header-meta {
@@ -102,6 +319,8 @@
             justify-content: space-between;
             align-items: flex-end;
             margin-top: 25px;
+            position: relative;
+            z-index: 1;
         }
 
         .qr-corner img {
@@ -111,6 +330,8 @@
             border: 3px solid white;
             transition: transform 0.3s;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            background: white;
+            object-fit: cover;
         }
 
         .qr-corner img:hover {
@@ -156,20 +377,60 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
+            padding-bottom: 12px;
             margin-bottom: 15px;
             gap: 15px;
         }
 
-        .card-badge {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--border-color);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            background-color: #fff;
+        .card-badge-wrapper {
+            position: relative;
+            width: 72px;
+            height: 72px;
             flex-shrink: 0;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 2.5px solid var(--border-color);
+            box-shadow: 0 4px 10px rgba(13, 148, 136, 0.14);
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+            cursor: zoom-in;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        .card-badge-wrapper:hover {
+            transform: scale(1.07);
+            border-color: var(--secondary-color);
+            box-shadow: 0 8px 16px rgba(13, 148, 136, 0.24);
+        }
+
+        .card-badge {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            background-color: #fff;
+            transition: opacity 0.25s ease;
+        }
+
+        .card-badge-zoom-hint {
+            position: absolute;
+            right: 4px;
+            bottom: 4px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(30, 27, 75, 0.78);
+            color: #ffffff;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .card-badge-wrapper:hover .card-badge-zoom-hint {
+            opacity: 1;
         }
 
         .info-card h3 {
@@ -366,7 +627,269 @@
             right: 35px;
         }
 
+        /* Lightbox Modal for Image Engine */
+        .ict-lightbox-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .ict-lightbox-backdrop.active {
+            display: flex;
+        }
+
+        .ict-lightbox-card {
+            background: #ffffff;
+            border-radius: 18px;
+            max-width: 720px;
+            width: 100%;
+            padding: 22px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+            border: 1px solid #ccfbf1;
+            position: relative;
+            text-align: center;
+            animation: ictLightboxPop 0.2s ease-out;
+        }
+
+        @keyframes ictLightboxPop {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .ict-lightbox-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #f1f5f9;
+            color: #334155;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .ict-lightbox-close:hover {
+            background: #e11d48;
+            color: #ffffff;
+        }
+
+        .ict-lightbox-img-wrap {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            min-height: 240px;
+            max-height: 68vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .ict-lightbox-img-wrap img {
+            max-width: 100%;
+            max-height: 62vh;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .ict-lightbox-title {
+            margin: 14px 0 4px 0;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .ict-lightbox-meta {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin: 0;
+        }
+
+        /* Floating Action Buttons (Self-Contained Styles) */
+        #scroll-toggle-btn {
+            position: fixed;
+            bottom: 92px;
+            right: 20px;
+            z-index: 100;
+            width: 48px;
+            height: 48px;
+            background-color: #374151;
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.25s ease, background-color 0.25s ease;
+            opacity: 0.92;
+        }
+
+        #scroll-toggle-btn:hover {
+            background-color: #111827;
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        #global-dark-mode-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 20px;
+            z-index: 999;
+            width: 54px;
+            height: 54px;
+            background-color: #1f2937;
+            color: #facc15;
+            border: 2px solid #374151;
+            border-radius: 50%;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.35rem;
+            transition: transform 0.25s ease;
+        }
+
+        #global-dark-mode-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Dark Mode Support */
+        body.dark-mode,
+        html.dark body {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f1f5f9;
+            --text-heading: #e0e7ff;
+            --border-color: #334155;
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+
+        body.dark-mode header.main-website-ui,
+        html.dark header.main-website-ui {
+            background: rgba(15, 23, 42, 0.92);
+            border-bottom-color: #334155;
+            color: #f8fafc;
+        }
+
+        body.dark-mode header.main-website-ui h1,
+        html.dark header.main-website-ui h1 {
+            color: #f8fafc;
+        }
+
+        body.dark-mode header.main-website-ui .nav-links-desktop,
+        html.dark header.main-website-ui .nav-links-desktop {
+            background: rgba(30, 41, 59, 0.85);
+            border-color: #334155;
+        }
+
+        body.dark-mode header.main-website-ui .nav-links-desktop a,
+        html.dark header.main-website-ui .nav-links-desktop a {
+            color: #cbd5e1;
+        }
+
+        body.dark-mode header.main-website-ui .nav-links-desktop a:hover,
+        html.dark header.main-website-ui .nav-links-desktop a:hover {
+            background: #334155;
+            color: #ffffff;
+        }
+
+        body.dark-mode header.main-website-ui .nav-links-desktop a.active-nav,
+        html.dark header.main-website-ui .nav-links-desktop a.active-nav {
+            color: #34d399;
+        }
+
+        body.dark-mode .info-card h3,
+        html.dark .info-card h3,
+        body.dark-mode .mcq-question,
+        html.dark .mcq-question {
+            color: #a5b4fc;
+        }
+
+        body.dark-mode tbody tr:nth-child(even),
+        html.dark tbody tr:nth-child(even) {
+            background-color: #0f172a;
+        }
+
+        body.dark-mode tbody tr:hover,
+        html.dark tbody tr:hover {
+            background-color: #1e293b;
+        }
+
+        body.dark-mode .mcq-options div,
+        html.dark .mcq-options div {
+            background: #0f172a;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .mcq-options div:hover,
+        html.dark .mcq-options div:hover {
+            background: #134e4a;
+            border-color: #14b8a6;
+        }
+
+        body.dark-mode .alert-box,
+        html.dark .alert-box,
+        body.dark-mode .master-footer,
+        html.dark .master-footer {
+            background-color: #1e293b;
+            border-color: #334155;
+        }
+
+        body.dark-mode .correction-box,
+        html.dark .correction-box {
+            background-color: #31101d;
+        }
+
+        body.dark-mode .ict-lightbox-card,
+        html.dark .ict-lightbox-card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        body.dark-mode .ict-lightbox-img-wrap,
+        html.dark .ict-lightbox-img-wrap {
+            background: #0f172a;
+            border-color: #334155;
+        }
+
+        body.dark-mode .ict-lightbox-title,
+        html.dark .ict-lightbox-title {
+            color: #a5b4fc;
+        }
+
         @media (max-width: 768px) {
+            header.main-website-ui .nav-links-desktop,
+            header.main-website-ui .nav-right-desktop {
+                display: none !important;
+            }
+            header.main-website-ui .nav-mobile-toggle {
+                display: flex !important;
+            }
+            .note-header {
+                padding: 30px 22px;
+            }
+            .note-header h1 {
+                font-size: 2rem;
+            }
             .header-meta {
                 flex-direction: column;
                 align-items: flex-start;
@@ -390,64 +913,82 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-<div class="container">
-
-    <!-- Header Section -->
-    <!-- =================== HEADER START =================== -->
-<header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200 main-website-ui shadow-sm text-gray-800">
-    <div class="container mx-auto px-6 py-3">
-        <nav class="flex justify-between items-center">
+<!-- =================== HEADER START =================== -->
+<header class="main-website-ui">
+    <div class="nav-inner">
+        <nav>
             <!-- Left Side: Profile & Title -->
-            <div class="flex items-center gap-4">
+            <div class="nav-brand">
                 <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer">
-                    <img src="images/profile.jpg" alt="Profile" class="h-10 w-10 rounded-full border-2 border-emerald-500 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/ffffff/059669?text=CC';">
+                    <img src="images/profile.jpg" alt="Profile" class="nav-avatar" onerror="this.onerror=null; this.src='https://placehold.co/40x40/ffffff/059669?text=CC';">
                 </a>
                 <a href="index.html">
-                    <h1 class="text-xl font-bold text-gray-800">Class Caddy</h1>
+                    <h1>Class Caddy</h1>
                 </a>
             </div>
 
-            <!-- Center: Desktop Navigation (hidden on mobile) -->
-            <div class="hidden md:flex items-center gap-1 bg-gray-100/50 border border-gray-200 rounded-full p-1 text-sm">
-                <a href="index.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Home</a>
-                <a href="archives.html" class="px-5 py-1.5 font-medium text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-full transition-colors">Archives</a>
-                <a href="study_plan.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Study Plan</a>
-                <a href="about.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">About</a>
-                <a href="contact.html" class="px-5 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-full transition-colors">Contact</a>
+            <!-- Center: Desktop Navigation -->
+            <div class="nav-links-desktop">
+                <a href="index.html">Home</a>
+                <a href="archives.html" class="active-nav">Archives</a>
+                <a href="study_plan.html">Study Plan</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
             </div>
 
-            <!-- Right Side: DU Logo & Sign Up (hidden on mobile) -->
-            <div class="hidden md:flex items-center gap-4">
+            <!-- Right Side: DU Logo & Sign Up -->
+            <div class="nav-right-desktop">
                 <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
-                    <img src="images/du_logo.png" alt="DU Logo" class="h-10 w-10 rounded-full border border-gray-200 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/eeeeee/111827?text=DU';">
+                    <img src="images/du_logo.png" alt="DU Logo" class="nav-logo-du" onerror="this.onerror=null; this.src='https://placehold.co/40x40/eeeeee/111827?text=DU';">
                 </a>
-                <div id="auth-container-desktop" class="auth-container text-sm">
-                    <a href="index.html#signup" class="px-5 py-2 font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors signup-button shadow-sm">Sign Up</a>
+                <div id="auth-container-desktop" class="auth-container">
+                    <a href="index.html#signup" class="signup-button">Sign Up</a>
                 </div>
             </div>
 
             <!-- Mobile Hamburger Menu Button -->
-            <div class="md:hidden flex items-center">
-                <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            <div class="nav-mobile-toggle">
+                <button id="mobile-menu-button" type="button" aria-label="Toggle Menu">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
             </div>
         </nav>
 
         <!-- Mobile Menu Panel -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200 -mx-6 mt-3 shadow-md">
-            <a href="index.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Home</a>
-            <a href="archives.html" class="block px-6 py-3 text-sm font-semibold text-emerald-600 hover:bg-gray-100 transition-colors">Archives</a>
-            <a href="study_plan.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Study Plan</a>
-            <a href="about.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">About</a>
-            <a href="contact.html" class="block px-6 py-3 text-sm text-gray-700 hover:bg-gray-100 transition-colors">Contact</a>
-            <div id="auth-container-mobile" class="auth-container px-6 py-4 border-t border-gray-200">
-                <a href="index.html#signup" class="block w-full text-center text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full py-2 transition-colors signup-button">Sign Up</a>
+        <div id="mobile-menu">
+            <a href="index.html" class="mobile-link">Home</a>
+            <a href="archives.html" class="mobile-link active-nav">Archives</a>
+            <a href="study_plan.html" class="mobile-link">Study Plan</a>
+            <a href="about.html" class="mobile-link">About</a>
+            <a href="contact.html" class="mobile-link">Contact</a>
+            <div id="auth-container-mobile" class="auth-container mobile-auth">
+                <a href="index.html#signup" class="signup-button">Sign Up</a>
             </div>
         </div>
     </div>
 </header>
 <!-- =================== HEADER END =================== -->
+
+<div class="container">
+
+    <!-- Note Hero Header Section -->
+    <header class="note-header">
+        <span class="chapter-tag"><i class="fas fa-microchip"></i> তথ্য ও যোগাযোগ প্রযুক্তি (ICT) — কম্পিউটার পেরিফেরালস</span>
+        <h1>কম্পিউটার পেরিফেরাল ডিভাইস (Computer Peripherals)</h1>
+        <p class="header-subtitle">ইনপুট, আউটপুট ও ইনপুট-আউটপুট ডিভাইস, কী-বোর্ড, মাউস, ডিজিটাইজার, স্ক্যানার, OMR, OCR, MICR এবং বিগত বিসিএস ও নিয়োগ পরীক্ষার পূর্ণাঙ্গ মাস্টার নোট ও প্রশ্নব্যাংক</p>
+
+        <div class="header-meta">
+            <div class="creator-wrapper">
+                <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--accent-highlight); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                    <span style="color: #1e1b4b;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" rel="noopener noreferrer" style="color: #1e1b4b; text-decoration: none;">ইমাম মেহেদি</a>
+                </div>
+            </div>
+
+            <a href="https://www.facebook.com/emammehedi17/" target="_blank" rel="noopener noreferrer" class="qr-corner">
+                <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.onerror=null; this.src='https://classcaddy.vercel.app/qr.fb.png';">
+            </a>
+        </div>
+    </header>
 
     <!-- Dynamic Containers -->
     <h2 class="section-title"><i class="fas fa-plug"></i> ১. কম্পিউটার পেরিফেরালস (Computer Peripherals)</h2>
@@ -493,29 +1034,65 @@
         
         <div class="footer-creator-wrapper">
             <div class="creator-badge" style="margin-top: 5px; display: inline-block; background-color: var(--secondary-color); padding: 8px 20px; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
-                <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
+                <span style="color: white;">নোট প্রস্তুতকরণে: </span><a href="https://www.facebook.com/emammehedi17/" target="_blank" rel="noopener noreferrer" style="color: white; text-decoration: none;">ইমাম মেহেদি</a>
             </div>
         </div>
 
-        <a href="https://www.facebook.com/emammehedi17/" target="_blank" class="qr-corner">
-            <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile">
+        <a href="https://www.facebook.com/emammehedi17/" target="_blank" rel="noopener noreferrer" class="qr-corner">
+            <img src="qr.fb.png" alt="Facebook QR Code" title="Scan to visit Facebook Profile" onerror="this.onerror=null; this.src='https://classcaddy.vercel.app/qr.fb.png';">
         </a>
     </footer>
 
 </div>
 
+<!-- Lightbox Modal for Device Images -->
+<div id="ict-lightbox-modal" class="ict-lightbox-backdrop" role="dialog" aria-modal="true" aria-labelledby="ict-lightbox-title">
+    <div class="ict-lightbox-card" onclick="event.stopPropagation()">
+        <button type="button" class="ict-lightbox-close" onclick="closeIctLightbox()" aria-label="Close Preview">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="ict-lightbox-img-wrap">
+            <img id="ict-lightbox-img" src="" alt="">
+        </div>
+        <h3 id="ict-lightbox-title" class="ict-lightbox-title"></h3>
+        <p id="ict-lightbox-meta" class="ict-lightbox-meta">ডিভাইস চিত্র প্রিভিউ • বাইরে ক্লিক করুন অথবা ESC চাপুন</p>
+    </div>
+</div>
+
 <!-- JavaScript Data and Rendering Logic -->
 <script>
-    // --- DATA STRUCTURES ---
+    // Detect iframe embedding so top navbar does not duplicate inside modal preview
+    if (window.self !== window.top) {
+        document.body.classList.add('in-iframe');
+    }
+
+    // Mobile Menu Toggle for Standalone Header
+    (function initHeaderMenu() {
+        const menuBtn = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('open');
+            });
+        }
+    })();
+
+    // --- DATA STRUCTURES (WITH VERIFIED WIKIMEDIA COMMONS URLS & WIKIPEDIA API METADATA) ---
     const peripheralsIntroCards = [
         {
             title: "কম্পিউটার পেরিফেরালস কী?", icon: "fas fa-plug",
-            img: "https://upload.wikimedia.org/wikipedia/commons/b/b7/Computer_motherboard.jpg",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Computer_motherboard.jpg/500px-Computer_motherboard.jpg",
+            fullImg: "https://upload.wikimedia.org/wikipedia/commons/6/68/Computer_motherboard.jpg",
+            wiki: "Motherboard",
+            query: "Computer motherboard",
             text: "নির্দিষ্ট কাজের জন্য কম্পিউটারের সিস্টেমে সংযুক্ত অতিরিক্ত ডিভাইসসমূহকে কম্পিউটার পেরিফেরালস বলে। কম্পিউটার পেরিফেরালস হার্ডওয়্যারের অংশ, কিন্তু হার্ডওয়্যার পেরিফেরালসের অংশ নয়। মাইক্রোপ্রসেসর, মাদারবোর্ড, পাওয়ার সাপ্লাই ইউনিট সিস্টেম ইউনিটের অংশ কিন্তু পেরিফেরালস নয়। পেরিফেরালস ৩ প্রকার: ১. ইনপুট ডিভাইস, ২. আউটপুট ডিভাইস, ৩. মেমোরি ডিভাইস।"
         },
         {
             title: "ইনপুট ডিভাইস (Input Device)", icon: "fas fa-sign-in-alt",
-            img: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Computer_keyboard_with_the_QWERTY_layout.jpg",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Wireless_computer_keyboard_with_mouse_an_USB_receiver.jpg/500px-Wireless_computer_keyboard_with_mouse_an_USB_receiver.jpg",
+            fullImg: "https://upload.wikimedia.org/wikipedia/commons/1/1b/Wireless_computer_keyboard_with_mouse_an_USB_receiver.jpg",
+            wiki: "Peripheral",
+            query: "Computer keyboard and mouse",
             text: "যেসব ডিভাইস ব্যবহার করে কম্পিউটারকে ডেটা প্রদান ও প্রক্রিয়াকরণের জন্য নির্দেশ দেওয়া ফার হয়, তাদের ইনপুট ডিভাইস বলে। অপটিক্যাল ইনপুট ডিভাইসসমূহ স্ক্যানিংয়ের মাধ্যমে কাজ শুরু করে এবং ইনপুট হিসেবে আলো (Light) গ্রহণ করে। মোবাইল ফোনের ইনপুট ডিভাইস: কি-প্যাড, টাচস্ক্রিন, ক্যামেরা ইত্যাদি।"
         }
     ];
@@ -535,7 +1112,10 @@
     const ioDevicesCards = [
         {
             title: "আউটপুট ডিভাইস (Output Device)", icon: "fas fa-sign-out-alt",
-            img: "https://upload.wikimedia.org/wikipedia/commons/f/f6/HP_LaserJet_1020.jpg",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/HP_LaserJet_1020_printer.jpg/500px-HP_LaserJet_1020_printer.jpg",
+            fullImg: "https://upload.wikimedia.org/wikipedia/commons/8/8d/HP_LaserJet_1020_printer.jpg",
+            wiki: "Printer_(computing)",
+            query: "HP LaserJet printer",
             list: [
                 "যে সকল ডিভাইসে ইনপুট ডেটা প্রসেসিং হওয়ার পর, আউটপুট প্রদান করে সেই সকল ডিভাইসকে আউটপুট ডিভাইস বলে।",
                 "<strong>উদাহরণ:</strong> মনিটর, প্লটার, প্রিন্টার, ফিল্ম রেকর্ডার, মাইক্রো ফিশ, ইমেজ সেটার, প্রজেক্টর, হেডফোন, স্পিকার ইত্যাদি।"
@@ -543,7 +1123,10 @@
         },
         {
             title: "ইনপুট-আউটপুট (উভয়) ডিভাইস", icon: "fas fa-exchange-alt",
-            img: "https://upload.wikimedia.org/wikipedia/commons/1/14/IPhone_5s_golden.jpg",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Hear_Music_touchscreen.jpg/500px-Hear_Music_touchscreen.jpg",
+            fullImg: "https://upload.wikimedia.org/wikipedia/commons/b/bf/Hear_Music_touchscreen.jpg",
+            wiki: "Touchscreen",
+            query: "Touchscreen display",
             list: [
                 "মানুষের ভাষায় উপস্থাপিত তথ্য সংগ্রহ করে কম্পিউটারের ভাষাকে প্রক্রিয়াধীন করে পুনরায় মানুষের ভাষায় উপস্থাপন করার জন্যে যে সকল ডিভাইস ব্যবহার করা হয় তাদেরকে ইনপুট-আউটপুট ডিভাইস বলে।",
                 "<strong>উদাহরণ:</strong> Modem, Touchscreen, Digital Camera, Sound Card, Network Card, Video Cassette Recorder (VCR), Tape Recorder, Punch Card, Fax.",
@@ -555,7 +1138,10 @@
     const keyboardIntroCards = [
         {
             title: "কী-বোর্ডের পরিচিতি", icon: "fas fa-keyboard",
-            img: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Computer_keyboard_with_the_QWERTY_layout.jpg",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Keyboard_Construction.JPG/500px-Keyboard_Construction.JPG",
+            fullImg: "https://upload.wikimedia.org/wikipedia/commons/9/97/Keyboard_Construction.JPG",
+            wiki: "Keyboard_technology",
+            query: "Computer keyboard keys",
             list: [
                 "অপর নাম: কন্ট্রোল বোর্ড/কনসোল (Console)। এটি সবচেয়ে ধীরগতির ইনপুট ব্যবস্থা।",
                 "আদর্শ কী-বোর্ডের সর্বোচ্চ কী (KEY) সংখ্যা ১০৫টি (আমেরিকান স্ট্যান্ডার্ডে - ১০১টি; উইন্ডোজ কম্পিউটারের - ১০৪টি)।",
@@ -565,7 +1151,10 @@
         },
         {
             title: "কী-বোর্ড বিন্যাস (Layout)", icon: "fas fa-font",
-            img: "https://upload.wikimedia.org/wikipedia/commons/4/47/Logitech_K330_keyboard.jpg",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/QWERTY_keyboard.jpg/500px-QWERTY_keyboard.jpg",
+            fullImg: "https://upload.wikimedia.org/wikipedia/commons/0/0a/QWERTY_keyboard.jpg",
+            wiki: "QWERTY",
+            query: "QWERTY keyboard",
             list: [
                 "কী-বোর্ডের বামপ্রান্তের উপরের প্রথম ৬টি বর্ণের ক্রমের আলোকে কী-বোর্ড লে-আউট নামকরণ করা হয়। যেমন: AZERTY, QWERTY, QWERTZ, DVORAK, JCUKEN ইত্যাদি।",
                 "<strong>QWERTY:</strong> আদর্শ/সাধারণ কী-বোর্ড বিন্যাস। এর আবিষ্কারক: ক্রিস্টোফার লাথাম সোলস (যুক্তরাষ্ট্র)।"
@@ -619,7 +1208,10 @@
     const banglaFontsCards = [
         {
             title: "বাংলা কী-বোর্ড সফটওয়্যার ও ফন্ট", icon: "fas fa-language",
-            img: "https://upload.wikimedia.org/wikipedia/commons/7/7b/Bangla_Keyboard.jpg",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Borno_Phonetic_Keyboard_Layout_from_Codepotro.png/500px-Borno_Phonetic_Keyboard_Layout_from_Codepotro.png",
+            fullImg: "https://upload.wikimedia.org/wikipedia/commons/b/b2/Borno_Phonetic_Keyboard_Layout_from_Codepotro.png",
+            wiki: "Avro_Keyboard",
+            query: "Bengali keyboard layout",
             list: [
                 "<strong>মুনীর কীবোর্ড (১৯৬৫):</strong> প্রথম বিজ্ঞানসম্মত বাংলা টাইপরাইটার কীবোর্ড। আবিষ্কারক মুনীর চৌধুরী।",
                 "<strong>বিজয় কী-বোর্ড (১৯৮৮):</strong> ফনেটিক সমর্থিত। আবিষ্কারক মোস্তফা জব্বার। বিজয় লে-আউটে যেতে Ctrl+Alt+B এবং ইউনিকোডে যেতে Ctrl+Alt+V চাপতে হয়।",
@@ -631,7 +1223,10 @@
         },
         {
             title: "মাল্টিমিডিয়া কী-বোর্ড", icon: "fas fa-play-circle",
-            img: "https://upload.wikimedia.org/wikipedia/commons/4/47/Logitech_K330_keyboard.jpg",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Multimediakb.jpg/500px-Multimediakb.jpg",
+            fullImg: "https://upload.wikimedia.org/wikipedia/commons/1/15/Multimediakb.jpg",
+            wiki: "Computer_keyboard",
+            query: "Multimedia keyboard",
             list: [
                 "মাল্টিমিডিয়া কী-বোর্ডে অতিরিক্ত কিছু কী থাকে যার সাহায্যে মিউজিক প্লেয়ার চালু করা, ভলিউম কমানো-বাড়ানো, ওয়েব ব্রাউজার চালু করা যায়।",
                 "<strong>Stand by Mood:</strong> কম্পিউটার চালু থাকবে কিন্তু মনিটর বন্ধ হয়ে যাবে।",
@@ -645,7 +1240,10 @@
     const mouseDigitizerCards = [
         {
             title: "মাউস (Mouse)", icon: "fas fa-mouse",
-            img: "https://upload.wikimedia.org/wikipedia/commons/2/22/3-Tasten-Maus_Microsoft.jpg",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/3-Tasten-Maus_Microsoft.jpg/500px-3-Tasten-Maus_Microsoft.jpg",
+            fullImg: "https://upload.wikimedia.org/wikipedia/commons/2/22/3-Tasten-Maus_Microsoft.jpg",
+            wiki: "Computer_mouse",
+            query: "3-Tasten-Maus Microsoft",
             list: [
                 "আকার ইঁদুর (Mouse)-এর মতো তাই এর নাম 'মাউস' রাখা হয়। এটি আবিষ্কার করেন ডগলাস এঞ্জেলবার্ট (১৯৬৪ সালে)।",
                 "সর্বপ্রথম মাউস ব্যবহৃত হয় ১৯৮৪ সালে (অ্যাপলের 'মেকিন্টোস' কম্পিউটারে)।",
@@ -656,7 +1254,10 @@
         },
         {
             title: "ডিজিটাইজার ও সেন্সর", icon: "fas fa-tablet-alt",
-            img: "https://upload.wikimedia.org/wikipedia/commons/4/4b/Wacom_Intuos3_A5.jpg",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Wacom_Intuos3_A5.jpg/500px-Wacom_Intuos3_A5.jpg",
+            fullImg: "https://upload.wikimedia.org/wikipedia/commons/6/63/Wacom_Intuos3_A5.jpg",
+            wiki: "Graphics_tablet",
+            query: "Wacom Intuos3 A5",
             list: [
                 "<strong>ডিজিটাইজার:</strong> ড্রয়িং, ম্যাপিং, এনিমেশন, গ্রাফিক্সকে কম্পিউটারে সংরক্ষণের জন্য ডিজিটাল ফর্মে কনভার্ট করে। এর অপর নাম ড্রয়িং ট্যাবলেট বা ডিজিটাল আর্ট বোর্ড। একটি স্টাইলাশের (Stylus) সাহায্যে ডিজিটাইজার বোর্ডে যা আঁকা হয় তাই মনিটরে ভেসে ওঠে।",
                 "<strong>সেন্সর (Sensor):</strong> এক ধরনের কনভার্টার যা কোনো সংকেতকে শনাক্ত করে ডিজিটাল সিগন্যালে পরিণত করে। ഫিজিক্যাল প্যারামিটারকে (তাপ, শব্দ, আলো) সিগন্যালে কনভার্ট করে। ২ প্রকার: Analog Sensor (পিটি-১০০) এবং Digital Sensor (PNP, NPN)।"
@@ -667,12 +1268,18 @@
     const scannerIntroCards = [
         {
             title: "স্ক্যানার (Scanner)", icon: "fas fa-print",
-            img: "https://upload.wikimedia.org/wikipedia/commons/8/87/Epson_Perfection_V33_Scanner_-_Lid_opened.jpg",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Epson_Perfection_4990_Photo_scanner_6012.jpg/500px-Epson_Perfection_4990_Photo_scanner_6012.jpg",
+            fullImg: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Epson_Perfection_4990_Photo_scanner_6012.jpg",
+            wiki: "Image_scanner",
+            query: "Epson Perfection scanner",
             text: "স্ক্যানার একটি অল্প সেনসিটিভ (Light Sensitive) ইনপুট ডিভাইস, যা লেখা, ছবি বা অবজেক্ট স্ক্যান করে ডিজিটাল ইমেজে কনভার্ট করে। ফ্লাট বেড স্ক্যানার (ফটোকপি মেশিনের মতো), হ্যান্ডহেল্ড স্ক্যানার (বারকোড রিডারের মতো) এবং ড্রাম স্ক্যানার (পেশাদারি মুদ্রণে) ইত্যাদি প্রকারের স্ক্যানার রয়েছে।"
         },
         {
             title: "OMR, OCR, MICR এর সংক্ষিপ্ত পরিচয়", icon: "fas fa-search",
-            img: "https://upload.wikimedia.org/wikipedia/commons/b/be/OMR_form.jpg",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/JRA_Fukushima_OMR_betting_slip.jpg/500px-JRA_Fukushima_OMR_betting_slip.jpg",
+            fullImg: "https://upload.wikimedia.org/wikipedia/commons/7/74/JRA_Fukushima_OMR_betting_slip.jpg",
+            wiki: "Optical_mark_recognition",
+            query: "OMR sheet",
             list: [
                 "<strong>OMR:</strong> Optical Mark Reader. পেন্সিলের সীসার উপাদান গ্রাফাইটের উপস্থিতিতে অপটিক্যাল বিম দ্বারা উত্তরপত্র স্ক্যান করে। প্রথম ব্যবহার ১৯৯৪ সালে।",
                 "<strong>OCR:</strong> Optical Character Reader. হাতের লেখা বা প্রিন্ট করা লেখাকে পড়ে মেশিন এনকোডেড টেক্সটে রূপান্তর করে। সর্বোচ্চ ২৪০০ ক্যারেক্টার পড়া যায়।",
@@ -696,7 +1303,10 @@
     const otherInputCards = [
         {
             title: "বারকোড রিডার (Barcode Reader)", icon: "fas fa-barcode",
-            img: "https://upload.wikimedia.org/wikipedia/commons/1/19/Barcode_scanner_%281%29.jpg",
+            img: "https://upload.wikimedia.org/wikipedia/commons/1/13/Barcode-scanner.jpg",
+            fullImg: "https://upload.wikimedia.org/wikipedia/commons/1/13/Barcode-scanner.jpg",
+            wiki: "Barcode_reader",
+            query: "Barcode scanner",
             list: [
                 "অপর নাম: ইউনিভার্সাল প্রোডাক্ট কোড। এটি এক ধরনের স্ক্যানার যা বার (Bar) বা রেখা কোড পড়তে পারে।",
                 "Barcode Reader emits – Light (আলো নির্গত করে)।",
@@ -706,7 +1316,10 @@
         },
         {
             title: "লাইট পেন ও জয়স্টিক", icon: "fas fa-gamepad",
-            img: "https://upload.wikimedia.org/wikipedia/commons/6/62/JoyStick-with-cross.png",
+            img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Atari-2600-Joystick.jpg/500px-Atari-2600-Joystick.jpg",
+            fullImg: "https://upload.wikimedia.org/wikipedia/commons/3/33/Atari-2600-Joystick.jpg",
+            wiki: "Joystick",
+            query: "Joystick controller",
             list: [
                 "<strong>লাইট পেন (Light Pen):</strong> এর এক প্রান্তে লাইট সেন্সর থাকে যা আলো অনুভব করতে পারে। এর সাহায্যে মনিটরের পর্দায় লেখা বা ছবি আঁকা যায়। ব্যবহার: প্রকৌশল ডিজাইন, নকশা তৈরি।",
                 "<strong>জয়স্টিক (Joystick):</strong> লম্বা বাটনটি দ্বারা ইনপুট সিগন্যাল প্রেরণ করা হয় এবং সামনে-পেছনে, ডানে-বামে ঘোরানো যায়। অপর নাম জয়স্টিক ক্যালিব্রেশন। ভিডিও গেম, ভার্চুয়াল রিয়েলিটি ও সিমুলেশনে ব্যবহৃত হয়।"
@@ -807,8 +1420,154 @@
         { q: "অভ্র কী-বোর্ড তৈরি করেন- [ঢাবি 'খ' ইউনিট]", options: ["A. মেহেদী হাসান", "B. মুহম্মদ জাফর ইকবাল", "C. মাকসুদুল আলম", "D. মুনীর চৌধুরী"], ans: "A. মেহেদী হাসান" }
     ];
 
+    // --- MULTI-STAGE DYNAMIC IMAGE ENGINE & LIGHTBOX ---
+    const ICT_IMG_CACHE_KEY = 'ict_peripherals_img_cache_v2';
+    let ictImgCache = {};
+    try {
+        ictImgCache = JSON.parse(localStorage.getItem(ICT_IMG_CACHE_KEY) || '{}') || {};
+    } catch (e) {
+        ictImgCache = {};
+    }
+
+    function saveIctImgCache() {
+        try {
+            localStorage.setItem(ICT_IMG_CACHE_KEY, JSON.stringify(ictImgCache));
+        } catch (e) {}
+    }
+
+    function createDeviceSvgFallback(title, query) {
+        const label = (query || title || 'ICT').replace(/[^A-Za-z0-9\u0980-\u09FF ]/g, '').trim().slice(0, 14) || 'ICT Device';
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+            <defs>
+                <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#312e81"/>
+                    <stop offset="100%" stop-color="#0d9488"/>
+                </linearGradient>
+            </defs>
+            <rect width="240" height="240" rx="28" fill="url(#bg)"/>
+            <circle cx="120" cy="100" r="46" fill="rgba(255,255,255,0.14)" stroke="rgba(255,255,255,0.35)" stroke-width="3"/>
+            <rect x="92" y="76" width="56" height="40" rx="6" fill="none" stroke="#fef08a" stroke-width="4"/>
+            <path d="M84 126h72M106 116v10M134 116v10" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+            <text x="120" y="182" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-size="16" font-weight="bold">${label}</text>
+            <text x="120" y="204" text-anchor="middle" fill="#ccfbf1" font-family="sans-serif" font-size="12">ICT Peripheral</text>
+        </svg>`;
+        return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+    }
+
+    async function fetchWikipediaImage(wikiTitle, searchQuery) {
+        const cacheId = (wikiTitle || '') + '|' + (searchQuery || '');
+        if (ictImgCache[cacheId]) return ictImgCache[cacheId];
+
+        // Stage A: Wikipedia PageImages API
+        if (wikiTitle) {
+            try {
+                const wikiUrl = 'https://en.wikipedia.org/w/api.php?action=query&titles=' + encodeURIComponent(wikiTitle)
+                    + '&prop=pageimages&piprop=thumbnail|original&pithumbsize=500& redirects=1&format=json&origin=*';
+                const res = await fetch(wikiUrl);
+                if (res.ok) {
+                    const data = await res.json();
+                    const pages = Object.values((data.query && data.query.pages) || {});
+                    const page = pages[0];
+                    if (page && page.thumbnail && page.thumbnail.source) {
+                        ictImgCache[cacheId] = page.thumbnail.source;
+                        saveIctImgCache();
+                        return page.thumbnail.source;
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // Stage B: Wikimedia Commons Search API
+        if (searchQuery) {
+            try {
+                const commonsUrl = 'https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch='
+                    + encodeURIComponent(searchQuery + ' filetype:bitmap')
+                    + '&gsrlimit=3&prop=imageinfo&iiprop=url&iiurlwidth=500&format=json&origin=*';
+                const res = await fetch(commonsUrl);
+                if (res.ok) {
+                    const data = await res.json();
+                    const pages = Object.values((data.query && data.query.pages) || {});
+                    const match = pages.find(p => p.imageinfo && p.imageinfo[0] && (p.imageinfo[0].thumburl || p.imageinfo[0].url));
+                    if (match) {
+                        const foundUrl = match.imageinfo[0].thumburl || match.imageinfo[0].url;
+                        ictImgCache[cacheId] = foundUrl;
+                        saveIctImgCache();
+                        return foundUrl;
+                    }
+                }
+            } catch (e) {}
+        }
+        return null;
+    }
+
+    window.handleIctImgError = async function(imgEl) {
+        const step = parseInt(imgEl.getAttribute('data-fallback-step') || '0', 10);
+        const fullImg = imgEl.getAttribute('data-full-img') || '';
+        const wiki = imgEl.getAttribute('data-wiki') || '';
+        const query = imgEl.getAttribute('data-query') || '';
+        const title = imgEl.getAttribute('alt') || 'ICT Device';
+
+        // Step 1: Try full Wikimedia Commons URL if thumbnail failed
+        if (step === 0 && fullImg && imgEl.src !== fullImg) {
+            imgEl.setAttribute('data-fallback-step', '1');
+            imgEl.src = fullImg;
+            return;
+        }
+
+        // Step 2: Query live Wikipedia / Wikimedia Commons API
+        if (step <= 1) {
+            imgEl.setAttribute('data-fallback-step', '2');
+            const dynamicUrl = await fetchWikipediaImage(wiki, query);
+            if (dynamicUrl && imgEl.src !== dynamicUrl) {
+                imgEl.src = dynamicUrl;
+                return;
+            }
+        }
+
+        // Step 3: Render guaranteed high-DPI SVG device badge
+        imgEl.onerror = null;
+        imgEl.src = createDeviceSvgFallback(title, query);
+    };
+
+    window.openIctLightbox = function(wrapperEl) {
+        const imgEl = wrapperEl.querySelector('img.card-badge');
+        if (!imgEl) return;
+        const modal = document.getElementById('ict-lightbox-modal');
+        const lightImg = document.getElementById('ict-lightbox-img');
+        const lightTitle = document.getElementById('ict-lightbox-title');
+        const fullSrc = imgEl.getAttribute('data-full-img') || imgEl.src;
+        const currentSrc = imgEl.src;
+        const title = imgEl.getAttribute('alt') || 'ডিভাইস চিত্র';
+
+        lightTitle.textContent = title;
+        lightImg.src = fullSrc;
+        lightImg.alt = title;
+        lightImg.onerror = function() {
+            this.onerror = null;
+            this.src = currentSrc;
+        };
+        modal.classList.add('active');
+    };
+
+    window.closeIctLightbox = function() {
+        const modal = document.getElementById('ict-lightbox-modal');
+        if (modal) modal.classList.remove('active');
+    };
+
+    document.getElementById('ict-lightbox-modal').addEventListener('click', function() {
+        closeIctLightbox();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeIctLightbox();
+    });
+
     // --- RENDERING LOGIC ---
     
+    function escapeAttr(str) {
+        return String(str || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
     function renderCards(containerId, data) {
         const container = document.getElementById(containerId);
         let html = '';
@@ -817,7 +1576,29 @@
             if(card.text) content = `<p style="margin: 0;">${card.text}</p>`;
             if(card.list) content += `<ul class="info-list">${card.list.map(li => `<li>${li}</li>`).join('')}</ul>`;
             
-            let imgHtml = card.img ? `<img src="${card.img}" alt="${card.title}" class="card-badge">` : '';
+            let imgHtml = '';
+            if (card.img) {
+                const safeTitle = escapeAttr(card.title);
+                const safeImg = escapeAttr(card.img);
+                const safeFull = escapeAttr(card.fullImg || card.img);
+                const safeWiki = escapeAttr(card.wiki || '');
+                const safeQuery = escapeAttr(card.query || card.title);
+                imgHtml = `
+                    <div class="card-badge-wrapper" onclick="openIctLightbox(this)" title="${safeTitle} — বড় করে দেখতে ক্লিক করুন">
+                        <img src="${safeImg}"
+                             alt="${safeTitle}"
+                             class="card-badge"
+                             loading="lazy"
+                             referrerpolicy="no-referrer"
+                             data-full-img="${safeFull}"
+                             data-wiki="${safeWiki}"
+                             data-query="${safeQuery}"
+                             data-fallback-step="0"
+                             onerror="handleIctImgError(this)">
+                        <span class="card-badge-zoom-hint"><i class="fas fa-search-plus"></i></span>
+                    </div>
+                `;
+            }
             
             html += `
                 <div class="info-card">
@@ -932,14 +1713,13 @@
     });
 </script>
 
-
     <!-- Floating Action Buttons (Scroll to Bottom/Top & Global Dark Mode) -->
-    <button id="scroll-toggle-btn" class="fixed bottom-32 right-5 z-[100] w-12 h-12 bg-gray-700 hover:bg-gray-900 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100" title="Scroll to Bottom" aria-label="Scroll to Bottom">
+    <button id="scroll-toggle-btn" title="Scroll to Bottom" aria-label="Scroll to Bottom">
         <i class="fas fa-arrow-down"></i>
     </button>
 
-    <button id="global-dark-mode-btn" class="fixed bottom-6 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-lg border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 transition-transform" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
-        <i class="fas fa-moon text-2xl"></i>
+    <button id="global-dark-mode-btn" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
+        <i class="fas fa-moon"></i>
     </button>
 
 <script type="module" src="script.js"></script>
