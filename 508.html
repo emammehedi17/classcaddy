@@ -99,12 +99,106 @@
         .toast-show {
             animation: slideUpFade 0.3s ease forwards;
         }
+
+        /* Print-only helper (hidden on screen, visible in print) */
+        .print-only {
+            display: none;
+        }
+        .print-only-inline {
+            display: none;
+        }
+
+        /* ================= PRINT / PDF OPTIMIZATION ================= */
+        @media print {
+            @page {
+                size: A4;
+                margin: 12mm;
+            }
+
+            html, body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                font-size: 11pt;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            /* Hide all interactive UI, fixed headers, sidebars, buttons & playground */
+            .no-print,
+            #main-header,
+            #sidebar,
+            #sidebar-overlay,
+            #toast,
+            #reading-progress-bar {
+                display: none !important;
+            }
+
+            .print-only {
+                display: block !important;
+            }
+            .print-only-inline {
+                display: inline !important;
+            }
+
+            main {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            section {
+                margin-bottom: 18px !important;
+            }
+
+            /* Remove sticky positioning & heavy shadows in print */
+            .sticky {
+                position: static !important;
+            }
+            .shadow-sm, .shadow-md, .shadow-xl, .shadow-lg {
+                box-shadow: none !important;
+            }
+
+            /* Prevent awkward page breaks inside cards & MCQs */
+            .note-card,
+            .mcq-item,
+            footer {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+
+            /* Ensure code blocks wrap cleanly without scrollbars */
+            pre, code {
+                white-space: pre-wrap !important;
+                word-break: break-word !important;
+                overflow: visible !important;
+            }
+
+            /* Arrange 3-section tag cards cleanly in print */
+            .tag-card-grid {
+                display: grid !important;
+                grid-template-columns: 1fr 1.15fr 0.95fr !important;
+                gap: 10px !important;
+            }
+
+            /* Make MCQ correct answers clearly visible in print */
+            .mcq-option-btn {
+                background-color: #ffffff !important;
+                color: #1e293b !important;
+                border-color: #cbd5e1 !important;
+            }
+            .mcq-correct-option {
+                background-color: #d1fae5 !important;
+                border: 2px solid #10b981 !important;
+                color: #065f46 !important;
+                font-weight: 700 !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 font-sans antialiased transition-colors duration-300 overflow-x-hidden">
 
     <!-- Top Reading Progress Bar -->
-    <div class="fixed top-0 left-0 w-full h-1 z-50 bg-slate-200 dark:bg-slate-800">
+    <div id="reading-progress-bar" class="fixed top-0 left-0 w-full h-1 z-50 bg-slate-200 dark:bg-slate-800 no-print">
         <div id="reading-progress" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 w-0 transition-all duration-150"></div>
     </div>
 
@@ -230,7 +324,7 @@
                     <p class="text-indigo-100 text-sm sm:text-lg max-w-3xl leading-relaxed mb-6">
                         একদম শূন্য থেকে <strong>HTML</strong> এবং <strong>CSS</strong> শেখার পরিপূর্ণ বাংলা নোট। প্রতিটি ট্যাগের ফরম্যাট, সম্পূর্ণ HTML কোডে ব্যবহার ও লাইভ আউটপুট, কালার কোডের গণিত, ভিজ্যুয়াল ডায়াগ্রাম, শিক্ষকের <code class="bg-white/20 px-1.5 py-0.5 rounded text-xs sm:text-sm">index.htm</code> বিশ্লেষণ এবং নিজেকে যাচাইয়ের জন্য <strong>৫০টি MCQ</strong>!
                     </p>
-                    <div class="flex flex-wrap gap-3">
+                    <div class="flex flex-wrap gap-3 no-print">
                         <a href="#course-outline" class="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-white text-indigo-700 text-sm font-semibold shadow-md hover:bg-indigo-50 transition">
                             <i class="fa-solid fa-list-check"></i> কোর্স আউটলাইন
                         </a>
@@ -426,7 +520,7 @@
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-sm font-bold text-slate-700 dark:text-slate-200">একটি বেসিক HTML পেজের গঠন (Basic Structure)</span>
-                            <button onclick="copyCode('basic-html-code')" class="text-xs px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-slate-600 dark:text-slate-300 transition">
+                            <button onclick="copyCode('basic-html-code')" class="no-print text-xs px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-slate-600 dark:text-slate-300 transition">
                                 <i class="fa-regular fa-copy mr-1"></i> কপি
                             </button>
                         </div>
@@ -637,7 +731,7 @@ h1 {
                     </div>
                 </div>
                 <!-- Live Tag Search Filter -->
-                <div class="relative w-full sm:w-64">
+                <div class="relative w-full sm:w-64 no-print">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                     <input id="tag-search" type="text" placeholder="ট্যাগ খুঁজুন (যেমন: mark, pre)..." class="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
@@ -697,7 +791,7 @@ h1 {
                 </div>
 
                 <!-- Interactive RGB Slider -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center pt-2">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center pt-2 no-print">
                     <div class="space-y-3">
                         <div>
                             <div class="flex justify-between text-xs font-bold mb-1">
@@ -864,7 +958,7 @@ h1 {
         </section>
 
         <!-- ================= SECTION 3.5: PRODUCE OUTPUT & LIVE PLAYGROUND ================= -->
-        <section id="sec-3-5" class="scroll-mt-20 space-y-6">
+        <section id="sec-3-5" class="scroll-mt-20 space-y-6 no-print">
             <div class="flex items-center gap-3">
                 <span class="px-3 py-1 rounded-lg bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 font-bold text-sm shrink-0">৩.৫</span>
                 <h2 class="text-xl sm:text-3xl font-bold text-slate-900 dark:text-white">কোড থেকে আউটপুট তৈরি (Live HTML Playground)</h2>
@@ -968,9 +1062,7 @@ h1 {
                             শিক্ষকের ফাইলে <code class="font-mono">&lt;!--style="background-color:powderblue;"--&gt;</code> লাইনটি কমেন্ট করা আছে, তাই এটি ব্রাউজারে কাজ করবে না। এছাড়াও <code class="font-mono">du_logo.jpg</code> ছবিটি যদি HTML ফাইলের একই ফোল্ডারে না থাকে, তবে ছবির বদলে <code class="font-mono">alt="DU Logo"</code> লেখাটি দেখাবে!
                         </p>
                     </div>
-                </div>
-
-                <div class="pt-2">
+                <div class="pt-2 no-print">
                     <a href="#sec-3-5" onclick="loadPreset('teacher')" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-700 text-white text-sm font-semibold shadow-md transition">
                         <i class="fa-solid fa-play"></i> উপরের লাইভ এডিটরে index.htm রান করে দেখো
                     </a>
@@ -994,8 +1086,9 @@ h1 {
                     <p class="text-sm text-emerald-100 mt-1">
                         সিলেবাসের সব টপিক (HTML Home থেকে HTML Lists পর্যন্ত) আরও প্র্যাকটিস করার জন্য সবচেয়ে সেরা ওয়েবসাইট।
                     </p>
+                    <p class="print-only text-xs font-mono text-white mt-1.5">URL: https://www.w3schools.com/html/</p>
                 </div>
-                <a href="https://www.w3schools.com/html/" target="_blank" rel="noopener noreferrer" class="shrink-0 px-5 py-2.5 rounded-xl bg-white text-emerald-700 font-bold text-sm shadow hover:bg-emerald-50 transition">
+                <a href="https://www.w3schools.com/html/" target="_blank" rel="noopener noreferrer" class="no-print shrink-0 px-5 py-2.5 rounded-xl bg-white text-emerald-700 font-bold text-sm shadow hover:bg-emerald-50 transition">
                     W3Schools ভিজিট করো <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i>
                 </a>
             </div>
@@ -1007,9 +1100,10 @@ h1 {
                         <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                             <i class="fa-solid fa-circle-question text-indigo-500"></i> সম্পূর্ণ ৫০টি MCQ (Self-Test)
                         </h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">সঠিক উত্তরটি বেছে নাও এবং সাথে সাথেই নিজের স্কোর দেখো!</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 no-print">সঠিক উত্তরটি বেছে নাও এবং সাথে সাথেই নিজের স্কোর দেখো!</p>
+                        <p class="print-only text-xs font-semibold text-emerald-700 mt-1">উত্তরমালা: প্রতিটি প্রশ্নের সঠিক উত্তর সবুজ রঙে (✓) চিহ্নিত করা হয়েছে।</p>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 no-print">
                         <div id="quiz-score-badge" class="px-3.5 py-1.5 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 font-bold text-xs sm:text-sm">
                             স্কোর: 0 / 50
                         </div>
@@ -1300,6 +1394,7 @@ h1 {
         function renderTags(filterText = '') {
             const grid = document.getElementById('tags-grid');
             const query = filterText.toLowerCase().trim();
+            const totalTags = htmlTagsData.length;
             const filtered = htmlTagsData.filter(item =>
                 item.tag.toLowerCase().includes(query) ||
                 item.name.toLowerCase().includes(query) ||
@@ -1310,6 +1405,71 @@ h1 {
                 grid.innerHTML = `<div class="text-center py-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400">কোনো ট্যাগ পাওয়া যায়নি। অন্য শব্দ দিয়ে চেষ্টা করো।</div>`;
                 return;
             }
+
+            grid.innerHTML = filtered.map((item, idx) => {
+                const origNumber = htmlTagsData.indexOf(item) + 1;
+                return `
+                <div class="note-card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+                    <!-- Card Header with Numbering (e.g., 1 / 15) -->
+                    <div class="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 font-mono text-xs font-bold">
+                                ${origNumber} / ${totalTags}
+                            </span>
+                            <span class="font-mono text-sm font-bold px-2.5 py-0.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
+                                ${escapeHtml(item.tag)}
+                            </span>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">${escapeHtml(item.name)}</span>
+                    </div>
+
+                    <!-- 3-Section Responsive Layout: Horizontal (lg:grid-cols-3) on Desktop, Vertical (grid-cols-1) on Mobile -->
+                    <div class="tag-card-grid grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
+
+                        <!-- Section 1: Tag Details & Format -->
+                        <div class="flex flex-col justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80">
+                            <div>
+                                <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-3">
+                                    ${escapeHtml(item.desc)}
+                                </p>
+                            </div>
+                            <div class="pt-2 border-t border-slate-200 dark:border-slate-700">
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1">ফরম্যাট (Syntax):</span>
+                                <code class="block text-xs font-mono bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 overflow-x-auto">${escapeHtml(item.format)}</code>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Used in Full HTML -->
+                        <div class="flex flex-col rounded-xl bg-slate-900 border border-slate-800 overflow-hidden">
+                            <div class="flex items-center justify-between px-3.5 py-2 bg-slate-800/90 text-slate-300 text-[11px] font-semibold">
+                                <span><i class="fa-solid fa-code text-amber-400 mr-1"></i> সম্পূর্ণ HTML কোডে ব্যবহার</span>
+                                <button onclick="copyCode('tag-code-${idx}')" class="no-print hover:text-white transition px-2 py-0.5 rounded bg-slate-700/70">
+                                    <i class="fa-regular fa-copy mr-1"></i>কপি
+                                </button>
+                            </div>
+                            <pre class="p-3.5 text-emerald-300 text-xs overflow-x-auto flex-1 flex items-center"><code id="tag-code-${idx}">${escapeHtml(item.fullHtml)}</code></pre>
+                        </div>
+
+                        <!-- Section 3: Output Preview -->
+                        <div class="flex flex-col rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white">
+                            <div class="flex items-center justify-between px-3.5 py-2 bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                                <span><i class="fa-solid fa-display text-emerald-500 mr-1"></i> ব্রাউজার আউটপুট (Output)</span>
+                                <div class="flex gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+                                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                </div>
+                            </div>
+                            <div class="p-4 text-slate-900 flex-1 flex flex-col justify-center">
+                                ${item.outputHtml}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
 
             grid.innerHTML = filtered.map((item, idx) => `
                 <div class="note-card bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
@@ -1602,21 +1762,23 @@ Kalabhaban, Shahbag, Dhaka-1000
         function renderQuiz() {
             const container = document.getElementById('quiz-container');
             container.innerHTML = quizQuestions.map((item, qIdx) => `
-                <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                <div class="mcq-item p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                     <p class="font-bold text-sm sm:text-base text-slate-800 dark:text-slate-100 mb-3">${escapeHtml(item.q)}</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         ${item.options.map((opt, oIdx) => {
+                            const isCorrect = oIdx === item.answer;
                             let btnClass = 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-indigo-400 text-slate-700 dark:text-slate-200';
                             if (quizState[qIdx] !== null) {
-                                if (oIdx === item.answer) {
+                                if (isCorrect) {
                                     btnClass = 'bg-emerald-100 dark:bg-emerald-900/50 border-emerald-500 text-emerald-800 dark:text-emerald-200 font-bold';
                                 } else if (oIdx === quizState[qIdx]) {
                                     btnClass = 'bg-rose-100 dark:bg-rose-900/50 border-rose-500 text-rose-800 dark:text-rose-200';
                                 }
                             }
                             return `
-                                <button onclick="selectAnswer(${qIdx}, ${oIdx})" ${quizState[qIdx] !== null ? 'disabled' : ''} class="text-left px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm transition ${btnClass}">
-                                    ${escapeHtml(opt)}
+                                <button onclick="selectAnswer(${qIdx}, ${oIdx})" ${quizState[qIdx] !== null ? 'disabled' : ''} class="mcq-option-btn ${isCorrect ? 'mcq-correct-option' : ''} text-left px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm transition flex items-center justify-between gap-2 ${btnClass}">
+                                    <span>${escapeHtml(opt)}</span>
+                                    ${isCorrect ? '<span class="print-only-inline text-emerald-700 font-bold shrink-0">✓ সঠিক উত্তর</span>' : ''}
                                 </button>
                             `;
                         }).join('')}
