@@ -172,13 +172,13 @@ function copyStaticAssetsPlugin(): Plugin {
           let htmlModified = false;
           const iconRegex = /<link\b[^>]*\brel=["'](?:shortcut\s+)?icon["'][^>]*>/gi;
           if (iconRegex.test(content)) {
-            const updated = content.replace(iconRegex, '<link rel="icon" type="image/png" href="/images/logo.png">');
+            const updated = content.replace(iconRegex, '<link rel="icon" type="image/png" href="/favicon.png?v=class-caddy-1">');
             if (updated !== content) {
               content = updated;
               htmlModified = true;
             }
           } else if (content.includes('</head>')) {
-            content = content.replace('</head>', '    <link rel="icon" type="image/png" href="/images/logo.png">\n</head>');
+            content = content.replace('</head>', '    <link rel="icon" type="image/png" href="/favicon.png?v=class-caddy-1">\n</head>');
             htmlModified = true;
           }
 

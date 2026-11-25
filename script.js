@@ -489,19 +489,19 @@ document.addEventListener('DOMContentLoaded', () => {
             document.head.appendChild(fontLink);
         }
 
-        // Ensure browser tab favicon on ALL pages shows the Class Caddy logo (/images/logo.png)
+        // Use a versioned root favicon so browsers replace any previously cached DU icon.
         if (document.head) {
             const existingIcons = document.querySelectorAll('link[rel*="icon"]');
             if (existingIcons.length > 0) {
                 existingIcons.forEach((iconLink) => {
                     iconLink.type = 'image/png';
-                    iconLink.href = '/images/logo.png';
+                    iconLink.href = '/favicon.png?v=class-caddy-1';
                 });
             } else {
                 const iconLink = document.createElement('link');
                 iconLink.rel = 'icon';
                 iconLink.type = 'image/png';
-                iconLink.href = '/images/logo.png';
+                iconLink.href = '/favicon.png?v=class-caddy-1';
                 document.head.appendChild(iconLink);
             }
         }

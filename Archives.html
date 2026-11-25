@@ -9,37 +9,39 @@
     <meta http-equiv="Expires" content="0">
     <title>Class Caddy - Archives</title>
     <meta name="description" content="Academic hub for notes, courses, and learning resources." />
-    <!-- Google Fonts -->
+    <!-- Google Fonts (Sans-Serif Bangla: Noto Sans Bengali & Hind Siliguri) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <base href="/" />
     <link rel="icon" type="image/png" href="/images/logo.png">
-      <script id="cc-instant-theme">
+    <script id="cc-instant-theme">
       (function () {
         var isDark = false;
         try {
-          var saved = localStorage.getItem("class_caddy_theme");
-          if (saved === "dark") {
+          var saved = localStorage.getItem('class_caddy_theme');
+          if (saved === 'dark') {
             isDark = true;
           } else if (!saved) {
-            var sp = localStorage.getItem("studyPlanSettings");
+            var sp = localStorage.getItem('studyPlanSettings');
             if (sp && JSON.parse(sp).darkMode === true) isDark = true;
           }
         } catch (e) {}
         var root = document.documentElement;
         if (isDark) {
-          root.classList.add("dark");
-          root.style.backgroundColor = "#0f172a";
-          root.style.colorScheme = "dark";
+          root.classList.add('dark');
+          root.style.backgroundColor = '#0f172a';
+          root.style.colorScheme = 'dark';
         } else {
-          root.classList.remove("dark");
-          root.style.colorScheme = "light";
+          root.classList.remove('dark');
+          root.style.backgroundColor = '#f8fafc';
+          root.style.colorScheme = 'light';
         }
         var obs = new MutationObserver(function () {
           if (document.body) {
-            if (isDark) document.body.classList.add("dark-mode");
-            else document.body.classList.remove("dark-mode");
+            if (isDark) document.body.classList.add('dark-mode');
+            else document.body.classList.remove('dark-mode');
             obs.disconnect();
           }
         });
@@ -48,9 +50,10 @@
     </script>
     <style id="cc-instant-theme-style">
       html.dark, html.dark body, body.dark-mode { background-color: #0f172a !important; color: #f1f5f9 !important; }
+      html:not(.dark) body:not(.dark-mode) { background-color: #f8fafc; color: #1f2937; }
     </style>
-</head>
-  <body class="bg-gray-100 text-gray-800 selection:bg-emerald-500 selection:text-white">
+  </head>
+  <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 selection:bg-emerald-500 selection:text-white">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
