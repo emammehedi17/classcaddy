@@ -16,6 +16,49 @@
     <meta property="og:title" content="Class Caddy — Smart Study Planner, MCQ Engine & Digital Archives">
     <meta property="og:description" content="প্রতিদিনের পড়াশোনা গুছিয়ে রাখা, লাইভ টাইমার ট্র্যাকিং, ডাইনামিক MCQ কুইজ এবং গোছানো আর্কাইভসের পূর্ণাঙ্গ ওয়েব অ্যাপ।">
 
+    <!-- Zero-Flicker Synchronous Theme Loader (Runs before first paint) -->
+    <script id="cc-instant-theme">
+      (function () {
+        try {
+          var isDark = localStorage.getItem('class_caddy_theme') === 'dark';
+          if (!isDark && !localStorage.getItem('class_caddy_theme')) {
+            var sp = localStorage.getItem('studyPlanSettings');
+            if (sp && JSON.parse(sp).darkMode === true) isDark = true;
+          }
+          var root = document.documentElement;
+          if (isDark) {
+            root.classList.add('dark');
+            root.style.backgroundColor = '#0f172a';
+            root.style.colorScheme = 'dark';
+            if (document.body) {
+              document.body.classList.add('dark-mode');
+            } else {
+              new MutationObserver(function (_, obs) {
+                if (document.body) {
+                  document.body.classList.add('dark-mode');
+                  obs.disconnect();
+                }
+              }).observe(root, { childList: true });
+            }
+          } else {
+            root.classList.remove('dark');
+            root.style.backgroundColor = '#f8fafc';
+            root.style.colorScheme = 'light';
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <style id="cc-instant-theme-style">
+      html.dark, html.dark body, body.dark-mode {
+        background-color: #0f172a !important;
+        color: #f1f5f9 !important;
+      }
+      html.dark header.main-website-ui, body.dark-mode header.main-website-ui {
+        background-color: rgba(17, 24, 39, 0.95) !important;
+        border-bottom-color: #1f2937 !important;
+      }
+    </style>
+
     <!-- Tailwind CSS with class-based Dark Mode -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -24,8 +67,8 @@
         theme: {
           extend: {
             fontFamily: {
-              sans: ['Hind Siliguri', 'Plus Jakarta Sans', 'Poppins', 'sans-serif'],
-              display: ['Plus Jakarta Sans', 'Hind Siliguri', 'Poppins', 'sans-serif'],
+              sans: ['Noto Sans Bengali', 'Hind Siliguri', 'Plus Jakarta Sans', 'Inter', 'Poppins', 'sans-serif'],
+              display: ['Plus Jakarta Sans', 'Noto Sans Bengali', 'Hind Siliguri', 'Inter', 'sans-serif'],
               mono: ['JetBrains Mono', 'monospace'],
             }
           }
@@ -33,13 +76,13 @@
       }
     </script>
 
-    <!-- Google Fonts: Hind Siliguri (Bangla), Plus Jakarta Sans (Display/Body), JetBrains Mono (Timers/Metrics) -->
+    <!-- Google Fonts: Noto Sans Bengali & Hind Siliguri (Sans-Serif Bangla), Plus Jakarta Sans, JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="https://eco.du.ac.bd//assets/images/fab_icon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" href="/images/logo.png">
 
     <style>
         /* Bilingual Toggle Visibility System */
@@ -50,13 +93,13 @@
             display: none !important;
         }
 
-        /* Smooth typography and layout refinements */
-        body {
-            font-family: 'Hind Siliguri', 'Plus Jakarta Sans', 'Poppins', sans-serif;
+        /* Smooth Sans-Serif Bangla & English typography */
+        body, .lang-bn {
+            font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'Plus Jakarta Sans', 'Inter', 'Poppins', sans-serif !important;
             line-height: 1.65;
         }
         body.lang-en {
-            font-family: 'Plus Jakarta Sans', 'Poppins', 'Hind Siliguri', sans-serif;
+            font-family: 'Plus Jakarta Sans', 'Inter', 'Poppins', 'Noto Sans Bengali', 'Hind Siliguri', sans-serif !important;
         }
 
         .tabular-nums {
@@ -89,16 +132,16 @@
         }
     </style>
 </head>
-<body class="lang-bn bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200 selection:bg-emerald-500 selection:text-white">
+<body class="lang-bn bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 selection:bg-emerald-500 selection:text-white">
 
 <!-- =================== HEADER START =================== -->
 <header class="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 border-b border-gray-200 dark:border-gray-800 main-website-ui shadow-sm">
     <div class="container mx-auto px-4 sm:px-6 py-3">
         <nav class="flex justify-between items-center">
-            <!-- Left Side: Profile & Title -->
+            <!-- Left Side: Logo & Title -->
             <div class="flex items-center gap-3 sm:gap-4 min-w-0">
                 <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer" class="flex-shrink-0">
-                    <img src="images/profile.jpg" alt="Profile" class="h-10 w-10 rounded-full border-2 border-emerald-500 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/ffffff/059669?text=CC';">
+                    <img src="/images/logo.png" alt="Class Caddy Logo" class="cc-avatar-founder h-10 w-10 rounded-full border-2 border-emerald-500 bg-white object-contain p-0.5" onerror="this.onerror=null; this.src='/favicon.png';">
                 </a>
                 <a href="index.html">
                     <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">Class Caddy</h1>

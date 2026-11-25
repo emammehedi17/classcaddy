@@ -9,19 +9,40 @@ interface FloatingActionButtonsProps {
 export function FloatingActionButtons({ theme, toggleTheme }: FloatingActionButtonsProps) {
   const [isScrolledDown, setIsScrolledDown] = useState(false);
 
+  const getScrollMidpoint = () => {
+    const docHeight = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.offsetHeight
+    );
+    const maxScroll = Math.max(0, docHeight - window.innerHeight);
+    return maxScroll / 2;
+  };
+
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolledDown(window.scrollY >= 300);
+      const midPoint = getScrollMidpoint();
+      setIsScrolledDown(midPoint > 0 && window.scrollY > midPoint);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
     handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
 
   const handleScrollToggle = () => {
-    if (window.scrollY < 300) {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    const midPoint = getScrollMidpoint();
+    if (window.scrollY <= midPoint) {
+      const docHeight = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight
+      );
+      window.scrollTo({ top: docHeight, behavior: 'smooth' });
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }

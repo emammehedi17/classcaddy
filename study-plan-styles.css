@@ -42,20 +42,20 @@
 
 /* --- Light Theme & Motivational Styles --- */
         html { scroll-behavior: smooth; }
-        /* --- Force Inter for English, Kalpurush for Bangla globally --- */
+        /* --- Force Inter for English, Sans-Serif (Noto Sans Bengali / Hind Siliguri) for Bangla globally --- */
         html, body, input, textarea, select, button {
-            font-family: 'Inter', 'Kalpurush', 'Noto Naskh Arabic', sans-serif !important;
+            font-family: 'Inter', 'Noto Sans Bengali', 'Hind Siliguri', 'Noto Naskh Arabic', sans-serif !important;
         }
-        .kalpurush {
-            font-family: 'Kalpurush', 'Inter', 'Noto Naskh Arabic', sans-serif !important;
+        .kalpurush, .bangla {
+            font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'Inter', 'Noto Naskh Arabic', sans-serif !important;
         }
-        /* Keep KaTeX math in KaTeX_Main while Bangla inside \text{...} uses Kalpurush via unicode-range */
+        /* Keep KaTeX math in KaTeX_Main while Bangla inside \text{...} uses Sans-Serif Bangla */
         .katex .mtext,
         .katex .mord.text {
-            font-family: 'Kalpurush', KaTeX_Main, 'Times New Roman', serif !important;
+            font-family: 'Noto Sans Bengali', 'Hind Siliguri', KaTeX_Main, sans-serif !important;
         }
         pre, code, kbd, samp, .font-mono {
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Kalpurush', monospace;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Noto Sans Bengali', 'Hind Siliguri', monospace;
         }
 
         body {
@@ -64,6 +64,10 @@
             overflow-x: clip;
             -webkit-font-smoothing: antialiased; /* Smoother fonts */
             -moz-osx-font-smoothing: grayscale;
+        }
+        html.dark, html.dark body, body.dark-mode {
+            background-color: #0f172a !important;
+            color: #d1d5db !important;
         }
         /* Subtle background pattern */
         body::before {

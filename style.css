@@ -8,11 +8,10 @@ html {
 }
 
 body {
-    font-family: 'Poppins', 'Inter', sans-serif;
+    font-family: 'Inter', 'Poppins', 'Noto Sans Bengali', 'Hind Siliguri', sans-serif;
     background-color: #f8fafc; /* Clean crisp modern light bg */
     color: #1e293b; /* Deep slate high contrast */
     overflow-x: hidden;
-    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 body.dark-mode, html.dark body, html.dark {

@@ -1,6 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Zero-Flicker Synchronous Theme Loader (Runs before first paint) -->
+    <script id="cc-instant-theme">
+      (function () {
+        try {
+          var isDark = localStorage.getItem('class_caddy_theme') === 'dark';
+          if (!isDark && !localStorage.getItem('class_caddy_theme')) {
+            var sp = localStorage.getItem('studyPlanSettings');
+            if (sp && JSON.parse(sp).darkMode === true) isDark = true;
+          }
+          var root = document.documentElement;
+          if (isDark) {
+            root.classList.add('dark');
+            root.style.backgroundColor = '#0f172a';
+            root.style.colorScheme = 'dark';
+            if (document.body) {
+              document.body.classList.add('dark-mode');
+            } else {
+              new MutationObserver(function (_, obs) {
+                if (document.body) {
+                  document.body.classList.add('dark-mode');
+                  obs.disconnect();
+                }
+              }).observe(root, { childList: true });
+            }
+          } else {
+            root.classList.remove('dark');
+            root.style.backgroundColor = '#f8fafc';
+            root.style.colorScheme = 'light';
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <style id="cc-instant-theme-style">
+      html.dark, html.dark body, body.dark-mode {
+        background-color: #0f172a !important;
+        color: #d1d5db !important;
+      }
+      html.dark header.main-website-ui, body.dark-mode header.main-website-ui {
+        background-color: rgba(17, 24, 39, 0.95) !important;
+        border-bottom-color: #1f2937 !important;
+      }
+    </style>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWZXVQC68L"></script>
 	<script>
 	  window.dataLayer = window.dataLayer || [];
@@ -18,33 +60,21 @@
     <meta http-equiv="Expires" content="0">
     <title>Class Caddy - My Study Plan</title>
     
-    <!-- Fonts are self-hosted via @font-face in study-plan-styles.css (no external CDN needed) -->
+    <!-- Google Sans-Serif Bangla Fonts (Noto Sans Bengali & Hind Siliguri) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="icon" href="images/cc-icon-full.png" type="image/x-icon">
+    <link rel="icon" type="image/png" href="/images/logo.png">
 	<script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = { darkMode: "class",
         theme: {
           fontFamily: {
-            sans: ['Inter', 'Kalpurush', 'sans-serif'],
+            sans: ['Inter', 'Noto Sans Bengali', 'Hind Siliguri', 'sans-serif'],
           }
         }
       }
-    </script>
-
-    <script>
-      (function () {
-        try {
-          var savedTheme = localStorage.getItem('class_caddy_theme');
-          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-          if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-            document.documentElement.classList.add('dark');
-            document.addEventListener('DOMContentLoaded', function () {
-              document.body.classList.add('dark-mode');
-            });
-          }
-        } catch (e) {}
-      })();
     </script>
 	<link rel="stylesheet" href="study-plan-styles.css">
 	<link rel="stylesheet" href="mcq-engine/mcq-engine.css">
@@ -58,7 +88,7 @@
             <nav class="flex justify-between items-center">
                 <div class="flex items-center gap-3 sm:gap-4 min-w-0">
                     <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer" class="flex-shrink-0">
-                        <img src="images/profile.jpg" alt="Profile" class="h-10 w-10 rounded-full border-2 border-emerald-500 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/ffffff/059669?text=CC';">
+                        <img src="/images/logo.png" alt="Class Caddy Logo" class="cc-avatar-founder h-10 w-10 rounded-full border-2 border-emerald-500 bg-white object-contain p-0.5" onerror="this.onerror=null; this.src='/favicon.png';">
                     </a>
                     <a href="index.html">
                         <h1 class="text-xl font-bold text-gray-800">Class Caddy</h1>

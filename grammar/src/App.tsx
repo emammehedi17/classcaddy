@@ -10,7 +10,8 @@ import { ArrowUp, BookOpen, CheckCircle, ShieldCheck, Download, Award, Calendar 
 
 export default function App() {
   const [isDark, setIsDark] = useState<boolean>(() => {
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const saved = localStorage.getItem('class_caddy_theme');
+    return saved === 'dark';
   });
   const [fontSizeLevel, setFontSizeLevel] = useState<number>(0); // -1, 0, 1, 2, 3
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -21,14 +22,31 @@ export default function App() {
   const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [showBackToTop, setShowBackToTop] = useState<boolean>(false);
 
-  // Sync dark mode class on <html>
+  // Sync dark mode class on <html> and localStorage
   useEffect(() => {
+    localStorage.setItem('class_caddy_theme', isDark ? 'dark' : 'light');
     if (isDark) {
       document.documentElement.classList.add('dark');
+      document.body?.classList.add('dark-mode');
+      document.documentElement.style.backgroundColor = '#0f172a';
+      document.documentElement.style.colorScheme = 'dark';
     } else {
       document.documentElement.classList.remove('dark');
+      document.body?.classList.remove('dark-mode');
+      document.documentElement.style.backgroundColor = '#f8fafc';
+      document.documentElement.style.colorScheme = 'light';
     }
   }, [isDark]);
+
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'class_caddy_theme') {
+        setIsDark(e.newValue === 'dark');
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
 
   // Track scroll for reading progress & back to top
   useEffect(() => {

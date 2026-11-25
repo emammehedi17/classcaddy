@@ -478,10 +478,42 @@ document.addEventListener('DOMContentLoaded', () => {
             document.head.appendChild(faLink);
         }
 
+        // Ensure Sans-Serif Bangla fonts (Noto Sans Bengali & Hind Siliguri) are loaded across all pages
+        const hasBanglaSansFont = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).some(
+            (l) => (l.href || '').includes('Noto+Sans+Bengali') || (l.href || '').includes('Hind+Siliguri')
+        );
+        if (!hasBanglaSansFont && document.head) {
+            const fontLink = document.createElement('link');
+            fontLink.rel = 'stylesheet';
+            fontLink.href = 'https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap';
+            document.head.appendChild(fontLink);
+        }
+
+        // Ensure browser tab favicon on ALL pages shows the Class Caddy logo (/images/logo.png)
+        if (document.head) {
+            const existingIcons = document.querySelectorAll('link[rel*="icon"]');
+            if (existingIcons.length > 0) {
+                existingIcons.forEach((iconLink) => {
+                    iconLink.type = 'image/png';
+                    iconLink.href = '/images/logo.png';
+                });
+            } else {
+                const iconLink = document.createElement('link');
+                iconLink.rel = 'icon';
+                iconLink.type = 'image/png';
+                iconLink.href = '/images/logo.png';
+                document.head.appendChild(iconLink);
+            }
+        }
+
         if (!document.getElementById('cc-universal-ui-styles') && document.head) {
             const style = document.createElement('style');
             style.id = 'cc-universal-ui-styles';
             style.textContent = `
+                /* Universal Sans-Serif Bangla Typography */
+                html, body, input, textarea, select, button, .bangla, .kalpurush, .bengali-text {
+                    font-family: 'Inter', 'Plus Jakarta Sans', 'Poppins', 'Noto Sans Bengali', 'Hind Siliguri', sans-serif;
+                }
                 /* Universal Study Plan Header Protection & Fallback Layout (Works with or without Tailwind) */
                 header.main-website-ui {
                     position: fixed !important;
@@ -552,7 +584,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     height: 40px !important;
                     border-radius: 9999px !important;
                     border: 2px solid #10b981 !important;
-                    object-fit: cover !important;
+                    background-color: #ffffff !important;
+                    object-fit: contain !important;
+                    padding: 2px !important;
                     display: block !important;
                 }
                 header.main-website-ui img[alt="DU Logo"] {
@@ -829,8 +863,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Universal Global Header Replacement / Injection (Matches study_plan.html 100%)
     function ensureUniversalHeader() {
-        // Skip if main React app manages the page (/src/main.tsx) or if inside Archives internal reader iframe or on study_plan.html itself
-        if (isMainReactApp() || isInsideInternalReaderIframe() || isStudyPlanPage()) {
+        // Ensure study_plan.html's own header logo also has cc-avatar-founder & /images/logo.png
+        if (isStudyPlanPage()) {
+            const spLogo = document.querySelector('header.main-website-ui nav a[href*="facebook.com"] img');
+            if (spLogo) {
+                spLogo.classList.add('cc-avatar-founder');
+                spLogo.src = '/images/logo.png';
+                spLogo.onerror = function () {
+                    this.onerror = null;
+                    this.src = '/favicon.png';
+                };
+            }
+            return;
+        }
+
+        // Skip if main React app manages the page (/src/main.tsx) or if inside Archives internal reader iframe
+        if (isMainReactApp() || isInsideInternalReaderIframe()) {
             return;
         }
 
@@ -845,7 +893,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <nav class="flex justify-between items-center">
                 <div class="cc-brand-left flex items-center gap-3 sm:gap-4 min-w-0">
                     <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer" class="flex-shrink-0">
-                        <img src="/images/profile.jpg" alt="Profile" class="cc-avatar-founder h-10 w-10 rounded-full border-2 border-emerald-500 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/ffffff/059669?text=CC';">
+                        <img src="/images/logo.png" alt="Class Caddy Logo" class="cc-avatar-founder h-10 w-10 rounded-full border-2 border-emerald-500 bg-white object-contain p-0.5" onerror="this.onerror=null; this.src='/favicon.png';">
                     </a>
                     <a href="/index.html">
                         <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">Class Caddy</h1>
@@ -939,9 +987,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isDark) {
             document.body?.classList.add('dark-mode');
             document.documentElement.classList.add('dark');
+            document.documentElement.style.backgroundColor = '#0f172a';
+            document.documentElement.style.colorScheme = 'dark';
         } else {
             document.body?.classList.remove('dark-mode');
             document.documentElement.classList.remove('dark');
+            document.documentElement.style.backgroundColor = '';
+            document.documentElement.style.colorScheme = 'light';
         }
 
         const darkBtn = document.getElementById('global-dark-mode-btn');
@@ -974,7 +1026,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const initialThemeIsDark = getStoredTheme() === 'dark';
     if (initialThemeIsDark) {
         document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#0f172a';
+        document.documentElement.style.colorScheme = 'dark';
         document.body?.classList.add('dark-mode');
+    } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '';
+        document.documentElement.style.colorScheme = 'light';
+        document.body?.classList.remove('dark-mode');
     }
 
     // 3. Ensure Study Plan's Exact Two Floating Action Buttons exist on DOM & remove legacy duplicates
@@ -1006,11 +1065,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!isStudyPlanPage()) {
+            const getScrollMidpoint = () => {
+                const docHeight = Math.max(
+                    document.body.scrollHeight,
+                    document.documentElement.scrollHeight,
+                    document.body.offsetHeight,
+                    document.documentElement.offsetHeight
+                );
+                const maxScroll = Math.max(0, docHeight - window.innerHeight);
+                return maxScroll / 2;
+            };
+
             const updateScrollIcon = () => {
                 const icon = scrollBtn.querySelector('i');
                 if (!icon) return;
                 const scrollPos = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
-                if (scrollPos >= 300) {
+                const midPoint = getScrollMidpoint();
+                if (midPoint > 0 && scrollPos > midPoint) {
                     icon.className = 'fas fa-arrow-up';
                     scrollBtn.title = 'Scroll to Top';
                 } else {
@@ -1021,12 +1092,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             window.removeEventListener('scroll', updateScrollIcon);
             window.addEventListener('scroll', updateScrollIcon, { passive: true });
+            window.addEventListener('resize', updateScrollIcon, { passive: true });
             updateScrollIcon();
 
             scrollBtn.onclick = (e) => {
                 if (e) e.preventDefault();
                 const scrollPos = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
-                if (scrollPos < 300) {
+                const midPoint = getScrollMidpoint();
+                if (scrollPos <= midPoint) {
                     const maxScroll = Math.max(
                         document.body.scrollHeight,
                         document.documentElement.scrollHeight

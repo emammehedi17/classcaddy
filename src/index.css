@@ -1,15 +1,15 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *, .dark-mode, .dark-mode *));
 
 /* General & Global Styles */
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', 'Poppins', 'Noto Sans Bengali', 'Hind Siliguri', sans-serif;
     overflow-x: hidden;
-    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-html.dark body, body.dark-mode {
-    background-color: #111827;
-    color: #f3f4f6;
+html.dark, html.dark body, body.dark-mode {
+    background-color: #0f172a !important;
+    color: #f3f4f6 !important;
 }
 
 html:not(.dark) body {
@@ -26,7 +26,7 @@ html:not(.dark) body {
 }
 
 .bangla {
-    font-family: 'Hind Siliguri', 'Kalpurush', sans-serif;
+    font-family: 'Noto Sans Bengali', 'Hind Siliguri', sans-serif;
 }
 
 /* Glow effects for login/signup forms and cards */

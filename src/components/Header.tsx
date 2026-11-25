@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PageView, UserProfile, ThemeMode } from '../types';
 import { Menu, X } from 'lucide-react';
+import { CLASS_CADDY_LOGO_DATA_URI } from '../lib/logoData';
 
 interface HeaderProps {
   currentPage: PageView;
@@ -68,13 +69,13 @@ export const Header: React.FC<HeaderProps> = ({
               title="Emam Mehedi - Class Caddy Founder"
             >
               <img
-                src="/images/profile.jpg"
-                alt="Profile"
-                className="h-10 w-10 rounded-full border-2 border-emerald-500 object-cover"
+                src="/images/logo.png"
+                alt="Class Caddy Logo"
+                className="h-10 w-10 rounded-full border-2 border-emerald-500 bg-white object-contain p-0.5"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
-                  target.src = 'https://placehold.co/40x40/ffffff/059669?text=CC';
+                  target.src = CLASS_CADDY_LOGO_DATA_URI;
                 }}
               />
             </a>

@@ -16,8 +16,27 @@ import { PrivacyPolicyView } from './components/PrivacyPolicyView';
 import { FloatingActionButtons } from './components/FloatingActionButtons';
 import { auth } from './lib/firebase';
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { CLASS_CADDY_LOGO_DATA_URI } from './lib/logoData';
 
 export default function App() {
+  useEffect(() => {
+    const ensureFavicon = () => {
+      const links = document.querySelectorAll<HTMLLinkElement>('link[rel*="icon"]');
+      if (links.length > 0) {
+        links.forEach((link) => {
+          link.type = 'image/png';
+          link.href = CLASS_CADDY_LOGO_DATA_URI;
+        });
+      } else if (document.head) {
+        const link = document.createElement('link');
+        link.rel = 'icon';
+        link.type = 'image/png';
+        link.href = CLASS_CADDY_LOGO_DATA_URI;
+        document.head.appendChild(link);
+      }
+    };
+    ensureFavicon();
+  }, []);
   const [currentPage, setCurrentPage] = useState<PageView>(() => {
     const path = window.location.pathname.toLowerCase();
     const hash = window.location.hash.toLowerCase();
@@ -116,9 +135,13 @@ export default function App() {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
       document.body.classList.add('dark-mode');
+      document.documentElement.style.backgroundColor = '#0f172a';
+      document.documentElement.style.colorScheme = 'dark';
     } else {
       document.documentElement.classList.remove('dark');
       document.body.classList.remove('dark-mode');
+      document.documentElement.style.backgroundColor = '#f8fafc';
+      document.documentElement.style.colorScheme = 'light';
     }
   }, [theme]);
 

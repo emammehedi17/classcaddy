@@ -10154,10 +10154,14 @@ function applySettingsToDom() {
     if (globalSettings.darkMode) {
         document.body.classList.add('dark-mode');
         document.documentElement.classList.add('dark');
+        document.documentElement.style.backgroundColor = '#0f172a';
+        document.documentElement.style.colorScheme = 'dark';
         localStorage.setItem('class_caddy_theme', 'dark');
     } else {
         document.body.classList.remove('dark-mode');
         document.documentElement.classList.remove('dark');
+        document.documentElement.style.backgroundColor = '#f8fafc';
+        document.documentElement.style.colorScheme = 'light';
         localStorage.setItem('class_caddy_theme', 'light');
     }
     updateAllChartsTheme();
@@ -10928,40 +10932,61 @@ window.addEventListener('beforeunload', function (e) {
     }
 });
 
-// --- SCROLL TOGGLE BUTTON LOGIC ---
+// --- SCROLL TOGGLE BUTTON LOGIC (Down arrow until middle of page, Up arrow after middle) ---
 const scrollBtn = document.getElementById('scroll-toggle-btn');
 if (scrollBtn) {
     const scrollIcon = scrollBtn.querySelector('i');
 
+    const getScrollMidpoint = () => {
+        const docHeight = Math.max(
+            document.body.scrollHeight,
+            document.documentElement.scrollHeight,
+            document.body.offsetHeight,
+            document.documentElement.offsetHeight
+        );
+        const maxScroll = Math.max(0, docHeight - window.innerHeight);
+        return maxScroll / 2;
+    };
+
     // 1. Monitor Scroll to change Icon (rAF throttled + passive + state-diffed)
     let scrollBtnRaf = null;
-    let lastIsNearTop = null;
+    let lastIsBeforeMid = null;
+    const syncScrollBtnState = () => {
+        scrollBtnRaf = null;
+        const midPoint = getScrollMidpoint();
+        const isBeforeMid = !(midPoint > 0 && window.scrollY > midPoint);
+        if (isBeforeMid === lastIsBeforeMid) return;
+        lastIsBeforeMid = isBeforeMid;
+        if (isBeforeMid) {
+            scrollIcon.classList.remove('fa-arrow-up');
+            scrollIcon.classList.add('fa-arrow-down');
+            scrollBtn.title = "Scroll to Bottom";
+        } else {
+            scrollIcon.classList.remove('fa-arrow-down');
+            scrollIcon.classList.add('fa-arrow-up');
+            scrollBtn.title = "Scroll to Top";
+        }
+    };
+
     window.addEventListener('scroll', () => {
         if (scrollBtnRaf) return;
-        scrollBtnRaf = requestAnimationFrame(() => {
-            scrollBtnRaf = null;
-            const isNearTop = window.scrollY < 300;
-            if (isNearTop === lastIsNearTop) return;
-            lastIsNearTop = isNearTop;
-            if (isNearTop) {
-                scrollIcon.classList.remove('fa-arrow-up');
-                scrollIcon.classList.add('fa-arrow-down');
-                scrollBtn.title = "Scroll to Bottom";
-            } else {
-                scrollIcon.classList.remove('fa-arrow-down');
-                scrollIcon.classList.add('fa-arrow-up');
-                scrollBtn.title = "Scroll to Top";
-            }
-        });
+        scrollBtnRaf = requestAnimationFrame(syncScrollBtnState);
     }, { passive: true });
+    window.addEventListener('resize', () => {
+        if (scrollBtnRaf) return;
+        scrollBtnRaf = requestAnimationFrame(syncScrollBtnState);
+    }, { passive: true });
+    syncScrollBtnState();
 
     // 2. Click Action
     scrollBtn.addEventListener('click', () => {
-        if (window.scrollY < 300) {
-            // We are at the top -> Scroll to Bottom
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        const midPoint = getScrollMidpoint();
+        if (window.scrollY <= midPoint) {
+            // Before or at middle -> Scroll to Bottom
+            const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+            window.scrollTo({ top: docHeight, behavior: 'smooth' });
         } else {
-            // We are down -> Scroll to Top
+            // Past middle -> Scroll to Top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });

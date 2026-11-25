@@ -160,6 +160,41 @@
         }
     </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script id="cc-instant-theme">
+      (function () {
+        var isDark = false;
+        try {
+          var saved = localStorage.getItem("class_caddy_theme");
+          if (saved === "dark") {
+            isDark = true;
+          } else if (!saved) {
+            var sp = localStorage.getItem("studyPlanSettings");
+            if (sp && JSON.parse(sp).darkMode === true) isDark = true;
+          }
+        } catch (e) {}
+        var root = document.documentElement;
+        if (isDark) {
+          root.classList.add("dark");
+          root.style.backgroundColor = "#0f172a";
+          root.style.colorScheme = "dark";
+        } else {
+          root.classList.remove("dark");
+          root.style.colorScheme = "light";
+        }
+        var obs = new MutationObserver(function () {
+          if (document.body) {
+            if (isDark) document.body.classList.add("dark-mode");
+            else document.body.classList.remove("dark-mode");
+            obs.disconnect();
+          }
+        });
+        obs.observe(root, { childList: true });
+      })();
+    </script>
+    <style id="cc-instant-theme-style">
+      html.dark, html.dark body, body.dark-mode { background-color: #0f172a !important; color: #f1f5f9 !important; }
+    </style>
+    <link rel="icon" type="image/png" href="/images/logo.png">
 </head>
 <body class="bg-gray-100 text-gray-800">
 

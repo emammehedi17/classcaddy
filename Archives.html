@@ -14,8 +14,42 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <base href="/" />
-    <link rel="icon" href="/images/cc-icon-full.png" type="image/x-icon">
-  </head>
+    <link rel="icon" type="image/png" href="/images/logo.png">
+      <script id="cc-instant-theme">
+      (function () {
+        var isDark = false;
+        try {
+          var saved = localStorage.getItem("class_caddy_theme");
+          if (saved === "dark") {
+            isDark = true;
+          } else if (!saved) {
+            var sp = localStorage.getItem("studyPlanSettings");
+            if (sp && JSON.parse(sp).darkMode === true) isDark = true;
+          }
+        } catch (e) {}
+        var root = document.documentElement;
+        if (isDark) {
+          root.classList.add("dark");
+          root.style.backgroundColor = "#0f172a";
+          root.style.colorScheme = "dark";
+        } else {
+          root.classList.remove("dark");
+          root.style.colorScheme = "light";
+        }
+        var obs = new MutationObserver(function () {
+          if (document.body) {
+            if (isDark) document.body.classList.add("dark-mode");
+            else document.body.classList.remove("dark-mode");
+            obs.disconnect();
+          }
+        });
+        obs.observe(root, { childList: true });
+      })();
+    </script>
+    <style id="cc-instant-theme-style">
+      html.dark, html.dark body, body.dark-mode { background-color: #0f172a !important; color: #f1f5f9 !important; }
+    </style>
+</head>
   <body class="bg-gray-100 text-gray-800 selection:bg-emerald-500 selection:text-white">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

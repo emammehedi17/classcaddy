@@ -4,11 +4,61 @@ import fs from 'fs';
 import path from 'path';
 import { defineConfig, Plugin } from 'vite';
 import { globSync } from 'glob';
+import { CLASS_CADDY_LOGO_BASE64 } from './src/lib/logoData';
+
+function ensureLogoAssets(baseDir: string) {
+  try {
+    // 1. Normalize any backslash-named files uploaded from Windows (e.g., "\images\logo.png")
+    const rootEntries = fs.readdirSync(baseDir, { withFileTypes: true });
+    for (const entry of rootEntries) {
+      if (entry.isFile() && entry.name.includes('\\')) {
+        const normalizedRel = entry.name.replace(/^\\+/, '').replace(/\\/g, '/');
+        const targetPath = path.resolve(baseDir, normalizedRel);
+        const targetDir = path.dirname(targetPath);
+        if (!fs.existsSync(targetDir)) {
+          fs.mkdirSync(targetDir, { recursive: true });
+        }
+        const srcFile = path.resolve(baseDir, entry.name);
+        if (fs.statSync(srcFile).size > 0) {
+          fs.copyFileSync(srcFile, targetPath);
+        }
+      }
+    }
+
+    // 2. Always ensure square-centered Class Caddy logo exists at images/logo.png, images/cc-icon-full.png, images/cc-icon.png, and public/images/logo.png
+    const logoBuffer = Buffer.from(CLASS_CADDY_LOGO_BASE64, 'base64');
+    const logoTargets = [
+      path.resolve(baseDir, 'images', 'logo.png'),
+      path.resolve(baseDir, 'images', 'cc-icon-full.png'),
+      path.resolve(baseDir, 'images', 'cc-icon.png'),
+      path.resolve(baseDir, 'public', 'images', 'logo.png'),
+      path.resolve(baseDir, 'public', 'favicon.png'),
+    ];
+    for (const target of logoTargets) {
+      const dir = path.dirname(target);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFileSync(target, logoBuffer);
+    }
+
+    // 3. Ensure images/du-logo.png exists (copy from images/du_logo.png if missing)
+    const duUnderscore = path.resolve(baseDir, 'images', 'du_logo.png');
+    const duHyphen = path.resolve(baseDir, 'images', 'du-logo.png');
+    if (fs.existsSync(duUnderscore) && (!fs.existsSync(duHyphen) || fs.statSync(duHyphen).size === 0)) {
+      fs.copyFileSync(duUnderscore, duHyphen);
+    }
+  } catch (e) {
+    console.warn('Notice while ensuring logo assets:', e);
+  }
+}
 
 function copyStaticAssetsPlugin(): Plugin {
   return {
     name: 'copy-static-assets',
     closeBundle() {
+      ensureLogoAssets(__dirname);
+
       const copyRecursive = (srcDir: string, destDir: string) => {
         if (!fs.existsSync(srcDir)) return;
         const entries = fs.readdirSync(srcDir, { withFileTypes: true });
@@ -42,6 +92,21 @@ function copyStaticAssetsPlugin(): Plugin {
       };
 
       copyRecursive(__dirname, path.resolve(__dirname, 'dist'));
+
+      // Explicitly guarantee logo.png, cc-icon-full.png, cc-icon.png, and du-logo.png in dist/images/
+      try {
+        const logoBuffer = Buffer.from(CLASS_CADDY_LOGO_BASE64, 'base64');
+        const distImagesDir = path.resolve(__dirname, 'dist', 'images');
+        if (!fs.existsSync(distImagesDir)) {
+          fs.mkdirSync(distImagesDir, { recursive: true });
+        }
+        fs.writeFileSync(path.join(distImagesDir, 'logo.png'), logoBuffer);
+        fs.writeFileSync(path.join(distImagesDir, 'cc-icon-full.png'), logoBuffer);
+        fs.writeFileSync(path.join(distImagesDir, 'cc-icon.png'), logoBuffer);
+        fs.writeFileSync(path.resolve(__dirname, 'dist', 'favicon.png'), logoBuffer);
+      } catch (e) {
+        console.warn('Failed to write dist logo files:', e);
+      }
 
       // Ensure Archives.html exists alongside archives.html for case-insensitive static hosting (Netlify/Linux)
       const distArchives = path.resolve(__dirname, 'dist', 'archives.html');
@@ -89,18 +154,36 @@ function copyStaticAssetsPlugin(): Plugin {
         }
       }
 
-      // Final integrity check: Verify all dist/**/*.html files are actual HTML, not accidentally overwritten with CSS
+      // Final integrity check: Verify all dist/**/*.html files are actual HTML and enforce Class Caddy favicon on every page
       const distHtmlFiles = globSync('dist/**/*.html');
       for (const distHtmlPath of distHtmlFiles) {
         try {
-          const content = fs.readFileSync(distHtmlPath, 'utf-8').trim();
-          if (!content.startsWith('<!') && !content.startsWith('<html')) {
+          let content = fs.readFileSync(distHtmlPath, 'utf-8');
+          const trimmed = content.trim();
+          if (!trimmed.startsWith('<!') && !trimmed.startsWith('<html')) {
             console.warn(`WARNING: ${distHtmlPath} was not valid HTML! Restoring from source...`);
             const relFromDist = path.relative(path.resolve(__dirname, 'dist'), distHtmlPath);
             const srcHtmlPath = path.resolve(__dirname, relFromDist);
             if (fs.existsSync(srcHtmlPath)) {
-              fs.copyFileSync(srcHtmlPath, distHtmlPath);
+              content = fs.readFileSync(srcHtmlPath, 'utf-8');
             }
+          }
+
+          let htmlModified = false;
+          const iconRegex = /<link\b[^>]*\brel=["'](?:shortcut\s+)?icon["'][^>]*>/gi;
+          if (iconRegex.test(content)) {
+            const updated = content.replace(iconRegex, '<link rel="icon" type="image/png" href="/images/logo.png">');
+            if (updated !== content) {
+              content = updated;
+              htmlModified = true;
+            }
+          } else if (content.includes('</head>')) {
+            content = content.replace('</head>', '    <link rel="icon" type="image/png" href="/images/logo.png">\n</head>');
+            htmlModified = true;
+          }
+
+          if (htmlModified) {
+            fs.writeFileSync(distHtmlPath, content, 'utf-8');
           }
         } catch (e) {
           console.warn(`Could not verify HTML integrity for ${distHtmlPath}:`, e);
@@ -111,6 +194,8 @@ function copyStaticAssetsPlugin(): Plugin {
 }
 
 export default defineConfig(() => {
+  ensureLogoAssets(__dirname);
+
   // Automatically find all HTML files across all directories
   const htmlFiles = globSync('**/*.html', {
     ignore: ['node_modules/**', 'dist/**', '.git/**', '.next/**', 'public/assets/aistudio/**'],
