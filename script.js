@@ -1,5 +1,16 @@
 const classCaddyAssetUrl = (assetPath) => new URL(assetPath, import.meta.url).href;
 
+window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    window.__classCaddyPendingInstallPrompt = event;
+});
+
+if (window.isSecureContext) {
+    import('./src/installPrompt.ts').catch((error) => {
+        console.warn('Class Caddy install offer could not be initialized:', error);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
 
     /* ==========================================================================

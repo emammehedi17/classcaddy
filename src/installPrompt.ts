@@ -4,6 +4,7 @@ const INSTALL_PROMPT_ID = 'class-caddy-install-prompt';
 declare global {
   interface Window {
     __classCaddyInstallPromptInitialized?: boolean;
+    __classCaddyPendingInstallPrompt?: InstallPromptEvent | null;
   }
 }
 
@@ -95,7 +96,8 @@ export function initializeClassCaddyInstallPrompt(): void {
 
   if (!window.isSecureContext || isInstalledApp() || wasPromptShownToday()) return;
 
-  let pendingPrompt: InstallPromptEvent | null = null;
+  let pendingPrompt: InstallPromptEvent | null = window.__classCaddyPendingInstallPrompt ?? null;
+  window.__classCaddyPendingInstallPrompt = null;
   let shownThisPage = false;
 
   const hidePrompt = () => document.getElementById(INSTALL_PROMPT_ID)?.remove();
@@ -134,6 +136,8 @@ export function initializeClassCaddyInstallPrompt(): void {
     pendingPrompt = event as InstallPromptEvent;
     showPrompt();
   });
+
+  if (pendingPrompt) showPrompt();
 
   window.addEventListener('appinstalled', () => {
     pendingPrompt = null;

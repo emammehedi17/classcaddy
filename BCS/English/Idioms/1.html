@@ -52,7 +52,9 @@
         }
     </style>
     <link rel="icon" type="image/png" href="../../../images/logo.png">
-</head>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#059669">
+  </head>
 <body class="text-slate-800 antialiased min-h-screen pb-12">
 
     <header class="bg-indigo-600 text-white py-12 px-4 shadow-lg relative overflow-hidden">
@@ -674,5 +676,6 @@
             });
         });
     </script>
+<script type="module" src="/src/installPrompt.ts"></script>
 </body>
 </html>
