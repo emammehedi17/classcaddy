@@ -62,11 +62,9 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             <a
               id="header-founder-profile"
-              href="https://facebook.com/emammehedi17"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/index.html"
               className="flex-shrink-0"
-              title="Emam Mehedi - Class Caddy Founder"
+              title="Class Caddy - Home"
             >
               <img
                 src="/images/logo.png"

@@ -863,9 +863,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Universal Global Header Replacement / Injection (Matches study_plan.html 100%)
     function ensureUniversalHeader() {
-        // Ensure study_plan.html's own header logo also has cc-avatar-founder & /images/logo.png
+        // Ensure study_plan.html's own header logo also has cc-avatar-founder, links to /index.html & uses /images/logo.png
         if (isStudyPlanPage()) {
-            const spLogo = document.querySelector('header.main-website-ui nav a[href*="facebook.com"] img');
+            const spLogo = document.querySelector('header.main-website-ui nav .flex.items-center a img, header.main-website-ui nav a[href*="facebook.com"] img');
             if (spLogo) {
                 spLogo.classList.add('cc-avatar-founder');
                 spLogo.src = '/images/logo.png';
@@ -873,6 +873,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     this.onerror = null;
                     this.src = '/favicon.png';
                 };
+                const parentAnchor = spLogo.closest('a');
+                if (parentAnchor) {
+                    parentAnchor.href = '/index.html';
+                    parentAnchor.removeAttribute('target');
+                    parentAnchor.removeAttribute('rel');
+                }
             }
             return;
         }
@@ -892,7 +898,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="container mx-auto px-4 sm:px-6 py-3">
             <nav class="flex justify-between items-center">
                 <div class="cc-brand-left flex items-center gap-3 sm:gap-4 min-w-0">
-                    <a href="https://facebook.com/emammehedi17" target="_blank" rel="noopener noreferrer" class="flex-shrink-0">
+                    <a href="/index.html" class="flex-shrink-0" title="Class Caddy - Home">
                         <img src="/images/logo.png" alt="Class Caddy Logo" class="cc-avatar-founder h-10 w-10 rounded-full border-2 border-emerald-500 bg-white object-contain p-0.5" onerror="this.onerror=null; this.src='/favicon.png';">
                     </a>
                     <a href="/index.html">
