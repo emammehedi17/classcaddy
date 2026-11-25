@@ -10,10 +10,10 @@ export type AppSettings = {
 export const APP_SETTINGS_KEY = 'class_caddy_settings_v1';
 
 export const DEFAULT_APP_SETTINGS: AppSettings = {
-  theme: 'light',
+  theme: 'dark',
   banglaFont: 'sans-serif',
   language: 'bn',
-  readingSize: 'medium',
+  readingSize: 'small',
   reduceMotion: false,
   autoBackupEnabled: true,
 };
@@ -28,19 +28,24 @@ export function loadAppSettings(): AppSettings {
       ...parsed,
       theme: ['light', 'dark', 'sepia', 'forest', 'midnight'].includes(parsed.theme)
         ? parsed.theme
-        : (!parsed.theme && legacyTheme === 'dark' ? 'dark' : 'light'),
+        : (!parsed.theme && ['light', 'dark', 'sepia', 'forest', 'midnight'].includes(legacyTheme) ? legacyTheme : 'dark'),
       banglaFont: ['sans-serif', 'amiri', 'hind-siliguri', 'kalpurush'].includes(parsed.banglaFont)
         ? parsed.banglaFont
         : 'sans-serif',
       language: parsed.language === 'en' || (!parsed.language && legacyLanguage === 'en') ? 'en' : 'bn',
       readingSize: ['small', 'medium', 'large'].includes(parsed.readingSize)
         ? parsed.readingSize
-        : 'medium',
+        : 'small',
       reduceMotion: parsed.reduceMotion === true,
       autoBackupEnabled: parsed.autoBackupEnabled !== false,
     };
   } catch {
-    return { ...DEFAULT_APP_SETTINGS };
+    const legacyTheme = localStorage.getItem('class_caddy_theme');
+    return {
+      ...DEFAULT_APP_SETTINGS,
+      theme: ['light', 'dark', 'sepia', 'forest', 'midnight'].includes(legacyTheme) ? legacyTheme as AppSettings['theme'] : DEFAULT_APP_SETTINGS.theme,
+      language: localStorage.getItem('cc_home_lang') === 'en' ? 'en' : DEFAULT_APP_SETTINGS.language,
+    };
   }
 }
 

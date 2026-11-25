@@ -1051,7 +1051,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const settings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
             const root = document.documentElement;
             root.dataset.banglaFont = ['amiri', 'hind-siliguri', 'kalpurush'].includes(settings.banglaFont) ? settings.banglaFont : 'sans-serif';
-            root.dataset.readingSize = ['small', 'medium', 'large'].includes(settings.readingSize) ? settings.readingSize : 'medium';
+            root.dataset.readingSize = ['small', 'medium', 'large'].includes(settings.readingSize) ? settings.readingSize : 'small';
             root.dataset.reduceMotion = String(settings.reduceMotion === true);
         } catch (e) {}
     }
@@ -1380,19 +1380,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     try {
                         const prefSnap = await getDoc(doc(firebaseDb, 'artifacts/study-plan17/users', user.uid, 'settings', 'preferences'));
                         const pref = prefSnap.data() || {};
-                        if (pref.appSettings) {
-                            localStorage.setItem('class_caddy_settings_v1', JSON.stringify(pref.appSettings));
-                            localStorage.setItem('cc_home_lang', pref.appSettings.language || 'bn');
-                            window.dispatchEvent(new CustomEvent('classcaddy:settings-change', { detail: pref.appSettings }));
-                        } else if (typeof pref.darkMode === 'boolean') {
+                        if (window.self === window.top && pref.appSettings) {
+                            let localSettings = {};
+                            try { localSettings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}'); } catch (_) {}
+                            const mergedSettings = { ...localSettings, ...pref.appSettings };
+                            localStorage.setItem('class_caddy_settings_v1', JSON.stringify(mergedSettings));
+                            localStorage.setItem('cc_home_lang', mergedSettings.language || 'bn');
+                            window.dispatchEvent(new CustomEvent('classcaddy:settings-change', { detail: mergedSettings }));
+                        } else if (window.self === window.top && typeof pref.darkMode === 'boolean') {
                             const legacySettings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
                             legacySettings.theme = pref.darkMode ? 'dark' : 'light';
-                            legacySettings.readingSize = pref.fontSize <= 14 ? 'small' : pref.fontSize >= 18 ? 'large' : 'medium';
+                            legacySettings.readingSize = pref.fontSize >= 18 ? 'large' : 'small';
                             legacySettings.language = pref.language === 'en' ? 'en' : (legacySettings.language || 'bn');
                             localStorage.setItem('class_caddy_settings_v1', JSON.stringify(legacySettings));
                             window.dispatchEvent(new CustomEvent('classcaddy:settings-change', { detail: legacySettings }));
                             await window._classCaddySaveAppSettings?.(legacySettings);
-                        } else await window._classCaddySaveAppSettings?.();
+                        } else if (window.self === window.top) await window._classCaddySaveAppSettings?.();
                         if (pref.quizPreferences) localStorage.setItem('cc_quiz_settings', JSON.stringify(pref.quizPreferences));
                         if (pref.examPreferences) localStorage.setItem('cc_new_exam_settings_v1', JSON.stringify(pref.examPreferences));
                     } catch (error) { console.warn('Could not load saved preferences:', error); }

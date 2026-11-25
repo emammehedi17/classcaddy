@@ -63,11 +63,15 @@ export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = fa
         return;
       }
       if (event.data?.type !== 'classcaddy:parent-settings-change') return;
-      const settings = event.data.settings;
+      const settings = event.data.settings as Record<string, unknown>;
       if (!settings || typeof settings !== 'object') return;
-      try { localStorage.setItem('class_caddy_settings_v1', JSON.stringify(settings)); } catch {}
+      let currentSettings: Record<string, unknown> = {};
+      try { currentSettings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}'); } catch {}
+      const mergedSettings: Record<string, unknown> = { ...currentSettings, ...settings };
+      delete mergedSettings.__classCaddyParentSync;
+      try { localStorage.setItem('class_caddy_settings_v1', JSON.stringify(mergedSettings)); } catch {}
       const settingsEvent = doc.createEvent('CustomEvent');
-      settingsEvent.initCustomEvent('classcaddy:settings-change', false, false, { ...settings, __classCaddyParentSync: true });
+      settingsEvent.initCustomEvent('classcaddy:settings-change', false, false, { ...mergedSettings, __classCaddyParentSync: true });
       doc.defaultView?.dispatchEvent(settingsEvent);
     });
     const initialSettings = (() => { try { return JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}'); } catch { return {}; } })();

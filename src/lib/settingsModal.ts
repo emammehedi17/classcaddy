@@ -553,7 +553,7 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
       theme: ['dark', 'sepia', 'forest', 'midnight'].includes(getValue(overlay, 'theme')) ? getValue(overlay, 'theme') as AppSettings['theme'] : 'light',
       banglaFont: ['amiri', 'hind-siliguri', 'kalpurush'].includes(getValue(overlay, 'banglaFont')) ? getValue(overlay, 'banglaFont') as AppSettings['banglaFont'] : 'sans-serif',
       language: getValue(overlay, 'language') === 'en' ? 'en' : 'bn',
-      readingSize: ['small', 'medium', 'large'].includes(getValue(overlay, 'readingSize')) ? getValue(overlay, 'readingSize') as AppSettings['readingSize'] : 'medium',
+      readingSize: ['small', 'medium', 'large'].includes(getValue(overlay, 'readingSize')) ? getValue(overlay, 'readingSize') as AppSettings['readingSize'] : 'small',
       reduceMotion: getChecked(overlay, 'reduceMotion'),
     });
     const status = overlay.querySelector<HTMLElement>('[data-appearance-status]')!;

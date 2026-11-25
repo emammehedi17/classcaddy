@@ -8,7 +8,8 @@
       (function () {
         try {
           var prefs = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
-          var theme = ['light','dark','sepia','forest','midnight'].includes(prefs.theme) ? prefs.theme : (localStorage.getItem('class_caddy_theme') || 'light');
+          var legacyTheme = localStorage.getItem('class_caddy_theme');
+          var theme = ['light','dark','sepia','forest','midnight'].includes(prefs.theme) ? prefs.theme : (['light','dark','sepia','forest','midnight'].includes(legacyTheme) ? legacyTheme : 'dark');
           var isDark = ['dark','forest','midnight'].includes(theme);
           if (!prefs.theme && !localStorage.getItem('class_caddy_theme')) {
             var sp = localStorage.getItem('studyPlanSettings');
@@ -17,7 +18,7 @@
           var root = document.documentElement;
           root.dataset.theme = theme;
           root.dataset.banglaFont = prefs.banglaFont || 'sans-serif';
-          root.dataset.readingSize = prefs.readingSize || 'medium';
+          root.dataset.readingSize = ['small','medium','large'].includes(prefs.readingSize) ? prefs.readingSize : 'small';
           root.dataset.language = prefs.language || localStorage.getItem('cc_home_lang') || 'bn';
           if (isDark) {
             root.classList.add('dark');

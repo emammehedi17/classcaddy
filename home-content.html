@@ -22,15 +22,22 @@
     <script id="cc-instant-theme">
       (function () {
         try {
-          var isDark = localStorage.getItem('class_caddy_theme') === 'dark';
-          if (!isDark && !localStorage.getItem('class_caddy_theme')) {
+          var prefs = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
+          var legacyTheme = localStorage.getItem('class_caddy_theme');
+          var theme = ['light', 'dark', 'sepia', 'forest', 'midnight'].includes(prefs.theme) ? prefs.theme : (['light', 'dark', 'sepia', 'forest', 'midnight'].includes(legacyTheme) ? legacyTheme : 'dark');
+          var isDark = ['dark', 'forest', 'midnight'].includes(theme);
+          if (!prefs.theme && !legacyTheme) {
             var sp = localStorage.getItem('studyPlanSettings');
-            if (sp && JSON.parse(sp).darkMode === true) isDark = true;
+            if (sp && JSON.parse(sp).darkMode === true) { isDark = true; theme = 'dark'; }
           }
           var root = document.documentElement;
+          root.dataset.theme = theme;
+          root.dataset.banglaFont = ['sans-serif', 'amiri', 'hind-siliguri', 'kalpurush'].includes(prefs.banglaFont) ? prefs.banglaFont : 'sans-serif';
+          root.dataset.readingSize = ['small', 'medium', 'large'].includes(prefs.readingSize) ? prefs.readingSize : 'small';
+          root.dataset.language = prefs.language === 'en' || localStorage.getItem('cc_home_lang') === 'en' ? 'en' : 'bn';
           if (isDark) {
             root.classList.add('dark');
-            root.style.backgroundColor = '#0f172a';
+            root.style.backgroundColor = theme === 'forest' ? '#10251f' : theme === 'midnight' ? '#080d1c' : '#0f172a';
             root.style.colorScheme = 'dark';
             if (document.body) {
               document.body.classList.add('dark-mode');
@@ -44,7 +51,7 @@
             }
           } else {
             root.classList.remove('dark');
-            root.style.backgroundColor = '#f8fafc';
+            root.style.backgroundColor = theme === 'sepia' ? '#f4ecd8' : '#f8fafc';
             root.style.colorScheme = 'light';
           }
         } catch (e) {}

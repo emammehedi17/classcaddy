@@ -16,7 +16,7 @@ export async function loadCloudAppSettings(uid: string): Promise<Partial<AppSett
   if (typeof data?.darkMode === 'boolean') {
     return {
       theme: data.darkMode ? 'dark' : 'light',
-      readingSize: data.fontSize <= 14 ? 'small' : data.fontSize >= 18 ? 'large' : 'medium',
+      readingSize: data.fontSize >= 18 ? 'large' : 'small',
       language: data.language === 'en' ? 'en' : 'bn',
     };
   }

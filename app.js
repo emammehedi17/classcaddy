@@ -945,10 +945,18 @@
         };
         window._classCaddySaveAppSettings = async (settings) => {
             if (!auth.currentUser || auth.currentUser.isAnonymous) return;
-            const fontSize = settings.readingSize === 'small' ? 14 : settings.readingSize === 'large' ? 18 : 16;
+            let currentSettings = {};
+            try { currentSettings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}'); } catch (_) {}
+            const value = { ...currentSettings, ...(settings || {}) };
+            delete value.__classCaddyParentSync;
+            if (!['light', 'dark', 'sepia', 'forest', 'midnight'].includes(value.theme)) value.theme = ['light', 'dark', 'sepia', 'forest', 'midnight'].includes(localStorage.getItem('class_caddy_theme')) ? localStorage.getItem('class_caddy_theme') : 'dark';
+            if (!['sans-serif', 'amiri', 'hind-siliguri', 'kalpurush'].includes(value.banglaFont)) value.banglaFont = 'sans-serif';
+            if (!['small', 'medium', 'large'].includes(value.readingSize)) value.readingSize = 'small';
+            if (!['bn', 'en'].includes(value.language)) value.language = localStorage.getItem('cc_home_lang') === 'en' ? 'en' : 'bn';
+            const fontSize = value.readingSize === 'small' ? 14 : value.readingSize === 'large' ? 18 : 16;
             await setDoc(doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/settings`, 'preferences'), {
-                appSettings: settings, darkMode: ['dark', 'forest', 'midnight'].includes(settings.theme), fontSize,
-                language: settings.language, updatedAt: Timestamp.now()
+                appSettings: value, darkMode: ['dark', 'forest', 'midnight'].includes(value.theme), fontSize,
+                language: value.language, updatedAt: Timestamp.now()
             }, { merge: true });
         };
         window._classCaddySaveExamPreferences = async (legacy, exam) => {
@@ -10195,9 +10203,13 @@ if (viewMcqFullscreenBtn && viewMcqModalContent) {
 // --- START: GLOBAL SETTINGS SYNC & MODAL CONTROLS ---
 
 // 1. Global State
+let initialAppPreferences = {};
+try { initialAppPreferences = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}'); } catch (_) {}
 let globalSettings = {
-    darkMode: (localStorage.getItem('class_caddy_theme') === 'dark' || document.documentElement.classList.contains('dark')),
-    fontSize: 16
+    darkMode: ['light', 'dark', 'sepia', 'forest', 'midnight'].includes(initialAppPreferences.theme)
+        ? ['dark', 'forest', 'midnight'].includes(initialAppPreferences.theme)
+        : localStorage.getItem('class_caddy_theme') === 'dark' || document.documentElement.classList.contains('dark'),
+    fontSize: initialAppPreferences.readingSize === 'large' ? 18 : initialAppPreferences.readingSize === 'medium' ? 16 : 14
 };
 
 // 2. Sync with Firebase on Login
@@ -10206,11 +10218,19 @@ function initSettingsSync(userId) {
     onSnapshot(settingsRef, (docSnap) => {
         if (docSnap.exists()) {
             const data = docSnap.data();
-            if (data.appSettings && typeof data.appSettings === 'object') {
-                localStorage.setItem('class_caddy_settings_v1', JSON.stringify(data.appSettings));
-                localStorage.setItem('cc_home_lang', data.appSettings.language || 'bn');
-                window.dispatchEvent(new CustomEvent('classcaddy:settings-change', { detail: data.appSettings }));
-            } else {
+            const embedded = window.self !== window.top;
+            // The React shell owns settings for embedded legacy pages and sends
+            // each update over postMessage. A second Firestore listener here can
+            // race that update when navigating between routes.
+            if (!embedded && data.appSettings && typeof data.appSettings === 'object') {
+                let localPrefs = {};
+                try { localPrefs = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}'); } catch (_) {}
+                const mergedSettings = { ...localPrefs, ...data.appSettings };
+                delete mergedSettings.__classCaddyParentSync;
+                localStorage.setItem('class_caddy_settings_v1', JSON.stringify(mergedSettings));
+                localStorage.setItem('cc_home_lang', mergedSettings.language || 'bn');
+                window.dispatchEvent(new CustomEvent('classcaddy:settings-change', { detail: mergedSettings }));
+            } else if (!embedded) {
                 try {
                     const localPrefs = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
                     if (Object.keys(localPrefs).length) window._classCaddySaveAppSettings?.(localPrefs);
@@ -10218,8 +10238,16 @@ function initSettingsSync(userId) {
             }
             if (data.quizPreferences) localStorage.setItem('cc_quiz_settings', JSON.stringify(data.quizPreferences));
             if (data.examPreferences) localStorage.setItem('cc_new_exam_settings_v1', JSON.stringify(data.examPreferences));
-            if (data.darkMode !== undefined) globalSettings.darkMode = data.darkMode;
-            if (data.fontSize !== undefined) globalSettings.fontSize = data.fontSize;
+            let effectiveAppSettings = data.appSettings;
+            if (embedded) {
+                try { effectiveAppSettings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}'); } catch (_) { effectiveAppSettings = {}; }
+            }
+            const savedTheme = effectiveAppSettings?.theme;
+            if (['light', 'dark', 'sepia', 'forest', 'midnight'].includes(savedTheme)) globalSettings.darkMode = ['dark', 'forest', 'midnight'].includes(savedTheme);
+            else if (!embedded && data.darkMode !== undefined) globalSettings.darkMode = data.darkMode;
+            const savedReadingSize = effectiveAppSettings?.readingSize;
+            if (['small', 'medium', 'large'].includes(savedReadingSize)) globalSettings.fontSize = savedReadingSize === 'small' ? 14 : savedReadingSize === 'large' ? 18 : 16;
+            else if (!embedded && data.fontSize !== undefined) globalSettings.fontSize = data.fontSize >= 18 ? 18 : data.fontSize <= 14 ? 14 : 14;
             applySettingsToDom();
             // Load saved daily goal from Firestore
             if (data.dailyGoalHours !== undefined) {
@@ -10302,7 +10330,7 @@ function applySettingsToDom() {
         ? appPreferences.theme : globalSettings.darkMode ? 'dark' : 'light';
     document.documentElement.dataset.theme = theme;
     document.documentElement.dataset.banglaFont = appPreferences.banglaFont || 'sans-serif';
-    document.documentElement.dataset.readingSize = appPreferences.readingSize || 'medium';
+    document.documentElement.dataset.readingSize = ['small', 'medium', 'large'].includes(appPreferences.readingSize) ? appPreferences.readingSize : 'small';
     document.documentElement.dataset.reduceMotion = String(appPreferences.reduceMotion === true);
     document.documentElement.dataset.language = appPreferences.language || 'bn';
     document.documentElement.lang = appPreferences.language || 'bn';
@@ -10336,11 +10364,14 @@ function applySettingsToDom() {
 }
 
 window.addEventListener('classcaddy:settings-change', (event) => {
-    const settings = event.detail;
-    if (!settings) return;
+    if (!event.detail || typeof event.detail !== 'object') return;
+    let current = {};
+    try { current = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}'); } catch (_) {}
+    const settings = { ...current, ...event.detail };
+    delete settings.__classCaddyParentSync;
     localStorage.setItem('class_caddy_settings_v1', JSON.stringify(settings));
-    globalSettings.darkMode = ['dark', 'forest', 'midnight'].includes(settings.theme);
-    globalSettings.fontSize = settings.readingSize === 'small' ? 14 : settings.readingSize === 'large' ? 18 : 16;
+    if (['light', 'dark', 'sepia', 'forest', 'midnight'].includes(settings.theme)) globalSettings.darkMode = ['dark', 'forest', 'midnight'].includes(settings.theme);
+    globalSettings.fontSize = settings.readingSize === 'large' ? 18 : settings.readingSize === 'medium' ? 16 : 14;
     applySettingsToDom();
 });
 

@@ -3,7 +3,7 @@
   try { settings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}'); } catch (_) {}
   let theme = ['light', 'dark', 'sepia', 'forest', 'midnight'].includes(settings.theme)
     ? settings.theme
-    : (['light', 'dark', 'sepia', 'forest', 'midnight'].includes(localStorage.getItem('class_caddy_theme')) ? localStorage.getItem('class_caddy_theme') : 'light');
+    : (['light', 'dark', 'sepia', 'forest', 'midnight'].includes(localStorage.getItem('class_caddy_theme')) ? localStorage.getItem('class_caddy_theme') : 'dark');
   let font = ['sans-serif', 'amiri', 'hind-siliguri', 'kalpurush'].includes(settings.banglaFont)
     ? settings.banglaFont : 'sans-serif';
   let language = settings.language === 'en' || localStorage.getItem('cc_home_lang') === 'en' ? 'en' : 'bn';
@@ -23,7 +23,7 @@
     dark = ['dark', 'forest', 'midnight'].includes(theme);
     root.dataset.theme = theme;
     root.dataset.banglaFont = font;
-    root.dataset.readingSize = ['small', 'medium', 'large'].includes(settings.readingSize) ? settings.readingSize : 'medium';
+    root.dataset.readingSize = ['small', 'medium', 'large'].includes(settings.readingSize) ? settings.readingSize : 'small';
     root.dataset.reduceMotion = String(settings.reduceMotion === true);
     root.dataset.language = language;
     root.lang = language;
