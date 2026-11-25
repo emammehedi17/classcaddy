@@ -7,6 +7,21 @@ body {
     overflow-x: hidden;
 }
 
+html[data-bangla-font="amiri"] body,
+html[data-bangla-font="amiri"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text) {
+    font-family: 'Amiri', 'Noto Sans Bengali', 'Hind Siliguri', sans-serif !important;
+}
+html[data-reading-size="small"] { font-size: 14px !important; }
+html[data-reading-size="medium"] { font-size: 16px !important; }
+html[data-reading-size="large"] { font-size: 18px !important; }
+html[data-reduce-motion="true"] *,
+html[data-reduce-motion="true"] *::before,
+html[data-reduce-motion="true"] *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+}
+
 html.dark, html.dark body, body.dark-mode {
     background-color: #0f172a !important;
     color: #f3f4f6 !important;

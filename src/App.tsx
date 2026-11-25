@@ -15,8 +15,10 @@ import { CourseDetailView } from './components/CourseDetailView';
 import { PrivacyPolicyView } from './components/PrivacyPolicyView';
 import { FloatingActionButtons } from './components/FloatingActionButtons';
 import { auth } from './lib/firebase';
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, updateProfile } from 'firebase/auth';
 import { CLASS_CADDY_LOGO_DATA_URI } from './lib/logoData';
+import { applyAppSettings, loadAppSettings, saveAppSettings } from './lib/appSettings';
+import { openSettingsDialog } from './lib/settingsModal';
 
 export default function App() {
   useEffect(() => {
@@ -54,10 +56,18 @@ export default function App() {
     if (path.includes('index') || path === '/' || path.endsWith('/')) return 'home';
     return 'archives';
   });
-  const [theme, setTheme] = useState<ThemeMode>(() => {
-    const savedTheme = localStorage.getItem('class_caddy_theme') as ThemeMode | null;
-    return savedTheme === 'dark' ? 'dark' : 'light';
-  });
+  const [theme, setTheme] = useState<ThemeMode>(() => loadAppSettings().theme);
+
+  useEffect(() => {
+    applyAppSettings(loadAppSettings());
+    const syncSettings = () => {
+      const settings = loadAppSettings();
+      setTheme(settings.theme);
+      applyAppSettings(settings);
+    };
+    window.addEventListener('classcaddy:settings-change', syncSettings);
+    return () => window.removeEventListener('classcaddy:settings-change', syncSettings);
+  }, []);
 
   // Windows 11 File Explorer Full-Screen Mode
   const [isExplorerMode, setIsExplorerMode] = useState<boolean>(() => {
@@ -200,8 +210,11 @@ export default function App() {
           } catch (err) {}
         }
         setUser({ name: '', email: '', isLoggedIn: false });
-      } else if (e.key === 'class_caddy_theme' && e.newValue) {
-        setTheme(e.newValue === 'dark' ? 'dark' : 'light');
+      } else if (e.key === 'class_caddy_theme' || e.key === 'class_caddy_settings_v1') {
+        const settings = loadAppSettings();
+        if (e.key === 'class_caddy_theme' && e.newValue) settings.theme = e.newValue === 'dark' ? 'dark' : 'light';
+        setTheme(settings.theme);
+        applyAppSettings(settings);
       }
     };
 
@@ -210,7 +223,9 @@ export default function App() {
   }, []);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    const next = theme === 'light' ? 'dark' : 'light';
+    setTheme(next);
+    saveAppSettings({ theme: next });
   };
 
   const handleGoogleSignIn = async () => {
@@ -287,6 +302,25 @@ export default function App() {
     localStorage.removeItem('cc_auth_user');
   };
 
+  const openAccountSettings = () => openSettingsDialog({
+    profile: user,
+    onSaveProfile: async (name) => {
+      if (auth.currentUser) await updateProfile(auth.currentUser, { displayName: name });
+      const updatedUser = { ...user, name };
+      setUser(updatedUser);
+      localStorage.setItem('class_caddy_user', JSON.stringify(updatedUser));
+      const cachedAuth = JSON.parse(localStorage.getItem('cc_auth_user') || '{}');
+      localStorage.setItem('cc_auth_user', JSON.stringify({
+        ...cachedAuth,
+        displayName: name,
+        email: user.email,
+        photoURL: user.photoURL,
+        isLoggedIn: user.isLoggedIn,
+      }));
+    },
+    onSignOut: handleLogout,
+  });
+
   const isDark = theme === 'dark';
 
   return (
@@ -307,6 +341,7 @@ export default function App() {
           user={user}
           onLogout={handleLogout}
           onOpenSignup={() => {}}
+          onOpenSettings={openAccountSettings}
           onGoogleSignIn={handleGoogleSignIn}
           theme={theme}
           toggleTheme={toggleTheme}

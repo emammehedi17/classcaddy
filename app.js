@@ -102,6 +102,10 @@
 					console.warn("Could not parse saved quiz settings:", e);
 				}
 			}
+			window.addEventListener('classcaddy:exam-settings-change', (event) => {
+				const next = event.detail?.legacy;
+				if (next && typeof next === 'object') quizSettings = { ...quizSettings, ...next };
+			});
 
 
         // --- DOM Elements ---
@@ -666,18 +670,15 @@
                 userIdDisplay.textContent = `ID: ${userId}`;
 				
                 // Update the card profile pic (existing code)
-				if (user.photoURL) {
+                if (user.photoURL) {
                     userPhotoDisplay.src = user.photoURL;
                     userPhotoDisplay.classList.remove('hidden');
-                    
-                    // --- START: UPDATE HEADER LOGO TO USER PHOTO ---
-                    if (headerLogo) {
-                        headerLogo.src = user.photoURL; // Change logo to user photo
-                        if (headerLink) headerLink.removeAttribute('href'); // Disable DU link
-                    }
-                    // --- END: UPDATE HEADER LOGO TO USER PHOTO ---
                 } else {
                     userPhotoDisplay.classList.add('hidden');
+                }
+                if (headerLogo) {
+                    headerLogo.src = user.photoURL || 'images/logo.png';
+                    if (headerLink) headerLink.removeAttribute('href');
                 }
                 userIdDisplay.title = 'Your unique User ID';
 
@@ -696,7 +697,8 @@
                     loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700 dark:text-gray-200">Guest Mode</p><p class="text-gray-500 dark:text-gray-400 text-xs">Viewing Mehedi's Plan</p></div>`;
                 } else {
                     // Removed the 'Log Out' button from here
-                    loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700 dark:text-gray-200">${user.displayName || 'User'}</p><p class="text-gray-500 dark:text-gray-400 text-xs">${user.email || (user.isAnonymous ? 'Anonymous' : '')}</p></div>`;
+                    const escapedName = String(user.displayName || 'User').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+                    loggedInHTML = `<button type="button" data-open-classcaddy-settings class="rounded-full px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="প্রোফাইল ও অ্যাপ সেটিংস খুলুন">${escapedName}</button>`;
                     try {
                         const profileName = user.displayName || user.email?.split('@')[0] || 'User';
                         localStorage.setItem('cc_auth_user', JSON.stringify({
@@ -719,7 +721,8 @@
                 
                 // Note: If you still want the button on MOBILE menu only, we can add it back here manually. 
                 // For now, this removes it from both Desktop Header and Mobile Menu to be consistent.
-                authContainerMobile.innerHTML = loggedInHTML; 
+                const safePhoto = String(user.photoURL || 'images/logo.png').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+                authContainerMobile.innerHTML = `<button type="button" data-open-classcaddy-settings class="flex w-full items-center gap-3 rounded-xl p-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="প্রোফাইল ও অ্যাপ সেটিংস খুলুন"><img src="${safePhoto}" alt="" class="h-10 w-10 rounded-full border border-emerald-300 object-cover"><span>${isGuestMode ? 'Guest Mode' : escapedName}</span></button>`;
                 // --- END: REMOVE LOGOUT BUTTON FROM HEADER ---
 
                 // We can safely leave these listeners; the ?. check prevents errors if the buttons don't exist
@@ -934,6 +937,13 @@
             } 
         }
 		
+        window._classCaddyUpdateProfile = async (name) => {
+            if (!auth.currentUser || auth.currentUser.isAnonymous) throw new Error('নাম বদলাতে Google account-এ সাইন ইন করুন।');
+            await updateProfile(auth.currentUser, { displayName: name });
+            updateAuthUI(auth.currentUser);
+        };
+        window._classCaddySignOut = handleLogout;
+
         logoutBtn.addEventListener('click', handleLogout);
 
         // --- START: ADD MOBILE DETECT HELPER ---

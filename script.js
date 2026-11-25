@@ -498,8 +498,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!hasBanglaSansFont && document.head) {
             const fontLink = document.createElement('link');
             fontLink.rel = 'stylesheet';
-            fontLink.href = 'https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap';
+            fontLink.href = 'https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap';
             document.head.appendChild(fontLink);
+        }
+        const hasAmiriFont = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).some((link) => (link.href || '').includes('family=Amiri'));
+        if (!hasAmiriFont && document.head) {
+            const amiriLink = document.createElement('link');
+            amiriLink.rel = 'stylesheet';
+            amiriLink.href = 'https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap';
+            document.head.appendChild(amiriLink);
         }
 
         // Use a versioned root favicon so browsers replace any previously cached DU icon.
@@ -526,6 +533,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 /* Universal Sans-Serif Bangla Typography */
                 html, body, input, textarea, select, button, .bangla, .kalpurush, .bengali-text {
                     font-family: 'Inter', 'Plus Jakarta Sans', 'Poppins', 'Noto Sans Bengali', 'Hind Siliguri', sans-serif;
+                }
+                html[data-bangla-font="amiri"] body, html[data-bangla-font="amiri"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text) {
+                    font-family: 'Amiri', 'Noto Sans Bengali', 'Hind Siliguri', sans-serif !important;
+                }
+                html[data-reading-size="small"] { font-size: 14px !important; }
+                html[data-reading-size="medium"] { font-size: 16px !important; }
+                html[data-reading-size="large"] { font-size: 18px !important; }
+                html[data-reduce-motion="true"] *, html[data-reduce-motion="true"] *::before, html[data-reduce-motion="true"] *::after {
+                    scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important;
                 }
                 /* Universal Study Plan Header Protection & Fallback Layout (Works with or without Tailwind) */
                 header.main-website-ui {
@@ -988,6 +1004,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Universal Theme Manager
     function getStoredTheme() {
+        try {
+            const appSettings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
+            if (appSettings.theme === 'dark' || appSettings.theme === 'light') return appSettings.theme;
+        } catch (e) {}
         const directTheme = localStorage.getItem('class_caddy_theme');
         if (directTheme) return directTheme;
         try {
@@ -1003,6 +1023,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applyGlobalTheme(isDark) {
+        applyGlobalPreferences();
         if (isDark) {
             document.body?.classList.add('dark-mode');
             document.documentElement.classList.add('dark');
@@ -1023,11 +1044,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function applyGlobalPreferences() {
+        try {
+            const settings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
+            const root = document.documentElement;
+            root.dataset.banglaFont = settings.banglaFont === 'amiri' ? 'amiri' : 'sans-serif';
+            root.dataset.readingSize = ['small', 'medium', 'large'].includes(settings.readingSize) ? settings.readingSize : 'medium';
+            root.dataset.reduceMotion = String(settings.reduceMotion === true);
+        } catch (e) {}
+    }
+
     window.toggleGlobalTheme = function () {
         const isCurrentlyDark = document.documentElement.classList.contains('dark') || document.body.classList.contains('dark-mode');
         const nextIsDark = !isCurrentlyDark;
         applyGlobalTheme(nextIsDark);
         localStorage.setItem('class_caddy_theme', nextIsDark ? 'dark' : 'light');
+        try {
+            const settings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
+            settings.theme = nextIsDark ? 'dark' : 'light';
+            localStorage.setItem('class_caddy_settings_v1', JSON.stringify(settings));
+        } catch (e) {}
         try {
             const sp = JSON.parse(localStorage.getItem('studyPlanSettings') || '{}');
             sp.darkMode = nextIsDark;
@@ -1216,7 +1252,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isFirebaseLoaded || window._fb_auth_initialized || isStudyPlanPage()) return;
         try {
             const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
-            const { getAuth, onAuthStateChanged, GoogleAuthProvider } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
+            const { getAuth, onAuthStateChanged, GoogleAuthProvider, updateProfile } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
 
             const firebaseConfig = {
                 apiKey: "AIzaSyAj7MDnrnzKUO73BXG0jeM-uBGrAH3XiAY",
@@ -1231,8 +1267,16 @@ document.addEventListener('DOMContentLoaded', () => {
             window._fb_auth_instance = firebaseAuthInstance;
             window._fb_google_provider = googleAuthProvider;
             window._fb_auth_initialized = true;
+            let markAuthReady;
+            const authReady = new Promise((resolve) => { markAuthReady = resolve; });
+            window._classCaddyUpdateProfile = async (name) => {
+                await authReady;
+                if (!firebaseAuthInstance.currentUser) throw new Error('নাম বদলাতে আবার সাইন ইন করুন।');
+                await updateProfile(firebaseAuthInstance.currentUser, { displayName: name });
+            };
 
             onAuthStateChanged(firebaseAuthInstance, (user) => {
+                markAuthReady();
                 if (user) {
                     const profile = {
                         name: user.displayName || user.email?.split('@')[0] || 'User',
@@ -1327,6 +1371,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.triggerGoogleSignOutGlobal = async function () {
         try {
+            if (!isFirebaseLoaded && !isStudyPlanPage()) await initFirebaseForStaticPages();
             if (firebaseAuthInstance) {
                 const { signOut } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
                 await signOut(firebaseAuthInstance);
@@ -1336,6 +1381,50 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('class_caddy_user');
         syncAuthUI();
     };
+
+    window.openClassCaddySettings = async function () {
+        try {
+            const raw = localStorage.getItem('cc_auth_user') || localStorage.getItem('class_caddy_user') || '{}';
+            const saved = JSON.parse(raw);
+            const profile = {
+                name: saved.displayName || saved.name || saved.email?.split('@')[0] || 'শিক্ষার্থী',
+                email: saved.email || '',
+                photoURL: saved.photoURL || saved.avatar || '',
+                isLoggedIn: Boolean(saved.isLoggedIn || saved.uid || saved.email)
+            };
+            const { openSettingsDialog } = await import('./src/lib/settingsModal.ts');
+            openSettingsDialog({
+                profile,
+                onSaveProfile: async (name) => {
+                    if (profile.isLoggedIn && !window._classCaddyUpdateProfile) await initFirebaseForStaticPages();
+                    if (profile.isLoggedIn && window._classCaddyUpdateProfile) await window._classCaddyUpdateProfile(name);
+                    profile.name = name;
+                },
+                onSignOut: async () => {
+                    if (window._classCaddySignOut) return window._classCaddySignOut();
+                    if (window.triggerGoogleSignOutGlobal) return window.triggerGoogleSignOutGlobal();
+                }
+            });
+        } catch (error) {
+            console.error('Could not open Class Caddy settings:', error);
+        }
+    };
+
+    document.addEventListener('click', (event) => {
+        const target = event.target instanceof Element ? event.target : null;
+        if (!target) return;
+        const profileButton = target.closest('[data-open-classcaddy-settings]');
+        if (profileButton) {
+            event.preventDefault();
+            window.openClassCaddySettings();
+            return;
+        }
+        const profileImage = target.closest('header.main-website-ui img[alt="DU Logo"]');
+        if (profileImage && !profileImage.closest('a')?.getAttribute('href')) {
+            event.preventDefault();
+            window.openClassCaddySettings();
+        }
+    });
 
     // 6. Universal Auth UI Synchronization — Exact Study Plan Header Format (app.js lines 674-772)
     function syncAuthUI() {
@@ -1373,15 +1462,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const displayName = user.displayName || user.name || user.email?.split('@')[0] || 'User';
 
             // Exact Study Plan behavior: replace DU Logo with user's Google profile photo when logged in
-            if (user.photoURL && headerLogo) {
-                headerLogo.src = user.photoURL;
+            if (headerLogo) {
+                headerLogo.src = user.photoURL || classCaddyAssetUrl('images/logo.png');
                 if (headerLink) headerLink.removeAttribute('href');
             }
 
-            const loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700 dark:text-gray-200">${displayName}</p><p class="text-gray-500 dark:text-gray-400 text-xs">${user.email || ''}</p></div>`;
+            const escapedName = String(displayName).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+            const loggedInHTML = `<button type="button" data-open-classcaddy-settings class="rounded-full px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="প্রোফাইল ও অ্যাপ সেটিংস খুলুন">${escapedName}</button>`;
+            const safePhoto = String(user.photoURL || classCaddyAssetUrl('images/logo.png')).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+            const mobileProfileHTML = `<button type="button" data-open-classcaddy-settings class="flex w-full items-center gap-3 rounded-xl p-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="প্রোফাইল ও অ্যাপ সেটিংস খুলুন"><img src="${safePhoto}" alt="" class="h-10 w-10 rounded-full border border-emerald-300 object-cover"><span>${escapedName}</span></button>`;
 
             if (authDesktop) authDesktop.innerHTML = loggedInHTML;
-            if (authMobile) authMobile.innerHTML = loggedInHTML;
+            if (authMobile) authMobile.innerHTML = mobileProfileHTML;
         } else {
             // Exact Study Plan behavior: restore DU Logo when logged out
             if (headerLogo) {
@@ -1421,13 +1513,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.addEventListener('storage', (e) => {
-        if (e.key === 'class_caddy_theme' || e.key === 'studyPlanSettings') {
+        if (e.key === 'class_caddy_theme' || e.key === 'studyPlanSettings' || e.key === 'class_caddy_settings_v1') {
             applyGlobalTheme(getStoredTheme() === 'dark');
+            applyGlobalPreferences();
         }
         if (e.key === 'cc_auth_user' || e.key === 'class_caddy_user') {
             syncAuthUI();
         }
     });
+    window.addEventListener('classcaddy:settings-change', () => {
+        applyGlobalTheme(getStoredTheme() === 'dark');
+        applyGlobalPreferences();
+    });
+    window.addEventListener('classcaddy:profile-change', syncAuthUI);
 })();
 // ===== END: UNIVERSAL STUDY PLAN HEADER, FLOATING BUTTONS & AUTH ENGINE =====
 

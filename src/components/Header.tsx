@@ -10,6 +10,7 @@ interface HeaderProps {
   onLogout: () => void;
   onOpenSignup: () => void;
   onGoogleSignIn?: () => void;
+  onOpenSettings: () => void;
   theme?: ThemeMode;
   toggleTheme?: () => void;
   onToggleExplorerMode?: () => void;
@@ -19,6 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   currentPage,
   user,
   onGoogleSignIn,
+  onOpenSettings,
   theme = 'light',
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -110,37 +112,41 @@ export const Header: React.FC<HeaderProps> = ({
             </a>
           </div>
 
-          {/* Right Side: DU Logo (or User Photo when logged in) & Auth Container */}
+          {/* Right Side: Account settings or sign-in */}
           <div className="hidden md:flex items-center gap-4">
-            <a
-              id="du-portal-header-link"
-              href={user.isLoggedIn && user.photoURL ? undefined : 'https://du.ac.bd/'}
-              target={user.isLoggedIn && user.photoURL ? undefined : '_blank'}
-              rel={user.isLoggedIn && user.photoURL ? undefined : 'noopener noreferrer'}
-            >
-              <img
-                src={user.isLoggedIn && user.photoURL ? user.photoURL : '/images/du_logo.png'}
-                alt="DU Logo"
-                className="h-10 w-10 rounded-full border border-gray-200 dark:border-gray-700 object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = 'https://placehold.co/40x40/eeeeee/111827?text=DU';
-                }}
-              />
-            </a>
+            {user.isLoggedIn ? (
+              <button
+                id="profile-settings-trigger"
+                type="button"
+                onClick={onOpenSettings}
+                className="flex items-center gap-2.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-1.5 pl-1.5 pr-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                aria-label="প্রোফাইল ও অ্যাপ সেটিংস খুলুন"
+                title="অ্যাপ সেটিংস"
+              >
+                <img
+                  src={user.photoURL || CLASS_CADDY_LOGO_DATA_URI}
+                  alt=""
+                  className="h-8 w-8 rounded-full border border-emerald-200 object-cover"
+                />
+                <span className="max-w-36 truncate text-sm font-semibold text-gray-700 dark:text-gray-200">{displayName}</span>
+              </button>
+            ) : (
+              <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer" aria-label="University of Dhaka website">
+                <img
+                  src="/images/du_logo.png"
+                  alt="DU Logo"
+                  className="h-10 w-10 rounded-full border border-gray-200 dark:border-gray-700 object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = 'https://placehold.co/40x40/eeeeee/111827?text=DU';
+                  }}
+                />
+              </a>
+            )}
 
             <div id="auth-container-desktop" className="auth-container text-sm">
-              {user.isLoggedIn ? (
-                <div className="text-sm">
-                  <p className="font-semibold text-gray-700 dark:text-gray-200">
-                    {displayName}
-                  </p>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs">
-                    {user.email || ''}
-                  </p>
-                </div>
-              ) : (
+              {!user.isLoggedIn && (
                 <button
                   id="header-signin-btn"
                   type="button"
@@ -156,6 +162,17 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Mobile Hamburger Button */}
           <div className="md:hidden flex items-center">
+            {user.isLoggedIn && (
+              <button
+                type="button"
+                onClick={onOpenSettings}
+                className="mr-2 flex items-center gap-2 rounded-full px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+                aria-label="প্রোফাইল ও অ্যাপ সেটিংস খুলুন"
+              >
+                <img src={user.photoURL || CLASS_CADDY_LOGO_DATA_URI} alt="" className="h-9 w-9 rounded-full border border-emerald-300 object-cover" />
+                <span className="max-w-24 truncate text-sm font-semibold">{displayName}</span>
+              </button>
+            )}
             <button
               id="mobile-menu-button"
               type="button"
@@ -195,14 +212,10 @@ export const Header: React.FC<HeaderProps> = ({
               className="auth-container px-6 py-4 border-t border-gray-200 dark:border-gray-800"
             >
               {user.isLoggedIn ? (
-                <div className="text-sm">
-                  <p className="font-semibold text-gray-700 dark:text-gray-200">
-                    {displayName}
-                  </p>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs">
-                    {user.email || ''}
-                  </p>
-                </div>
+                <button type="button" onClick={() => { onOpenSettings(); setMobileMenuOpen(false); }} className="flex w-full items-center gap-3 rounded-xl p-2 text-left hover:bg-gray-100 dark:hover:bg-gray-800">
+                  <img src={user.photoURL || CLASS_CADDY_LOGO_DATA_URI} alt="" className="h-10 w-10 rounded-full object-cover" />
+                  <span className="font-semibold">{displayName}<small className="block font-normal text-gray-500">সেটিংস খুলুন</small></span>
+                </button>
               ) : (
                 <button
                   id="mobile-signin-btn"
