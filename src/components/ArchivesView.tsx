@@ -1993,7 +1993,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
   onToggleExplorerMode: propToggleExplorerMode,
   user,
 }) => {
-  const isDark = theme === 'dark';
+  const isDark = ['dark', 'forest', 'midnight'].includes(theme);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Full nested tree state

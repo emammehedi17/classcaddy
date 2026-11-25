@@ -11,6 +11,8 @@ interface HeaderProps {
   onOpenSignup: () => void;
   onGoogleSignIn?: () => void;
   onOpenSettings: () => void;
+  language: 'bn' | 'en';
+  onLanguageChange: (language: 'bn' | 'en') => void;
   theme?: ThemeMode;
   toggleTheme?: () => void;
   onToggleExplorerMode?: () => void;
@@ -21,11 +23,13 @@ export const Header: React.FC<HeaderProps> = ({
   user,
   onGoogleSignIn,
   onOpenSettings,
+  language,
+  onLanguageChange,
   theme = 'light',
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const isDark = theme === 'dark';
+  const isDark = ['dark', 'forest', 'midnight'].includes(theme);
 
   const getNavClass = (tab: PageView) => {
     const isActive = currentPage === tab;
@@ -96,24 +100,27 @@ export const Header: React.FC<HeaderProps> = ({
             className="hidden md:flex items-center gap-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-1 text-sm"
           >
             <a href="/index.html" className={getNavClass('home')}>
-              Home
+              {language === 'bn' ? 'হোম' : 'Home'}
             </a>
             <a href="/archives.html" className={getNavClass('archives')}>
-              Archives
+              {language === 'bn' ? 'আর্কাইভ' : 'Archives'}
             </a>
             <a href="/study_plan.html" className={getNavClass('study-plan')}>
-              Study Plan
+              {language === 'bn' ? 'স্টাডি প্ল্যান' : 'Study Plan'}
             </a>
             <a href="/about.html" className={getNavClass('about')}>
-              About
+              {language === 'bn' ? 'আমাদের সম্পর্কে' : 'About'}
             </a>
             <a href="/contact.html" className={getNavClass('contact')}>
-              Contact
+              {language === 'bn' ? 'যোগাযোগ' : 'Contact'}
             </a>
           </div>
 
           {/* Right Side: Account settings or sign-in */}
           <div className="hidden md:flex items-center gap-4">
+            <div className="flex rounded-full border border-gray-200 dark:border-gray-700 p-1 text-xs">
+              {(['bn', 'en'] as const).map((lang) => <button key={lang} type="button" onClick={() => onLanguageChange(lang)} className={`rounded-full px-3 py-1 ${language === lang ? 'bg-emerald-600 text-white' : 'text-gray-600 dark:text-gray-300'}`}>{lang === 'bn' ? 'বাংলা' : 'EN'}</button>)}
+            </div>
             {user.isLoggedIn ? (
               <button
                 id="profile-settings-trigger"
@@ -191,20 +198,23 @@ export const Header: React.FC<HeaderProps> = ({
             id="mobile-menu"
             className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 -mx-6 mt-3 shadow-md"
           >
+            <div className="flex gap-2 px-6 py-3">
+              {(['bn', 'en'] as const).map((lang) => <button key={lang} type="button" onClick={() => onLanguageChange(lang)} className={`rounded-full px-4 py-2 text-sm ${language === lang ? 'bg-emerald-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}>{lang === 'bn' ? 'বাংলা' : 'English'}</button>)}
+            </div>
             <a href="/index.html" className={getMobileNavClass('home')}>
-              Home
+              {language === 'bn' ? 'হোম' : 'Home'}
             </a>
             <a href="/archives.html" className={getMobileNavClass('archives')}>
-              Archives
+              {language === 'bn' ? 'আর্কাইভ' : 'Archives'}
             </a>
             <a href="/study_plan.html" className={getMobileNavClass('study-plan')}>
-              Study Plan
+              {language === 'bn' ? 'স্টাডি প্ল্যান' : 'Study Plan'}
             </a>
             <a href="/about.html" className={getMobileNavClass('about')}>
-              About
+              {language === 'bn' ? 'আমাদের সম্পর্কে' : 'About'}
             </a>
             <a href="/contact.html" className={getMobileNavClass('contact')}>
-              Contact
+              {language === 'bn' ? 'যোগাযোগ' : 'Contact'}
             </a>
 
             <div

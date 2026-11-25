@@ -943,6 +943,20 @@
             await updateProfile(auth.currentUser, { displayName: name });
             updateAuthUI(auth.currentUser);
         };
+        window._classCaddySaveAppSettings = async (settings) => {
+            if (!auth.currentUser || auth.currentUser.isAnonymous) return;
+            const fontSize = settings.readingSize === 'small' ? 14 : settings.readingSize === 'large' ? 18 : 16;
+            await setDoc(doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/settings`, 'preferences'), {
+                appSettings: settings, darkMode: ['dark', 'forest', 'midnight'].includes(settings.theme), fontSize,
+                language: settings.language, updatedAt: Timestamp.now()
+            }, { merge: true });
+        };
+        window._classCaddySaveExamPreferences = async (legacy, exam) => {
+            if (!auth.currentUser || auth.currentUser.isAnonymous) return;
+            await setDoc(doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/settings`, 'preferences'), {
+                quizPreferences: legacy, examPreferences: exam, updatedAt: Timestamp.now()
+            }, { merge: true });
+        };
         window._classCaddySignOut = handleLogout;
         window.openClassCaddySettings = async () => {
             try {
@@ -959,6 +973,14 @@
                     onSaveProfile: async (name) => {
                         await window._classCaddyUpdateProfile(name);
                     },
+                    onSaveAppSettings: window._classCaddySaveAppSettings,
+                    onSaveExamPreferences: window._classCaddySaveExamPreferences,
+                    onExportCloudBackup: async () => auth.currentUser && !auth.currentUser.isAnonymous ? exportFullUserBackup(auth.currentUser.uid) : null,
+                    onRestoreCloudBackup: async (data) => {
+                        if (!auth.currentUser || auth.currentUser.isAnonymous) throw new Error('Firebase-এর backup restore করতে account-এ sign in করুন।');
+                        return restoreFullUserBackup(auth.currentUser.uid, data);
+                    },
+                    onRestoreProfile: async (name) => { if (auth.currentUser && !auth.currentUser.isAnonymous) await updateProfile(auth.currentUser, { displayName: name }); },
                     onSignOut: handleLogout,
                 });
             } catch (error) {
@@ -9106,6 +9128,10 @@ let _smartBackupTimerStarted = false; // guard against duplicate setInterval tim
 async function initSmartCloudBackup() {
     const checkAndRun = async () => {
         if (!auth.currentUser) return;
+        try {
+            const appSettings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
+            if (appSettings.autoBackupEnabled === false) return;
+        } catch (_) {}
 
         const userId = auth.currentUser.uid;
         const appId = "study-plan17";
@@ -10180,6 +10206,18 @@ function initSettingsSync(userId) {
     onSnapshot(settingsRef, (docSnap) => {
         if (docSnap.exists()) {
             const data = docSnap.data();
+            if (data.appSettings && typeof data.appSettings === 'object') {
+                localStorage.setItem('class_caddy_settings_v1', JSON.stringify(data.appSettings));
+                localStorage.setItem('cc_home_lang', data.appSettings.language || 'bn');
+                window.dispatchEvent(new CustomEvent('classcaddy:settings-change', { detail: data.appSettings }));
+            } else {
+                try {
+                    const localPrefs = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
+                    if (Object.keys(localPrefs).length) window._classCaddySaveAppSettings?.(localPrefs);
+                } catch (_) {}
+            }
+            if (data.quizPreferences) localStorage.setItem('cc_quiz_settings', JSON.stringify(data.quizPreferences));
+            if (data.examPreferences) localStorage.setItem('cc_new_exam_settings_v1', JSON.stringify(data.examPreferences));
             if (data.darkMode !== undefined) globalSettings.darkMode = data.darkMode;
             if (data.fontSize !== undefined) globalSettings.fontSize = data.fontSize;
             applySettingsToDom();
@@ -10196,19 +10234,89 @@ function initSettingsSync(userId) {
     });
 }
 
+async function exportFullUserBackup(userId) {
+    const base = `artifacts/${appId}/users/${userId}`;
+    const collections = {};
+    for (const name of ['studyPlans', 'quizResults', 'examResults', 'reviewQuestions']) {
+        const snapshot = await getDocs(collection(db, base, name));
+        collections[name] = [];
+        for (const item of snapshot.docs) {
+            const row = { id: item.id, data: item.data() };
+            if (name === 'studyPlans') {
+                const weeks = await getDocs(collection(db, base, name, item.id, 'weeks'));
+                row.weeks = weeks.docs.map((week) => ({ id: week.id, data: week.data() }));
+            }
+            collections[name].push(row);
+        }
+    }
+    const settings = {};
+    for (const id of ['preferences', 'examBookmarks']) {
+        const snapshot = await getDoc(doc(db, base, 'settings', id));
+        if (snapshot.exists()) settings[id] = snapshot.data();
+    }
+    return { collections, settings };
+}
+
+async function restoreFullUserBackup(userId, data) {
+    const base = `artifacts/${appId}/users/${userId}`;
+    let count = 0;
+    for (const name of ['studyPlans', 'quizResults', 'examResults', 'reviewQuestions']) {
+        const current = await getDocs(collection(db, base, name));
+        for (const item of current.docs) {
+            if (name === 'studyPlans') {
+                const weeks = await getDocs(collection(db, base, name, item.id, 'weeks'));
+                for (const week of weeks.docs) await deleteDoc(week.ref);
+            }
+            await deleteDoc(item.ref);
+        }
+        for (const row of (Array.isArray(data.collections?.[name]) ? data.collections[name] : [])) {
+            if (!row || typeof row.id !== 'string' || !row.data || typeof row.data !== 'object') continue;
+            await setDoc(doc(db, base, name, row.id), decodeBackupValue(row.data)); count += 1;
+            for (const week of (name === 'studyPlans' && Array.isArray(row.weeks) ? row.weeks : [])) {
+                if (week && typeof week.id === 'string' && week.data && typeof week.data === 'object') {
+                    await setDoc(doc(db, base, name, row.id, 'weeks', week.id), decodeBackupValue(week.data)); count += 1;
+                }
+            }
+        }
+    }
+    for (const [id, value] of Object.entries(data.settings || {})) {
+        if (['preferences', 'examBookmarks'].includes(id) && value && typeof value === 'object') {
+            await setDoc(doc(db, base, 'settings', id), decodeBackupValue(value)); count += 1;
+        }
+    }
+    return count;
+}
+
+function decodeBackupValue(value) {
+    if (value && value.__classCaddyTimestamp === true && Number.isFinite(value.seconds)) return Timestamp.fromMillis(value.seconds * 1000 + (Number(value.nanoseconds) || 0) / 1e6);
+    if (Array.isArray(value)) return value.map(decodeBackupValue);
+    if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, decodeBackupValue(item)]));
+    return value;
+}
+
 // 3. Apply Settings to Screen
 function applySettingsToDom() {
-    // Dark Mode
-    if (globalSettings.darkMode) {
+    let appPreferences = {};
+    try { appPreferences = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}'); } catch (_) {}
+    const theme = ['light', 'dark', 'sepia', 'forest', 'midnight'].includes(appPreferences.theme)
+        ? appPreferences.theme : globalSettings.darkMode ? 'dark' : 'light';
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.dataset.banglaFont = appPreferences.banglaFont || 'sans-serif';
+    document.documentElement.dataset.readingSize = appPreferences.readingSize || 'medium';
+    document.documentElement.dataset.reduceMotion = String(appPreferences.reduceMotion === true);
+    document.documentElement.dataset.language = appPreferences.language || 'bn';
+    document.documentElement.lang = appPreferences.language || 'bn';
+    const darkTheme = ['dark', 'forest', 'midnight'].includes(theme);
+    if (darkTheme) {
         document.body.classList.add('dark-mode');
         document.documentElement.classList.add('dark');
-        document.documentElement.style.backgroundColor = '#0f172a';
+        document.documentElement.style.backgroundColor = theme === 'forest' ? '#10251f' : theme === 'midnight' ? '#080d1c' : '#0f172a';
         document.documentElement.style.colorScheme = 'dark';
         localStorage.setItem('class_caddy_theme', 'dark');
     } else {
         document.body.classList.remove('dark-mode');
         document.documentElement.classList.remove('dark');
-        document.documentElement.style.backgroundColor = '#f8fafc';
+        document.documentElement.style.backgroundColor = theme === 'sepia' ? '#f4ecd8' : '#f8fafc';
         document.documentElement.style.colorScheme = 'light';
         localStorage.setItem('class_caddy_theme', 'light');
     }
@@ -10230,7 +10338,8 @@ function applySettingsToDom() {
 window.addEventListener('classcaddy:settings-change', (event) => {
     const settings = event.detail;
     if (!settings) return;
-    globalSettings.darkMode = settings.theme === 'dark';
+    localStorage.setItem('class_caddy_settings_v1', JSON.stringify(settings));
+    globalSettings.darkMode = ['dark', 'forest', 'midnight'].includes(settings.theme);
     globalSettings.fontSize = settings.readingSize === 'small' ? 14 : settings.readingSize === 'large' ? 18 : 16;
     applySettingsToDom();
 });

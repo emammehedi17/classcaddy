@@ -1,0 +1,45 @@
+@font-face {
+  font-family:'Kalpurush';font-style:normal;font-weight:100 900;font-display:swap;
+  src:url('/fonts/font_2.woff2') format('woff2');unicode-range:U+0980-09FF,U+0964-0965,U+200C-200D,U+25CC;
+}
+html[data-reading-size="small"] { font-size: 14px !important; }
+html[data-reading-size="medium"] { font-size: 16px !important; }
+html[data-reading-size="large"] { font-size: 18px !important; }
+html[data-reduce-motion="true"] *, html[data-reduce-motion="true"] *::before, html[data-reduce-motion="true"] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: .01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .01ms !important;
+}
+html[data-bangla-font="sans-serif"] body,
+html[data-bangla-font="sans-serif"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text) {
+  font-family: 'Noto Sans Bengali','Hind Siliguri','Inter',sans-serif !important;
+}
+html[data-bangla-font="hind-siliguri"] body,
+html[data-bangla-font="hind-siliguri"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text) {
+  font-family: 'Hind Siliguri','Noto Sans Bengali','Inter',sans-serif !important;
+}
+html[data-bangla-font="amiri"] body,
+html[data-bangla-font="amiri"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text) {
+  font-family: 'Amiri','Noto Sans Bengali','Hind Siliguri',serif !important;
+}
+html[data-bangla-font="kalpurush"] body,
+html[data-bangla-font="kalpurush"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text) {
+  font-family: 'Kalpurush','Noto Sans Bengali','Hind Siliguri',sans-serif !important;
+}
+html[data-theme="sepia"], html[data-theme="sepia"] body { background:#f4ecd8 !important; color:#43382b !important; }
+html[data-theme="sepia"] :is(.bg-white,.bg-gray-50,.bg-gray-100,.bg-slate-50,.bg-slate-100) { background-color:#fbf6e9 !important; }
+html[data-theme="sepia"] :is(.text-gray-800,.text-gray-900,.text-slate-800,.text-slate-900) { color:#43382b !important; }
+html[data-theme="sepia"] :is(.border-gray-200,.border-gray-300,.border-slate-200,.border-slate-300) { border-color:#d8c9aa !important; }
+html[data-theme="forest"], html[data-theme="forest"] body { background:#10251f !important; color:#e4f2e9 !important; }
+html[data-theme="forest"] :is(.bg-white,.bg-gray-50,.bg-gray-100,.bg-slate-50,.bg-slate-100,.bg-gray-900,.bg-slate-900) { background-color:#17362d !important; }
+html[data-theme="forest"] :is(.text-gray-800,.text-gray-900,.text-gray-700,.text-slate-800,.text-slate-900,.text-slate-700) { color:#e4f2e9 !important; }
+html[data-theme="forest"] :is(.text-gray-500,.text-gray-600,.text-slate-500,.text-slate-600) { color:#b4cbbc !important; }
+html[data-theme="forest"] :is(.border-gray-200,.border-gray-300,.border-slate-200,.border-slate-300) { border-color:#36584c !important; }
+html[data-theme="midnight"], html[data-theme="midnight"] body { background:#080d1c !important; color:#e7eaff !important; }
+html[data-theme="midnight"] :is(.bg-white,.bg-gray-50,.bg-gray-100,.bg-slate-50,.bg-slate-100,.bg-gray-900,.bg-slate-900) { background-color:#131d36 !important; }
+html[data-theme="midnight"] :is(.text-gray-800,.text-gray-900,.text-gray-700,.text-slate-800,.text-slate-900,.text-slate-700) { color:#e7eaff !important; }
+html[data-theme="midnight"] :is(.text-gray-500,.text-gray-600,.text-slate-500,.text-slate-600) { color:#b4bfdc !important; }
+html[data-theme="midnight"] :is(.border-gray-200,.border-gray-300,.border-slate-200,.border-slate-300) { border-color:#34415f !important; }
+html[data-theme="dark"] { color-scheme:dark; }
+html[data-theme="sepia"] { color-scheme:light; }

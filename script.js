@@ -1006,7 +1006,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function getStoredTheme() {
         try {
             const appSettings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
-            if (appSettings.theme === 'dark' || appSettings.theme === 'light') return appSettings.theme;
+            if (['dark', 'light', 'sepia', 'forest', 'midnight'].includes(appSettings.theme)) return appSettings.theme;
         } catch (e) {}
         const directTheme = localStorage.getItem('class_caddy_theme');
         if (directTheme) return directTheme;
@@ -1024,15 +1024,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function applyGlobalTheme(isDark) {
         applyGlobalPreferences();
-        if (isDark) {
+        const theme = getStoredTheme();
+        document.documentElement.dataset.theme = theme;
+        if (['dark', 'forest', 'midnight'].includes(theme)) {
             document.body?.classList.add('dark-mode');
             document.documentElement.classList.add('dark');
-            document.documentElement.style.backgroundColor = '#0f172a';
+            document.documentElement.style.backgroundColor = theme === 'forest' ? '#10251f' : theme === 'midnight' ? '#080d1c' : '#0f172a';
             document.documentElement.style.colorScheme = 'dark';
         } else {
             document.body?.classList.remove('dark-mode');
             document.documentElement.classList.remove('dark');
-            document.documentElement.style.backgroundColor = '';
+            document.documentElement.style.backgroundColor = theme === 'sepia' ? '#f4ecd8' : '';
             document.documentElement.style.colorScheme = 'light';
         }
 
@@ -1048,7 +1050,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const settings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
             const root = document.documentElement;
-            root.dataset.banglaFont = settings.banglaFont === 'amiri' ? 'amiri' : 'sans-serif';
+            root.dataset.banglaFont = ['amiri', 'hind-siliguri', 'kalpurush'].includes(settings.banglaFont) ? settings.banglaFont : 'sans-serif';
             root.dataset.readingSize = ['small', 'medium', 'large'].includes(settings.readingSize) ? settings.readingSize : 'medium';
             root.dataset.reduceMotion = String(settings.reduceMotion === true);
         } catch (e) {}
@@ -1078,15 +1080,17 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Apply theme immediately to prevent flash
-    const initialThemeIsDark = getStoredTheme() === 'dark';
+    const initialTheme = getStoredTheme();
+    const initialThemeIsDark = ['dark', 'forest', 'midnight'].includes(initialTheme);
+    document.documentElement.dataset.theme = initialTheme;
     if (initialThemeIsDark) {
         document.documentElement.classList.add('dark');
-        document.documentElement.style.backgroundColor = '#0f172a';
+        document.documentElement.style.backgroundColor = initialTheme === 'forest' ? '#10251f' : initialTheme === 'midnight' ? '#080d1c' : '#0f172a';
         document.documentElement.style.colorScheme = 'dark';
         document.body?.classList.add('dark-mode');
     } else {
         document.documentElement.classList.remove('dark');
-        document.documentElement.style.backgroundColor = '';
+        document.documentElement.style.backgroundColor = initialTheme === 'sepia' ? '#f4ecd8' : '';
         document.documentElement.style.colorScheme = 'light';
         document.body?.classList.remove('dark-mode');
     }
@@ -1253,6 +1257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js');
             const { getAuth, onAuthStateChanged, GoogleAuthProvider, updateProfile } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js');
+            const { getFirestore, doc, collection, getDoc, getDocs, setDoc, deleteDoc, serverTimestamp, Timestamp } = await import('https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js');
 
             const firebaseConfig = {
                 apiKey: "AIzaSyAj7MDnrnzKUO73BXG0jeM-uBGrAH3XiAY",
@@ -1262,6 +1267,86 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
             firebaseAuthInstance = getAuth(app);
+            const firebaseDb = getFirestore(app);
+            window._classCaddySaveAppSettings = async (settings) => {
+                const current = firebaseAuthInstance.currentUser;
+                if (!current || current.isAnonymous) return;
+                const value = settings || JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
+                const fontSize = value.readingSize === 'small' ? 14 : value.readingSize === 'large' ? 18 : 16;
+                await setDoc(doc(firebaseDb, 'artifacts/study-plan17/users', current.uid, 'settings', 'preferences'), {
+                    appSettings: value,
+                    darkMode: ['dark', 'forest', 'midnight'].includes(value.theme),
+                    fontSize,
+                    language: value.language,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+            };
+            window._classCaddySaveExamPreferences = async (legacy, exam) => {
+                const current = firebaseAuthInstance.currentUser;
+                if (!current || current.isAnonymous) return;
+                await setDoc(doc(firebaseDb, 'artifacts/study-plan17/users', current.uid, 'settings', 'preferences'), {
+                    quizPreferences: legacy, examPreferences: exam, updatedAt: serverTimestamp()
+                }, { merge: true });
+            };
+            window._classCaddyExportBackupData = async (uid) => {
+                const base = `artifacts/study-plan17/users/${uid}`;
+                const result = { collections: {}, settings: {} };
+                for (const name of ['studyPlans', 'quizResults', 'examResults', 'reviewQuestions']) {
+                    const snap = await getDocs(collection(firebaseDb, base, name));
+                    result.collections[name] = [];
+                    for (const item of snap.docs) {
+                        const row = { id: item.id, data: item.data() };
+                        if (name === 'studyPlans') {
+                            const weeks = await getDocs(collection(firebaseDb, base, name, item.id, 'weeks'));
+                            row.weeks = weeks.docs.map(week => ({ id: week.id, data: week.data() }));
+                        }
+                        result.collections[name].push(row);
+                    }
+                }
+                for (const id of ['preferences', 'examBookmarks']) {
+                    const snap = await getDoc(doc(firebaseDb, base, 'settings', id));
+                    if (snap.exists()) result.settings[id] = snap.data();
+                }
+                return result;
+            };
+            window._classCaddyRestoreBackupData = async (uid, data) => {
+                const base = `artifacts/study-plan17/users/${uid}`;
+                let count = 0;
+                for (const name of ['studyPlans', 'quizResults', 'examResults', 'reviewQuestions']) {
+                    const current = await getDocs(collection(firebaseDb, base, name));
+                    for (const item of current.docs) {
+                        if (name === 'studyPlans') {
+                            const weeks = await getDocs(collection(firebaseDb, base, name, item.id, 'weeks'));
+                            for (const week of weeks.docs) await deleteDoc(week.ref);
+                        }
+                        await deleteDoc(item.ref);
+                    }
+                    for (const row of (Array.isArray(data.collections?.[name]) ? data.collections[name] : [])) {
+                        if (!row || typeof row.id !== 'string' || !row.data || typeof row.data !== 'object') continue;
+                        await setDoc(doc(firebaseDb, base, name, row.id), decodeBackupValue(row.data));
+                        count++;
+                        for (const week of (name === 'studyPlans' && Array.isArray(row.weeks) ? row.weeks : [])) {
+                            if (week && typeof week.id === 'string' && week.data && typeof week.data === 'object') {
+                                await setDoc(doc(firebaseDb, base, name, row.id, 'weeks', week.id), decodeBackupValue(week.data));
+                                count++;
+                            }
+                        }
+                    }
+                }
+                for (const [id, value] of Object.entries(data.settings || {})) {
+                    if (['preferences', 'examBookmarks'].includes(id) && value && typeof value === 'object') {
+                        await setDoc(doc(firebaseDb, base, 'settings', id), decodeBackupValue(value));
+                        count++;
+                    }
+                }
+                return count;
+            };
+            const decodeBackupValue = (value) => {
+                if (value && value.__classCaddyTimestamp === true && Number.isFinite(value.seconds)) return Timestamp.fromMillis(value.seconds * 1000 + (Number(value.nanoseconds) || 0) / 1e6);
+                if (Array.isArray(value)) return value.map(decodeBackupValue);
+                if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, decodeBackupValue(item)]));
+                return value;
+            };
             googleAuthProvider = new GoogleAuthProvider();
             isFirebaseLoaded = true;
             window._fb_auth_instance = firebaseAuthInstance;
@@ -1275,7 +1360,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 await updateProfile(firebaseAuthInstance.currentUser, { displayName: name });
             };
 
-            onAuthStateChanged(firebaseAuthInstance, (user) => {
+            onAuthStateChanged(firebaseAuthInstance, async (user) => {
                 markAuthReady();
                 if (user) {
                     const profile = {
@@ -1292,6 +1377,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         isLoggedIn: true
                     }));
                     localStorage.setItem('class_caddy_user', JSON.stringify(profile));
+                    try {
+                        const prefSnap = await getDoc(doc(firebaseDb, 'artifacts/study-plan17/users', user.uid, 'settings', 'preferences'));
+                        const pref = prefSnap.data() || {};
+                        if (pref.appSettings) {
+                            localStorage.setItem('class_caddy_settings_v1', JSON.stringify(pref.appSettings));
+                            localStorage.setItem('cc_home_lang', pref.appSettings.language || 'bn');
+                            window.dispatchEvent(new CustomEvent('classcaddy:settings-change', { detail: pref.appSettings }));
+                        } else if (typeof pref.darkMode === 'boolean') {
+                            const legacySettings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
+                            legacySettings.theme = pref.darkMode ? 'dark' : 'light';
+                            legacySettings.readingSize = pref.fontSize <= 14 ? 'small' : pref.fontSize >= 18 ? 'large' : 'medium';
+                            legacySettings.language = pref.language === 'en' ? 'en' : (legacySettings.language || 'bn');
+                            localStorage.setItem('class_caddy_settings_v1', JSON.stringify(legacySettings));
+                            window.dispatchEvent(new CustomEvent('classcaddy:settings-change', { detail: legacySettings }));
+                            await window._classCaddySaveAppSettings?.(legacySettings);
+                        } else await window._classCaddySaveAppSettings?.();
+                        if (pref.quizPreferences) localStorage.setItem('cc_quiz_settings', JSON.stringify(pref.quizPreferences));
+                        if (pref.examPreferences) localStorage.setItem('cc_new_exam_settings_v1', JSON.stringify(pref.examPreferences));
+                    } catch (error) { console.warn('Could not load saved preferences:', error); }
                 }
                 syncAuthUI();
             });
@@ -1400,6 +1504,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (profile.isLoggedIn && window._classCaddyUpdateProfile) await window._classCaddyUpdateProfile(name);
                     profile.name = name;
                 },
+                onSaveAppSettings: async (settings) => {
+                    await window._classCaddySaveAppSettings?.(settings);
+                },
+                onSaveExamPreferences: async (legacy, exam) => window._classCaddySaveExamPreferences?.(legacy, exam),
+                onExportCloudBackup: async () => {
+                    if (!isFirebaseLoaded) await initFirebaseForStaticPages();
+                    if (firebaseAuthInstance?.currentUser && !firebaseAuthInstance.currentUser.isAnonymous) {
+                        return window._classCaddyExportBackupData(firebaseAuthInstance.currentUser.uid);
+                    }
+                    return null;
+                },
+                onRestoreCloudBackup: async (data) => {
+                    if (!isFirebaseLoaded) await initFirebaseForStaticPages();
+                    if (!firebaseAuthInstance?.currentUser || firebaseAuthInstance.currentUser.isAnonymous) throw new Error('Firebase-এর backup restore করতে account-এ sign in করুন।');
+                    return window._classCaddyRestoreBackupData(firebaseAuthInstance.currentUser.uid, data);
+                },
+                onRestoreProfile: async (name) => {
+                    if (firebaseAuthInstance?.currentUser && !firebaseAuthInstance.currentUser.isAnonymous) await window._classCaddyUpdateProfile?.(name);
+                },
                 onSignOut: async () => {
                     if (window._classCaddySignOut) return window._classCaddySignOut();
                     if (window.triggerGoogleSignOutGlobal) return window.triggerGoogleSignOutGlobal();
@@ -1506,7 +1629,14 @@ document.addEventListener('DOMContentLoaded', () => {
         initFirebaseForStaticPages();
     }
 
-    if (document.readyState === 'loading') {
+    const currentPath = (window.location.pathname || '').toLowerCase();
+    const isLegacyTopLevelPage = window.self === window.top && window.location.protocol !== 'file:' &&
+        !isMainReactApp() && /\.html?$/i.test(currentPath) &&
+        !['/index.html', '/archives.html', '/about.html', '/contact.html', '/privacy.html', '/privacy-policy.html', '/academic.html'].includes(currentPath);
+    if (isLegacyTopLevelPage) {
+        const page = window.location.pathname + window.location.search + window.location.hash;
+        window.location.replace(`/?cc-page=${encodeURIComponent(page)}`);
+    } else if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initAll);
     } else {
         initAll();

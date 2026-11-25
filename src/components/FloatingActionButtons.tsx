@@ -48,7 +48,7 @@ export function FloatingActionButtons({ theme, toggleTheme }: FloatingActionButt
     }
   };
 
-  const isDark = theme === 'dark';
+  const isDark = ['dark', 'forest', 'midnight'].includes(theme);
 
   return (
     <>

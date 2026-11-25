@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>try { if (window.parent !== window) document.documentElement.classList.add('cc-embedded'); } catch (_) {}</script>
+    <style>html.cc-embedded header.main-website-ui,#scroll-toggle-btn,#global-dark-mode-btn,#action-buttons-container{display:none!important}html.cc-embedded main{padding-top:0!important}</style>
+    <!-- Zero-Flicker Synchronous Theme Loader (Runs before first paint) -->
+    <script id="cc-instant-theme">
+      (function () {
+        try {
+          var prefs = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
+          var theme = ['light','dark','sepia','forest','midnight'].includes(prefs.theme) ? prefs.theme : (localStorage.getItem('class_caddy_theme') || 'light');
+          var isDark = ['dark','forest','midnight'].includes(theme);
+          if (!prefs.theme && !localStorage.getItem('class_caddy_theme')) {
+            var sp = localStorage.getItem('studyPlanSettings');
+            if (sp && JSON.parse(sp).darkMode === true) isDark = true;
+          }
+          var root = document.documentElement;
+          root.dataset.theme = theme;
+          root.dataset.banglaFont = prefs.banglaFont || 'sans-serif';
+          root.dataset.readingSize = prefs.readingSize || 'medium';
+          root.dataset.language = prefs.language || localStorage.getItem('cc_home_lang') || 'bn';
+          if (isDark) {
+            root.classList.add('dark');
+            root.style.backgroundColor = theme === 'forest' ? '#10251f' : theme === 'midnight' ? '#080d1c' : '#0f172a';
+            root.style.colorScheme = 'dark';
+            if (document.body) {
+              document.body.classList.add('dark-mode');
+            } else {
+              new MutationObserver(function (_, obs) {
+                if (document.body) {
+                  document.body.classList.add('dark-mode');
+                  obs.disconnect();
+                }
+              }).observe(root, { childList: true });
+            }
+          } else {
+            root.classList.remove('dark');
+            root.style.backgroundColor = theme === 'sepia' ? '#f4ecd8' : '#f8fafc';
+            root.style.colorScheme = 'light';
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <style id="cc-instant-theme-style">
+      html.dark, html.dark body, body.dark-mode {
+        background-color: #0f172a !important;
+        color: #d1d5db !important;
+      }
+      html.dark header.main-website-ui, body.dark-mode header.main-website-ui {
+        background-color: rgba(17, 24, 39, 0.95) !important;
+        border-bottom-color: #1f2937 !important;
+      }
+    </style>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JWZXVQC68L"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-JWZXVQC68L');
+	</script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Prevent stale HTML caching so layout changes always take effect -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Class Caddy - My Study Plan</title>
+    
+    <!-- Google Sans-Serif Bangla Fonts (Noto Sans Bengali & Hind Siliguri) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" xintegrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="icon" type="image/png" href="images/logo.png">
+	<script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { darkMode: "class",
+        theme: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans Bengali', 'Hind Siliguri', 'sans-serif'],
+          }
+        }
+      }
+    </script>
+	<link rel="stylesheet" href="study-plan-styles.css">
+	<link rel="stylesheet" href="mcq-engine/mcq-engine.css">
+	<link rel="stylesheet" href="exam-module/exam-styles.css?v=2026111701">
+
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#059669">
+  </head>
+<body class="bg-gray-100 text-gray-800">
+
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 border-b border-gray-200 main-website-ui shadow-sm">
+        <div class="container mx-auto px-4 sm:px-6 py-3">
+            <nav class="flex justify-between items-center">
+                <div class="flex items-center gap-3 sm:gap-4 min-w-0">
+                    <a href="/index.html" class="flex-shrink-0" title="Class Caddy - Home">
+                        <img src="images/logo.png" alt="Class Caddy Logo" class="cc-avatar-founder h-10 w-10 rounded-full border-2 border-emerald-500 bg-white object-contain p-0.5" onerror="this.onerror=null; this.src='images/logo.png';">
+                    </a>
+                    <a href="index.html">
+                        <h1 class="text-xl font-bold text-gray-800">Class Caddy</h1>
+                    </a>
+                </div>
+                <!-- Center: Desktop Navigation (hidden on mobile) -->
+            <div class="hidden md:flex items-center gap-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full p-1 text-sm">
+                <a href="index.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Home</a>
+                <a href="archives.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Archives</a>
+                <a href="study_plan.html" class="px-5 py-1.5 bg-emerald-500 text-white rounded-full transition-colors font-medium shadow-sm">Study Plan</a>
+                <a href="about.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">About</a>
+                <a href="contact.html" class="px-5 py-1.5 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors">Contact</a>
+            </div>
+                 <div class="hidden md:flex items-center gap-4">
+                    <a href="https://du.ac.bd/" target="_blank" rel="noopener noreferrer">
+                        <img src="images/du_logo.png" alt="DU Logo" class="h-10 w-10 rounded-full border border-gray-200 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/40x40/eeeeee/111827?text=DU';">
+                    </a>
+                     <div id="auth-container-desktop" class="auth-container text-sm">
+                         <a href="index.html#signup" class="px-5 py-2 font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full transition-colors signup-button">Sign Up</a>
+                    </div>
+                </div>
+                 <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" type="button" aria-label="Toggle Menu" class="min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg text-gray-700 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </nav>
+             <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 -mx-6 mt-3 shadow-md">
+                <a href="/index.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Home</a>
+                <a href="/archives.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Archives</a>
+                <a href="/study_plan.html" class="block px-6 py-3 text-sm font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 transition-colors">Study Plan</a>
+                <a href="/about.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">About</a>
+                <a href="/contact.html" class="block px-6 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">Contact</a>
+                <div id="auth-container-mobile" class="auth-container px-6 py-4 border-t border-gray-200 dark:border-gray-800">
+                    <a href="/index.html#signup" class="block w-full text-center text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-full py-2 transition-colors signup-button">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16"> <h1 class="text-3xl sm:text-4xl font-bold text-emerald-600 mb-8 text-center">My Study Plan</h1>
+
+        <div id="auth-section" class="mb-10 card">
+            <div id="login-prompt" class="text-center">
+                <p class="text-gray-600 mb-4">Log in to create and manage your personalized study plans.</p>
+                <button id="google-login-btn">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4cHgiIGhlaWdodD0iMThweCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48Zz48cGF0aCBmaWxsPSIjRUE0MzM1IiBkPSJNMjQgOS41YzMuNTQgMCA2LjcxIDEuMjIgOS4yMSAzLjZsNi44NS02Ljg1QzM1LjkgMi4zOCAzMC40NyAwIDI0IDAgMTQuNjIgMCA2LjUxIDUuMzggMi41NiAxMy4yMmw3Ljk4IDYuMTlDMTIuNDMgMTMuNzIgMTcuNzQgOS41IDI0IDkuNXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjNDI4NUY0IiBkPSJNNDYuOTggMjQuNTVjMC0xLjU3LS4xNS0zLjA5LS4zOC00LjU1SDI0djkuMDJoMTIuOTRjLS41OCAyLjk2LTIuMjYgNS40OC00Ljc4IDcuMThsNy43MyA2YzQuNTEtNC4xOCA3LjA5LTEwLjM2IDcuMDktMTcuNjV6Ij48L3BhdGg+PHBhdGggZmlsbD0iI0ZCQkMwNSIgZD0iTTEwLjUzIDI4LjU5Yy0uNDgtMS40NS0uNzYtMi45OS0uNzYtNC41OXMuMjctMy4xNC43Ni00LjU5bC03Ljk4LTYuMTlDMS4yNSAxNi4xMyAwIDIwLjA4IDAgMjRjMCAzLjkyIDEuMjUgNy44NyAyLjk5IDEwLjk4bDcuNTQtNS45OXoiPjwvcGF0aD48cGF0aCBmaWxsPSIjMzRBMDMyIiBkPSJNMjQgNDhjNi40OCAwIDExLjkzLTIuMTMgMTUuODktNS44MWwtNy43My02Yy0yLjE1IDEuNDUtNC45MiAyLjMtOC4xNiAyLjMtNi4yNiAwLTExLjU3LTQuMjItMTMuNDctOS45MWwtNy45OCA2LjE5QzYuNTEgNDIuNjIgMTQuNjIgNDggMjQgNDh6Ij48L3BhdGg+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGg0OHY0OEgweiI+PC9wYXRoPjwvZz48L3N2Zz4=" alt="Google logo">
+                    <span>Sign in with Google</span>
+                </button>
+                
+                <p class="text-gray-500 text-sm my-4">or</p>
+                <button id="guest-login-btn" class="action-button action-button-secondary" style="border-color: #059669; color: #059669;">
+                    <i class="fas fa-binoculars mr-2"></i> Study With Mehedi (Guest)
+                </button>
+            </div>
+            <div id="user-info" class="hidden flex flex-col sm:flex-row justify-between items-center text-sm">
+                <div class="flex flex-col items-start gap-1 mb-3 sm:mb-0">
+                    <div class="flex items-center gap-3 text-gray-600">
+                        <i class="fas fa-check-circle text-emerald-500"></i>
+                        <span id="sync-status-text" class="text-emerald-500 font-medium">Synced</span>
+                    </div>
+                    <button id="open-backup-modal-btn" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium underline decoration-indigo-300 underline-offset-2 transition-colors">
+                        <i class="fas fa-hdd mr-1"></i> Backup / Restore .
+                    </button>
+                </div>
+                 
+                <div class="flex items-center gap-3">
+                    <div class="text-center sm:text-right">
+                        <p id="user-display" class="font-medium text-gray-800"></p>
+                        <p id="user-email-display" class="text-gray-500 text-xs"></p>
+                        <span id="user-id-display" class="ml-4 text-xs text-gray-400 break-all" title="Your unique User ID"></span>
+                        <button id="logout-btn" class="mt-1 text-red-500 hover:text-red-700 text-xs font-semibold">Log Out</button>
+                    </div>
+                    <img id="user-photo-display" class="h-10 w-10 rounded-full border-2 border-emerald-500 object-cover hidden" src="" alt="Profile">
+                </div>
+            </div>
+        </div>
+
+        <div id="study-plan-content" class="hidden">
+
+            <div class="mb-8 flex flex-wrap items-center gap-2">
+                 
+                 <div id="month-nav-buttons" class="flex-grow flex flex-wrap gap-2">
+                     </div>
+                <div class="ml-auto flex-shrink-0 flex gap-2">
+                     <button id="show-master-mcq-btn" class="action-button action-button-secondary flex items-center gap-1.5">
+                        <i class="fas fa-tasks text-sm"></i> MCQ List
+                     </button>
+					 
+					 <button id="show-all-vocab-btn" class="action-button action-button-secondary flex items-center gap-1.5">
+                        <i class="fas fa-book-open text-sm"></i> Vocab List
+                     </button>
+
+                     <button id="show-results-sheet-btn" class="action-button action-button-secondary flex items-center gap-1.5">
+                        <i class="fas fa-poll text-sm"></i> Results
+                     </button>
+                     <button id="add-month-btn" class="action-button flex items-center gap-1.5 hidden">
+                         <i class="fas fa-plus-circle text-sm"></i> Add Month
+                     </button>
+                 </div>
+               </div>
+                <!-- ============================================================
+                     STREAK TRACKER & DAILY GOAL WIDGET
+                     ============================================================ -->
+                <div class="streak-goal-widget" id="streak-goal-widget">
+
+                    <!-- TOP ROW: Goal input (left) + Streak counter (right) -->
+                    <div class="streak-goal-top-row">
+
+                        <!-- Goal Setting -->
+                        <div class="goal-section">
+                            <span class="goal-label"><i class="fas fa-calendar-check text-emerald-500 mr-1.5"></i> Daily study goal:</span>
+                            <div class="goal-input-wrapper">
+                                <input
+                                    type="number"
+                                    id="goal-hours-input"
+                                    class="goal-hours-input"
+                                    min="0.5"
+                                    max="24"
+                                    step="0.5"
+                                    value="5"
+                                    placeholder="5"
+                                    title="Set your daily study goal in hours"
+                                />
+                                <span class="goal-unit">hrs / day</span>
+                            </div>
+                            <button class="goal-save-btn" id="goal-save-btn" onclick="saveGoal()">
+                                <i class="fas fa-check mr-1 text-xs"></i> Save goal
+                            </button>
+                            <span class="goal-saved-msg" id="goal-saved-msg"><i class="fas fa-check-circle mr-1"></i> Saved!</span>
+                        </div>
+
+                        <!-- Streak Counter -->
+                        <div class="streak-section">
+                            <span class="streak-flame-icon"><i class="fas fa-fire text-orange-500"></i></span>
+                            <div class="streak-count-block">
+                                <span class="streak-number" id="streak-number">0</span>
+                                <span class="streak-sublabel">day streak</span>
+                            </div>
+                            <span class="streak-best-badge" id="streak-best-badge">Best: 0</span>
+                        </div>
+
+                    </div>
+
+                    <!-- PROGRESS BAR: today's time vs goal -->
+                    <div class="goal-progress-section">
+                        <div class="goal-progress-header">
+                            <span class="goal-progress-title" id="goal-progress-title">Today's progress</span>
+                            <span class="goal-progress-status" id="goal-progress-status">
+                                <span class="time-studied" id="goal-time-studied">0h 0m</span>
+                                <span id="goal-of-text"> studied</span>
+                            </span>
+                        </div>
+                        <div class="goal-progress-bar-track" id="goal-progress-bar-track">
+                            <div class="goal-progress-bar-fill" id="goal-progress-bar" style="width: 0%"></div>
+                            <div class="skeleton goal-progress-skeleton" id="goal-progress-skeleton"></div>
+                        </div>
+                    </div>
+
+                    <!-- 7-DAY DOT ROW -->
+                    <div class="streak-days-row" id="streak-days-row">
+                        <!-- Skeleton placeholders shown while loading -->
+                        <div class="streak-skeleton-dots" id="streak-skeleton-dots">
+                            <div class="skeleton streak-skeleton-dot"></div>
+                            <div class="skeleton streak-skeleton-dot"></div>
+                            <div class="skeleton streak-skeleton-dot"></div>
+                            <div class="skeleton streak-skeleton-dot"></div>
+                            <div class="skeleton streak-skeleton-dot"></div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- END: STREAK TRACKER & DAILY GOAL WIDGET -->
+
+                <div id="current-month-plan-display">
+                    <p id="no-plans-message" class="text-center text-gray-500 italic py-10">No study plans found. Click "Add Month" to create one.</p>
+                     <p id="select-month-message" class="text-center text-gray-500 italic py-10 hidden">Select a month from the buttons above to view its plan.</p>
+                </div>
+
+            </div> 
+			
+			<div id="result-sheet-modal" class="modal">
+      <div class="modal-content" style="max-width: 900px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header-sticky">
+          <h3 class="text-2xl font-semibold text-emerald-600">My Quiz Results</h3>
+          <span class="modal-close" onclick="closeModal('result-sheet-modal')">&times;</span>
+        </div>
+    
+        <div class="flex border-b border-gray-200 mt-2">
+            <button id="tab-btn-by-day" class="result-tab-btn active-tab">
+                <i class="fas fa-calendar-day mr-2"></i> By Day
+            </button>
+            <button id="tab-btn-by-subject" class="result-tab-btn">
+                <i class="fas fa-tags mr-2"></i> By Subject
+            </button>
+            <button id="tab-btn-review-yourself" class="result-tab-btn">
+                <i class="fas fa-user-check mr-2"></i> Review Yourself
+            </button>
+        </div>
+
+        <div class="" style="overflow-y: auto; flex-grow: 1; padding-top: 1rem;">
+
+            <div id="tab-content-by-day" class="result-tab-content">
+                <div id="by-day-results-list" class="results-table-container">
+                    <p class="text-center text-gray-500 italic py-10">Loading all results by day...</p>
+                </div>
+            </div>
+
+            <div id="tab-content-by-subject" class="result-tab-content hidden">
+                <div id="subject-sub-tabs-nav" class="flex border-b border-gray-200 -mt-3 mb-2" style="overflow-x: auto;">
+                    </div>
+                <div id="subject-sub-tabs-content" class="results-table-container">
+                    </div>
+            </div>
+
+            <div id="tab-content-review-yourself" class="result-tab-content hidden">
+                <div class="flex gap-2 mb-4 border-b border-gray-100 pb-2">
+                    <button id="subtab-btn-wrong-ans" class="px-3 py-1 text-xs font-bold text-white bg-indigo-500 rounded-full shadow-sm">
+                        Wrong Answered
+                    </button>
+                </div>
+
+                <div id="review-wrong-ans-content" class="max-h-[55vh] overflow-y-auto custom-scrollbar space-y-4">
+                    <p class="text-center text-gray-500 italic py-10">Loading wrong answers...</p>
+                </div>
+            </div>
+
+        </div>
+    
+      </div>
+    </div>
+    <div id="view-saved-result-modal" class="modal" style="z-index: 110;">
+      <div class="modal-content" style="max-width: 600px;">
+        <span class="modal-close" onclick="closeModal('view-saved-result-modal')">&times;</span>
+        
+        <div id="saved-result-content" class="text-center py-10">
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Quiz Result</h2>
+            <p id="saved-result-topic-name" class="text-sm text-gray-500 mb-6"></p>
+            
+            <div class="result-summary-list kalpurush">
+                <div class="result-summary-row">
+                    <span class="result-label">Total Answered:</span>
+                    <span id="saved-summary-answered-count" class="result-count">0</span>
+                    <span class="result-score-impact"></span>
+                </div>
+                <div class="result-summary-row">
+                    <span class="result-label text-green-700">Correct Answered:</span>
+                    <span id="saved-summary-correct-count" class="result-count text-green-700">0</span>
+                    <span id="saved-summary-correct-score" class="result-score-impact text-green-700">+0.00</span>
+                </div>
+                <div class="result-summary-row">
+                    <span class="result-label text-red-700">Wrong Answered:</span>
+                    <span id="saved-summary-wrong-count" class="result-count text-red-700">0</span>
+                    <span id="saved-summary-wrong-score" class="result-score-impact text-red-700">-0.00</span>
+                </div>
+                <div class="result-summary-row">
+                    <span class="result-label text-gray-600">Not Answered:</span>
+                    <span id="saved-summary-not-answered-count" class="result-count text-gray-600">0</span>
+                    <span id="saved-summary-not-answered-score" class="result-score-impact">0.00</span>
+                </div>
+                <hr class="my-3 border-gray-300">
+                <div class="result-summary-row final-score">
+                    <span class="result-label">Final Score:</span>
+                    <span id="saved-summary-final-score" class="result-score-impact">0.00</span>
+                </div>
+                <div class="result-summary-row final-stat">
+                    <span class="result-label">Percentage:</span>
+                    <span id="saved-summary-percentage" class="result-score-impact">0.0%</span>
+                </div>
+                <div class="result-summary-row final-stat">
+                    <span class="result-label">Time Taken:</span>
+                    <span id="saved-summary-time-taken" class="result-score-impact">00:00</span>
+                </div>
+            </div>
+            <div class="flex flex-wrap justify-center gap-3 mt-8">
+                <button id="saved-quiz-review-btn" class="action-button action-button-secondary">
+                    <i class="fas fa-search-minus mr-1.5"></i> Review Wrong
+                </button>
+
+                <button id="saved-quiz-restart-btn" class="action-button" style="background-color: #4f46e5; padding: 10px 24px; font-size: 1rem;">
+                    <i class="fas fa-redo mr-2"></i>Try Again
+                </button>
+                
+                <button id="saved-quiz-print-btn" class="action-button action-button-secondary">
+                    <i class="fas fa-print mr-1.5"></i> Print Script
+                </button>
+
+                <button class="action-button" onclick="closeModal('view-saved-result-modal')">
+                    Close
+                </button>
+            </div>
+        </div>
+    
+      </div>
+    </div>
+	
+	
+            </main>
+
+    <div id="add-month-modal" class="modal">
+      <div class="modal-content" style="max-width: 400px;">
+        <span class="modal-close" onclick="closeModal('add-month-modal')">&times;</span>
+        <h3 class="text-xl font-semibold mb-5 text-emerald-600">Add New Study Month</h3>
+        
+        <div class="space-y-4">
+            <div>
+                <label for="new-month-select" class="block text-sm font-medium text-gray-700 mb-1">Month</label>
+                <select id="new-month-select" class="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800">
+                    <option value="0">January</option>
+                    <option value="1">February</option>
+                    <option value="2">March</option>
+                    <option value="3">April</option>
+                    <option value="4">May</option>
+                    <option value="5">June</option>
+                    <option value="6">July</option>
+                    <option value="7">August</option>
+                    <option value="8">September</option>
+                    <option value="9">October</option>
+                    <option value="10">November</option>
+                    <option value="11">December</option>
+                </select>
+            </div>
+            <div>
+                <label for="new-month-year" class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+                <input type="number" id="new-month-year" class="w-full p-2 border border-gray-300 rounded-md text-gray-800" placeholder="e.g., 2025">
+            </div>
+        </div>
+        
+        <div class="mt-6 flex justify-end gap-3">
+             <button onclick="closeModal('add-month-modal')" class="action-button action-button-secondary">Cancel</button>
+             <button id="save-new-month-btn" class="action-button">Create Month</button>
+        </div>
+      </div>
+    </div>
+
+
+	<!-- --- NEW VOCAB-CODE-MODAL --- -->
+    <div id="vocab-code-modal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close" onclick="closeModal('vocab-code-modal')">&times;</span>
+        <h3 class="text-xl font-semibold mb-3 text-emerald-600">Add Vocabulary with Code</h3>
+        <p class="text-sm text-gray-500 mb-2">
+            Enter words and meanings. Format: <strong>Word, Meaning - Synonym @ Antonym;</strong>
+            &nbsp;
+            Separate each new pair with a semicolon (;). The synonym and antonym are optional.
+        </p>
+        <p class="text-xs text-gray-600 mb-4">Example: Cow, গরু; Disrupt, ব্যাহত করা - Interrupt @ Calm; Hen, মুরগী @ Rooster;</p>
+        
+        <textarea id="vocab-code-textarea" rows="8" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-md text-gray-800 placeholder-gray-400 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Word, Meaning - Synonym @ Antonym; Word, Meaning; ..."></textarea>
+        
+        <div class="mt-4 flex justify-end gap-3">
+             <button onclick="closeModal('vocab-code-modal')" class="action-button action-button-secondary">Cancel</button>
+             <button id="save-vocab-code-btn" class="action-button">Save & Add Pairs</button>
+        </div>
+      </div>
+    </div>
+    <!-- --- END VOCAB-CODE-MODAL --- -->
+	
+    <div id="story-modal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close" onclick="closeModal('story-modal')">&times;</span>
+        <h3 class="text-xl font-semibold mb-3 text-emerald-600">Story</h3>
+        <p id="story-modal-content" class="text-gray-700 whitespace-pre-wrap"></p>
+      </div>
+    </div>
+
+     <div id="edit-story-modal" class="modal">
+      <div class="modal-content">
+        <span class="modal-close" onclick="closeModal('edit-story-modal')">&times;</span>
+        <h3 class="text-xl font-semibold mb-3 text-emerald-600">Add/Edit Story</h3>
+        <textarea id="story-textarea" rows="6" class="w-full p-2 bg-gray-50 border border-gray-300 rounded-md text-gray-800 placeholder-gray-400 focus:ring-emerald-500 focus:border-emerald-500" placeholder="Write a story using the vocabulary words..."></textarea>
+        <div class="mt-4 flex justify-end gap-3">
+             <button onclick="closeModal('edit-story-modal')" class="action-button action-button-secondary">Cancel</button>
+             <button id="save-story-btn" class="action-button">Save Story</button>
+        </div>
+      </div>
+    </div>
+
+     
+	<div id="confirm-modal" class="modal" style="z-index: 130;">
+      <div class="modal-content">
+        <span class="modal-close" onclick="closeModal('confirm-modal')">&times;</span>
+        <h3 id="confirm-modal-title" class="text-lg font-semibold mb-4 text-gray-800">Confirm Action</h3>
+        <p id="confirm-modal-message" class="text-gray-600 mb-6">Are you sure?</p>
+        <div class="flex justify-end gap-3">
+             <button id="confirm-modal-cancel" class="action-button action-button-secondary">Cancel</button>
+             <button id="confirm-modal-confirm" class="action-button action-button-danger">Confirm</button>
+        </div>
+      </div>
+    </div>
+	
+	
+	<div id="delete-month-confirm-modal" class="modal" style="z-index: 110;">
+      <div class="modal-content" style="max-width: 500px;">
+        <h3 id="delete-month-title" class="text-xl font-semibold mb-4 text-red-700">
+            Final Confirmation
+        </h3>
+        <p class="text-gray-600 mb-4">
+            এটি একটি অপরিবর্তনযোগ্য (irreversible) পদক্ষেপ। আপনার এই মাসের সমস্ত ডেটা, টার্গেট, এবং কুইজ স্থায়ীভাবে মুছে ফেলা হবে।
+        </p>
+        <p class="text-gray-700 mb-3 font-medium">
+            নিশ্চিত করতে, অনুগ্রহ করে নিচের টেক্সটটি হুবহু টাইপ করুন:
+        </p>
+        <p class="text-gray-800 bg-gray-100 p-2 rounded-md text-sm font-mono mb-4" id="delete-month-challenge-text">
+            I want to delete 2025-10's entirely
+        </p>
+        
+        <input type="text" id="delete-month-input" class="w-full p-2 border border-gray-300 rounded-md focus:ring-red-500 focus:border-red-500" placeholder="Type the text above...">
+        
+        <p id="delete-month-error" class="text-red-600 text-sm mt-2 font-medium hidden">
+            <i class="fas fa-times-circle mr-1"></i> The text does not match. Please try again.
+        </p>
+        
+        <div class="flex justify-end gap-3 mt-6">
+             <button id="delete-month-cancel-btn" class="action-button action-button-secondary">Cancel</button>
+             <button id="delete-month-confirm-btn" class="action-button action-button-danger">Delete This Month</button>
+        </div>
+      </div>
+    </div>
+	
+
+    <div id="all-vocab-modal" class="modal">
+      <div class="modal-content all-vocab-modal-content" style="max-width: 700px; max-height: 80vh; display: flex; flex-direction: column;">
+        
+        <div class="modal-header-sticky">
+          <h3 class="text-2xl font-semibold text-emerald-600">Master Vocabulary List</h3>
+          <span class="modal-close" onclick="closeModal('all-vocab-modal')">&times;</span>
+        </div>
+        
+        <div id="vocab-list-content" style="overflow-y: auto; flex-grow: 1;">
+            </div>
+			
+		<div id="vocab-modal-footer" class="modal-footer-sticky" style="display: flex; justify-content: space-between; align-items: center;">
+            <button id="show-quiz-center-btn" class="action-button" style="background-color: #4f46e5;">
+                <i class="fas fa-brain mr-1.5"></i> Test Yourself
+            </button>
+            <span>
+                Total Vocabularies: <span id="total-vocab-count" class="font-bold">0</span>
+            </span>
+        </div>
+      </div>
+    </div>
+    
+    <div id="quiz-modal" class="modal" style="z-index: 120;">
+      <div class="modal-content" style="max-width: 600px; padding-top: 35px; padding-right: 45px; overflow: hidden;">
+        <span class="modal-close" onclick="closeQuizModal()">&times;</span>
+        
+        <div id="quiz-start-screen" class="quiz-start-container">
+            
+            <div class="quiz-start-content">
+                <h3 id="quiz-title" class="text-2xl font-semibold mb-4 text-indigo-600">Vocabulary Quiz</h3>
+                <p id="quiz-start-message" class="text-gray-600 mb-6">Loading vocabulary...</p>
+                
+                <div class="relative bg-indigo-50 border border-indigo-100 rounded-lg p-4 mb-6 transition-all">
+                
+                <button id="quiz-settings-edit-btn" class="absolute top-2 right-2 text-gray-400 hover:text-indigo-600 transition-colors p-1" title="Edit Quiz Settings">
+                    <i class="fas fa-pen"></i>
+                </button>
+
+                <div id="quiz-settings-display">
+                    <p class="text-sm font-medium text-red-600 mb-2">
+                        <i class="fas fa-exclamation-triangle mr-1"></i> 
+                        Warning: <span id="display-neg-mark">0.25</span> marks will be deducted for each wrong answer.
+                    </p>
+                    <p id="quiz-total-time-warning" class="text-sm font-medium text-blue-600">
+                        <i class="fas fa-clock mr-1"></i> 
+                        Time per Question: <span id="display-time-per-q" class="font-bold">60s</span> 
+                        (Total: <span id="display-total-time" class="font-bold">00:00</span>)
+                    </p>
+                    
+                    <!-- Direct Shuffle Toggle on Start Screen -->
+                    <div class="mt-3 pt-2.5 border-t border-indigo-200/70 flex items-center justify-between">
+                        <label class="flex items-center gap-2 text-xs font-bold text-indigo-900 cursor-pointer" for="display-toggle-shuffle">
+                            <i class="fas fa-random text-indigo-600 text-xs"></i>
+                            <span>Shuffle Questions</span>
+                            <span id="display-shuffle-mode-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">ON</span>
+                        </label>
+                        <label class="quiz-toggle-wrapper" title="Toggle Shuffle Questions" for="display-toggle-shuffle">
+                            <input type="checkbox" id="display-toggle-shuffle" checked class="quiz-toggle-input">
+                            <div class="quiz-toggle-track">
+                                <div class="quiz-toggle-thumb"></div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="quiz-settings-form" class="hidden mt-2 pt-3 border-t border-indigo-200">
+                    <div class="flex gap-4 mb-3">
+                        <div class="w-1/2">
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Time per Question (sec)</label>
+                            <input type="number" id="setting-time-input" class="w-full p-1.5 border border-gray-300 rounded text-sm text-center" value="60" min="10">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Negative Marking</label>
+                            <input type="number" id="setting-neg-input" class="w-full p-1.5 border border-gray-300 rounded text-sm text-center" value="0.25" step="0.05" min="0">
+                        </div>
+                    </div>
+
+                    <!-- Shuffle Questions Toggle inside Settings Form -->
+                    <div class="w-full mb-3 flex items-center justify-between border border-indigo-100 bg-white/70 p-2 rounded">
+                        <label class="block text-xs font-bold text-indigo-700 cursor-pointer flex items-center gap-1.5" for="setting-shuffle-questions">
+                            <i class="fas fa-random text-indigo-500 text-xs"></i>
+                            <span>Shuffle Questions</span>
+                        </label>
+                        <label class="quiz-toggle-wrapper" for="setting-shuffle-questions">
+                            <input type="checkbox" id="setting-shuffle-questions" checked class="quiz-toggle-input">
+                            <div class="quiz-toggle-track">
+                                <div class="quiz-toggle-thumb"></div>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="w-full mb-3 flex items-center justify-between border border-indigo-100 bg-indigo-50 p-2 rounded">
+                        <label class="block text-xs font-bold text-indigo-700 cursor-pointer" for="setting-show-answers">Show Answers & Notes Instantly</label>
+                        <input type="checkbox" id="setting-show-answers" checked class="w-4 h-4 text-indigo-600 border-gray-300 rounded cursor-pointer">
+                    </div>
+
+                    <button id="quiz-settings-save-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2 rounded transition-colors">
+                        Save Settings
+                    </button>
+                </div>
+            </div>
+            </div>
+            
+            <div class="quiz-start-footer">
+                <div class="flex flex-wrap items-center justify-center gap-3">
+                    <button id="quiz-start-btn" class="hidden action-button w-full sm:w-auto" style="background-color: #4f46e5; padding: 10px 24px; font-size: 1rem;">
+                        <i class="fas fa-play mr-2"></i>Start Quiz
+                    </button>
+                    <button id="launch-new-exam-ui-btn" type="button" class="action-button w-full sm:w-auto" style="background-color: #059669; padding: 10px 22px; font-size: 1rem;">
+                        <i class="fas fa-layer-group mr-2"></i>New UI
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div id="quiz-main-screen" class="hidden flex flex-col h-full">
+			<div class="flex items-center gap-3 mb-2 pt-2">
+        <div id="quiz-timer" class="text-lg font-bold text-gray-700 w-16 text-center">00:00</div>
+        
+        <div class="flex-grow h-2.5 bg-gray-200 rounded-full overflow-hidden">
+            <div id="quiz-progress-bar" class="h-full bg-indigo-600 transition-all duration-300" style="width: 0%"></div>
+        </div>
+        
+        <div id="quiz-question-number" class="text-xs font-semibold text-gray-500 border border-gray-300 px-2 py-1 rounded">1/10</div>
+    </div>
+	
+    <div class="flex flex-wrap justify-between items-center gap-2 mb-4 border-b border-gray-200 pb-2">
+        <h3 id="quiz-topic-name" class="text-sm font-semibold text-gray-700 truncate pr-2 max-w-full sm:max-w-[38%]">
+            Subject - Topic
+        </h3>
+
+        <div id="quiz-score" class="text-xs font-bold text-white bg-indigo-600 px-4 py-1.5 rounded-full shadow-md mx-2 whitespace-nowrap">
+            Score: 0.00
+        </div>
+
+        <div class="flex items-center gap-2 text-xs font-bold flex-shrink-0">
+            <div id="badge-correct" class="flex items-center text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100" title="Correct">
+                <i class="fas fa-check mr-1"></i> <span id="quiz-live-correct">0</span>
+            </div>
+            <div id="badge-wrong" class="flex items-center text-red-500 bg-red-50 px-2 py-1 rounded border border-red-100" title="Wrong">
+                <i class="fas fa-times mr-1"></i> <span id="quiz-live-wrong">0</span>
+            </div>
+            
+            <div id="badge-answered" class="hidden items-center text-indigo-600 bg-indigo-50 px-2 py-1 rounded border border-indigo-200" title="Answered">
+                <i class="fas fa-pen mr-1"></i> <span id="quiz-live-answered">0</span>
+            </div>
+
+            <div class="flex items-center text-gray-500 bg-gray-100 px-2 py-1 rounded border border-gray-200" title="Skipped">
+                <i class="fas fa-forward mr-1"></i> <span id="quiz-live-skipped">0</span>
+            </div>
+        </div>
+    </div>
+	
+	
+    <div id="quiz-question-area" class="flex-grow overflow-y-auto custom-scrollbar pr-1">
+        <h2 id="quiz-question-text" class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 leading-relaxed" oncontextmenu="return false;">
+            Loading question...
+        </h2>
+        <div id="quiz-options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2">
+            </div>
+    </div>
+
+    <div class="flex items-center w-full mt-3 pt-2 border-t border-gray-100 flex-shrink-0">
+        <div class="flex-1 flex justify-start">
+            <button id="quiz-prev-btn" class="action-button action-button-secondary text-xs px-3 py-2">
+                &larr; Prev
+            </button>
+        </div>
+        
+        <div class="flex-1 flex justify-center">
+            <button id="quiz-skip-btn" class="action-button action-button-secondary text-xs px-3 py-2" style="color: #4f46e5; border-color: #6366f1;">
+                Skip <i class="fas fa-fast-forward ml-1"></i>
+            </button>
+        </div>
+
+        <div class="flex-1 flex justify-end">
+            <button id="quiz-next-btn" class="action-button text-xs px-4 py-2" style="background-color: #4f46e5;">
+                Next &rarr;
+            </button>
+        </div>
+    </div>
+</div>
+
+        <div id="quiz-skipped-prompt-screen" class="hidden flex flex-col h-full cc-skipped-screen relative z-10" style="min-height: 360px; justify-content: center;">
+            <div class="flex flex-col items-center justify-center p-6 text-center h-full">
+                <div class="w-16 h-16 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-question text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Wait a second!</h2>
+                <p class="text-gray-600 mb-8">You have <span id="skipped-prompt-count" class="font-bold text-amber-600 text-lg">0</span> skipped questions.</p>
+                <div class="w-full max-w-sm mx-auto space-y-3">
+                    <button id="skipped-prompt-answer-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition-colors">
+                        Answer <span id="skipped-prompt-btn-count">0</span> Qs
+                    </button>
+                    <button id="skipped-prompt-submit-btn" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 rounded-lg transition-colors">
+                        Submit Test Anyway
+                    </button>
+                </div>
+            </div>
+        </div>
+                
+        <div id="quiz-results-screen" class="hidden text-center py-10">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">Quiz Completed!</h2>
+            
+            <div class="result-summary-list kalpurush">
+                
+                <div class="result-summary-row">
+                    <span class="result-label">Total Answered:</span>
+                    <span id="summary-answered-count" class="result-count">0</span>
+                    <span class="result-score-impact"></span> </div>
+                
+                <div class="result-summary-row">
+                    <span class="result-label text-green-700">Correct Answered:</span>
+                    <span id="summary-correct-count" class="result-count text-green-700">0</span>
+                    <span id="summary-correct-score" class="result-score-impact text-green-700">+0.00</span>
+                </div>
+                
+                <div class="result-summary-row">
+                    <span class="result-label text-red-700">Wrong Answered:</span>
+                    <span id="summary-wrong-count" class="result-count text-red-700">0</span>
+                    <span id="summary-wrong-score" class="result-score-impact text-red-700">-0.00</span>
+                </div>
+                
+                <div class="result-summary-row">
+                    <span class="result-label text-gray-600">Not Answered:</span>
+                    <span id="summary-not-answered-count" class="result-count text-gray-600">0</span>
+                    <span id="summary-not-answered-score" class="result-score-impact text-gray-600">0.00</span>
+                </div>
+                
+                <hr class="my-3 border-gray-300">
+                
+                <div class="result-summary-row final-score">
+                    <span class="result-label">Final Score:</span>
+                    <span id="summary-final-score" class="result-score-impact">0.00</span>
+                </div>
+                
+                <div class="result-summary-row final-stat">
+                    <span class="result-label">Percentage:</span>
+                    <span id="summary-percentage" class="result-score-impact">0.0%</span>
+                </div>
+                
+                <div class="result-summary-row final-stat">
+                    <span class="result-label">Time Taken:</span>
+                    <span id="summary-time-taken" class="result-score-impact">00:00</span>
+                </div>
+                
+            </div>
+            <div class="flex flex-wrap justify-center gap-3 mt-8">
+                <button id="quiz-review-btn" class="action-button action-button-secondary">
+                    <i class="fas fa-search-minus mr-1.5"></i> Review Wrong
+                </button>
+                <button id="quiz-restart-btn" class="action-button" style="background-color: #4f46e5; padding: 10px 24px; font-size: 1rem;">
+                    <i class="fas fa-redo mr-2"></i>Try Again
+                </button>
+                
+                <button id="quiz-print-btn" class="action-button action-button-secondary">
+					<i class="fas fa-print mr-2"></i>Print Answer Script
+				</button>
+
+                <button id="quiz-save-btn" class="action-button" disabled>
+                    <i class="fas fa-save mr-2"></i>Save
+                </button>
+            </div>
+        </div>
+		
+		<div id="quiz-review-screen" class="hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Review Incorrect Answers</h2>
+            <div id="quiz-review-content" class="mb-6 space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
+                </div>
+            <div class="flex justify-end gap-2">
+                <button id="quiz-test-weakness-btn" class="action-button" style="background-color: #f59e0b;">
+                    <i class="fas fa-dumbbell mr-1"></i> Test Weak Points
+                </button>
+                <button id="quiz-back-to-results-btn" class="action-button action-button-secondary">Back to Results</button>
+            </div>
+        </div>
+        
+
+      </div>
+    </div>
+	<div id="quiz-center-modal" class="modal">
+      <div class="modal-content" style="max-width: 500px;">
+        <span class="modal-close" onclick="closeModal('quiz-center-modal')">&times;</span>
+        <h3 class="text-2xl font-semibold mb-5 text-indigo-600">Weekly Quiz Center</h3>
+        
+        <p class="text-sm text-gray-500 mb-4">Select a week to start a quiz. You need at least 4 words in a week's total vocabulary to generate a quiz.</p>
+        
+        <div id="quiz-center-content" style="max-height: 50vh; overflow-y: auto; padding-top: 5px;">
+            </div>
+        
+      </div>
+	</div>
+	
+	<div id="quiz-confirm-modal" class="modal" style="z-index: 130;"> <div class="modal-content" style="max-width: 450px;">
+        <h3 class="text-lg font-semibold mb-4 text-gray-800">Exit Quiz?</h3>
+        <p class="text-gray-600 mb-6">Are you sure you want to exit?</p>
+        
+        <div class="flex justify-between items-center gap-3">
+             <button id="quiz-confirm-quit" class="action-button action-button-secondary">Yes</button>
+             
+             <div class="flex gap-3">
+                 <button id="quiz-confirm-submit" class="action-button" style="background-color: #10b981; border-color: #10b981;">Submit Test</button>
+                 
+                 <button id="quiz-confirm-continue" class="action-button" style="background-color: #4f46e5; border-color: #4f46e5;">No</button>
+             </div>
+        </div>
+      </div>
+    </div>
+    <div id="vocab-quiz-choice-modal" class="modal" style="z-index: 130;">
+      <div class="modal-content" style="max-width: 420px;">
+        <h3 class="text-lg font-semibold mb-2 text-gray-800">Choose Quiz Type</h3>
+        <p class="text-gray-600 mb-6 text-sm">This row has both vocabulary words and custom MCQs. Which would you like to be tested on?</p>
+        <div class="flex flex-col gap-3">
+            <button id="vocab-quiz-choice-vocab-btn" class="action-button" style="background-color: #4f46e5; border-color: #4f46e5;">
+                <i class="fas fa-book mr-1.5"></i> Vocab Quiz
+            </button>
+            <button id="vocab-quiz-choice-mcq-btn" class="action-button" style="background-color: #10b981; border-color: #10b981;">
+                <i class="fas fa-question-circle mr-1.5"></i> MCQs
+            </button>
+            <button id="vocab-quiz-choice-cancel-btn" class="action-button action-button-secondary" onclick="closeModal('vocab-quiz-choice-modal')">
+                Cancel
+            </button>
+        </div>
+      </div>
+    </div>
+    <div id="add-mcq-modal" class="modal cc-modal-fullscreen-mobile" style="z-index: 105;">
+      <div class="modal-content cc-import-modal-content" style="max-width: 920px; width: 96vw; max-height: 92dvh; display: flex; flex-direction: column;">
+        <div class="flex items-center justify-between border-b pb-3 mb-3 flex-shrink-0">
+          <div>
+            <h3 class="text-xl font-semibold text-emerald-600">MCQ Import &amp; Rich Editor</h3>
+            <p class="text-xs text-gray-500">Paste text, HTML, JS/JSON, or upload .docx/.html/.txt/.json/.js files with live KaTeX math &amp; code preview.</p>
+          </div>
+          <span class="modal-close static text-3xl leading-none cursor-pointer" onclick="closeModal('add-mcq-modal')">&times;</span>
+        </div>
+        <div id="mcq-import-workspace-mount" class="overflow-y-auto custom-scrollbar flex-1 pr-1"></div>
+      </div>
+    </div>
+    <div id="view-mcq-modal" class="modal" style="z-index: 106; overflow: hidden;">
+      <div class="modal-content cc-reader-modal-content" style="width: 96%; max-width: 1000px; height: 90dvh; display: flex; flex-direction: column; padding: 0; margin: 0;">
+        
+		
+		<button id="view-mcq-settings-btn" class="floating-settings-btn" title="Settings">
+			<i class="fas fa-cog text-lg"></i>
+		</button>
+
+		<div id="view-mcq-settings-panel" class="settings-panel">
+			<div class="flex justify-between items-center mb-4 border-b pb-2">
+				<span class="font-semibold text-sm text-gray-700">Appearance</span>
+				<button class="text-gray-400 hover:text-red-500" onclick="document.getElementById('view-mcq-settings-panel').classList.remove('active')"><i class="fas fa-times"></i></button>
+			</div>
+			
+			
+
+			<div class="mb-1">
+				<div class="text-sm text-gray-600 mb-2"><i class="fas fa-text-height mr-2"></i>Font Size</div>
+				<div class="flex items-center gap-2">
+					<button class="font-control-btn" id="view-mcq-font-dec">-</button>
+					<input type="number" id="view-mcq-font-input" value="16" class="w-full border border-gray-300 rounded p-1 text-center text-sm" min="10" max="30">
+					<button class="font-control-btn" id="view-mcq-font-inc">+</button>
+				</div>
+			</div>
+		</div>
+        <button id="view-mcq-fullscreen-btn" class="absolute bottom-6 right-6 w-12 h-12 bg-white rounded-full shadow-xl border border-gray-200 flex items-center justify-center text-gray-600 hover:text-indigo-600 hover:bg-gray-50 transition-all z-20 focus:outline-none" title="Enter Fullscreen">
+            <i class="fas fa-expand text-lg"></i>
+        </button>
+
+        <div class="flex flex-wrap justify-between items-center gap-3 p-3 sm:p-4 border-b bg-white rounded-t-lg cc-reader-modal-header">
+            <div class="min-w-0">
+                <h3 class="text-lg sm:text-xl font-bold text-indigo-700 truncate">View MCQs</h3>
+                <p id="view-mcq-subtitle" class="text-xs text-gray-500 truncate">Selected Questions</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <button id="copy-view-mcq-btn" class="action-button action-button-secondary text-xs sm:text-sm">
+                    <i class="fas fa-copy mr-1"></i> Copy
+                </button>
+                
+                <button id="view-mcq-test-btn" class="action-button text-xs sm:text-sm" style="background-color: #4f46e5;">
+                    <i class="fas fa-play mr-1"></i> Test
+                </button>
+                <button id="view-mcq-print-btn" class="action-button action-button-secondary text-xs sm:text-sm">
+                    <i class="fas fa-print mr-1"></i> Print
+                </button>
+                <button class="text-gray-400 hover:text-red-500 transition-colors text-2xl min-w-[36px] min-h-[36px] flex items-center justify-center" onclick="closeModal('view-mcq-modal')" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="view-mcq-content" class="p-6 bg-gray-50 overflow-y-auto custom-scrollbar kalpurush" style="flex-grow: 1;">
+        </div>
+
+      </div>
+    </div>
+    <div id="master-mcq-modal" class="modal">
+      <div class="modal-content" style="max-width: 600px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header-sticky border-b pb-3 mb-4">
+          <h3 class="text-2xl font-semibold text-emerald-600">MCQ Repository</h3>
+          <p class="text-xs text-gray-500 mt-1">Select a specific topic, day, week, or month to study.</p>
+          <span class="modal-close text-3xl leading-none cursor-pointer hover:text-gray-800 text-gray-400" onclick="closeModal('master-mcq-modal')">&times;</span>
+        </div>
+        
+        <div id="master-mcq-menu-content" class="custom-scrollbar" style="overflow-y: auto; flex-grow: 1; padding-right: 5px;">
+        </div>
+
+        <div class="modal-footer-sticky border-t pt-3 mt-3 flex justify-between items-center">
+            <button id="show-mcq-quiz-center-btn" class="action-button" style="background-color: #4f46e5;">
+                <i class="fas fa-brain mr-1.5"></i> Test Yourself
+            </button>
+        </div>
+      </div>
+    </div>
+
+   
+		
+	<div id="mcq-study-modal" class="modal" style="z-index: 106; overflow: hidden;">
+		<div class="modal-content cc-reader-modal-content" style="width: 96%; max-width: 1000px; height: 90dvh; display: flex; flex-direction: column; padding: 0; margin: 0;">
+        
+			<div class="flex flex-wrap justify-between items-center gap-3 p-3 sm:p-4 border-b bg-white rounded-t-lg cc-reader-modal-header">
+				<div class="min-w-0">
+					<h3 id="study-modal-title" class="text-lg sm:text-xl font-bold text-indigo-700 truncate">MCQ Study View</h3>
+					<p id="study-modal-subtitle" class="text-xs text-gray-500 truncate">... topics ...</p>
+				</div>
+				<div class="flex flex-wrap items-center gap-2">
+					<button id="copy-study-mcq-btn" class="action-button action-button-secondary text-xs sm:text-sm">
+						<i class="fas fa-copy mr-1"></i> Copy
+					</button>
+
+					<button id="test-study-mcq-btn" class="action-button text-xs sm:text-sm" style="background-color: #4f46e5;">
+						<i class="fas fa-play mr-1"></i> Test
+					</button>
+					
+					<button id="print-study-mcq-btn" class="action-button action-button-secondary text-xs sm:text-sm">
+						<i class="fas fa-print mr-1"></i> Print
+					</button>
+					<button class="text-gray-400 hover:text-red-500 transition-colors text-2xl min-w-[36px] min-h-[36px] flex items-center justify-center" onclick="closeModal('mcq-study-modal')" aria-label="Close">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+			</div>
+
+			<div id="mcq-study-content" class="p-4 sm:p-6 bg-gray-50 overflow-y-auto custom-scrollbar kalpurush" style="flex-grow: 1;">
+			</div>
+
+			<button id="mcq-settings-btn" class="floating-settings-btn" title="Settings">
+				<i class="fas fa-cog text-lg"></i>
+			</button>
+
+			<div id="mcq-settings-panel" class="settings-panel">
+				<div class="flex justify-between items-center mb-4 border-b pb-2">
+					<span class="font-semibold text-sm text-gray-700">Appearance</span>
+					<button class="text-gray-400 hover:text-red-500" onclick="document.getElementById('mcq-settings-panel').classList.remove('active')"><i class="fas fa-times"></i></button>
+				</div>
+				
+				<div class="mb-1">
+					<div class="text-sm text-gray-600 mb-2"><i class="fas fa-text-height mr-2"></i>Font Size</div>
+					<div class="flex items-center gap-2">
+						<button class="font-control-btn" id="mcq-font-dec">-</button>
+						<input type="number" id="mcq-font-input" value="16" class="w-full border border-gray-300 rounded p-1 text-center text-sm" min="10" max="30">
+						<button class="font-control-btn" id="mcq-font-inc">+</button>
+					</div>
+				</div>
+			</div>
+
+			<button id="mcq-fullscreen-btn" class="absolute bottom-6 right-6 w-12 h-12 bg-white rounded-full shadow-xl border border-gray-200 flex items-center justify-center text-gray-600 hover:text-indigo-600 hover:bg-gray-50 transition-all z-20 focus:outline-none" title="Enter Fullscreen">
+				<i class="fas fa-expand text-lg"></i>
+			</button>
+
+		</div>
+    </div>
+    <div id="mcq-quiz-center-modal" class="modal">
+      <div class="modal-content" style="max-width: 500px;">
+        <span class="modal-close" onclick="closeModal('mcq-quiz-center-modal')">&times;</span>
+        <h3 class="text-2xl font-semibold mb-5 text-indigo-600">MCQ Quiz Center</h3>
+        
+        <div id="mcq-quiz-center-content" class="kalpurush" style="max-height: 60vh; overflow-y: auto; padding-top: 5px;">
+            </div>
+        
+      </div>
+    </div>
+    <div id="chart-modal" class="modal">
+      <div class="modal-content" style="max-width: 800px;">
+        <span class="modal-close" onclick="closeModal('chart-modal')">&times;</span>
+        <h3 id="chart-modal-title" class="text-2xl font-semibold mb-5 text-emerald-600">Your Progress</h3>
+        
+        <div style="width: 100%; height: 400px;">
+            <canvas id="progress-chart-canvas"></canvas>
+        </div>
+
+      </div>
+    </div>
+	
+	<div id="week-summary-modal" class="modal">
+      <div class="modal-content" style="max-width: 900px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header-sticky flex justify-between items-center border-b pb-3 mb-4">
+          <h3 class="text-2xl font-semibold text-emerald-600">Weekly Summary</h3>
+          <div class="flex items-center gap-3">
+              <button id="print-week-summary-btn" class="action-button action-button-secondary text-sm">
+                  <i class="fas fa-print mr-1.5"></i> Print
+              </button>
+              <span class="modal-close static text-3xl leading-none cursor-pointer hover:text-gray-800 text-gray-400" onclick="closeModal('week-summary-modal')">&times;</span>
+          </div>
+        </div>
+        <div id="week-summary-content" style="overflow-y: auto; flex-grow: 1; padding-top: 0.5rem;">
+            </div>
+      </div>
+    </div>
+	
+	<div id="month-summary-modal" class="modal">
+      <div class="modal-content" style="max-width: 95%; width: 1100px; max-height: 85vh; display: flex; flex-direction: column;">
+        <div class="modal-header-sticky flex justify-between items-center border-b pb-3 mb-4">
+          <h3 class="text-2xl font-semibold text-emerald-600">Monthly Summary</h3>
+          <div class="flex items-center gap-3">
+              <button id="print-month-summary-btn" class="action-button action-button-secondary text-sm">
+                  <i class="fas fa-print mr-1.5"></i> Print
+              </button>
+              <span class="modal-close static text-3xl leading-none cursor-pointer hover:text-gray-800 text-gray-400" onclick="closeModal('month-summary-modal')">&times;</span>
+          </div>
+        </div>
+        <div id="month-summary-content" style="overflow-y: auto; flex-grow: 1; padding-top: 0.5rem;">
+            </div>
+      </div>
+    </div>
+	
+	<div id="study-time-report-modal" class="modal">
+      <div class="modal-content" style="width: 100vw; max-width: 100vw; height: 100vh; max-height: 100vh; margin: 0; border-radius: 0; display: flex; flex-direction: column;">
+        <div class="modal-header-sticky flex justify-between items-center border-b pb-3 mb-4">
+          <h3 class="text-2xl font-semibold text-emerald-600">Study Time Report</h3>
+          <div class="flex items-center gap-3">
+              <button id="print-study-time-report-btn" class="action-button action-button-secondary text-sm">
+                  <i class="fas fa-print mr-1.5"></i> Print
+              </button>
+              <span class="modal-close static text-3xl leading-none cursor-pointer hover:text-gray-800 text-gray-400" onclick="closeModal('study-time-report-modal')">&times;</span>
+          </div>
+        </div>
+        <div id="study-time-report-content" style="overflow-y: auto; flex-grow: 1; padding-top: 0.5rem; padding-left: 1rem; padding-right: 1rem;">
+            </div>
+      </div>
+    </div>
+	
+	
+	
+	<button id="scroll-toggle-btn" class="fixed bottom-32 right-5 z-[100] w-12 h-12 bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:bg-gray-900 hover:scale-110 focus:outline-none opacity-90 hover:opacity-100" title="Scroll">
+    <i class="fas fa-arrow-down"></i>
+</button>
+
+<button id="global-dark-mode-btn" class="fixed bottom-6 right-5 w-14 h-14 bg-gray-800 text-yellow-400 rounded-full shadow-lg border-2 border-gray-700 z-[999] flex items-center justify-center hover:scale-110 transition-transform" title="Toggle Dark Mode">
+    <i class="fas fa-moon text-2xl"></i>
+</button>
+	
+    
+
+    <div id="fullscreen-timer-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; flex-direction:column; align-items:center; justify-content:center; color:#ffffff;">
+        <button id="fullscreen-timer-close-btn" style="position:absolute; top:20px; right:30px; background:none; border:none; color:#ffffff; font-size:2.5rem; cursor:pointer; line-height:1;">&times;</button>
+        <button id="fullscreen-timer-mini-btn" title="Mini Window" style="position:absolute; top:24px; right:80px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:#ffffff; font-size:0.8rem; padding:6px 12px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px; transition:background 0.2s;">
+            <i class="fas fa-compress-alt"></i> Mini Window
+        </button>
+        <div id="fullscreen-timer-subject" style="font-size:2rem; font-weight:700; margin-bottom:8px; text-align:center; padding:0 20px;"></div>
+        <div id="fullscreen-timer-topic" style="font-size:1.2rem; color:#d1d5db; margin-bottom:30px; text-align:center; padding:0 20px;"></div>
+        <div id="fullscreen-timer-session" style="font-family:monospace; font-size:6rem; font-weight:800; letter-spacing:0.05em; margin-bottom:10px;">00:00:00</div>
+        <div id="fullscreen-timer-total-label" style="font-size:1rem; color:#9ca3af; margin-bottom:6px;">Day Total Study Time</div>
+        <div id="fullscreen-timer-total" style="font-family:monospace; font-size:2.5rem; font-weight:700; color:#34d399; margin-bottom:40px;">00:00:00</div>
+        <div style="display:flex; gap:24px;">
+            <button id="fullscreen-timer-startpause-btn" style="width:80px; height:80px; border-radius:50%; border:none; background:#10b981; color:#ffffff; font-size:2rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                <i id="fullscreen-timer-startpause-icon" class="fas fa-play"></i>
+            </button>
+            <button id="fullscreen-timer-end-btn" style="width:80px; height:80px; border-radius:50%; border:none; background:#ef4444; color:#ffffff; font-size:2rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                <i class="fas fa-stop"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mini Timer Window (draggable, always-on-top via Document PiP or fallback) -->
+    <div id="mini-timer-modal" style="display:none; position:fixed; bottom:24px; right:24px; width:160px; background:linear-gradient(135deg,#1a1a2e,#16213e); border:1px solid rgba(255,255,255,0.15); border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.5); z-index:99999; color:#fff; user-select:none; overflow:hidden;">
+        <div id="mini-timer-titlebar" style="display:flex; align-items:center; justify-content:space-between; padding:6px 8px; background:rgba(255,255,255,0.07); cursor:move; border-bottom:1px solid rgba(255,255,255,0.08);">
+            <span style="font-size:0.6rem; font-weight:600; color:#9ca3af; letter-spacing:0.05em; text-transform:uppercase;">Timer</span>
+            <div style="display:flex; gap:4px;">
+                <button id="mini-timer-pin-btn" title="Pin (always on top)" style="width:18px;height:18px;border-radius:50%;border:none;background:rgba(251,191,36,0.8);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:#78350f;padding:0;">
+                    <i class="fas fa-thumbtack"></i>
+                </button>
+                <button id="mini-timer-maximize-btn" title="Maximize" style="width:18px;height:18px;border-radius:50%;border:none;background:rgba(52,211,153,0.8);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:#065f46;padding:0;">
+                    <i class="fas fa-expand"></i>
+                </button>
+                <button id="mini-timer-close-btn" title="Close" style="width:18px;height:18px;border-radius:50%;border:none;background:rgba(239,68,68,0.8);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:#fff;padding:0;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div style="padding:10px 10px 8px; text-align:center;">
+            <div id="mini-timer-subject" style="font-size:0.6rem; color:#9ca3af; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
+            <div id="mini-timer-session" style="font-family:monospace; font-size:1.5rem; font-weight:800; letter-spacing:0.04em; line-height:1.1;">00:00:00</div>
+            <div id="mini-timer-total" style="font-family:monospace; font-size:0.75rem; color:#34d399; margin-top:2px;">00:00:00</div>
+            <div style="display:flex; gap:8px; justify-content:center; margin-top:8px;">
+                <button id="mini-timer-startpause-btn" style="width:34px;height:34px;border-radius:50%;border:none;background:#10b981;color:#fff;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                    <i id="mini-timer-startpause-icon" class="fas fa-play"></i>
+                </button>
+                <button id="mini-timer-end-btn" style="width:34px;height:34px;border-radius:50%;border:none;background:#ef4444;color:#fff;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-stop"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="backup-restore-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="modal-close" onclick="closeModal('backup-restore-modal')">&times;</span>
+            <h3 class="text-xl font-semibold mb-4 text-gray-800">Manage Data</h3>
+            
+            <div class="flex border-b border-gray-200 mb-6">
+                <button id="tab-btn-backup" class="flex-1 py-2 text-center font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 transition-colors active-tab-br">Backup</button>
+                <button id="tab-btn-restore" class="flex-1 py-2 text-center font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 transition-colors">Restore</button>
+            </div>
+
+            <div id="content-backup" class="tab-content-br">
+                <div class="text-center py-4">
+                    <div class="bg-emerald-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-save text-2xl text-emerald-600"></i>
+                    </div>
+                    <h4 class="font-semibold text-gray-800 mb-2">Create Backup</h4>
+                    <p class="text-sm text-gray-600 mb-6">Save your study plan locally or to the cloud.</p>
+                    
+                    <div class="space-y-3">
+                        <button id="backup-cloud-btn" class="action-button w-full justify-center py-3 text-sm bg-indigo-600 hover:bg-indigo-700">
+                            <i class="fas fa-cloud-upload-alt mr-2"></i> Backup & Save to Cloud
+                        </button>
+                        
+                        <div id="backup-progress-ui" class="hidden text-left mt-2 mb-2 p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                            <div class="flex justify-between text-xs font-semibold text-indigo-700 mb-1">
+                                <span id="backup-step-text">Preparing...</span>
+                                <span id="backup-percent-text">0%</span>
+                            </div>
+                            <div class="w-full bg-indigo-200 rounded-full h-2.5">
+                                <div id="backup-progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="relative flex py-1 items-center">
+                            <div class="flex-grow border-t border-gray-200"></div>
+                            <span class="flex-shrink-0 mx-4 text-gray-400 text-xs uppercase">Or</span>
+                            <div class="flex-grow border-t border-gray-200"></div>
+                        </div>
+
+                        <button id="backup-download-btn" class="action-button w-full justify-center py-3 text-sm action-button-secondary">
+                            <i class="fas fa-file-download mr-2"></i> Download JSON File
+                        </button>
+                    </div>
+                    <p id="last-backup-text" class="text-xs text-gray-400 mt-4">Last backup: Never</p>
+                </div>
+            </div>
+
+            <div id="content-restore" class="tab-content-br hidden">
+                <div class="py-2">
+                    <h4 class="font-semibold text-gray-800 mb-3 text-sm flex justify-between items-center">
+                        Cloud Backups
+                        <button id="refresh-cloud-backups-btn" class="text-xs text-indigo-600 hover:underline"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </h4>
+                    
+                    <div id="cloud-backup-list" class="space-y-2 mb-6 max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
+                        <p class="text-center text-gray-400 text-xs py-4">Loading backups...</p>
+                    </div>
+
+                    <div class="relative flex py-2 items-center mb-4">
+                        <div class="flex-grow border-t border-gray-200"></div>
+                        <span class="flex-shrink-0 mx-4 text-gray-400 text-xs uppercase">Or Upload File</span>
+                        <div class="flex-grow border-t border-gray-200"></div>
+                    </div>
+
+                    <input type="file" id="restore-file-input" accept=".json" class="hidden">
+                    <button id="perform-restore-file-btn" class="action-button w-full justify-center py-2 text-sm" style="background-color: #d97706;">
+                        <i class="fas fa-file-import mr-2"></i> Select .JSON File
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+	
+	<div id="new-exam-ui-root" class="hidden" aria-hidden="true"></div>
+
+	<script type="module" src="app.js?v=2026070901" defer></script>
+	<script type="module" src="exam-module/exam-ui.js?v=2026111701" defer></script>
+<script type="module" src="/src/installPrompt.ts"></script>
+</body>
+</html>

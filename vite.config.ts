@@ -191,6 +191,26 @@ function copyStaticAssetsPlugin(): Plugin {
   };
 }
 
+function universalSettingsBootstrapPlugin(): Plugin {
+  return {
+    name: 'universal-settings-bootstrap',
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html) {
+        if (html.includes('settings-bootstrap.js')) return html;
+        return {
+          html,
+          tags: [{
+            tag: 'script',
+            attrs: { src: '/settings-bootstrap.js' },
+            injectTo: 'head-prepend',
+          }],
+        };
+      },
+    },
+  };
+}
+
 export default defineConfig(() => {
   ensureLogoAssets(__dirname);
 
@@ -206,7 +226,7 @@ export default defineConfig(() => {
   }, {});
 
   return {
-    plugins: [react(), tailwindcss(), copyStaticAssetsPlugin()],
+    plugins: [universalSettingsBootstrapPlugin(), react(), tailwindcss(), copyStaticAssetsPlugin()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

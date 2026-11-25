@@ -1,4 +1,4 @@
-export type ThemeMode = 'light' | 'dark';
+export type ThemeMode = 'light' | 'dark' | 'sepia' | 'forest' | 'midnight';
 
 export type PageView =
   | 'home'
@@ -11,7 +11,8 @@ export type PageView =
   | 'study-plan'
   | 'about'
   | 'contact'
-  | 'privacy';
+  | 'privacy'
+  | 'embedded';
 
 export interface ArchiveCardButton {
   id: string;

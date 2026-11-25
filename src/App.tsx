@@ -11,6 +11,7 @@ import { ArchivesView } from './components/ArchivesView';
 import { AboutView } from './components/AboutView';
 import { ContactView } from './components/ContactView';
 import { StudyPlanView } from './components/StudyPlanView';
+import { LegacyPageFrame } from './components/LegacyPageFrame';
 import { CourseDetailView } from './components/CourseDetailView';
 import { PrivacyPolicyView } from './components/PrivacyPolicyView';
 import { FloatingActionButtons } from './components/FloatingActionButtons';
@@ -19,8 +20,25 @@ import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, updat
 import { CLASS_CADDY_LOGO_DATA_URI } from './lib/logoData';
 import { applyAppSettings, loadAppSettings, saveAppSettings } from './lib/appSettings';
 import { openSettingsDialog } from './lib/settingsModal';
+import { exportCloudUserData, loadCloudAppSettings, loadCloudExamPreferences, restoreCloudUserData, saveCloudAppSettings, saveCloudExamPreferences } from './lib/settingsCloud';
 
 export default function App() {
+  const pageFromLocation = (): PageView => {
+    if (new URLSearchParams(window.location.search).has('cc-page')) return 'embedded';
+    const path = window.location.pathname.toLowerCase();
+    const hash = window.location.hash.toLowerCase();
+    if (path.includes('study_plan') || hash.includes('study-plan') || hash.includes('study_plan')) return 'study-plan';
+    if (path.includes('privacy') || hash.includes('privacy')) return 'privacy';
+    if (path.includes('about') || hash.includes('about')) return 'about';
+    if (path.includes('contact') || hash.includes('contact')) return 'contact';
+    if (path.includes('academic') || hash.includes('academic')) return 'academic';
+    if (hash.includes('course-')) return hash.replace('#', '') as PageView;
+    if (path.includes('archives') || hash.includes('archives')) return 'archives';
+    if (path === '/' || path.endsWith('/index.html') || path.includes('home-content')) return 'home';
+    if (/\.html?$/i.test(path)) return 'embedded';
+    return 'home';
+  };
+  const pathForPage = (page: PageView) => page === 'home' ? '/index.html' : page === 'study-plan' ? '/study_plan.html' : page === 'academic' || page.startsWith('course-') ? `/archives.html#${page}` : `/${page === 'privacy' ? 'privacy-policy' : page}.html`;
   useEffect(() => {
     const ensureFavicon = () => {
       const links = document.querySelectorAll<HTMLLinkElement>('link[rel*="icon"]');
@@ -40,6 +58,7 @@ export default function App() {
     ensureFavicon();
   }, []);
   const [currentPage, setCurrentPage] = useState<PageView>(() => {
+    if (new URLSearchParams(window.location.search).has('cc-page')) return 'embedded';
     const path = window.location.pathname.toLowerCase();
     const hash = window.location.hash.toLowerCase();
     if (path.includes('grammar') || hash.includes('grammar')) {
@@ -56,13 +75,80 @@ export default function App() {
     if (path.includes('index') || path === '/' || path.endsWith('/')) return 'home';
     return 'archives';
   });
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [embeddedPath, setEmbeddedPath] = useState(() => new URLSearchParams(window.location.search).get('cc-page') || (window.location.pathname + window.location.search + window.location.hash));
+  const navigateTo = (page: PageView, href = pathForPage(page)) => {
+    const frameWillChange = page !== currentPage || (page === 'embedded' && href !== embeddedPath);
+    if (href !== window.location.pathname + window.location.search + window.location.hash) window.history.pushState({ page }, '', href);
+    setIsNavigating(true);
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.setTimeout(() => setIsNavigating(false), frameWillChange && ['home', 'study-plan', 'embedded'].includes(page) ? 5000 : 350);
+  };
   const [theme, setTheme] = useState<ThemeMode>(() => loadAppSettings().theme);
+  const [language, setLanguage] = useState<'bn' | 'en'>(() => loadAppSettings().language);
+
+  useEffect(() => {
+    const onPopState = () => { setIsNavigating(true); setEmbeddedPath(new URLSearchParams(window.location.search).get('cc-page') || (window.location.pathname + window.location.search + window.location.hash)); setCurrentPage(pageFromLocation()); window.setTimeout(() => setIsNavigating(false), 320); };
+    const onInternalLink = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const anchor = (event.target as Element | null)?.closest<HTMLAnchorElement>('a[href]');
+      if (!anchor || anchor.target === '_blank' || anchor.hasAttribute('download')) return;
+      const url = new URL(anchor.href, window.location.href);
+      if (url.origin !== window.location.origin) return;
+      if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash && !url.hash.startsWith('#course-')) return;
+      const path = url.pathname.toLowerCase();
+      let page: PageView | null = null;
+      if (path.endsWith('/index.html') || path === '/') page = 'home';
+      else if (path.includes('archives')) page = url.hash.startsWith('#course-') ? url.hash.slice(1) as PageView : 'archives';
+      else if (path.includes('study_plan')) page = 'study-plan';
+      else if (path.includes('about')) page = 'about';
+      else if (path.includes('contact')) page = 'contact';
+      else if (path.includes('privacy')) page = 'privacy';
+      else if (path.includes('academic')) page = 'academic';
+      else if (/\.html?$/i.test(path)) page = 'embedded';
+      if (!page) return;
+      event.preventDefault();
+      if (page === 'embedded') setEmbeddedPath(url.pathname + url.search + url.hash);
+      navigateTo(page, url.pathname + url.search + url.hash);
+    };
+    const onFrameNavigation = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type === 'classcaddy:navigation-loaded') { setIsNavigating(false); return; }
+      if (event.data?.type === 'classcaddy:settings-change' && event.data.settings) {
+        const updated = saveAppSettings(event.data.settings);
+        setTheme(updated.theme);
+        setLanguage(updated.language);
+        if (auth.currentUser) void saveCloudAppSettings(auth.currentUser.uid, updated);
+        return;
+      }
+      if (event.data?.type !== 'classcaddy:navigate') return;
+      const url = new URL(event.data.href, window.location.href);
+      const path = url.pathname.toLowerCase();
+      let page: PageView | null = null;
+      if (path.endsWith('/index.html') || path === '/' || path.includes('home-content')) page = 'home';
+      else if (path.includes('archives')) page = url.hash.startsWith('#course-') ? url.hash.slice(1) as PageView : 'archives';
+      else if (path.includes('study_plan')) page = 'study-plan';
+      else if (path.includes('about')) page = 'about';
+      else if (path.includes('contact')) page = 'contact';
+      else if (path.includes('privacy')) page = 'privacy';
+      else if (path.includes('academic')) page = 'academic';
+      else if (/\.html?$/i.test(path)) page = 'embedded';
+      if (page === 'embedded') setEmbeddedPath(url.pathname + url.search + url.hash);
+      if (page) navigateTo(page, url.pathname + url.search + url.hash);
+    };
+    window.addEventListener('popstate', onPopState);
+    document.addEventListener('click', onInternalLink);
+    window.addEventListener('message', onFrameNavigation);
+    return () => { window.removeEventListener('popstate', onPopState); document.removeEventListener('click', onInternalLink); window.removeEventListener('message', onFrameNavigation); };
+  }, [currentPage, embeddedPath]);
 
   useEffect(() => {
     applyAppSettings(loadAppSettings());
     const syncSettings = () => {
       const settings = loadAppSettings();
       setTheme(settings.theme);
+      setLanguage(settings.language);
       applyAppSettings(settings);
     };
     window.addEventListener('classcaddy:settings-change', syncSettings);
@@ -140,24 +226,9 @@ export default function App() {
     return { name: '', email: '', isLoggedIn: false };
   });
 
-  useEffect(() => {
-    localStorage.setItem('class_caddy_theme', theme);
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.body.classList.add('dark-mode');
-      document.documentElement.style.backgroundColor = '#0f172a';
-      document.documentElement.style.colorScheme = 'dark';
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.body.classList.remove('dark-mode');
-      document.documentElement.style.backgroundColor = '#f8fafc';
-      document.documentElement.style.colorScheme = 'light';
-    }
-  }, [theme]);
-
   // Firebase Auth State Listener & Sync
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         const profile: UserProfile = {
           name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
@@ -174,6 +245,16 @@ export default function App() {
           isLoggedIn: true,
         }));
         localStorage.setItem('class_caddy_user', JSON.stringify(profile));
+        try {
+          const cloudSettings = await loadCloudAppSettings(firebaseUser.uid);
+          if (cloudSettings) saveAppSettings(cloudSettings);
+          else await saveCloudAppSettings(firebaseUser.uid, loadAppSettings());
+          const examPrefs = await loadCloudExamPreferences(firebaseUser.uid);
+          if (examPrefs?.legacy) localStorage.setItem('cc_quiz_settings', JSON.stringify(examPrefs.legacy));
+          if (examPrefs?.exam) localStorage.setItem('cc_new_exam_settings_v1', JSON.stringify(examPrefs.exam));
+        } catch (error) {
+          console.warn('Could not sync app preferences from Firebase:', error);
+        }
       }
     });
 
@@ -214,6 +295,7 @@ export default function App() {
         const settings = loadAppSettings();
         if (e.key === 'class_caddy_theme' && e.newValue) settings.theme = e.newValue === 'dark' ? 'dark' : 'light';
         setTheme(settings.theme);
+        setLanguage(settings.language);
         applyAppSettings(settings);
       }
     };
@@ -223,10 +305,24 @@ export default function App() {
   }, []);
 
   const toggleTheme = () => {
-    const next = theme === 'light' ? 'dark' : 'light';
-    setTheme(next);
-    saveAppSettings({ theme: next });
+    void persistAppSettings({ theme: theme === 'light' ? 'dark' : 'light' });
   };
+
+  const persistAppSettings = async (next: Partial<ReturnType<typeof loadAppSettings>>) => {
+    const settings = saveAppSettings(next);
+    setTheme(settings.theme);
+    setLanguage(settings.language);
+    if (auth.currentUser) await saveCloudAppSettings(auth.currentUser.uid, settings);
+  };
+
+  useEffect(() => {
+    const onLanguageMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin || event.data?.type !== 'classcaddy:language-change') return;
+      void persistAppSettings({ language: event.data.language === 'en' ? 'en' : 'bn' });
+    };
+    window.addEventListener('message', onLanguageMessage);
+    return () => window.removeEventListener('message', onLanguageMessage);
+  }, [auth.currentUser]);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -303,7 +399,7 @@ export default function App() {
   };
 
   const openAccountSettings = () => openSettingsDialog({
-    profile: user,
+    profile: { ...user, uid: auth.currentUser?.uid },
     onSaveProfile: async (name) => {
       if (auth.currentUser) await updateProfile(auth.currentUser, { displayName: name });
       const updatedUser = { ...user, name };
@@ -318,10 +414,21 @@ export default function App() {
         isLoggedIn: user.isLoggedIn,
       }));
     },
+    onSaveAppSettings: persistAppSettings,
+    onSaveExamPreferences: async (legacy, exam) => { if (auth.currentUser) await saveCloudExamPreferences(auth.currentUser.uid, legacy, exam); },
+    onExportCloudBackup: async () => auth.currentUser ? exportCloudUserData(auth.currentUser.uid) : null,
+    onRestoreCloudBackup: async (data) => {
+      if (!auth.currentUser) throw new Error('Firebase-এর backup restore করতে account-এ sign in করুন।');
+      const count = await restoreCloudUserData(auth.currentUser.uid, data);
+      const restoredSettings = await loadCloudAppSettings(auth.currentUser.uid);
+      if (restoredSettings) saveAppSettings(restoredSettings);
+      return count;
+    },
+    onRestoreProfile: async (name) => { if (auth.currentUser) await updateProfile(auth.currentUser, { displayName: name }); },
     onSignOut: handleLogout,
   });
 
-  const isDark = theme === 'dark';
+  const isDark = theme !== 'light' && theme !== 'sepia';
 
   return (
     <div
@@ -334,14 +441,13 @@ export default function App() {
       {!isExplorerMode && (
         <Header
           currentPage={currentPage}
-          setCurrentPage={(page) => {
-            setCurrentPage(page);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
+          setCurrentPage={(page) => navigateTo(page)}
           user={user}
           onLogout={handleLogout}
           onOpenSignup={() => {}}
           onOpenSettings={openAccountSettings}
+          language={language}
+          onLanguageChange={(nextLanguage) => { void persistAppSettings({ language: nextLanguage }); }}
           onGoogleSignIn={handleGoogleSignIn}
           theme={theme}
           toggleTheme={toggleTheme}
@@ -358,7 +464,8 @@ export default function App() {
             : 'pt-24 pb-16'
         }`}
       >
-        {(currentPage === 'archives' || currentPage === 'home') && (
+        <div aria-hidden="true" className={`fixed top-0 left-0 z-[60] h-[3px] bg-emerald-500 transition-[width,opacity] duration-300 ${isNavigating ? 'w-2/3 opacity-100' : 'w-full opacity-0'}`} />
+        {currentPage === 'archives' && (
           <ArchivesView
             theme={theme}
             isExplorerMode={isExplorerMode}
@@ -366,6 +473,8 @@ export default function App() {
             user={user}
           />
         )}
+        {currentPage === 'home' && <LegacyPageFrame src="/home-content.html?cc-embedded=1" title="Class Caddy Home" />}
+        {currentPage === 'embedded' && <LegacyPageFrame src={embeddedPath} title="Class Caddy" />}
         {currentPage === 'about' && <AboutView />}
         {currentPage === 'contact' && <ContactView />}
         {currentPage === 'privacy' && <PrivacyPolicyView />}
@@ -374,12 +483,10 @@ export default function App() {
           <CourseDetailView
             courseId={currentPage.startsWith('course-') ? currentPage : 'course-405'}
             onBack={() => {
-              setCurrentPage('archives');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              navigateTo('archives');
             }}
             onNavigateCourse={(page) => {
-              setCurrentPage(page);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              navigateTo(page);
             }}
           />
         )}
@@ -394,8 +501,7 @@ export default function App() {
       {!isExplorerMode && (
         <Footer
           onNavigate={(page) => {
-            setCurrentPage(page);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            navigateTo(page);
           }}
           theme={theme}
         />

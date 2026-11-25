@@ -8,7 +8,7 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, theme = 'light' }) => {
-  const isDark = theme === 'dark';
+  const isDark = ['dark', 'forest', 'midnight'].includes(theme);
 
   return (
     <footer

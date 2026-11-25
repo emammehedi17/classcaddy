@@ -17,6 +17,11 @@ type SettingsProfile = {
 type SettingsDialogOptions = {
   profile: SettingsProfile;
   onSaveProfile?: (name: string) => Promise<void> | void;
+  onSaveAppSettings?: (settings: AppSettings) => Promise<void> | void;
+  onSaveExamPreferences?: (legacy: RecordValue, exam: RecordValue) => Promise<void> | void;
+  onExportCloudBackup?: () => Promise<Record<string, unknown> | null>;
+  onRestoreCloudBackup?: (data: Record<string, any>) => Promise<number>;
+  onRestoreProfile?: (name: string) => Promise<void> | void;
   onSignOut?: () => Promise<void> | void;
 };
 
@@ -76,6 +81,7 @@ function installDialogStyles(): void {
     #cc-settings-overlay{position:fixed;inset:0;z-index:2147483001;background:rgba(5,12,25,.58);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:24px;font:15px/1.55 Inter,'Noto Sans Bengali',sans-serif;color:#1f2937}
     #cc-settings-dialog{width:min(1080px,100%);height:min(720px,calc(100dvh - 64px));background:#fff;border:1px solid #dbe3ed;border-radius:22px;box-shadow:0 28px 90px rgba(0,0,0,.34);display:flex;flex-direction:column;overflow:hidden}
     #cc-settings-dialog *{box-sizing:border-box}
+    #cc-settings-overlay #cc-settings-dialog>header#cc-settings-head{position:static!important;inset:auto!important;left:auto!important;right:auto!important;top:auto!important;transform:none!important;width:auto!important;max-width:none!important;z-index:auto!important;float:none!important;}
     #cc-settings-dialog, #cc-settings-dialog *{font-family:Inter,'Noto Sans Bengali','Hind Siliguri',sans-serif!important}
     #cc-settings-dialog button,#cc-settings-dialog input,#cc-settings-dialog select{font:inherit}
     #cc-settings-head{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid #e5e7eb;background:#fff;flex:none}
@@ -148,40 +154,62 @@ function safeProfileCache(name: string, profile: SettingsProfile): void {
   window.dispatchEvent(new CustomEvent('classcaddy:profile-change', { detail: { ...profile, name } }));
 }
 
-function collectBackup(): RecordValue {
+async function collectBackup(options: SettingsDialogOptions): Promise<RecordValue> {
   const localStorageData: RecordValue = {};
   for (let i = 0; i < localStorage.length; i += 1) {
     const key = localStorage.key(i);
     if (!key || SAFE_BACKUP_KEY.test(key) || /installprompt|install_prompt|settings-modal/i.test(key)) continue;
     localStorageData[key] = localStorage.getItem(key);
   }
+  let cloud: Record<string, unknown> | null = null;
+  if (options.profile.isLoggedIn && options.onExportCloudBackup) cloud = encodeCloudValues(await options.onExportCloudBackup());
   return {
     app: 'Class Caddy',
-    schemaVersion: 1,
+    schemaVersion: 2,
     exportedAt: new Date().toISOString(),
     localStorage: localStorageData,
+    profile: { name: options.profile.name || '', email: options.profile.email || '', photoURL: options.profile.photoURL || '' },
+    cloud,
   };
 }
 
-function downloadBackup(): void {
-  const blob = new Blob([JSON.stringify(collectBackup(), null, 2)], { type: 'application/json' });
+function encodeCloudValues(value: any): any {
+  if (value && typeof value.toDate === 'function' && typeof value.seconds === 'number') {
+    return { __classCaddyTimestamp: true, seconds: value.seconds, nanoseconds: value.nanoseconds || 0 };
+  }
+  if (Array.isArray(value)) return value.map(encodeCloudValues);
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, encodeCloudValues(item)]));
+  return value;
+}
+
+async function downloadBackup(options: SettingsDialogOptions): Promise<boolean> {
+  const backup = await collectBackup(options);
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
   link.download = `class-caddy-backup-${new Date().toISOString().slice(0, 10)}.json`;
   link.click();
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return backup.cloud !== null;
 }
 
-async function restoreBackup(file: File): Promise<number> {
+async function restoreBackup(file: File, options: SettingsDialogOptions): Promise<number> {
   const payload = JSON.parse(await file.text());
-  if (payload?.app !== 'Class Caddy' || payload?.schemaVersion !== 1 || !payload.localStorage || typeof payload.localStorage !== 'object') {
+  if (payload?.app !== 'Class Caddy' || ![1, 2].includes(payload?.schemaVersion) || !payload.localStorage || typeof payload.localStorage !== 'object') {
     throw new Error('এটি Class Caddy-এর সমর্থিত backup ফাইল নয়।');
   }
   const entries = Object.entries(payload.localStorage as RecordValue)
     .filter(([key, value]) => !SAFE_BACKUP_KEY.test(key) && typeof value === 'string');
-  if (!window.confirm(`${entries.length}টি সংরক্ষিত preference ও study data restore হবে। বর্তমান একই key-এর data প্রতিস্থাপিত হবে। এগোবেন?`)) return 0;
+  if (payload.cloud && !options.onRestoreCloudBackup) throw new Error('Firebase backup restore-এর জন্য account sync support পাওয়া যায়নি।');
+  const confirmText = loadAppSettings().language === 'en'
+    ? `${entries.length} device items will be restored. ${payload.cloud ? 'Firebase study plans, quiz/exam results, reviews, and settings will be replaced by this backup.' : 'Matching local data will be replaced.'} Continue?`
+    : `${entries.length}টি device item restore হবে। ${payload.cloud ? 'Firebase-এর study plan, quiz/exam result, review ও settings backup দিয়ে প্রতিস্থাপিত হবে।' : 'একই key-এর local data প্রতিস্থাপিত হবে।'} এগোবেন?`;
+  if (!window.confirm(confirmText)) return 0;
   entries.forEach(([key, value]) => localStorage.setItem(key, value as string));
+  let restoredCloud = 0;
+  if (payload.cloud && options.onRestoreCloudBackup) restoredCloud = await options.onRestoreCloudBackup(payload.cloud);
+  if (typeof payload.profile?.name === 'string' && payload.profile.name.trim()) await options.onRestoreProfile?.(payload.profile.name.trim());
   applyAppSettings(loadAppSettings());
   window.dispatchEvent(new CustomEvent('classcaddy:settings-change', { detail: loadAppSettings() }));
   window.dispatchEvent(new StorageEvent('storage', { key: 'cc_quiz_settings', newValue: localStorage.getItem('cc_quiz_settings') }));
@@ -192,7 +220,124 @@ async function restoreBackup(file: File): Promise<number> {
       exam: readRecord('cc_new_exam_settings_v1', EXAM_DEFAULTS),
     },
   }));
-  return entries.length;
+  return entries.length + restoredCloud;
+}
+
+const SETTINGS_EN: Record<string, string> = {
+  'অ্যাপ সেটিংস': 'App settings',
+  'আপনার পড়াশোনার অভিজ্ঞতা নিজের মতো সাজান': 'Personalize your study experience',
+  '👤 ব্যক্তিগত তথ্য': '👤 Personal information',
+  '🎨 চেহারা ও ফন্ট': '🎨 Appearance & fonts',
+  '📝 পরীক্ষা': '📝 Exams',
+  '💾 Backup': '💾 Backup',
+  '⚙️ অ্যাকাউন্ট': '⚙️ Account',
+  'ব্যক্তিগত তথ্য': 'Personal information',
+  'আপনার account-এর পরিচিতি দেখুন ও নাম আপডেট করুন।': 'View your account details and update your name.',
+  'Google account-এর প্রোফাইল ছবি': 'Profile photo from your Google account',
+  'নাম': 'Name',
+  'ইমেইল': 'Email',
+  'ইমেইল Google account থেকে আসে; এখানে এটি পরিবর্তন করা যাবে না।': 'Your email comes from Google and cannot be changed here.',
+  'নাম সংরক্ষণ করুন': 'Save name',
+  'চেহারা ও পড়ার ধরন': 'Appearance & reading',
+  'এই পছন্দগুলো এই browser-এ সংরক্ষিত থাকবে।': 'These preferences are saved in this browser and synced to your account.',
+  'অ্যাপের থিম ও লেখা': 'Theme, language & text',
+  'থিম': 'Theme',
+  'লাইট': 'Light',
+  'ডার্ক': 'Dark',
+  'সেপিয়া': 'Sepia',
+  'ফরেস্ট': 'Forest',
+  'মিডনাইট': 'Midnight',
+  'বাংলা ফন্ট': 'Bangla font',
+  'Sans Serif': 'Sans Serif',
+  'হিন্দ সিলিগুড়ি': 'Hind Siliguri',
+  'কালপুরুষ': 'Kalpurush',
+  'আমিরি': 'Amiri',
+  'ভাষা': 'Language',
+  'বাংলা': 'বাংলা',
+  'English': 'English',
+  'লেখার আকার': 'Text size',
+  'ছোট': 'Small',
+  'মাঝারি': 'Medium',
+  'বড়': 'Large',
+  'কম animation ব্যবহার করুন': 'Reduce motion',
+  'পেজের চলমান transition কমাবে।': 'Reduce animations and transitions across pages.',
+  'পছন্দ সংরক্ষণ করুন': 'Save preferences',
+  'পরীক্ষার পছন্দ': 'Exam preferences',
+  'এগুলো নতুন quiz ও exam শুরু করার default হবে। চলমান পরীক্ষা বদলাবে না।': 'These defaults apply to new quizzes and exams. Active exams are unchanged.',
+  'সাধারণ MCQ quiz': 'Standard MCQ quiz',
+  'প্রতি প্রশ্নে সময়': 'Time per question',
+  'ভুল উত্তরে নম্বর': 'Negative marks',
+  'প্রশ্ন এলোমেলো করুন': 'Shuffle questions',
+  'উত্তর দেওয়ার পর সঠিক উত্তর দেখান': 'Show correct answers after responding',
+  'Exam Studio default': 'Exam Studio defaults',
+  'প্রশ্ন সংখ্যা': 'Question count',
+  'পরীক্ষার ধরন': 'Exam mode',
+  'প্রশ্ন দেখানোর ধরন': 'Question layout',
+  'একবারে একটি': 'One at a time',
+  'সব প্রশ্ন একসাথে': 'All questions on one page',
+  'OMR bubble sheet': 'OMR bubble sheet',
+  'প্রশ্নের ক্রম': 'Question order',
+  'এলোমেলো': 'Random',
+  'ক্রম অনুযায়ী': 'Original order',
+  'সময় ব্যবস্থা': 'Timing',
+  'পুরো পরীক্ষার সময়': 'Whole exam',
+  'প্রতি প্রশ্নে সময়': 'Per question',
+  'সময় সীমা নেই': 'No time limit',
+  'পুরো পরীক্ষার সময় (মিনিট)': 'Whole exam time (minutes)',
+  'প্রতি প্রশ্নে সময় (সেকেন্ড)': 'Time per question (seconds)',
+  'সঠিক উত্তরে নম্বর': 'Marks for a correct answer',
+  'ফাঁকা উত্তরে নম্বর': 'Marks for an unanswered question',
+  'পাস নম্বর (%)': 'Pass mark (%)',
+  'সাম্প্রতিক প্রশ্ন এড়িয়ে চলুন': 'Avoid recently used questions',
+  'Exam Studio-র সময়ের জন্য নিজের default ব্যবহার করুন': 'Use custom time defaults in Exam Studio',
+  'আগে করা প্রশ্ন অন্তর্ভুক্ত করুন': 'Include attempted questions',
+  'শুধু ভুল করা প্রশ্ন নিন': 'Use only questions answered incorrectly',
+  'শুধু বুকমার্ক করা প্রশ্ন নিন': 'Use only bookmarked questions',
+  'বিকল্প এলোমেলো করুন': 'Shuffle answer options',
+  'আগের/পরের প্রশ্নে যাওয়া যাবে': 'Allow moving between questions',
+  'প্রশ্ন review-এর জন্য চিহ্নিত করা যাবে': 'Allow marking questions for review',
+  'উত্তর দেওয়ার পর পরিবর্তন বন্ধ করুন': 'Lock an answer after selection',
+  'উত্তর দিলে পরের প্রশ্নে যান': 'Advance after answering',
+  'জমা দেওয়ার আগে নিশ্চিত করুন': 'Confirm before submitting',
+  'সময় শেষ হলে নিজে থেকে জমা দিন': 'Submit automatically when time expires',
+  'প্রশ্নের তালিকা দেখান': 'Show the question palette',
+  'পরীক্ষায় sound effect চালু রাখুন': 'Enable exam sound effects',
+  'পরীক্ষার সময় tab বদলানো গুনে রাখুন': 'Track tab switches during exams',
+  'পরীক্ষার পছন্দ সংরক্ষণ করুন': 'Save exam preferences',
+  'Backup ও Restore': 'Backup & restore',
+  'স্বয়ংক্রিয় Backup': 'Automatic backup',
+  'স্বয়ংক্রিয় cloud backup চালু রাখুন': 'Enable automatic cloud backup',
+  'Study Plan-এর cloud backup সময় অনুযায়ী চালাবে।': 'Study Plan cloud backup will run on schedule.',
+  'Backup পছন্দ সংরক্ষণ করুন': 'Save backup preferences',
+  'এই browser-এর data': 'Data on this device',
+  'Account sign-in তথ্য ও token backup-এ রাখা হয় না। Restore করলে একই key-এর বর্তমান data প্রতিস্থাপিত হবে।': 'Sign-in details and tokens are excluded. Restore replaces saved data with matching keys.',
+  'Backup ডাউনলোড': 'Download backup',
+  'Backup restore': 'Restore backup',
+  'আপনার browser-এ রাখা app preference ও study data JSON ফাইলে নিন, অথবা আগের backup ফিরিয়ে আনুন।': 'Export your app data and preferences to a JSON file, or restore a previous backup.',
+  'Account sign-in তথ্য ও token backup-এ রাখা হয় না। Restore করলে একই key-এর বর্তমান data প্রতিস্থাপিত হবে।': 'Passwords and sign-in tokens are never included. Restoring replaces matching saved data.',
+  'অ্যাকাউন্ট ও নিরাপত্তা': 'Account & security',
+  'সাইন আউট করলে এই device-এর account session বন্ধ হবে।': 'Signing out ends this account session on this device.',
+  'সেশন': 'Session',
+  'বর্তমান account:': 'Current account:',
+  'সাইন আউট': 'Sign out',
+  'পছন্দ reset': 'Reset preferences',
+  'থিম, ফন্ট ও পরীক্ষার default আগের অবস্থায় ফিরবে। Study data মুছবে না।': 'Reset theme, font, and exam defaults. Study data will remain.',
+  'পছন্দ reset করুন': 'Reset preferences',
+};
+
+function localizeSettingsModal(root: HTMLElement, language: 'bn' | 'en'): void {
+  document.documentElement.dataset.language = language;
+  const reverse = language === 'bn' ? Object.fromEntries(Object.entries(SETTINGS_EN).map(([bn, en]) => [en, bn])) : SETTINGS_EN;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const nodes: Text[] = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+  nodes.forEach((node) => {
+    const text = node.nodeValue || '';
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    const translated = reverse[trimmed];
+    if (translated) node.nodeValue = text.replace(trimmed, translated);
+  });
 }
 
 export function openSettingsDialog(options: SettingsDialogOptions): void {
@@ -234,8 +379,9 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
             <h3>চেহারা ও পড়ার ধরন</h3><p class="cc-settings-intro">এই পছন্দগুলো এই browser-এ সংরক্ষিত থাকবে।</p>
             <div class="cc-settings-card"><h4>অ্যাপের থিম ও লেখা</h4>
               <div class="cc-settings-grid">
-                <label class="cc-settings-field">থিম<select data-setting="theme"><option value="light">লাইট</option><option value="dark">ডার্ক</option></select></label>
-                <label class="cc-settings-field">বাংলা ফন্ট<select data-setting="banglaFont"><option value="sans-serif">Sans Serif</option><option value="amiri">Amiri</option></select></label>
+                <label class="cc-settings-field">থিম<select data-setting="theme"><option value="light">লাইট</option><option value="dark">ডার্ক</option><option value="sepia">সেপিয়া</option><option value="forest">ফরেস্ট</option><option value="midnight">মিডনাইট</option></select></label>
+                <label class="cc-settings-field">বাংলা ফন্ট<select data-setting="banglaFont"><option value="sans-serif">Sans Serif</option><option value="amiri">Amiri</option><option value="hind-siliguri">হিন্দ সিলিগুড়ি</option><option value="kalpurush">কালপুরুষ</option></select></label>
+                <label class="cc-settings-field">ভাষা<select data-setting="language"><option value="bn">বাংলা</option><option value="en">English</option></select></label>
                 <label class="cc-settings-field">লেখার আকার<select data-setting="readingSize"><option value="small">ছোট</option><option value="medium">মাঝারি</option><option value="large">বড়</option></select></label>
               </div>
               <label class="cc-settings-toggle"><input type="checkbox" data-setting="reduceMotion"><span><b>কম animation ব্যবহার করুন</b><br><small>পেজের চলমান transition কমাবে।</small></span></label>
@@ -293,6 +439,7 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
               <div class="cc-settings-actions"><button class="cc-settings-btn primary" type="button" data-export-backup>Backup ডাউনলোড</button><button class="cc-settings-btn" type="button" data-import-trigger>Backup restore</button><input type="file" accept="application/json,.json" data-import-file hidden></div>
               <p class="cc-settings-status" data-backup-status role="status"></p>
             </div>
+            <div class="cc-settings-card"><h4>স্বয়ংক্রিয় Backup</h4><label class="cc-settings-toggle"><input type="checkbox" data-setting="autoBackupEnabled"><span><b>স্বয়ংক্রিয় cloud backup চালু রাখুন</b><br><small>Study Plan-এর cloud backup সময় অনুযায়ী চালাবে।</small></span></label><div class="cc-settings-actions"><button class="cc-settings-btn primary" type="button" data-save-backup-preferences>Backup পছন্দ সংরক্ষণ করুন</button></div><p class="cc-settings-status" data-backup-preferences-status role="status"></p></div>
           </section>
           <section class="cc-settings-section" data-panel="account" hidden>
             <h3>অ্যাকাউন্ট ও নিরাপত্তা</h3><p class="cc-settings-intro">সাইন আউট করলে এই device-এর account session বন্ধ হবে।</p>
@@ -331,8 +478,11 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
   const appSettings = loadAppSettings();
   setControl(overlay, 'theme', appSettings.theme);
   setControl(overlay, 'banglaFont', appSettings.banglaFont);
+  setControl(overlay, 'language', appSettings.language);
   setControl(overlay, 'readingSize', appSettings.readingSize);
   setControl(overlay, 'reduceMotion', appSettings.reduceMotion);
+  setControl(overlay, 'autoBackupEnabled', appSettings.autoBackupEnabled);
+  localizeSettingsModal(overlay, appSettings.language);
 
   const legacy = readRecord('cc_quiz_settings', LEGACY_QUIZ_DEFAULTS);
   const exam = readRecord('cc_new_exam_settings_v1', EXAM_DEFAULTS);
@@ -384,25 +534,32 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
       await options.onSaveProfile?.(name);
       safeProfileCache(name, options.profile);
       overlay.querySelector<HTMLElement>('[data-profile-name]')!.textContent = name;
-      status.textContent = 'নাম সংরক্ষণ হয়েছে।'; status.style.color = '#047857';
+      status.textContent = loadAppSettings().language === 'en' ? 'Name saved.' : 'নাম সংরক্ষণ হয়েছে।'; status.style.color = '#047857';
     } catch (error) {
-      status.textContent = error instanceof Error ? error.message : 'নাম সংরক্ষণ করা যায়নি।';
+      status.textContent = error instanceof Error ? error.message : loadAppSettings().language === 'en' ? 'Could not save the name.' : 'নাম সংরক্ষণ করা যায়নি।';
       status.style.color = '#b91c1c';
     }
   });
 
-  overlay.querySelector('[data-save-appearance]')?.addEventListener('click', () => {
-    saveAppSettings({
-      theme: getValue(overlay, 'theme') === 'dark' ? 'dark' : 'light',
-      banglaFont: getValue(overlay, 'banglaFont') === 'amiri' ? 'amiri' : 'sans-serif',
+  overlay.querySelector('[data-save-appearance]')?.addEventListener('click', async () => {
+    const settings = saveAppSettings({
+      theme: ['dark', 'sepia', 'forest', 'midnight'].includes(getValue(overlay, 'theme')) ? getValue(overlay, 'theme') as AppSettings['theme'] : 'light',
+      banglaFont: ['amiri', 'hind-siliguri', 'kalpurush'].includes(getValue(overlay, 'banglaFont')) ? getValue(overlay, 'banglaFont') as AppSettings['banglaFont'] : 'sans-serif',
+      language: getValue(overlay, 'language') === 'en' ? 'en' : 'bn',
       readingSize: ['small', 'medium', 'large'].includes(getValue(overlay, 'readingSize')) ? getValue(overlay, 'readingSize') as AppSettings['readingSize'] : 'medium',
       reduceMotion: getChecked(overlay, 'reduceMotion'),
     });
     const status = overlay.querySelector<HTMLElement>('[data-appearance-status]')!;
-    status.textContent = 'চেহারা ও ফন্টের পছন্দ সংরক্ষণ হয়েছে।';
+    try {
+      await options.onSaveAppSettings?.(settings);
+      status.textContent = settings.language === 'en' ? 'Appearance, font, and language preferences saved to this account.' : 'চেহারা, ফন্ট ও ভাষার পছন্দ account-এ সংরক্ষণ হয়েছে।';
+      localizeSettingsModal(overlay, settings.language);
+    } catch {
+      status.textContent = settings.language === 'en' ? 'Saved on this device, but cloud sync failed.' : 'এই device-এ সংরক্ষিত হয়েছে, তবে cloud sync হয়নি।';
+    }
   });
 
-  overlay.querySelector('[data-save-exam]')?.addEventListener('click', () => {
+  overlay.querySelector('[data-save-exam]')?.addEventListener('click', async () => {
     const number = (name: string, fallback: number, min: number, max: number) => {
       const value = Number(getValue(overlay, name));
       return Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback;
@@ -448,10 +605,26 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
     localStorage.setItem('cc_new_exam_settings_v1', JSON.stringify(nextExam));
     window.dispatchEvent(new CustomEvent('classcaddy:exam-settings-change', { detail: { legacy: nextLegacy, exam: nextExam } }));
     const status = overlay.querySelector<HTMLElement>('[data-exam-status]')!;
-    status.textContent = 'পরীক্ষার পছন্দ সংরক্ষণ হয়েছে। চলমান পরীক্ষা বদলাবে না।';
+    try {
+      await options.onSaveExamPreferences?.(nextLegacy, nextExam);
+      status.textContent = loadAppSettings().language === 'en' ? 'Exam preferences saved. Current exams are unchanged.' : 'পরীক্ষার পছন্দ সংরক্ষণ হয়েছে। চলমান পরীক্ষা বদলাবে না।';
+    } catch {
+      status.textContent = 'এই device-এ পছন্দ সংরক্ষিত হয়েছে, তবে Firebase sync হয়নি।';
+      status.style.color = '#b91c1c';
+    }
   });
 
-  overlay.querySelector('[data-export-backup]')?.addEventListener('click', downloadBackup);
+  overlay.querySelector('[data-export-backup]')?.addEventListener('click', async () => {
+    const status = overlay.querySelector<HTMLElement>('[data-backup-status]')!;
+    try { const includesCloud = await downloadBackup(options); status.textContent = loadAppSettings().language === 'en' ? (includesCloud ? 'Device and Firebase study data and settings were backed up.' : 'Device data was backed up. Sign in to include Firebase data.') : (includesCloud ? 'Device ও Firebase-এর study data এবং settings backup হয়েছে।' : 'Device-এর data backup হয়েছে। Firebase-এর data পেতে sign in করুন।'); }
+    catch (error) { status.textContent = error instanceof Error ? error.message : 'Backup তৈরি করা যায়নি।'; status.style.color = '#b91c1c'; }
+  });
+  overlay.querySelector('[data-save-backup-preferences]')?.addEventListener('click', async () => {
+    const settings = saveAppSettings({ autoBackupEnabled: getChecked(overlay, 'autoBackupEnabled') });
+    const status = overlay.querySelector<HTMLElement>('[data-backup-preferences-status]')!;
+    try { await options.onSaveAppSettings?.(settings); status.textContent = settings.language === 'en' ? (settings.autoBackupEnabled ? 'Automatic backup enabled.' : 'Automatic backup disabled.') : (settings.autoBackupEnabled ? 'স্বয়ংক্রিয় Backup চালু হয়েছে।' : 'স্বয়ংক্রিয় Backup বন্ধ হয়েছে।'); }
+    catch { status.textContent = 'এই device-এ সংরক্ষিত হয়েছে, Firebase sync হয়নি।'; status.style.color = '#b91c1c'; }
+  });
   const fileInput = overlay.querySelector<HTMLInputElement>('[data-import-file]')!;
   overlay.querySelector('[data-import-trigger]')?.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', async () => {
@@ -459,8 +632,8 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
     const status = overlay.querySelector<HTMLElement>('[data-backup-status]')!;
     if (!file) return;
     try {
-      const count = await restoreBackup(file);
-      status.textContent = count ? `${count}টি data restore হয়েছে। পরিবর্তন প্রয়োগ করতে পেজটি reload করুন।` : 'Restore বাতিল করা হয়েছে।';
+      const count = await restoreBackup(file, options);
+      status.textContent = count ? (loadAppSettings().language === 'en' ? `${count} items restored successfully.` : `${count}টি data restore হয়েছে।`) : (loadAppSettings().language === 'en' ? 'Restore cancelled.' : 'Restore বাতিল করা হয়েছে।');
     } catch (error) {
       status.textContent = error instanceof Error ? error.message : 'Backup restore করা যায়নি।';
       status.style.color = '#b91c1c';
@@ -472,16 +645,24 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
   overlay.querySelector('[data-sign-out]')?.addEventListener('click', async () => {
     const status = overlay.querySelector<HTMLElement>('[data-account-status]')!;
     if (!options.onSignOut) { status.textContent = 'সাইন আউট করার account action পাওয়া যায়নি।'; status.style.color = '#b91c1c'; return; }
-    if (!window.confirm('আপনি কি Class Caddy থেকে সাইন আউট করতে চান?')) return;
+    if (!window.confirm(loadAppSettings().language === 'en' ? 'Do you want to sign out of Class Caddy?' : 'আপনি কি Class Caddy থেকে সাইন আউট করতে চান?')) return;
     try { await options.onSignOut(); close(); }
     catch (error) { status.textContent = error instanceof Error ? error.message : 'সাইন আউট করা যায়নি।'; status.style.color = '#b91c1c'; }
   });
 
-  overlay.querySelector('[data-reset-settings]')?.addEventListener('click', () => {
-    if (!window.confirm('থিম, ফন্ট ও পরীক্ষার default reset হবে। আপনার study data মুছবে না। এগোবেন?')) return;
+  overlay.querySelector('[data-reset-settings]')?.addEventListener('click', async () => {
+    if (!window.confirm(loadAppSettings().language === 'en' ? 'Theme, font, and exam defaults will reset. Your study data will remain. Continue?' : 'থিম, ফন্ট ও পরীক্ষার default reset হবে। আপনার study data মুছবে না। এগোবেন?')) return;
     localStorage.setItem('cc_quiz_settings', JSON.stringify(LEGACY_QUIZ_DEFAULTS));
     localStorage.setItem('cc_new_exam_settings_v1', JSON.stringify(EXAM_DEFAULTS));
-    saveAppSettings(DEFAULT_APP_SETTINGS);
+    const resetSettings = saveAppSettings(DEFAULT_APP_SETTINGS);
+    try {
+      await options.onSaveAppSettings?.(resetSettings);
+      await options.onSaveExamPreferences?.(LEGACY_QUIZ_DEFAULTS, EXAM_DEFAULTS);
+    } catch {
+      const status = overlay.querySelector<HTMLElement>('[data-account-status]');
+      if (status) { status.textContent = 'এই device-এ reset হয়েছে, তবে Firebase sync হয়নি।'; status.style.color = '#b91c1c'; }
+      return;
+    }
     window.dispatchEvent(new CustomEvent('classcaddy:exam-settings-change', { detail: { legacy: LEGACY_QUIZ_DEFAULTS, exam: EXAM_DEFAULTS } }));
     close();
   });
