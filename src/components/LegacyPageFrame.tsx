@@ -1,16 +1,24 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-type Props = { src: string; title: string; viewportMode?: boolean };
+type Props = { src: string; title: string; viewportMode?: boolean; hideHeaderOnScroll?: boolean; headerHidden?: boolean };
 
-export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = false }) => {
+export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = false, hideHeaderOnScroll = false, headerHidden = false }) => {
   const frameRef = useRef<HTMLIFrameElement>(null);
   useEffect(() => {
     const sendSettings = (event: Event) => {
       const settings = (event as CustomEvent).detail;
       if (settings && typeof settings === 'object') frameRef.current?.contentWindow?.postMessage({ type: 'classcaddy:parent-settings-change', settings }, window.location.origin);
     };
+    const sendExamSettings = (event: Event) => {
+      const preferences = (event as CustomEvent).detail;
+      if (preferences && typeof preferences === 'object') frameRef.current?.contentWindow?.postMessage({ type: 'classcaddy:parent-exam-settings-change', preferences }, window.location.origin);
+    };
     window.addEventListener('classcaddy:settings-change', sendSettings);
-    return () => window.removeEventListener('classcaddy:settings-change', sendSettings);
+    window.addEventListener('classcaddy:exam-settings-change', sendExamSettings);
+    return () => {
+      window.removeEventListener('classcaddy:settings-change', sendSettings);
+      window.removeEventListener('classcaddy:exam-settings-change', sendExamSettings);
+    };
   }, []);
   const prepareFrame = useCallback(() => {
     const frame = frameRef.current;
@@ -18,7 +26,7 @@ export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = fa
     if (!frame || !doc) return;
     const style = doc.createElement('style');
     style.dataset.classCaddyEmbedded = 'true';
-    style.textContent = `header.main-website-ui,#main-navigation-header,#scroll-toggle-btn,#global-dark-mode-btn,#action-buttons-container{display:none!important}main{padding-top:0!important}.go-to-top-btn,#back-to-top,.back-to-top{display:none!important}`;
+    style.textContent = `header.main-website-ui,#main-navigation-header,html.cc-embedded #scroll-toggle-btn,html.cc-embedded #global-dark-mode-btn,html.cc-embedded #action-buttons-container{display:none!important}main{padding-top:0!important}.go-to-top-btn,#back-to-top,.back-to-top{display:none!important}`;
     doc.head.appendChild(style);
     if (doc.body) doc.body.style.paddingTop = '0';
     window.parent.postMessage({ type: 'classcaddy:navigation-loaded' }, window.location.origin);
@@ -26,8 +34,35 @@ export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = fa
       const detail = (event as CustomEvent).detail;
       if (detail && typeof detail === 'object' && detail.__classCaddyParentSync !== true) window.parent.postMessage({ type: 'classcaddy:settings-change', settings: detail }, window.location.origin);
     });
+    let previousScrollY = doc.defaultView?.scrollY || 0;
+    let headerIsHidden = false;
+    if (hideHeaderOnScroll) {
+      doc.defaultView?.addEventListener('scroll', () => {
+        const scrollY = doc.defaultView?.scrollY || 0;
+        if (scrollY > previousScrollY && scrollY > 64) headerIsHidden = true;
+        else if (scrollY < previousScrollY) headerIsHidden = false;
+        previousScrollY = scrollY;
+        window.parent.postMessage({ type: 'classcaddy:studyplan-scroll', hideHeader: headerIsHidden }, window.location.origin);
+      }, { passive: true });
+    }
     doc.defaultView?.addEventListener('message', (event: MessageEvent) => {
-      if (event.origin !== window.location.origin || event.source !== window.parent || event.data?.type !== 'classcaddy:parent-settings-change') return;
+      if (event.origin !== window.location.origin || event.source !== window.parent) return;
+      if (event.data?.type === 'classcaddy:parent-header-state') {
+        headerIsHidden = Boolean(event.data.hidden);
+        previousScrollY = doc.defaultView?.scrollY || 0;
+        return;
+      }
+      if (event.data?.type === 'classcaddy:parent-exam-settings-change') {
+        const preferences = event.data.preferences;
+        if (!preferences || typeof preferences !== 'object') return;
+        if (preferences.legacy) localStorage.setItem('cc_quiz_settings', JSON.stringify(preferences.legacy));
+        if (preferences.exam) localStorage.setItem('cc_new_exam_settings_v1', JSON.stringify(preferences.exam));
+        const examEvent = doc.createEvent('CustomEvent');
+        examEvent.initCustomEvent('classcaddy:exam-settings-change', false, false, preferences);
+        doc.defaultView?.dispatchEvent(examEvent);
+        return;
+      }
+      if (event.data?.type !== 'classcaddy:parent-settings-change') return;
       const settings = event.data.settings;
       if (!settings || typeof settings !== 'object') return;
       try { localStorage.setItem('class_caddy_settings_v1', JSON.stringify(settings)); } catch {}
@@ -58,5 +93,8 @@ export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = fa
     resize();
   }, [viewportMode]);
 
-  return <iframe ref={frameRef} title={title} src={src} onLoad={prepareFrame} scrolling={viewportMode ? 'yes' : 'no'} className="block w-full border-0" style={viewportMode ? { height: 'calc(100dvh - 96px)', minHeight: 'calc(100vh - 96px)' } : { minHeight: 'calc(100vh - 100px)' }} />;
+  const frameStyle: React.CSSProperties = hideHeaderOnScroll
+    ? { position: 'fixed', top: headerHidden ? 0 : 76, left: 0, width: '100%', height: headerHidden ? '100dvh' : 'calc(100dvh - 76px)', transition: 'top 300ms ease, height 300ms ease' }
+    : viewportMode ? { height: 'calc(100dvh - 76px)', minHeight: 'calc(100vh - 76px)' } : { minHeight: 'calc(100vh - 100px)' };
+  return <iframe ref={frameRef} title={title} src={src} onLoad={prepareFrame} scrolling={viewportMode ? 'yes' : 'no'} className="block w-full border-0" style={frameStyle} />;
 };

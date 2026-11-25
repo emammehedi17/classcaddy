@@ -14,7 +14,7 @@
     if (document.head && !document.querySelector('style[data-cc-embed-shell]')) {
       const embedStyle = document.createElement('style');
       embedStyle.dataset.ccEmbedShell = 'true';
-      embedStyle.textContent = 'html.cc-embedded header.main-website-ui,#main-navigation-header,#scroll-toggle-btn,#global-dark-mode-btn,#action-buttons-container{display:none!important}html.cc-embedded body{padding-top:0!important}html.cc-embedded main{padding-top:0!important}';
+      embedStyle.textContent = 'html.cc-embedded header.main-website-ui,#main-navigation-header,html.cc-embedded #scroll-toggle-btn,html.cc-embedded #global-dark-mode-btn,html.cc-embedded #action-buttons-container{display:none!important}html.cc-embedded body{padding-top:0!important}html.cc-embedded main{padding-top:0!important}';
       document.head.appendChild(embedStyle);
     }
   }

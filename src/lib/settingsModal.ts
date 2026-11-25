@@ -78,11 +78,11 @@ function installDialogStyles(): void {
   const style = document.createElement('style');
   style.id = 'cc-settings-modal-styles';
   style.textContent = `
-    #cc-settings-overlay{position:fixed;inset:0;z-index:2147483001;background:rgba(5,12,25,.58);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:24px;font:15px/1.55 Inter,'Noto Sans Bengali',sans-serif;color:#1f2937}
+    #cc-settings-overlay{position:fixed;inset:0;z-index:2147483001;background:rgba(5,12,25,.58);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:24px;font-family:inherit;font-size:1rem;line-height:1.55;color:#1f2937}
     #cc-settings-dialog{width:min(1080px,100%);height:min(720px,calc(100dvh - 64px));background:#fff;border:1px solid #dbe3ed;border-radius:22px;box-shadow:0 28px 90px rgba(0,0,0,.34);display:flex;flex-direction:column;overflow:hidden}
     #cc-settings-dialog *{box-sizing:border-box}
     #cc-settings-overlay #cc-settings-dialog>header#cc-settings-head{position:static!important;inset:auto!important;left:auto!important;right:auto!important;top:auto!important;transform:none!important;width:auto!important;max-width:none!important;z-index:auto!important;float:none!important;}
-    #cc-settings-dialog, #cc-settings-dialog *{font-family:Inter,'Noto Sans Bengali','Hind Siliguri',sans-serif!important}
+    #cc-settings-dialog{font-family:inherit}
     #cc-settings-dialog button,#cc-settings-dialog input,#cc-settings-dialog select{font:inherit}
     #cc-settings-head{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid #e5e7eb;background:#fff;flex:none}
     #cc-settings-head h2{margin:0;font-size:22px;font-weight:800;color:#111827}
@@ -132,7 +132,13 @@ function installDialogStyles(): void {
     html.dark .cc-settings-btn{background:#1e293b;border-color:#64748b;color:#f1f5f9}
     html.dark .cc-settings-btn.primary{background:#059669;border-color:#059669;color:#fff}
     html.dark .cc-settings-btn.danger{background:#2b1720;border-color:#7f1d1d;color:#fecaca}
+    html[data-reading-size="small"] #cc-settings-dialog{zoom:.875;width:min(1234px,calc(100vw - 48px));height:min(823px,calc((100dvh - 64px)/.875))}
+    html[data-reading-size="large"] #cc-settings-dialog{zoom:1.125;width:min(960px,calc((100vw - 48px)/1.125));height:min(640px,calc((100dvh - 64px)/1.125))}
+    html[data-theme="sepia"] #cc-settings-dialog,html[data-theme="sepia"] #cc-settings-head,html[data-theme="sepia"] #cc-settings-content,html[data-theme="sepia"] .cc-settings-card{background:#fbf6e9;border-color:#d8c9aa;color:#43382b}
+    html[data-theme="forest"] #cc-settings-dialog,html[data-theme="forest"] #cc-settings-head,html[data-theme="forest"] #cc-settings-content,html[data-theme="forest"] .cc-settings-card{background:#17362d;border-color:#36584c;color:#e4f2e9}
+    html[data-theme="midnight"] #cc-settings-dialog,html[data-theme="midnight"] #cc-settings-head,html[data-theme="midnight"] #cc-settings-content,html[data-theme="midnight"] .cc-settings-card{background:#131d36;border-color:#34415f;color:#e7eaff}
     @media(max-width:640px){#cc-settings-overlay{padding:0}#cc-settings-dialog{height:100dvh;width:100%;border-radius:0}#cc-settings-head{padding:14px 16px}#cc-settings-layout{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}#cc-settings-nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid #e5e7eb;padding:8px;gap:4px}#cc-settings-nav button{white-space:nowrap;padding:9px;font-size:12px}#cc-settings-content{padding:16px}.cc-settings-grid{grid-template-columns:1fr}}
+    @media(max-width:640px){html[data-reading-size="small"] #cc-settings-dialog,html[data-reading-size="large"] #cc-settings-dialog{zoom:1;width:100%;height:100dvh}}
     @media(prefers-reduced-motion:reduce){#cc-settings-dialog *,#cc-settings-overlay *{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
   `;
   document.head.appendChild(style);
@@ -541,7 +547,7 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
     }
   });
 
-  overlay.querySelector('[data-save-appearance]')?.addEventListener('click', async () => {
+  const saveAppearance = async () => {
     const settings = saveAppSettings({
       theme: ['dark', 'sepia', 'forest', 'midnight'].includes(getValue(overlay, 'theme')) ? getValue(overlay, 'theme') as AppSettings['theme'] : 'light',
       banglaFont: ['amiri', 'hind-siliguri', 'kalpurush'].includes(getValue(overlay, 'banglaFont')) ? getValue(overlay, 'banglaFont') as AppSettings['banglaFont'] : 'sans-serif',
@@ -557,6 +563,10 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
     } catch {
       status.textContent = settings.language === 'en' ? 'Saved on this device, but cloud sync failed.' : 'এই device-এ সংরক্ষিত হয়েছে, তবে cloud sync হয়নি।';
     }
+  };
+  overlay.querySelector('[data-save-appearance]')?.addEventListener('click', () => { void saveAppearance(); });
+  overlay.querySelectorAll('[data-setting="theme"], [data-setting="banglaFont"], [data-setting="language"], [data-setting="readingSize"], [data-setting="reduceMotion"]').forEach((control) => {
+    control.addEventListener('change', () => { void saveAppearance(); });
   });
 
   overlay.querySelector('[data-save-exam]')?.addEventListener('click', async () => {
@@ -613,6 +623,11 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
       status.style.color = '#b91c1c';
     }
   });
+  overlay.querySelectorAll<HTMLElement>('[data-setting]').forEach((control) => {
+    if (/^(exam|legacy)/.test(control.dataset.setting || '')) {
+      control.addEventListener('change', () => overlay.querySelector<HTMLButtonElement>('[data-save-exam]')?.click());
+    }
+  });
 
   overlay.querySelector('[data-export-backup]')?.addEventListener('click', async () => {
     const status = overlay.querySelector<HTMLElement>('[data-backup-status]')!;
@@ -625,6 +640,7 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
     try { await options.onSaveAppSettings?.(settings); status.textContent = settings.language === 'en' ? (settings.autoBackupEnabled ? 'Automatic backup enabled.' : 'Automatic backup disabled.') : (settings.autoBackupEnabled ? 'স্বয়ংক্রিয় Backup চালু হয়েছে।' : 'স্বয়ংক্রিয় Backup বন্ধ হয়েছে।'); }
     catch { status.textContent = 'এই device-এ সংরক্ষিত হয়েছে, Firebase sync হয়নি।'; status.style.color = '#b91c1c'; }
   });
+  overlay.querySelector('[data-setting="autoBackupEnabled"]')?.addEventListener('change', () => overlay.querySelector<HTMLButtonElement>('[data-save-backup-preferences]')?.click());
   const fileInput = overlay.querySelector<HTMLInputElement>('[data-import-file]')!;
   overlay.querySelector('[data-import-trigger]')?.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', async () => {

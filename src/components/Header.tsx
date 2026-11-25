@@ -16,6 +16,7 @@ interface HeaderProps {
   theme?: ThemeMode;
   toggleTheme?: () => void;
   onToggleExplorerMode?: () => void;
+  isHidden?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -26,6 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
   language,
   onLanguageChange,
   theme = 'light',
+  isHidden = false,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -56,14 +58,15 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header
       id="main-navigation-header"
-      className={`fixed top-0 left-0 right-0 z-50 border-b main-website-ui shadow-sm ${
+      style={{ height: 76 }}
+      className={`fixed top-0 left-0 right-0 z-50 h-[76px] min-h-[76px] border-b main-website-ui shadow-sm transition-transform duration-300 ease-out ${isHidden ? '-translate-y-full' : 'translate-y-0'} ${
         isDark
           ? 'bg-gray-900/95 border-gray-800 text-gray-100'
           : 'bg-white/95 border-gray-200 text-gray-800'
       }`}
     >
-      <div className="container mx-auto px-4 sm:px-6 py-3">
-        <nav className="flex justify-between items-center">
+      <div className="container mx-auto h-full px-4 sm:px-6 py-0">
+        <nav className="flex h-full justify-between items-center">
           {/* Left: Profile & Brand Title */}
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             <a
@@ -75,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({
               <img
                 src={CLASS_CADDY_LOGO_DATA_URI}
                 alt="Class Caddy Logo"
-                className="h-10 w-10 rounded-full border-2 border-emerald-500 bg-white object-contain p-0.5"
+                className="h-[40px] w-[40px] rounded-full border-2 border-emerald-500 bg-white object-contain p-0.5"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;

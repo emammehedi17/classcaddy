@@ -122,9 +122,12 @@ function decodeBackupValue(value: any): any {
   return value;
 }
 
-export function subscribeCloudAppSettings(uid: string, callback: (settings: Partial<AppSettings> | null) => void): Unsubscribe {
+export function subscribeCloudAppSettings(uid: string, callback: (settings: Partial<AppSettings> | null, examPreferences: { legacy?: Record<string, unknown>; exam?: Record<string, unknown> } | null) => void): Unsubscribe {
   return onSnapshot(settingsRef(uid), (snapshot) => {
     const data = snapshot.data();
-    callback(data?.appSettings && typeof data.appSettings === 'object' ? data.appSettings as Partial<AppSettings> : null);
+    callback(
+      data?.appSettings && typeof data.appSettings === 'object' ? data.appSettings as Partial<AppSettings> : null,
+      data ? { legacy: data.quizPreferences, exam: data.examPreferences } : null,
+    );
   });
 }

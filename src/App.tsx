@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { PageView, UserProfile, ThemeMode } from './types';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -20,7 +20,7 @@ import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, updat
 import { CLASS_CADDY_LOGO_DATA_URI } from './lib/logoData';
 import { applyAppSettings, loadAppSettings, saveAppSettings } from './lib/appSettings';
 import { openSettingsDialog } from './lib/settingsModal';
-import { exportCloudUserData, loadCloudAppSettings, loadCloudExamPreferences, restoreCloudUserData, saveCloudAppSettings, saveCloudExamPreferences } from './lib/settingsCloud';
+import { exportCloudUserData, loadCloudAppSettings, loadCloudExamPreferences, restoreCloudUserData, saveCloudAppSettings, saveCloudExamPreferences, subscribeCloudAppSettings } from './lib/settingsCloud';
 
 export default function App() {
   const pageFromLocation = (): PageView => {
@@ -76,6 +76,15 @@ export default function App() {
     return 'archives';
   });
   const [isNavigating, setIsNavigating] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [isHeaderHidden, setIsHeaderHidden] = useState(false);
+  const navigationTimeout = useRef<number | null>(null);
+  const finishNavigation = () => {
+    if (navigationTimeout.current !== null) window.clearTimeout(navigationTimeout.current);
+    navigationTimeout.current = null;
+    setLoadingProgress(100);
+    window.setTimeout(() => setIsNavigating(false), 240);
+  };
   const [embeddedPath, setEmbeddedPath] = useState(() => new URLSearchParams(window.location.search).get('cc-page') || (window.location.pathname + window.location.search + window.location.hash));
   const [hasVisitedStudyPlan, setHasVisitedStudyPlan] = useState(() => currentPage === 'study-plan');
   const navigateTo = (page: PageView, href = pathForPage(page)) => {
@@ -83,15 +92,26 @@ export default function App() {
     if (href !== window.location.pathname + window.location.search + window.location.hash) window.history.pushState({ page }, '', href);
     if (page === 'study-plan') setHasVisitedStudyPlan(true);
     setIsNavigating(true);
+    setLoadingProgress(8);
+    setIsHeaderHidden(false);
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    window.setTimeout(() => setIsNavigating(false), frameWillChange && ['home', 'study-plan', 'embedded'].includes(page) ? 5000 : 350);
+    const cachedStudyPlan = page === 'study-plan' && hasVisitedStudyPlan;
+    if (navigationTimeout.current !== null) window.clearTimeout(navigationTimeout.current);
+    navigationTimeout.current = window.setTimeout(finishNavigation, frameWillChange && ['home', 'study-plan', 'embedded'].includes(page) && !cachedStudyPlan ? 8000 : 350);
   };
   const [theme, setTheme] = useState<ThemeMode>(() => loadAppSettings().theme);
   const [language, setLanguage] = useState<'bn' | 'en'>(() => loadAppSettings().language);
+  const settingsSaveQueue = useRef<Promise<void>>(Promise.resolve());
 
   useEffect(() => {
-    const onPopState = () => { setIsNavigating(true); setEmbeddedPath(new URLSearchParams(window.location.search).get('cc-page') || (window.location.pathname + window.location.search + window.location.hash)); const page = pageFromLocation(); if (page === 'study-plan') setHasVisitedStudyPlan(true); setCurrentPage(page); window.setTimeout(() => setIsNavigating(false), 320); };
+    if (!isNavigating) return;
+    const timer = window.setInterval(() => setLoadingProgress((progress) => progress >= 90 ? 90 : Math.min(90, progress + Math.max(2, Math.round((90 - progress) * 0.12)))), 120);
+    return () => window.clearInterval(timer);
+  }, [isNavigating]);
+
+  useEffect(() => {
+    const onPopState = () => { setIsNavigating(true); setLoadingProgress(8); setIsHeaderHidden(false); setEmbeddedPath(new URLSearchParams(window.location.search).get('cc-page') || (window.location.pathname + window.location.search + window.location.hash)); const page = pageFromLocation(); if (page === 'study-plan') setHasVisitedStudyPlan(true); setCurrentPage(page); if (navigationTimeout.current !== null) window.clearTimeout(navigationTimeout.current); navigationTimeout.current = window.setTimeout(finishNavigation, 350); };
     const onInternalLink = (event: MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const anchor = (event.target as Element | null)?.closest<HTMLAnchorElement>('a[href]');
@@ -116,12 +136,20 @@ export default function App() {
     };
     const onFrameNavigation = (event: MessageEvent) => {
       if (event.origin !== window.location.origin) return;
-      if (event.data?.type === 'classcaddy:navigation-loaded') { setIsNavigating(false); return; }
+      if (event.data?.type === 'classcaddy:navigation-loaded') { finishNavigation(); return; }
+      if (event.data?.type === 'classcaddy:studyplan-scroll') {
+        if (currentPage === 'study-plan') setIsHeaderHidden(Boolean(event.data.hideHeader));
+        return;
+      }
       if (event.data?.type === 'classcaddy:settings-change' && event.data.settings) {
         const updated = saveAppSettings(event.data.settings);
         setTheme(updated.theme);
         setLanguage(updated.language);
-        if (auth.currentUser) void saveCloudAppSettings(auth.currentUser.uid, updated);
+        if (auth.currentUser) {
+          const uid = auth.currentUser.uid;
+          settingsSaveQueue.current = settingsSaveQueue.current.catch(() => {}).then(() => saveCloudAppSettings(uid, updated));
+          void settingsSaveQueue.current.catch((error) => console.warn('Could not sync app preferences to Firebase:', error));
+        }
         return;
       }
       if (event.data?.type !== 'classcaddy:navigate') return;
@@ -156,6 +184,12 @@ export default function App() {
     window.addEventListener('classcaddy:settings-change', syncSettings);
     return () => window.removeEventListener('classcaddy:settings-change', syncSettings);
   }, []);
+
+  useEffect(() => {
+    if (currentPage === 'study-plan') return;
+    const frame = document.querySelector<HTMLIFrameElement>('#persistent-study-plan-frame iframe');
+    frame?.contentWindow?.postMessage({ type: 'classcaddy:parent-header-state', hidden: false }, window.location.origin);
+  }, [currentPage]);
 
   // Windows 11 File Explorer Full-Screen Mode
   const [isExplorerMode, setIsExplorerMode] = useState<boolean>(() => {
@@ -230,8 +264,22 @@ export default function App() {
 
   // Firebase Auth State Listener & Sync
   useEffect(() => {
+    let unsubscribeSettings: (() => void) | undefined;
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        unsubscribeSettings?.();
+        unsubscribeSettings = subscribeCloudAppSettings(firebaseUser.uid, (cloudSettings, examPreferences) => {
+          if (cloudSettings) {
+            const settings = saveAppSettings({ ...loadAppSettings(), ...cloudSettings });
+            setTheme(settings.theme);
+            setLanguage(settings.language);
+          }
+          if (examPreferences?.legacy) localStorage.setItem('cc_quiz_settings', JSON.stringify(examPreferences.legacy));
+          if (examPreferences?.exam) localStorage.setItem('cc_new_exam_settings_v1', JSON.stringify(examPreferences.exam));
+          if (examPreferences?.legacy || examPreferences?.exam) {
+            window.dispatchEvent(new CustomEvent('classcaddy:exam-settings-change', { detail: { legacy: examPreferences.legacy, exam: examPreferences.exam } }));
+          }
+        });
         const profile: UserProfile = {
           name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
           email: firebaseUser.email || '',
@@ -257,10 +305,10 @@ export default function App() {
         } catch (error) {
           console.warn('Could not sync app preferences from Firebase:', error);
         }
-      }
+      } else { unsubscribeSettings?.(); unsubscribeSettings = undefined; }
     });
 
-    return () => unsubscribe();
+    return () => { unsubscribe(); unsubscribeSettings?.(); };
   }, []);
 
   // Sync auth & theme changes across windows / localStorage
@@ -314,7 +362,11 @@ export default function App() {
     const settings = saveAppSettings(next);
     setTheme(settings.theme);
     setLanguage(settings.language);
-    if (auth.currentUser) await saveCloudAppSettings(auth.currentUser.uid, settings);
+    if (auth.currentUser) {
+      const uid = auth.currentUser.uid;
+      settingsSaveQueue.current = settingsSaveQueue.current.catch(() => {}).then(() => saveCloudAppSettings(uid, settings));
+      await settingsSaveQueue.current;
+    }
   };
 
   useEffect(() => {
@@ -417,7 +469,12 @@ export default function App() {
       }));
     },
     onSaveAppSettings: persistAppSettings,
-    onSaveExamPreferences: async (legacy, exam) => { if (auth.currentUser) await saveCloudExamPreferences(auth.currentUser.uid, legacy, exam); },
+    onSaveExamPreferences: async (legacy, exam) => {
+      if (!auth.currentUser) return;
+      const uid = auth.currentUser.uid;
+      settingsSaveQueue.current = settingsSaveQueue.current.catch(() => {}).then(() => saveCloudExamPreferences(uid, legacy, exam));
+      await settingsSaveQueue.current;
+    },
     onExportCloudBackup: async () => auth.currentUser ? exportCloudUserData(auth.currentUser.uid) : null,
     onRestoreCloudBackup: async (data) => {
       if (!auth.currentUser) throw new Error('Firebase-এর backup restore করতে account-এ sign in করুন।');
@@ -454,19 +511,22 @@ export default function App() {
           theme={theme}
           toggleTheme={toggleTheme}
           onToggleExplorerMode={toggleExplorerMode}
+          isHidden={currentPage === 'study-plan' && isHeaderHidden}
         />
       )}
 
       {/* Main Content Area */}
       <main
         id="main-content"
-        className={`flex-grow ${
+        className={`${
           isExplorerMode
             ? 'p-0 m-0 w-screen h-screen fixed inset-0 z-50 overflow-hidden'
-            : 'pt-24 pb-16'
+            : currentPage === 'study-plan'
+              ? 'h-dvh flex-none overflow-hidden p-0'
+              : 'flex-grow pt-[76px] pb-16'
         }`}
       >
-        <div aria-hidden="true" className={`fixed top-0 left-0 z-[60] h-[3px] bg-emerald-500 transition-[width,opacity] duration-300 ${isNavigating ? 'w-2/3 opacity-100' : 'w-full opacity-0'}`} />
+        <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px] bg-emerald-500 transition-[width,opacity] duration-150 ease-linear" style={{ width: `${loadingProgress}%`, opacity: isNavigating ? 1 : 0 }} />
         {currentPage === 'archives' && (
           <ArchivesView
             theme={theme}
@@ -486,7 +546,7 @@ export default function App() {
             aria-hidden={currentPage !== 'study-plan'}
             style={currentPage === 'study-plan' ? undefined : { position: 'absolute', width: '100%', height: 0, overflow: 'hidden', visibility: 'hidden', pointerEvents: 'none' }}
           >
-            <StudyPlanView />
+            <StudyPlanView headerHidden={isHeaderHidden} />
           </div>
         )}
         {(currentPage === 'academic' || currentPage.startsWith('course-')) && (
@@ -508,7 +568,7 @@ export default function App() {
       )}
 
       {/* Footer (Hidden when File Explorer Fullscreen Mode is active) */}
-      {!isExplorerMode && (
+      {!isExplorerMode && currentPage !== 'study-plan' && (
         <Footer
           onNavigate={(page) => {
             navigateTo(page);

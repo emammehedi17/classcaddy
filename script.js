@@ -800,10 +800,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 /* Universal Study Plan Floating Action Buttons (#scroll-toggle-btn & #global-dark-mode-btn) */
                 #scroll-toggle-btn {
                     position: fixed !important;
-                    bottom: 128px !important; /* 8rem / bottom-32 */
+                    bottom: 78px !important;
                     right: 20px !important;   /* 1.25rem / right-5 */
-                    width: 48px !important;   /* w-12 */
-                    height: 48px !important;  /* h-12 */
+                    width: 44px !important;
+                    height: 44px !important;
                     background-color: #374151 !important; /* bg-gray-700 */
                     color: #ffffff !important;
                     border-radius: 9999px !important;
@@ -830,7 +830,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 #global-dark-mode-btn {
                     position: fixed !important;
-                    bottom: 75px !important;  /* Matches study-plan-styles.css line 3230 */
+                    bottom: 24px !important;
                     right: 20px !important;   /* right-5 */
                     width: 44px !important;   /* Matches study-plan-styles.css line 3228 */
                     height: 44px !important;  /* Matches study-plan-styles.css line 3229 */
@@ -872,13 +872,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 @media (max-width: 414px) {
                     #scroll-toggle-btn {
                         right: 10px !important;
-                        bottom: 130px !important;
-                        width: 40px !important;
-                        height: 40px !important;
+                        bottom: 78px !important;
+                        width: 44px !important;
+                        height: 44px !important;
                     }
                     #global-dark-mode-btn {
                         right: 10px !important;
-                        bottom: 70px !important;
+                        bottom: 24px !important;
                     }
                 }
             `;
@@ -1093,12 +1093,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.remove('dark');
         document.documentElement.style.backgroundColor = initialTheme === 'sepia' ? '#f4ecd8' : '';
         document.documentElement.style.colorScheme = 'light';
-        document.body?.classList.remove('dark-mode');
     }
 
     // 3. Ensure Study Plan's Exact Two Floating Action Buttons exist on DOM & remove legacy duplicates
     function ensureFloatingButtons() {
-        if (isMainReactApp() || isInsideInternalReaderIframe()) {
+        if (window.self !== window.top || isMainReactApp() || isInsideInternalReaderIframe()) {
             return;
         }
 
