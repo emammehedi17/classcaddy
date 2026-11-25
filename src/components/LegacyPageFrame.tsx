@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-type Props = { src: string; title: string; viewportMode?: boolean; hideHeaderOnScroll?: boolean; headerHidden?: boolean };
+type Props = { src: string; title: string; viewportMode?: boolean; fixedViewport?: boolean; hideHeaderOnScroll?: boolean; headerHidden?: boolean };
 
-export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = false, hideHeaderOnScroll = false, headerHidden = false }) => {
+export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = false, fixedViewport = false, hideHeaderOnScroll = false, headerHidden = false }) => {
   const frameRef = useRef<HTMLIFrameElement>(null);
   useEffect(() => {
     const sendSettings = (event: Event) => {
@@ -94,7 +94,8 @@ export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = fa
   }, [viewportMode]);
 
   const frameStyle: React.CSSProperties = hideHeaderOnScroll
-    ? { position: 'fixed', top: headerHidden ? 0 : 76, left: 0, width: '100%', height: headerHidden ? '100dvh' : 'calc(100dvh - 76px)', transition: 'top 300ms ease, height 300ms ease' }
-    : viewportMode ? { height: 'calc(100dvh - 76px)', minHeight: 'calc(100vh - 76px)' } : { minHeight: 'calc(100vh - 100px)' };
+    ? { position: 'fixed', top: headerHidden ? 0 : 64, left: 0, width: '100%', height: headerHidden ? '100dvh' : 'calc(100dvh - 64px)', transition: 'top 300ms ease, height 300ms ease' }
+    : fixedViewport ? { position: 'fixed', top: 64, left: 0, width: '100%', height: 'calc(100dvh - 64px)' }
+    : viewportMode ? { height: 'calc(100dvh - 64px)', minHeight: 'calc(100vh - 64px)' } : { minHeight: 'calc(100vh - 100px)' };
   return <iframe ref={frameRef} title={title} src={src} onLoad={prepareFrame} scrolling={viewportMode ? 'yes' : 'no'} className="block w-full border-0" style={frameStyle} />;
 };

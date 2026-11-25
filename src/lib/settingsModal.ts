@@ -108,6 +108,7 @@ function installDialogStyles(): void {
     .cc-settings-toggle input{accent-color:#059669;width:17px;height:17px;margin:1px 0 0}
     .cc-settings-actions{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:14px}
     .cc-settings-btn{border:1px solid #bdc9d8;border-radius:10px;background:#fff;color:#243247;padding:10px 15px;font-weight:750;cursor:pointer}
+    .cc-settings-btn[aria-busy="true"]{opacity:.72;cursor:wait}
     .cc-settings-btn:hover{background:#f8fafc}
     .cc-settings-btn.primary{background:#059669;border-color:#059669;color:#fff}
     .cc-settings-btn.danger{color:#b91c1c;border-color:#fecaca;background:#fff}
@@ -556,12 +557,37 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
       reduceMotion: getChecked(overlay, 'reduceMotion'),
     });
     const status = overlay.querySelector<HTMLElement>('[data-appearance-status]')!;
+    localizeSettingsModal(overlay, settings.language);
+    const button = overlay.querySelector<HTMLButtonElement>('[data-save-appearance]')!;
+    const requestId = Number(button.dataset.saveRequest || '0') + 1;
+    button.dataset.saveRequest = String(requestId);
+    const isLatestSave = () => button.dataset.saveRequest === String(requestId);
+    const idleLabel = settings.language === 'en' ? 'Save preferences' : 'পছন্দ সংরক্ষণ করুন';
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    button.textContent = settings.language === 'en' ? 'Saving…' : 'সংরক্ষণ হচ্ছে…';
+    status.style.color = '#047857';
+    status.textContent = settings.language === 'en' ? 'Saving preferences to your account…' : 'আপনার account-এ পছন্দ সংরক্ষণ হচ্ছে…';
     try {
       await options.onSaveAppSettings?.(settings);
-      status.textContent = settings.language === 'en' ? 'Appearance, font, and language preferences saved to this account.' : 'চেহারা, ফন্ট ও ভাষার পছন্দ account-এ সংরক্ষণ হয়েছে।';
-      localizeSettingsModal(overlay, settings.language);
+      if (isLatestSave()) {
+        status.textContent = options.profile.isLoggedIn
+          ? settings.language === 'en' ? 'Preferences saved to your account.' : 'আপনার account-এ পছন্দ সংরক্ষণ হয়েছে।'
+          : settings.language === 'en' ? 'Preferences saved on this device.' : 'এই device-এ পছন্দ সংরক্ষণ হয়েছে।';
+        button.textContent = settings.language === 'en' ? 'Saved ✓' : 'সংরক্ষিত ✓';
+      }
     } catch {
-      status.textContent = settings.language === 'en' ? 'Saved on this device, but cloud sync failed.' : 'এই device-এ সংরক্ষিত হয়েছে, তবে cloud sync হয়নি।';
+      if (isLatestSave()) {
+        status.textContent = settings.language === 'en' ? 'Saved on this device, but cloud sync failed.' : 'এই device-এ সংরক্ষিত হয়েছে, তবে cloud sync হয়নি।';
+        status.style.color = '#b91c1c';
+        button.textContent = settings.language === 'en' ? 'Save failed' : 'সংরক্ষণ হয়নি';
+      }
+    } finally {
+      if (isLatestSave()) {
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
+        window.setTimeout(() => { if (button.isConnected && isLatestSave()) button.textContent = idleLabel; }, 1800);
+      }
     }
   };
   overlay.querySelector('[data-save-appearance]')?.addEventListener('click', () => { void saveAppearance(); });
@@ -569,7 +595,19 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
     control.addEventListener('change', () => { void saveAppearance(); });
   });
 
-  overlay.querySelector('[data-save-exam]')?.addEventListener('click', async () => {
+  const saveExamPreferences = async () => {
+    const button = overlay.querySelector<HTMLButtonElement>('[data-save-exam]')!;
+    const status = overlay.querySelector<HTMLElement>('[data-exam-status]')!;
+    const language = loadAppSettings().language;
+    const idleLabel = language === 'en' ? 'Save exam preferences' : 'পরীক্ষার পছন্দ সংরক্ষণ করুন';
+    const requestId = Number(button.dataset.saveRequest || '0') + 1;
+    button.dataset.saveRequest = String(requestId);
+    const isLatestSave = () => button.dataset.saveRequest === String(requestId);
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    button.textContent = language === 'en' ? 'Saving…' : 'সংরক্ষণ হচ্ছে…';
+    status.style.color = '#047857';
+    status.textContent = language === 'en' ? 'Saving exam preferences…' : 'পরীক্ষার পছন্দ সংরক্ষণ হচ্ছে…';
     const number = (name: string, fallback: number, min: number, max: number) => {
       const value = Number(getValue(overlay, name));
       return Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback;
@@ -614,18 +652,30 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
     localStorage.setItem('cc_quiz_settings', JSON.stringify(nextLegacy));
     localStorage.setItem('cc_new_exam_settings_v1', JSON.stringify(nextExam));
     window.dispatchEvent(new CustomEvent('classcaddy:exam-settings-change', { detail: { legacy: nextLegacy, exam: nextExam } }));
-    const status = overlay.querySelector<HTMLElement>('[data-exam-status]')!;
     try {
       await options.onSaveExamPreferences?.(nextLegacy, nextExam);
-      status.textContent = loadAppSettings().language === 'en' ? 'Exam preferences saved. Current exams are unchanged.' : 'পরীক্ষার পছন্দ সংরক্ষণ হয়েছে। চলমান পরীক্ষা বদলাবে না।';
+      if (isLatestSave()) {
+        status.textContent = language === 'en' ? 'Exam preferences saved. Current exams are unchanged.' : 'পরীক্ষার পছন্দ সংরক্ষণ হয়েছে। চলমান পরীক্ষা বদলাবে না।';
+        button.textContent = language === 'en' ? 'Saved ✓' : 'সংরক্ষিত ✓';
+      }
     } catch {
-      status.textContent = 'এই device-এ পছন্দ সংরক্ষিত হয়েছে, তবে Firebase sync হয়নি।';
-      status.style.color = '#b91c1c';
+      if (isLatestSave()) {
+        status.textContent = language === 'en' ? 'Saved on this device, but Firebase sync failed.' : 'এই device-এ পছন্দ সংরক্ষিত হয়েছে, তবে Firebase sync হয়নি।';
+        status.style.color = '#b91c1c';
+        button.textContent = language === 'en' ? 'Save failed' : 'সংরক্ষণ হয়নি';
+      }
+    } finally {
+      if (isLatestSave()) {
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
+        window.setTimeout(() => { if (button.isConnected && isLatestSave()) button.textContent = idleLabel; }, 1800);
+      }
     }
-  });
+  };
+  overlay.querySelector('[data-save-exam]')?.addEventListener('click', () => { void saveExamPreferences(); });
   overlay.querySelectorAll<HTMLElement>('[data-setting]').forEach((control) => {
     if (/^(exam|legacy)/.test(control.dataset.setting || '')) {
-      control.addEventListener('change', () => overlay.querySelector<HTMLButtonElement>('[data-save-exam]')?.click());
+      control.addEventListener('change', () => { void saveExamPreferences(); });
     }
   });
 
@@ -634,13 +684,41 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
     try { const includesCloud = await downloadBackup(options); status.textContent = loadAppSettings().language === 'en' ? (includesCloud ? 'Device and Firebase study data and settings were backed up.' : 'Device data was backed up. Sign in to include Firebase data.') : (includesCloud ? 'Device ও Firebase-এর study data এবং settings backup হয়েছে।' : 'Device-এর data backup হয়েছে। Firebase-এর data পেতে sign in করুন।'); }
     catch (error) { status.textContent = error instanceof Error ? error.message : 'Backup তৈরি করা যায়নি।'; status.style.color = '#b91c1c'; }
   });
-  overlay.querySelector('[data-save-backup-preferences]')?.addEventListener('click', async () => {
+  const saveBackupPreferences = async () => {
     const settings = saveAppSettings({ autoBackupEnabled: getChecked(overlay, 'autoBackupEnabled') });
     const status = overlay.querySelector<HTMLElement>('[data-backup-preferences-status]')!;
-    try { await options.onSaveAppSettings?.(settings); status.textContent = settings.language === 'en' ? (settings.autoBackupEnabled ? 'Automatic backup enabled.' : 'Automatic backup disabled.') : (settings.autoBackupEnabled ? 'স্বয়ংক্রিয় Backup চালু হয়েছে।' : 'স্বয়ংক্রিয় Backup বন্ধ হয়েছে।'); }
-    catch { status.textContent = 'এই device-এ সংরক্ষিত হয়েছে, Firebase sync হয়নি।'; status.style.color = '#b91c1c'; }
-  });
-  overlay.querySelector('[data-setting="autoBackupEnabled"]')?.addEventListener('change', () => overlay.querySelector<HTMLButtonElement>('[data-save-backup-preferences]')?.click());
+    const button = overlay.querySelector<HTMLButtonElement>('[data-save-backup-preferences]')!;
+    const idleLabel = settings.language === 'en' ? 'Save backup preferences' : 'Backup পছন্দ সংরক্ষণ করুন';
+    const requestId = Number(button.dataset.saveRequest || '0') + 1;
+    button.dataset.saveRequest = String(requestId);
+    const isLatestSave = () => button.dataset.saveRequest === String(requestId);
+    button.disabled = true;
+    button.setAttribute('aria-busy', 'true');
+    button.textContent = settings.language === 'en' ? 'Saving…' : 'সংরক্ষণ হচ্ছে…';
+    status.style.color = '#047857';
+    status.textContent = settings.language === 'en' ? 'Saving backup preferences…' : 'Backup-এর পছন্দ সংরক্ষণ হচ্ছে…';
+    try {
+      await options.onSaveAppSettings?.(settings);
+      if (isLatestSave()) {
+        status.textContent = settings.language === 'en' ? (settings.autoBackupEnabled ? 'Automatic backup enabled and saved.' : 'Automatic backup disabled and saved.') : (settings.autoBackupEnabled ? 'স্বয়ংক্রিয় Backup চালু ও সংরক্ষিত হয়েছে।' : 'স্বয়ংক্রিয় Backup বন্ধ ও সংরক্ষিত হয়েছে।');
+        button.textContent = settings.language === 'en' ? 'Saved ✓' : 'সংরক্ষিত ✓';
+      }
+    } catch {
+      if (isLatestSave()) {
+        status.textContent = settings.language === 'en' ? 'Saved on this device, but Firebase sync failed.' : 'এই device-এ সংরক্ষিত হয়েছে, Firebase sync হয়নি।';
+        status.style.color = '#b91c1c';
+        button.textContent = settings.language === 'en' ? 'Save failed' : 'সংরক্ষণ হয়নি';
+      }
+    } finally {
+      if (isLatestSave()) {
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
+        window.setTimeout(() => { if (button.isConnected && isLatestSave()) button.textContent = idleLabel; }, 1800);
+      }
+    }
+  };
+  overlay.querySelector('[data-save-backup-preferences]')?.addEventListener('click', () => { void saveBackupPreferences(); });
+  overlay.querySelector('[data-setting="autoBackupEnabled"]')?.addEventListener('change', () => { void saveBackupPreferences(); });
   const fileInput = overlay.querySelector<HTMLInputElement>('[data-import-file]')!;
   overlay.querySelector('[data-import-trigger]')?.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', async () => {

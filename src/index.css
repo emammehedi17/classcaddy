@@ -14,7 +14,7 @@ html[data-bangla-font="amiri"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,
 html[data-reading-size="small"] { font-size: 14px !important; }
 html[data-reading-size="medium"] { font-size: 16px !important; }
 html[data-reading-size="large"] { font-size: 18px !important; }
-#main-navigation-header { height: 76px !important; min-height: 76px !important; font-size: 14px !important; }
+#main-navigation-header { height: 64px !important; min-height: 64px !important; font-size: 14px !important; }
 #main-navigation-header h1 { font-size: 20px !important; line-height: 24px !important; }
 #main-navigation-header img { max-height: 40px; }
 html[data-reduce-motion="true"] *,

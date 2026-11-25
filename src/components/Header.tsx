@@ -58,8 +58,8 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header
       id="main-navigation-header"
-      style={{ height: 76 }}
-      className={`fixed top-0 left-0 right-0 z-50 h-[76px] min-h-[76px] border-b main-website-ui shadow-sm transition-transform duration-300 ease-out ${isHidden ? '-translate-y-full' : 'translate-y-0'} ${
+      style={{ height: 64 }}
+      className={`fixed top-0 left-0 right-0 z-50 h-[64px] min-h-[64px] border-b main-website-ui shadow-sm transition-transform duration-300 ease-out ${isHidden ? '-translate-y-full' : 'translate-y-0'} ${
         isDark
           ? 'bg-gray-900/95 border-gray-800 text-gray-100'
           : 'bg-white/95 border-gray-200 text-gray-800'

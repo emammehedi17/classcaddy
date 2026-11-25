@@ -523,7 +523,9 @@ export default function App() {
             ? 'p-0 m-0 w-screen h-screen fixed inset-0 z-50 overflow-hidden'
             : currentPage === 'study-plan'
               ? 'h-dvh flex-none overflow-hidden p-0'
-              : 'flex-grow pt-[76px] pb-16'
+              : currentPage === 'home'
+                ? 'h-dvh flex-none overflow-hidden p-0'
+              : 'flex-grow pt-[64px] pb-16'
         }`}
       >
         <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px] bg-emerald-500 transition-[width,opacity] duration-150 ease-linear" style={{ width: `${loadingProgress}%`, opacity: isNavigating ? 1 : 0 }} />
@@ -535,7 +537,7 @@ export default function App() {
             user={user}
           />
         )}
-        {currentPage === 'home' && <LegacyPageFrame src="/home-content.html?cc-embedded=1" title="Class Caddy Home" viewportMode />}
+        {currentPage === 'home' && <LegacyPageFrame src="/home-content.html?cc-embedded=1" title="Class Caddy Home" viewportMode fixedViewport />}
         {currentPage === 'embedded' && <LegacyPageFrame src={embeddedPath} title="Class Caddy" viewportMode />}
         {currentPage === 'about' && <AboutView />}
         {currentPage === 'contact' && <ContactView />}
@@ -568,7 +570,7 @@ export default function App() {
       )}
 
       {/* Footer (Hidden when File Explorer Fullscreen Mode is active) */}
-      {!isExplorerMode && currentPage !== 'study-plan' && (
+      {!isExplorerMode && currentPage !== 'study-plan' && currentPage !== 'home' && (
         <Footer
           onNavigate={(page) => {
             navigateTo(page);
