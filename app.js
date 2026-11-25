@@ -691,13 +691,14 @@
                 logoutBtn.classList.remove('hidden');
 
                 // --- START: REMOVE LOGOUT BUTTON FROM HEADER ---
+                const profileDisplayName = user.displayName || user.email?.split('@')[0] || 'User';
+                const escapedName = String(isGuestMode ? 'Guest Mode' : profileDisplayName).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
                 let loggedInHTML = '';
                 if (isGuestMode) {
                     // Removed the 'Exit' button from here
-                    loggedInHTML = `<div class="text-sm"><p class="font-semibold text-gray-700 dark:text-gray-200">Guest Mode</p><p class="text-gray-500 dark:text-gray-400 text-xs">Viewing Mehedi's Plan</p></div>`;
+                    loggedInHTML = `<button type="button" data-open-classcaddy-settings class="rounded-full px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="প্রোফাইল ও অ্যাপ সেটিংস খুলুন">${escapedName}</button>`;
                 } else {
                     // Removed the 'Log Out' button from here
-                    const escapedName = String(user.displayName || 'User').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
                     loggedInHTML = `<button type="button" data-open-classcaddy-settings class="rounded-full px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="প্রোফাইল ও অ্যাপ সেটিংস খুলুন">${escapedName}</button>`;
                     try {
                         const profileName = user.displayName || user.email?.split('@')[0] || 'User';
