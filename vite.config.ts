@@ -25,12 +25,10 @@ function ensureLogoAssets(baseDir: string) {
       }
     }
 
-    // 2. Always ensure square-centered Class Caddy logo exists at images/logo.png, images/cc-icon-full.png, images/cc-icon.png, and public/images/logo.png
+    // 2. Keep the Class Caddy mark available at the paths used by page headers and favicons.
     const logoBuffer = Buffer.from(CLASS_CADDY_LOGO_BASE64, 'base64');
     const logoTargets = [
       path.resolve(baseDir, 'images', 'logo.png'),
-      path.resolve(baseDir, 'images', 'cc-icon-full.png'),
-      path.resolve(baseDir, 'images', 'cc-icon.png'),
       path.resolve(baseDir, 'public', 'images', 'logo.png'),
       path.resolve(baseDir, 'public', 'favicon.png'),
     ];
@@ -93,7 +91,7 @@ function copyStaticAssetsPlugin(): Plugin {
 
       copyRecursive(__dirname, path.resolve(__dirname, 'dist'));
 
-      // Explicitly guarantee logo.png, cc-icon-full.png, cc-icon.png, and du-logo.png in dist/images/
+      // Explicitly guarantee the Class Caddy logo and favicon in the build output.
       try {
         const logoBuffer = Buffer.from(CLASS_CADDY_LOGO_BASE64, 'base64');
         const distImagesDir = path.resolve(__dirname, 'dist', 'images');
@@ -101,8 +99,6 @@ function copyStaticAssetsPlugin(): Plugin {
           fs.mkdirSync(distImagesDir, { recursive: true });
         }
         fs.writeFileSync(path.join(distImagesDir, 'logo.png'), logoBuffer);
-        fs.writeFileSync(path.join(distImagesDir, 'cc-icon-full.png'), logoBuffer);
-        fs.writeFileSync(path.join(distImagesDir, 'cc-icon.png'), logoBuffer);
         fs.writeFileSync(path.resolve(__dirname, 'dist', 'favicon.png'), logoBuffer);
       } catch (e) {
         console.warn('Failed to write dist logo files:', e);
