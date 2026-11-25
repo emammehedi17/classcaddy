@@ -1,3 +1,5 @@
+const classCaddyAssetUrl = (assetPath) => new URL(assetPath, import.meta.url).href;
+
 document.addEventListener('DOMContentLoaded', function () {
 
     /* ==========================================================================
@@ -495,13 +497,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (existingIcons.length > 0) {
                 existingIcons.forEach((iconLink) => {
                     iconLink.type = 'image/png';
-                    iconLink.href = '/favicon.png?v=class-caddy-1';
+                    iconLink.href = `${classCaddyAssetUrl('images/logo.png')}?v=class-caddy-2`;
                 });
             } else {
                 const iconLink = document.createElement('link');
                 iconLink.rel = 'icon';
                 iconLink.type = 'image/png';
-                iconLink.href = '/favicon.png?v=class-caddy-1';
+                iconLink.href = `${classCaddyAssetUrl('images/logo.png')}?v=class-caddy-2`;
                 document.head.appendChild(iconLink);
             }
         }
@@ -868,10 +870,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const spLogo = document.querySelector('header.main-website-ui nav .flex.items-center a img, header.main-website-ui nav a[href*="facebook.com"] img');
             if (spLogo) {
                 spLogo.classList.add('cc-avatar-founder');
-                spLogo.src = '/images/logo.png';
+                spLogo.src = classCaddyAssetUrl('images/logo.png');
                 spLogo.onerror = function () {
                     this.onerror = null;
-                    this.src = '/favicon.png';
+                    this.src = classCaddyAssetUrl('images/logo.png');
                 };
                 const parentAnchor = spLogo.closest('a');
                 if (parentAnchor) {
@@ -899,7 +901,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <nav class="flex justify-between items-center">
                 <div class="cc-brand-left flex items-center gap-3 sm:gap-4 min-w-0">
                     <a href="/index.html" class="flex-shrink-0" title="Class Caddy - Home">
-                        <img src="/images/logo.png" alt="Class Caddy Logo" class="cc-avatar-founder h-10 w-10 rounded-full border-2 border-emerald-500 bg-white object-contain p-0.5" onerror="this.onerror=null; this.src='/favicon.png';">
+                        <img src="${classCaddyAssetUrl('images/logo.png')}" alt="Class Caddy Logo" class="cc-avatar-founder h-10 w-10 rounded-full border-2 border-emerald-500 bg-white object-contain p-0.5" onerror="this.onerror=null; this.src='${classCaddyAssetUrl('images/logo.png')}';">
                     </a>
                     <a href="/index.html">
                         <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">Class Caddy</h1>

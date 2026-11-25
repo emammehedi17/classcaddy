@@ -170,15 +170,17 @@ function copyStaticAssetsPlugin(): Plugin {
           }
 
           let htmlModified = false;
+          const distRoot = path.resolve(__dirname, 'dist');
+          const faviconPath = `${path.relative(path.dirname(distHtmlPath), path.join(distRoot, 'images', 'logo.png')).replace(/\\/g, '/')}?v=class-caddy-2`;
           const iconRegex = /<link\b[^>]*\brel=["'](?:shortcut\s+)?icon["'][^>]*>/gi;
           if (iconRegex.test(content)) {
-            const updated = content.replace(iconRegex, '<link rel="icon" type="image/png" href="/favicon.png?v=class-caddy-1">');
+            const updated = content.replace(iconRegex, `<link rel="icon" type="image/png" href="${faviconPath}">`);
             if (updated !== content) {
               content = updated;
               htmlModified = true;
             }
           } else if (content.includes('</head>')) {
-            content = content.replace('</head>', '    <link rel="icon" type="image/png" href="/favicon.png?v=class-caddy-1">\n</head>');
+            content = content.replace('</head>', `    <link rel="icon" type="image/png" href="${faviconPath}">\n</head>`);
             htmlModified = true;
           }
 

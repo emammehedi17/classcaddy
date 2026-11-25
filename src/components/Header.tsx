@@ -67,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({
               title="Class Caddy - Home"
             >
               <img
-                src="/images/logo.png"
+                src={CLASS_CADDY_LOGO_DATA_URI}
                 alt="Class Caddy Logo"
                 className="h-10 w-10 rounded-full border-2 border-emerald-500 bg-white object-contain p-0.5"
                 onError={(e) => {
