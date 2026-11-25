@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "Class Caddy",
+  "short_name": "Class Caddy",
+  "description": "Class Caddy-এর স্টাডি প্ল্যানার, নোটস ও পরীক্ষার প্রস্তুতি।",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#059669",
+  "categories": ["education", "productivity"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/icons/class-caddy-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/class-caddy-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

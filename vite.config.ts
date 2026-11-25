@@ -54,6 +54,28 @@ function ensureLogoAssets(baseDir: string) {
 function copyStaticAssetsPlugin(): Plugin {
   return {
     name: 'copy-static-assets',
+    transformIndexHtml: {
+      order: 'pre',
+      handler() {
+        return [
+          {
+            tag: 'link',
+            attrs: { rel: 'manifest', href: '/manifest.webmanifest' },
+            injectTo: 'head',
+          },
+          {
+            tag: 'meta',
+            attrs: { name: 'theme-color', content: '#059669' },
+            injectTo: 'head',
+          },
+          {
+            tag: 'script',
+            attrs: { type: 'module', src: '/src/installPrompt.ts' },
+            injectTo: 'body',
+          },
+        ];
+      },
+    },
     closeBundle() {
       ensureLogoAssets(__dirname);
 
