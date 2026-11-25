@@ -1,6 +1,6 @@
 // Import necessary functions from Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, signInWithCustomToken, signInAnonymously, getRedirectResult, signInWithRedirect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, updateProfile, signInWithCustomToken, signInAnonymously, getRedirectResult, signInWithRedirect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { initializeFirestore, setDoc, doc, getDoc, getDocFromServer, collection, query, getDocs, getDocsFromServer, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import 'katex/dist/katex.min.css';
         import { McqImportWorkspace } from './mcq-engine/import-workspace.js';
@@ -943,6 +943,40 @@
             updateAuthUI(auth.currentUser);
         };
         window._classCaddySignOut = handleLogout;
+        window.openClassCaddySettings = async () => {
+            try {
+                const profileUser = auth.currentUser || currentUser;
+                const { openSettingsDialog } = await import('./src/lib/settingsModal.ts');
+                openSettingsDialog({
+                    profile: {
+                        name: profileUser?.displayName || profileUser?.email?.split('@')[0] || (isGuestMode ? 'Guest Mode' : 'শিক্ষার্থী'),
+                        email: profileUser?.email || '',
+                        photoURL: profileUser?.photoURL || 'images/logo.png',
+                        uid: profileUser?.uid,
+                        isLoggedIn: Boolean(profileUser),
+                    },
+                    onSaveProfile: async (name) => {
+                        await window._classCaddyUpdateProfile(name);
+                    },
+                    onSignOut: handleLogout,
+                });
+            } catch (error) {
+                console.error('Could not open Class Caddy settings:', error);
+            }
+        };
+        document.addEventListener('click', (event) => {
+            const target = event.target instanceof Element ? event.target : null;
+            if (!target) return;
+            if (target.closest('[data-open-classcaddy-settings]')) {
+                event.preventDefault();
+                window.openClassCaddySettings();
+                return;
+            }
+            if (target.closest('header.main-website-ui img[alt="DU Logo"]') && !target.closest('header.main-website-ui img[alt="DU Logo"]')?.closest('a')?.getAttribute('href')) {
+                event.preventDefault();
+                window.openClassCaddySettings();
+            }
+        });
 
         logoutBtn.addEventListener('click', handleLogout);
 
@@ -1128,6 +1162,7 @@
         // Load plans AND setup month navigation
         async function loadStudyPlans() {
             if (!currentUser || !userId) return;
+            currentMonthPlanDisplay.innerHTML = '<div class="study-plan-loading" role="status"><span class="study-plan-spinner"></span><span>Loading your study plans…</span></div>';
             const plansCollectionPath = getUserPlansCollectionPath();
             const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc")); // Order by document ID (YYYY-MM)
 
@@ -1155,9 +1190,11 @@
                 let shouldRestoreScroll = scrollY > (parentContainerRect.top + window.scrollY);
 
                 if (querySnapshot.empty) {
-                    currentMonthPlanDisplay.innerHTML = '';
+                    currentMonthPlanDisplay.replaceChildren(noPlansMessage, selectMonthMessage);
                     noPlansMessage.style.display = 'block';
                     selectMonthMessage.classList.add('hidden');
+                    if (unsubscribeActiveMonth) unsubscribeActiveMonth();
+                    unsubscribeActiveMonth = null;
                 } else {
                     noPlansMessage.style.display = 'none';
 
@@ -1189,7 +1226,7 @@
                     // --- MODIFIED BLOCK START ---
                     if (currentMonthId && !monthExists) {
                         // The month we were viewing was deleted. Show the 'select' message.
-                        currentMonthPlanDisplay.innerHTML = '';
+                        currentMonthPlanDisplay.replaceChildren(selectMonthMessage);
                         selectMonthMessage.classList.remove('hidden');
                         if (unsubscribeActiveMonth) unsubscribeActiveMonth(); // Stop listening to deleted month
                         unsubscribeActiveMonth = null;
@@ -1216,7 +1253,7 @@
                 }
             }, (error) => {
                 console.error("Error fetching study plans:", error);
-                currentMonthPlanDisplay.innerHTML = '<p class="text-red-500 text-center">Error loading plans.</p>';
+                currentMonthPlanDisplay.innerHTML = '<div class="study-plan-error" role="alert"><strong>প্ল্যান লোড করা যায়নি</strong><p>ইন্টারনেট সংযোগ বা Firebase access পরীক্ষা করে আবার চেষ্টা করুন।</p><button type="button" class="action-button action-button-secondary" onclick="location.reload()">আবার চেষ্টা করুন</button></div>';
                 noPlansMessage.style.display = 'none';
                 selectMonthMessage.classList.add('hidden');
             });
@@ -10188,6 +10225,14 @@ function applySettingsToDom() {
     // Update Input Boxes
     document.querySelectorAll('#mcq-font-input, #view-mcq-font-input').forEach(inp => inp.value = globalSettings.fontSize);
 }
+
+window.addEventListener('classcaddy:settings-change', (event) => {
+    const settings = event.detail;
+    if (!settings) return;
+    globalSettings.darkMode = settings.theme === 'dark';
+    globalSettings.fontSize = settings.readingSize === 'small' ? 14 : settings.readingSize === 'large' ? 18 : 16;
+    applySettingsToDom();
+});
 
 
 // 4. Save Settings

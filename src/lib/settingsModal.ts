@@ -73,33 +73,35 @@ function installDialogStyles(): void {
   const style = document.createElement('style');
   style.id = 'cc-settings-modal-styles';
   style.textContent = `
-    #cc-settings-overlay{position:fixed;inset:0;z-index:2147483001;background:rgba(15,23,42,.64);display:flex;align-items:center;justify-content:center;padding:16px;font:14px/1.5 Inter,'Noto Sans Bengali',sans-serif;color:#1f2937}
-    #cc-settings-dialog{width:min(940px,100%);height:min(740px,calc(100dvh - 32px));background:#fff;border:1px solid #e5e7eb;border-radius:22px;box-shadow:0 24px 80px rgba(0,0,0,.28);display:flex;flex-direction:column;overflow:hidden}
+    #cc-settings-overlay{position:fixed;inset:0;z-index:2147483001;background:rgba(5,12,25,.58);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:24px;font:15px/1.55 Inter,'Noto Sans Bengali',sans-serif;color:#1f2937}
+    #cc-settings-dialog{width:min(1080px,100%);height:min(720px,calc(100dvh - 64px));background:#fff;border:1px solid #dbe3ed;border-radius:22px;box-shadow:0 28px 90px rgba(0,0,0,.34);display:flex;flex-direction:column;overflow:hidden}
     #cc-settings-dialog *{box-sizing:border-box}
+    #cc-settings-dialog, #cc-settings-dialog *{font-family:Inter,'Noto Sans Bengali','Hind Siliguri',sans-serif!important}
     #cc-settings-dialog button,#cc-settings-dialog input,#cc-settings-dialog select{font:inherit}
-    #cc-settings-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #e5e7eb;flex:none}
-    #cc-settings-head h2{margin:0;font-size:20px;font-weight:750;color:#111827}
-    #cc-settings-head p{margin:2px 0 0;color:#64748b;font-size:12px}
-    #cc-settings-close{width:38px;height:38px;border:0;border-radius:12px;background:#f1f5f9;color:#334155;font-size:22px;cursor:pointer}
+    #cc-settings-head{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid #e5e7eb;background:#fff;flex:none}
+    #cc-settings-head h2{margin:0;font-size:22px;font-weight:800;color:#111827}
+    #cc-settings-head p{margin:3px 0 0;color:#64748b;font-size:13px}
+    #cc-settings-close{width:40px;height:40px;border:1px solid #dbe3ed;border-radius:12px;background:#f8fafc;color:#334155;font-size:22px;cursor:pointer}
     #cc-settings-layout{display:grid;grid-template-columns:215px minmax(0,1fr);min-height:0;flex:1}
-    #cc-settings-nav{padding:14px;border-right:1px solid #e5e7eb;background:#f8fafc;display:flex;flex-direction:column;gap:5px}
-    #cc-settings-nav button{display:flex;gap:10px;align-items:center;text-align:left;border:0;background:transparent;color:#475569;border-radius:11px;padding:11px 12px;font-weight:650;cursor:pointer}
-    #cc-settings-nav button[aria-selected="true"]{color:#047857;background:#d1fae5}
-    #cc-settings-content{overflow:auto;padding:22px;min-width:0}
+    #cc-settings-nav{padding:16px 12px;border-right:1px solid #e5e7eb;background:#f5f8fc;display:flex;flex-direction:column;gap:6px}
+    #cc-settings-nav button{display:flex;gap:10px;align-items:center;text-align:left;border:1px solid transparent;background:transparent;color:#334155;border-radius:11px;padding:12px;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s}
+    #cc-settings-nav button:hover{background:#eaf0f7}
+    #cc-settings-nav button[aria-selected="true"]{color:#047857;background:#d1fae5;border-color:#a7f3d0}
+    #cc-settings-content{overflow:auto;padding:26px;min-width:0;background:#fff}
     .cc-settings-section[hidden]{display:none}
-    .cc-settings-section h3{margin:0 0 4px;font-size:18px;color:#111827}
-    .cc-settings-intro{margin:0 0 18px;color:#64748b;font-size:13px}
-    .cc-settings-card{border:1px solid #e2e8f0;border-radius:15px;padding:16px;margin:0 0 14px;background:#fff}
+    .cc-settings-section h3{margin:0 0 4px;font-size:20px;color:#111827}
+    .cc-settings-intro{margin:0 0 20px;color:#53657b;font-size:14px}
+    .cc-settings-card{border:1px solid #dbe3ed;border-radius:16px;padding:19px;margin:0 0 16px;background:#fff;box-shadow:0 2px 8px rgba(15,23,42,.035)}
     .cc-settings-card h4{margin:0 0 12px;font-size:14px;color:#1f2937}
     .cc-settings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
-    .cc-settings-field{display:flex;flex-direction:column;gap:6px;color:#475569;font-size:12px;font-weight:650}
-    .cc-settings-field input,.cc-settings-field select{width:100%;height:40px;border:1px solid #cbd5e1;border-radius:10px;padding:0 10px;background:#fff;color:#0f172a;outline:none}
+    .cc-settings-field{display:flex;flex-direction:column;gap:7px;color:#334155;font-size:13px;font-weight:700}
+    .cc-settings-field input,.cc-settings-field select{width:100%;min-height:42px;border:1px solid #bdc9d8;border-radius:10px;padding:0 11px;background:#fff;color:#0f172a;outline:none}
     .cc-settings-field input:focus,.cc-settings-field select:focus{border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.14)}
     .cc-settings-field input[readonly]{background:#f8fafc;color:#64748b}
-    .cc-settings-toggle{display:flex;align-items:flex-start;gap:10px;padding:10px 0;color:#334155;font-size:13px}
+    .cc-settings-toggle{display:flex;align-items:flex-start;gap:11px;padding:10px 0;color:#263449;font-size:14px}
     .cc-settings-toggle input{accent-color:#059669;width:17px;height:17px;margin:1px 0 0}
     .cc-settings-actions{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-top:14px}
-    .cc-settings-btn{border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#334155;padding:9px 13px;font-weight:700;cursor:pointer}
+    .cc-settings-btn{border:1px solid #bdc9d8;border-radius:10px;background:#fff;color:#243247;padding:10px 15px;font-weight:750;cursor:pointer}
     .cc-settings-btn:hover{background:#f8fafc}
     .cc-settings-btn.primary{background:#059669;border-color:#059669;color:#fff}
     .cc-settings-btn.danger{color:#b91c1c;border-color:#fecaca;background:#fff}
@@ -107,17 +109,21 @@ function installDialogStyles(): void {
     .cc-settings-profile{display:flex;align-items:center;gap:14px;margin-bottom:16px}
     .cc-settings-profile img{width:58px;height:58px;border-radius:50%;object-fit:cover;background:#f1f5f9;border:2px solid #d1fae5}
     .cc-settings-note{color:#64748b;font-size:12px;margin:8px 0 0}
-    html.dark #cc-settings-dialog{background:#111827;border-color:#374151;color:#e5e7eb}
-    html.dark #cc-settings-head{border-color:#374151}
+    html.dark #cc-settings-dialog{background:#0f172a;border-color:#475569;color:#f1f5f9}
+    html.dark #cc-settings-head{border-color:#475569;background:#111c30}
     html.dark #cc-settings-head h2,html.dark .cc-settings-section h3,html.dark .cc-settings-card h4{color:#f8fafc}
-    html.dark #cc-settings-head p,html.dark .cc-settings-intro,html.dark .cc-settings-note{color:#9ca3af}
-    html.dark #cc-settings-nav{background:#0f172a;border-color:#374151}
-    html.dark #cc-settings-nav button{color:#cbd5e1}
-    html.dark #cc-settings-nav button[aria-selected="true"]{background:#064e3b;color:#a7f3d0}
-    html.dark .cc-settings-card{background:#111827;border-color:#374151}
-    html.dark .cc-settings-field,html.dark .cc-settings-toggle{color:#cbd5e1}
-    html.dark .cc-settings-field input,html.dark .cc-settings-field select{background:#1f2937;border-color:#4b5563;color:#f3f4f6}
-    html.dark .cc-settings-btn{background:#1f2937;border-color:#4b5563;color:#e5e7eb}
+    html.dark #cc-settings-head p,html.dark .cc-settings-intro,html.dark .cc-settings-note{color:#b7c4d6}
+    html.dark #cc-settings-nav{background:#0b1425;border-color:#475569}
+    html.dark #cc-settings-nav button{color:#dbe5f2}
+    html.dark #cc-settings-nav button:hover{background:#1b2a40}
+    html.dark #cc-settings-nav button[aria-selected="true"]{background:#064e3b;border-color:#0f766e;color:#d1fae5}
+    html.dark #cc-settings-content{background:#0f172a}
+    html.dark .cc-settings-card{background:#152238;border-color:#42536b}
+    html.dark .cc-settings-field,html.dark .cc-settings-toggle{color:#e2eaf4}
+    html.dark .cc-settings-field input,html.dark .cc-settings-field select{background:#0b1425;border-color:#60728a;color:#f8fafc}
+    html.dark .cc-settings-field input[readonly]{background:#25344b;color:#d2dbea}
+    html.dark #cc-settings-close{background:#1e293b;border-color:#53647a;color:#f1f5f9}
+    html.dark .cc-settings-btn{background:#1e293b;border-color:#64748b;color:#f1f5f9}
     html.dark .cc-settings-btn.primary{background:#059669;border-color:#059669;color:#fff}
     html.dark .cc-settings-btn.danger{background:#2b1720;border-color:#7f1d1d;color:#fecaca}
     @media(max-width:640px){#cc-settings-overlay{padding:0}#cc-settings-dialog{height:100dvh;width:100%;border-radius:0}#cc-settings-head{padding:14px 16px}#cc-settings-layout{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}#cc-settings-nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid #e5e7eb;padding:8px;gap:4px}#cc-settings-nav button{white-space:nowrap;padding:9px;font-size:12px}#cc-settings-content{padding:16px}.cc-settings-grid{grid-template-columns:1fr}}
@@ -251,6 +257,7 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
               <div class="cc-settings-grid">
                 <label class="cc-settings-field">প্রশ্ন সংখ্যা<input type="number" min="5" max="200" step="5" data-setting="examCount"></label>
                 <label class="cc-settings-field">পরীক্ষার ধরন<select data-setting="examMode"><option value="exam">পরীক্ষা</option><option value="practice">অনুশীলন</option><option value="timed-practice">সময় ধরে অনুশীলন</option><option value="untimed-practice">সময় ছাড়া অনুশীলন</option></select></label>
+                <label class="cc-settings-field">প্রশ্ন দেখানোর ধরন<select data-setting="examLayout"><option value="screen">একবারে একটি</option><option value="scroll">সব প্রশ্ন একসাথে</option><option value="omr">OMR bubble sheet</option></select></label>
                 <label class="cc-settings-field">প্রশ্নের ক্রম<select data-setting="examQuestionOrder"><option value="random">এলোমেলো</option><option value="serial">ক্রম অনুযায়ী</option></select></label>
                 <label class="cc-settings-field">সময় ব্যবস্থা<select data-setting="examTiming"><option value="whole">পুরো পরীক্ষার সময়</option><option value="per-question">প্রতি প্রশ্নে সময়</option><option value="unlimited">সময় সীমা নেই</option></select></label>
                 <label class="cc-settings-field">পুরো পরীক্ষার সময় (মিনিট)<input type="number" min="1" max="600" data-setting="examMinutes"></label>
@@ -261,6 +268,7 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
                 <label class="cc-settings-field">পাস নম্বর (%)<input type="number" min="0" max="100" step="5" data-setting="examPass"></label>
               </div>
               <label class="cc-settings-toggle"><input type="checkbox" data-setting="examAvoidRecent"><span>সাম্প্রতিক প্রশ্ন এড়িয়ে চলুন</span></label>
+              <label class="cc-settings-toggle"><input type="checkbox" data-setting="examCustomTime"><span>Exam Studio-র সময়ের জন্য নিজের default ব্যবহার করুন</span></label>
               <label class="cc-settings-toggle"><input type="checkbox" data-setting="examIncludeAttempted"><span>আগে করা প্রশ্ন অন্তর্ভুক্ত করুন</span></label>
               <label class="cc-settings-toggle"><input type="checkbox" data-setting="examWrongOnly"><span>শুধু ভুল করা প্রশ্ন নিন</span></label>
               <label class="cc-settings-toggle"><input type="checkbox" data-setting="examBookmarkedOnly"><span>শুধু বুকমার্ক করা প্রশ্ন নিন</span></label>
@@ -334,6 +342,7 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
   setControl(overlay, 'legacyAnswers', legacy.showAnswersInstantly);
   setControl(overlay, 'examCount', exam.questionCount);
   setControl(overlay, 'examMode', exam.mode);
+  setControl(overlay, 'examLayout', exam.layout);
   setControl(overlay, 'examQuestionOrder', exam.questionOrder);
   setControl(overlay, 'examTiming', exam.timingType);
   setControl(overlay, 'examMinutes', exam.totalMinutes);
@@ -345,6 +354,7 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
   setControl(overlay, 'examShuffleQuestions', exam.shuffleQuestions);
   setControl(overlay, 'examShuffleOptions', exam.shuffleOptions);
   setControl(overlay, 'examAvoidRecent', exam.avoidRecent);
+  setControl(overlay, 'examCustomTime', exam.customTimeOverride);
   setControl(overlay, 'examIncludeAttempted', exam.includeAttempted);
   setControl(overlay, 'examWrongOnly', exam.wrongOnly);
   setControl(overlay, 'examBookmarkedOnly', exam.bookmarkedOnly);
@@ -408,6 +418,7 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
       ...exam,
       questionCount: number('examCount', 25, 5, 200),
       mode: getValue(overlay, 'examMode'),
+      layout: ['screen', 'scroll', 'omr'].includes(getValue(overlay, 'examLayout')) ? getValue(overlay, 'examLayout') : 'screen',
       timingType: getValue(overlay, 'examMode') === 'untimed-practice' ? 'unlimited' : getValue(overlay, 'examTiming'),
       totalMinutes: number('examMinutes', 15, 1, 600),
       secondsPerQuestion: number('examSeconds', 36, 5, 600),
@@ -419,6 +430,7 @@ export function openSettingsDialog(options: SettingsDialogOptions): void {
       questionOrder: getValue(overlay, 'examQuestionOrder') === 'serial' ? 'serial' : 'random',
       shuffleOptions: getChecked(overlay, 'examShuffleOptions'),
       avoidRecent: getChecked(overlay, 'examAvoidRecent'),
+      customTimeOverride: getChecked(overlay, 'examCustomTime'),
       includeAttempted: getChecked(overlay, 'examIncludeAttempted'),
       wrongOnly: getChecked(overlay, 'examWrongOnly'),
       bookmarkedOnly: getChecked(overlay, 'examBookmarkedOnly'),

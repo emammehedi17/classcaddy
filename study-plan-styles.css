@@ -41,10 +41,53 @@
 }
 
 /* --- Light Theme & Motivational Styles --- */
+        .study-plan-loading, .study-plan-error {
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 28px;
+            text-align: center;
+            color: #475569;
+            background: rgba(255,255,255,.82);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+        }
+        .study-plan-error { color: #b91c1c; }
+        .study-plan-error p { margin: 0; color: #64748b; }
+        .study-plan-spinner {
+            width: 28px;
+            height: 28px;
+            border: 3px solid #a7f3d0;
+            border-top-color: #059669;
+            border-radius: 50%;
+            animation: cc-plan-spin .8s linear infinite;
+        }
+        @keyframes cc-plan-spin { to { transform: rotate(360deg); } }
+        html.dark .study-plan-loading, html.dark .study-plan-error, body.dark-mode .study-plan-loading, body.dark-mode .study-plan-error {
+            color: #e2e8f0;
+            background: #111c30;
+            border-color: #334155;
+        }
+        html.dark .study-plan-error p, body.dark-mode .study-plan-error p { color: #cbd5e1; }
         html { scroll-behavior: smooth; }
         /* --- Force Inter for English, Sans-Serif (Noto Sans Bengali / Hind Siliguri) for Bangla globally --- */
         html, body, input, textarea, select, button {
             font-family: 'Inter', 'Noto Sans Bengali', 'Hind Siliguri', 'Noto Naskh Arabic', sans-serif !important;
+        }
+        html[data-bangla-font="amiri"] body,
+        html[data-bangla-font="amiri"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text) {
+            font-family: 'Amiri', 'Noto Sans Bengali', 'Hind Siliguri', sans-serif !important;
+        }
+        html[data-reading-size="small"] { font-size: 14px !important; }
+        html[data-reading-size="medium"] { font-size: 16px !important; }
+        html[data-reading-size="large"] { font-size: 18px !important; }
+        html[data-reduce-motion="true"] *, html[data-reduce-motion="true"] *::before, html[data-reduce-motion="true"] *::after {
+            scroll-behavior: auto !important;
+            animation-duration: .01ms !important;
+            transition-duration: .01ms !important;
         }
         .kalpurush, .bangla {
             font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'Inter', 'Noto Naskh Arabic', sans-serif !important;
