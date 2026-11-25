@@ -77,9 +77,11 @@ export default function App() {
   });
   const [isNavigating, setIsNavigating] = useState(false);
   const [embeddedPath, setEmbeddedPath] = useState(() => new URLSearchParams(window.location.search).get('cc-page') || (window.location.pathname + window.location.search + window.location.hash));
+  const [hasVisitedStudyPlan, setHasVisitedStudyPlan] = useState(() => currentPage === 'study-plan');
   const navigateTo = (page: PageView, href = pathForPage(page)) => {
     const frameWillChange = page !== currentPage || (page === 'embedded' && href !== embeddedPath);
     if (href !== window.location.pathname + window.location.search + window.location.hash) window.history.pushState({ page }, '', href);
+    if (page === 'study-plan') setHasVisitedStudyPlan(true);
     setIsNavigating(true);
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -89,7 +91,7 @@ export default function App() {
   const [language, setLanguage] = useState<'bn' | 'en'>(() => loadAppSettings().language);
 
   useEffect(() => {
-    const onPopState = () => { setIsNavigating(true); setEmbeddedPath(new URLSearchParams(window.location.search).get('cc-page') || (window.location.pathname + window.location.search + window.location.hash)); setCurrentPage(pageFromLocation()); window.setTimeout(() => setIsNavigating(false), 320); };
+    const onPopState = () => { setIsNavigating(true); setEmbeddedPath(new URLSearchParams(window.location.search).get('cc-page') || (window.location.pathname + window.location.search + window.location.hash)); const page = pageFromLocation(); if (page === 'study-plan') setHasVisitedStudyPlan(true); setCurrentPage(page); window.setTimeout(() => setIsNavigating(false), 320); };
     const onInternalLink = (event: MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const anchor = (event.target as Element | null)?.closest<HTMLAnchorElement>('a[href]');
@@ -293,7 +295,7 @@ export default function App() {
         setUser({ name: '', email: '', isLoggedIn: false });
       } else if (e.key === 'class_caddy_theme' || e.key === 'class_caddy_settings_v1') {
         const settings = loadAppSettings();
-        if (e.key === 'class_caddy_theme' && e.newValue) settings.theme = e.newValue === 'dark' ? 'dark' : 'light';
+        if (e.key === 'class_caddy_theme' && e.newValue && ['light', 'dark', 'sepia', 'forest', 'midnight'].includes(e.newValue)) settings.theme = e.newValue as ThemeMode;
         setTheme(settings.theme);
         setLanguage(settings.language);
         applyAppSettings(settings);
@@ -473,12 +475,20 @@ export default function App() {
             user={user}
           />
         )}
-        {currentPage === 'home' && <LegacyPageFrame src="/home-content.html?cc-embedded=1" title="Class Caddy Home" />}
-        {currentPage === 'embedded' && <LegacyPageFrame src={embeddedPath} title="Class Caddy" />}
+        {currentPage === 'home' && <LegacyPageFrame src="/home-content.html?cc-embedded=1" title="Class Caddy Home" viewportMode />}
+        {currentPage === 'embedded' && <LegacyPageFrame src={embeddedPath} title="Class Caddy" viewportMode />}
         {currentPage === 'about' && <AboutView />}
         {currentPage === 'contact' && <ContactView />}
         {currentPage === 'privacy' && <PrivacyPolicyView />}
-        {currentPage === 'study-plan' && <StudyPlanView />}
+        {hasVisitedStudyPlan && (
+          <div
+            id="persistent-study-plan-frame"
+            aria-hidden={currentPage !== 'study-plan'}
+            style={currentPage === 'study-plan' ? undefined : { position: 'absolute', width: '100%', height: 0, overflow: 'hidden', visibility: 'hidden', pointerEvents: 'none' }}
+          >
+            <StudyPlanView />
+          </div>
+        )}
         {(currentPage === 'academic' || currentPage.startsWith('course-')) && (
           <CourseDetailView
             courseId={currentPage.startsWith('course-') ? currentPage : 'course-405'}
@@ -494,7 +504,7 @@ export default function App() {
 
       {/* Floating Action Buttons (Scroll Toggle and Dark Mode) */}
       {!isExplorerMode && (
-        <FloatingActionButtons theme={theme} toggleTheme={toggleTheme} />
+        <FloatingActionButtons theme={theme} toggleTheme={toggleTheme} activePage={currentPage} />
       )}
 
       {/* Footer (Hidden when File Explorer Fullscreen Mode is active) */}

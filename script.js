@@ -1065,6 +1065,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const settings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
             settings.theme = nextIsDark ? 'dark' : 'light';
             localStorage.setItem('class_caddy_settings_v1', JSON.stringify(settings));
+            window.dispatchEvent(new CustomEvent('classcaddy:settings-change', { detail: settings }));
         } catch (e) {}
         try {
             const sp = JSON.parse(localStorage.getItem('studyPlanSettings') || '{}');

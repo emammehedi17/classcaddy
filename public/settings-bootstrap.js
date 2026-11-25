@@ -1,12 +1,12 @@
 (function () {
   let settings = {};
   try { settings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}'); } catch (_) {}
-  const theme = ['light', 'dark', 'sepia', 'forest', 'midnight'].includes(settings.theme)
+  let theme = ['light', 'dark', 'sepia', 'forest', 'midnight'].includes(settings.theme)
     ? settings.theme
     : (['light', 'dark', 'sepia', 'forest', 'midnight'].includes(localStorage.getItem('class_caddy_theme')) ? localStorage.getItem('class_caddy_theme') : 'light');
-  const font = ['sans-serif', 'amiri', 'hind-siliguri', 'kalpurush'].includes(settings.banglaFont)
+  let font = ['sans-serif', 'amiri', 'hind-siliguri', 'kalpurush'].includes(settings.banglaFont)
     ? settings.banglaFont : 'sans-serif';
-  const language = settings.language === 'en' || localStorage.getItem('cc_home_lang') === 'en' ? 'en' : 'bn';
+  let language = settings.language === 'en' || localStorage.getItem('cc_home_lang') === 'en' ? 'en' : 'bn';
   const root = document.documentElement;
   const embedded = window.self !== window.top;
   if (embedded) {
@@ -18,23 +18,37 @@
       document.head.appendChild(embedStyle);
     }
   }
-  const dark = ['dark', 'forest', 'midnight'].includes(theme);
-  root.dataset.theme = theme;
-  root.dataset.banglaFont = font;
-  root.dataset.readingSize = ['small', 'medium', 'large'].includes(settings.readingSize) ? settings.readingSize : 'medium';
-  root.dataset.reduceMotion = String(settings.reduceMotion === true);
-  root.dataset.language = language;
-  root.lang = language;
-  root.classList.toggle('dark', dark);
-  root.style.colorScheme = theme === 'sepia' ? 'light' : dark ? 'dark' : 'light';
-  root.style.backgroundColor = theme === 'sepia' ? '#f4ecd8' : theme === 'forest' ? '#10251f' : theme === 'midnight' ? '#080d1c' : dark ? '#0f172a' : '#f8fafc';
-  if (dark) root.style.color = '#e5e7eb';
-  new MutationObserver(() => {
-    root.classList.toggle('dark', dark);
+  let dark = ['dark', 'forest', 'midnight'].includes(theme);
+  const applyRoot = () => {
+    dark = ['dark', 'forest', 'midnight'].includes(theme);
     root.dataset.theme = theme;
+    root.dataset.banglaFont = font;
+    root.dataset.readingSize = ['small', 'medium', 'large'].includes(settings.readingSize) ? settings.readingSize : 'medium';
+    root.dataset.reduceMotion = String(settings.reduceMotion === true);
+    root.dataset.language = language;
+    root.lang = language;
+    root.classList.toggle('dark', dark);
     root.style.colorScheme = theme === 'sepia' ? 'light' : dark ? 'dark' : 'light';
-    root.style.backgroundColor = theme === 'sepia' ? '#f4ecd8' : dark ? (theme === 'forest' ? '#10251f' : theme === 'midnight' ? '#080d1c' : '#0f172a') : '#f8fafc';
+    root.style.backgroundColor = theme === 'sepia' ? '#f4ecd8' : theme === 'forest' ? '#10251f' : theme === 'midnight' ? '#080d1c' : dark ? '#0f172a' : '#f8fafc';
+    if (dark) root.style.color = '#e5e7eb';
+    else root.style.removeProperty('color');
+    if (document.body) document.body.classList.toggle('dark-mode', dark);
+  };
+  applyRoot();
+  new MutationObserver(() => {
+    applyRoot();
   }).observe(root, { attributes: true, attributeFilter: ['class'] });
+
+  window.addEventListener('classcaddy:settings-change', (event) => {
+    const detail = event.detail;
+    if (!detail || typeof detail !== 'object') return;
+    settings = { ...settings, ...detail };
+    if (['light', 'dark', 'sepia', 'forest', 'midnight'].includes(settings.theme)) theme = settings.theme;
+    if (['sans-serif', 'amiri', 'hind-siliguri', 'kalpurush'].includes(settings.banglaFont)) font = settings.banglaFont;
+    if (settings.language === 'bn' || settings.language === 'en') language = settings.language;
+    applyRoot();
+    syncBody();
+  });
 
   const fontHref = 'https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap';
   if (document.head && !document.querySelector('link[data-cc-settings-fonts]')) {

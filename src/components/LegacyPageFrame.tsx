@@ -1,9 +1,17 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
-type Props = { src: string; title: string };
+type Props = { src: string; title: string; viewportMode?: boolean };
 
-export const LegacyPageFrame: React.FC<Props> = ({ src, title }) => {
+export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = false }) => {
   const frameRef = useRef<HTMLIFrameElement>(null);
+  useEffect(() => {
+    const sendSettings = (event: Event) => {
+      const settings = (event as CustomEvent).detail;
+      if (settings && typeof settings === 'object') frameRef.current?.contentWindow?.postMessage({ type: 'classcaddy:parent-settings-change', settings }, window.location.origin);
+    };
+    window.addEventListener('classcaddy:settings-change', sendSettings);
+    return () => window.removeEventListener('classcaddy:settings-change', sendSettings);
+  }, []);
   const prepareFrame = useCallback(() => {
     const frame = frameRef.current;
     const doc = frame?.contentDocument;
@@ -16,9 +24,20 @@ export const LegacyPageFrame: React.FC<Props> = ({ src, title }) => {
     window.parent.postMessage({ type: 'classcaddy:navigation-loaded' }, window.location.origin);
     doc.defaultView?.addEventListener('classcaddy:settings-change', (event: Event) => {
       const detail = (event as CustomEvent).detail;
-      if (detail && typeof detail === 'object') window.parent.postMessage({ type: 'classcaddy:settings-change', settings: detail }, window.location.origin);
+      if (detail && typeof detail === 'object' && detail.__classCaddyParentSync !== true) window.parent.postMessage({ type: 'classcaddy:settings-change', settings: detail }, window.location.origin);
     });
-    const resize = () => { frame.style.height = `${Math.max(640, doc.documentElement.scrollHeight, doc.body?.scrollHeight || 0)}px`; };
+    doc.defaultView?.addEventListener('message', (event: MessageEvent) => {
+      if (event.origin !== window.location.origin || event.source !== window.parent || event.data?.type !== 'classcaddy:parent-settings-change') return;
+      const settings = event.data.settings;
+      if (!settings || typeof settings !== 'object') return;
+      try { localStorage.setItem('class_caddy_settings_v1', JSON.stringify(settings)); } catch {}
+      const settingsEvent = doc.createEvent('CustomEvent');
+      settingsEvent.initCustomEvent('classcaddy:settings-change', false, false, { ...settings, __classCaddyParentSync: true });
+      doc.defaultView?.dispatchEvent(settingsEvent);
+    });
+    const initialSettings = (() => { try { return JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}'); } catch { return {}; } })();
+    frame.contentWindow?.postMessage({ type: 'classcaddy:parent-settings-change', settings: initialSettings }, window.location.origin);
+    const resize = () => { if (!viewportMode) frame.style.height = `${Math.max(640, doc.documentElement.scrollHeight, doc.body?.scrollHeight || 0)}px`; };
     doc.addEventListener('click', (event) => {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const anchor = (event.target as Element | null)?.closest<HTMLAnchorElement>('a[href]');
@@ -32,10 +51,12 @@ export const LegacyPageFrame: React.FC<Props> = ({ src, title }) => {
       event.preventDefault();
       window.parent.postMessage({ type: 'classcaddy:navigate', href: url.pathname + url.search + url.hash }, window.location.origin);
     });
-    new ResizeObserver(resize).observe(doc.documentElement);
-    new MutationObserver(resize).observe(doc.body || doc.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
+    if (!viewportMode) {
+      new ResizeObserver(resize).observe(doc.documentElement);
+      new MutationObserver(resize).observe(doc.body || doc.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
+    }
     resize();
-  }, []);
+  }, [viewportMode]);
 
-  return <iframe ref={frameRef} title={title} src={src} onLoad={prepareFrame} className="block w-full border-0" style={{ minHeight: 'calc(100vh - 100px)' }} />;
+  return <iframe ref={frameRef} title={title} src={src} onLoad={prepareFrame} scrolling={viewportMode ? 'yes' : 'no'} className="block w-full border-0" style={viewportMode ? { height: 'calc(100dvh - 96px)', minHeight: 'calc(100vh - 96px)' } : { minHeight: 'calc(100vh - 100px)' }} />;
 };
