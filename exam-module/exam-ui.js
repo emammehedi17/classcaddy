@@ -299,6 +299,20 @@ function buildEditedFieldProps(rawInput) {
     return { plain, html };
 }
 
+function getExamDeviceId() {
+    const key = 'cc_new_exam_device_id_v1';
+    try {
+        let id = localStorage.getItem(key);
+        if (!id) {
+            id = `dev_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+            localStorage.setItem(key, id);
+        }
+        return id;
+    } catch {
+        return `dev_${Math.random().toString(36).slice(2, 10)}`;
+    }
+}
+
 class NewExamSystemController {
     constructor() {
         this.root = document.getElementById('new-exam-ui-root');
@@ -309,6 +323,11 @@ class NewExamSystemController {
         this.bookmarks = new Set();
         this.history = [];
         this.draft = null;
+        this.deviceId = getExamDeviceId();
+        this.cloudDraftSaveTimer = null;
+        this.unsubscribeCloudDraft = null;
+        this.awaitingDraftRestore = false;
+        this.lastDraftPersistMs = 0;
 
         this.config = {
             scopeMode: 'all', // 'inherited' | 'all' | 'subject'
@@ -344,7 +363,28 @@ class NewExamSystemController {
         return this.bridge;
     }
 
+    async openRecoveredDraftOnPageLoad() {
+        if (this._checkingStartupDraft || this.view === 'run') return;
+        this._checkingStartupDraft = true;
+        try {
+            const bridge = this.getBridge();
+            const uid = bridge?.getUserId?.() || 'guest';
+            const localDraft = loadExamDraft(uid);
+            const remoteDraft = await bridge?.fetchActiveExamDraft?.().catch((error) => {
+                console.warn('[NewExamUI] Startup draft check failed:', error);
+                return null;
+            });
+            if (localDraft || remoteDraft) await this.openFromQuizModal();
+        } finally {
+            this._checkingStartupDraft = false;
+        }
+    }
+
     bindGlobalListeners() {
+        window.addEventListener('pagehide', () => {
+            if (this.run) this.persistActiveDraft(true);
+        });
+
         // Keyboard navigation & answer selection during exam runtime
         document.addEventListener('keydown', (e) => {
             if (!this.root || this.root.classList.contains('hidden')) return;
@@ -428,14 +468,20 @@ class NewExamSystemController {
 
         try {
             const uid = bridge.getUserId?.() || 'guest';
-            this.draft = loadExamDraft(uid);
+            const localDraft = loadExamDraft(uid);
             this.bookmarks = loadLocalBookmarks(uid);
 
-            const [repo, syncedBookmarks, historyList] = await Promise.all([
+            const [repo, syncedBookmarks, historyList, remoteDraft] = await Promise.all([
                 buildStudyPlanRepository(bridge),
                 syncBookmarksFromBridge(bridge),
-                fetchExamHistory(bridge)
+                fetchExamHistory(bridge),
+                bridge.fetchActiveExamDraft?.().catch((error) => {
+                    console.warn('[NewExamUI] Active exam draft fetch failed:', error);
+                    return null;
+                }) || Promise.resolve(null)
             ]);
+
+            this.draft = (remoteDraft?.updatedAt || 0) > (localDraft?.updatedAt || 0) ? remoteDraft : localDraft;
 
             this.repo = repo;
             this.bookmarks = syncedBookmarks;
@@ -450,12 +496,41 @@ class NewExamSystemController {
             this.config.customTitle = repo.inheritedCollection?.title || '';
             this.config.topicSearch = '';
             this.config.sectionBExpanded = false;
+
+            this.unsubscribeCloudDraft?.();
+            this.unsubscribeCloudDraft = bridge.subscribeActiveExamDraft?.((remote) => {
+                if (!remote) {
+                    if (this.draft && this.draft.writerDeviceId !== this.deviceId && this.view === 'config') {
+                        this.draft = null;
+                        this.render();
+                    }
+                    return;
+                }
+                if (remote.writerDeviceId === this.deviceId) return;
+                const currentUpdatedAt = this.run?.updatedAt || this.draft?.updatedAt || 0;
+                if ((remote.updatedAt || 0) <= currentUpdatedAt) return;
+                if (this.view === 'run' && this.run && !this.submitDialogOpen) {
+                    this.applyRemoteDraft(remote);
+                } else if (this.view === 'config') {
+                    this.draft = remote;
+                    if (this.awaitingDraftRestore) {
+                        this.awaitingDraftRestore = false;
+                        this.resumeFromDraft();
+                    } else {
+                        this.render();
+                    }
+                }
+            }) || null;
         } catch (err) {
             console.error('[NewExamUI] Failed to initialize repository:', err);
             this.showToast('Could not load Study Plan questions. Check your connection.');
         } finally {
             this.isLoadingRepo = false;
-            this.render();
+            if (this.draft) this.resumeFromDraft();
+            else {
+                this.awaitingDraftRestore = true;
+                this.render();
+            }
         }
     }
 
@@ -692,13 +767,15 @@ class NewExamSystemController {
 
     discardDraft() {
         const uid = this.getBridge()?.getUserId?.() || 'guest';
+        const attemptId = this.draft?.attemptId;
         clearExamDraft(uid);
+        this.getBridge()?.clearActiveExamDraft?.(attemptId).catch((error) => console.warn('[NewExamUI] Could not clear cloud draft:', error));
         this.draft = null;
         this.render();
         this.showToast('Unfinished draft discarded.');
     }
 
-    persistActiveDraft() {
+    persistActiveDraft(immediateCloud = false) {
         if (!this.run) return;
         const uid = this.getBridge()?.getUserId?.() || 'guest';
         const nowMs = Date.now();
@@ -709,7 +786,7 @@ class NewExamSystemController {
             ? this.run.pausedElapsedMs
             : (this.run.pausedElapsedMs || 0) + (nowMs - (this.run.lastActiveStartMs || nowMs));
 
-        saveExamDraft(uid, {
+        const draft = saveExamDraft(uid, {
             attemptId: this.run.attemptId,
             title: this.run.title,
             subjectSummary: this.run.subjectSummary,
@@ -723,8 +800,35 @@ class NewExamSystemController {
             pausedElapsedMs: elapsedMs,
             tabSwitches: this.run.tabSwitches || 0,
             timerHidden: !!this.run.timerHidden,
-            paletteOpen: !!this.run.paletteOpen
+            paletteOpen: !!this.run.paletteOpen,
+            paused: !!this.run.paused,
+            writerDeviceId: this.deviceId
         });
+        this.run.updatedAt = draft?.updatedAt || nowMs;
+        const bridge = this.getBridge();
+        if (bridge && !bridge.isGuestMode?.() && bridge.saveActiveExamDraft) {
+            clearTimeout(this.cloudDraftSaveTimer);
+            const saveToCloud = () => {
+                bridge.saveActiveExamDraft(draft).catch((error) => console.warn('[NewExamUI] Cloud exam draft save failed:', error));
+            };
+            if (immediateCloud) saveToCloud();
+            else this.cloudDraftSaveTimer = setTimeout(saveToCloud, 250);
+        }
+    }
+
+    applyRemoteDraft(draft) {
+        if (!draft || !this.run) return;
+        const nowMs = Date.now();
+        const remainingMs = draft.unlimited ? 0 : Math.max(0, Number(draft.pausedRemainingMs) || 0);
+        this.run = {
+            ...draft,
+            lastActiveStartMs: nowMs,
+            endTimeMs: draft.unlimited || draft.paused ? null : nowMs + remainingMs,
+            pausedRemainingMs: remainingMs
+        };
+        if (this.run.paused) this.stopTimerLoop();
+        else this.startTimerLoop();
+        this.render();
     }
 
     stopTimerLoop() {
@@ -743,6 +847,10 @@ class NewExamSystemController {
 
             const clockEl = this.root?.querySelector('#ex-live-clock');
             const nowMs = Date.now();
+            if (nowMs - this.lastDraftPersistMs >= 5000) {
+                this.lastDraftPersistMs = nowMs;
+                this.persistActiveDraft();
+            }
 
             if (this.run.unlimited) {
                 const elapsedSec = Math.floor(((this.run.pausedElapsedMs || 0) + (nowMs - this.run.lastActiveStartMs)) / 1000);
@@ -1738,6 +1846,8 @@ class NewExamSystemController {
         // Clear unfinished draft immediately so reload never reopens finished exam
         const bridge = this.getBridge();
         clearExamDraft(bridge?.getUserId?.() || 'guest');
+        clearTimeout(this.cloudDraftSaveTimer);
+        bridge?.clearActiveExamDraft?.(this.run.attemptId).catch((error) => console.warn('[NewExamUI] Could not clear cloud draft:', error));
         this.draft = null;
         this.run = null;
 
@@ -3627,6 +3737,13 @@ class NewExamSystemController {
 
 const examController = new NewExamSystemController();
 window.__NewExamController = examController;
+
+window.addEventListener('classcaddy:exam-auth-ready', () => {
+    examController.openRecoveredDraftOnPageLoad();
+});
+if (window._currentUserId) {
+    examController.openRecoveredDraftOnPageLoad();
+}
 
 document.addEventListener('click', (e) => {
     const launchBtn = e.target.closest('#launch-new-exam-ui-btn');

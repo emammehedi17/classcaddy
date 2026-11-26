@@ -1833,6 +1833,21 @@ html.dark #new-exam-ui-root {
     -webkit-overflow-scrolling: touch;
 }
 
+/* Keep KaTeX radicals on math fonts when a Bengali reading font is selected.
+   Some system/browser font stacks substitute the radical glyph with an empty box. */
+#new-exam-ui-root .katex .sqrt .sqrt-sign,
+#new-exam-ui-root .katex .sqrt .sqrt-sign * {
+    font-family: KaTeX_Main, "Cambria Math", "STIX Two Math", "Noto Sans Math", "Times New Roman", serif !important;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    color: currentColor !important;
+}
+
+#new-exam-ui-root .katex,
+#new-exam-ui-root .katex .sqrt {
+    overflow: visible;
+}
+
 #new-exam-ui-root .ex-opt-btn .cc-code-block,
 #new-exam-ui-root .ex-bk-opt .cc-code-block,
 #new-exam-ui-root .ex-rv-opt .cc-code-block {

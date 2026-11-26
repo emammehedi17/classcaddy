@@ -71,10 +71,12 @@ function getDraftKey(userId) {
 export function saveExamDraft(userId, draftObj) {
     try {
         if (!draftObj) return;
-        localStorage.setItem(getDraftKey(userId), JSON.stringify({
+        const savedDraft = {
             ...draftObj,
             updatedAt: Date.now()
-        }));
+        };
+        localStorage.setItem(getDraftKey(userId), JSON.stringify(savedDraft));
+        return savedDraft;
     } catch (e) {
         console.warn('[ExamStorage] Failed to save draft:', e);
     }

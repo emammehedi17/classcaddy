@@ -694,6 +694,7 @@
                 currentUser = user;
                 userId = user.uid; // This will be MEHEDI_UID in guest mode
                 window._currentUserId = userId;
+                window.dispatchEvent(new Event('classcaddy:exam-auth-ready'));
                 console.log("User logged in:", userId);
                 console.log("Is Guest Mode:", isGuestMode); 
 
@@ -11936,6 +11937,36 @@ window.__StudyPlanQuizBridge = {
             savedAt: Timestamp.now()
         });
         return docId;
+    },
+    fetchActiveExamDraft: async () => {
+        if (!userId || !db || isGuestMode) return null;
+        const snap = await getDoc(doc(db, `artifacts/${appId}/users/${userId}/examDrafts`, 'active'));
+        const payload = snap.exists() ? snap.data() : null;
+        return payload?.draft && Array.isArray(payload.draft.questions) ? payload.draft : null;
+    },
+    saveActiveExamDraft: async (draft) => {
+        if (!userId || !db || isGuestMode || !draft?.attemptId) return false;
+        await setDoc(doc(db, `artifacts/${appId}/users/${userId}/examDrafts`, 'active'), {
+            draft,
+            updatedAt: Timestamp.now()
+        });
+        return true;
+    },
+    clearActiveExamDraft: async (attemptId = null) => {
+        if (!userId || !db || isGuestMode) return;
+        const draftRef = doc(db, `artifacts/${appId}/users/${userId}/examDrafts`, 'active');
+        if (attemptId) {
+            const snap = await getDoc(draftRef);
+            if (snap.exists() && snap.data()?.draft?.attemptId !== attemptId) return;
+        }
+        await deleteDoc(draftRef);
+    },
+    subscribeActiveExamDraft: (callback) => {
+        if (!userId || !db || isGuestMode || typeof callback !== 'function') return () => {};
+        return onSnapshot(doc(db, `artifacts/${appId}/users/${userId}/examDrafts`, 'active'), (snap) => {
+            const draft = snap.exists() ? snap.data()?.draft : null;
+            callback(draft && Array.isArray(draft.questions) ? draft : null);
+        }, (error) => console.warn('[Exam] Active draft sync listener failed:', error));
     },
     deleteNewExamResult: async (docId) => {
         if (!userId || !db || isGuestMode || !docId) return;
