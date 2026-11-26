@@ -1896,22 +1896,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
              const tableId = `table-${monthId}-${weekId}-${dayIndex}`;
              const initialDayProgress = calculateDailyProgress(dayData);
              
-             // --- All MCQ Button Logic ---
-             let allMcqButtonsNormalMode = '';
-             const allDayMcqs = dayData.rows?.reduce((acc, row) => {
-                if (row.mcqData) {
-                    acc.push(...row.mcqData);
-                }
-                return acc;
-             }, []) || [];
-
-             if (allDayMcqs.length > 0) {
-                 allMcqButtonsNormalMode = `
-                     <button class="action-button action-button-secondary text-xs view-all-mcq-btn"><i class="fas fa-eye mr-1"></i> View All MCQ</button>
-                     <button class="action-button action-button-secondary text-xs test-all-mcq-btn" style="border-color: #6366f1; color: #4f46e5;"><i class="fas fa-tasks mr-1"></i> Test All MCQ</button>
-                 `;
-             }
-
              // --- START: NEW HTML STRUCTURE ---
              return `
                  <div class="day-section is-collapsed" id="day-${monthId}-${weekId}-${dayIndex}" data-day-index="${dayIndex}"> 
@@ -1948,7 +1932,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          </div>
 
                          <div class="day-header-actions">
-                             ${allMcqButtonsNormalMode}
                              ${isGuestMode ? '' : '<button class="action-button action-button-secondary text-xs edit-day-btn"><i class="fas fa-pencil-alt mr-1"></i> Edit</button>'}
                              ${isGuestMode ? '' : '<button class="action-button text-xs save-day-btn hidden"><i class="fas fa-save mr-1"></i> Save</button>'}
                          </div>
@@ -3783,17 +3766,6 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
 
 
-                 // --- START: NEW MCQ BUTTON HANDLERS ---
-				 
-                 else if (button.classList.contains('view-all-mcq-btn')) {
-                     const dayIndex = parseInt(daySection.dataset.dayIndex);
-                     openViewMcqModal(monthId, weekId, dayIndex, null); // null signifies "All MCQs"
-                 }
-                 else if (button.classList.contains('test-all-mcq-btn')) {
-                     const dayIndex = parseInt(daySection.dataset.dayIndex);
-                     startMcqQuiz(monthId, weekId, dayIndex, null); // null signifies "All MCQs"
-                 }
-                 // --- END: NEW MCQ BUTTON HANDLERS ---
                  else if (button.classList.contains('study-time-report-btn')) {
                      openStudyTimeReportModal(monthId, weekId);
                  }
