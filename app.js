@@ -132,6 +132,38 @@
         const authContainerMobile = document.getElementById('auth-container-mobile');
 		let activeWeeksDataCache = {};
 		window._weeksCache = activeWeeksDataCache;
+        const LAST_ACTIVE_STUDY_DAY_KEY = 'cc_study_plan_last_active_day_v1';
+        let restoreLastStudyDayOnOpen = true;
+
+        function getLastActiveStudyDay() {
+            try {
+                const value = JSON.parse(localStorage.getItem(LAST_ACTIVE_STUDY_DAY_KEY) || 'null');
+                if (value && typeof value.monthId === 'string' && typeof value.weekId === 'string' && Number.isInteger(value.dayIndex)) return value;
+            } catch (_) {}
+            return null;
+        }
+
+        function rememberActiveStudyDay(monthId, weekId, dayIndex) {
+            if (!monthId || !weekId || !Number.isInteger(dayIndex)) return;
+            try { localStorage.setItem(LAST_ACTIVE_STUDY_DAY_KEY, JSON.stringify({ monthId, weekId, dayIndex, updatedAt: Date.now() })); } catch (_) {}
+        }
+
+        function restoreLastActiveStudyDay(monthId) {
+            if (!restoreLastStudyDayOnOpen) return false;
+            const lastDay = getLastActiveStudyDay();
+            if (!lastDay || lastDay.monthId !== monthId) return false;
+            const daySection = document.getElementById(`day-${lastDay.monthId}-${lastDay.weekId}-${lastDay.dayIndex}`);
+            if (!daySection) {
+                restoreLastStudyDayOnOpen = false;
+                return false;
+            }
+            const monthElement = daySection.closest('.card[data-month-id]');
+            monthElement?.querySelectorAll('.day-section:not(.is-collapsed)').forEach(day => day.classList.add('is-collapsed'));
+            daySection.classList.remove('is-collapsed');
+            restoreLastStudyDayOnOpen = false;
+            window.setTimeout(() => daySection.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+            return true;
+        }
 
         // Header navigation elements
         const pageHeader = document.querySelector('header.main-website-ui');
@@ -1262,11 +1294,13 @@
                         if (unsubscribeActiveMonth) unsubscribeActiveMonth(); // Stop listening to deleted month
                         unsubscribeActiveMonth = null;
                     } else if (!currentMonthId) {
-                        // No month is currently selected (e.g., initial page load).
-                        // Default to the last month in the list.
-                        const lastMonthId = querySnapshot.docs[querySnapshot.docs.length - 1].id;
-                        console.log("No month selected. Defaulting to last month:", lastMonthId);
-                        displayMonthPlan(lastMonthId); // Automatically load the last month
+                        // Restore the month containing the last day the user worked on.
+                        // If there is no saved day, keep the usual latest-month default.
+                        const lastActivity = restoreLastStudyDayOnOpen ? getLastActiveStudyDay() : null;
+                        const activityMonthExists = lastActivity && querySnapshot.docs.some(item => item.id === lastActivity.monthId);
+                        const defaultMonthId = activityMonthExists ? lastActivity.monthId : querySnapshot.docs[querySnapshot.docs.length - 1].id;
+                        console.log("No month selected. Defaulting to last active month:", defaultMonthId);
+                        displayMonthPlan(defaultMonthId);
                     }
                     // --- MODIFIED BLOCK END ---
                 }
@@ -1539,6 +1573,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                          currentMonthPlanDisplay.innerHTML = '';
                          // Pass BOTH data objects to the renderer
                          currentMonthPlanDisplay.appendChild(createMonthElement(monthId, monthData, weeksData));
+                         if (restoreLastStudyDayOnOpen) restoreLastActiveStudyDay(monthId);
                          if (window.recalcSticky) setTimeout(window.recalcSticky, 50);
 
                          if (shouldRestoreScroll) {
@@ -1565,6 +1600,16 @@ function updateMonthUI(monthId, monthData, weeksData) {
              // --- END: NEW DATA LOADING LOGIC ---
          }
 
+
+        window.addEventListener('message', (event) => {
+            if (event.source !== window.parent || event.origin !== window.location.origin || event.data?.type !== 'classcaddy:studyplan-activate') return;
+            restoreLastStudyDayOnOpen = true;
+            const lastDay = getLastActiveStudyDay();
+            if (!lastDay) return;
+            const activeMonth = monthNavButtonsContainer.querySelector('button.active-month')?.dataset.monthId;
+            if (activeMonth === lastDay.monthId) restoreLastActiveStudyDay(activeMonth);
+            else if (monthNavButtonsContainer.querySelector(`button[data-month-id="${lastDay.monthId}"]`)) displayMonthPlan(lastDay.monthId);
+        });
 
        // 1. This listener OPENS the modal and sets the default date
         document.addEventListener('click', (e) => {
@@ -3615,6 +3660,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
                      const doneBtn = target.closest('.done-btn');
                      doneBtn.blur();
                      if (!daySection?.classList.contains('editing')) {
+                         rememberActiveStudyDay(monthId, weekId, parseInt(daySection.dataset.dayIndex));
                          // 1. Instant visual feedback — toggle button state and row style
                          const nowCompleted = !doneBtn.classList.contains('done-btn-completed');
                          doneBtn.classList.toggle('done-btn-completed', nowCompleted);
@@ -3678,6 +3724,7 @@ function updateMonthUI(monthId, monthData, weeksData) {
 
                  // Edit/Save Day Button
                  if (button.classList.contains('edit-day-btn') || button.classList.contains('save-day-btn')) {
+                     rememberActiveStudyDay(monthId, weekId, parseInt(daySection.dataset.dayIndex));
                      const isEditing = daySection.classList.contains('editing');
                      toggleDayEditMode(monthId, weekId, daySection, !isEditing);
                  }

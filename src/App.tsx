@@ -548,7 +548,7 @@ export default function App() {
             aria-hidden={currentPage !== 'study-plan'}
             style={currentPage === 'study-plan' ? undefined : { position: 'absolute', width: '100%', height: 0, overflow: 'hidden', visibility: 'hidden', pointerEvents: 'none' }}
           >
-            <StudyPlanView headerHidden={isHeaderHidden} />
+            <StudyPlanView headerHidden={isHeaderHidden} active={currentPage === 'study-plan'} />
           </div>
         )}
         {(currentPage === 'academic' || currentPage.startsWith('course-')) && (

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-type Props = { src: string; title: string; viewportMode?: boolean; fixedViewport?: boolean; hideHeaderOnScroll?: boolean; headerHidden?: boolean };
+type Props = { src: string; title: string; viewportMode?: boolean; fixedViewport?: boolean; hideHeaderOnScroll?: boolean; headerHidden?: boolean; active?: boolean };
 
-export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = false, fixedViewport = false, hideHeaderOnScroll = false, headerHidden = false }) => {
+export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = false, fixedViewport = false, hideHeaderOnScroll = false, headerHidden = false, active = true }) => {
   const frameRef = useRef<HTMLIFrameElement>(null);
   useEffect(() => {
     const sendSettings = (event: Event) => {
@@ -30,6 +30,7 @@ export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = fa
     doc.head.appendChild(style);
     if (doc.body) doc.body.style.paddingTop = '0';
     window.parent.postMessage({ type: 'classcaddy:navigation-loaded' }, window.location.origin);
+    if (hideHeaderOnScroll && active) frame.contentWindow?.postMessage({ type: 'classcaddy:studyplan-activate' }, window.location.origin);
     doc.defaultView?.addEventListener('classcaddy:settings-change', (event: Event) => {
       const detail = (event as CustomEvent).detail;
       if (detail && typeof detail === 'object' && detail.__classCaddyParentSync !== true) window.parent.postMessage({ type: 'classcaddy:settings-change', settings: detail }, window.location.origin);
@@ -95,7 +96,11 @@ export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = fa
       new MutationObserver(resize).observe(doc.body || doc.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
     }
     resize();
-  }, [viewportMode]);
+  }, [viewportMode, active, hideHeaderOnScroll]);
+
+  useEffect(() => {
+    if (hideHeaderOnScroll && active) frameRef.current?.contentWindow?.postMessage({ type: 'classcaddy:studyplan-activate' }, window.location.origin);
+  }, [active, hideHeaderOnScroll]);
 
   const frameStyle: React.CSSProperties = hideHeaderOnScroll
     ? { position: 'fixed', top: headerHidden ? 0 : 64, left: 0, width: '100%', height: headerHidden ? '100dvh' : 'calc(100dvh - 64px)', transition: 'top 300ms ease, height 300ms ease' }
