@@ -235,6 +235,41 @@ export default function App() {
     });
   };
 
+  useEffect(() => {
+    const exitFullscreen = () => {
+      if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
+    };
+    const exitExplorerMode = () => {
+      setIsExplorerMode(false);
+      localStorage.setItem('class_caddy_explorer_mode', 'false');
+      exitFullscreen();
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target;
+      const isWriting = target instanceof HTMLElement && (
+        target.isContentEditable
+        || Boolean(target.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"], [role="textbox"]'))
+      );
+      if (event.key.toLowerCase() === 'f' && !event.repeat && !isWriting && !event.ctrlKey && !event.altKey && !event.metaKey) {
+        event.preventDefault();
+        if (isExplorerMode) {
+          exitExplorerMode();
+        } else if (document.fullscreenElement) {
+          exitFullscreen();
+        } else {
+          const root = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> };
+          const request = root.requestFullscreen || root.webkitRequestFullscreen;
+          if (request) void Promise.resolve(request.call(root)).catch((error) => console.warn('Could not enter fullscreen:', error));
+        }
+      } else if (event.key === 'Escape' && (document.fullscreenElement || isExplorerMode)) {
+        if (isExplorerMode) exitExplorerMode();
+        else exitFullscreen();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isExplorerMode]);
+
   const [user, setUser] = useState<UserProfile>(() => {
     const ccAuth = localStorage.getItem('cc_auth_user');
     if (ccAuth) {

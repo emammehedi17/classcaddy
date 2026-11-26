@@ -31,6 +31,28 @@ export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = fa
     if (doc.body) doc.body.style.paddingTop = '0';
     window.parent.postMessage({ type: 'classcaddy:navigation-loaded' }, window.location.origin);
     if (hideHeaderOnScroll && active) frame.contentWindow?.postMessage({ type: 'classcaddy:studyplan-activate' }, window.location.origin);
+    const onFrameFullscreenKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const isWriting = Boolean(target && (
+        target.isContentEditable
+        || target.closest('input, textarea, select, [contenteditable=""], [contenteditable="true"], [role="textbox"]')
+      ));
+      if (event.key.toLowerCase() === 'f' && !event.repeat && !isWriting && !event.ctrlKey && !event.altKey && !event.metaKey) {
+        event.preventDefault();
+        const parentDocument = window.parent.document;
+        const activeFullscreen = doc.fullscreenElement || parentDocument.fullscreenElement;
+        if (activeFullscreen) {
+          void activeFullscreen.ownerDocument.exitFullscreen?.().catch(() => {});
+        } else {
+          void doc.documentElement.requestFullscreen?.().catch((error) => console.warn('Could not enter fullscreen:', error));
+        }
+      } else if (event.key === 'Escape') {
+        const parentDocument = window.parent.document;
+        const activeFullscreen = doc.fullscreenElement || parentDocument.fullscreenElement;
+        if (activeFullscreen) void activeFullscreen.ownerDocument.exitFullscreen?.().catch(() => {});
+      }
+    };
+    doc.addEventListener('keydown', onFrameFullscreenKeyDown);
     doc.defaultView?.addEventListener('classcaddy:settings-change', (event: Event) => {
       const detail = (event as CustomEvent).detail;
       if (detail && typeof detail === 'object' && detail.__classCaddyParentSync !== true) window.parent.postMessage({ type: 'classcaddy:settings-change', settings: detail }, window.location.origin);
@@ -106,5 +128,5 @@ export const LegacyPageFrame: React.FC<Props> = ({ src, title, viewportMode = fa
     ? { position: 'fixed', top: headerHidden ? 0 : 64, left: 0, width: '100%', height: headerHidden ? '100dvh' : 'calc(100dvh - 64px)', transition: 'top 300ms ease, height 300ms ease' }
     : fixedViewport ? { position: 'fixed', top: 64, left: 0, width: '100%', height: 'calc(100dvh - 64px)' }
     : viewportMode ? { height: 'calc(100dvh - 64px)', minHeight: 'calc(100vh - 64px)' } : { minHeight: 'calc(100vh - 100px)' };
-  return <iframe ref={frameRef} title={title} src={src} onLoad={prepareFrame} scrolling={viewportMode ? 'yes' : 'no'} className="block w-full border-0" style={frameStyle} />;
+  return <iframe ref={frameRef} title={title} src={src} onLoad={prepareFrame} allowFullScreen scrolling={viewportMode ? 'yes' : 'no'} className="block w-full border-0" style={frameStyle} />;
 };
