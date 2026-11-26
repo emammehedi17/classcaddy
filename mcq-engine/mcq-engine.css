@@ -171,6 +171,25 @@ html.dark .cc-rich-content svg {
   border-color: #475569;
 }
 
+/*
+ * KaTeX draws the root sign (√), long arrows, braces, etc. with its own
+ * internal <svg>. The diagram-card rule above must NOT apply to those,
+ * otherwise the root sign gets a border, rounded box, padding and a broken
+ * height (clipped / half visible). Reset them to what katex.css expects.
+ */
+.cc-rich-content .katex svg,
+body.dark-mode .cc-rich-content .katex svg,
+html.dark .cc-rich-content .katex svg {
+  display: block;
+  max-width: none;
+  height: inherit;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
 .cc-rich-content a {
   color: var(--cc-accent, #4f46e5);
   text-decoration: underline;
