@@ -8954,7 +8954,7 @@ async function executeCloudBackup(isAuto = false) {
         const q = query(cloudBackupsRef, orderBy("timestamp", "asc"));
         const snapshot = await getDocsFromServer(q);
 
-        let successMessage = isAuto ? "Daily Auto-Backup Complete!" : "Backup saved to cloud successfully!";
+        let successMessage = isAuto ? "Automatic Backup Complete!" : "Backup saved to cloud successfully!";
 
         if (snapshot.size >= 10) { 
             if (!isAuto) updateProgress(10, "Cleaning old backups...");
@@ -8975,7 +8975,7 @@ async function executeCloudBackup(isAuto = false) {
             }
             await batch.commit();
             
-            if (isAuto) successMessage = "Daily Auto-Backup Complete! (Oldest removed)";
+            if (isAuto) successMessage = "Automatic Backup Complete! (Oldest removed)";
             else successMessage = "Backup saved! (Oldest backup removed to maintain limit)";
         }
 
@@ -8992,7 +8992,7 @@ async function executeCloudBackup(isAuto = false) {
 
         const jsonString = JSON.stringify(backupData);
         const CHUNK_SIZE = 50000; 
-        const noteText = isAuto ? "Auto-Backup (24h Cycle)" : "Manual Cloud Backup";
+        const noteText = isAuto ? "Auto-Backup (6h Cycle)" : "Manual Cloud Backup";
 
         // --- STEP 3: UPLOAD (Writing is fast, but we track it) ---
         if (!isAuto) updateProgress(85, "Uploading...");
@@ -9100,7 +9100,7 @@ async function executeCloudBackup(isAuto = false) {
 backupCloudBtn.addEventListener('click', () => executeCloudBackup(false));
 
 
-// --- 5. SMART SCHEDULER (UNIVERSAL 24-HOUR CYCLE) ---
+// --- 5. SMART SCHEDULER (UNIVERSAL 6-HOUR CYCLE) ---
 
 const SIX_HOURS = 6 * 60 * 60 * 1000;
 let _smartBackupTimerStarted = false; // guard against duplicate setInterval timers
