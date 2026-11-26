@@ -49,6 +49,17 @@ export function shuffleArrayCopy(arr) {
     return copy;
 }
 
+function normalizeOptionForShuffleDetection(option) {
+    return htmlToPlainText(String(option || ''))
+        .normalize('NFKC')
+        .toLowerCase()
+        // Facebook/Docs/keyboard input can spell Bengali য় with either codepoint form.
+        .replace(/য়/g, 'য়')
+        .replace(/[।,;:!?()[\]{}]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
 export function processOptionBundle(q, shouldAllowShuffle = true) {
     const rawOptions = Array.isArray(q?.options) ? q.options.slice() : [];
     const rawOptionsHtml = Array.isArray(q?.optionsHtml) ? q.optionsHtml.slice() : [];
@@ -63,15 +74,17 @@ export function processOptionBundle(q, shouldAllowShuffle = true) {
     }
 
     const restrictedPhrases = [
-        'both', 'all of the above', 'none of the above', 'a & b', 'b and c', 'c and d', 'none', 'all',
-        'উভয়', 'উভয়ই', 'দুটিই', 'উপরের সব', 'উপরের সবগুলো', 'সবগুলো',
-        'কোনোটিই নয়', 'কোনোটিই না', 'কোনোটি নয়', 'কোনোটি না',
-        'ক ও খ', 'খ ও গ', 'ক ও গ'
+        'both', 'all of the above', 'all of above', 'none of the above', 'none of above',
+        'a & b', 'a and b', 'b & c', 'b and c', 'c & d', 'c and d', 'both a and b', 'both a & b',
+        'উপরের সব', 'উপরের সবগুলো', 'সবগুলোই', 'সবগুলো',
+        'কোনোটিই নয়', 'কোনোটি নয়', 'কোনোটিই না', 'কোনোটি না', 'কোনোটাই নয়', 'কোনোটাই না',
+        'উভয়ই', 'উভয়', 'দুটোই', 'দুটিই', 'ক ও খ', 'খ ও গ', 'ক ও গ'
     ];
 
     const hasRestricted = rawOptions.some(opt => {
-        const lower = htmlToPlainText(String(opt || '')).toLowerCase();
-        return restrictedPhrases.some(phrase => lower.includes(phrase.toLowerCase()));
+        const normalized = normalizeOptionForShuffleDetection(opt);
+        return normalized === 'all' || normalized === 'none'
+            || restrictedPhrases.some(phrase => normalized.includes(normalizeOptionForShuffleDetection(phrase)));
     });
 
     const indices = rawOptions.map((_, i) => i);
