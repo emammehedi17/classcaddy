@@ -12,19 +12,19 @@ html[data-reduce-motion="true"] *, html[data-reduce-motion="true"] *::before, ht
   transition-duration: .01ms !important;
 }
 html[data-bangla-font="sans-serif"] body,
-html[data-bangla-font="sans-serif"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text) {
+html[data-bangla-font="sans-serif"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text):not(.katex):not(.katex *) {
   font-family: 'Noto Sans Bengali','Hind Siliguri','Inter',sans-serif !important;
 }
 html[data-bangla-font="hind-siliguri"] body,
-html[data-bangla-font="hind-siliguri"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text) {
+html[data-bangla-font="hind-siliguri"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text):not(.katex):not(.katex *) {
   font-family: 'Hind Siliguri','Noto Sans Bengali','Inter',sans-serif !important;
 }
 html[data-bangla-font="amiri"] body,
-html[data-bangla-font="amiri"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text) {
+html[data-bangla-font="amiri"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text):not(.katex):not(.katex *) {
   font-family: 'Amiri','Noto Sans Bengali','Hind Siliguri',serif !important;
 }
 html[data-bangla-font="kalpurush"] body,
-html[data-bangla-font="kalpurush"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text) {
+html[data-bangla-font="kalpurush"] body :is(h1,h2,h3,h4,p,span,a,button,label,li,td,th,input,textarea,select,.bangla,.bengali-text):not(.katex):not(.katex *) {
   font-family: 'Kalpurush','Noto Sans Bengali','Hind Siliguri',sans-serif !important;
 }
 html[data-theme="sepia"], html[data-theme="sepia"] body { background:#f4ecd8 !important; color:#43382b !important; }
