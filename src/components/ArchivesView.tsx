@@ -4195,7 +4195,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
       {showAuthModal && (
         <div
           id="developer-auth-modal"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150"
+          className="fixed inset-x-0 top-16 bottom-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150"
         >
           <div
             className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl transition-all ${
@@ -4309,7 +4309,7 @@ export const ArchivesView: React.FC<ArchivesViewProps> = ({
       {(editingCard || isAddMode) && (
         <div
           id="edit-card-modal"
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150"
+          className="fixed inset-x-0 top-16 bottom-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150"
         >
           <div
             className={`w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden rounded-2xl border shadow-2xl transition-all ${

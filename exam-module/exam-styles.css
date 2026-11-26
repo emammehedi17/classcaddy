@@ -59,6 +59,17 @@
     -webkit-font-smoothing: antialiased;
 }
 
+/* In standalone Study Plan, leave room for its fixed header. Embedded Study Plan
+   already starts below the app shell header, so it must continue from iframe top. */
+html:not(.cc-embedded) #new-exam-ui-root {
+    inset: 64px 0 0;
+}
+
+html:not(.cc-embedded) #new-exam-ui-root:fullscreen,
+html:not(.cc-embedded) #new-exam-ui-root:-webkit-full-screen {
+    inset: 0;
+}
+
 #new-exam-ui-root.hidden {
     display: none !important;
 }

@@ -725,6 +725,13 @@ body.dark-mode .done-btn-completed {
     background-color: rgba(15, 23, 42, 0.68); 
 }
 
+/* Standalone Study Plan pages have their own fixed 64px header. Keep regular
+   dialogs below it; embedded pages already get this space from the shell iframe. */
+html:not(.cc-embedded) .modal {
+    top: 64px;
+    height: calc(100% - 64px);
+}
+
 .modal-content { 
     background-color: #ffffff; 
     
