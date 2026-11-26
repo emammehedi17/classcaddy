@@ -637,17 +637,34 @@ export function selectQuestionsForExam(repo, configState, bookmarkSet) {
 
     const totalEligible = pool.length;
 
-    // Sort / Shuffle questions
+    // A numbered range always refers to original question order. Apply it after
+    // eligibility filters, then optionally shuffle only the questions in-range.
+    const rangeStart = configState.settings.questionRangeStart;
+    const rangeEnd = configState.settings.questionRangeEnd;
+    const hasRange = (rangeStart !== '' && rangeStart !== null && rangeStart !== undefined)
+        || (rangeEnd !== '' && rangeEnd !== null && rangeEnd !== undefined);
+    const rangeStartNumber = Number(rangeStart);
+    const rangeEndNumber = Number(rangeEnd);
+    const rangeIsValid = Number.isInteger(rangeStartNumber) && rangeStartNumber >= 1
+        && Number.isInteger(rangeEndNumber) && rangeEndNumber >= rangeStartNumber;
+
     let ordered = pool.slice();
-    if (configState.settings.questionOrder === 'serial') {
+    if (hasRange && !rangeIsValid) {
+        return { totalEligible, requestedCount: 0, actualCount: 0, questions: [], rangeError: 'invalid' };
+    }
+    if (hasRange) {
         ordered.sort((a, b) => (a.serialIndex || 0) - (b.serialIndex || 0));
-    } else if (configState.settings.shuffleQuestions) {
-        ordered = shuffleArrayCopy(ordered);
+        ordered = ordered.slice(rangeStartNumber - 1, rangeEndNumber);
+        if (configState.settings.questionOrder !== 'serial') ordered = shuffleArrayCopy(ordered);
+    } else if (configState.settings.questionOrder === 'serial') {
+        ordered.sort((a, b) => (a.serialIndex || 0) - (b.serialIndex || 0));
     } else {
         ordered = shuffleArrayCopy(ordered);
     }
 
-    const requestedCount = Math.max(1, parseInt(configState.settings.questionCount, 10) || 25);
+    const requestedCount = hasRange
+        ? rangeEndNumber - rangeStartNumber + 1
+        : Math.max(1, parseInt(configState.settings.questionCount, 10) || 25);
     const actualCount = Math.min(requestedCount, ordered.length);
     const chosen = ordered.slice(0, actualCount).map((q, index) => {
         const bundle = processOptionBundle(q, configState.settings.shuffleOptions !== false);
@@ -671,6 +688,8 @@ export function selectQuestionsForExam(repo, configState, bookmarkSet) {
         totalEligible,
         requestedCount,
         actualCount,
+        rangeStart: hasRange ? rangeStartNumber : null,
+        rangeEnd: hasRange ? rangeEndNumber : null,
         avoidedRecentFallbackUsed,
         questions: chosen
     };

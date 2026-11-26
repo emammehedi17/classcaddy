@@ -14,6 +14,8 @@ export const DEFAULT_EXAM_SETTINGS = {
     wrongOnly: false,
     bookmarkedOnly: false,
     questionCount: 25,
+    questionRangeStart: '',
+    questionRangeEnd: '',
     timingType: 'whole', // 'whole' | 'per-question' | 'unlimited'
     totalMinutes: 15,
     secondsPerQuestion: 36,

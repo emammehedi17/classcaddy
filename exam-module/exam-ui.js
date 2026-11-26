@@ -2102,11 +2102,18 @@ class NewExamSystemController {
 
         // 4. Question Count Presets
         const countPresets = [10, 20, 25, 30, 50, 100, 150, 200];
-        const countUnavailableNotice = (Number(s.questionCount) > preview.totalEligible && preview.totalEligible > 0)
-            ? `<div style="font-size:0.8rem; color:var(--ex-amber); font-weight:600;"><i class="fas fa-info-circle"></i> Requested ${s.questionCount} questions, but ${preview.totalEligible} eligible questions are available. Exam will include all ${preview.totalEligible}.</div>`
-            : (preview.totalEligible === 0
-                ? `<div style="font-size:0.8rem; color:var(--ex-red); font-weight:600;"><i class="fas fa-exclamation-triangle"></i> 0 eligible questions match your selected topics &amp; filters.</div>`
-                : '');
+        const rangeActive = (s.questionRangeStart !== '' && s.questionRangeStart !== null && s.questionRangeStart !== undefined)
+            || (s.questionRangeEnd !== '' && s.questionRangeEnd !== null && s.questionRangeEnd !== undefined);
+        let countUnavailableNotice = '';
+        if (preview.totalEligible === 0) {
+            countUnavailableNotice = `<div style="font-size:0.8rem; color:var(--ex-red); font-weight:600;"><i class="fas fa-exclamation-triangle"></i> 0 eligible questions match your selected topics &amp; filters.</div>`;
+        } else if (rangeActive && preview.rangeError === 'invalid') {
+            countUnavailableNotice = `<div style="font-size:0.8rem; color:var(--ex-red); font-weight:600;">The question range is invalid. Enter a start and end number, with the end greater than or equal to the start.</div>`;
+        } else if (rangeActive && preview.actualCount < preview.requestedCount) {
+            countUnavailableNotice = `<div style="font-size:0.8rem; color:var(--ex-amber); font-weight:600;"><i class="fas fa-info-circle"></i> Range ${preview.rangeStart}–${preview.rangeEnd}: only ${preview.actualCount} question${preview.actualCount === 1 ? '' : 's'} available in this selection.</div>`;
+        } else if (!rangeActive && Number(s.questionCount) > preview.totalEligible && preview.totalEligible > 0) {
+            countUnavailableNotice = `<div style="font-size:0.8rem; color:var(--ex-amber); font-weight:600;"><i class="fas fa-info-circle"></i> Requested ${s.questionCount} questions, but ${preview.totalEligible} eligible questions are available. Exam will include all ${preview.totalEligible}.</div>`;
+        }
 
         // 5. Recent History Preview on Config bottom
         const recentHistoryHtml = this.history.length > 0 ? `
@@ -2194,12 +2201,21 @@ class NewExamSystemController {
                                     <span class="ex-label-col">Questions</span>
                                     <div class="ex-chips" style="flex:1;">
                                         ${countPresets.map(n => `
-                                            <button type="button" class="ex-chip ${Number(s.questionCount) === n ? 'on' : ''}" data-qcount="${n}">${n}</button>
+                                            <button type="button" class="ex-chip ${!rangeActive && Number(s.questionCount) === n ? 'on' : ''}" data-qcount="${n}">${n}</button>
                                         `).join('')}
-                                        <button type="button" class="ex-chip ${Number(s.questionCount) === preview.totalEligible && preview.totalEligible > 0 ? 'on' : ''}" data-qcount="${Math.max(1, preview.totalEligible)}">All (${preview.totalEligible})</button>
-                                        <input type="number" id="ex-custom-qcount" class="ex-input ex-num" min="1" max="1000" value="${s.questionCount}" style="width:86px;" aria-label="Custom Question Count">
+                                        <button type="button" class="ex-chip ${!rangeActive && Number(s.questionCount) === preview.totalEligible && preview.totalEligible > 0 ? 'on' : ''}" data-qcount="${Math.max(1, preview.totalEligible)}">All (${preview.totalEligible})</button>
+                                        <input type="number" id="ex-custom-qcount" class="ex-input ex-num" min="1" max="1000" value="${rangeActive ? '' : s.questionCount}" placeholder="Count" style="width:86px;" aria-label="Custom Question Count">
+                                        <div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap; padding:2px 0;">
+                                            <span style="font-size:0.72rem; color:var(--ex-muted); font-weight:700;">RANGE</span>
+                                            <input type="number" id="ex-question-range-start" class="ex-input ex-num" min="1" max="10000" value="${rangeActive ? esc(s.questionRangeStart) : ''}" placeholder="From" style="width:72px;" aria-label="Question range start">
+                                            <span style="color:var(--ex-muted);">–</span>
+                                            <input type="number" id="ex-question-range-end" class="ex-input ex-num" min="1" max="10000" value="${rangeActive ? esc(s.questionRangeEnd) : ''}" placeholder="To" style="width:72px;" aria-label="Question range end">
+                                            <button type="button" class="ex-btn sm" data-action="apply-question-range">Apply</button>
+                                            ${rangeActive ? `<button type="button" class="ex-btn sm ghost" data-action="clear-question-range">Clear</button>` : ''}
+                                        </div>
                                     </div>
                                 </div>
+                                <div style="font-size:0.74rem; color:var(--ex-muted); margin-top:4px;">Select a numbered range from the eligible questions; random selection only shuffles questions inside that range.</div>
                                 ${countUnavailableNotice}
                             </fieldset>
 
@@ -3222,6 +3238,8 @@ class NewExamSystemController {
                 const preset = EXAM_PRESETS.find(p => p.id === btn.dataset.preset);
                 if (!preset) return;
                 this.config.settings.presetId = preset.id;
+                this.config.settings.questionRangeStart = '';
+                this.config.settings.questionRangeEnd = '';
                 preset.apply(this.config, this.repo);
                 saveExamSettings(this.config.settings);
                 this.render();
@@ -3306,6 +3324,8 @@ class NewExamSystemController {
         this.root.querySelectorAll('[data-qcount]').forEach(btn => {
             btn.addEventListener('click', () => {
                 this.config.settings.questionCount = parseInt(btn.dataset.qcount, 10) || 25;
+                this.config.settings.questionRangeStart = '';
+                this.config.settings.questionRangeEnd = '';
                 saveExamSettings(this.config.settings);
                 this.render();
             });
@@ -3314,6 +3334,38 @@ class NewExamSystemController {
         if (customQCount) {
             customQCount.addEventListener('change', (e) => {
                 this.config.settings.questionCount = Math.max(1, parseInt(e.target.value, 10) || 1);
+                this.config.settings.questionRangeStart = '';
+                this.config.settings.questionRangeEnd = '';
+                saveExamSettings(this.config.settings);
+                this.render();
+            });
+        }
+
+        const applyQuestionRange = this.root.querySelector('[data-action="apply-question-range"]');
+        if (applyQuestionRange) {
+            applyQuestionRange.addEventListener('click', () => {
+                const startInput = this.root.querySelector('#ex-question-range-start');
+                const endInput = this.root.querySelector('#ex-question-range-end');
+                const start = Number(startInput?.value);
+                const end = Number(endInput?.value);
+                if (!Number.isInteger(start) || start < 1 || !Number.isInteger(end) || end < start) {
+                    this.showToast('Enter a valid range, for example 51 to 100.');
+                    (startInput?.value ? endInput : startInput)?.focus();
+                    return;
+                }
+                this.config.settings.questionRangeStart = start;
+                this.config.settings.questionRangeEnd = end;
+                this.config.settings.questionCount = end - start + 1;
+                saveExamSettings(this.config.settings);
+                this.render();
+            });
+        }
+
+        const clearQuestionRange = this.root.querySelector('[data-action="clear-question-range"]');
+        if (clearQuestionRange) {
+            clearQuestionRange.addEventListener('click', () => {
+                this.config.settings.questionRangeStart = '';
+                this.config.settings.questionRangeEnd = '';
                 saveExamSettings(this.config.settings);
                 this.render();
             });
