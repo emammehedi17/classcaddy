@@ -460,7 +460,7 @@ class NewExamSystemController {
         this.root = document.getElementById('new-exam-ui-root');
         this.root.classList.remove('hidden');
         this.root.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
+        this.lockPageScroll();
 
         this.view = 'config';
         this.isLoadingRepo = true;
@@ -547,7 +547,43 @@ class NewExamSystemController {
             this.root.classList.add('hidden');
             this.root.setAttribute('aria-hidden', 'true');
         }
+        this.unlockPageScroll();
+    }
+
+    /**
+     * Single-scrollbar guarantee: while the exam is open only #new-exam-ui-root
+     * may scroll. A CSS class on <html> is used (instead of only an inline
+     * body style) because the app's generic modal scroll-lock observer resets
+     * document.body.style.overflow whenever no ".modal" is visible, which
+     * brought the page scrollbar back behind the exam. When embedded in an
+     * <iframe scrolling="yes"> the frame is also switched to scrolling="no" so
+     * its forced scrollbar track disappears.
+     */
+    lockPageScroll() {
+        document.documentElement.classList.add('cc-exam-open');
+        document.body.style.overflow = 'hidden';
+        try {
+            const frame = window.frameElement;
+            if (frame && !this._frameScrollingLocked) {
+                this._prevFrameScrolling = frame.getAttribute('scrolling');
+                if (this._prevFrameScrolling !== 'no') frame.setAttribute('scrolling', 'no');
+                this._frameScrollingLocked = true;
+            }
+        } catch (_) { /* cross-origin frame: nothing to do */ }
+    }
+
+    unlockPageScroll() {
+        document.documentElement.classList.remove('cc-exam-open');
         document.body.style.overflow = '';
+        try {
+            const frame = window.frameElement;
+            if (frame && this._frameScrollingLocked) {
+                if (this._prevFrameScrolling === null || this._prevFrameScrolling === undefined) frame.removeAttribute('scrolling');
+                else frame.setAttribute('scrolling', this._prevFrameScrolling);
+            }
+        } catch (_) { /* ignore */ }
+        this._frameScrollingLocked = false;
+        this._prevFrameScrolling = null;
     }
 
     showToast(msg) {

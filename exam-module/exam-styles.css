@@ -74,6 +74,12 @@ html:not(.cc-embedded) #new-exam-ui-root:-webkit-full-screen {
     display: none !important;
 }
 
+/* Single scrollbar: while the exam is open the page behind must not scroll */
+html.cc-exam-open,
+html.cc-exam-open body {
+    overflow: hidden !important;
+}
+
 body.dark-mode #new-exam-ui-root,
 html.dark #new-exam-ui-root {
     --ex-paper: #0f172a;
