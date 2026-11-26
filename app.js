@@ -153,15 +153,17 @@
             const lastDay = getLastActiveStudyDay();
             if (!lastDay || lastDay.monthId !== monthId) return false;
             const daySection = document.getElementById(`day-${lastDay.monthId}-${lastDay.weekId}-${lastDay.dayIndex}`);
-            if (!daySection) {
-                restoreLastStudyDayOnOpen = false;
-                return false;
-            }
+            // The activate message can arrive while this month is still loading.
+            // Keep the request pending so the first rendered snapshot can retry.
+            if (!daySection) return false;
             const monthElement = daySection.closest('.card[data-month-id]');
             monthElement?.querySelectorAll('.day-section:not(.is-collapsed)').forEach(day => day.classList.add('is-collapsed'));
             daySection.classList.remove('is-collapsed');
             restoreLastStudyDayOnOpen = false;
-            window.setTimeout(() => daySection.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+            window.setTimeout(() => {
+                const top = daySection.getBoundingClientRect().top + window.scrollY - Math.max(24, window.innerHeight * 0.3);
+                window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+            }, 180);
             return true;
         }
 
