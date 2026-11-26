@@ -1,6 +1,9 @@
 import React from 'react';
 import { GraduationCap, Heart, Sparkles, BookOpen, ShieldCheck, Users } from 'lucide-react';
 
+const founderProfileUrl = 'https://www.facebook.com/emammehedi17';
+const founderPhotoUrl = '/founder-emam-mehedi.avif';
+
 export const AboutView: React.FC = () => {
   return (
     <div className="container mx-auto px-4 md:px-6 pt-28 pb-20 max-w-4xl">
@@ -55,9 +58,18 @@ export const AboutView: React.FC = () => {
 
       {/* Founder & Contributor Card */}
       <div className="bg-gradient-to-r from-white to-gray-50 dark:from-gray-800/90 dark:to-gray-800/60 border border-emerald-500/30 rounded-2xl p-6 md:p-8 shadow-md dark:shadow-xl flex flex-col sm:flex-row items-center gap-6">
-        <div className="w-20 h-20 rounded-full border-2 border-emerald-500 bg-emerald-50 dark:bg-gray-900 flex items-center justify-center text-2xl font-bold text-emerald-600 dark:text-emerald-400 shadow-md shrink-0">
-          EM
-        </div>
+        <a href={founderProfileUrl} target="_blank" rel="noopener noreferrer" aria-label="Emam Mehedi-এর Facebook profile" className="shrink-0">
+          <div className="relative w-20 h-20 overflow-hidden rounded-full border-2 border-emerald-500 bg-emerald-50 dark:bg-gray-900 flex items-center justify-center text-2xl font-bold text-emerald-600 dark:text-emerald-400 shadow-md">
+            <span>EM</span>
+            <img
+              src={founderPhotoUrl}
+              alt="Emam Mehedi"
+              referrerPolicy="no-referrer"
+              className="absolute inset-0 h-full w-full object-cover"
+              onError={(event) => { event.currentTarget.style.display = 'none'; }}
+            />
+          </div>
+        </a>
         <div>
           <div className="flex items-center gap-2">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Emam Mehedi</h3>
