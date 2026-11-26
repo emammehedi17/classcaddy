@@ -986,7 +986,10 @@
             if (!['light', 'dark', 'sepia', 'forest', 'midnight'].includes(value.theme)) value.theme = ['light', 'dark', 'sepia', 'forest', 'midnight'].includes(localStorage.getItem('class_caddy_theme')) ? localStorage.getItem('class_caddy_theme') : 'dark';
             if (!['sans-serif', 'amiri', 'hind-siliguri', 'kalpurush'].includes(value.banglaFont)) value.banglaFont = 'sans-serif';
             if (!['small', 'medium', 'large'].includes(value.readingSize)) value.readingSize = 'small';
-            if (!['bn', 'en'].includes(value.language)) value.language = localStorage.getItem('cc_home_lang') === 'en' ? 'en' : 'bn';
+            if (!['bn', 'en'].includes(value.language)) {
+                const savedLanguage = localStorage.getItem('cc_home_lang');
+                value.language = savedLanguage === 'bn' || savedLanguage === 'en' ? savedLanguage : 'en';
+            }
             const fontSize = value.readingSize === 'small' ? 14 : value.readingSize === 'large' ? 18 : 16;
             await setDoc(doc(db, `artifacts/${appId}/users/${auth.currentUser.uid}/settings`, 'preferences'), {
                 appSettings: value, darkMode: ['dark', 'forest', 'midnight'].includes(value.theme), fontSize,
@@ -10249,7 +10252,9 @@ function initSettingsSync(userId) {
                 const mergedSettings = { ...localPrefs, ...data.appSettings };
                 delete mergedSettings.__classCaddyParentSync;
                 localStorage.setItem('class_caddy_settings_v1', JSON.stringify(mergedSettings));
-                localStorage.setItem('cc_home_lang', mergedSettings.language || 'bn');
+                const savedLanguage = ['bn', 'en'].includes(mergedSettings.language) ? mergedSettings.language : (['bn', 'en'].includes(localStorage.getItem('cc_home_lang')) ? localStorage.getItem('cc_home_lang') : 'en');
+                mergedSettings.language = savedLanguage;
+                localStorage.setItem('cc_home_lang', savedLanguage);
                 window.dispatchEvent(new CustomEvent('classcaddy:settings-change', { detail: mergedSettings }));
             } else if (!embedded) {
                 try {
@@ -10353,8 +10358,10 @@ function applySettingsToDom() {
     document.documentElement.dataset.banglaFont = appPreferences.banglaFont || 'sans-serif';
     document.documentElement.dataset.readingSize = ['small', 'medium', 'large'].includes(appPreferences.readingSize) ? appPreferences.readingSize : 'small';
     document.documentElement.dataset.reduceMotion = String(appPreferences.reduceMotion === true);
-    document.documentElement.dataset.language = appPreferences.language || 'bn';
-    document.documentElement.lang = appPreferences.language || 'bn';
+    const savedLanguage = localStorage.getItem('cc_home_lang');
+    const language = ['bn', 'en'].includes(appPreferences.language) ? appPreferences.language : (['bn', 'en'].includes(savedLanguage) ? savedLanguage : 'en');
+    document.documentElement.dataset.language = language;
+    document.documentElement.lang = language;
     const darkTheme = ['dark', 'forest', 'midnight'].includes(theme);
     if (darkTheme) {
         document.body.classList.add('dark-mode');

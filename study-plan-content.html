@@ -19,7 +19,8 @@
           root.dataset.theme = theme;
           root.dataset.banglaFont = prefs.banglaFont || 'sans-serif';
           root.dataset.readingSize = ['small','medium','large'].includes(prefs.readingSize) ? prefs.readingSize : 'small';
-          root.dataset.language = prefs.language || localStorage.getItem('cc_home_lang') || 'bn';
+          var savedLanguage = localStorage.getItem('cc_home_lang');
+          root.dataset.language = prefs.language === 'en' || prefs.language === 'bn' ? prefs.language : (savedLanguage === 'en' || savedLanguage === 'bn' ? savedLanguage : 'en');
           if (isDark) {
             root.classList.add('dark');
             root.style.backgroundColor = theme === 'forest' ? '#10251f' : theme === 'midnight' ? '#080d1c' : '#0f172a';
@@ -1199,7 +1200,7 @@
 	
 	<div id="new-exam-ui-root" class="hidden" aria-hidden="true"></div>
 
-	<script type="module" src="app.js?v=2026112601" defer></script>
+	<script type="module" src="app.js?v=2026112602" defer></script>
 	<script type="module" src="exam-module/exam-ui.js?v=2026111701" defer></script>
 <script type="module" src="/src/installPrompt.ts"></script>
 </body>

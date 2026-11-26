@@ -6,7 +6,10 @@
     : (['light', 'dark', 'sepia', 'forest', 'midnight'].includes(localStorage.getItem('class_caddy_theme')) ? localStorage.getItem('class_caddy_theme') : 'dark');
   let font = ['sans-serif', 'amiri', 'hind-siliguri', 'kalpurush'].includes(settings.banglaFont)
     ? settings.banglaFont : 'sans-serif';
-  let language = settings.language === 'en' || localStorage.getItem('cc_home_lang') === 'en' ? 'en' : 'bn';
+  const savedLanguage = localStorage.getItem('cc_home_lang');
+  let language = settings.language === 'en' || settings.language === 'bn'
+    ? settings.language
+    : savedLanguage === 'bn' || savedLanguage === 'en' ? savedLanguage : 'en';
   const root = document.documentElement;
   const embedded = window.self !== window.top;
   if (embedded) {

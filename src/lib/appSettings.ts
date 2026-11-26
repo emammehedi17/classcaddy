@@ -12,7 +12,7 @@ export const APP_SETTINGS_KEY = 'class_caddy_settings_v1';
 export const DEFAULT_APP_SETTINGS: AppSettings = {
   theme: 'dark',
   banglaFont: 'sans-serif',
-  language: 'bn',
+  language: 'en',
   readingSize: 'small',
   reduceMotion: false,
   autoBackupEnabled: true,
@@ -32,7 +32,9 @@ export function loadAppSettings(): AppSettings {
       banglaFont: ['sans-serif', 'amiri', 'hind-siliguri', 'kalpurush'].includes(parsed.banglaFont)
         ? parsed.banglaFont
         : 'sans-serif',
-      language: parsed.language === 'en' || (!parsed.language && legacyLanguage === 'en') ? 'en' : 'bn',
+      language: parsed.language === 'en' || parsed.language === 'bn'
+        ? parsed.language
+        : legacyLanguage === 'bn' || legacyLanguage === 'en' ? legacyLanguage : 'en',
       readingSize: ['small', 'medium', 'large'].includes(parsed.readingSize)
         ? parsed.readingSize
         : 'small',

@@ -1385,13 +1385,19 @@ document.addEventListener('DOMContentLoaded', () => {
                             try { localSettings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}'); } catch (_) {}
                             const mergedSettings = { ...localSettings, ...pref.appSettings };
                             localStorage.setItem('class_caddy_settings_v1', JSON.stringify(mergedSettings));
-                            localStorage.setItem('cc_home_lang', mergedSettings.language || 'bn');
+                            const savedLanguage = mergedSettings.language === 'bn' || mergedSettings.language === 'en'
+                                ? mergedSettings.language
+                                : (localStorage.getItem('cc_home_lang') === 'bn' || localStorage.getItem('cc_home_lang') === 'en' ? localStorage.getItem('cc_home_lang') : 'en');
+                            mergedSettings.language = savedLanguage;
+                            localStorage.setItem('cc_home_lang', savedLanguage);
                             window.dispatchEvent(new CustomEvent('classcaddy:settings-change', { detail: mergedSettings }));
                         } else if (window.self === window.top && typeof pref.darkMode === 'boolean') {
                             const legacySettings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
                             legacySettings.theme = pref.darkMode ? 'dark' : 'light';
                             legacySettings.readingSize = pref.fontSize >= 18 ? 'large' : 'small';
-                            legacySettings.language = pref.language === 'en' ? 'en' : (legacySettings.language || 'bn');
+                            legacySettings.language = pref.language === 'bn' || pref.language === 'en'
+                                ? pref.language
+                                : (legacySettings.language === 'bn' || legacySettings.language === 'en' ? legacySettings.language : 'en');
                             localStorage.setItem('class_caddy_settings_v1', JSON.stringify(legacySettings));
                             window.dispatchEvent(new CustomEvent('classcaddy:settings-change', { detail: legacySettings }));
                             await window._classCaddySaveAppSettings?.(legacySettings);

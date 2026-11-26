@@ -34,7 +34,8 @@
           root.dataset.theme = theme;
           root.dataset.banglaFont = ['sans-serif', 'amiri', 'hind-siliguri', 'kalpurush'].includes(prefs.banglaFont) ? prefs.banglaFont : 'sans-serif';
           root.dataset.readingSize = ['small', 'medium', 'large'].includes(prefs.readingSize) ? prefs.readingSize : 'small';
-          root.dataset.language = prefs.language === 'en' || localStorage.getItem('cc_home_lang') === 'en' ? 'en' : 'bn';
+          var savedLanguage = localStorage.getItem('cc_home_lang');
+          root.dataset.language = prefs.language === 'en' || prefs.language === 'bn' ? prefs.language : (savedLanguage === 'en' || savedLanguage === 'bn' ? savedLanguage : 'en');
           if (isDark) {
             root.classList.add('dark');
             root.style.backgroundColor = theme === 'forest' ? '#10251f' : theme === 'midnight' ? '#080d1c' : '#0f172a';
@@ -143,7 +144,7 @@
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#059669">
   </head>
-<body class="lang-bn bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 selection:bg-emerald-500 selection:text-white">
+<body class="lang-en bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 selection:bg-emerald-500 selection:text-white">
 
 <!-- =================== HEADER START =================== -->
 <header class="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 border-b border-gray-200 dark:border-gray-800 main-website-ui shadow-sm">
@@ -1601,11 +1602,13 @@
         applyLanguage(lang);
     };
 
-    // Initialize saved language (Default: Bangla 'bn')
-    let initialLang = 'bn';
+    // The app settings are canonical; use the legacy key only when no modern preference exists.
+    let initialLang = 'en';
     try {
-        const stored = localStorage.getItem('cc_home_lang');
-        if (stored === 'en' || stored === 'bn') initialLang = stored;
+        const appSettings = JSON.parse(localStorage.getItem('class_caddy_settings_v1') || '{}');
+        const legacy = localStorage.getItem('cc_home_lang');
+        if (appSettings.language === 'en' || appSettings.language === 'bn') initialLang = appSettings.language;
+        else if (legacy === 'en' || legacy === 'bn') initialLang = legacy;
     } catch (e) {}
     applyLanguage(initialLang);
 
