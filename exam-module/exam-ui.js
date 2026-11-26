@@ -3064,7 +3064,7 @@ class NewExamSystemController {
 
                     <div>
                         <h3 style="margin:0 0 10px; font-size:0.98rem; font-weight:700;">Topic-wise Breakdown</h3>
-                        <div class="ex-table-wrap" style="max-height:260px; overflow-y:auto;">
+                        <div class="ex-table-wrap">
                             <table class="ex-tbl">
                                 <thead>
                                     <tr><th>Topic</th><th class="num">✓/Total</th><th class="num">Acc.</th><th>Level</th></tr>

@@ -705,8 +705,6 @@ html.dark #new-exam-ui-root {
 }
 
 .ex-topic-list {
-    max-height: 240px;
-    overflow-y: auto;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
     gap: 6px;
@@ -1182,14 +1180,12 @@ html.dark #new-exam-ui-root {
 
 /* Sticky Question Palette */
 .ex-palette-card {
-    position: sticky;
-    top: 84px;
+    /* Single-scroll: the modal root is the only scroller, no inner scrollbar */
+    position: static;
     background: var(--ex-surface);
     border: 1px solid var(--ex-line);
     border-radius: var(--ex-radius);
     padding: 14px;
-    max-height: calc(100vh - 104px);
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -1360,10 +1356,8 @@ html.dark #new-exam-ui-root {
 }
 
 .ex-omr-pane {
-    position: sticky;
-    top: 84px;
-    max-height: calc(100vh - 104px);
-    overflow: auto;
+    /* Single-scroll: the modal root is the only scroller, no inner scrollbar */
+    position: static;
     border: 1px solid var(--ex-line);
     border-radius: var(--ex-radius);
     background: var(--ex-omr-paper);
