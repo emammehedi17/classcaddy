@@ -89,6 +89,7 @@
 	<link rel="stylesheet" href="study-plan-styles.css">
 	<link rel="stylesheet" href="mcq-engine/mcq-engine.css">
 	<link rel="stylesheet" href="exam-module/exam-styles.css?v=2026112701">
+	<link rel="stylesheet" href="study-modals-v2.css?v=2026112702">
 
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="theme-color" content="#059669">
@@ -282,53 +283,46 @@
             </div> 
 			
 			<div id="result-sheet-modal" class="modal">
-      <div class="modal-content" style="max-width: 900px; max-height: 85vh; display: flex; flex-direction: column;">
-        <div class="modal-header-sticky">
-          <h3 class="text-2xl font-semibold text-emerald-600">My Quiz Results</h3>
-          <span class="modal-close" onclick="closeModal('result-sheet-modal')">&times;</span>
-        </div>
-    
-        <div class="flex border-b border-gray-200 mt-2">
-            <button id="tab-btn-by-day" class="result-tab-btn active-tab">
-                <i class="fas fa-calendar-day mr-2"></i> By Day
-            </button>
-            <button id="tab-btn-by-subject" class="result-tab-btn">
-                <i class="fas fa-tags mr-2"></i> By Subject
-            </button>
-            <button id="tab-btn-review-yourself" class="result-tab-btn">
-                <i class="fas fa-user-check mr-2"></i> Review Yourself
-            </button>
+      <div class="modal-content c2-sheet" role="dialog" aria-modal="true" aria-labelledby="results-title">
+        <div class="c2-head">
+          <div class="c2-head-ico amber"><i class="fas fa-chart-line"></i></div>
+          <div class="c2-head-text">
+            <h3 id="results-title" class="c2-title">My Quiz Results</h3>
+            <p class="c2-sub">Track your scores and trends, and review the questions you got wrong.</p>
+          </div>
+          <div class="c2-head-actions">
+            <button type="button" id="results-refresh-btn" class="c2-icon-btn" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+            <button type="button" class="c2-icon-btn" onclick="closeModal('result-sheet-modal')" title="Close"><i class="fas fa-times"></i></button>
+          </div>
         </div>
 
-        <div class="" style="overflow-y: auto; flex-grow: 1; padding-top: 1rem;">
-
-            <div id="tab-content-by-day" class="result-tab-content">
-                <div id="by-day-results-list" class="results-table-container">
-                    <p class="text-center text-gray-500 italic py-10">Loading all results by day...</p>
-                </div>
-            </div>
-
-            <div id="tab-content-by-subject" class="result-tab-content hidden">
-                <div id="subject-sub-tabs-nav" class="flex border-b border-gray-200 -mt-3 mb-2" style="overflow-x: auto;">
-                    </div>
-                <div id="subject-sub-tabs-content" class="results-table-container">
-                    </div>
-            </div>
-
-            <div id="tab-content-review-yourself" class="result-tab-content hidden">
-                <div class="flex gap-2 mb-4 border-b border-gray-100 pb-2">
-                    <button id="subtab-btn-wrong-ans" class="px-3 py-1 text-xs font-bold text-white bg-indigo-500 rounded-full shadow-sm">
-                        Wrong Answered
-                    </button>
-                </div>
-
-                <div id="review-wrong-ans-content" class="max-h-[55vh] overflow-y-auto custom-scrollbar space-y-4">
-                    <p class="text-center text-gray-500 italic py-10">Loading wrong answers...</p>
-                </div>
-            </div>
-
+        <div class="c2-tabs">
+          <button id="tab-btn-by-day" type="button" class="result-tab-btn active-tab"><i class="fas fa-calendar-day"></i> By Day</button>
+          <button id="tab-btn-by-subject" type="button" class="result-tab-btn"><i class="fas fa-tags"></i> By Subject</button>
+          <button id="tab-btn-review-yourself" type="button" class="result-tab-btn"><i class="fas fa-user-check"></i> Review Yourself</button>
         </div>
-    
+
+        <div class="c2-body">
+          <div id="tab-content-by-day" class="result-tab-content">
+            <div id="by-day-results-list" class="results-table-container">
+              <p class="text-center text-gray-500 italic py-10">Loading all results by day...</p>
+            </div>
+          </div>
+
+          <div id="tab-content-by-subject" class="result-tab-content hidden">
+            <div id="subject-sub-tabs-nav"></div>
+            <div id="subject-sub-tabs-content" class="results-table-container"></div>
+          </div>
+
+          <div id="tab-content-review-yourself" class="result-tab-content hidden">
+            <div class="rv-chips">
+              <button id="subtab-btn-wrong-ans" type="button" class="c2-chip active"><i class="fas fa-circle-xmark"></i> Wrong Answered</button>
+            </div>
+            <div id="review-wrong-ans-content">
+              <p class="text-center text-gray-500 italic py-10">Loading wrong answers...</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div id="view-saved-result-modal" class="modal" style="z-index: 110;">
@@ -522,27 +516,30 @@
 	
 
     <div id="all-vocab-modal" class="modal">
-      <div class="modal-content all-vocab-modal-content" style="max-width: 700px; max-height: 80vh; display: flex; flex-direction: column;">
-        
-        <div class="modal-header-sticky">
-          <h3 class="text-2xl font-semibold text-emerald-600">Master Vocabulary List</h3>
-          <span class="modal-close" onclick="closeModal('all-vocab-modal')">&times;</span>
+      <div class="modal-content c2-sheet" role="dialog" aria-modal="true" aria-labelledby="vocab-list-title">
+        <div class="c2-head">
+          <div class="c2-head-ico green"><i class="fas fa-book-open"></i></div>
+          <div class="c2-head-text">
+            <h3 id="vocab-list-title" class="c2-title">Master Vocabulary List</h3>
+            <p class="c2-sub">Search, hide meanings to self-test, listen to pronunciation and practise with flashcards.</p>
+          </div>
+          <div class="c2-head-actions">
+            <button type="button" id="vocab-refresh-btn" class="c2-icon-btn" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+            <button type="button" class="c2-icon-btn" onclick="closeModal('all-vocab-modal')" title="Close"><i class="fas fa-times"></i></button>
+          </div>
         </div>
-        
-        <div id="vocab-list-content" style="overflow-y: auto; flex-grow: 1;">
-            </div>
-			
-		<div id="vocab-modal-footer" class="modal-footer-sticky" style="display: flex; justify-content: space-between; align-items: center;">
-            <button id="show-quiz-center-btn" class="action-button" style="background-color: #4f46e5;">
-                <i class="fas fa-brain mr-1.5"></i> Test Yourself
-            </button>
-            <span>
-                Total Vocabularies: <span id="total-vocab-count" class="font-bold">0</span>
-            </span>
+
+        <div id="vocab-list-content" class="c2-body"></div>
+
+        <div id="vocab-modal-footer" class="c2-foot">
+          <button id="show-quiz-center-btn" type="button" class="c2-btn primary">
+            <i class="fas fa-brain"></i> Test Yourself
+          </button>
+          <span>Total vocabularies: <b id="total-vocab-count" style="color:var(--c2-text)">0</b></span>
         </div>
       </div>
     </div>
-    
+
     <div id="quiz-modal" class="modal" style="z-index: 120;">
       <div class="modal-content" style="max-width: 600px; padding-top: 35px; padding-right: 45px; overflow: hidden;">
         <span class="modal-close" onclick="closeQuizModal()">&times;</span>
@@ -917,26 +914,30 @@
       </div>
     </div>
     <div id="master-mcq-modal" class="modal">
-      <div class="modal-content" style="max-width: 600px; max-height: 85vh; display: flex; flex-direction: column;">
-        <div class="modal-header-sticky border-b pb-3 mb-4">
-          <h3 class="text-2xl font-semibold text-emerald-600">MCQ Repository</h3>
-          <p class="text-xs text-gray-500 mt-1">Select a specific topic, day, week, or month to study.</p>
-          <span class="modal-close text-3xl leading-none cursor-pointer hover:text-gray-800 text-gray-400" onclick="closeModal('master-mcq-modal')">&times;</span>
-        </div>
-        
-        <div id="master-mcq-menu-content" class="custom-scrollbar" style="overflow-y: auto; flex-grow: 1; padding-right: 5px;">
+      <div class="modal-content c2-sheet" role="dialog" aria-modal="true" aria-labelledby="mcq-repo-title">
+        <div class="c2-head">
+          <div class="c2-head-ico"><i class="fas fa-layer-group"></i></div>
+          <div class="c2-head-text">
+            <h3 id="mcq-repo-title" class="c2-title">MCQ Repository</h3>
+            <p class="c2-sub">Pick a month, week, day or subject to study, or search across everything.</p>
+          </div>
+          <div class="c2-head-actions">
+            <button type="button" id="mcq-repo-refresh-btn" class="c2-icon-btn" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+            <button type="button" class="c2-icon-btn" onclick="closeModal('master-mcq-modal')" title="Close"><i class="fas fa-times"></i></button>
+          </div>
         </div>
 
-        <div class="modal-footer-sticky border-t pt-3 mt-3 flex justify-between items-center">
-            <button id="show-mcq-quiz-center-btn" class="action-button" style="background-color: #4f46e5;">
-                <i class="fas fa-brain mr-1.5"></i> Test Yourself
-            </button>
+        <div id="master-mcq-menu-content" class="c2-body"></div>
+
+        <div class="c2-foot">
+          <span>Tap any subject to open the study view.</span>
+          <button id="show-mcq-quiz-center-btn" type="button" class="c2-btn primary">
+            <i class="fas fa-brain"></i> Test Yourself
+          </button>
         </div>
       </div>
     </div>
 
-   
-		
 	<div id="mcq-study-modal" class="modal" style="z-index: 106; overflow: hidden;">
 		<div class="modal-content cc-reader-modal-content" style="width: 96%; max-width: 1000px; height: 90dvh; display: flex; flex-direction: column; padding: 0; margin: 0;">
         
@@ -1200,7 +1201,7 @@
 	
 	<div id="new-exam-ui-root" class="hidden" aria-hidden="true"></div>
 
-	<script type="module" src="app.js?v=2026112602" defer></script>
+	<script type="module" src="app.js?v=2026112702" defer></script>
 	<script type="module" src="exam-module/exam-ui.js?v=2026112701" defer></script>
 <script type="module" src="/src/installPrompt.ts"></script>
 </body>

@@ -4,6 +4,7 @@
         import { initializeFirestore, setDoc, doc, getDoc, getDocFromServer, collection, query, getDocs, getDocsFromServer, onSnapshot, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, writeBatch, Timestamp, where, orderBy, setLogLevel, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import 'katex/dist/katex.min.css';
         import { McqImportWorkspace } from './mcq-engine/import-workspace.js';
+import { skeletonHtml, renderMcqRepository, renderVocabList, buildResultsView, initResultsInteractivity, primeResultViews } from './study-modals-v2.js';
         import {
             normalizeMcqItem,
             toStorageMcqList,
@@ -1736,97 +1737,71 @@ function updateMonthUI(monthId, monthData, weeksData) {
             const modal = document.getElementById('all-vocab-modal');
             const contentDiv = document.getElementById('vocab-list-content');
             const totalVocabCountSpan = document.getElementById('total-vocab-count');
-            
+            const refreshBtn = document.getElementById('vocab-refresh-btn');
+
             modal.style.display = "block";
-            contentDiv.innerHTML = getListSkeleton();
-            if (totalVocabCountSpan) totalVocabCountSpan.textContent = "...";
+
+            // Stale-while-revalidate: show the last loaded list instantly, then refresh in the background.
+            const cached = (window.__ccVocabCache && window.__ccVocabCache.uid === userId) ? window.__ccVocabCache.items : null;
+            if (cached) {
+                renderVocabList(contentDiv, cached);
+                if (totalVocabCountSpan) totalVocabCountSpan.textContent = cached.length;
+            } else {
+                contentDiv.innerHTML = skeletonHtml();
+                if (totalVocabCountSpan) totalVocabCountSpan.textContent = "...";
+            }
+            if (refreshBtn) refreshBtn.classList.add('spin');
             setSyncStatus("Loading...", "blue");
 
             try {
                 const plansCollectionPath = getUserPlansCollectionPath();
                 const q = query(collection(db, plansCollectionPath), orderBy(documentId(), "asc"));
-                const querySnapshot = await getDocs(q);
+                const monthsSnap = await getDocs(q);
 
-                let allVocabsHtml = '';
-                let totalVocabCount = 0;
-
-                if (querySnapshot.empty) {
-                    contentDiv.innerHTML = '<p class="text-center text-gray-500 italic py-10">No study plans found.</p>';
-                    if (totalVocabCountSpan) totalVocabCountSpan.textContent = "0";
-                    setSyncStatus("Synced", "green");
-                    return;
-                }
-
-                for (const docSnap of querySnapshot.docs) {
+                // Fetch every month's weeks in parallel (was one-by-one before).
+                const perMonth = await Promise.all(monthsSnap.docs.map(async (docSnap) => {
                     const monthId = docSnap.id;
-                    const monthData = docSnap.data();
-                    const monthName = monthData.monthName || monthId;
-                    
-                    // --- START: MODIFIED ---
-                    // Fetch the weeks subcollection for this month
-                    const weeksCollectionRef = collection(db, docSnap.ref.path, 'weeks');
-                    const weeksQuerySnapshot = await getDocs(weeksCollectionRef);
-                    // --- END: MODIFIED ---
-
-                    for (const weekDocSnap of weeksQuerySnapshot.docs) {
-                        const weekId = weekDocSnap.id;
+                    const monthName = docSnap.data().monthName || monthId;
+                    const weeksSnap = await getDocs(collection(db, docSnap.ref.path, 'weeks'));
+                    const weekDocs = weeksSnap.docs.slice().sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
+                    const out = [];
+                    for (const weekDocSnap of weekDocs) {
                         const weekData = weekDocSnap.data();
                         if (!weekData || !weekData.days) continue;
-
-                        let weekVocabs = [];
+                        const weekId = weekDocSnap.id;
+                        const weekLabel = weekId.replace('week', 'Week ');
                         for (const day of weekData.days) {
-                            for (const row of day.rows) {
+                            for (const row of (day.rows || [])) {
                                 if (row.subject?.toLowerCase() === 'vocabulary' && row.vocabData) {
-                                    weekVocabs.push(...row.vocabData);
+                                    for (const v of row.vocabData) {
+                                        if (!v || (!v.word && !v.meaning)) continue;
+                                        out.push({ word: v.word || '', meaning: v.meaning || '', antonym: v.antonym || '', monthId, monthName, weekId, weekLabel });
+                                    }
                                 }
                             }
                         }
-
-                        if (weekVocabs.length > 0) {
-                            totalVocabCount += weekVocabs.length;
-                            const weekTitle = weekId.replace('week', 'Week ');
-                            
-                            allVocabsHtml += `<h4>${weekTitle} - ${monthName}</h4>`;
-                            allVocabsHtml += `
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th class="sl-column">SL.</th>
-                                            <th>Word</th>
-                                            <th>Meaning</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        ${weekVocabs.map((v, index) => `
-                                            <tr>
-                                                <td class="sl-column">${index + 1}</td>
-                                                <td>${escapeHtml(v.word || '')}</td>
-                                                <td>${escapeHtml(v.meaning || '')}</td>
-                                            </tr>
-                                        `).join('')}
-                                    </tbody>
-                                </table>
-                            `;
-                        }
                     }
-                }
+                    return out;
+                }));
 
-                if (totalVocabCount === 0) {
-                    contentDiv.innerHTML = '<p class="text-center text-gray-500 italic py-10">You have not added any vocabularies to your study plans yet.</p>';
-                } else {
-                    contentDiv.innerHTML = allVocabsHtml;
-                }
-                
-                if (totalVocabCountSpan) totalVocabCountSpan.textContent = totalVocabCount;
+                const items = perMonth.flat();
+                window.__ccVocabCache = { uid: userId, items };
+                renderVocabList(contentDiv, items);
+                if (totalVocabCountSpan) totalVocabCountSpan.textContent = items.length;
                 setSyncStatus("Synced", "green");
 
             } catch (error) {
                 console.error("Error fetching all vocabularies:", error);
-                contentDiv.innerHTML = '<p class="text-center text-red-500 py-10">Could not load vocabularies. Please try again.</p>';
-                if (totalVocabCountSpan) totalVocabCountSpan.textContent = "Error";
+                if (!cached) {
+                    contentDiv.innerHTML = '<div class="c2-empty"><i class="fas fa-triangle-exclamation"></i><b>Could not load vocabularies</b>Please check your connection and press refresh.</div>';
+                    if (totalVocabCountSpan) totalVocabCountSpan.textContent = "Error";
+                }
                 setSyncStatus("Error", "red");
+            } finally {
+                if (refreshBtn) refreshBtn.classList.remove('spin');
             }
         }
+        document.getElementById('vocab-refresh-btn')?.addEventListener('click', displayAllVocabs);
         // --- END: ADD THIS FUNCTION ---
 		
 
@@ -7672,6 +7647,16 @@ showResultsSheetBtn.addEventListener('click', () => {
     resultSheetModal.style.display = 'block';
     loadAndDisplayResults();
 });
+initResultsInteractivity(byDayResultsList);
+initResultsInteractivity(subjectSubTabsContent);
+document.getElementById('results-refresh-btn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('results-refresh-btn');
+    btn?.classList.add('spin');
+    savedResultsCache = null;
+    await loadAndDisplayResults();
+    if (tabContentReviewYourself && !tabContentReviewYourself.classList.contains('hidden')) loadReviewWrongAnswers();
+    btn?.classList.remove('spin');
+});
 
 // --- Tab Switching (Updated for 3 Tabs) ---
 tabBtnByDay.addEventListener('click', () => {
@@ -7732,9 +7717,9 @@ async function loadAndDisplayResults() {
     }
 
     // Set loading state
-    byDayResultsList.innerHTML = getListSkeleton();
+    byDayResultsList.innerHTML = skeletonHtml();
     subjectSubTabsNav.innerHTML = '';
-    subjectSubTabsContent.innerHTML = getListSkeleton();
+    subjectSubTabsContent.innerHTML = skeletonHtml();
 
     try {
         console.log("Fetching results from Firestore...");
@@ -7765,6 +7750,7 @@ function renderResults(allResults) {
     const byDayStats = calculateOverallStats(allResults); // Stats for ALL results
     // We pass 'by-day' to createResultsTable to use the correct topicName
     byDayResultsList.innerHTML = createResultsTable(allResults, 'by-day', byDayStats);
+    primeResultViews(byDayResultsList);
 
     // --- 2. Render "By Subject" Tab ---
     
@@ -7811,6 +7797,8 @@ function renderResults(allResults) {
             `;
         }).join('');
 
+        primeResultViews(subjectSubTabsContent);
+
         // Add event listeners for sub-tabs
         subjectSubTabsNav.querySelectorAll('.result-tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -7856,95 +7844,10 @@ function calculateOverallStats(results) {
     };
 }
 
-function createResultsTable(results, tableType, stats) { 
-    if (results.length === 0) {
-        return `<p class="text-center text-gray-500 italic py-10">No results found for this view.</p>`;
-    }
-
-    const rows = results.map((res, index) => {
-        const date = res.saveTimestamp?.toDate ? res.saveTimestamp.toDate().toLocaleDateString('en-US', {
-            year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-        }) : 'N/A';
-        
-        let topicDisplayName = '';
-        if (tableType === 'by-day') {
-            topicDisplayName = res.topicName;
-        } else { 
-            topicDisplayName = res.topicDetail;
-        }
-        
-        const topicLinkHtml = `
-            <a href="${res.topicLink || '#'}" class="topic-link" 
-               data-link="${res.topicLink || '#'}" 
-               data-link-type="${res.topicLink?.startsWith('#day') ? 'day' : (res.topicLink ? 'modal' : 'none')}">
-                ${escapeHtml(topicDisplayName)}
-            </a>
-        `;
-        
-        // --- NEW COLUMN LOGIC ---
-        const weakPointBadge = res.isWeakness 
-            ? `<span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">Yes</span>` 
-            : `<span class="text-gray-300">-</span>`;
-        // ------------------------
-        
-        return `
-            <tr>
-                <td class="sl-col">${index + 1}</td>
-                <td class="date-col">${date}</td>
-                <td class="topic-col">${topicLinkHtml}</td>
-                
-                <td class="text-center">${weakPointBadge}</td> 
-                
-                <td class="score-col">${res.finalScore.toFixed(2)}</td>
-                <td class="score-col">${res.totalQuestions}</td>
-                <td class="time-col">${formatTime(res.timeTakenInSeconds)}</td> 
-                <td class="percent-col ${res.percentage >= 50 ? 'text-emerald-600' : 'text-red-600'}">${res.percentage}%</td>
-                <td class="view-col">
-                    <button class="action-button action-button-secondary text-xs view-saved-result-btn" data-result-id="${res.id}">
-                        <i class="fas fa-eye mr-1"></i> View
-                    </button>
-                </td>
-            </tr>
-        `;
-    }).join('');
-
-    const chartButtonType = (tableType === 'by-day') ? 'all' : 'subject';
-
-    return `
-        <table>
-            <thead>
-                <tr>
-                    <th class="sl-col">SL.</th>
-                    <th class="date-col">Date</th>
-                    <th class="topic-col">Exam Topic</th>
-                    
-                    <th class="text-center" style="width: 100px;">Weak Points</th>
-                    
-                    <th class="score-col">Obtained</th>
-                    <th class="score-col">Full</th> 
-                    <th class="time-col">Time Taken</th> 
-                    <th class="percent-col">Percentage</th>
-                    <th class="view-col">Summary</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${rows}
-            </tbody>
-            <tfoot>
-                <tr>
-                    <th colspan="4">Overall Performance</th> <th class="score-col">${stats.totalObtained.toFixed(2)}</th>
-                    <th class="score-col">${stats.totalFull}</th>
-                    <th class="time-col">${formatTime(stats.totalTime)}</th>
-                    <th class="percent-col">${stats.overallPercentage}%</th>
-                    <th class="view-col">
-                        <button class="action-button progress-chart-btn" data-chart-type="${chartButtonType}">
-                            <i class="fas fa-chart-line mr-1"></i> Your Progress
-                        </button>
-                        </th>
-                </tr>
-            </tfoot>
-        </table>
-    `;
+function createResultsTable(results, tableType, stats) {
+    // UI lives in study-modals-v2.js; the class names / data-attributes it emits
+    // (.view-saved-result-btn, .topic-link, .progress-chart-btn) keep the listeners below working.
+    return buildResultsView(results, tableType, stats, { formatTime });
 }
 
 // --- Attach Listeners for "View" Buttons ---
@@ -9578,122 +9481,77 @@ async function displayMcqMenu() {
     if (!auth.currentUser) { showCustomAlert("Please log in."); return; }
     
     masterMcqModal.style.display = "block";
-    masterMcqMenuContent.innerHTML = getListSkeleton();
+
+    const uid = auth.currentUser.uid;
+    const cached = (window.__ccMcqCache && window.__ccMcqCache.uid === uid) ? window.__ccMcqCache.months : null;
+    if (cached) renderMcqRepository(masterMcqMenuContent, cached);
+    else masterMcqMenuContent.innerHTML = skeletonHtml();
+
+    const refreshBtn = document.getElementById('mcq-repo-refresh-btn');
+    if (refreshBtn) refreshBtn.classList.add('spin');
 
     try {
-        const userId = auth.currentUser.uid;
         const appId = "study-plan17";
-        const q = query(collection(db, `artifacts/${appId}/users/${userId}/studyPlans`), orderBy(documentId(), "asc"));
-        const querySnapshot = await getDocs(q);
+        const q = query(collection(db, `artifacts/${appId}/users/${uid}/studyPlans`), orderBy(documentId(), "asc"));
+        const monthsSnap = await getDocs(q);
 
-        let html = '';
-        let totalLifetimeMcqs = 0;
-        let monthsHtml = '';
-
-        for (const docSnap of querySnapshot.docs) {
+        // Load every month's weeks in parallel (was sequential before).
+        const months = await Promise.all(monthsSnap.docs.map(async (docSnap) => {
             const monthId = docSnap.id;
-            const monthData = docSnap.data();
-            const monthName = monthData.monthName || monthId;
-            
-            // Fetch Weeks
-            const weeksRef = collection(db, docSnap.ref.path, 'weeks');
-            const weeksSnap = await getDocs(weeksRef);
-            const sortedWeeks = weeksSnap.docs.sort((a, b) => a.id.localeCompare(b.id));
+            const monthName = docSnap.data().monthName || monthId;
+            const weeksSnap = await getDocs(collection(db, docSnap.ref.path, 'weeks'));
+            const sortedWeeks = weeksSnap.docs.slice().sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
 
-            let monthMcqCount = 0;
-            let weeksHtml = '';
-
+            const weeks = [];
+            let monthCount = 0;
             for (const weekDoc of sortedWeeks) {
-                const weekId = weekDoc.id;
                 const weekData = weekDoc.data();
                 if (!weekData.days) continue;
 
-                let weekMcqCount = 0;
-                let daysHtml = '';
-
+                const days = [];
+                let weekCount = 0;
                 weekData.days.forEach(day => {
                     const subjectCounts = {};
                     let dayTotal = 0;
-
                     day.rows?.forEach(row => {
                         if (row.mcqData && row.mcqData.length > 0) {
                             const sub = row.subject || 'General';
-                            if (!subjectCounts[sub]) subjectCounts[sub] = 0;
-                            subjectCounts[sub] += row.mcqData.length;
+                            subjectCounts[sub] = (subjectCounts[sub] || 0) + row.mcqData.length;
                             dayTotal += row.mcqData.length;
                         }
                     });
-
                     if (dayTotal > 0) {
-                        weekMcqCount += dayTotal;
-                        const subjectBtns = Object.entries(subjectCounts).map(([sub, count]) => {
-                            // FIX: Use data attributes instead of onclick
-                            return `<button class="btn-mcq-subject" data-action="open-study" data-scope="subject" data-month-id="${monthId}" data-week-id="${weekId}" data-day-num="${day.dayNumber}" data-subject="${escapeHtml(sub)}">
-                                ${escapeHtml(sub)} (${count})
-                            </button>`;
-                        }).join('');
-
-                        daysHtml += `
-                            <div class="ml-4 mb-2 border-l-2 border-gray-200 pl-3">
-                                <div class="text-xs font-bold text-gray-400 mb-1">Day ${day.dayNumber}</div>
-                                <div class="flex flex-wrap">${subjectBtns}</div>
-                            </div>
-                        `;
+                        weekCount += dayTotal;
+                        days.push({
+                            dayNumber: day.dayNumber,
+                            total: dayTotal,
+                            subjects: Object.entries(subjectCounts).map(([name, count]) => ({ name, count }))
+                        });
                     }
                 });
 
-                if (weekMcqCount > 0) {
-                    monthMcqCount += weekMcqCount;
-                    weeksHtml += `
-                        <div class="mb-4">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm font-semibold text-indigo-600 uppercase tracking-wide">${weekId.replace('week', 'Week ')}</span>
-                                <button class="btn-mcq-week" data-action="open-study" data-scope="week" data-month-id="${monthId}" data-week-id="${weekId}">
-                                    Week Total (${weekMcqCount})
-                                </button>
-                            </div>
-                            ${daysHtml}
-                        </div>
-                    `;
+                if (weekCount > 0) {
+                    monthCount += weekCount;
+                    weeks.push({ weekId: weekDoc.id, label: weekDoc.id.replace('week', 'Week '), count: weekCount, days });
                 }
             }
+            return { monthId, monthName, count: monthCount, weeks };
+        }));
 
-            if (monthMcqCount > 0) {
-                totalLifetimeMcqs += monthMcqCount;
-                monthsHtml += `
-                    <div class="mcq-menu-section">
-                        <div class="mcq-menu-header">
-                            <span>${monthName}</span>
-                            <button class="btn-mcq-month" style="width:auto; margin:0; padding:4px 10px; font-size:0.8rem;" data-action="open-study" data-scope="month" data-month-id="${monthId}">
-                                Study Month (${monthMcqCount})
-                            </button>
-                        </div>
-                        <div class="mcq-menu-body">
-                            ${weeksHtml}
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        if (totalLifetimeMcqs > 0) {
-            html += `
-                <button class="btn-mcq-all" data-action="open-study" data-scope="all">
-                    <i class="fas fa-globe-asia mr-2"></i> Study All Lifetime MCQs (${totalLifetimeMcqs})
-                </button>
-            `;
-        } else {
-            html += `<p class="text-center text-gray-500">No MCQs found in your study plan.</p>`;
-        }
-
-        html += monthsHtml;
-        masterMcqMenuContent.innerHTML = html;
+        const withMcqs = months.filter(m => m.count > 0);
+        window.__ccMcqCache = { uid, months: withMcqs };
+        renderMcqRepository(masterMcqMenuContent, withMcqs);
 
     } catch (e) {
         console.error(e);
-        masterMcqMenuContent.innerHTML = '<p class="text-red-500 text-center">Error loading menu.</p>';
+        if (!cached) {
+            masterMcqMenuContent.innerHTML = '<div class="c2-empty"><i class="fas fa-triangle-exclamation"></i><b>Could not load the MCQ repository</b>Please check your connection and press refresh.</div>';
+        }
+    } finally {
+        if (refreshBtn) refreshBtn.classList.remove('spin');
     }
 }
+document.getElementById('mcq-repo-refresh-btn')?.addEventListener('click', displayMcqMenu);
 
 // --- NEW: Event Delegation for MCQ Repository ---
 if (masterMcqMenuContent) {
@@ -11264,7 +11122,7 @@ async function loadReviewWrongAnswers() {
     if (!currentUser || !userId) return;
 
     const container = document.getElementById('review-wrong-ans-content');
-    container.innerHTML = '<p class="text-center text-gray-500 italic py-10"><i class="fas fa-spinner fa-spin mr-2"></i>Loading your test history...</p>';
+    container.innerHTML = skeletonHtml(4);
 
     try {
         // 1. Get Results (Use Cache if available, otherwise fetch)
@@ -11283,14 +11141,7 @@ async function loadReviewWrongAnswers() {
         const wrongResults = results.filter(r => r.wrongCount > 0);
 
         if (wrongResults.length === 0) {
-            container.innerHTML = `
-                <div class="text-center py-10">
-                    <div class="bg-emerald-50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-check text-emerald-500 text-2xl"></i>
-                    </div>
-                    <p class="text-gray-600 font-medium">Great job! No wrong answers recorded.</p>
-                    <p class="text-gray-400 text-sm">Or you haven't taken any tests yet.</p>
-                </div>`;
+            container.innerHTML = `<div class="c2-empty"><i class="fas fa-circle-check" style="color:var(--c2-good);opacity:.8"></i><b>Great job! No wrong answers recorded.</b>Or you haven't taken any tests yet.</div>`;
             return;
         }
 
@@ -11306,17 +11157,15 @@ async function loadReviewWrongAnswers() {
 
         // 4. Build UI Structure (Tabs + Content Area)
         let html = `
-            <div class="flex gap-2 mb-4 overflow-x-auto pb-2 custom-scrollbar border-b border-gray-100" id="wrong-ans-subject-nav">
+            <div class="rv-chips" id="wrong-ans-subject-nav">
                 ${subjects.map((sub, idx) => `
-                    <button class="px-3 py-1.5 text-xs font-semibold rounded-full border transition-colors whitespace-nowrap
-                        ${idx === 0 ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}"
-                        data-subject="${escapeHtml(sub)}">
-                        ${escapeHtml(sub)} <span class="ml-1 opacity-75 text-[10px] bg-white/50 px-1 rounded">${grouped[sub].length}</span>
+                    <button type="button" class="c2-chip ${idx === 0 ? 'active' : ''}" data-subject="${escapeHtml(sub)}">
+                        ${escapeHtml(sub)} <span class="n">${grouped[sub].length}</span>
                     </button>
                 `).join('')}
             </div>
 
-            <div id="wrong-ans-list-container" class="space-y-3">
+            <div id="wrong-ans-list-container" class="rv-list">
                 </div>
         `;
 
@@ -11332,30 +11181,17 @@ async function loadReviewWrongAnswers() {
             const listHtml = tests.map(res => {
                 const date = res.saveTimestamp?.toDate ? res.saveTimestamp.toDate().toLocaleDateString() : 'N/A';
                 return `
-                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <div class="flex-grow min-w-0">
-                        <h4 class="font-bold text-gray-800 text-sm truncate" title="${escapeHtml(res.topicName)}">
-                            ${escapeHtml(res.topicDetail || res.topicName)}
-                        </h4>
-                        <div class="text-xs text-gray-500 mt-1 flex items-center gap-3">
-                            <span><i class="far fa-calendar-alt mr-1"></i>${date}</span>
-                            <span><i class="fas fa-list-ol mr-1"></i>${res.totalQuestions} Qs</span>
+                <div class="rv-card">
+                    <div style="min-width:0;flex:1 1 220px">
+                        <h4 title="${escapeHtml(res.topicName)}">${escapeHtml(res.topicDetail || res.topicName)}</h4>
+                        <div class="rv-meta">
+                            <span><i class="far fa-calendar-alt"></i> ${date}</span>
+                            <span><i class="fas fa-list-ol"></i> ${res.totalQuestions} Qs</span>
                         </div>
                     </div>
-                    
-                    <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-gray-100 pt-3 sm:pt-0">
-                        <div class="text-right">
-                            <div class="text-red-600 font-bold text-sm whitespace-nowrap">
-                                ${res.wrongCount} Wrong
-                            </div>
-                            <div class="text-[10px] text-gray-400">Score: ${res.percentage}%</div>
-                        </div>
-                        
-                        <button class="action-button text-xs view-wrong-qs-btn" 
-                                data-result-id="${res.id}" 
-                                style="background-color: #4f46e5; padding: 6px 12px;">
-                            View
-                        </button>
+                    <div class="rv-right">
+                        <div class="rv-wrong"><b>${res.wrongCount} wrong</b><small>Score ${res.percentage}%</small></div>
+                        <button type="button" class="c2-btn sm primary view-wrong-qs-btn" data-result-id="${res.id}"><i class="fas fa-eye"></i> Review</button>
                     </div>
                 </div>`;
             }).join('');
@@ -11373,10 +11209,8 @@ async function loadReviewWrongAnswers() {
             if (!btn) return;
 
             // Update Active State
-            navContainer.querySelectorAll('button').forEach(b => {
-                b.className = `px-3 py-1.5 text-xs font-semibold rounded-full border transition-colors whitespace-nowrap bg-white text-gray-600 border-gray-200 hover:bg-gray-50`;
-            });
-            btn.className = `px-3 py-1.5 text-xs font-semibold rounded-full border transition-colors whitespace-nowrap bg-indigo-100 text-indigo-700 border-indigo-200`;
+            navContainer.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
 
             // Render Content
             renderList(btn.dataset.subject);
