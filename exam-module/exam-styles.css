@@ -1186,8 +1186,16 @@ html.dark #new-exam-ui-root {
 
 /* Sticky Question Palette */
 .ex-palette-card {
-    /* Single-scroll: the modal root is the only scroller, no inner scrollbar */
-    position: static;
+    /* Stays pinned while the page scrolls. If a long palette (e.g. 200 Qs) is
+       taller than the screen it scrolls internally with an INVISIBLE scrollbar,
+       so the modal still shows exactly one scrollbar. */
+    position: sticky;
+    top: 84px;
+    max-height: calc(100vh - 104px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     background: var(--ex-surface);
     border: 1px solid var(--ex-line);
     border-radius: var(--ex-radius);
@@ -1361,9 +1369,18 @@ html.dark #new-exam-ui-root {
     color: var(--ex-red);
 }
 
+.ex-palette-card::-webkit-scrollbar,
+.ex-omr-pane::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
 .ex-omr-pane {
-    /* Single-scroll: the modal root is the only scroller, no inner scrollbar */
-    position: static;
+    /* Pinned beside the questions; internal scroll (if needed) has no visible bar */
+    position: sticky;
+    top: 84px;
+    max-height: calc(100vh - 104px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     border: 1px solid var(--ex-line);
     border-radius: var(--ex-radius);
     background: var(--ex-omr-paper);
